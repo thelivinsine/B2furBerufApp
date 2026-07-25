@@ -7,13 +7,13 @@ import { themes, themeById } from "@/data/themes";
 import {
   eligibleTasks,
   randomTask,
-  taskText,
+  taskAt,
   type WritingTaskRef,
 } from "@/lib/writingScope";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
-import { WritingRail } from "./WritingRail";
+import { WritingRail, WRITING_FORMATS, WRITING_LEVELS, writingFormatLabel } from "./WritingRail";
 import { UmlautKeys } from "./UmlautKeys";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { Card, CardContent } from "@/components/ui/card";
@@ -79,11 +79,15 @@ export function GuidedWritingTrainer({
   const sub = themeById(themeScope)?.subThemes?.some((s) => s.id === subParam) ? subParam : "";
   const sectorParam = params.get("sector") ?? "";
   const sector = SECTOR_OPTIONS.some((o) => o.value === sectorParam) ? sectorParam : "";
+  const levelParam = params.get("level") ?? "";
+  const level = WRITING_LEVELS.some((l) => l.value === levelParam) ? levelParam : "";
+  const formatParam = params.get("format") ?? "";
+  const format = WRITING_FORMATS.includes(formatParam) ? formatParam : "";
 
   // ONE selection rule, shared with the rail's option counts (`lib/writingScope`).
   const eligible = useMemo(
-    () => eligibleTasks({ theme: themeScope, sub, sector, length }),
-    [themeScope, length, sub, sector],
+    () => eligibleTasks({ theme: themeScope, sub, sector, level, format, length }),
+    [themeScope, length, sub, sector, level, format],
   );
 
   const [drawn, setDrawn] = useState<WritingTaskRef>(() =>
@@ -103,9 +107,9 @@ export function GuidedWritingTrainer({
   // Reset draft + result and draw a fresh random Aufgabe when the task scope
   // (theme, length, Unterthema or Branche) changes, but NOT on mount (so a
   // resumed draft survives). keyRef is seeded with the initial scope.
-  const keyRef = useRef(`${themeScope}|${length}|${sub}|${sector}`);
+  const keyRef = useRef(`${themeScope}|${length}|${sub}|${sector}|${level}|${format}`);
   useEffect(() => {
-    const key = `${themeScope}|${length}|${sub}|${sector}`;
+    const key = `${themeScope}|${length}|${sub}|${sector}|${level}|${format}`;
     if (keyRef.current !== key) {
       keyRef.current = key;
       setText("");
@@ -113,7 +117,7 @@ export function GuidedWritingTrainer({
       setDrawn(randomTask(eligible));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themeScope, length, sub, sector]);
+  }, [themeScope, length, sub, sector, level, format]);
 
   const setTheme = (id: ThemeId | "") => {
     const p = new URLSearchParams(params);
@@ -136,6 +140,18 @@ export function GuidedWritingTrainer({
     else p.delete("sector");
     setParams(p);
   };
+  const setLevel = (l: string) => {
+    const p = new URLSearchParams(params);
+    if (l) p.set("level", l);
+    else p.delete("level");
+    setParams(p);
+  };
+  const setFormat = (f: string) => {
+    const p = new URLSearchParams(params);
+    if (f) p.set("format", f);
+    else p.delete("format");
+    setParams(p);
+  };
 
   // The dice: another random Aufgabe within the current scope. Keeps any
   // typed text (a mis-tap must not destroy work) but clears a stale result.
@@ -153,8 +169,10 @@ export function GuidedWritingTrainer({
     p.delete("theme");
     p.delete("sub");
     p.delete("sector");
+    p.delete("level");
+    p.delete("format");
     setParams(p);
-    const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", length });
+    const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", level: "", format: "", length });
     setDrawn((cur) => randomTask(fullPool, cur));
     setResult(null);
     setDiceSpin((d) => d + 180);
@@ -179,8 +197,13 @@ export function GuidedWritingTrainer({
   // The eyebrow names the DRAWN task's theme, which under "Alle Themen" is the
   // only place the learner learns what they are writing about.
   const t = themeById(drawn.theme)!;
-  const prompt = taskText(drawn, length);
-  const [min, max] = rangeByLength[length];
+  const task = taskAt(drawn, length);
+  const prompt = task?.text ?? "";
+  // Word target: per task where the Aufgabe declares one (real exam targets run
+  // 40 to 200 and do NOT share one number), else the mode default (s167).
+  const [min, max] = task?.words
+    ? [task.words, Math.round(task.words * 1.25)]
+    : rangeByLength[length];
   const enough = words >= Math.floor(min * 0.6);
   const minWords = 5;
   const remaining = Math.max(0, minWords - words);
@@ -237,7 +260,7 @@ export function GuidedWritingTrainer({
                 Aufgabe: {t.titleDe}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Ziel {min}–{max} Wörter
+                {task?.format ? `${writingFormatLabel(task.format)} · ` : ""}Ziel {min}–{max} Wörter
               </p>
             </div>
             {/* Standard 40px icon-button size; the icon half-spins per roll. */}
@@ -263,6 +286,34 @@ export function GuidedWritingTrainer({
           >
             {prompt}
           </motion.p>
+          {/* Inhaltspunkte: what an examiner actually grades (Goethe
+              "Erfüllung", telc "Berücksichtigung der Leitpunkte"), so they are
+              part of the Aufgabe, not decoration. Only tasks upgraded to the
+              s167 schema carry them; the rest render as before. */}
+          {task?.points?.length ? (
+            <motion.div
+              key={`points|${drawn.theme}|${length}|${drawn.ix}`}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-1.5"
+            >
+              {task.addressee && (
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-accent-ink">An:</span> {task.addressee}
+                  {task.register === "sie" ? " (Sie)" : task.register === "du" ? " (du)" : ""}
+                </p>
+              )}
+              <ul className="space-y-1">
+                {task.points.map((point) => (
+                  <li key={point} className="flex gap-2 text-sm leading-relaxed">
+                    <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -395,6 +446,10 @@ export function GuidedWritingTrainer({
               <WritingRail
                 layout="panel"
                 value={themeScope}
+                level={level}
+                onLevelChange={setLevel}
+                format={format}
+                onFormatChange={setFormat}
                 onChange={(id) => {
                   setTheme(id);
                   setPickerOpen(false);
@@ -418,6 +473,10 @@ export function GuidedWritingTrainer({
         <WritingRail
           value={themeScope}
           onChange={setTheme}
+          level={level}
+          onLevelChange={setLevel}
+          format={format}
+          onFormatChange={setFormat}
           sub={sub}
           onSubChange={setSub}
           sector={sector}

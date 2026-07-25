@@ -1,5 +1,5 @@
 import { themes } from "@/data/themes";
-import { writingPrompts } from "@/data/writingPrompts";
+import { writingPrompts, type WritingTask } from "@/data/writingPrompts";
 import type { ThemeId, WorkSector } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 
@@ -45,39 +45,100 @@ export interface WritingScope {
   sub: string;
   /** "" = all Branchen. */
   sector: string;
+  /** "" = alle Niveaus. Untagged tasks show at every Niveau. */
+  level?: string;
+  /** "" = alle Textsorten. Untagged tasks show under every Textsorte. */
+  format?: string;
   length: WritingLength;
 }
 
 const ALL_THEME_IDS: ThemeId[] = themes.map((t) => t.id);
 
 /** Every task the scope allows, in theme order. Never empty. */
-export function eligibleTasks({ theme, sub, sector, length }: WritingScope): WritingTaskRef[] {
+export function eligibleTasks({
+  theme,
+  sub,
+  sector,
+  level,
+  format,
+  length,
+}: WritingScope): WritingTaskRef[] {
   const out: WritingTaskRef[] = [];
   for (const id of theme ? [theme] : ALL_THEME_IDS) {
     const pool = writingPrompts[id]?.[length] ?? [];
     if (!pool.length) continue;
     let ix = pool.map((_, i) => i);
     if (theme && sub) ix = ix.filter((i) => pool[i].sub === sub);
-    if (sector) {
-      const tagged = ix.filter((i) => pool[i].sectors?.includes(sector as WorkSector));
-      ix = tagged.length ? tagged : ix.filter((i) => !pool[i].sectors?.length);
-    }
-    // A theme in scope never contributes nothing.
-    if (!ix.length) ix = pool.map((_, i) => i);
+    // Every tag axis narrows the same way: take the tasks tagged with the
+    // chosen value, else the untagged ones, else keep what we had. Narrowing to
+    // nothing is never allowed, so no scope can empty the picker.
+    const narrow = (has: (i: number) => boolean, untagged: (i: number) => boolean) => {
+      const tagged = ix.filter(has);
+      if (tagged.length) return void (ix = tagged);
+      const universal = ix.filter(untagged);
+      if (universal.length) ix = universal;
+    };
+    if (sector)
+      narrow(
+        (i) => !!pool[i].sectors?.includes(sector as WorkSector),
+        (i) => !pool[i].sectors?.length,
+      );
+    // Niveau and Textsorte PREFER their tagged tasks rather than admitting every
+    // untagged one alongside (s167 fix). Untagged-=-universal is right for
+    // Branche, because general vocabulary really does apply to every industry,
+    // but an untagged task is not "every level" and certainly not "every
+    // Textsorte": while the bank upgrades in waves the untagged legacy tasks
+    // outnumber the tagged ones roughly ten to one, so admitting them made
+    // "C1.1 + Widerspruch" serve a B1 address-change mail.
+    if (level)
+      narrow(
+        (i) => pool[i].level === level,
+        (i) => !pool[i].level,
+      );
+    if (format)
+      narrow(
+        (i) => pool[i].format === format,
+        (i) => !pool[i].format,
+      );
     out.push(...ix.map((i) => ({ theme: id, ix: i })));
   }
   return out;
 }
 
-/** How many tasks a scope yields; the number every rail dropdown shows. */
+/** How many tasks a scope yields; the number the Branche/Thema/Unterthema
+ *  dropdowns show. Never zero, because those axes always fall back. */
 export function countTasks(scope: WritingScope): number {
   return eligibleTasks(scope).length;
 }
 
+/**
+ * How many tasks genuinely CARRY the chosen Niveau/Textsorte, with no fallback.
+ * Those two dropdowns count with this and grey out at zero: a Branche can
+ * honestly serve untagged tasks (general vocabulary suits every industry), but
+ * "Forumsbeitrag" that quietly serves a Notiz is a lie. Forumsbeitrag exists
+ * only as a Lang task, so under Kurz it correctly reads as unavailable.
+ */
+export function countExact(scope: WritingScope): number {
+  const { level, format, length } = scope;
+  if (!level && !format) return eligibleTasks(scope).length;
+  // Drop the two axes from the fallback pass, then filter hard.
+  return eligibleTasks({ ...scope, level: "", format: "" }).filter((ref) => {
+    const t = writingPrompts[ref.theme]?.[length]?.[ref.ix];
+    if (!t) return false;
+    return (!level || t.level === level) && (!format || t.format === format);
+  }).length;
+}
+
+/** The task behind a ref, with a safe fallback for stale refs (a resumed draft
+ *  can point past the end of a pool that has since been re-authored). */
+export function taskAt(ref: WritingTaskRef, length: WritingLength): WritingTask | undefined {
+  const pool = writingPrompts[ref.theme]?.[length] ?? [];
+  return pool[ref.ix] ?? pool[0];
+}
+
 /** The task text behind a ref, with a safe fallback for stale refs. */
 export function taskText(ref: WritingTaskRef, length: WritingLength): string {
-  const pool = writingPrompts[ref.theme]?.[length] ?? [];
-  return (pool[ref.ix] ?? pool[0])?.text ?? "";
+  return taskAt(ref, length)?.text ?? "";
 }
 
 export function sameTask(a: WritingTaskRef | null, b: WritingTaskRef | null): boolean {

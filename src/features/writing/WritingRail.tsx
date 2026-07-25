@@ -4,7 +4,7 @@ import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { domains } from "@/data/domains";
 import { SECTOR_OPTIONS } from "@/lib/facets";
-import { countTasks } from "@/lib/writingScope";
+import { countExact, countTasks } from "@/lib/writingScope";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,77 @@ import { cn } from "@/lib/utils";
  * folds into Alltag** in the Thema grouping (founder rule).
  */
 
+/** Niveau options: the three levels the Schreiben module targets (founder
+ *  s167). `ContentCefr` is the shared content band, so B2 spans B2.1/B2.2 and
+ *  the coarse label is what the learner picks. */
+export const WRITING_LEVELS: { value: string; label: string }[] = [
+  { value: "B1.2", label: "B1" },
+  { value: "B2.1", label: "B2" },
+  { value: "C1", label: "C1.1" },
+];
+
+/** Textsorte options, grouped by family so a 16-value list stays scannable. */
+const FORMAT_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+  {
+    label: "E-Mail & Nachricht",
+    options: [
+      { value: "email_informell", label: "E-Mail (privat)" },
+      { value: "email_halbformell", label: "E-Mail (halbformell)" },
+      { value: "email_formell", label: "E-Mail (formell)" },
+      { value: "nachricht", label: "Kurznachricht" },
+      { value: "notiz", label: "Notiz" },
+      { value: "uebergabe", label: "Übergabe" },
+    ],
+  },
+  {
+    label: "Meinung & Öffentlichkeit",
+    options: [
+      { value: "forumsbeitrag", label: "Forumsbeitrag" },
+      { value: "stellungnahme", label: "Stellungnahme" },
+    ],
+  },
+  {
+    label: "Bericht",
+    options: [
+      { value: "bericht", label: "Bericht" },
+      { value: "protokoll", label: "Protokoll" },
+    ],
+  },
+  {
+    label: "Beschwerde & Antrag",
+    options: [
+      { value: "beschwerde", label: "Beschwerde" },
+      { value: "reklamation", label: "Reklamation" },
+      { value: "antrag", label: "Antrag" },
+      { value: "widerspruch", label: "Widerspruch" },
+      { value: "kuendigung", label: "Kündigung" },
+      { value: "bewerbung", label: "Bewerbung" },
+    ],
+  },
+];
+
+const FORMAT_LABEL: Record<string, string> = Object.fromEntries(
+  FORMAT_GROUPS.flatMap((g) => g.options).map((o) => [o.value, o.label]),
+);
+
+/** Valid Textsorte values, for URL-param validation in the trainer. */
+export const WRITING_FORMATS: string[] = FORMAT_GROUPS.flatMap((g) => g.options).map(
+  (o) => o.value,
+);
+
+/** Learner-facing Textsorte label, e.g. for the Aufgabe card. */
+export const writingFormatLabel = (format: string): string => FORMAT_LABEL[format] ?? format;
+
 interface WritingRailProps {
   /** Selected Thema ("" = all Themen). */
   value: ThemeId | "";
   onChange: (id: ThemeId | "") => void;
+  /** Selected Niveau ("" = alle Niveaus). */
+  level: string;
+  onLevelChange: (level: string) => void;
+  /** Selected Textsorte ("" = alle Textsorten). */
+  format: string;
+  onFormatChange: (format: string) => void;
   /** Selected sub-theme slug ("" = whole theme). */
   sub: string;
   onSubChange: (sub: string) => void;
@@ -183,6 +250,10 @@ function ScopeSelect({
 export function WritingRail({
   value,
   onChange,
+  level,
+  onLevelChange,
+  format,
+  onFormatChange,
   sub,
   onSubChange,
   sector,
@@ -203,14 +274,53 @@ export function WritingRail({
   // counted only sector-TAGGED tasks and greyed out at zero, which contradicted
   // the untagged-=-universal rule and made most Branchen look unavailable while
   // the engine would have served the full pool behind them.
-  const countWith = (over: Partial<{ theme: ThemeId | ""; sub: string; sector: string }>) =>
-    countTasks({ theme: value, sub, sector, length, ...over });
+  const countWith = (
+    over: Partial<{
+      theme: ThemeId | "";
+      sub: string;
+      sector: string;
+      level: string;
+      format: string;
+    }>,
+  ) => countTasks({ theme: value, sub, sector, level, format, length, ...over });
+
+  // Niveau and Textsorte count WITHOUT the fallback and grey out at zero: they
+  // are not universal axes, so an option that would silently serve a different
+  // Textsorte must read as unavailable rather than as a match.
+  const countExactWith = (over: Partial<{ level: string; format: string }>) =>
+    countExact({ theme: value, sub, sector, level, format, length, ...over });
 
   const sectionLabel = "text-xs font-semibold uppercase tracking-wide text-muted-foreground";
 
   const body = (
     <div className="space-y-4">
-      {/* Bibliothek hierarchy order: Branche -> Thema -> Unterthema. */}
+      {/* Niveau -> Branche -> Thema -> Unterthema -> Textsorte (s167): the
+          Bibliothek hierarchy with the level axis in front (it is the coarsest
+          scope) and Textsorte last (it narrows within everything else). */}
+      <section>
+        <p className={cn("mb-2", sectionLabel)}>Niveau</p>
+        <ScopeSelect
+          ariaLabel="Niveau"
+          triggerLabel={
+            level ? WRITING_LEVELS.find((l) => l.value === level)?.label ?? level : "Alle Niveaus"
+          }
+          value={level}
+          onChange={onLevelChange}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
+                ...WRITING_LEVELS.map((l) => {
+                  const count = countExactWith({ level: l.value });
+                  return { value: l.value, label: l.label, count, disabled: count === 0 };
+                }),
+              ],
+            },
+          ]}
+        />
+      </section>
+
       <section>
         <p className={cn("mb-2", sectionLabel)}>Branche</p>
         <ScopeSelect
@@ -288,6 +398,31 @@ export function WritingRail({
           />
         </section>
       )}
+
+      <section>
+        <p className={cn("mb-2", sectionLabel)}>Textsorte</p>
+        <ScopeSelect
+          ariaLabel="Textsorte"
+          triggerLabel={format ? FORMAT_LABEL[format] ?? format : "Alle Textsorten"}
+          value={format}
+          onChange={onFormatChange}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Textsorten", count: countWith({ format: "" }) },
+              ],
+            },
+            ...FORMAT_GROUPS.map((g) => ({
+              label: g.label,
+              options: g.options.map((o) => {
+                const count = countExactWith({ format: o.value });
+                return { value: o.value, label: o.label, count, disabled: count === 0 };
+              }),
+            })),
+          ]}
+        />
+      </section>
     </div>
   );
 

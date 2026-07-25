@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { countTasks, eligibleTasks, randomTask, sameTask, taskText } from "@/lib/writingScope";
+import {
+  countExact,
+  countTasks,
+  eligibleTasks,
+  randomTask,
+  sameTask,
+  taskText,
+} from "@/lib/writingScope";
 import { writingPrompts } from "@/data/writingPrompts";
 import { themes } from "@/data/themes";
 import { SECTOR_OPTIONS } from "@/lib/facets";
@@ -84,6 +91,136 @@ describe("eligibleTasks", () => {
     for (const length of LENGTHS) {
       for (const ref of eligibleTasks({ theme: "", sub: "", sector: "", length })) {
         expect(taskText(ref, length).length).toBeGreaterThan(0);
+      }
+    }
+  });
+});
+
+describe("Niveau and Textsorte axes (s167)", () => {
+  const LEVELS = ["B1.2", "B2.1", "C1"];
+
+  it("every Niveau yields tasks under every Thema and length", () => {
+    for (const length of LENGTHS) {
+      for (const level of LEVELS) {
+        expect(countTasks({ theme: "", sub: "", sector: "", level, length })).toBeGreaterThan(0);
+        for (const id of THEME_IDS) {
+          const n = countTasks({ theme: id, sub: "", sector: "", level, length });
+          expect(n, `${id}/${length}/${level}`).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it("REGRESSION: a Niveau filter serves ONLY that level where tagged tasks exist", () => {
+    // Untagged-=-universal is right for Branche but wrong here: legacy tasks
+    // outnumber tagged ones ~10:1, so admitting them made a C1.1 scope serve a
+    // B1 task. Every theme now has a tagged task at every level, so the filter
+    // must be exact.
+    for (const length of LENGTHS) {
+      for (const level of LEVELS) {
+        for (const ref of eligibleTasks({ theme: "", sub: "", sector: "", level, length })) {
+          const task = writingPrompts[ref.theme][length][ref.ix];
+          expect(task.level, `${ref.theme}/${length}[${ref.ix}]`).toBe(level);
+        }
+      }
+    }
+  });
+
+  it("REGRESSION: a Textsorte filter serves that format wherever it exists", () => {
+    for (const format of ["email_formell", "forumsbeitrag", "widerspruch", "bericht"]) {
+      for (const length of LENGTHS) {
+        const exists = THEME_IDS.some((id) =>
+          writingPrompts[id][length].some((t) => t.format === format),
+        );
+        const tasks = eligibleTasks({ theme: "", sub: "", sector: "", format, length });
+        expect(tasks.length).toBeGreaterThan(0);
+        if (!exists) continue; // e.g. Forumsbeitrag is a Lang-only Textsorte
+        expect(tasks.some((r) => writingPrompts[r.theme][length][r.ix].format === format)).toBe(
+          true,
+        );
+      }
+    }
+  });
+
+  it("countExact reports 0 for a Textsorte that does not exist at this length", () => {
+    // Forumsbeitrag is a Lang shape only; the Kurz dropdown must grey it out
+    // instead of quietly serving a Notiz under a Forumsbeitrag label.
+    expect(countExact({ theme: "", sub: "", sector: "", format: "forumsbeitrag", length: "long" }))
+      .toBeGreaterThan(0);
+    expect(
+      countExact({ theme: "", sub: "", sector: "", format: "forumsbeitrag", length: "short" }),
+    ).toBe(0);
+  });
+
+  it("countExact never exceeds the fallback count", () => {
+    for (const length of LENGTHS) {
+      for (const level of LEVELS) {
+        const scope = { theme: "" as const, sub: "", sector: "", level, length };
+        expect(countExact(scope)).toBeLessThanOrEqual(countTasks(scope));
+      }
+    }
+  });
+
+  it("REGRESSION: Niveau + Textsorte together honour BOTH tags", () => {
+    // The exact case caught on screen: C1.1 + Widerspruch under Behörden must
+    // draw the C1 Widerspruch, not an untagged legacy mail.
+    const tasks = eligibleTasks({
+      theme: "behoerde",
+      sub: "",
+      sector: "",
+      level: "C1",
+      format: "widerspruch",
+      length: "short",
+    });
+    expect(tasks.length).toBeGreaterThan(0);
+    for (const ref of tasks) {
+      const task = writingPrompts[ref.theme].short[ref.ix];
+      expect(task.level).toBe("C1");
+      expect(task.format).toBe("widerspruch");
+      expect(task.words).toBeGreaterThan(60);
+    }
+  });
+
+  it("Niveau and Textsorte combine without emptying the pool", () => {
+    for (const length of LENGTHS) {
+      for (const level of LEVELS) {
+        expect(
+          countTasks({ theme: "", sub: "", sector: "", level, format: "email_formell", length }),
+        ).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("every structured task is internally consistent", () => {
+    // A task that declares one exam-realistic field must declare the set, or
+    // the Aufgabe card renders a half-built brief.
+    for (const length of LENGTHS) {
+      for (const id of THEME_IDS) {
+        writingPrompts[id][length].forEach((t, i) => {
+          if (!t.points) return;
+          const where = `${id}.${length}[${i}]`;
+          expect(t.points.length, where).toBeGreaterThanOrEqual(2);
+          expect(t.points.length, where).toBeLessThanOrEqual(5);
+          expect(t.addressee, where).toBeTruthy();
+          expect(t.register, where).toBeTruthy();
+          expect(t.level, where).toBeTruthy();
+          expect(t.format, where).toBeTruthy();
+          expect(t.words, where).toBeGreaterThan(0);
+          // No em dashes in any shipped copy (project-wide writing rule).
+          expect(t.text.includes("—"), where).toBe(false);
+          for (const p of t.points) expect(p.includes("—"), where).toBe(false);
+        });
+      }
+    }
+  });
+
+  it("covers every Thema at every Niveau in both lengths", () => {
+    for (const length of LENGTHS) {
+      for (const id of THEME_IDS) {
+        for (const level of LEVELS) {
+          const structured = writingPrompts[id][length].filter((t) => t.level === level);
+          expect(structured.length, `${id}/${length}/${level}`).toBeGreaterThan(0);
+        }
       }
     }
   });

@@ -87,6 +87,43 @@ export type WorkSector =
 // authoring plan, so they only invited tagging against half-designed axes.
 // Zero data was lost; re-declare if a real authoring plan ever exists.)
 
+// Schreiben axes (s167). Textsorte is what a learner actually thinks in ("ich
+// muss eine Beschwerde schreiben"), and it is the axis that makes a writing
+// task feel like exam practice. A scope DROPDOWN like Branche, so it escapes
+// the ≤12-option pill cap; grouped by family in the rail.
+export type WritingFormat =
+  | "email_informell"
+  | "email_halbformell"
+  | "email_formell"
+  | "nachricht"
+  | "notiz"
+  | "uebergabe"
+  | "forumsbeitrag"
+  | "stellungnahme"
+  | "bericht"
+  | "protokoll"
+  | "beschwerde"
+  | "reklamation"
+  | "antrag"
+  | "widerspruch"
+  | "kuendigung"
+  | "bewerbung";
+
+// Which exam task shape a writing Aufgabe is modelled on. Reference only: the
+// tasks are Genauly's own, not reproductions of exam material (founder s167).
+// "alltag" = a real-world genre that appears on no exam (Widerspruch,
+// Mängelanzeige) but matters more in daily life.
+export type WritingExam =
+  | "goethe_b1"
+  | "goethe_b2"
+  | "goethe_c1"
+  | "telc_b2_beruf"
+  | "dtb"
+  | "alltag";
+
+/** Who the learner writes to; drives Anrede and the du/Sie choice. */
+export type WritingRegister = "du" | "sie";
+
 // (The former WorkSituation enum/facet was retired in the categorization audit
 // 2026-07-09: "Situation" is the fine grain of Thema, carried by subThemeId,
 // not a separate axis. Its values duplicated themes, e.g. "meeting" restated
