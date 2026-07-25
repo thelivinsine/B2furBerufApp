@@ -114,7 +114,13 @@ export function GuidedWritingTrainer({
       keyRef.current = key;
       setText("");
       setResult(null);
-      setDrawn(randomTask(eligible));
+      // Exclude the CURRENT task from the re-roll (founder rule: controls
+      // always visibly act). Most scope changes redraw from a pool the filter
+      // did not actually narrow (only 71 of 600 theme x Länge x Branche slots
+      // carry a dedicated task today), so without this a re-roll lands back on
+      // the same Aufgabe roughly one time in twelve and the filter reads as
+      // broken.
+      setDrawn((cur) => randomTask(eligible, cur));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeScope, length, sub, sector, level, format]);
