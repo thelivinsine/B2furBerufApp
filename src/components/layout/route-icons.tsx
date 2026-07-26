@@ -41,14 +41,14 @@ const RENDERERS: Record<string, Render> = {
       <line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".35" />
     </>
   ),
-  // Bibliothek — a closed book with a neon-cyan bookmark ribbon and faint
-  // title lines. Founder pick P, session 158 (replaced the lying stack).
+  // Bibliothek — a stack of three books (blue spine + neon-cyan middle).
+  // Restored (founder request, session 170): this was the mark shipped before
+  // session 158's "closed book + bookmark ribbon" pick.
   "/library": c => (
     <>
-      <rect x="4.4" y="2.8" width="11.2" height="14.4" rx="1.4" fill={c} />
-      <polygon points="11.6,2.8 14.6,2.8 14.6,9 13.1,7.4 11.6,9" fill="#22d3ee" />
-      <line x1="6.6" y1="12.6" x2="10.4" y2="12.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".55" />
-      <line x1="6.6" y1="14.4" x2="9.2" y2="14.4" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".4" />
+      <rect x="2.8" y="4"    width="14.4" height="3.4" rx="1.1" fill={c} />
+      <rect x="3.6" y="8.3"  width="14.4" height="3.4" rx="1.1" fill="#22d3ee" />
+      <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill={c} opacity=".82" />
     </>
   ),
   // Anwenden — a target / bullseye (aim, then apply) in orange + neon-amber
@@ -122,13 +122,16 @@ const RENDERERS: Record<string, Render> = {
       <polygon points="9.2,11 8,18 15.2,8.6 10.8,8.6" fill="#fde047" />
     </>
   ),
-  // Fortschritt — a progress ring: faint sky track, near-closed sky arc, neon
-  // endpoint dot. Founder pick S, session 158 (replaced the bar chart).
+  // Fortschritt — a Pokal (trophy/cup): sky bowl + handles, neon-cyan base.
+  // Founder request, session 170: swapped in from the session 158 icon-preview
+  // batch (option T, "Pokal") in place of the progress ring shipped since then.
   "/analytics": c => (
     <>
-      <circle cx="10" cy="10" r="7" stroke={c} strokeWidth="2.6" fill="none" opacity=".22" />
-      <path d="M10 3 A7 7 0 1 1 3 10" stroke={c} strokeWidth="2.6" strokeLinecap="round" fill="none" />
-      <circle cx="3" cy="10" r="1.9" fill="#22d3ee" />
+      <path d="M5.6 4.4 H3.7 c-.2 2.6 1 4.1 2.9 4.5" stroke={c} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+      <path d="M14.4 4.4 h1.9 c.2 2.6-1 4.1-2.9 4.5" stroke={c} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+      <path d="M5.8 3h8.4v4a4.2 4.2 0 0 1-8.4 0Z" fill={c} />
+      <rect x="9.1" y="11" width="1.8" height="3" fill={c} />
+      <rect x="6.4" y="14.4" width="7.2" height="2" rx="0.9" fill="#22d3ee" />
     </>
   ),
   // Einstellungen — gear (slate ring + neon-blue centre)
@@ -157,7 +160,7 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
   "/":             { box: [3.2, 3.6, 13.6, 13.8],   weight: 1.05 },
-  "/library":      { box: [4.4, 2.8, 11.2, 14.4],   weight: 1.04 },
+  "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
   "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
   "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.05 },
@@ -168,7 +171,7 @@ const NORM: Record<string, { box: [number, number, number, number]; weight: numb
   "/simulation":   { box: [4.2, 1.6, 11.6, 16.2],   weight: 1.05 },
   "/exam":         { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.08 },
   "/revision":     { box: [4.8, 2, 10.4, 16],       weight: 1.0 },
-  "/analytics":    { box: [1.7, 1.7, 16.6, 16.6],   weight: 0.98 },
+  "/analytics":    { box: [3.2, 3, 13.6, 13.4],     weight: 1.03 },
   "/settings":     { box: [2.31, 2.31, 15.38, 15.38], weight: 1.01 },
 };
 

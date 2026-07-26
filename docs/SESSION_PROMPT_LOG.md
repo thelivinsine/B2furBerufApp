@@ -1360,3 +1360,32 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `CLAUDE.md`, `/design` §2/§3/§5/§7, `BRAND.md` §Dialog and `DECISIONS.md` were each updated in the
   round that changed them, and were re-checked here against the shipped code.
 - **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · `docs/areas/SCHREIBEN.md` · this log
+
+## Session 170 (2026-07-26) — branch `claude/praktisch-toggle-design-961kcu`
+
+- **Prompt 1 (verbatim, 2026-07-26):** `can you adapt the same toggle design with reduced rounding
+  of bibliothek and schreiben to the praktisch section? also, restore the bibliothek icon from
+  previous version and for fortschritt use the leader board cup icon from one of the previews
+  generated`
+- **Response summary:** Three direct ports of already-approved designs, no new preview round
+  (each request pointed at a concrete existing reference, not open design space). Found the
+  references first: `LibrarySwitcher`/`WritingModeSwitcher` both use a `rounded-lg` track +
+  `rounded-md` sliding pill via `useSlidingPill`, while the Praktisch Trainieren/Spielen toggle
+  (`Dashboard.tsx`) still used the older fully-`rounded-full` track with two independently-flagged
+  buttons; converted it to the same mechanism, keeping it content-sized (`w-fit`) since it is a
+  two-segment toggle, and keeping its section-tinted active icon/label (blue Dumbbell / orange
+  Play), which is Praktisch-specific and not part of the ask. Git history (`997e8a0`) held the
+  Bibliothek icon shipped before session 158 (a stack of three books); restored it verbatim,
+  including its `NORM` box, in `route-icons.tsx`. `preview/fortschritt-icon-vorschlaege.html`
+  (from the same session-158 icon round) held a "Pokal" (trophy/cup) option that lost to the
+  Ring at the time; ported it verbatim in place of the progress ring, keeping the route's
+  `#0ea5e9` colour. Verified in headless Chromium (bottom tab bar + desktop Sidebar, both new
+  icons in active/inactive state; the toggle sliding between Trainieren and Spielen) since no
+  running app screenshot tooling was pre-wired in this session (Playwright installed on the fly,
+  pointed at the pre-installed Chromium binary). Gates: typecheck · lint (0 errors, pre-existing
+  warnings only) · test:unit 317/317 · build · check:bundle (118.1 kB).
+- **Artifacts:** PR **#PRNUM** · `src/features/dashboard/Dashboard.tsx` ·
+  `src/components/layout/route-icons.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log

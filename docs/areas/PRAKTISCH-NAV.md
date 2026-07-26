@@ -12,9 +12,9 @@ restore it. `BottomTabBar` `REORDERABLE = ["/library", "/writing"]` + `FIXED_LAS
 "/analytics"` (Fortschritt is pinned directly left of Einstellungen for every user since s158,
 founder request; older persisted orders are normalised at read time);
 `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed
-Einstellungen = the 5 locked slots). Route marks since s158 (founder picks): Praktisch =
-Wegweiser signpost, Bibliothek = book with bookmark ribbon, Schreiben = fountain-pen nib
-(accent moved rose → brand blue), Fortschritt = progress ring. The Anwenden hub
+Einstellungen = the 5 locked slots). Route marks (founder picks, s158; Bibliothek + Fortschritt
+swapped s170): Praktisch = Wegweiser signpost, Bibliothek = stack of three books, Schreiben =
+fountain-pen nib (accent moved rose → brand blue), Fortschritt = Pokal (trophy/cup). The Anwenden hub
 itself (`/anwenden`) is 3 cards → Sprechen/Schreiben/Prüfung. Remote-config overrides (admin
 Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults match the above.
 
@@ -67,7 +67,10 @@ the Koralle reward tokens (streak = celebration).
 ## Praktisch dashboard (`/`)
 One column on ALL sizes (two-column desktop was rejected). Heute → **Trainieren/Spielen toggle**
 (`Dashboard.tsx`; "Üben" → "Lernen" s105, → "Trainieren" with the dumbbell restored s158, both
-founder requests): active tab gets a subtle section tint on the lifted white pill (Trainieren
+founder requests): since s170 it shares the squircle-track + sliding-pill language with
+`LibrarySwitcher`/`WritingModeSwitcher` (`rounded-lg` track, `rounded-md` pill, `useSlidingPill`
+measuring the active segment), content-sized (`w-fit`, centered) rather than full width since it is
+only two segments. Active tab keeps its subtle section tint on the sliding white pill (Trainieren
 `text-blue-600` + lucide Dumbbell icon; Spielen `text-orange-500` + Play icon; both active icons
 fill via `fill-current`). Tab switch is a directional horizontal slide (right→left to Spielen,
 ~0.16s easeOut, reduced-motion safe).
