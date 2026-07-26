@@ -1077,3 +1077,54 @@ the card underneath (Schreiben), branch `claude/button-overlap-fix-s7fl28`.** Fo
   Grammatik) already carry `bg-background/90 backdrop-blur` and needed no change.
 - **Gates:** typecheck · lint (0 errors) · test:unit **293/293** · build · check:bundle (117.0 kB),
   all green.
+
+**Follow-up in session 166: the Schreiben panel toggles now carry the rail's Himmelblau.** Founder:
+"increase the contrast of the grammatik and aufgabe wahlen buttons in schreiben section" (preview
+round explicitly waived, so implemented directly against the established language). Both toggles used
+the shared `outline` variant (`bg-surface/50` + `border-border`), which reads as a ghost on the page
+ground in both themes. They now use a new **`accent` Button variant** (Himmelblau tile, the color of
+the rail each one opens) when closed, and keep the solid `default` when open, so the open/closed
+distinction survives. Light mode borders with **`accent-ink/70`, not `accent`**: the accent is a
+77%-light sky, so no alpha of it clears the 3:1 UI floor on the near-white ground (1.31:1 measured);
+accent-ink/70 lands at 3.07:1. Dark keeps `accent/45` (3.34:1). Label contrast 4.72:1 light,
+7.71:1 dark; `pnpm check:contrast` still green. The variant lives in `src/components/ui/button.tsx`,
+so the Bibliothek filter toggles can adopt it later if the founder wants the same treatment there.
+Gates: typecheck · lint (0 errors) · test:unit 293/293 · build · check:bundle · check:contrast.
+
+**Handoff after session 167 (2026-07-25). Schreiben Aufgabe picker: one selection rule, plus the
+overhaul plan, branch `claude/writing-aufgaben-research-faw959`.** Founder (two screenshots of the
+Kurz/Lang Branche dropdown): "why are there almost no items in the writing section?"
+- **Root cause: the rail and the engine disagreed.** `WritingRail.tsx` counted a Branche option as
+  "tasks explicitly TAGGED with this sector" and set `disabled: count === 0`, while
+  `GuidedWritingTrainer.tsx` drew with prefer-tagged-else-untagged and is never empty. The rail
+  marked a Branche unavailable while the engine would have served the full universal pool behind it.
+  The pool was never the problem: **373 tasks** (189 Kurz, 184 Lang) across all 20 Themen. Only
+  70 carry a `sectors` tag, and **11 of 20 Themen carry none**, so every Alltag theme showed a
+  completely dead Branche dropdown.
+- **Fix: `src/lib/writingScope.ts` is now the ONE selection rule.** `eligibleTasks({theme, sub,
+  sector, length})` returns `WritingTaskRef[]` (`{theme, ix}`); the trainer draws from it and every
+  rail dropdown counts with it, so all counts finally mean the same thing. Branche never disables.
+  The sector fallback is applied **per theme**, so a Branche under Alle Themen keeps the broad pool
+  instead of collapsing to the tagged handful.
+- **"Alle Themen" added** (founder: "add a generic or all themes option for all the dropdowns"), and
+  it is now the **default landing scope** (was `themes[0]`, Besprechungen). A drawn task carries its
+  own theme, which drives the "Aufgabe: <Thema>" eyebrow, the `evaluateWriting` call, the practice
+  deep-link and the saved draft. Unterthema hides under Alle Themen (slugs are theme-scoped).
+- **`tests/writingScope.test.ts` (new, 11 cases)** pins the invariants, including the regression:
+  every Branche x every Thema x both lengths must yield > 0 tasks.
+- **Files:** `src/lib/writingScope.ts` (new), `WritingRail.tsx`, `GuidedWritingTrainer.tsx`,
+  `tests/writingScope.test.ts` (new), `docs/areas/SCHREIBEN.md`, `docs/plans/SCHREIBEN-OVERHAUL.md`
+  (new). **Gates:** typecheck · lint (0 errors) · test:unit **304/304** · build · check:bundle
+  (117.2 kB) · lint:content, all green.
+- **The plan doc is the real deliverable of this session.** It carries the founder-approved scope
+  (B1/B2/C1.1 Niveau axis · no fifth tab, exam simulation rides Kurz/Lang via a Prüfungsformat tag ·
+  add Niveau + Textsorte rail axes · 800-1200 tasks in waves) and three findings that change
+  existing assumptions: **Kurz/Lang word targets (40-60 / 120-150) match no real exam** and must
+  become task-SHAPE buckets with per-task word targets; **there is no Goethe-Zertifikat B2 Beruf**
+  (Goethe-Test PRO has no writing module at all, the Beruf writing exam is telc-only, so CLAUDE.md
+  needs correcting); and **`evaluate-writing` never receives the task text**, which makes
+  Aufgabenerfüllung structurally uncheckable and is the biggest quality ceiling in the module.
+- **Research was half-blocked:** WebFetch returned 403 at the proxy for every external host and the
+  session WebSearch budget ran out, so no official Modellsatz PDF was opened and **no verbatim exam
+  prompt was obtained**. Findings are confidence-marked; §12 of the plan lists 7 items that must not
+  be hard-coded until verified from a primary source.

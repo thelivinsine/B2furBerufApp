@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, Target, Loader2, Lightbulb, Clock, Info, Dices, ChevronDown } from "lucide-react";
@@ -16,6 +17,7 @@ import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/l
 import { WritingRail, WRITING_FORMATS, WRITING_LEVELS, writingFormatLabel } from "./WritingRail";
 import { UmlautKeys } from "./UmlautKeys";
 import { floatingNote, floatingSlot } from "./floatingCluster";
+import { useFillEditor } from "./useFillEditor";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -101,6 +103,14 @@ export function GuidedWritingTrainer({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [diceSpin, setDiceSpin] = useState(0);
   const editorRef = useRef<HTMLTextAreaElement>(null);
+  // Geometry refs for `useFillEditor`: the field fills the gap between the
+  // Aufgabe card and whichever bottom chrome is laid out at this breakpoint.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const taskCardRef = useRef<HTMLDivElement>(null);
+  const editorCardRef = useRef<HTMLDivElement>(null);
+  const clusterRef = useRef<HTMLDivElement>(null);
+  const noteRef = useRef<HTMLDivElement>(null);
 
   const words = useMemo(() => countWords(text), [text]);
 
@@ -231,6 +241,21 @@ export function GuidedWritingTrainer({
 
   const area = result?.practiceArea ? practiceAreaById(result.practiceArea) : undefined;
 
+  // The field owns the rest of the viewport (founder s168). Once a result is on
+  // screen it drops back to its text's own height so the feedback is not pushed
+  // a full screen down.
+  useFillEditor({
+    editorRef,
+    cardRef: editorCardRef,
+    rootRef,
+    aboveRef: taskCardRef,
+    headerRef: pickerRef,
+    clusterRef,
+    noteRef,
+    fill: !result,
+    revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}`,
+  });
+
   const evaluateButton = (
     <Button onClick={handleEvaluate} disabled={submitting || tooShort} variant="gradient">
       {submitting ? (
@@ -250,7 +275,10 @@ export function GuidedWritingTrainer({
   // the pill's `lg:pl-64` + `max-w-6xl` + `sm:px-6` offsets and clearing it on the
   // right; pointer-events pass through except the link. Mirrors Fokus (founder s160).
   const aiNoteDesktop = (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64">
+    <div
+      ref={noteRef}
+      className="pointer-events-none fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64"
+    >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <p className="max-w-[calc(100%-18rem)] text-center text-xs leading-relaxed text-muted-foreground">
           <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
@@ -271,7 +299,7 @@ export function GuidedWritingTrainer({
   const content = (
     <div className="space-y-4">
       {/* Aufgabe: eyebrow names the topic, dice draws another random task. */}
-      <Card>
+      <Card ref={taskCardRef}>
         <CardContent className="space-y-3 p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -338,8 +366,11 @@ export function GuidedWritingTrainer({
       </Card>
 
       {/* Editor */}
-      <Card>
+      <Card ref={editorCardRef}>
         <CardContent className="space-y-3 p-5">
+          {/* `useFillEditor` owns the height (fill the viewport, then grow, then
+              scroll internally), so the field is not hand-resizable any more and
+              `rows` is only the pre-measurement fallback. */}
           <textarea
             ref={editorRef}
             value={text}
@@ -347,7 +378,7 @@ export function GuidedWritingTrainer({
             disabled={submitting}
             rows={length === "long" ? 10 : 6}
             placeholder="Schreibe hier deinen Text auf Deutsch …"
-            className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+            className="block w-full resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
           />
           <div className="flex flex-wrap items-center gap-2">
             {/* German special-character keys for non-German keyboards (s150). */}
@@ -433,10 +464,10 @@ export function GuidedWritingTrainer({
   );
 
   return (
-    <div>
+    <div ref={rootRef}>
       {/* Mobile: the Bibliothek pattern, a toolbar button toggling the
           collapsible "Aufgabe wählen" panel (no floating chip row). */}
-      <div className="mb-4 space-y-3 lg:hidden">
+      <div ref={pickerRef} className="mb-4 space-y-3 lg:hidden">
         <div className="flex justify-center">
           <Button
             /* Closed = the Himmelblau tile of the rail it opens (founder s166,
@@ -509,53 +540,73 @@ export function GuidedWritingTrainer({
         />
       </div>
 
-      {/* Mobile: Feedback + Auswerten (and Neu schreiben after a result) float
-          side by side above the nav, no bar chrome, with the condensed KI-Hinweis
-          directly beneath (founder s160, matching Fokus). */}
-      <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mt-4 lg:hidden">
-        {/* Every control sits on its own opaque backing (see `floatingCluster`);
-            FeedbackIconButton is already solid. */}
-        <div className="flex items-stretch gap-2">
-          <FeedbackIconButton />
-          {result && (
-            <div className={floatingSlot}>
-              <Button
-                variant="outline"
-                className="h-11 rounded-xl"
-                onClick={() => { setResult(null); setText(""); }}
-                disabled={submitting}
-              >
-                Neu schreiben
-              </Button>
-            </div>
-          )}
-          <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
-            {evaluateButton}
-          </div>
-        </div>
-        {/* One line slot under the buttons: while the text is too short to
-            evaluate it carries the "how many words to go" hint (the honest
-            reason the button is inactive), otherwise the Art. 50 note. Only
-            one of them is ever true, so this stays a single line of chrome. */}
-        {tooShort ? (
-          <p className="mt-2 text-center text-[11px] font-medium leading-snug text-warning">
-            <span className={floatingNote}>
-              Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
-            </span>
-          </p>
-        ) : (
-          <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
-            <span className={floatingNote}>
-              KI-geprüft, kann Fehler enthalten.{" "}
-              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                Mehr
-              </Link>
-            </span>
-          </p>
-        )}
-      </div>
+      {/* Both bits of bottom chrome are `position: fixed`, so they are portalled
+          to <body>: WritingHub slides the tab panels with an `x` transform, and
+          a transformed ancestor becomes the containing block for its fixed
+          descendants, which would re-anchor them to the panel mid-slide and make
+          `useFillEditor` measure the wrong reserve on mount. */}
+      {createPortal(
+        <>
+          {/* Mobile: Feedback + Auswerten (and Neu schreiben after a result)
+              float side by side above the nav, no bar chrome, with the condensed
+              KI-Hinweis directly beneath (founder s160, matching Fokus).
 
-      {aiNoteDesktop}
+              FIXED, not sticky (founder s168): sticky parks the cluster at the
+              end of the content whenever the page fits the viewport, so it sat
+              at a different height in Kurz than in Lang and jumped on every task
+              change. Fixed pins it above the nav at one height for good; the
+              trainer root carries the matching clearance (`useFillEditor`), and
+              the container offsets mirror AppShell's `<main>` so the cluster
+              stays in the content column. */}
+          <div
+            ref={clusterRef}
+            className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
+          >
+            {/* Every control sits on its own opaque backing (see
+                `floatingCluster`); FeedbackIconButton is already solid. */}
+            <div className="flex items-stretch gap-2">
+              <FeedbackIconButton />
+              {result && (
+                <div className={floatingSlot}>
+                  <Button
+                    variant="outline"
+                    className="h-11 rounded-xl"
+                    onClick={() => { setResult(null); setText(""); }}
+                    disabled={submitting}
+                  >
+                    Neu schreiben
+                  </Button>
+                </div>
+              )}
+              <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
+                {evaluateButton}
+              </div>
+            </div>
+            {/* One line slot under the buttons: while the text is too short to
+                evaluate it carries the "how many words to go" hint (the honest
+                reason the button is inactive), otherwise the Art. 50 note. Only
+                one of them is ever true, so this stays a single line. */}
+            {tooShort ? (
+              <p className="mt-2 text-center text-[11px] font-medium leading-snug text-warning">
+                <span className={floatingNote}>
+                  Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
+                </span>
+              </p>
+            ) : (
+              <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
+                <span className={floatingNote}>
+                  KI-geprüft, kann Fehler enthalten.{" "}
+                  <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+                    Mehr
+                  </Link>
+                </span>
+              </p>
+            )}
+          </div>
+          {aiNoteDesktop}
+        </>,
+        document.body,
+      )}
     </div>
   );
 }

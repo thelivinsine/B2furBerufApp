@@ -88,6 +88,16 @@ design as reference.**
   contrast 4.72:1 light / 7.71:1 dark. Reuse the variant for any panel toggle, never re-tint
   `outline` itself.
 - Umlaut keys (`UmlautKeys`, below) sit in the word-count row of `GuidedWritingTrainer.tsx`.
+- **The writing field is sized, not fixed-`rows`** (`useFillEditor.ts`, founder s168). At rest it
+  fills from its own top down to whichever bottom chrome is laid out (mobile cluster / desktop
+  Art. 50 line), so the page does not scroll; typing past that grows it (page scroll turns on) to
+  at most 1.8x the resting height or 60% of the viewport, whichever is larger; past that it stops
+  and scrolls internally. `resize-none`: the height is measured, so hand-resizing is gone and
+  `rows` is only the pre-measurement fallback. Floor = max(160px, 22% of the viewport): a long
+  Aufgabe (Inhaltspunkte) can leave less room than that on a phone, and a small page scroll beats
+  a four-line writing slot. Once a result is on screen the field drops to its text's own height so
+  the feedback is not pushed a screen down. Measure it in JS, not a `dvh`/flex chain: the trainer
+  sits inside AppShell → WritingHub → AnimatePresence, none of them height-constrained.
 - Verlauf renders inside the same content grid column (never full width); its empty state
   deep-links into Kurz. `WritingHistory` shows only the learner's text (the exact prompt behind
   an old entry is not recoverable since pools).
@@ -138,10 +148,19 @@ design as reference.**
 - The Fokus Original/Korrigiert toggle is `rounded-lg`/`rounded-md` squircle.
 
 ## Mobile floating action cluster (Fokus + Kurz/Lang)
-The sticky bottom cluster (Feedback + Korrigieren / Auswerten, and Neu schreiben after a result)
-carries **no bar chrome** (founder s159/s160): no border, no full-width backdrop. It therefore
-floats straight over the content cards, so nothing in it may be see-through (s164 founder report:
-the disabled Auswerten button and the card's hint line read as two labels on top of each other).
+The bottom cluster (Feedback + Korrigieren / Auswerten, and Neu schreiben after a result) carries
+**no bar chrome** (founder s159/s160): no border, no full-width backdrop. It therefore floats
+straight over the content cards, so nothing in it may be see-through (s164 founder report: the
+disabled Auswerten button and the card's hint line read as two labels on top of each other).
+- **Kurz/Lang: `fixed`, not `sticky`** (founder s168). Sticky parks the cluster at the END of the
+  content whenever the page fits the viewport, so it sat at one height in Kurz, another in Lang,
+  and jumped on every task change. It is now pinned above the nav at one height for good, with
+  AppShell's `<main>` offsets mirrored (`mx-auto max-w-6xl px-4 sm:px-6`) so it stays in the
+  content column, and `useFillEditor` gives the trainer root the matching bottom clearance.
+- **Both fixed layers are portalled to `<body>`.** WritingHub slides tab panels with an `x`
+  transform, and a transformed ancestor becomes the containing block for its `fixed` descendants;
+  without the portal the cluster and the Art. 50 line re-anchor to the panel mid-slide. Fokus still
+  uses the in-flow sticky cluster.
 - **Opacity is the contract, not the bar.** `src/features/writing/floatingCluster.ts` holds the two
   class names: `floatingSlot` (opaque `bg-background` behind a control, because `variant="outline"`
   is `bg-surface/50` and `disabled:` is `opacity-50`) and `floatingNote` (the caption plate,
