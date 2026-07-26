@@ -318,6 +318,36 @@ input:-webkit-autofill {
     padding-bottom: 1px;
   }
 
+  /* Fokus "the KI is working" skeleton (founder s169): the sentence line is
+     replaced by rounded bars that carry a slow highlight sweep, so the top tile
+     announces the wait instead of leaving it to the button label. The sweep is
+     a moving gradient over the bar's own muted fill, never a pulse, and it is
+     one of the standard timing families slowed to a "breathing" 1.6s. */
+  .fx-skeleton-bar {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted)) 30%,
+      hsl(var(--accent) / 0.45) 50%,
+      hsl(var(--muted)) 70%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 220% 100%;
+    background-position: 120% 0;
+    animation: fx-skeleton-sweep 1.6s ease-in-out infinite;
+  }
+  @keyframes fx-skeleton-sweep {
+    to {
+      background-position: -120% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fx-skeleton-bar {
+      animation: none;
+      background-position: 50% 0;
+    }
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

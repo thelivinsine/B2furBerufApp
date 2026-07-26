@@ -618,3 +618,54 @@ one-tap action chips (`→ Passiv`), which break as soon as forms combine; a tra
 that stacks a card per attempt (re-introduces page scroll by design); the dials in the bottom thumb
 slot (best ergonomics, but four floating controls with no bar behind them); and a deep navy "stage"
 panel for the Grammatik tile, which would have been the app's only dark surface in light mode.
+
+## s169 — Schreiben follow-up: no resting scroll, one bottom-chrome geometry, edgeless rails (2026-07-26) — founder-requested
+
+**Context.** The founder reviewed the shipped s168 rework on a phone and sent an eight-point list.
+Two points were bugs (a persistent page scroll on all three trainers; the action buttons jumping
+between Fokus and Kurz/Lang), the rest were finishing work on the Fokus sentence tile and the rails.
+
+**Decisions.**
+1. **A freshly opened page never scrolls, and the elastic element pays for it.** `useFillEditor`
+   handed the writing field its floor (`max(160px, 22vh)`) even when the screen did not have the
+   room, which is exactly where the ~60px of resting scroll came from: the floor was written as a
+   guarantee when it is only a preference. Order of concession is now Aufgabe card (its prompt
+   region caps + scrolls internally, down to 72px) → field (down to `HARD_MIN` 72px) → page scroll,
+   and in practice the page never gets there on a 360x740 screen or larger. Typing grows the field
+   again immediately, so a short resting field costs nothing.
+2. **Fokus's tile column gets a fixed `height` before a correction, a `minHeight` after.** A minimum
+   alone let the tiles' natural height win: on a narrow phone the dial row wraps and the legend runs
+   to three lines, and the column silently outgrew the screen. A fixed height forces the writing
+   field to absorb it. After a correction it must be a minimum again, because a long list of fixes
+   has to be able to grow the page. Verified headless from 320x568 to 412x915 with and without
+   simulated safe-area insets.
+3. **The three trainers share ONE bottom-chrome geometry.** Both clusters sit at
+   `bottom-[calc(nav + safe-area + 2rem)]` and both carry the KI line as a separately fixed line at
+   `+0.5rem`. Kurz/Lang used to keep its note INSIDE the cluster, which pushed its buttons ~13px
+   below the Fokus ones; that difference was visible as a jump on every tab switch. The lift came
+   down from 2.5rem to 2rem to pay for the extra reservation this costs Kurz/Lang.
+4. **The "Noch N Wörter" hint belongs in the card being typed in, under the umlaut keys.** This
+   reverses the s168 rule that parked transient hints in the cluster's caption slot. Two reasons:
+   the slot's job is the Art. 50 note, and a bottom line that swaps content between states reads as
+   chrome that cannot be trusted; and the original hazard (a card-tail line landing under the pinned
+   cluster) is gone now that the cluster sits 2rem higher and the field is sized to end above it.
+5. **The rails have no visible edge at all.** Third and final answer after an accent edge (s166) and
+   a neutral grey one (s168): the border wears the fill's own colour and `shadow-soft` does the
+   separating, exactly like the Bibliothek word cards the founder pointed at. Inner dividers are
+   tinted to match, so no hard grey line survives. Applies to `WritingRail`, `GrammarRail`,
+   `GrammarDials` and the `accent` button variant that opens them. Label contrast is untouched
+   (4.72:1 light / 7.71:1 dark), so this is a pure edge change.
+6. **The Fokus sentence tile is two stacked regions.** Sentence centered in a `flex-1` region, the
+   detail block anchored under it. One centered group put all its slack above the sentence, which
+   the founder read as "more space before the sentence than after". The horizontal rule under the
+   sentence is gone with it: the gap separates them.
+7. **The correction separator is one full-height rule, not a per-cell border.** With three fixes the
+   per-cell `border-l` stopped after row 1 and looked broken. An absolutely-positioned
+   `inset-y-0 left-1/2` line spans whatever the grid ends up being. The eyebrow also hugs its own
+   fix now (`mb-0.5`) while the row gap widened (`gap-y-5`), so each category + edit reads as one
+   unit rather than an evenly spaced list.
+8. **Waiting is shown in the tile the answer will appear in.** A skeleton of three tapering rounded
+   bars with a slow Himmelblau sweep (`.fx-skeleton-bar`, reduced-motion safe) replaces the sentence
+   line while the KI works, during both the correction and a transform. The spinning dial and the
+   "Wird geprüft …" button label were the only signals before, and the founder did not read them as
+   "something is happening".

@@ -66,10 +66,11 @@ export function GrammarDials({
     <section
       ref={rootRef}
       aria-label="Grammatik"
-      // The rail tile recipe: Himmelblau FILL, neutral `border` outline (s168).
-      // No overflow clipping, the dial pickers must escape the tile.
+      // The rail tile recipe: Himmelblau FILL, border in the fill's own colour
+      // and `shadow-soft` for the lift (founder s169: no grey outline on the
+      // rails). No overflow clipping, the dial pickers must escape the tile.
       className={cn(
-        "flex flex-col rounded-xl border border-border bg-accent/20 shadow-soft dark:bg-accent/10",
+        "flex flex-col rounded-xl border border-accent/20 bg-accent/20 shadow-soft dark:border-accent/10 dark:bg-accent/10",
         className,
       )}
     >
@@ -100,7 +101,7 @@ export function GrammarDials({
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col justify-center gap-4 border-t border-border p-4">
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-4 border-t border-accent-ink/10 p-4">
         <div className="flex flex-wrap items-start justify-center gap-x-2.5 gap-y-3">
           {GRAMMAR_AXES.map((axis) => {
             const value = selection[axis.id];

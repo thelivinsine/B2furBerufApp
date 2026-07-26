@@ -1,3 +1,31 @@
+**Handoff after session 167 (2026-07-25), part 3: the Branche answer + wave 2. MERGED AND LIVE**
+(PRs **#714**, **#715**).
+
+- **Founder: "when a thema is selected and then the Branche is changed, the aufgabe doesn't change."**
+  Reproduced in the running app rather than reasoned from the code: the task IS re-drawn every time,
+  on desktop and in the mobile panel. The cause was **coverage**, not the mechanism. Only **71 of 600**
+  theme x Länge x Branche slots carried a task tagged for that Branche (11.8%), and **11 of 20 Themen
+  had none**, so the fallback served the identical pool whichever Branche was picked, and the re-roll
+  landed back on the same task about one time in twelve.
+- **Fix (#714):** the scope-change re-roll now passes the current task as `exclude`, exactly like the
+  dice, so a filter change is always visible (founder rule: controls always visibly act). Verified on
+  `behoerde` (zero coverage, worst case): 14 consecutive Branche switches, 0 repeats.
+- **Mobile panel stays open until closed (#715).** Picking a Thema used to dismiss it while every
+  other scope left it open, so the one control that auto-closed was also the one that changed the
+  most. Only the X and the toolbar toggle close it now.
+- **Wave 2 (#715): 150 Branche-specific Aufgaben.** The five Beruf Themen that apply to EVERY industry
+  (`meetings`, `scheduling`, `conflict`, `safety`, `customer`) x **all 15 Branchen** x both Längen, at
+  B2. Bank: 493 -> **643 tasks**. **Branche slots filled: 71/600 (11.8%) -> 173/600 (28.8%).**
+  Every variant satisfies the four-way-difference test (plan §8): different ADDRESSEE, GENRE, domain
+  CONTENT POINTS and FACHLEXIK. Swapping the Branche noun breaks all of them, which was the point.
+- **A test pins it:** for those five Themen every Branche must have a tagged task AND the draw must
+  serve it rather than fall back past it. The task-count assertion is now self-maintaining (compares
+  against pool totals) so it does not need bumping as the bank grows.
+- **Still generic: 11 Themen** (`travel` + all 10 Alltag). For Alltag this is partly principled, since
+  Branche means where you WORK and a Wohnen or Bank task is personal life. But some genuinely do vary
+  (Krankmeldung in Schichtdienst vs Büro, Urlaubsantrag auf der Baustelle). That judgement call is
+  **wave 3**, together with rewriting the remaining legacy tasks to carry Inhaltspunkte.
+
 
 
 **Handoff after session 167 (2026-07-25), part 2: P2 + no-CLI deploys, MERGED AND LIVE.**

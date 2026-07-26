@@ -1238,3 +1238,67 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   r1 to r4 series and flags r4 "Option 2" as the shipped one.
 - **Artifacts (prompt 11):** `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` ·
   `.claude/skills/design/SKILL.md` · `CLAUDE.md` · `docs/areas/SCHREIBEN.md` · this log
+
+## Session 169 (2026-07-26) — branch `claude/fokus-kurz-lang-layout-s8unl4`
+
+- **Prompt 1 (verbatim, 2026-07-26):** `referring to the changes done in the previous session, I'd
+  like move some things around or fix some lose ends.  Following are the comments:` /
+  `1. All the three pages have the components well spaced and positioned but there's evidently
+  persistent page scroll - see the attached screenshots. Fix the bug, there should be no scrolling
+  when opened newly.` /
+  `2. when switching between fokus and Kurz/lang, the bottom buttons keep switching abrublty because
+  the buttons on fokus page are of different shape and positioned on a different height compared to
+  the other two pages. Fix it.` /
+  `2. I don't like the gray outline on the grammar rail or ausgabe wahlen rail doesn't look good.
+  Keep the same color as the rail fill color but keep enough contrast of the tile with background
+  using shadows same as the vocabulary cards in bibliothek.` /
+  `3. In fokus, in the top tile, after there's more soace before the sentence than after, keep it
+  centered and maintain enough space before and after to look good.` /
+  `4. In fokus, if there are three corrections as shown in the attached screenshot, the vertical
+  separator is too short and doesn't look good - it should be increaed to cover the two items on the
+  left column and dynamically adjusted as per the number of items vertically.` /
+  `5. Fokus: There's no need of a horizontal  separator after the sentence on the top tile.` /
+  `6. Fokus: In the top tile, the space between the header of a correction and the next line showing
+  the corrected mistake should be lower than the space between the line with correction and the next
+  header of the correction. Fix it.` /
+  `7. Fokus: The top tile should have a neat animation when the AI is working to show that. Right now
+  only the dials in the bottom tile loads but it's not understandable that something's happening. Use
+  an animation that looks like the sentence is loading with horizontal loading bars or something like
+  that. Chose the most premium looking and high quality one.` /
+  `3. Kurz/Lang: The line saying still 5 more words to write to evaluate should live in the tile
+  where the user writes something - ideally below the vowel buttons. Keep the KI geprüft line in the
+  bottom of the page similar to Fokus page.` /
+  `for all the points above, no previews are needed. Just execute them directly loading the design
+  skill.` (with 7 phone screenshots: Fokus idle + scrolled, Kurz, Lang + scrolled, Fokus with two and
+  with three corrections)
+- **Response summary:** All eight points executed directly (previews waived).
+  **Page scroll (point 1)** was measured before it was fixed: a headless sampler across seven phone
+  viewports, with and without simulated safe-area insets, isolated two causes. Kurz/Lang overshot
+  because `useFillEditor` treated the field's floor (`max(160px, 22vh)`) as a guarantee rather than a
+  preference; it now falls to `HARD_MIN` 72px and the Aufgabe card's cap gives up more first
+  (`TASK_BODY_MIN` 96 → 72). Fokus overshot because its tile column had a `minHeight`, so on a narrow
+  phone the wrapping legend and dial row simply won; it gets an exact `height` before a correction
+  (a `minHeight` after, since a long fix list must be able to grow) with `min-h-0` down the flex
+  chain. Result: zero overflow from 360x740 up; SE-class 667px viewports remain structurally short
+  and are logged as open. **Buttons jumping (point 2a):** the cause was Kurz/Lang keeping its caption
+  inside the fixed cluster while Fokus had it as a separate fixed line, putting the two rows ~13px
+  apart; both now use the same offsets (lift trimmed 2.5rem → 2rem to pay for the extra reservation).
+  **Rail outline (2b):** border in the fill's own colour plus `shadow-soft`, inner dividers tinted,
+  applied to both rails, the dial tile and the `accent` Button variant. This is the third edge answer
+  (accent s166 → grey s168 → none s169) and is recorded as such. **Fokus tile (3 to 6):** sentence and
+  detail block are two stacked regions so the sentence centers in the room left over; the horizontal
+  rule is gone; the correction separator is one absolutely-positioned full-height line (the per-cell
+  `border-l` stopped after row 1 with three fixes); eyebrow `mb-0.5` against a `gap-y-5` row gap so
+  each pair reads as a unit. **Waiting animation (7):** new `.fx-skeleton-bar` utility, three tapering
+  bars with a slow Himmelblau sweep, reduced-motion safe, shown during both the correction and a
+  transform. **Word hint (8):** moved into the card under the umlaut keys in BOTH trainers, freeing
+  the bottom line to be the Art. 50 note in every state. Verified visually in headless Chromium at
+  360x800 (idle, typing, checking, corrected with three fixes) and 1440x900 desktop. Gates: typecheck
+  · lint (0 errors) · lint:content · test:unit 317/317 · build · check:bundle (117.3 kB) ·
+  check:contrast.
+- **Artifacts (prompt 1):** commit `947e384` · `src/features/writing/useFillEditor.ts` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/writing/fokus/GrammarRail.tsx` ·
+  `src/features/writing/fokus/GrammarDials.tsx` · `src/components/ui/button.tsx` · `src/index.css` ·
+  `CLAUDE.md` · `.claude/skills/design/SKILL.md` · `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log
