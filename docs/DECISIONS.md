@@ -669,3 +669,20 @@ between Fokus and Kurz/Lang), the rest were finishing work on the Fokus sentence
    line while the KI works, during both the correction and a transform. The spinning dial and the
    "Wird geprüft …" button label were the only signals before, and the founder did not read them as
    "something is happening".
+
+## s169 follow-up — the Grammatik legend, the Aufgabe pop-up, and the shuffle button (2026-07-26) — founder-requested
+
+1. **The Grammatik tile's legend sits at the tile's foot.** Dials centered in the room above,
+   legend on the bottom edge. Same two-region split as the Fokus sentence card, so the two tiles
+   rhyme instead of each centering their own contents.
+2. **The Aufgabe card gets an expand button that opens the task in a pop-up.** This is the
+   consequence of the s168/s169 capping rule: the card is deliberately capped so the page fits one
+   viewport, which means a long Aufgabe gets cut mid-line, so there has to be one place that shows
+   all of it. The founder pointed at the round-1 Fokus preview's "Variante A" as the reference: the
+   app's standard centered dialog, soft darkening, no blur, explicitly NOT a bottom sheet (the
+   retired "Mehr" sheet is on the landmine list). The pop-up repeats the card's eyebrow and Ziel
+   line so it reads as the same object, not a new surface.
+3. **Shuffle replaces the dice, and neither icon button wears a box.** A border around a 40px icon
+   inside a card competed with the card's own edge; the hover tint is affordance enough, and it
+   matches the rail header icons. The shuffle glyph is point-symmetric, so the existing half-turn
+   per roll still reads as motion and settles back into the same shape.

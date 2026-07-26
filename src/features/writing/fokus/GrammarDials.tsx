@@ -101,8 +101,11 @@ export function GrammarDials({
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col justify-center gap-4 border-t border-accent-ink/10 p-4">
-        <div className="flex flex-wrap items-start justify-center gap-x-2.5 gap-y-3">
+      {/* Dials centered in the room left over, legend parked at the tile's
+          bottom edge (founder s169 follow-up), the same two-region split the
+          Fokus sentence card uses. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-4 border-t border-accent-ink/10 p-4">
+        <div className="flex flex-1 flex-wrap content-center items-start justify-center gap-x-2.5 gap-y-3">
           {GRAMMAR_AXES.map((axis) => {
             const value = selection[axis.id];
             const isDetected = value === detected[axis.id];

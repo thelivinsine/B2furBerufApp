@@ -125,6 +125,13 @@ rework, executed directly (previews explicitly waived). Two were bugs, six were 
   `.claude/skills/design/SKILL.md` · `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md`.
   **Gates:** typecheck · lint (0 errors) · lint:content · test:unit **317/317** · build ·
   check:bundle (117.3 kB) · check:contrast.
+- **Follow-up round, same session.** (a) Fokus: the Grammatik tile's legend line moved to the
+  tile's bottom edge, dials centered above it. (b) Kurz/Lang: the Aufgabe card header now carries
+  two BORDERLESS 40px icon buttons. **Expand** opens the whole task in the app's standard centered
+  dialog (the round-1 Fokus preview's "Variante A"), which the capping rule made necessary: the card
+  is capped to keep the page at one viewport, so a long Aufgabe gets cut mid-line and needs one
+  place that shows all of it. **Shuffle** replaces the dice (point-symmetric glyph, so the half-turn
+  per roll still reads as motion). Adressat + Leitpunkte are now shared between card and pop-up.
 - **Open, small:** SE-class (667px) viewports still page-scroll on Kurz/Lang; closing that needs
   chrome to go, not elasticity (the "Aufgabe wählen" toggle row and the two-card split are the two
   candidates). Fokus's `GrammarRail` `layout="panel"` branch is still dead code on mobile.
