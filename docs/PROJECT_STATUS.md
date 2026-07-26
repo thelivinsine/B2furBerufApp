@@ -132,6 +132,12 @@ rework, executed directly (previews explicitly waived). Two were bugs, six were 
   is capped to keep the page at one viewport, so a long Aufgabe gets cut mid-line and needs one
   place that shows all of it. **Shuffle** replaces the dice (point-symmetric glyph, so the half-turn
   per roll still reads as motion). Adressat + Leitpunkte are now shared between card and pop-up.
+- **Second follow-up.** Shuffle moved left of expand (founder order), and the shared dialog
+  backdrop deepened from 0.30/0.62 to **0.48/0.76**: the founder reported the pop-up had "no
+  contrast with the background", and measuring it in the app showed why, white card on the
+  near-white page ground was only **1.9:1** against the old wash (the card's soft shadow is
+  invisible over a backdrop, so the backdrop is the only thing defining it). Now **3.3:1**, clear of
+  the 3:1 UI floor, dark mode re-checked. Changed on the token, never per dialog.
 - **Open, small:** SE-class (667px) viewports still page-scroll on Kurz/Lang; closing that needs
   chrome to go, not elasticity (the "Aufgabe wählen" toggle row and the two-card split are the two
   candidates). Fokus's `GrammarRail` `layout="panel"` branch is still dead code on mobile.

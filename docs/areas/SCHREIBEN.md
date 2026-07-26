@@ -66,6 +66,8 @@ for rework — do not treat its current design as reference.**
   deadline or euro amount**: they ask the learner to name the date instead.
 - **The Aufgabe card header carries two 40px icon buttons, both BORDERLESS** (founder s169
   follow-up: no box around them; hover tint only, matching the rail header icons).
+  **Shuffle sits left, Expand right** (founder order, s169): the button that CHANGES the Aufgabe
+  keeps away from the card's outer corner, the one that only opens it takes the corner.
   **Expand** (`Maximize2`) opens the whole task in the app's standard centered dialog: the card is
   capped so the page fits one viewport and can therefore cut a long Aufgabe mid-line, so there has
   to be one place that shows all of it. Same eyebrow + Ziel line as the card, so it reads as the

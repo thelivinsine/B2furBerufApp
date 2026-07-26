@@ -686,3 +686,18 @@ between Fokus and Kurz/Lang), the rest were finishing work on the Fokus sentence
    inside a card competed with the card's own edge; the hover tint is affordance enough, and it
    matches the rail header icons. The shuffle glyph is point-symmetric, so the existing half-turn
    per roll still reads as motion and settles back into the same shape.
+
+## s169 second follow-up — button order and a dialog backdrop that actually separates (2026-07-26) — founder-requested
+
+1. **Shuffle left, expand right** on the Aufgabe card. Founder's order. It also happens to be the
+   defensible one: the button that CHANGES the task keeps away from the card's outer corner, the one
+   that only opens it takes the corner.
+2. **The dialog backdrop deepened from 0.30/0.62 to 0.48/0.76.** Founder: "the pop up window doesn't
+   have any contrast with the background." Measured in the running app rather than judged by eye: a
+   white card on the near-white page ground came out at **1.9:1** against the old backdrop, because
+   the card's `shadow-elevated-soft` (2.4% and 6% alpha) is invisible over a dark wash, so the
+   backdrop is the ONLY thing defining the card. 0.48 puts it at **3.3:1**, clear of the 3:1 UI
+   floor, and dark mode stays comfortable (its `--shadow` is near-black, and the 18%-L card still
+   separates). Changed on the shared `bg-dialog-overlay` token, never per dialog: the locked recipe
+   exists so every dialog in the app reads the same, and a one-off override here would be exactly
+   the parallel style rule zero forbids.

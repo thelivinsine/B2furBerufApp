@@ -398,17 +398,10 @@ export function GuidedWritingTrainer({
               </p>
             </div>
             {/* Two borderless 40px icon buttons (founder s169 follow-up: no box
-                around these). Read the whole Aufgabe, then draw another one. */}
+                around these). Shuffle left, expand right (founder order): the
+                one that CHANGES the Aufgabe sits away from the card's outer
+                corner, the one that only opens it takes the corner. */}
             <div className="flex shrink-0 items-center">
-              <button
-                type="button"
-                onClick={() => setTaskOpen(true)}
-                aria-label="Aufgabe vergrößern"
-                title="Aufgabe vergrößern"
-                className={iconButton}
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
               <button
                 type="button"
                 onClick={reroll}
@@ -423,6 +416,15 @@ export function GuidedWritingTrainer({
                   className="h-4 w-4 transition-transform duration-300"
                   style={reduce ? undefined : { transform: `rotate(${rollSpin}deg)` }}
                 />
+              </button>
+              <button
+                type="button"
+                onClick={() => setTaskOpen(true)}
+                aria-label="Aufgabe vergrößern"
+                title="Aufgabe vergrößern"
+                className={iconButton}
+              >
+                <Maximize2 className="h-4 w-4" />
               </button>
             </div>
           </div>
