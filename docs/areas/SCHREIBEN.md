@@ -164,6 +164,13 @@ for rework — do not treat its current design as reference.**
     correction, so the feature announces itself. The legend line doubles as the refusal/error slot
     and is **parked at the tile's bottom edge** (founder s169 follow-up), with the dials centered in
     the room above it: the same two-region split the sentence card uses, so the two tiles rhyme.
+  - **The picker places itself** (s170): it is measured before paint, then flipped ABOVE the dial
+    whenever it would not clear the floor, capped to the room it has (internal scroll as the last
+    resort) and nudged back inside the viewport when an edge dial would push it off screen. The
+    floor is the LOWER of the tile's foot and `bottomLimit()`, the live top of the fixed bottom
+    chrome that `FokusTrainer` passes down: once a long correction lets the page scroll, the tile's
+    own foot slides under that chrome and stops being the limit. A downward-only picker was the bug
+    (founder s170: the last options sat under the tab bar with no scroll able to reach them).
   - **The sentence card owns every state** behind a centered view toggle: Original (coral marks) /
     Korrigiert (green marks) / **Umgeformt** (the transformed sentence, green-marked via a diff
     against the corrected one, plus the Hinweis + Nochmal + speak row). The separate transform card

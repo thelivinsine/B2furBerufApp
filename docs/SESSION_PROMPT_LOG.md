@@ -1389,3 +1389,67 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log
+
+- **Prompt 2 (verbatim, 2026-07-26):** `give me the artifact`
+- **Response summary:** Published the pending Schreiben icon round (round 3, options U/V/W/X plus
+  the shipped Federspitze as reference) as a Claude artifact so the founder can review it outside
+  the sandbox. No content change: `preview/schreiben-icon-vorschlaege.html` was already built from
+  the real `route-icons.tsx` path data and optical normalisation, and its `NORM` boxes were
+  re-checked against the shipped file after PR #730, so the three neighbour marks in the mockup
+  (Wegweiser, Bücherstapel, Pokal) show the just-merged state.
+- **Artifacts:** artifact `fee81c4c-dec9-41b2-91dd-0240e6999467` ·
+  `preview/schreiben-icon-vorschlaege.html` (unchanged)
+
+- **Prompt 3 (verbatim, 2026-07-26):** `generate more previews`
+- **Response summary:** Round 4 of the Schreiben icon, four new marks added to the four still
+  open. Read the earlier rounds first to avoid re-proposing: A-D (s158 round 1), E-H (round 2),
+  I-L (Praktisch), U-X (round 3) means nine of the twelve proposals so far were pens, so this
+  round deliberately went elsewhere. **Y Blatt mit Stift** (the universal compose mark, the one
+  obvious form never yet shown), **Z Absatzmarke** (the pilcrow, the only non-object option),
+  **AA Klemmbrett** (the Aufgabe that Kurz/Lang set, its cyan clip breaking the top silhouette so
+  it cannot be confused with U), **AB Bleistift, schräg** (every previous pen stood upright; the
+  diagonal is the only one in the whole bar). Page restructured against the redundancy rule: r1
+  repeated all five tabs at large size under every variant (45 tiles), r2 shows the neighbours
+  once, all nine candidates once in a single-row form comparison, then per-variant only the real
+  light + dark tab bars. Verified in headless Chromium at 150px, at the real 29px nav size on both
+  grounds, and full-page: first pass caught the Bleistift rendering as a blunt slab and the Y pen
+  as a detached stub (both re-derived, rotation maths corrected), second pass caught the Y sheet
+  reading as a square rather than paper. A clipped mobile screenshot turned out to be a harness
+  artifact, not a page bug: headless Chromium clamps the viewport to 500px, and a direct
+  measurement (`docScroll == docClient`, tab bar forced to 350px shows no overflow) confirmed the
+  page does not scroll sideways. Redeployed to the same artifact URL, one link per topic.
+- **Artifacts:** `preview/schreiben-icon-vorschlaege-r2.html` · artifact
+  `fee81c4c-dec9-41b2-91dd-0240e6999467` (redeployed) · this log
+
+- **Prompt 4 (verbatim, 2026-07-26):** `when the dials in the bottom tile are opened, they're being
+  cut off and there's no way to see them as the scroll isn't working well - fix it` [+ two mobile
+  screenshots: the Genus-Verbi and Zeitform pickers with their last option under the tab bar]
+- **Prompt 5 (verbatim, 2026-07-26):** `another issue is there's a missing button to regenerate ai
+  response!`
+- **Prompt 6 (verbatim, 2026-07-26):** `apply bleistift icon from the preview for schreiben`
+- **Response summary:** **(a) Dial pickers.** `GrammarDials` opened its picker with a hardcoded
+  `top-full`, so a dial low in the tile put its last options under the fixed bottom chrome, and
+  since the Fokus page is built NOT to scroll there was nothing to scroll to them with. Replaced
+  with a measure-then-place pass in `useLayoutEffect` (before paint, no flicker): flip above the
+  dial when the picker would not clear the floor, cap `max-height` to the room it actually has with
+  `overflow-y-auto` as the last resort, and shift it horizontally back inside the viewport when an
+  edge dial would push it off screen. The floor is the lower of the tile's own foot and a new
+  `bottomLimit()` prop: `FokusTrainer` already measures the fixed cluster + KI line for
+  `measureMobile`, and only it knows where that chrome sits. The first cut used the tile foot alone
+  and a 360x640 run caught it still clipping, because once a correction is long enough to let the
+  page scroll the tile foot slides under the chrome. Verified by driving the real app in Playwright
+  against a stubbed `check-sentence` (seeded session + onboarding flag, so no live AI call): all
+  three dials on 390x844 light and 360x640 dark now report every option on screen, no internal
+  scrolling needed, and the resting page still shows 0px overflow on the tall phone.
+  **(b) Schreiben icon.** Founder picked **AB (Bleistift, schräg)** from the round-4 preview;
+  ported verbatim into `route-icons.tsx` with its `NORM` box `[3.21, 3.21, 13.58, 13.58]` @ 0.98
+  and checked active + inactive in the real bar and the desktop sidebar. **(c)** The "regenerate AI
+  response" report is NOT fixed: `m.regenerate` exists only for the transform ("Nochmal" in
+  Umgeformt, cycling 2 server-side variants); the Korrigiert view has no equivalent, and because
+  `check-sentence` is cached per sentence a naive re-run there would return byte-identical text, so
+  the direction was put back to the founder rather than guessed at.
+  Gates: typecheck · lint (0 errors, 75 pre-existing warnings) · test:unit 317/317 · build ·
+  check:bundle (118.0 kB).
+- **Artifacts:** `src/features/writing/fokus/GrammarDials.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/components/layout/route-icons.tsx` ·
+  `docs/areas/SCHREIBEN.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` · this log

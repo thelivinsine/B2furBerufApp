@@ -5,16 +5,17 @@ without an explicit founder request. Mechanism history + mockups: `docs/DECISION
 
 ## Nav zones
 Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Schreiben** (`/writing`, brand-blue
-accent, nib mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
+accent, pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
 **Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, but `/anwenden`
 stays mounted in `router.tsx` so `/welt` + deep links resolve — re-add the `navItems` row to
 restore it. `BottomTabBar` `REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT =
 "/analytics"` (Fortschritt is pinned directly left of Einstellungen for every user since s158,
 founder request; older persisted orders are normalised at read time);
 `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed
-Einstellungen = the 5 locked slots). Route marks (founder picks, s158; Bibliothek + Fortschritt
-swapped s170): Praktisch = Wegweiser signpost, Bibliothek = stack of three books, Schreiben =
-fountain-pen nib (accent moved rose → brand blue), Fortschritt = Pokal (trophy/cup). The Anwenden hub
+Einstellungen = the 5 locked slots). Route marks (founder picks, s158; Bibliothek, Fortschritt +
+Schreiben swapped s170): Praktisch = Wegweiser signpost, Bibliothek = stack of three books,
+Schreiben = pencil on the diagonal (accent stays brand blue), Fortschritt = Pokal (trophy/cup).
+The Anwenden hub
 itself (`/anwenden`) is 3 cards → Sprechen/Schreiben/Prüfung. Remote-config overrides (admin
 Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults match the above.
 

@@ -171,6 +171,19 @@ export function FokusTrainer({
     root.style.minHeight = fits;
     root.style.height = grows ? "" : fits;
   }, [m.status]);
+  // The same fixed chrome `measureMobile` reserves room for, as a live viewport
+  // y: the grammar pickers use it as their floor so they never open underneath
+  // the action cluster, the KI line or the tab bar.
+  const bottomLimit = useCallback(() => {
+    let top = window.innerHeight;
+    for (const el of [clusterRef.current, kiNoteRef.current]) {
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (r.height > 0) top = Math.min(top, r.top);
+    }
+    return top - 8;
+  }, []);
+
   useLayoutEffect(() => {
     measureMobile();
   });
@@ -725,6 +738,7 @@ export function FokusTrainer({
           onReset={m.reset}
           canReset={canReset}
           legend={dialsLegend}
+          bottomLimit={bottomLimit}
           className="min-h-0 grow"
         />
       </div>
