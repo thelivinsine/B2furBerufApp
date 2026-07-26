@@ -1042,3 +1042,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 1):** `src/features/writing/useFillEditor.ts` (new) ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 2 (verbatim, 2026-07-26):** `for desktop view specifically.. it's looks odd to fill up the
+  entire screen. reduce it to some extent. Keep kurz writing field shorter than the lang but both never
+  occupying the whole screen. Mobile view stays intact`
+- **Response summary:** Added a desktop-only cap on the field's RESTING height (`desktopFieldCap` in
+  `GuidedWritingTrainer.tsx`, applied by `useFillEditor` behind a `matchMedia("(min-width: 1024px)")`
+  check, i.e. Tailwind `lg`): Kurz = max(176px, 22% of the viewport), Lang = max(252px, 32%). Measured
+  at 1440x900, 1680x1050 and 1280x800: the field now ends 220-480px above the window bottom on the
+  roomy sizes and Lang runs about 45% taller than Kurz. **Mobile is provably untouched, not just
+  visually:** below `lg` the cap is skipped, so `rest === available` and the height formula collapses
+  to exactly the one that shipped in prompt 1; re-ran the 390x844 probe to confirm the cluster still
+  holds one y and the resting page is still one viewport tall. One knock-on fix: the growth ceiling
+  gained `available` as a third term next to `1.8 x rest` and `60% of the viewport`. On desktop `rest`
+  is now deliberately short of the screen, so without it typing would have hit internal scrolling while
+  a few hundred pixels of empty window were still going spare (observed at 1280x800: internal scroll at
+  317px with 142px of window free).
+- **Artifacts (prompt 2):** `src/features/writing/useFillEditor.ts` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · this log

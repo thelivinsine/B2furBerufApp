@@ -8,7 +8,8 @@ import { useCallback, useEffect, useLayoutEffect, type RefObject } from "react";
  * Three states, in order:
  *   1. At rest the field fills from its own top down to the bottom chrome (the
  *      mobile Feedback/Auswerten cluster, or the desktop Art. 50 line), so the
- *      page needs no scrolling at all. The one exception is the floor below.
+ *      page needs no scrolling at all. Two exceptions: the floor below, and
+ *      `desktopCap`, which stops the field short of the chrome from `lg` up.
  *   2. Typing past that grows the field, which turns page scrolling on, up to
  *      `GROWTH` times the resting height.
  *   3. Past that cap the field stops growing and scrolls internally.
@@ -35,6 +36,8 @@ const GROWTH = 1.8;
  * Inhaltspunkte) does not also shrink the room the learner has to write in.
  */
 const GROWTH_FLOOR = 0.6;
+/** Tailwind's `lg`, i.e. the breakpoint where `desktopCap` starts applying. */
+const WIDE = "(min-width: 1024px)";
 /** Breathing room between the field (or the card below it) and fixed chrome. */
 const GAP = 12;
 
@@ -46,6 +49,7 @@ export function useFillEditor({
   headerRef,
   clusterRef,
   noteRef,
+  desktopCap,
   fill,
   revision,
 }: {
@@ -63,6 +67,12 @@ export function useFillEditor({
   clusterRef: RefObject<HTMLElement>;
   /** Desktop Art. 50 line (laid out from `lg` up). */
   noteRef: RefObject<HTMLElement>;
+  /**
+   * From `lg` up, cap the RESTING height at `max(min, share x viewport)`. A
+   * desktop window is tall and wide, so filling every last pixel reads as one
+   * giant empty box (founder s168 follow-up); mobile has no cap and still fills.
+   */
+  desktopCap: { min: number; share: number };
   /** False once a result is on screen: size to the text instead of filling. */
   fill: boolean;
   /** Any value that should force a re-measure. */
@@ -100,8 +110,22 @@ export function useFillEditor({
     }
 
     const min = Math.max(MIN_ABSOLUTE, Math.round(window.innerHeight * MIN_SHARE));
-    const rest = Math.max(min, Math.floor(window.innerHeight - top - tail - reserve));
-    const max = Math.max(Math.round(rest * GROWTH), Math.round(window.innerHeight * GROWTH_FLOOR));
+    const available = Math.max(min, Math.floor(window.innerHeight - top - tail - reserve));
+    // Desktop stops short of the bottom chrome on purpose; mobile fills it.
+    const wide = window.matchMedia(WIDE).matches;
+    const rest = wide
+      ? Math.min(available, Math.max(desktopCap.min, Math.round(window.innerHeight * desktopCap.share)))
+      : available;
+    // Growth is measured off the resting height, but never below what the
+    // screen actually offers: on desktop `rest` is deliberately short of that,
+    // and where a tall Aufgabe pushes `available` down to the floor, 1.8x a
+    // floor is still a floor. Without `available` in here, typing would hit
+    // internal scrolling while empty screen was still going spare.
+    const max = Math.max(
+      Math.round(rest * GROWTH),
+      available,
+      Math.round(window.innerHeight * GROWTH_FLOOR),
+    );
     const height = Math.min(Math.max(content, fill ? rest : min), max);
     ta.style.height = `${height}px`;
     ta.style.overflowY = content > max ? "auto" : "hidden";
@@ -116,7 +140,7 @@ export function useFillEditor({
       const mainPad = main ? parseFloat(getComputedStyle(main).paddingBottom) || 0 : 0;
       root.style.paddingBottom = `${Math.max(0, Math.round(reserve - mainPad))}px`;
     }
-  }, [editorRef, cardRef, rootRef, clusterRef, noteRef, fill]);
+  }, [editorRef, cardRef, rootRef, clusterRef, noteRef, desktopCap.min, desktopCap.share, fill]);
 
   useLayoutEffect(() => {
     measure();
