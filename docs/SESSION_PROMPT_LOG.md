@@ -1010,3 +1010,35 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 20):** `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` ·
   this log
+
+## Session 168 (2026-07-26) — branch `claude/layout-feedback-writing-fields-3utbul`
+
+- **Prompt 1 (verbatim, 2026-07-26):** `[two phone screenshots of Schreiben Kurz and Lang] the feedback
+  button, auswerten button and the line below keep moving up and down when switching between the toggles
+  and tasks in Kurz and lang. Make them fixed at the bottom below. Also, the writing field below the
+  aufgabe should occupy the rest of the space without any scrolling. Only when the learner writes more
+  text than the visible field should the field be extended to a certain reasonable extend and page scroll
+  should be enabled. If the text is too large, then internal scrolling should also be enabled after a
+  point. Implement this without needing any preview`
+- **Response summary:** Implemented directly (preview round waived by the founder). Three changes, all in
+  Kurz/Lang. **(1)** The Feedback + Auswerten row and its caption were `sticky`, which only sticks once a
+  page actually scrolls: whenever the content fit the viewport the cluster simply parked at the end of the
+  content, so it sat at one height in Kurz, another in Lang, and moved on every task change. It is now
+  `fixed` above the nav with AppShell's `<main>` offsets mirrored so it stays in the content column.
+  **(2)** The cluster and the desktop Art. 50 line are portalled to `<body>`: WritingHub slides tab panels
+  with an `x` transform, and a transformed ancestor becomes the containing block for its `fixed`
+  descendants, which would otherwise re-anchor both mid-slide. **(3)** New `useFillEditor` hook sizes the
+  textarea: fills the gap between the Aufgabe card and the bottom chrome at rest (no page scroll), grows
+  with the text (page scroll on) to 1.8x the resting height or 60% of the viewport, then stops and scrolls
+  internally; `resize-none`, `rows` is only the pre-measurement fallback. Measured in JS rather than a
+  `dvh`/flex chain because the trainer sits inside AppShell → WritingHub → AnimatePresence, none of them
+  height-constrained. Verified in headless Chromium at 390x844, 360x640 and 1440x900: the cluster holds one
+  y across Kurz, Lang, three re-rolls and the whole 150 ms tab slide; the resting page is exactly one
+  viewport tall; 600 words caps the field and scrolls it internally. **Limit reported honestly:** a long
+  Aufgabe (one with Inhaltspunkte) takes 47-52% of a 390x844 viewport and 65-72% of a 360x640 one, so over
+  a 30-re-roll sample about a third of tasks still scroll a little; the field holds a floor of max(160px,
+  22% of the viewport) rather than collapsing. Fokus was left untouched, since the founder named Kurz and
+  Lang.
+- **Artifacts (prompt 1):** `src/features/writing/useFillEditor.ts` (new) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

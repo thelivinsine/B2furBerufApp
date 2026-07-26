@@ -1,21 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-25 (session 167). **Schreiben: the Aufgabe picker stopped lying, plus the
-overhaul plan.** Founder report "why are there almost no items in the writing section?" root-caused:
-the pool holds **373 tasks**, but the rail counted only sector-TAGGED tasks and greyed out at zero
-while the trainer drew with a prefer-tagged-else-untagged fallback. Both now share ONE selector
-(`src/lib/writingScope.ts`); Branche never disables, every dropdown count means "tasks this scope
-draws from", and every dropdown carries a generic option including the new **Alle Themen** (now the
-default landing scope). `docs/plans/SCHREIBEN-OVERHAUL.md` holds the founder-approved scope for the
-content rebuild (B1/B2/C1.1 Niveau axis, exam-realistic Aufgaben, Textsorte axis, 800-1200 tasks in
-waves). Prior s166: Schreiben mobile floating-cluster collision + panel-toggle contrast.
-Wave 1 then added the exam-shaped task schema, 120 new Aufgaben across B1/B2/C1.1, the Niveau and
-Textsorte rail axes, and founder-set daily allowances (Fokus 10 / Kurz 4 / Lang 2). P2 followed: the
-evaluator now RECEIVES the Aufgabe and grades content first, every task carries a permanent id, and
-evaluations record it so Verlauf shows the task again. Then **wave 2**: 150 Branche-specific Aufgaben,
-taking the bank to **643 tasks** and Branche coverage from 11.8% to 28.8%. **All of it is merged and
-live** (PRs #711 to #715), and `.github/workflows/supabase.yml` now deploys Edge Functions on merge,
-so backend changes no longer need a CLI. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-26 (session 168). **Schreiben Kurz/Lang: the bottom chrome stopped moving
+and the writing field now fills the screen.** The Feedback/Auswerten row and its caption were
+`sticky`, so whenever the page fit the viewport they parked at the end of the content, at one
+height in Kurz and another in Lang. They are now `fixed` above the nav (portalled to `<body>`, so
+WritingHub's tab-slide transform cannot re-anchor them), and a new `useFillEditor` hook sizes the
+textarea to the space actually left: fills it at rest with no page scroll, grows with the text,
+then scrolls internally. Prior s167 (merged and live, PRs #711 to #715): one shared Aufgabe-selection
+rule so the picker's counts stop lying, the exam-shaped task schema, and two content waves taking the
+bank to **643 tasks**; `docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest of that roadmap.
+`.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
+a CLI. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -81,6 +76,39 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 168 (2026-07-26): Kurz/Lang bottom chrome pinned, writing field sized to
+the screen.** Founder (with two phone screenshots): "the feedback button, auswerten button and the
+line below keep moving up and down when switching between the toggles and tasks in Kurz and lang.
+Make them fixed at the bottom below. Also, the writing field below the aufgabe should occupy the
+rest of the space without any scrolling." Preview round explicitly waived.
+
+- **Cause of the jumping: the cluster was `sticky`, not `fixed`.** A sticky element only sticks
+  once the page actually scrolls; whenever the content fit the viewport it simply parked at the end
+  of the content, which is a different height in Kurz than in Lang and moves with every Aufgabe.
+  It is now `fixed` above the nav, mirroring AppShell's `<main>` offsets so it stays in the content
+  column. Verified: the cluster sits at the identical y in Kurz, in Lang, across 3 re-rolls, and
+  through the whole 150 ms tab slide.
+- **Both fixed layers (cluster + desktop Art. 50 line) are portalled to `<body>`.** WritingHub
+  slides tab panels with an `x` transform and a transformed ancestor becomes the containing block
+  for its `fixed` descendants, so without the portal they re-anchor to the panel mid-slide.
+- **`src/features/writing/useFillEditor.ts` (new) sizes the field.** Fills the gap between the
+  Aufgabe card and the bottom chrome at rest (no page scroll), grows with the text (page scroll on)
+  to 1.8x the resting height or 60% of the viewport, then stops and scrolls internally. `rows` no
+  longer decides anything and the field is `resize-none`. Measured in JS deliberately: the trainer
+  sits inside AppShell → WritingHub → AnimatePresence, none of them height-constrained, so a
+  `dvh`/flex chain would have meant touching every other Schreiben surface.
+- **The one honest limit:** on a phone, a long Aufgabe (one carrying Inhaltspunkte) can occupy
+  47-52% of the viewport on a 390x844 device and 65-72% on a 360x640 one. Sampled 30 re-rolls per
+  mode per size: about two thirds of tasks now fit with no page scroll at all; the rest keep a
+  usable field (floor = max(160px, 22% of the viewport)) and the page scrolls a little instead of
+  the field collapsing to four lines. Fully removing that would mean capping the Aufgabe card
+  itself with internal scroll, which the founder did not ask for.
+- **Fokus was left alone** (the founder named Kurz and Lang): it still uses the in-flow sticky
+  cluster. If the same jumping is reported there, the fix is the same three changes.
+- **Files:** `src/features/writing/useFillEditor.ts` (new) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md`.
+  **Gates:** typecheck · lint (0 errors) · test:unit **317/317** · build · check:bundle (117.2 kB).
 
 **Handoff after session 167 (2026-07-25), part 3: the Branche answer + wave 2. MERGED AND LIVE**
 (PRs **#714**, **#715**).
@@ -178,57 +206,6 @@ Branch `claude/writing-aufgaben-research-faw959`, PRs **#711** (the overhaul) an
   check:bundle (117.2 kB). Verified in a real viewport, desktop + mobile 390px.
 - **P2 SHIPPED later the same session** (see the handoff above): the evaluator receives the Aufgabe,
   every task has a permanent id, and evaluations record it.
-
-**Handoff after session 167 (2026-07-25). Schreiben Aufgabe picker: one selection rule, plus the
-overhaul plan, branch `claude/writing-aufgaben-research-faw959`.** Founder (two screenshots of the
-Kurz/Lang Branche dropdown): "why are there almost no items in the writing section?"
-- **Root cause: the rail and the engine disagreed.** `WritingRail.tsx` counted a Branche option as
-  "tasks explicitly TAGGED with this sector" and set `disabled: count === 0`, while
-  `GuidedWritingTrainer.tsx` drew with prefer-tagged-else-untagged and is never empty. The rail
-  marked a Branche unavailable while the engine would have served the full universal pool behind it.
-  The pool was never the problem: **373 tasks** (189 Kurz, 184 Lang) across all 20 Themen. Only
-  70 carry a `sectors` tag, and **11 of 20 Themen carry none**, so every Alltag theme showed a
-  completely dead Branche dropdown.
-- **Fix: `src/lib/writingScope.ts` is now the ONE selection rule.** `eligibleTasks({theme, sub,
-  sector, length})` returns `WritingTaskRef[]` (`{theme, ix}`); the trainer draws from it and every
-  rail dropdown counts with it, so all counts finally mean the same thing. Branche never disables.
-  The sector fallback is applied **per theme**, so a Branche under Alle Themen keeps the broad pool
-  instead of collapsing to the tagged handful.
-- **"Alle Themen" added** (founder: "add a generic or all themes option for all the dropdowns"), and
-  it is now the **default landing scope** (was `themes[0]`, Besprechungen). A drawn task carries its
-  own theme, which drives the "Aufgabe: <Thema>" eyebrow, the `evaluateWriting` call, the practice
-  deep-link and the saved draft. Unterthema hides under Alle Themen (slugs are theme-scoped).
-- **`tests/writingScope.test.ts` (new, 11 cases)** pins the invariants, including the regression:
-  every Branche x every Thema x both lengths must yield > 0 tasks.
-- **Files:** `src/lib/writingScope.ts` (new), `WritingRail.tsx`, `GuidedWritingTrainer.tsx`,
-  `tests/writingScope.test.ts` (new), `docs/areas/SCHREIBEN.md`, `docs/plans/SCHREIBEN-OVERHAUL.md`
-  (new). **Gates:** typecheck · lint (0 errors) · test:unit **304/304** · build · check:bundle
-  (117.2 kB) · lint:content, all green.
-- **The plan doc is the real deliverable of this session.** It carries the founder-approved scope
-  (B1/B2/C1.1 Niveau axis · no fifth tab, exam simulation rides Kurz/Lang via a Prüfungsformat tag ·
-  add Niveau + Textsorte rail axes · 800-1200 tasks in waves) and three findings that change
-  existing assumptions: **Kurz/Lang word targets (40-60 / 120-150) match no real exam** and must
-  become task-SHAPE buckets with per-task word targets; **there is no Goethe-Zertifikat B2 Beruf**
-  (Goethe-Test PRO has no writing module at all, the Beruf writing exam is telc-only, so CLAUDE.md
-  needs correcting); and **`evaluate-writing` never receives the task text**, which makes
-  Aufgabenerfüllung structurally uncheckable and is the biggest quality ceiling in the module.
-- **Research was half-blocked:** WebFetch returned 403 at the proxy for every external host and the
-  session WebSearch budget ran out, so no official Modellsatz PDF was opened and **no verbatim exam
-  prompt was obtained**. Findings are confidence-marked; §12 of the plan lists 7 items that must not
-  be hard-coded until verified from a primary source.
-
-**Follow-up in session 166: the Schreiben panel toggles now carry the rail's Himmelblau.** Founder:
-"increase the contrast of the grammatik and aufgabe wahlen buttons in schreiben section" (preview
-round explicitly waived, so implemented directly against the established language). Both toggles used
-the shared `outline` variant (`bg-surface/50` + `border-border`), which reads as a ghost on the page
-ground in both themes. They now use a new **`accent` Button variant** (Himmelblau tile, the color of
-the rail each one opens) when closed, and keep the solid `default` when open, so the open/closed
-distinction survives. Light mode borders with **`accent-ink/70`, not `accent`**: the accent is a
-77%-light sky, so no alpha of it clears the 3:1 UI floor on the near-white ground (1.31:1 measured);
-accent-ink/70 lands at 3.07:1. Dark keeps `accent/45` (3.34:1). Label contrast 4.72:1 light,
-7.71:1 dark; `pnpm check:contrast` still green. The variant lives in `src/components/ui/button.tsx`,
-so the Bibliothek filter toggles can adopt it later if the founder wants the same treatment there.
-Gates: typecheck · lint (0 errors) · test:unit 293/293 · build · check:bundle · check:contrast.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
