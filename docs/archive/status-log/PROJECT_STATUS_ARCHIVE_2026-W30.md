@@ -845,3 +845,24 @@ healthy, the s155 restructure is holding), then the approved fix pass:
 - **Next:** nothing pending from this session. The standing doc jobs continue as usual: rotate the
   prompt log past ~1,200 lines, keep two handoffs here, bump `docs/README.md` when the folder
   shape changes.
+
+**Handoff after session 158 (2026-07-24). Nav-icon family harmonization + Trainieren toggle,
+branch `claude/schreiben-icon-design-cz21ts`, PRs #679-#683.** A preview-first icon session: the
+founder picked every mark by letter from tab-bar mockups (`preview/schreiben-icon-harmony{,-r2}.html`,
+`praktisch-icon-vorschlaege.html`, `bibliothek-icon-vorschlaege.html`,
+`fortschritt-icon-vorschlaege.html`), then everything was implemented in one pass:
+- **New route marks** (`route-icons.tsx` + `NORM` boxes): Praktisch = **Wegweiser** signpost (pick I,
+  replaced the compass), Bibliothek = **Buch mit Lesezeichen** (pick P, replaced the lying stack),
+  Schreiben = **Federspitze** nib (pick E; `nav-items.ts` accent moved rose `#f43f5e` → brand blue
+  `#3D74ED` with it), Fortschritt = **Fortschrittsring** (pick S, replaced the bar chart). All marks
+  stay two-tone with neon-cyan `#22d3ee` companions.
+- **Trainieren toggle:** the Praktisch dashboard toggle "Lernen" renamed to **"Trainieren"** with the
+  lucide Dumbbell restored (`Dashboard.tsx`, `LernenBook` removed; admin H8 label; Help-hub line).
+- **Fortschritt pinned:** `BottomTabBar` now keeps Fortschritt directly LEFT of Einstellungen for
+  every user (`REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT`); older persisted
+  orders normalise at read time; edit-mode reorder covers only Bibliothek + Schreiben.
+- **Verified live** (vite preview + Playwright): all five tabs render the picked marks at equal
+  widths; screenshots match the approved previews. Docs: `docs/areas/PRAKTISCH-NAV.md` updated.
+- **Gates:** build · check:bundle **116.9 kB** · test:unit green.
+- **Next:** nothing pending from this session; the old `preview/route-icons-preview.svg` reference
+  sheet is stale (pre-s158 marks) if anyone wants to regenerate it.

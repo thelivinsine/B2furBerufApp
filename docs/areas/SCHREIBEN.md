@@ -2,8 +2,8 @@
 
 A visual EXTENSION of the Bibliothek design language (see the `/design` skill). Founder-approved
 previews: `preview/schreiben-bibliothek-extension*.html`, `preview/schreiben-design-review.html`,
-`preview/fokus-correction-*.html`. **Verlauf is slated for rework — do not treat its current
-design as reference.**
+`preview/fokus-correction-*.html`, `preview/verlauf-fortschritt-redesign.html` (Verlauf variant
+**C "Entwicklung zuerst"**, founder-picked s160).
 
 ## Page frame
 - 4-segment sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (no
@@ -34,9 +34,28 @@ design as reference.**
 - Mobile = the Bibliothek pattern: a toolbar button toggles the collapsible panel
   (`layout="panel"`, no floating chip rows); Kurz/Lang get a sticky bottom Auswerten action bar.
 - Umlaut keys (`UmlautKeys`, below) sit in the word-count row of `GuidedWritingTrainer.tsx`.
-- Verlauf renders inside the same content grid column (never full width); its empty state
-  deep-links into Kurz. `WritingHistory` shows only the learner's text (the exact prompt behind
-  an old entry is not recoverable since pools).
+## Verlauf (history)
+Renders inside the same content grid column (never full width); the empty state deep-links into
+Kurz. Design = variant C, "development first" (s160):
+- **"Deine Entwicklung" card leads the tab**: the top 3 weakness categories as monthly mini bar
+  groups over `TREND_MONTHS` (3) calendar months, oldest bar lightest, with a per-category trend
+  arrow (down = `--success`, up = `--warning`, flat = muted) and a success badge for the biggest
+  drop ("Kasus & Artikel: 33 % weniger"). Footer = "Größte Schwachstelle: X" + "Jetzt üben".
+- **Honesty rules that must not be weakened:** a month only counts as a comparison point with
+  `MIN_TEXTS_PER_MONTH` (2) texts or more, so a quiet month never reads as progress; a month with
+  no texts prints "–", never 0; with fewer than two comparable months the card falls back to plain
+  totals plus "Der Trend erscheint ab dem zweiten Monat."
+- **List = compact rows** (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron). The
+  tip, the learner's text, delete, and the practice CTA live behind the row disclosure; the AI
+  disclaimer is the standalone muted line at the bottom of the expanded area.
+- Kurz/Lang filter (`ModeSwitcher`, the shipped grey-track/white-pill language) appears ONLY when
+  both kinds exist; the count badge next to "Letzte Auswertungen" reflects the filtered list.
+- `getWritingHistory` returns `null` on a failed query (never `[]`), so the error card with
+  "Erneut versuchen" is reachable and an empty history is never faked.
+- `WritingHistory` still shows only the learner's text: the exact prompt behind an old entry is
+  not recoverable since pools. **Storing the correction + the Aufgabe, and giving Fokus a history,
+  are the open follow-ups** (they need a `writing_evaluations` schema migration; the Fokus segment
+  is deliberately absent from the filter until then, never a dead control).
 
 ## Fokus (Satzlabor)
 - Single-sentence write → correct → transform lab. **Grammar rail = three combinable axes,

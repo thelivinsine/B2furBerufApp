@@ -140,8 +140,18 @@ button right. Noun+verb combos live in Kollokationen, never as Wörter entries.
 interstitial); dice re-rolls in scope; "Aufgabe: <Thema>" eyebrow bold brand blue, Ziel stated
 once. Fokus: detected form = white pill + green dot; correction card = Original/Korrigiert toggle
 (coral marks on Original, green on Korrigiert) + Himmelblau fix tiles + "Neuer Satz" outline
-button on the tile row. Rails are Himmelblau tiles with header reset icons. (Verlauf is slated
-for rework; do not treat its current design as reference.)
+button on the tile row. Rails are Himmelblau tiles with header reset icons. **Verlauf** (picked
+s160, variant C "Entwicklung zuerst"): a "Deine Entwicklung" card leads with per-category monthly
+bars + trend arrows (down = green, up = amber) and a "X % weniger" success badge, then a COMPACT
+row list (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron) whose disclosure holds
+the tip, the text, delete, and the practice CTA. A trend is only ever claimed from months with
+≥2 texts; months without texts print "–".
+
+**Fortschritt (`/analytics`)** (picked s160, variant 3 "Kompetenzkurve"): the Überblick block is
+unchanged; directly below it a Kompetenz curve (mastered words / Can-Dos over time, green
+milestone dots) replaces XP as the headline, XP stays in Details. Dranbleiben = Prüfung
+(countdown + last simulation, only while the exam date is ahead) + a writing-aware Diagnose +
+Nächste Quest. The curve card shows the direction only; absolute counts stay on the tiles.
 
 **Praktisch (`/`).** One centered column all breakpoints (two-column desktop was rejected);
 Üben = the soft SVG city map in a white `bg-surface` mat with neutral grey border, Spielen = the

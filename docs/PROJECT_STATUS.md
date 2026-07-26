@@ -1,10 +1,10 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 158). **Nav-icon family harmonization (founder-picked):**
-Praktisch = Wegweiser, Bibliothek = Buch mit Lesezeichen, Schreiben = Federspitze (accent rose → brand
-blue), Fortschritt = Fortschrittsring; the dashboard toggle is now "Trainieren" with the Dumbbell; and
-Fortschritt is pinned directly left of Einstellungen in the bottom bar for all users. Prior s159:
-Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; founder must redeploy `transform-sentence`).
+_Last updated: 2026-07-26 (session 160). **Verlauf + Fortschritt redesign (founder-picked C and 3):**
+Schreiben's Verlauf now leads with a weakness-trend card over a compact row list; Fortschritt leads with
+a Kompetenz curve (mastered words / Can-Dos over time) and pairs a Prüfung countdown with a
+writing-aware Diagnose. Competence is now SAMPLED daily (`masteryHistory`), since FSRS history cannot be
+backfilled. Prior s158: nav-icon family harmonization + Fortschritt pinned left of Einstellungen.
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -69,26 +69,46 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 158 (2026-07-24). Nav-icon family harmonization + Trainieren toggle,
-branch `claude/schreiben-icon-design-cz21ts`, PRs #679-#683.** A preview-first icon session: the
-founder picked every mark by letter from tab-bar mockups (`preview/schreiben-icon-harmony{,-r2}.html`,
-`praktisch-icon-vorschlaege.html`, `bibliothek-icon-vorschlaege.html`,
-`fortschritt-icon-vorschlaege.html`), then everything was implemented in one pass:
-- **New route marks** (`route-icons.tsx` + `NORM` boxes): Praktisch = **Wegweiser** signpost (pick I,
-  replaced the compass), Bibliothek = **Buch mit Lesezeichen** (pick P, replaced the lying stack),
-  Schreiben = **Federspitze** nib (pick E; `nav-items.ts` accent moved rose `#f43f5e` → brand blue
-  `#3D74ED` with it), Fortschritt = **Fortschrittsring** (pick S, replaced the bar chart). All marks
-  stay two-tone with neon-cyan `#22d3ee` companions.
-- **Trainieren toggle:** the Praktisch dashboard toggle "Lernen" renamed to **"Trainieren"** with the
-  lucide Dumbbell restored (`Dashboard.tsx`, `LernenBook` removed; admin H8 label; Help-hub line).
-- **Fortschritt pinned:** `BottomTabBar` now keeps Fortschritt directly LEFT of Einstellungen for
-  every user (`REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT`); older persisted
-  orders normalise at read time; edit-mode reorder covers only Bibliothek + Schreiben.
-- **Verified live** (vite preview + Playwright): all five tabs render the picked marks at equal
-  widths; screenshots match the approved previews. Docs: `docs/areas/PRAKTISCH-NAV.md` updated.
-- **Gates:** build · check:bundle **116.9 kB** · test:unit green.
-- **Next:** nothing pending from this session; the old `preview/route-icons-preview.svg` reference
-  sheet is stale (pre-s158 marks) if anyone wants to regenerate it.
+**Handoff after session 160 (2026-07-26). Verlauf + Fortschritt redesign (founder picks C and 3),
+branch `claude/selection-color-contrast-3upqkz`.** Started with a one-line fix (the sidebar active-row
+grey was too dark: `bg-border` -> `bg-muted`, PR #685), then a four-agent analysis of Schreiben's
+Verlauf and the Fortschritt page (purpose, current state, docs/founder record, learner value), then
+preview-first design (`preview/verlauf-fortschritt-redesign.html`, artifact c3df428e, 3 variants per
+surface). Founder picked **C "Entwicklung zuerst"** for Verlauf and **3 "Kompetenzkurve"** for
+Fortschritt; both implemented in this session.
+- **Verlauf (`WritingHistory.tsx`, rewritten):** a "Deine Entwicklung" card leads (top-3 weakness
+  categories as 3-month mini bar groups, trend arrows, "X % weniger" success badge, "Jetzt üben"
+  footer), then a COMPACT row list whose disclosure holds the tip, the learner's text, delete and the
+  practice CTA. Kurz/Lang `ModeSwitcher` only when both kinds exist. **Honesty guards:** a month
+  needs >=2 texts to count as a comparison point (`MIN_TEXTS_PER_MONTH`), a month with no texts
+  prints "-" not 0, and under two comparable months the card falls back to totals + "Der Trend
+  erscheint ab dem zweiten Monat."
+- **Fortschritt (`Analytics.tsx`):** new **Kompetenz** curve directly under the unchanged Überblick
+  (mastered words / Can-Dos over time, green dots on days a Can-Do was reached, "Zuletzt erreicht"
+  line, direction-only footer "+16 Wörter diese Woche"); XP chart stays in Details. **Dranbleiben**
+  is now Prüfung (days-remaining ring over a 90-day run-up + last simulation + `/exam` CTA, only
+  while `examDate` is ahead) + a **writing-aware Diagnose** (most-flagged weakness from the last 60
+  evaluations, falling back to the weakest band/theme) + Nächste Quest (spans both columns when the
+  Prüfung card shows). The duplicated writing-weakness panel was DELETED from Details (it disagreed
+  with the Verlauf panel: 60 vs 30 entries).
+- **New competence sampling:** `useProgressStore.masteryHistory` + `canDoAchievedAt` +
+  `recordCompetence`, sampled from Analytics on view and from `lib/competence.ts` at session end
+  (SessionPlayer `finish`). FSRS keeps current state only, so this history CANNOT be backfilled;
+  pre-existing achievements are stamped `SEEDED_MILESTONE` so they never plot as "reached today".
+  Both fields are local-only (the `progress` row has a fixed column set), same caveat as
+  `missionsDone`/`keyItems`. `lib/competence.ts` imports banks: never import it from eager code.
+- **`getWritingHistory` now returns `null` on failure** (was `[]`), so the Verlauf error card with
+  "Erneut versuchen" is finally reachable and an empty history is never faked.
+- **Verified in the real app**, not just the mockup: seeded a demo state and screenshotted
+  `/analytics` + `/writing?mode=verlauf` in light AND dark, incl. the expanded row. Two defects found
+  and fixed that way (the trend arrow was comparing against a 1-text month, so an improving category
+  read as worsening; a two-line weakness label pushed its arrow out of place).
+- **Gates:** typecheck · lint 0 errors (72 warnings = baseline) · test:unit **289/289** · build ·
+  check:bundle **117.3 kB** (banks stayed out of the eager chunk).
+- **Next:** the two high-value follow-ups both need a `writing_evaluations` migration and are NOT
+  done: (1) store the corrected text + the Aufgabe so Verlauf can show the actual correction in the
+  Fokus mark language, (2) give Fokus a history (the Fokus filter segment is deliberately absent
+  until then). Optional: "In die Wiederholung" (turn a correction into an FSRS card).
 
 **Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
 branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a

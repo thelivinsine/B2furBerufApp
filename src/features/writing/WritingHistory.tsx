@@ -1,16 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown, Lightbulb, Sparkles } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  Loader2,
+  PenLine,
+  Target,
+  AlertCircle,
+  Trash2,
+  ChevronDown,
+  Lightbulb,
+  Sparkles,
+  ArrowDown,
+  ArrowUp,
+  ArrowRight,
+} from "lucide-react";
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
-import { getWritingHistory, deleteWritingEvaluation, type WritingHistoryEntry } from "@/lib/writing";
+import { useSlidingPill } from "@/features/shared/useSlidingPill";
+import {
+  getWritingHistory,
+  deleteWritingEvaluation,
+  type WritingHistoryEntry,
+} from "@/lib/writing";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+/** How many calendar months the development card compares. */
+const TREND_MONTHS = 3;
+/**
+ * A month needs at least this many texts before it counts as a comparison
+ * point. Without the floor a quiet month (one text, so almost no findings)
+ * would read as a big improvement, or as a relapse the moment writing resumes.
+ */
+const MIN_TEXTS_PER_MONTH = 2;
 
 function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("de-DE", {
@@ -20,63 +46,217 @@ function formatDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-function WeaknessFrequency({ entries }: { entries: WritingHistoryEntry[] }) {
+function monthKeyOf(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthLabel(key: string): string {
+  const [y, m] = key.split("-").map(Number);
+  return new Intl.DateTimeFormat("de-DE", { month: "short" }).format(new Date(y, m - 1, 1));
+}
+
+/** The last n calendar month keys, oldest first. */
+function lastMonthKeys(n: number): string[] {
+  const out: string[] = [];
+  const now = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+  }
+  return out;
+}
+
+/** Himmelblau weakness chip (squircle, never a fully round badge). */
+function WeaknessChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-md border border-accent/50 bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-ink dark:border-accent/25 dark:bg-accent/10">
+      {children}
+    </span>
+  );
+}
+
+/**
+ * "Deine Entwicklung" — the card that leads the Verlauf (founder pick C): are the
+ * same mistakes still happening, or fewer of them? Falls back to plain totals
+ * until there are two months to compare, so it never implies a trend it cannot
+ * prove.
+ */
+function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
   const navigate = useNavigate();
 
-  const freq = entries.reduce(
-    (acc, e) => {
-      if (e.weakness) acc[e.weakness] = (acc[e.weakness] ?? 0) + 1;
-      return acc;
-    },
-    {} as Partial<Record<WeaknessCategory, number>>,
-  );
+  const model = useMemo(() => {
+    const months = lastMonthKeys(TREND_MONTHS);
+    const textsPerMonth = months.map(() => 0);
+    const totals = new Map<WeaknessCategory, number>();
+    const perMonth = new Map<WeaknessCategory, number[]>();
 
-  const sorted = (Object.entries(freq) as [WeaknessCategory, number][]).sort(
-    ([, a], [, b]) => b - a,
-  );
+    for (const e of entries) {
+      const idx = months.indexOf(monthKeyOf(e.created_at));
+      if (idx >= 0) textsPerMonth[idx] += 1;
+      if (!e.weakness) continue;
+      totals.set(e.weakness, (totals.get(e.weakness) ?? 0) + 1);
+      if (idx >= 0) {
+        const arr = perMonth.get(e.weakness) ?? months.map(() => 0);
+        arr[idx] += 1;
+        perMonth.set(e.weakness, arr);
+      }
+    }
 
-  if (sorted.length === 0) return null;
+    const ranked = [...totals.entries()].sort(([, a], [, b]) => b - a);
+    // Compare the first and last months that carry enough writing to mean
+    // something, never a month the learner skipped.
+    const solid = months.flatMap((_, i) => (textsPerMonth[i] >= MIN_TEXTS_PER_MONTH ? [i] : []));
+    const comparable = solid.length >= 2;
+    const fromIdx = solid[0];
+    const toIdx = solid[solid.length - 1];
 
-  const maxCount = sorted[0][1];
-  const topArea = practiceAreaById(sorted[0][0]);
+    const top = ranked.slice(0, 3).map(([weakness, total]) => {
+      const counts = perMonth.get(weakness) ?? months.map(() => 0);
+      const first = comparable ? counts[fromIdx] : 0;
+      const last = comparable ? counts[toIdx] : 0;
+      return {
+        weakness,
+        total,
+        counts,
+        direction: !comparable
+          ? null
+          : last < first
+            ? ("down" as const)
+            : last > first
+              ? ("up" as const)
+              : ("flat" as const),
+        dropPct: comparable && first > 0 && last < first
+          ? Math.round(((first - last) / first) * 100)
+          : 0,
+      };
+    });
+
+    const peak = Math.max(1, ...top.flatMap((t) => t.counts));
+    const bestDrop = [...top].sort((a, b) => b.dropPct - a.dropPct)[0];
+
+    return { months, textsPerMonth, ranked, top, peak, comparable, bestDrop };
+  }, [entries]);
+
+  if (model.ranked.length === 0) return null;
+
+  const topArea = practiceAreaById(model.ranked[0][0]);
+  const showTrend = model.comparable;
+  const improvement =
+    showTrend && model.bestDrop && model.bestDrop.dropPct > 0 ? model.bestDrop : null;
 
   return (
     <Card>
       <CardContent className="space-y-4 p-5">
-        <p className="flex items-center gap-2 text-sm font-semibold">
-          <TrendingUp className="h-4 w-4 text-primary" /> Deine häufigsten Schwachstellen
-        </p>
-
-        <div className="space-y-2.5">
-          {sorted.slice(0, 5).map(([weakness, count], i) => {
-            const area = practiceAreaById(weakness);
-            const widthPct = Math.round((count / maxCount) * 100);
-            return (
-              <div key={weakness} className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className={cn("font-medium", i === 0 && "text-primary")}>
-                    {area?.labelDe ?? weakness}
-                  </span>
-                  <span className="tabular-nums text-muted-foreground">{count}×</span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-                  <div
-                    className={cn(
-                      "h-full rounded-full transition-all",
-                      i === 0 ? "bg-primary" : "bg-muted-foreground/40",
-                    )}
-                    style={{ width: `${widthPct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-eyebrow text-muted-foreground">Deine Entwicklung</p>
+          {improvement && (
+            <Badge variant="success">
+              {practiceAreaById(improvement.weakness)?.labelDe ?? improvement.weakness}:{" "}
+              {improvement.dropPct} % weniger
+            </Badge>
+          )}
         </div>
 
+        {showTrend ? (
+          <div className="grid gap-4 sm:grid-cols-3">
+            {model.top.map(({ weakness, counts, direction }) => {
+              const area = practiceAreaById(weakness);
+              const Arrow =
+                direction === "down"
+                  ? ArrowDown
+                  : direction === "up"
+                    ? ArrowUp
+                    : direction === "flat"
+                      ? ArrowRight
+                      : null;
+              return (
+                <div key={weakness}>
+                  <div className="flex h-16 items-end gap-1.5" aria-hidden>
+                    {counts.map((n, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "flex-1 rounded-t-sm",
+                          n === 0 && "bg-muted",
+                        )}
+                        style={{
+                          height: `${Math.max(4, (n / model.peak) * 100)}%`,
+                          ...(n > 0
+                            ? {
+                                background: `hsl(var(--primary) / ${(
+                                  0.25 +
+                                  (i / Math.max(1, counts.length - 1)) * 0.75
+                                ).toFixed(2)})`,
+                              }
+                            : {}),
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Inline icon, so a two-line label keeps its arrow attached. */}
+                  <p className="mt-1.5 text-sm font-semibold">
+                    {area?.labelDe ?? weakness}{" "}
+                    {Arrow && (
+                      <Arrow
+                        className={cn(
+                          "inline-block h-3.5 w-3.5 align-[-2px]",
+                          direction === "down" && "text-success",
+                          direction === "up" && "text-warning",
+                          direction === "flat" && "text-muted-foreground",
+                        )}
+                      />
+                    )}
+                  </p>
+                  <p className="text-xs tabular-nums text-muted-foreground">
+                    {counts
+                      .map(
+                        (n, i) =>
+                          // A month without texts shows "–": no writing is not
+                          // the same as no mistakes.
+                          `${monthLabel(model.months[i])} ${model.textsPerMonth[i] > 0 ? n : "–"}`,
+                      )
+                      .join(" · ")}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="space-y-2.5">
+              {model.ranked.slice(0, 5).map(([weakness, count], i) => {
+                const area = practiceAreaById(weakness);
+                return (
+                  <div key={weakness} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className={cn("font-medium", i === 0 && "text-primary")}>
+                        {area?.labelDe ?? weakness}
+                      </span>
+                      <span className="tabular-nums text-muted-foreground">{count}×</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className={cn(
+                          "h-full rounded-full",
+                          i === 0 ? "bg-primary" : "bg-muted-foreground/40",
+                        )}
+                        style={{ width: `${Math.round((count / model.ranked[0][1]) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">Der Trend erscheint ab dem zweiten Monat.</p>
+          </div>
+        )}
+
         {topArea && (
-          <div className="flex items-center justify-between border-t border-border pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
             <p className="text-sm text-muted-foreground">
-              Größte Schwachstelle: <span className="font-medium text-foreground">{topArea.labelDe}</span>
+              Größte Schwachstelle:{" "}
+              <span className="font-medium text-foreground">{topArea.labelDe}</span>
             </p>
             <Button size="sm" onClick={() => navigate(topArea.route)}>
               <Target className="h-3.5 w-3.5" /> Jetzt üben
@@ -88,6 +268,67 @@ function WeaknessFrequency({ entries }: { entries: WritingHistoryEntry[] }) {
   );
 }
 
+type ModeFilter = "alle" | "short" | "long";
+
+const MODE_TABS: { id: ModeFilter; label: string }[] = [
+  { id: "alle", label: "Alle" },
+  { id: "short", label: "Kurz" },
+  { id: "long", label: "Lang" },
+];
+
+/** Compact segmented filter in the shipped switcher language (grey track, white pill). */
+function ModeSwitcher({
+  value,
+  onChange,
+}: {
+  value: ModeFilter;
+  onChange: (v: ModeFilter) => void;
+}) {
+  const reduce = useReducedMotion();
+  const { trackRef, registerItem, rect } = useSlidingPill(value);
+  return (
+    <div
+      ref={trackRef as React.RefObject<HTMLDivElement>}
+      role="tablist"
+      aria-label="Nach Art filtern"
+      className="relative flex items-stretch gap-0.5 rounded-lg border border-border bg-muted p-1"
+    >
+      {rect && (
+        <motion.span
+          aria-hidden
+          className="absolute bottom-1 top-1 left-0 rounded-md bg-surface shadow-soft"
+          initial={false}
+          animate={{ x: rect.left, width: rect.width }}
+          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }}
+        />
+      )}
+      {MODE_TABS.map((tab) => {
+        const active = tab.id === value;
+        return (
+          <button
+            key={tab.id}
+            ref={registerItem(tab.id)}
+            onClick={() => onChange(tab.id)}
+            role="tab"
+            aria-selected={active}
+            className={cn(
+              "relative z-10 rounded-md px-3 py-1.5 text-xs leading-none transition-colors",
+              active ? "font-bold text-primary" : "font-medium text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * One history row. Compact by default (concept C): date, theme, kind, weakness.
+ * The tip, the learner's own text, and the destructive action live behind the
+ * disclosure, so a long history stays scannable.
+ */
 function HistoryEntry({
   entry,
   index,
@@ -98,6 +339,7 @@ function HistoryEntry({
   onDelete: (id: string) => Promise<void>;
 }) {
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
   const theme = themeById(entry.theme);
   const area = practiceAreaById(entry.weakness);
   const [confirming, setConfirming] = useState(false);
@@ -114,26 +356,59 @@ function HistoryEntry({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={reduce ? false : { opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
+      transition={{ delay: Math.min(index, 8) * 0.03, duration: 0.16 }}
     >
       <Card className="overflow-hidden">
-        <CardContent className="space-y-3 p-4">
-          {/* Meta row: when + what */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">{formatDate(entry.created_at)}</span>
-            {theme && (
-              <Badge variant="muted" className="text-xs">
-                {theme.titleDe}
-              </Badge>
-            )}
-            <Badge variant="muted" className="text-xs">
-              {entry.length === "short" ? "Kurz" : "Lang"}
-            </Badge>
-            <div className="ml-auto flex items-center gap-2">
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className="flex w-full flex-wrap items-center gap-2 p-4 text-left transition-colors hover:bg-muted/40"
+        >
+          <span className="text-xs font-medium tabular-nums text-muted-foreground">
+            {formatDate(entry.created_at)}
+          </span>
+          {theme && <Badge variant="muted">{theme.titleDe}</Badge>}
+          <Badge variant="outline">{entry.length === "short" ? "Kurz" : "Lang"}</Badge>
+          <span className="ml-auto flex items-center gap-2">
+            {area && <WeaknessChip>{area.labelDe}</WeaknessChip>}
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                expanded && "rotate-180",
+              )}
+            />
+          </span>
+        </button>
+
+        {expanded && (
+          <CardContent className="space-y-3 border-t border-border p-4">
+            {/* The headline result of the evaluation. */}
+            <div className="space-y-2 rounded-xl border border-primary/15 bg-primary/5 p-3.5">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 shrink-0 text-primary" />
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  Wichtigster Tipp
+                </p>
+              </div>
+              <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
+            </div>
+
+            {/* The learner's own text. (The Aufgabe behind an old entry is not
+                recoverable: since the s148 random pools it is not stored.) */}
+            <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <PenLine className="h-3.5 w-3.5" /> Dein Text
+              </p>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
               {confirming ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-3">
                   <button
                     onClick={() => setConfirming(false)}
                     disabled={deleting}
@@ -159,61 +434,19 @@ function HistoryEntry({
                   <Trash2 className="h-4 w-4" />
                 </button>
               )}
-            </div>
-          </div>
-
-          {/* Feedback: the headline result, visually emphasised */}
-          <div className="space-y-2 rounded-xl border border-primary/15 bg-primary/5 p-3.5">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="h-4 w-4 shrink-0 text-primary" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                Wichtigster Tipp
-              </p>
               {area && (
-                <Badge className="ml-auto bg-primary/10 text-primary text-xs">{area.labelDe}</Badge>
+                <Button size="sm" variant="outline" onClick={() => navigate(area.route)}>
+                  <Target className="h-3.5 w-3.5" /> {area.labelDe} üben
+                </Button>
               )}
             </div>
-            <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+
+            <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
               <Sparkles className="h-3 w-3 shrink-0" />
               KI-generierte Rückmeldung
             </p>
-          </div>
-
-          {/* Disclosure for the learner's own text. (The Aufgabe itself is no
-              longer shown: since the s148 random pools the exact prompt behind
-              an old entry is not recoverable from theme + length alone.) */}
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            aria-expanded={expanded}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
-            {expanded ? "Deinen Text ausblenden" : "Deinen Text anzeigen"}
-          </button>
-
-          {expanded && (
-            <div className="space-y-3">
-              <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
-                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  <PenLine className="h-3.5 w-3.5" /> Dein Text
-                </p>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                  {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Practice CTA */}
-          {area && (
-            <div className="flex justify-end border-t border-border pt-3">
-              <Button size="sm" variant="outline" onClick={() => navigate(area.route)} className="gap-1.5">
-                <Target className="h-3.5 w-3.5" /> {area.labelDe} üben
-              </Button>
-            </div>
-          )}
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
     </motion.div>
   );
@@ -224,6 +457,7 @@ export function WritingHistory() {
   const [entries, setEntries] = useState<WritingHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [mode, setMode] = useState<ModeFilter>("alle");
   const showToast = useSessionStore((s) => s.showToast);
 
   const handleDelete = async (id: string) => {
@@ -252,6 +486,12 @@ export function WritingHistory() {
   useEffect(() => {
     load();
   }, []);
+
+  // The filter only appears when it can actually sort something: with a single
+  // kind of text on record it would be chrome with nothing to do.
+  const hasShort = entries.some((e) => e.length === "short");
+  const hasLong = entries.some((e) => e.length === "long");
+  const shown = mode === "alle" ? entries : entries.filter((e) => e.length === mode);
 
   if (loading) {
     return (
@@ -298,13 +538,21 @@ export function WritingHistory() {
 
   return (
     <div className="space-y-5">
-      <WeaknessFrequency entries={entries} />
+      <WeaknessTrend entries={entries} />
 
       <div className="space-y-3">
-        <p className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-          Letzte Auswertungen · {entries.length}
-        </p>
-        {entries.map((e, i) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-eyebrow text-muted-foreground">Letzte Auswertungen</p>
+          <Badge variant="muted" className="tabular-nums">
+            {shown.length}
+          </Badge>
+          {hasShort && hasLong && (
+            <div className="ml-auto">
+              <ModeSwitcher value={mode} onChange={setMode} />
+            </div>
+          )}
+        </div>
+        {shown.map((e, i) => (
           <HistoryEntry key={e.id} entry={e} index={i} onDelete={handleDelete} />
         ))}
       </div>
