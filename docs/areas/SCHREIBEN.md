@@ -91,13 +91,20 @@ design as reference.**
 - **The writing field is sized, not fixed-`rows`** (`useFillEditor.ts`, founder s168). At rest it
   fills from its own top down to whichever bottom chrome is laid out (mobile cluster / desktop
   Art. 50 line), so the page does not scroll; typing past that grows it (page scroll turns on) to
-  at most 1.8x the resting height or 60% of the viewport, whichever is larger; past that it stops
-  and scrolls internally. `resize-none`: the height is measured, so hand-resizing is gone and
-  `rows` is only the pre-measurement fallback. Floor = max(160px, 22% of the viewport): a long
-  Aufgabe (Inhaltspunkte) can leave less room than that on a phone, and a small page scroll beats
-  a four-line writing slot. Once a result is on screen the field drops to its text's own height so
-  the feedback is not pushed a screen down. Measure it in JS, not a `dvh`/flex chain: the trainer
-  sits inside AppShell → WritingHub → AnimatePresence, none of them height-constrained.
+  at most 1.8x the resting height, the space the screen actually offers, or 60% of the viewport,
+  whichever is largest; past that it stops and scrolls internally. `resize-none`: the height is
+  measured, so hand-resizing is gone and `rows` is only the pre-measurement fallback. Floor =
+  max(160px, 22% of the viewport): a long Aufgabe (Inhaltspunkte) can leave less room than that on
+  a phone, and a small page scroll beats a four-line writing slot. Once a result is on screen the
+  field drops to its text's own height so the feedback is not pushed a screen down. Measure it in
+  JS, not a `dvh`/flex chain: the trainer sits inside AppShell → WritingHub → AnimatePresence,
+  none of them height-constrained.
+- **From `lg` up the RESTING height is capped and Kurz is shorter than Lang** (`desktopFieldCap`
+  in `GuidedWritingTrainer.tsx`, founder s168 follow-up: filling a whole desktop window "looks
+  odd"). Kurz = max(176px, 22% of the viewport), Lang = max(252px, 32%), so the field never
+  reaches the bottom chrome on desktop and the two modes read as different sizes. **Mobile has no
+  cap and still fills** — on phones the space is genuinely scarce, which is the whole point there.
+  Growth and internal scrolling are unchanged by the cap.
 - Verlauf renders inside the same content grid column (never full width); its empty state
   deep-links into Kurz. `WritingHistory` shows only the learner's text (the exact prompt behind
   an old entry is not recoverable since pools).

@@ -39,6 +39,17 @@ const rangeByLength: Record<WritingLength, [number, number]> = {
   long: [120, 150],
 };
 
+/**
+ * Desktop resting height of the writing field, `max(min, share x viewport)`
+ * (founder s168 follow-up: filling a whole desktop window "looks odd"). Kurz is
+ * deliberately shorter than Lang, in proportion to what each one asks for, and
+ * neither ever reaches the bottom of the window. Mobile keeps the full fill.
+ */
+const desktopFieldCap: Record<WritingLength, { min: number; share: number }> = {
+  short: { min: 176, share: 0.22 },
+  long: { min: 252, share: 0.32 },
+};
+
 function countWords(text: string): number {
   const t = text.trim();
   return t ? t.split(/\s+/).length : 0;
@@ -252,6 +263,7 @@ export function GuidedWritingTrainer({
     headerRef: pickerRef,
     clusterRef,
     noteRef,
+    desktopCap: desktopFieldCap[length],
     fill: !result,
     revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}`,
   });

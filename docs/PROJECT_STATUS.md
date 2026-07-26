@@ -6,7 +6,8 @@ and the writing field now fills the screen.** The Feedback/Auswerten row and its
 height in Kurz and another in Lang. They are now `fixed` above the nav (portalled to `<body>`, so
 WritingHub's tab-slide transform cannot re-anchor them), and a new `useFillEditor` hook sizes the
 textarea to the space actually left: fills it at rest with no page scroll, grows with the text,
-then scrolls internally. Prior s167 (merged and live, PRs #711 to #715): one shared Aufgabe-selection
+then scrolls internally. On desktop that resting height is capped (Kurz shorter than Lang, neither
+filling the window); mobile still fills. Prior s167 (merged and live, PRs #711 to #715): one shared Aufgabe-selection
 rule so the picker's counts stop lying, the exam-shaped task schema, and two content waves taking the
 bank to **643 tasks**; `docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest of that roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
@@ -106,6 +107,16 @@ rest of the space without any scrolling." Preview round explicitly waived.
   itself with internal scroll, which the founder did not ask for.
 - **Fokus was left alone** (the founder named Kurz and Lang): it still uses the in-flow sticky
   cluster. If the same jumping is reported there, the fix is the same three changes.
+- **Follow-up in the same session: the desktop field is capped.** Founder: "for desktop view
+  specifically.. it's looks odd to fill up the entire screen. reduce it to some extent. Keep kurz
+  writing field shorter than the lang but both never occupying the whole screen. Mobile view stays
+  intact." From `lg` up the RESTING height is now capped (`desktopFieldCap`): Kurz = max(176px,
+  22% of the viewport), Lang = max(252px, 32%). Measured at 1440x900 / 1680x1050 / 1280x800: the
+  field ends 220-480px above the window bottom and Lang runs ~45% taller than Kurz. **Mobile is
+  provably untouched** — below `lg` the cap is skipped, so `rest === available` and the formula
+  reduces to exactly what shipped in the first pass. The growth ceiling gained `available` as a
+  third term, because on desktop `rest` is deliberately short of the screen and 1.8x a capped
+  height would have started internal scrolling while empty window was still going spare.
 - **Files:** `src/features/writing/useFillEditor.ts` (new) ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md`.
   **Gates:** typecheck · lint (0 errors) · test:unit **317/317** · build · check:bundle (117.2 kB).
