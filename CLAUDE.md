@@ -81,8 +81,12 @@ after pulling.
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
   lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the grey-tile/white-controls
   FilterRail answer, the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
-  `layoutId`), the Schreiben mobile anatomy (fixed bottom chrome + measured tile heights + the
-  Fokus dial tile — four preview rounds settled it, `docs/areas/SCHREIBEN.md`).
+  `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
+  Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
+  `docs/areas/SCHREIBEN.md`).
+- **A freshly opened page never scrolls.** Every trainer sizes its elastic element (the writing
+  field, the tile column) to the room actually left, and gives up its preferred floor rather than
+  push the resting page past one viewport (`useFillEditor`, `measureMobile`).
 - **Design landmines:** the `/design` skill §7 lists everything shipped-then-reverted; never
   reintroduce an item on that list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior
@@ -105,9 +109,10 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile.
 - **Controls always visibly act:** no disabled-at-default buttons; zero-yield options grey out
   with honest counts.
-- **Color language:** Himmelblau accent tiles for selection rails (not grey), but the accent is a
-  FILL only: rails and the buttons that open them are outlined with the neutral `border` token,
-  never an accent edge. Content on white cards (no grey washes); card-title eyebrows bold brand
+- **Color language:** Himmelblau accent tiles for selection rails (not grey), and the accent is a
+  FILL with NO visible edge: rails and the buttons that open them border in their own fill color
+  and separate from the page by `shadow-soft` alone, like the Bibliothek cards (never an accent
+  edge, never a grey one). Content on white cards (no grey washes); card-title eyebrows bold brand
   blue, inner labels muted; a bold colored word label over an i icon; green dot = detected fact;
   AI/legal disclaimers as standalone lines below cards; labels neutral dark grey, never accent blue.
 - **Consistency + motion:** primary actions in the same place across sibling modes; subtle

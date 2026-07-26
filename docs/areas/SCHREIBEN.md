@@ -72,8 +72,12 @@ for rework — do not treat its current design as reference.**
   card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
   pill; on mobile it rides the floating cluster's caption slot (s160, same as Fokus, see below).
 - **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20`, dark
-  `bg-accent/10`; NOT grey) in a neutral `border-border` outline (founder s168: the accent is a
-  fill, never an edge) with a header reset icon and the
+  `bg-accent/10`; NOT grey) with **no visible outline at all** (founder s169): the border wears the
+  fill's own colour (`border-accent/20`, dark `border-accent/10`) and the tile is separated from the
+  page by `shadow-soft`, exactly like the Bibliothek word cards. The s168 answer (a neutral
+  `border-border` edge) is retired: a grey rule around a blue wash read as dirty. Inner dividers are
+  tinted to match (`border-accent-ink/10`), so no hard grey line survives on the tile. Header reset
+  icon and the
   scope hierarchy Niveau → Branche → Thema → Unterthema → Textsorte as single-select dropdowns
   (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
   Beschwerde & Antrag) (grouped listbox
@@ -87,10 +91,10 @@ for rework — do not treat its current design as reference.**
   `GrammarDials` tile (see §Fokus).
 - **The panel toggle wears the rail's own Himmelblau** (s166): "Aufgabe wählen" (Kurz/Lang) is
   `variant="accent"` when closed, `default` (solid primary) when open.
-  `outline`'s `bg-surface/50` made them vanish into the page ground. Since s168 the `accent`
-  variant is outlined with the neutral `border` token, matching the rails it opens (the earlier
-  `accent-ink/70` edge existed only to clear the 3:1 UI floor that no alpha of the 77%-light accent
-  can reach on a near-white ground; a neutral edge sidesteps it). Label contrast is unchanged,
+  `outline`'s `bg-surface/50` made them vanish into the page ground. Since s169 the `accent`
+  variant follows the rails exactly: border in its own fill colour plus `shadow-soft`, no visible
+  edge (s166's `accent-ink/70` and s168's neutral `border` are both retired; the alpha problem they
+  were solving disappears once there is no edge to read). Label contrast is unchanged,
   4.72:1 light / 7.71:1 dark. Reuse the variant for any panel toggle, never re-tint `outline`.
 - Umlaut keys (`UmlautKeys`, below) sit in the word-count row of `GuidedWritingTrainer.tsx`.
 - **The writing field is sized, not fixed-`rows`** (`useFillEditor.ts`, founder s168). At rest it
@@ -98,15 +102,24 @@ for rework — do not treat its current design as reference.**
   Art. 50 line), so the page does not scroll; typing past that grows it (page scroll turns on) to
   at most 1.8x the resting height, the space the screen actually offers, or 60% of the viewport,
   whichever is largest; past that it stops and scrolls internally. `resize-none`: the height is
-  measured, so hand-resizing is gone and `rows` is only the pre-measurement fallback. Floor =
-  max(160px, 22% of the viewport). When a long Aufgabe (Inhaltspunkte) would push the field below
-  that floor, the shortfall comes out of the AUFGABE CARD first: its prompt + Inhaltspunkte region
-  is capped by exactly the deficit and scrolls internally (`slim-scrollbar`; the eyebrow + dice row
-  never scrolls away), down to a 96px minimum, past which a small page scroll is the lesser evil
-  (only sub-660px viewports hit it). Once a result is on screen the
-  field drops to its text's own height so the feedback is not pushed a screen down. Measure it in
-  JS, not a `dvh`/flex chain: the trainer sits inside AppShell → WritingHub → AnimatePresence,
-  none of them height-constrained.
+  measured, so hand-resizing is gone and `rows` is only the pre-measurement fallback.
+- **The floor is a preference, the fit is the guarantee** (founder s169: "there should be no
+  scrolling when opened newly"). Preferred floor = max(160px, 22% of the viewport). When a long
+  Aufgabe (Inhaltspunkte) would push the field below it, the shortfall comes out of the AUFGABE
+  CARD first: its prompt + Inhaltspunkte region is capped by exactly the deficit and scrolls
+  internally (`slim-scrollbar`; the eyebrow + dice row never scrolls away), down to a **72px**
+  minimum. Anything still missing after that comes out of the FIELD, down to `HARD_MIN` = 72px:
+  handing the field its preferred floor regardless is what put ~60px of resting scroll on Kurz and
+  Lang. A field that small only happens on a small phone with a long Aufgabe, and typing grows it
+  again immediately. Measured headless from 320x568 to 412x915, with and without simulated
+  safe-area insets: zero overflow from 360x740 up, SE-class 667px viewports still short by design.
+  Once a result is on screen the field drops to its text's own height so the feedback is not pushed
+  a screen down. Measure it in JS, not a `dvh`/flex chain: the trainer sits inside AppShell →
+  WritingHub → AnimatePresence, none of them height-constrained.
+- **The "Noch N Wörter" hint lives in the editor card, under the umlaut keys** (founder s169), not
+  in the action cluster's caption slot (the s168 answer). It is the honest reason Auswerten is
+  inactive, and it belongs next to the thing being typed; the cluster sits high enough now that a
+  card-tail line cannot land under it. Same placement in Fokus.
 - **From `lg` up the RESTING height is capped and Kurz is shorter than Lang** (`desktopFieldCap`
   in `GuidedWritingTrainer.tsx`, founder s168 follow-up: filling a whole desktop window "looks
   odd"). Kurz = max(176px, 22% of the viewport), Lang = max(252px, 32%), so the field never
@@ -128,9 +141,13 @@ for rework — do not treat its current design as reference.**
   after "Grüner Punkt = dein Satz.". Desktop only since s168; the founder-approved
   mobile rework (preview rounds r2 to r4, "Option 2") replaced the collapsed panel + toolbar toggle,
   which read as a filter and hid the transform feature:
-  - **Two tiles fill the height** between the switcher and the fixed bottom chrome (`measureMobile`
-    sets `minHeight`; sentence card `grow-[1.15]`, tile `grow`, content vertically centered). No
-    resting page scroll.
+  - **Two tiles fill the height** between the switcher and the fixed bottom chrome (sentence card
+    `grow-[1.15]`, tile `grow`, content vertically centered). `measureMobile` sets an exact
+    **`height`** before a correction exists and a **`minHeight`** after (founder s169): a minimum
+    alone let the tiles' natural height win whenever card chrome + three dials + a wrapping legend
+    outgrew the screen, which is where Fokus's resting page scroll came from. With a fixed height
+    the writing field (`min-h-[72px]`, `min-h-0` on every flex ancestor) absorbs the shortfall;
+    after a correction it must be a minimum again, because a long list of fixes has to grow.
   - **`GrammarDials`** (mobile-only) is a Himmelblau tile headed "Grammatik" (+ reset icon) with
     ONE content-sized dial per axis, centered, axis eyebrows above: green dot = detected form,
     solid primary = chosen target, tap opens a small picker popover. Dimmed but visible before a
@@ -140,12 +157,24 @@ for rework — do not treat its current design as reference.**
     against the corrected one, plus the Hinweis + Nochmal + speak row). The separate transform card
     below is desktop-only. **"Neu"** (not "Neuer Satz") sits top-right of the card, the Kurz/Lang
     dice corner; icon-only beside the three-segment toggle.
-  - **Corrections are two text columns with a vertical separator** (founder r4 amendment: no
-    Himmelblau chip backgrounds on mobile; category eyebrow, struck original and green fix keep
-    their colors). Desktop keeps the fix tiles.
+  - **The card body is TWO stacked regions** (founder s169): the sentence centered in a `flex-1`
+    region, the detail block (corrections / Hinweis + actions / "Alles korrekt") anchored under it.
+    One centered group gave all its slack to the space ABOVE the sentence ("more space before the
+    sentence than after"). **No horizontal rule under the sentence** either; the gap separates them.
+  - **Corrections are two text columns** (founder r4 amendment: no Himmelblau chip backgrounds on
+    mobile; category eyebrow, struck original and green fix keep their colors). The separator is
+    ONE full-height rule down the middle of the grid (`absolute inset-y-0 left-1/2`), never a
+    per-cell `border-l`: with three fixes the per-cell version stopped after row 1 (founder s169).
+    The eyebrow hugs its fix (`mb-0.5`) and the row gap is wider (`gap-y-5`), so each category +
+    edit reads as one unit. Desktop keeps the fix tiles.
+  - **While the KI works, the sentence line becomes a skeleton**: three tapering rounded bars with
+    a slow Himmelblau sweep (`.fx-skeleton-bar` in `index.css`, reduced-motion safe, 0.14s per-bar
+    stagger). Shown during the correction call (with the learner's own sentence above it, the card's
+    whole idle body replaced) and again in the sentence region during a transform. Founder s169:
+    the spinning dial and the button label alone did not read as "something is happening".
   - **Feedback + Korrigieren float fixed** above the KI line until a correction exists (portalled,
-    see §Mobile floating action cluster); the KI line is locked just above the nav in every state,
-    and carries the "Noch N Wörter" hint instead while the sentence is too short.
+    see §Mobile floating action cluster); the KI line is locked just above the nav in every state
+    and carries the Art. 50 note only (the "Noch N Wörter" hint moved into the card, s169).
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. Its header row carries a
   **"Nochmal" button** (RefreshCw, beside the speaker) that asks the AI for an alternative phrasing
@@ -184,14 +213,19 @@ The bottom cluster (Feedback + Korrigieren / Auswerten, and Neu schreiben after 
 **no bar chrome** (founder s159/s160): no border, no full-width backdrop. It therefore floats
 straight over the content cards, so nothing in it may be see-through (s164 founder report: the
 disabled Auswerten button and the card's hint line read as two labels on top of each other).
-- **Kurz/Lang: `fixed`, not `sticky`** (founder s168). Sticky parks the cluster at the END of the
+- **`fixed`, not `sticky`** (founder s168). Sticky parks the cluster at the END of the
   content whenever the page fits the viewport, so it sat at one height in Kurz, another in Lang,
   and jumped on every task change. It is now pinned above the nav at one height for good, with
   AppShell's `<main>` offsets mirrored (`mx-auto max-w-6xl px-4 sm:px-6`) so it stays in the
   content column, and `useFillEditor` gives the trainer root the matching bottom clearance.
-- **Fokus followed in the same session** (the s168 mobile rework): its cluster is `fixed` too,
-  raised 2.5rem above the nav so the locked KI line fits beneath it, and it disappears once a
-  correction exists (the card corner "Neu" and the dial tile take over).
+- **ONE geometry for all three trainers** (founder s169: the buttons "keep switching abruptly"
+  between Fokus and Kurz/Lang). Both clusters sit at
+  `bottom-[calc(3.9375rem + safe-area + 2rem)]`, and BOTH carry their KI line as a separately fixed
+  line at `+0.5rem`, never as an in-cluster caption. Before this, Kurz/Lang's note rode inside the
+  cluster, which pushed its buttons ~13px below the Fokus ones. Anything mode-specific in this row
+  shows up as a jump on every tab switch, so keep the two call sites identical.
+- Fokus's cluster disappears once a correction exists (the card corner "Neu" and the dial tile take
+  over); its KI line stays.
 - **All fixed layers are portalled to `<body>`.** WritingHub slides tab panels with an `x`
   transform, and a transformed ancestor becomes the containing block for its `fixed` descendants;
   without the portal the clusters and the KI lines re-anchor to the panel mid-slide.
@@ -200,12 +234,12 @@ disabled Auswerten button and the card's hint line read as two labels on top of 
   is `bg-surface/50` and `disabled:` is `opacity-50`) and `floatingNote` (the caption plate,
   `bg-background/90` + `backdrop-blur-sm`, matching the other mobile bars). `--background` equals
   the page stops, so both are invisible against the page ground and only mask over a card.
-- **Transient hint lines belong in the cluster, not at the card tail.** The "Noch N Wörter
-  schreiben …" line is the honest reason the primary button is inactive; a card-tail line lands
-  exactly under the pinned cluster. It rides the cluster's single caption slot instead: the hint
-  while the text is too short, the Art. 50 note whenever prüfen/auswerten is actually possible
-  (never both, so this stays one line of chrome). The card keeps the hint on `lg:` only, where
-  there is no cluster.
+- **The caption slot carries the Art. 50 note and nothing else** (founder s169, superseding the
+  s168 rule that put transient hints there). The "Noch N Wörter schreiben …" line moved into the
+  card, under the umlaut keys, in both trainers: it is a note about what the learner is typing, and
+  a bottom line that swaps content between states reads as chrome that cannot be trusted. The
+  original reason for the s168 placement (a card-tail line landing under the pinned cluster) is
+  gone now that the cluster sits 2rem higher and the field is sized to end 12px above it.
 
 ## Umlaut keys
 `src/features/writing/UmlautKeys.tsx`: reusable insert bar (ä ö ü ß Ä Ö Ü) for non-German

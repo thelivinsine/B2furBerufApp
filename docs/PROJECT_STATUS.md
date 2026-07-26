@@ -1,20 +1,19 @@
 # Project Status
 
-_Last updated: 2026-07-26 (session 168). **The Schreiben mobile pass: every surface now rests at
-exactly one viewport, with its chrome pinned instead of drifting** (PRs #717 to #724, all live).
-Kurz/Lang: the Feedback/Auswerten row was `sticky`, so it parked at the end of the content whenever
-the page fit the screen, at one height in Kurz and another in Lang; it is now `fixed` above the nav,
-and a new `useFillEditor` hook sizes the textarea to the space actually left (capped on desktop,
-Kurz shorter than Lang). A long Aufgabe no longer scrolls the page either: its card caps and scrolls
-internally instead. **Fokus was reworked on mobile after four preview rounds**: the transform
-feature, hidden behind a filter-looking "Grammatik" toggle, is now an always-visible dial tile under
-the sentence card, with an **Umgeformt** view toggle, a corner "Neu" and two-column corrections.
-Also standing law now: **the Himmelblau accent is a FILL, never an outline** (every filter/selection
-rail and its opening button wears the neutral card edge). Prior s167 (PRs #711 to #715): one shared
-Aufgabe-selection rule so the picker's counts stop lying, the exam-shaped task schema, and two
-content waves taking the bank to **643 tasks**; `docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest
-of that roadmap. `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend
-changes no longer need a CLI. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-26 (session 169). **Schreiben on mobile, finished: a freshly opened trainer
+never scrolls, and Fokus, Kurz and Lang share one bottom-chrome geometry.** s168 (PRs #717 to #724,
+live) pinned the chrome and measured the heights; the founder's review round then found that the
+writing field was still handed a floor the screen could not pay for, that the Fokus tile column let
+its natural height win, and that the two clusters sat ~13px apart. All three are fixed by making the
+elastic element give way, plus the finishing work on the Fokus sentence tile (two stacked regions,
+one full-height correction separator, a shimmering skeleton while the KI works). Standing law now:
+**the Himmelblau accent is a fill with NO visible edge** (shadow separates the rails, like the
+Bibliothek cards), and **a page that scrolls the moment it opens is a bug**. Prior s167 (PRs #711 to
+#715): one shared Aufgabe-selection rule so the picker's counts stop lying, the exam-shaped task
+schema, and two content waves taking the bank to **643 tasks**;
+`docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest of that roadmap.
+`.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
+a CLI. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -80,6 +79,55 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 169 (2026-07-26): the s168 founder review round. Branch
+`claude/fokus-kurz-lang-layout-s8unl4`.** Eight numbered points on the shipped Schreiben mobile
+rework, executed directly (previews explicitly waived). Two were bugs, six were finishing work.
+
+- **1 · No resting page scroll on any of the three trainers.** The founder's screenshots showed
+  ~50-60px of scroll on a freshly opened Fokus, Kurz and Lang. Two independent causes.
+  **Kurz/Lang:** `useFillEditor` handed the writing field its floor (`max(160px, 22vh)`) even when
+  the screen did not have it, so the sum of chrome + field exceeded the viewport by exactly that
+  overshoot. The floor is a preference now; `HARD_MIN` (72px) is the guarantee, and the Aufgabe
+  card's cap gives up a little more first (`TASK_BODY_MIN` 96 → 72). **Fokus:** the tile column had
+  a `minHeight`, so the tiles' natural height (a wrapping legend, a dial row that wraps on a narrow
+  phone) simply won. It now gets an exact `height` before a correction and a `minHeight` after,
+  with `min-h-0` down the flex chain so the writing field absorbs the shortfall. Verified headless
+  at 320x568 / 375x812 / 390x664 / 360x740 / 360x800 / 393x852 / 412x915, with and without
+  simulated safe-area insets, 5-6 random Aufgaben each: **zero overflow from 360x740 up.** SE-class
+  667px viewports still come up ~75px short, which is structural (chrome alone exceeds them).
+- **2 · One bottom-chrome geometry for all three modes.** The buttons "keep switching abruptly"
+  because Kurz/Lang kept its caption INSIDE the fixed cluster while Fokus had it as a separate
+  fixed line, which put the two button rows ~13px apart. Both now sit at
+  `bottom-[calc(nav + safe-area + 2rem)]` with a separately fixed KI line at `+0.5rem` (the lift
+  came down from 2.5rem to 2rem to pay for the reservation this costs Kurz/Lang).
+- **3 · The rails lost their outline.** Third and final answer after an accent edge (s166) and a
+  neutral grey one (s168): border in the fill's own colour, separation by `shadow-soft`, like the
+  Bibliothek word cards the founder pointed at. Inner dividers tinted to match. Applies to
+  `WritingRail`, `GrammarRail`, `GrammarDials` and the `accent` Button variant. `check:contrast`
+  untouched (pure edge change).
+- **4 · Fokus sentence tile.** Sentence and detail block are two stacked regions, so the sentence is
+  centered in the room left over instead of collecting all the slack above it; the horizontal rule
+  under it is gone; the correction columns are separated by ONE full-height rule (the per-cell
+  `border-l` stopped after row 1 with three fixes); the eyebrow hugs its own fix (`mb-0.5`) and the
+  row gap widened (`gap-y-5`).
+- **5 · A waiting animation in the tile the answer lands in.** `.fx-skeleton-bar` (new,
+  `index.css`): three tapering rounded bars with a slow Himmelblau sweep, reduced-motion safe,
+  0.14s per-bar stagger. Shown during the correction call (with the learner's sentence above it)
+  and again in the sentence region during a transform.
+- **6 · The "Noch N Wörter" hint moved into the card,** under the umlaut keys, in BOTH trainers
+  (reversing the s168 rule that parked it in the cluster caption). The bottom line is the Art. 50
+  note in every state now and never swaps content.
+- **Files:** `src/features/writing/useFillEditor.ts` · `src/features/writing/fokus/FokusTrainer.tsx`
+  · `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/fokus/GrammarRail.tsx` · `src/features/writing/fokus/GrammarDials.tsx` ·
+  `src/components/ui/button.tsx` · `src/index.css` · `CLAUDE.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md`.
+  **Gates:** typecheck · lint (0 errors) · lint:content · test:unit **317/317** · build ·
+  check:bundle (117.3 kB) · check:contrast.
+- **Open, small:** SE-class (667px) viewports still page-scroll on Kurz/Lang; closing that needs
+  chrome to go, not elasticity (the "Aufgabe wählen" toggle row and the two-card split are the two
+  candidates). Fokus's `GrammarRail` `layout="panel"` branch is still dead code on mobile.
 
 **Handoff after session 168 (2026-07-26): the Schreiben mobile pass. ALL MERGED AND LIVE**
 (PRs **#717** to **#724**). Eight PRs across one theme: on a phone, every Schreiben surface now
@@ -168,33 +216,6 @@ re-anchors to the panel mid-slide (and the measurement reads the wrong reserve o
   mobile but still used by the desktop rail; the `panel` branch itself could be retired. Sub-660px
   viewports still page-scroll ~165px in Kurz/Lang, which is structural, not a bug.
 
-**Handoff after session 167 (2026-07-25), part 3: the Branche answer + wave 2. MERGED AND LIVE**
-(PRs **#714**, **#715**).
-
-- **Founder: "when a thema is selected and then the Branche is changed, the aufgabe doesn't change."**
-  Reproduced in the running app rather than reasoned from the code: the task IS re-drawn every time,
-  on desktop and in the mobile panel. The cause was **coverage**, not the mechanism. Only **71 of 600**
-  theme x Länge x Branche slots carried a task tagged for that Branche (11.8%), and **11 of 20 Themen
-  had none**, so the fallback served the identical pool whichever Branche was picked, and the re-roll
-  landed back on the same task about one time in twelve.
-- **Fix (#714):** the scope-change re-roll now passes the current task as `exclude`, exactly like the
-  dice, so a filter change is always visible (founder rule: controls always visibly act). Verified on
-  `behoerde` (zero coverage, worst case): 14 consecutive Branche switches, 0 repeats.
-- **Mobile panel stays open until closed (#715).** Picking a Thema used to dismiss it while every
-  other scope left it open, so the one control that auto-closed was also the one that changed the
-  most. Only the X and the toolbar toggle close it now.
-- **Wave 2 (#715): 150 Branche-specific Aufgaben.** The five Beruf Themen that apply to EVERY industry
-  (`meetings`, `scheduling`, `conflict`, `safety`, `customer`) x **all 15 Branchen** x both Längen, at
-  B2. Bank: 493 -> **643 tasks**. **Branche slots filled: 71/600 (11.8%) -> 173/600 (28.8%).**
-  Every variant satisfies the four-way-difference test (plan §8): different ADDRESSEE, GENRE, domain
-  CONTENT POINTS and FACHLEXIK. Swapping the Branche noun breaks all of them, which was the point.
-- **A test pins it:** for those five Themen every Branche must have a tagged task AND the draw must
-  serve it rather than fall back past it. The task-count assertion is now self-maintaining (compares
-  against pool totals) so it does not need bumping as the bank grows.
-- **Still generic: 11 Themen** (`travel` + all 10 Alltag). For Alltag this is partly principled, since
-  Branche means where you WORK and a Wohnen or Bank task is personal life. But some genuinely do vary
-  (Krankmeldung in Schichtdienst vs Büro, Urlaubsantrag auf der Baustelle). That judgement call is
-  **wave 3**, together with rewriting the remaining legacy tasks to carry Inhaltspunkte.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
