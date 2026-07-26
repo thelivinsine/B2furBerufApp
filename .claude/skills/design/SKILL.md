@@ -147,7 +147,9 @@ Ranked by how often the founder had to correct AI output:
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).
 - Modals/sheets inherit `bg-dialog-overlay` + `shadow-elevated-soft` from the shared dialog
-  primitive. No flat `bg-black/*`, no `backdrop-blur`.
+  primitive. No flat `bg-black/*`, no `backdrop-blur`. The backdrop is what separates a white card
+  from a near-white page (the soft shadow is invisible over it), so its alphas are 0.48/0.76 and
+  never overridden per dialog (s169, `docs/areas/BRAND.md`).
 
 ## 6. Per-section anchors
 

@@ -1324,3 +1324,20 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 2):** commit `16f285c` · `src/features/writing/fokus/GrammarDials.tsx` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-26):** `the expand button should be to the right and the shuffle
+  button should be to the left. Also, the pop up window doesn't have any contrast with the
+  background. Increase the contrast. no need of preview, just execute it.`
+- **Response summary:** Buttons swapped (shuffle left, expand right). For the contrast: measured the
+  running app instead of judging by eye. The white dialog card on the near-white page ground was
+  **1.9:1** against the old backdrop, because `shadow-elevated-soft` (2.4% / 6% alpha) is invisible
+  over a dark wash, so the backdrop is the only thing defining the card. Deepened the shared
+  `bg-dialog-overlay` radial from 0.30/0.62 to **0.48/0.76**, which measures **3.3:1** in the running
+  app, clear of the 3:1 UI floor; dark mode re-checked and still comfortable (its `--shadow` is
+  near-black and the 18%-L card keeps its edge). Changed on the token, never per dialog, so every
+  dialog in the app benefits and no parallel style appears. Note: the first screenshot pass showed no
+  change because Vite had not rebuilt `tailwind.config.ts`; verified via `getComputedStyle` and pixel
+  sampling after a restart. Gates: typecheck · lint (0 errors) · lint:content · test:unit 317/317 ·
+  build · check:bundle (117.3 kB) · check:contrast.
+- **Artifacts (prompt 3):** `tailwind.config.ts` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `docs/areas/BRAND.md` · `docs/areas/SCHREIBEN.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log

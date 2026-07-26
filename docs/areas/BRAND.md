@@ -96,3 +96,9 @@ All popups/modals/dialogs: backdrop `bg-dialog-overlay` (a brand-tinted radial s
 `DialogContent`/overlay in `src/components/ui/dialog.tsx`; any new dialog on that primitive
 inherits them. Reuse for sheets/drawers too (adjust only the radial center); never flat
 `bg-black/*`.
+**Alphas: 0.48 behind the card, 0.76 at the edges** (deepened from 0.30/0.62, founder s169: "the
+pop up window doesn't have any contrast with the background"). A white card on a near-white page
+gets its definition from the BACKDROP, not from its shadow, which is invisible over a dark wash:
+0.30 left white-on-backdrop at 1.9:1, 0.48 puts it at **3.3:1** (measured in the running app), clear
+of the 3:1 UI floor. This is one token on purpose, so every dialog in the app reads the same;
+never override it per dialog.
