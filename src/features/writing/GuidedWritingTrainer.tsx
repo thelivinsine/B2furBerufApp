@@ -119,6 +119,7 @@ export function GuidedWritingTrainer({
   const rootRef = useRef<HTMLDivElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
   const taskCardRef = useRef<HTMLDivElement>(null);
+  const taskBodyRef = useRef<HTMLDivElement>(null);
   const editorCardRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLDivElement>(null);
@@ -260,6 +261,7 @@ export function GuidedWritingTrainer({
     cardRef: editorCardRef,
     rootRef,
     aboveRef: taskCardRef,
+    taskBodyRef,
     headerRef: pickerRef,
     clusterRef,
     noteRef,
@@ -337,43 +339,49 @@ export function GuidedWritingTrainer({
               />
             </button>
           </div>
-          <motion.p
-            key={`${drawn.theme}|${length}|${drawn.ix}`}
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
-            className="text-sm leading-relaxed"
-          >
-            {prompt}
-          </motion.p>
-          {/* Inhaltspunkte: what an examiner actually grades (Goethe
-              "Erfüllung", telc "Berücksichtigung der Leitpunkte"), so they are
-              part of the Aufgabe, not decoration. Only tasks upgraded to the
-              s167 schema carry them; the rest render as before. */}
-          {task?.points?.length ? (
-            <motion.div
-              key={`points|${drawn.theme}|${length}|${drawn.ix}`}
+          {/* The prompt + Inhaltspunkte region is the part `useFillEditor` caps
+              (internal scroll) when a long Aufgabe would otherwise push the
+              writing field below its floor; the eyebrow + dice row above never
+              scrolls away. */}
+          <div ref={taskBodyRef} className="slim-scrollbar space-y-3">
+            <motion.p
+              key={`${drawn.theme}|${length}|${drawn.ix}`}
               initial={reduce ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15 }}
-              className="space-y-1.5"
+              className="text-sm leading-relaxed"
             >
-              {task.addressee && (
-                <p className="text-xs text-muted-foreground">
-                  <span className="font-semibold text-accent-ink">An:</span> {task.addressee}
-                  {task.register === "sie" ? " (Sie)" : task.register === "du" ? " (du)" : ""}
-                </p>
-              )}
-              <ul className="space-y-1">
-                {task.points.map((point) => (
-                  <li key={point} className="flex gap-2 text-sm leading-relaxed">
-                    <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ) : null}
+              {prompt}
+            </motion.p>
+            {/* Inhaltspunkte: what an examiner actually grades (Goethe
+                "Erfüllung", telc "Berücksichtigung der Leitpunkte"), so they are
+                part of the Aufgabe, not decoration. Only tasks upgraded to the
+                s167 schema carry them; the rest render as before. */}
+            {task?.points?.length ? (
+              <motion.div
+                key={`points|${drawn.theme}|${length}|${drawn.ix}`}
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-1.5"
+              >
+                {task.addressee && (
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-accent-ink">An:</span> {task.addressee}
+                    {task.register === "sie" ? " (Sie)" : task.register === "du" ? " (du)" : ""}
+                  </p>
+                )}
+                <ul className="space-y-1">
+                  {task.points.map((point) => (
+                    <li key={point} className="flex gap-2 text-sm leading-relaxed">
+                      <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
 

@@ -137,6 +137,16 @@ rest of the space without any scrolling." Preview round explicitly waived.
   `docs/areas/SCHREIBEN.md`. **Gates:** typecheck · lint (0 errors) · test:unit **317/317** ·
   build · check:bundle (117.2 kB) · check:contrast · lint:content.
 
+**Follow-up: the Aufgabe-card scroll remainder is fixed too.** The one honest limit from the
+Kurz/Lang pass (a third of tasks, the ones with Inhaltspunkte, still scrolled the page a little at
+rest) is gone: when a long Aufgabe would push the writing field below its floor, `useFillEditor`
+now caps the card's prompt + Inhaltspunkte region by exactly the shortfall and lets it scroll
+internally (eyebrow + dice stay put; 96px minimum). Sampled 30 re-rolls per mode: **0/30 page
+scrolls at 390x844** in both Kurz and Lang (was up to 227px on a third of tasks); on a 360x640
+viewport a structural remainder of ~165px stays (field floor + minimum card + chrome exceed 640),
+down from ~430px. The cap math works off `scrollHeight`, never by un-capping to re-measure, so the
+ResizeObserver watching the card cannot ping-pong.
+
 **Fokus mobile rework: SHIPPED after four preview rounds.** The transform feature, which IS the
 Satzlabor, hid behind a "Grammatik" toggle that sat where Kurz/Lang put a filter and looked exactly
 like one. Rounds: r1 (move the panel; both variants rejected) → r2 ideation ("it is a flow step,
