@@ -1108,3 +1108,31 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/writing/fokus/GrammarRail.tsx` · `src/components/ui/button.tsx` ·
   `preview/fokus-grammatik-mobile.html` · `CLAUDE.md` · `.claude/skills/design/SKILL.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-26):** `none of the previews for the fokus are convincing. I want you to
+  help me ideate the best view for fokus mobile view so that the user gets beat experience, it's intuitive
+  to understand all the features and of high quality design.`
+- **Response summary:** Ideation in chat, no artifacts (report-before-edits rule). Diagnosis of why round
+  1 failed: both variants moved the grammar FILTER somewhere else, but the feature is not a filter, it is
+  the next step in a flow, so any pill-panel reads as settings. Proposed four shapes built around the
+  post-correction moment: (1) **Satz-Regler**, a one-line classification row under the corrected sentence
+  (Aktiv · Präsens · Indikativ as three tappable controls; tap one, pick a new value, the sentence
+  rewrites in place), (2) **Aktions-Chips** on the sentence (→ Passiv as a one-tap command), (3) a
+  **lab timeline** where each transformation stacks a new card (rejected against the no-scroll and
+  no-redundancy instincts), (4) a **guided suggestion** teasing one pedagogically sensible next form.
+  Plus a placement insight: after correction the Korrigieren thumb slot goes empty, prime real estate the
+  controls could morph into. Recommended (1), with the thumb-slot placement as the variant to compare.
+- **Artifacts (prompt 5):** none (chat only)
+- **Prompt 6 (verbatim, 2026-07-26):** `do the previews`
+- **Response summary:** Round-2 preview sheet with three named variants, built from the real tokens and
+  redeployed to the same artifact URL as round 1. **C · Satz-Regler an der Karte:** the classification
+  row lives in the sentence card under the correction tiles, three content-sized dial controls with axis
+  eyebrows, green dot = detected form, solid primary = changed form; a picker popover per dial; shown in
+  three states (corrected, picker open, transformed with the Umgeformt toggle). **D · Regler im
+  Daumen-Slot:** the same three dials replace Korrigieren in the pinned bottom cluster, menus open
+  upward, reset icon rides the bar; shown resting and with a combined Passiv + Perfekt state. **E ·
+  Aktions-Chips:** "Probier deinen Satz in …" chips on the card (→ Passiv, → Perfekt …), which become
+  "+" chips after the first transformation to keep combining honest. All variants share: no Grammatik
+  toggle at the top, Umgeformt as third view-toggle segment, result in place, no resting page scroll,
+  desktop untouched. Recommendation stayed C, with D as best-ergonomics contender and E as the
+  fastest-first-tap contender.
+- **Artifacts (prompt 6):** `preview/fokus-grammatik-mobile-r2.html` (new) · this log
