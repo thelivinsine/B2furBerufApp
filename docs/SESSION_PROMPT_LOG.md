@@ -1136,3 +1136,20 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   desktop untouched. Recommendation stayed C, with D as best-ergonomics contender and E as the
   fastest-first-tap contender.
 - **Artifacts (prompt 6):** `preview/fokus-grammatik-mobile-r2.html` (new) · this log
+- **Prompt 7 (verbatim, 2026-07-26):** `I like concept c but divide the two parts into two different
+  tiles. keep the header Grammatik in the bottom tile and all the chips centered. The positioning of all
+  the components should be well occupied sith decent spacing, clear contrast yet subtle. Use the color
+  palette for better visual quality. Generate more previews with these points into consideration.`
+- **Response summary:** Round-3 preview sheet (same artifact URL), concept C refined to the founder's
+  points: the sentence card and the grammar controls are now TWO separate tiles, the bottom tile carries
+  the header **Grammatik** (name kept per the prompt, not the round-2 "Satz umformen" rename), the dial
+  chips and their axis eyebrows are centered, spacing widened (40px chips, 16px tile gap). Three named
+  treatments of the bottom tile, differing only in how it wears the palette: **F · Weiße Karte** (normal
+  white content card, GRAMMATIK as centered brand-blue eyebrow, quietest), **G · Himmelblau-Kachel** (the
+  established rail tile: accent wash, neutral grey outline, header row with reset, white chips centered
+  on the blue; shown post-correction AND transformed-with-picker-open), **H · Die Bühne** (a deep
+  warm-navy panel with a Himmelblau shimmer, the loudest and explicitly flagged as a NEW pattern that
+  needs a deliberate decision). Recommendation: **G**, because it uses the palette with its already
+  learned meaning (Himmelblau = selection surface) and the white-chips-on-blue gives clear but subtle
+  contrast; F is the quiet alternative, H the outlier.
+- **Artifacts (prompt 7):** `preview/fokus-grammatik-mobile-r3.html` (new) · this log
