@@ -1341,3 +1341,22 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 3):** `tailwind.config.ts` · `src/features/writing/GuidedWritingTrainer.tsx` ·
   `docs/areas/BRAND.md` · `docs/areas/SCHREIBEN.md` · `.claude/skills/design/SKILL.md` ·
   `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (verbatim, 2026-07-26):** `document the session`
+- **Response summary:** Coherence pass over session 169 (prompts 1 to 3 were each logged as they
+  happened; this pass made the rest of the docs agree with each other).
+  **`docs/PROJECT_STATUS.md`:** the s169 handoff had grown as three chronological bolt-ons, the same
+  shape the s168 pass had to fix. Rewritten as ONE structured handoff with seven numbered parts
+  (page scroll · one bottom-chrome geometry · the two colour answers · the Fokus tiles · the waiting
+  skeleton · the hint's move · the Aufgabe pop-up and shuffle), each carrying its PR number, plus a
+  method note (every layout claim this session was measured in headless Chromium against the running
+  app, which is what caught both the real cause of the Kurz/Lang scroll and a tailwind.config change
+  Vite had not rebuilt). The s168 handoff's "the accent is a FILL, never an outline" part was
+  contradicting the s169 handoff two screens above it, since s169 rejected the grey edge it
+  described; it is now marked superseded and keeps only the lasting half of that decision. The
+  `_Last updated_` block rewritten for the whole session, and the file trimmed back to exactly 250
+  lines (the cap) by compressing verbose s168 passages.
+  **`docs/areas/SCHREIBEN.md`:** four stale references cleaned up (the dice, and the Kurz/Lang AI
+  disclaimer still described as riding the cluster's caption slot). **Nothing else was stale:**
+  `CLAUDE.md`, `/design` §2/§3/§5/§7, `BRAND.md` §Dialog and `DECISIONS.md` were each updated in the
+  round that changed them, and were re-checked here against the shipped code.
+- **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · `docs/areas/SCHREIBEN.md` · this log

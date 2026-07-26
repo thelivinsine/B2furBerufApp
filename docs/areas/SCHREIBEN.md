@@ -42,7 +42,7 @@ for rework — do not treat its current design as reference.**
 - **Every dropdown carries a generic first option** (founder s167): "Alle Niveaus", "Alle Branchen",
   "Alle Themen", "Gesamtes Thema", "Alle Textsorten".
 - **A scope change never re-rolls onto the same Aufgabe** (s167): the re-roll passes the current task
-  as `exclude`, exactly like the dice. Most scope changes still redraw from a pool the filter did not
+  as `exclude`, exactly like the shuffle button. Most scope changes still redraw from a pool the filter did not
   narrow, so without this a filter looked broken roughly one time in twelve.
 - **The mobile panel stays open until the learner closes it** (founder s167). Picking a Thema used to
   close it while every other scope left it open, so the one control that auto-dismissed was also the
@@ -79,7 +79,8 @@ for rework — do not treat its current design as reference.**
 - Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel
   line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is NOT inside the
   card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
-  pill; on mobile it rides the floating cluster's caption slot (s160, same as Fokus, see below).
+  pill; on mobile it is a fixed line just above the nav, in every state (s160/s169, same as Fokus,
+  see below).
 - **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20`, dark
   `bg-accent/10`; NOT grey) with **no visible outline at all** (founder s169): the border wears the
   fill's own colour (`border-accent/20`, dark `border-accent/10`) and the tile is separated from the
@@ -116,7 +117,7 @@ for rework — do not treat its current design as reference.**
   scrolling when opened newly"). Preferred floor = max(160px, 22% of the viewport). When a long
   Aufgabe (Inhaltspunkte) would push the field below it, the shortfall comes out of the AUFGABE
   CARD first: its prompt + Inhaltspunkte region is capped by exactly the deficit and scrolls
-  internally (`slim-scrollbar`; the eyebrow + dice row never scrolls away), down to a **72px**
+  internally (`slim-scrollbar`; the eyebrow + icon-button row never scrolls away), down to a **72px**
   minimum. Anything still missing after that comes out of the FIELD, down to `HARD_MIN` = 72px:
   handing the field its preferred floor regardless is what put ~60px of resting scroll on Kurz and
   Lang. A field that small only happens on a small phone with a long Aufgabe, and typing grows it
@@ -167,7 +168,7 @@ for rework — do not treat its current design as reference.**
     Korrigiert (green marks) / **Umgeformt** (the transformed sentence, green-marked via a diff
     against the corrected one, plus the Hinweis + Nochmal + speak row). The separate transform card
     below is desktop-only. **"Neu"** (not "Neuer Satz") sits top-right of the card, the Kurz/Lang
-    dice corner; icon-only beside the three-segment toggle.
+    shuffle/expand corner; icon-only beside the three-segment toggle.
   - **The card body is TWO stacked regions** (founder s169): the sentence centered in a `flex-1`
     region, the detail block (corrections / Hinweis + actions / "Alles korrekt") anchored under it.
     One centered group gave all its slack to the space ABOVE the sentence ("more space before the
