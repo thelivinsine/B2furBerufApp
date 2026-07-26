@@ -1420,3 +1420,36 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   page does not scroll sideways. Redeployed to the same artifact URL, one link per topic.
 - **Artifacts:** `preview/schreiben-icon-vorschlaege-r2.html` · artifact
   `fee81c4c-dec9-41b2-91dd-0240e6999467` (redeployed) · this log
+
+- **Prompt 4 (verbatim, 2026-07-26):** `when the dials in the bottom tile are opened, they're being
+  cut off and there's no way to see them as the scroll isn't working well - fix it` [+ two mobile
+  screenshots: the Genus-Verbi and Zeitform pickers with their last option under the tab bar]
+- **Prompt 5 (verbatim, 2026-07-26):** `another issue is there's a missing button to regenerate ai
+  response!`
+- **Prompt 6 (verbatim, 2026-07-26):** `apply bleistift icon from the preview for schreiben`
+- **Response summary:** **(a) Dial pickers.** `GrammarDials` opened its picker with a hardcoded
+  `top-full`, so a dial low in the tile put its last options under the fixed bottom chrome, and
+  since the Fokus page is built NOT to scroll there was nothing to scroll to them with. Replaced
+  with a measure-then-place pass in `useLayoutEffect` (before paint, no flicker): flip above the
+  dial when the picker would not clear the floor, cap `max-height` to the room it actually has with
+  `overflow-y-auto` as the last resort, and shift it horizontally back inside the viewport when an
+  edge dial would push it off screen. The floor is the lower of the tile's own foot and a new
+  `bottomLimit()` prop: `FokusTrainer` already measures the fixed cluster + KI line for
+  `measureMobile`, and only it knows where that chrome sits. The first cut used the tile foot alone
+  and a 360x640 run caught it still clipping, because once a correction is long enough to let the
+  page scroll the tile foot slides under the chrome. Verified by driving the real app in Playwright
+  against a stubbed `check-sentence` (seeded session + onboarding flag, so no live AI call): all
+  three dials on 390x844 light and 360x640 dark now report every option on screen, no internal
+  scrolling needed, and the resting page still shows 0px overflow on the tall phone.
+  **(b) Schreiben icon.** Founder picked **AB (Bleistift, schräg)** from the round-4 preview;
+  ported verbatim into `route-icons.tsx` with its `NORM` box `[3.21, 3.21, 13.58, 13.58]` @ 0.98
+  and checked active + inactive in the real bar and the desktop sidebar. **(c)** The "regenerate AI
+  response" report is NOT fixed: `m.regenerate` exists only for the transform ("Nochmal" in
+  Umgeformt, cycling 2 server-side variants); the Korrigiert view has no equivalent, and because
+  `check-sentence` is cached per sentence a naive re-run there would return byte-identical text, so
+  the direction was put back to the founder rather than guessed at.
+  Gates: typecheck · lint (0 errors, 75 pre-existing warnings) · test:unit 317/317 · build ·
+  check:bundle (118.0 kB).
+- **Artifacts:** `src/features/writing/fokus/GrammarDials.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/components/layout/route-icons.tsx` ·
+  `docs/areas/SCHREIBEN.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` · this log

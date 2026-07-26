@@ -88,15 +88,15 @@ const RENDERERS: Record<string, Render> = {
       <polyline points="6,10.5 8.7,13 14,7" stroke="#fde047" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </>
   ),
-  // Schreibtraining — a fountain-pen nib (Federspitze): blue body, neon-cyan
-  // breather hole + slit. Founder pick E, session 158 (replaced the rose
-  // pencil; the route accent moved from rose to brand blue with it).
+  // Schreibtraining — a pencil on the diagonal: blue body, neon-cyan tip.
+  // Founder pick AB, session 170 round 4 (replaced the Federspitze of s158).
+  // Every earlier proposal stood upright; the diagonal is the only one in the
+  // bar, so the eye finds it without learning a new shape.
   "/writing": c => (
-    <>
-      <path d="M5.9 2.6h8.2c.66 0 1.2.54 1.2 1.2V5c0 2.8-2 7-5.3 12.6C6.7 12 4.7 7.8 4.7 5V3.8c0-.66.54-1.2 1.2-1.2Z" fill={c} />
-      <line x1="10" y1="9" x2="10" y2="13.6" stroke="#22d3ee" strokeWidth="1.2" strokeLinecap="round" />
-      <circle cx="10" cy="7.2" r="1.5" fill="#22d3ee" />
-    </>
+    <g transform="rotate(45 10 10)">
+      <path d="M8.9 2.6h2.2c.66 0 1.1.54 1.1 1.2v9.4H7.8V3.8c0-.66.44-1.2 1.1-1.2Z" fill={c} />
+      <path d="M7.8 13.2h4.4L10 17.4Z" fill="#22d3ee" />
+    </g>
   ),
   // Sprechsimulation — microphone (cyan capsule + neon-teal stand)
   "/simulation": c => (
@@ -167,7 +167,7 @@ const NORM: Record<string, { box: [number, number, number, number]; weight: numb
   "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.08 },
   "/collocations": { box: [2.05, 4.45, 15.9, 11.1], weight: 1.05 },
   "/quiz":         { box: [1.4, 1.4, 17.2, 17.2],   weight: 0.92 },
-  "/writing":      { box: [4.7, 2.6, 10.6, 15],     weight: 1.02 },
+  "/writing":      { box: [3.21, 3.21, 13.58, 13.58], weight: 0.98 },
   "/simulation":   { box: [4.2, 1.6, 11.6, 16.2],   weight: 1.05 },
   "/exam":         { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.08 },
   "/revision":     { box: [4.8, 2, 10.4, 16],       weight: 1.0 },

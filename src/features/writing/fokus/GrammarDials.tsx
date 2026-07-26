@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronDown, Loader2, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { GRAMMAR_AXES, valueLabel, type AxisId } from "./grammarDimensions";
 import type { FokusSelection } from "./useFokusMachine";
@@ -25,6 +25,7 @@ export function GrammarDials({
   onReset,
   canReset,
   legend,
+  bottomLimit,
   className,
 }: {
   detected: { voice: string | null; tense: string | null; mood: string | null };
@@ -36,16 +37,72 @@ export function GrammarDials({
   canReset: boolean;
   /** One line under the dials: legend, refusal reason, or error. */
   legend: ReactNode;
+  /**
+   * Viewport y of the top of the fixed bottom chrome (action cluster, KI line,
+   * tab bar). Only the trainer knows where that chrome sits, and once a long
+   * correction lets the page scroll the tile's own foot slides underneath it,
+   * so the picker needs this as its real floor.
+   */
+  bottomLimit?: () => number;
   className?: string;
 }) {
   const [open, setOpen] = useState<AxisId | null>(null);
   const rootRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+  /**
+   * Where the open picker fits. The tile is the LAST element of the mobile
+   * column and the column is sized to end exactly at the fixed bottom chrome,
+   * so the tile's own bottom edge is as far down as a picker may reach: below
+   * it lies the action cluster, the KI line and the tab bar, which clipped the
+   * downward-only picker (a dial near the tile foot lost its last options with
+   * no scroll to reach them). Upward it may overlay the sentence card, which is
+   * what "the pickers must escape the tile" always meant.
+   */
+  const [placement, setPlacement] = useState<{ up: boolean; maxH: number; shift: number } | null>(
+    null,
+  );
 
   // Dropdown housekeeping: a disabling state change (fresh sentence) closes a
   // stale picker; outside tap or Escape closes an open one.
   useEffect(() => {
     if (!enabled) setOpen(null);
   }, [enabled]);
+  // Measure the picker where it would open (downward, natural height), then
+  // place it: flip up when it would not clear the tile's foot and there is more
+  // room above, cap it to the room it actually has, and nudge it back inside
+  // the viewport when a dial near the edge would push it off screen. Runs
+  // before paint, so the picker never appears in the wrong spot.
+  useLayoutEffect(() => {
+    if (!open) {
+      setPlacement(null);
+      return;
+    }
+    const pop = popRef.current;
+    const trigger = triggerRef.current;
+    const root = rootRef.current;
+    if (!pop || !trigger || !root) return;
+    const GAP = 4; // matches mt-1 / mb-1
+    const EDGE = 8;
+    const HEADER = 72; // the sticky app header, which the picker must not slide under
+    const t = trigger.getBoundingClientRect();
+    const floor = Math.min(
+      root.getBoundingClientRect().bottom,
+      bottomLimit?.() ?? Number.POSITIVE_INFINITY,
+    );
+    const below = floor - t.bottom - GAP;
+    const above = t.top - HEADER - GAP;
+    const up = pop.scrollHeight > below && above > below;
+    const r = pop.getBoundingClientRect();
+    const shift =
+      r.left < EDGE
+        ? EDGE - r.left
+        : r.right > window.innerWidth - EDGE
+          ? window.innerWidth - EDGE - r.right
+          : 0;
+    setPlacement({ up, maxH: Math.max(88, Math.floor(up ? above : below)), shift });
+  }, [open, bottomLimit]);
+
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
@@ -123,6 +180,7 @@ export function GrammarDials({
                 </p>
                 <button
                   type="button"
+                  ref={isOpen ? triggerRef : undefined}
                   aria-haspopup="listbox"
                   aria-expanded={isOpen}
                   aria-label={`${axis.label}: ${valueLabel(axis.id, value)}`}
@@ -148,9 +206,17 @@ export function GrammarDials({
                 </button>
                 {isOpen && (
                   <div
+                    ref={popRef}
                     role="listbox"
                     aria-label={axis.label}
-                    className="absolute left-1/2 top-full z-30 mt-1 w-44 -translate-x-1/2 rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
+                    className={cn(
+                      "absolute left-1/2 z-30 w-44 overflow-y-auto overscroll-contain rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft",
+                      placement?.up ? "bottom-full mb-1" : "top-full mt-1",
+                    )}
+                    style={{
+                      transform: `translateX(calc(-50% + ${placement?.shift ?? 0}px))`,
+                      maxHeight: placement?.maxH,
+                    }}
                   >
                     {axis.values.map((v) => {
                       const optDetected = v.id === detected[axis.id];

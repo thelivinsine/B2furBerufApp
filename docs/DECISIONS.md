@@ -415,7 +415,11 @@ shipped (PRs #679-#683):
 1. **Schreiben = Federspitze (pick E).** A fountain-pen nib in brand blue with neon-cyan breather
    hole + slit. The route accent moved rose → brand blue `#3D74ED` WITH the mark: the founder
    explicitly wanted "similar colors as other icons, not red". Feather/quill and upright-pen
-   alternates were rejected in favor of the nib.
+   alternates were rejected in favor of the nib. **Superseded s170 (pick AB): a pencil on the
+   diagonal**, blue body + neon-cyan tip, same accent. Twelve of the marks proposed across s158
+   and s170 were pens and all of them stood upright; round 4 offered a sheet-with-pen, a pilcrow,
+   a clipboard and this one. The diagonal is the only slanted silhouette in the bar, so it is
+   found without learning a new shape.
 2. **Praktisch = Wegweiser (pick I).** Two direction boards on a post (blue + cyan), replacing the
    compass but keeping its "finding your way in real life" motif as a solid upright silhouette.
    Stadt, Zuhause and Route alternates rejected.
