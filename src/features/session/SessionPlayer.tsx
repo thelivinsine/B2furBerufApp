@@ -27,6 +27,7 @@ import { listen, recognitionSupported, ttsSupported, type RecognitionHandle } fr
 import { matchesSpoken } from "@/engine/pronounce";
 import { gradeTyped, gradeTypedAny, type TypedGrade } from "@/engine/typing";
 import { ReadingBlock } from "@/features/session/ReadingBlock";
+import { recordCompetenceSnapshot } from "@/lib/competence";
 import { useCountdown } from "@/lib/hooks";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
 import { GrammarDrillCard } from "@/features/grammar/GrammarDrillCard";
@@ -218,6 +219,9 @@ function SessionRun({
 
   const finish = () => {
     registerSession();
+    // Sample competence here too, not just on the Fortschritt page: the curve
+    // should have a point for every day the learner actually practised.
+    recordCompetenceSnapshot();
     showToast("Session abgeschlossen!", "success");
     setDone(true);
   };

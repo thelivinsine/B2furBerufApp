@@ -1461,3 +1461,45 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   open question left in PR #731 is answered. Nothing was built for it, since the direction had been
   put back to the founder rather than guessed at.
 - **Artifacts:** this log
+
+## Session 171 (2026-07-26) — branch `claude/selection-color-contrast-3upqkz`
+
+- **Prompt 1 (verbatim, 2026-07-26, with a screenshot of the desktop sidebar):** `the selection here is too dark of gray. as much as the icon isn't clear. Use a much lighter shade than this but darker than the hover shade.` →
+  `Sidebar.tsx`: the active nav row moved from `bg-border` (218 13% 84%) to `bg-muted` (220 13% 88%),
+  lighter than the old selection but still darker than the `bg-muted/60` hover, so the branded route
+  mark reads clearly against it. PR #685.
+- **Prompt 2 (verbatim, 2026-07-26):** `merge to main` →
+  PR #685 squash-merged (`fefa277`); branch reset to the new `main` with `--force-with-lease`.
+- **Prompt 3 (verbatim, 2026-07-26, via `/design`):** `I want to redesign verlauf section in shcreiben and fortschritt pages. Do a thorough analysis of the purpose of these pages, current state, how it can be improved and be clear on what value it brings. Use a panel of agents if needed. I need clear analysis and recommendations` →
+  Report-only round (design skill rule 1: no code before a pick). Four parallel agents covered the
+  Verlauf code + data model, the Fortschritt inventory, the docs/founder record, and learner value.
+  Findings delivered in chat: the correction is never stored (only one tip sentence survives), Fokus
+  leaves no trace in Verlauf, there is no time dimension; Fortschritt shows vocabulary mastery four
+  times while grammar/Redemittel/game show zero times, the exam countdown renders ONLY for
+  zero-activity users, and the writing-weakness panel is duplicated (60 entries vs Verlauf's 30, so
+  the two pages could disagree). Recommendation: phase the rework and split the two surfaces as
+  Verlauf = artifacts, Fortschritt = aggregates and direction.
+- **Prompt 4 (verbatim, 2026-07-26):** `Generate a few previews based on your analysis and recommendations` (followed mid-turn by `use design skill`) →
+  `preview/verlauf-fortschritt-redesign.html` + artifact c3df428e: Verlauf variants A Korrekturkarten ·
+  B Archiv mit Filter-Rail · C Entwicklung zuerst, and Fortschritt variants 1 Prüfungs-Cockpit ·
+  2 Diagnose zuerst · 3 Kompetenzkurve. Built from the real `src/index.css` tokens and real component
+  geometry, screenshot-verified in headless Chromium before presenting.
+- **Prompt 5 (verbatim, 2026-07-26):** `I like the concepts C and 3 for verlauf and fortschritt. Go ahead and execute a robust implementation of these concepts to the latest version of the app.` →
+  Both picks implemented. `WritingHistory.tsx` rewritten to C (trend card + compact disclosure rows +
+  Kurz/Lang switcher, with the >=2-texts-per-month floor, "-" for text-less months, totals fallback);
+  `Analytics.tsx` to 3 (Kompetenz curve headline, Prüfung countdown, writing-aware Diagnose,
+  duplicated weakness panel deleted, XP demoted to Details). New daily competence sampling
+  (`masteryHistory`, `canDoAchievedAt`, `recordCompetence`, `SEEDED_MILESTONE`, `lib/competence.ts`
+  called from SessionPlayer `finish`). `getWritingHistory` now returns `null` on failure. Verified by
+  seeding a demo state and screenshotting the REAL pages (light, dark, expanded row), which caught two
+  defects fixed before commit: the trend arrow compared against a one-text month (an improving
+  category read as worsening) and a two-line label pushed its arrow out of place. `main` had advanced
+  47 commits (s161-s170) meanwhile, so it was merged in and the s167 `task_id` Aufgabe tile folded
+  into the new disclosure; the "store the Aufgabe" follow-up was already shipped by s167.
+  Gates: typecheck · lint 0 errors · test:unit · build · check:bundle 117.3 kB · lint:content.
+- **Artifacts (session 171):** `src/components/layout/Sidebar.tsx` ·
+  `src/features/writing/WritingHistory.tsx` · `src/features/analytics/Analytics.tsx` ·
+  `src/store/useProgressStore.ts` · `src/lib/competence.ts` · `src/lib/writing.ts` ·
+  `src/features/session/SessionPlayer.tsx` · `preview/verlauf-fortschritt-redesign.html` ·
+  `docs/areas/SCHREIBEN.md` · `docs/areas/SESSION.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log · PRs #685, #733 · artifact c3df428e

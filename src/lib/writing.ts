@@ -36,18 +36,25 @@ export interface WritingEvalResult {
   message?: string;
 }
 
-/** Fetch the current user's past writing evaluations, newest first. */
-export async function getWritingHistory(limit = 30): Promise<WritingHistoryEntry[]> {
+/**
+ * Fetch the current user's past writing evaluations, newest first. Returns
+ * `null` on a failed query (never `[]`), so the Verlauf can tell "nothing
+ * written yet" apart from "could not load" and offer a retry instead of
+ * claiming an empty history.
+ */
+export async function getWritingHistory(
+  limit = 30,
+): Promise<WritingHistoryEntry[] | null> {
   try {
     const { data, error } = await supabase
       .from("writing_evaluations")
       .select("id, created_at, theme, length, text, weakness, insight, cached, task_id")
       .order("created_at", { ascending: false })
       .limit(limit);
-    if (error || !data) return [];
+    if (error || !data) return null;
     return data as WritingHistoryEntry[];
   } catch {
-    return [];
+    return null;
   }
 }
 

@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   AreaChart,
   Area,
+  ComposedChart,
+  Scatter,
   XAxis,
   YAxis,
   Tooltip,
@@ -17,11 +19,9 @@ import {
   Zap,
   Trophy,
   BookOpen,
-  TrendingUp,
   Target,
   CheckCircle2,
   Circle,
-  Compass,
   Sparkles,
   Boxes,
   ChevronDown,
@@ -31,8 +31,13 @@ import { themes, themeById } from "@/data/themes";
 import { vocabByTheme } from "@/data/vocabulary";
 import { scenarios } from "@/data/dialogues";
 import { practiceAreaById } from "@/data/practiceAreas";
-import { canDoByTheme } from "@/data/canDo";
-import { useProgressStore, useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
+import { canDoByTheme, canDoStatements } from "@/data/canDo";
+import {
+  useProgressStore,
+  useEffectiveStreak,
+  useTodayXp,
+  SEEDED_MILESTONE,
+} from "@/store/useProgressStore";
 import { useSettingsStore, type LearningGoal } from "@/store/useSettingsStore";
 import { mastery, masteryLabel, dueCount } from "@/engine/srs";
 import { frequencyBin } from "@/data/frequency";
@@ -49,6 +54,7 @@ import { Progress } from "@/components/ui/progress";
 import { SectionHeading, XPBar } from "@/components/shared/misc";
 import { StatCard } from "@/components/shared/StatCard";
 import { recommendedNext } from "@/features/dashboard/recommend";
+import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { cardLevel } from "@/engine/collection";
 
 const goalLabelDe: Record<LearningGoal, string> = {
@@ -69,74 +75,6 @@ function lastNDays(n: number): string[] {
   return days;
 }
 
-function WeaknessPanel({ entries }: { entries: WritingHistoryEntry[] }) {
-  const navigate = useNavigate();
-
-  const freq = entries.reduce(
-    (acc, e) => {
-      if (e.weakness) acc[e.weakness] = (acc[e.weakness] ?? 0) + 1;
-      return acc;
-    },
-    {} as Partial<Record<WeaknessCategory, number>>,
-  );
-
-  const sorted = (Object.entries(freq) as [WeaknessCategory, number][]).sort(
-    ([, a], [, b]) => b - a,
-  );
-
-  if (sorted.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Noch keine Auswertungen. Reiche einen Text ein, um Schwachstellen zu sehen.
-      </p>
-    );
-  }
-
-  const maxCount = sorted[0][1];
-  const topArea = practiceAreaById(sorted[0][0]);
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2.5">
-        {sorted.slice(0, 5).map(([weakness, count], i) => {
-          const area = practiceAreaById(weakness);
-          const widthPct = Math.round((count / maxCount) * 100);
-          return (
-            <div key={weakness} className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className={cn("font-medium", i === 0 && "text-primary")}>
-                  {area?.labelDe ?? weakness}
-                </span>
-                <span className="tabular-nums text-muted-foreground">{count}×</span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-                <div
-                  className={cn(
-                    "h-full rounded-full transition-all",
-                    i === 0 ? "bg-primary" : "bg-muted-foreground/40",
-                  )}
-                  style={{ width: `${widthPct}%` }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {topArea && (
-        <div className="flex items-center justify-between border-t border-border pt-3">
-          <p className="text-sm text-muted-foreground">
-            Top-Schwachstelle:{" "}
-            <span className="font-medium text-foreground">{topArea.labelDe}</span>
-          </p>
-          <Button size="sm" onClick={() => navigate(topArea.route)}>
-            <Target className="h-3.5 w-3.5" /> Jetzt üben
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /** Quiet section label used to group the Fortschritt page into calm blocks. */
 function Subheading({
   children,
@@ -152,6 +90,206 @@ function Subheading({
       </h2>
       {aside}
     </div>
+  );
+}
+
+type CompetenceMetric = "w" | "c";
+
+const COMPETENCE_TABS: { id: CompetenceMetric; label: string }[] = [
+  { id: "w", label: "Wörter" },
+  { id: "c", label: "Can-Dos" },
+];
+
+function shortDay(day: string): string {
+  const [y, m, d] = day.split("-").map(Number);
+  return new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(
+    new Date(y, m - 1, d),
+  );
+}
+
+function dayKeyMinus(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/**
+ * Kompetenzkurve (founder pick 3): the headline chart is a number that only
+ * goes up. XP measures effort and dips in a quiet week, which reads as
+ * regression; mastered words and reached Can-Dos measure ability. Built from
+ * the daily samples in `masteryHistory` — history that cannot be backfilled, so
+ * the card states the current number honestly until there are two samples.
+ */
+function CompetenceCard({
+  mastered,
+  achieved,
+  canDoTotal,
+}: {
+  mastered: number;
+  achieved: number;
+  canDoTotal: number;
+}) {
+  const masteryHistory = useProgressStore((s) => s.masteryHistory);
+  const canDoAchievedAt = useProgressStore((s) => s.canDoAchievedAt);
+  const [metric, setMetric] = useState<CompetenceMetric>("w");
+  const reduce = useReducedMotion();
+  const { trackRef, registerItem, rect } = useSlidingPill(metric);
+
+  const milestoneDays = useMemo(() => {
+    const days = new Set<string>();
+    for (const stamp of Object.values(canDoAchievedAt)) {
+      if (stamp !== SEEDED_MILESTONE) days.add(stamp);
+    }
+    return days;
+  }, [canDoAchievedAt]);
+
+  const points = useMemo(() => {
+    return Object.keys(masteryHistory)
+      .sort()
+      .map((day) => {
+        const snap = masteryHistory[day];
+        const value = metric === "w" ? snap.w : snap.c;
+        return {
+          day,
+          label: shortDay(day),
+          value,
+          milestoneValue: milestoneDays.has(day) ? value : null,
+        };
+      });
+  }, [masteryHistory, metric, milestoneDays]);
+
+  const lastMilestone = useMemo(() => {
+    let best: { id: string; day: string } | null = null;
+    for (const [id, day] of Object.entries(canDoAchievedAt)) {
+      if (day === SEEDED_MILESTONE) continue;
+      if (!best || day > best.day) best = { id, day };
+    }
+    if (!best) return null;
+    return canDoStatements.find((c) => c.id === best.id)?.statement ?? null;
+  }, [canDoAchievedAt]);
+
+  const current = metric === "w" ? mastered : achieved;
+  if (current === 0 && points.length === 0) return null;
+
+  // Only claim a weekly delta when there is a sample at least a week old to
+  // compare against; otherwise the card shows the number without a trend.
+  const weekAgo = dayKeyMinus(7);
+  const prior = points.filter((p) => p.day <= weekAgo);
+  const delta = prior.length ? current - prior[prior.length - 1].value : null;
+
+  const unit =
+    metric === "w" ? "Wörter gemeistert" : `von ${canDoTotal} Kompetenzen erreicht`;
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-eyebrow text-muted-foreground">Kompetenz</p>
+          {canDoTotal > 0 && (
+            <div
+              ref={trackRef as React.RefObject<HTMLDivElement>}
+              role="tablist"
+              aria-label="Kennzahl"
+              className="relative flex items-stretch gap-0.5 rounded-lg border border-border bg-muted p-1"
+            >
+              {rect && (
+                <motion.span
+                  aria-hidden
+                  className="absolute bottom-1 top-1 left-0 rounded-md bg-surface shadow-soft"
+                  initial={false}
+                  animate={{ x: rect.left, width: rect.width }}
+                  transition={
+                    reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }
+                  }
+                />
+              )}
+              {COMPETENCE_TABS.map((tab) => {
+                const active = tab.id === metric;
+                return (
+                  <button
+                    key={tab.id}
+                    ref={registerItem(tab.id)}
+                    onClick={() => setMetric(tab.id)}
+                    role="tab"
+                    aria-selected={active}
+                    className={cn(
+                      "relative z-10 rounded-md px-3 py-1.5 text-xs leading-none transition-colors",
+                      active
+                        ? "font-bold text-primary"
+                        : "font-medium text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {points.length >= 2 ? (
+          <>
+            <ResponsiveContainer width="100%" height={170}>
+              <ComposedChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
+                <defs>
+                  <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: "hsl(var(--surface))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  name={metric === "w" ? "Gemeistert" : "Kompetenzen"}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2.5}
+                  fill="url(#compGrad)"
+                  dot={false}
+                  animationDuration={reduce ? 0 : 300}
+                />
+                {/* Days a Can-Do was reached, marked on the curve. */}
+                <Scatter
+                  dataKey="milestoneValue"
+                  name="Kompetenz erreicht"
+                  fill="hsl(var(--success))"
+                  animationDuration={reduce ? 0 : 300}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+            {/* The absolute count already rides the Vokabeln tile and the
+                Kompetenzen badge; this card owns the direction. */}
+            {delta !== null && delta > 0 && (
+              <p className="text-sm tabular-nums text-muted-foreground">
+                +{delta} {metric === "w" ? "Wörter" : "Kompetenzen"} diese Woche
+              </p>
+            )}
+          </>
+        ) : (
+          <div className="space-y-1">
+            <p className="text-3xl font-extrabold tabular-nums">{current}</p>
+            <p className="text-sm text-muted-foreground">{unit}</p>
+            <p className="text-xs text-muted-foreground">Die Kurve baut sich ab heute auf.</p>
+          </div>
+        )}
+
+        {lastMilestone && (
+          <p className="flex items-start gap-2 border-t border-border pt-3 text-sm text-muted-foreground">
+            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-success" aria-hidden />
+            Zuletzt erreicht: <span className="font-medium text-foreground">{lastMilestone}</span>
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -178,13 +316,11 @@ export function Analytics() {
   const minutesGoal = Math.max(5, Math.round(dailyGoalXp / 8));
 
   const [writingEntries, setWritingEntries] = useState<WritingHistoryEntry[]>([]);
-  const [writingLoaded, setWritingLoaded] = useState(false);
 
   useEffect(() => {
-    getWritingHistory(60).then((data) => {
-      setWritingEntries(data);
-      setWritingLoaded(true);
-    });
+    // A failed fetch (null) simply leaves the diagnosis on its vocabulary
+    // fallback; the Verlauf tab is where a load error is reported and retried.
+    getWritingHistory(60).then((data) => setWritingEntries(data ?? []));
   }, []);
 
   const info = levelFromXp(xp);
@@ -250,10 +386,21 @@ export function Analytics() {
       .filter((g) => g.items.length > 0);
   }, [themeStats]);
   const canDoTotal = canDoGroups.reduce((acc, g) => acc + g.items.length, 0);
-  const canDoAchieved = canDoGroups.reduce(
-    (acc, g) => acc + g.items.filter((c) => g.ratio >= c.threshold).length,
-    0,
+  const achievedIds = useMemo(
+    () =>
+      canDoGroups.flatMap(({ ratio, items }) =>
+        items.filter((c) => ratio >= c.threshold).map((c) => c.id),
+      ),
+    [canDoGroups],
   );
+  const canDoAchieved = achievedIds.length;
+
+  // Sample today's competence so the Kompetenzkurve has a point for this visit.
+  // The store call is a no-op when nothing changed, so this cannot loop.
+  const recordCompetence = useProgressStore((s) => s.recordCompetence);
+  useEffect(() => {
+    recordCompetence({ mastered: masteryGroups.mastered, achievedIds });
+  }, [recordCompetence, masteryGroups.mastered, achievedIds]);
 
   // Diagnose: current weakest CEFR band (or theme, as a fallback for a fresh
   // learner with no started cards yet) plus a one-tap session into it.
@@ -297,6 +444,32 @@ export function Analytics() {
     () => vocabulary.filter((v) => cardLevel(srs[v.id]) >= 1 || savedWords.includes(v.id)).length,
     [srs, savedWords],
   );
+
+  // Prüfung block: only while the date is still ahead. A past date would sit at
+  // "0 Tage" forever, so the card retires itself once the exam has happened.
+  const examUpcoming = examDate !== null && examDate >= todayKey() && daysToExam !== null;
+  const lastExam = examsDone.length ? examsDone[examsDone.length - 1] : null;
+  const examDateLabel = examDate
+    ? new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long" }).format(
+        new Date(`${examDate}T00:00:00`),
+      )
+    : "";
+  // Ring fill = how close the exam is, over a 90-day run-up.
+  const examProgress = daysToExam !== null ? Math.min(1, Math.max(0, 1 - daysToExam / 90)) : 0;
+
+  // Diagnose: the writing weakness the AI flagged most often, which is more
+  // specific than a CEFR band. Falls back to the weakest vocabulary spot while
+  // the history is still loading or when nothing has been written yet.
+  const topWriting = useMemo(() => {
+    const freq = new Map<WeaknessCategory, number>();
+    for (const e of writingEntries) {
+      if (e.weakness) freq.set(e.weakness, (freq.get(e.weakness) ?? 0) + 1);
+    }
+    const top = [...freq.entries()].sort(([, a], [, b]) => b - a)[0];
+    if (!top) return null;
+    const area = practiceAreaById(top[0]);
+    return area ? { area, count: top[1], of: writingEntries.length } : null;
+  }, [writingEntries]);
 
   const detailsExpanded = useSettingsStore((s) => s.progressDetailsExpanded);
   const setSettings = useSettingsStore((s) => s.setSettings);
@@ -372,6 +545,13 @@ export function Analytics() {
         )}
       </section>
 
+      {/* ── Kompetenz: the headline is ability over time, not effort ── */}
+      <CompetenceCard
+        mastered={masteryGroups.mastered}
+        achieved={canDoAchieved}
+        canDoTotal={canDoTotal}
+      />
+
       {/* Claim moment — a rare reward: an achieved milestone waiting to be
           collected. Reward-gold, spring-in; claiming advances to the next win. */}
       <AnimatePresence mode="popLayout">
@@ -411,32 +591,97 @@ export function Analytics() {
       <section className="space-y-3">
         <Subheading>Dranbleiben</Subheading>
         <div className="grid gap-4 sm:grid-cols-2">
-          {/* Diagnose — the weakest spot right now, one tap into a scoped session. */}
-          <Card className="border-warning/20 bg-warning/5">
+          {/* Prüfung — the countdown and the last simulation, so "am I on track"
+              is answered for the learner working towards a date. */}
+          {examUpcoming && (
+            <Card>
+              <CardContent className="flex h-full flex-col gap-3 p-5">
+                <p className="text-eyebrow text-muted-foreground">Prüfung</p>
+                <div className="flex flex-1 items-center gap-4">
+                  <div
+                    className="relative h-[60px] w-[60px] shrink-0 rounded-full"
+                    style={{
+                      background: `conic-gradient(hsl(var(--primary)) ${examProgress * 360}deg, hsl(var(--border)) 0deg)`,
+                    }}
+                  >
+                    <div className="absolute inset-[7px] grid place-items-center rounded-full bg-surface">
+                      <span className="text-base font-bold tabular-nums">{daysToExam}</span>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold">
+                      {daysToExam === 0 ? "Heute ist Prüfungstag" : `Tage bis zum ${examDateLabel}`}
+                    </p>
+                    <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">
+                      {lastExam
+                        ? `letzte Simulation ${lastExam.score} %`
+                        : "noch keine Simulation"}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="self-start"
+                  onClick={() => navigate("/exam")}
+                >
+                  <Trophy className="h-4 w-4" /> Simulation starten
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Diagnose — the most specific weak spot available, one tap into it. */}
+          <Card>
             <CardContent className="flex h-full flex-col gap-3 p-5">
-              <div className="flex items-center gap-2 text-warning">
-                <Compass className="h-4 w-4 shrink-0" />
-                <p className="text-sm font-medium">Deine Schwachstelle</p>
-              </div>
-              <div className="flex-1">
-                <p className="text-base font-semibold">
-                  {weakBand ? `Niveau ${weakBand}` : weakThemeTitle}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {weakBand
-                    ? `Am wenigsten gefestigt: dein Wortschatz auf Niveau ${weakBand}.`
-                    : `Am wenigsten gefestigt: ${weakThemeTitle}.`}
-                </p>
-              </div>
-              <Button size="sm" className="self-start" onClick={() => navigate(`/session?theme=${weakTheme}`)}>
-                <Zap className="h-4 w-4" /> Session starten
-              </Button>
+              <p className="text-eyebrow text-muted-foreground">Diagnose</p>
+              {topWriting ? (
+                <>
+                  <div className="flex-1">
+                    <p className="text-base font-semibold">
+                      {topWriting.area.labelDe}{" "}
+                      <span className="font-normal text-muted-foreground">(Schreiben)</span>
+                    </p>
+                    <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">
+                      {topWriting.count}× in {topWriting.of}{" "}
+                      {topWriting.of === 1 ? "Text" : "Texten"}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="self-start"
+                    onClick={() => navigate(topWriting.area.route)}
+                  >
+                    <Target className="h-4 w-4" /> Üben
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="flex-1">
+                    <p className="text-base font-semibold">
+                      {weakBand ? `Niveau ${weakBand}` : weakThemeTitle}
+                    </p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {weakBand
+                        ? `Am wenigsten gefestigt: dein Wortschatz auf Niveau ${weakBand}.`
+                        : `Am wenigsten gefestigt: ${weakThemeTitle}.`}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="self-start"
+                    onClick={() => navigate(`/session?theme=${weakTheme}`)}
+                  >
+                    <Zap className="h-4 w-4" /> Session starten
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
 
           {/* Next quest — the single nearest Can-Do milestone still to be reached. */}
           {nextQuest ? (
-            <Card className="border-primary/20 bg-primary/5">
+            <Card className={cn("border-primary/20 bg-primary/5", examUpcoming && "sm:col-span-2")}>
               <CardContent className="flex h-full flex-col gap-3 p-5">
                 <div className="flex items-center gap-2 text-primary">
                   <Sparkles className="h-4 w-4 shrink-0" />
@@ -458,7 +703,12 @@ export function Analytics() {
             </Card>
           ) : (
             canDoGroups.length > 0 && (
-              <Card className="border-success/20 bg-success/5">
+              <Card
+                className={cn(
+                  "border-success/20 bg-success/5",
+                  examUpcoming && "sm:col-span-2",
+                )}
+              >
                 <CardContent className="flex h-full items-center gap-3 p-5">
                   <Sparkles className="h-5 w-5 shrink-0 text-success" />
                   <p className="text-sm font-medium text-success">
@@ -674,23 +924,6 @@ export function Analytics() {
 
             {/* Activity calendar */}
             <ActivityCalendar />
-
-            {/* Writing weaknesses */}
-            <Card>
-              <CardContent className="p-5">
-                <p className="mb-1 flex items-center gap-2 font-semibold">
-                  <TrendingUp className="h-4 w-4 text-primary" /> Schwachstellen (Schreiben)
-                </p>
-                <p className="mb-4 text-xs text-muted-foreground">
-                  Aus deinen letzten KI-Auswertungen (letzte 60 Einträge)
-                </p>
-                {writingLoaded ? (
-                  <WeaknessPanel entries={writingEntries} />
-                ) : (
-                  <div className="h-20 animate-pulse rounded-lg bg-muted/40" />
-                )}
-              </CardContent>
-            </Card>
 
             {/* Exam history */}
             {examsDone.length > 0 && (

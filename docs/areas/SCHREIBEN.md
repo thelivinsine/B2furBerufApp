@@ -2,10 +2,11 @@
 
 A visual EXTENSION of the Bibliothek design language (see the `/design` skill). Founder-approved
 previews: `preview/schreiben-bibliothek-extension*.html`, `preview/schreiben-design-review.html`,
-`preview/fokus-correction-*.html`, and the s168 Fokus-mobile series
+`preview/fokus-correction-*.html`, the s168 Fokus-mobile series
 `preview/fokus-grammatik-mobile{,-r2,-r3,-r4}.html` (**r4 "Option 2" is the shipped one**; the
-earlier rounds are kept as the record of what was rejected, see `/design` §7). **Verlauf is slated
-for rework — do not treat its current design as reference.**
+earlier rounds are kept as the record of what was rejected, see `/design` §7), and
+`preview/verlauf-fortschritt-redesign.html` (Verlauf variant **C "Entwicklung zuerst"**,
+founder-picked s171).
 
 ## Page frame
 - 4-segment sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (no
@@ -136,9 +137,31 @@ for rework — do not treat its current design as reference.**
   reaches the bottom chrome on desktop and the two modes read as different sizes. **Mobile has no
   cap and still fills** — on phones the space is genuinely scarce, which is the whole point there.
   Growth and internal scrolling are unchanged by the cap.
-- Verlauf renders inside the same content grid column (never full width); its empty state
-  deep-links into Kurz. `WritingHistory` shows only the learner's text (the exact prompt behind
-  an old entry is not recoverable since pools).
+
+## Verlauf (history)
+Renders inside the same content grid column (never full width); the empty state deep-links into
+Kurz. Design = variant C, "development first" (founder-picked s171):
+- **"Deine Entwicklung" card leads the tab**: the top 3 weakness categories as monthly mini bar
+  groups over `TREND_MONTHS` (3) calendar months, oldest bar lightest, with a per-category trend
+  arrow (down = `--success`, up = `--warning`, flat = muted) and a success badge for the biggest
+  drop ("Kasus & Artikel: 33 % weniger"). Footer = "Größte Schwachstelle: X" + "Jetzt üben".
+- **Honesty rules that must not be weakened:** a month only counts as a comparison point with
+  `MIN_TEXTS_PER_MONTH` (2) texts or more, so a quiet month never reads as progress; a month with
+  no texts prints "–", never 0; with fewer than two comparable months the card falls back to plain
+  totals plus "Der Trend erscheint ab dem zweiten Monat." The first live check caught exactly this:
+  compared against a one-text month, an IMPROVING category rendered as worsening.
+- **List = compact rows** (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron). The row
+  disclosure holds, in the order it happened, the **Aufgabe** (resolved from `task_id`, s167; older
+  rows without one omit it), **Dein Text**, then the **Tipp** next to the practice CTA, with delete
+  and the standalone AI line at the foot.
+- Kurz/Lang filter (`ModeSwitcher`, the shipped grey-track/white-pill language) appears ONLY when
+  both kinds exist; the count badge next to "Letzte Auswertungen" reflects the filtered list.
+- `getWritingHistory` returns `null` on a failed query (never `[]`), so the error card with
+  "Erneut versuchen" is reachable and an empty history is never faked.
+- **Open follow-ups** (both need a `writing_evaluations` migration): store the CORRECTED text so the
+  entry can show the actual correction in the Fokus mark language, and give **Fokus** a history. The
+  Fokus filter segment is deliberately absent until the latter lands, never a dead control.
+
 
 ## Fokus (Satzlabor)
 - Single-sentence write → correct → transform lab. **Grammar rail = three combinable axes,

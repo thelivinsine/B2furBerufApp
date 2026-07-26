@@ -61,6 +61,30 @@ StatCard ride them too (streak = celebration, not warning).
   content is `z-10` above the effect so the burst radiates from behind the opaque card).
 
 ## Fortschritt & Can-Do
-`canDo.ts` (52 milestones) drives the Fortschritt lead section, a weakest-band diagnose card, and
-the relocated theme-mastery grid. The daily-goal ring lives on Fortschritt (`/analytics`), not on
+`canDo.ts` (52 milestones) drives the Fortschritt lead section, the diagnose card, and the
+relocated theme-mastery grid. The daily-goal ring lives on Fortschritt (`/analytics`), not on
 the dashboard.
+
+Page order (variant 3 "Kompetenzkurve", founder-picked s171; preview
+`preview/verlauf-fortschritt-redesign.html`): Überblick (ring + level + 4 tiles, unchanged) →
+**Kompetenz** → claim moment → **Dranbleiben** → Was du schon kannst → Sammlung → Details.
+- **Kompetenz** = the headline chart: mastered words (or Can-Dos, via the small pill toggle) over
+  time, with green dots marking the days a Can-Do was reached and a "Zuletzt erreicht" line. XP
+  stays in Details: XP measures effort and dips in a quiet week, which reads as regression, while
+  this curve only goes up. The card owns the DIRECTION only ("+16 Wörter diese Woche"); the
+  absolute count belongs to the Vokabeln tile, so it is never printed twice.
+- **Data comes from daily samples, not backfill.** FSRS keeps current card state only, so
+  `useProgressStore.masteryHistory` (`{ [YYYY-MM-DD]: { w, c } }`) is sampled by `recordCompetence`
+  from Analytics on view and from `lib/competence.ts` at session end. Never sample from eager code
+  (it would pull a content bank into the main chunk). `canDoAchievedAt` stamps each milestone's
+  first-seen day; milestones already achieved when sampling began carry `SEEDED_MILESTONE`, so a
+  long-standing win is never drawn as "reached today". Under two samples the card shows the plain
+  number plus "Die Kurve baut sich ab heute auf." Both fields are local-only for now, same as
+  `missionsDone`/`keyItems` (the `progress` row has a fixed column set).
+- **Dranbleiben** = Prüfung (only while `examDate` is still ahead: days-remaining ring over a
+  90-day run-up, the date, the last simulation score, "Simulation starten" → `/exam`) + Diagnose +
+  Nächste Quest (spans both columns when the Prüfung card is present).
+- **Diagnose is writing-aware**: the weakness the AI flagged most often across the last 60
+  evaluations, with its count, falling back to the weakest CEFR band / theme while the history
+  loads or when nothing has been written. The duplicated writing-weakness panel that used to sit
+  in Details is gone: one weakness ranking, one home.

@@ -732,3 +732,46 @@ between Fokus and Kurz/Lang), the rest were finishing work on the Fokus sentence
   option), so this shipped without a new preview round. Verified in headless Chromium at 390×844
   (bottom tab bar, both new icons in their active and inactive states) and at 1280×900 (desktop
   Sidebar + the toggle), plus the full gate list.
+
+## Session 171 (2026-07-26) — Verlauf + Fortschritt redesign
+
+Preview-first round on the two surfaces with almost no recorded founder direction (the whole prior
+record was "except the verlauf - I want to rework it", s155, and "Redesign fortschritt section - it's
+chaotic at the moment", s105). Three variants each in
+`preview/verlauf-fortschritt-redesign.html`; the founder picked **C** and **3**.
+
+1. **Verlauf = "Entwicklung zuerst" (pick C).** A development card (per-category monthly bars, trend
+   arrows, "X % weniger" badge) leads, over a COMPACT row list. Rejected: A "Korrekturkarten"
+   (correction-first cards) and B "Archiv mit Filter-Rail" (rail + month groups). A's premise, showing
+   the real correction, is still the top follow-up but needs a schema migration; C shipped against
+   today's data without faking anything.
+2. **Fortschritt = "Kompetenzkurve" (pick 3).** Mastered words / Can-Dos over time became the
+   headline and XP moved into Details: XP measures effort and DIPS in a quiet week, which a plateau
+   learner reads as regression, while mastered-words only rises (the LingQ known-words lesson).
+   Rejected: 1 "Prüfungs-Cockpit" (full readiness bars per pillar) and 2 "Diagnose zuerst" (weakness
+   tiles as hero) — though both donated pieces: the exam countdown and the writing-aware diagnosis
+   shipped in compact form.
+3. **Competence history is sampled, never reconstructed.** FSRS keeps only current card state, so
+   "am I getting better" cannot be derived retroactively. Rejected: dating each mastered card by its
+   `lastReview`, which would date a word mastered in May but reviewed yesterday as yesterday and fake
+   a hockey stick. Instead `masteryHistory` samples daily (Analytics on view, session end via
+   `lib/competence.ts`), the card degrades to a plain number under two samples, and pre-existing
+   milestones carry `SEEDED_MILESTONE` so they never plot as "reached today".
+4. **A trend needs a comparable month.** `MIN_TEXTS_PER_MONTH = 2`. Comparing against a month with a
+   single text made an improving category (June 3 -> July 2) render as WORSENING in the first live
+   check. Months without texts print "-", never 0: no writing is not the same as no mistakes.
+5. **One weakness ranking, one home.** The duplicated writing-weakness panel in Fortschritt's Details
+   (60 entries against Verlauf's 30, so the pages could name different top weaknesses) was deleted.
+   The aggregate lives in the Diagnose card; the per-text artifacts live in Verlauf.
+6. **The Kompetenz card owns direction, not the count.** Its footer states only "+16 Wörter diese
+   Woche"; the absolute number already rides the Vokabeln tile and the Kompetenzen badge. A deliberate
+   deviation from the approved preview (which printed both) in service of the no-redundancy rule.
+7. **The Fokus filter segment was deliberately omitted** from Verlauf's Kurz/Lang switcher: Fokus
+   persists nothing yet, so shipping the segment would have shipped a dead control.
+8. **Verlauf's disclosure reads in event order:** Aufgabe (s167 `task_id`) -> Dein Text -> Tipp, with
+   the Tipp deliberately adjacent to the practice CTA. The tip used to sit outside the disclosure and
+   always visible; in a compact list the weakness chip carries that signal in the collapsed row.
+
+Method note: items 4 and the label/arrow layout bug were caught ONLY by seeding a demo state and
+screenshotting the REAL pages (light + dark + expanded row), not the static mockup. Verify in the
+app, not only in the preview.

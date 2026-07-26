@@ -31,6 +31,28 @@ interface ProgressState {
   missionsDone: string[];
   keyItems: string[];
 
+  /**
+   * Daily competence snapshots for the Fortschritt Kompetenzkurve, keyed by
+   * YYYY-MM-DD: `w` = mastered vocabulary count, `c` = achieved Can-Do count.
+   * FSRS keeps only CURRENT card state, so the "am I actually getting better"
+   * curve cannot be reconstructed after the fact; it has to be sampled as the
+   * learner goes. Written only from surfaces that already hold the content
+   * banks (Analytics, session end via lib/competence.ts) — never from eager
+   * code, which must not import a bank.
+   */
+  masteryHistory: Record<string, { w: number; c: number }>;
+  /**
+   * Milestone id → the day it was first observed as achieved, so the curve can
+   * mark real wins. Milestones already achieved when sampling starts are
+   * stamped `SEEDED_MILESTONE` instead of a date: they are genuinely achieved
+   * but we do not know when, so they must never be drawn as "reached today".
+   *
+   * Both fields carry the same local-only caveat as missionsDone/keyItems: the
+   * cloud `progress` row has a fixed column set, so they ride into Supabase
+   * only once a schema migration adds a column for them.
+   */
+  canDoAchievedAt: Record<string, string>;
+
   addXp: (amount: number) => void;
   reviewVocab: (vocabId: string, grade: Grade, latencyMs?: number) => void;
   toggleSavedWord: (vocabId: string) => void;
@@ -40,8 +62,15 @@ interface ProgressState {
   registerSession: () => void;
   completeMission: (missionId: string) => void;
   grantKeyItems: (itemIds: string[]) => void;
+  recordCompetence: (input: { mastered: number; achievedIds: string[] }) => void;
   resetProgress: () => void;
 }
+
+/**
+ * Stamp for a milestone that was already achieved before competence sampling
+ * began (see `canDoAchievedAt`). Not a date, so it never plots as a dot.
+ */
+export const SEEDED_MILESTONE = "seed";
 
 const defaults = {
   xp: 0,
@@ -58,6 +87,8 @@ const defaults = {
   savedWords: [] as string[],
   missionsDone: [] as string[],
   keyItems: [] as string[],
+  masteryHistory: {} as Record<string, { w: number; c: number }>,
+  canDoAchievedAt: {} as Record<string, string>,
 };
 
 /** Updates the streak bookkeeping for "today". */
@@ -145,7 +176,38 @@ export const useProgressStore = create<ProgressState>()(
           keyItems: Array.from(new Set([...s.keyItems, ...itemIds])),
         })),
 
-      resetProgress: () => set({ ...defaults, srs: {}, dailyXp: {} }),
+      /**
+       * Sample today's competence. Idempotent per day: repeated calls with the
+       * same numbers are a no-op, and a day's entry always holds that day's
+       * latest reading. `achievedIds` are the Can-Do milestones currently
+       * reached; first-seen ids get today's date (or the seed stamp when this
+       * is the very first sample, since their real date is unknown).
+       */
+      recordCompetence: ({ mastered, achievedIds }) =>
+        set((s) => {
+          const today = todayKey();
+          const seeding = Object.keys(s.masteryHistory).length === 0;
+          let achievedAt = s.canDoAchievedAt;
+          let stamped = false;
+          for (const id of achievedIds) {
+            if (achievedAt[id]) continue;
+            if (!stamped) {
+              achievedAt = { ...achievedAt };
+              stamped = true;
+            }
+            achievedAt[id] = seeding ? SEEDED_MILESTONE : today;
+          }
+          const sample = s.masteryHistory[today];
+          const c = achievedIds.length;
+          if (!stamped && sample && sample.w === mastered && sample.c === c) return {};
+          return {
+            masteryHistory: { ...s.masteryHistory, [today]: { w: mastered, c } },
+            ...(stamped ? { canDoAchievedAt: achievedAt } : {}),
+          };
+        }),
+
+      resetProgress: () =>
+        set({ ...defaults, srs: {}, dailyXp: {}, masteryHistory: {}, canDoAchievedAt: {} }),
     }),
     {
       name: "b2beruf.progress.v1",
