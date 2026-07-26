@@ -1389,3 +1389,34 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log
+
+- **Prompt 2 (verbatim, 2026-07-26):** `give me the artifact`
+- **Response summary:** Published the pending Schreiben icon round (round 3, options U/V/W/X plus
+  the shipped Federspitze as reference) as a Claude artifact so the founder can review it outside
+  the sandbox. No content change: `preview/schreiben-icon-vorschlaege.html` was already built from
+  the real `route-icons.tsx` path data and optical normalisation, and its `NORM` boxes were
+  re-checked against the shipped file after PR #730, so the three neighbour marks in the mockup
+  (Wegweiser, Bücherstapel, Pokal) show the just-merged state.
+- **Artifacts:** artifact `fee81c4c-dec9-41b2-91dd-0240e6999467` ·
+  `preview/schreiben-icon-vorschlaege.html` (unchanged)
+
+- **Prompt 3 (verbatim, 2026-07-26):** `generate more previews`
+- **Response summary:** Round 4 of the Schreiben icon, four new marks added to the four still
+  open. Read the earlier rounds first to avoid re-proposing: A-D (s158 round 1), E-H (round 2),
+  I-L (Praktisch), U-X (round 3) means nine of the twelve proposals so far were pens, so this
+  round deliberately went elsewhere. **Y Blatt mit Stift** (the universal compose mark, the one
+  obvious form never yet shown), **Z Absatzmarke** (the pilcrow, the only non-object option),
+  **AA Klemmbrett** (the Aufgabe that Kurz/Lang set, its cyan clip breaking the top silhouette so
+  it cannot be confused with U), **AB Bleistift, schräg** (every previous pen stood upright; the
+  diagonal is the only one in the whole bar). Page restructured against the redundancy rule: r1
+  repeated all five tabs at large size under every variant (45 tiles), r2 shows the neighbours
+  once, all nine candidates once in a single-row form comparison, then per-variant only the real
+  light + dark tab bars. Verified in headless Chromium at 150px, at the real 29px nav size on both
+  grounds, and full-page: first pass caught the Bleistift rendering as a blunt slab and the Y pen
+  as a detached stub (both re-derived, rotation maths corrected), second pass caught the Y sheet
+  reading as a square rather than paper. A clipped mobile screenshot turned out to be a harness
+  artifact, not a page bug: headless Chromium clamps the viewport to 500px, and a direct
+  measurement (`docScroll == docClient`, tab bar forced to 350px shows no overflow) confirmed the
+  page does not scroll sideways. Redeployed to the same artifact URL, one link per topic.
+- **Artifacts:** `preview/schreiben-icon-vorschlaege-r2.html` · artifact
+  `fee81c4c-dec9-41b2-91dd-0240e6999467` (redeployed) · this log
