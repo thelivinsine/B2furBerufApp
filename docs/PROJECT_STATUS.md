@@ -1,6 +1,6 @@
 # Project Status
 
-_Last updated: 2026-07-26 (session 170, PR #PRNUM, live). **Praktisch's Trainieren/Spielen toggle
+_Last updated: 2026-07-26 (session 170, PR #730, live). **Praktisch's Trainieren/Spielen toggle
 now shares the squircle-track + sliding-pill language with Bibliothek/Schreiben** (was a fully
 `rounded-full` track); **Bibliothek's route icon reverted to the pre-s158 "stack of three books"**,
 and **Fortschritt's became the "Pokal" (trophy/cup)** from the unpicked s158 icon-preview batch.
@@ -79,7 +79,7 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 ## Resume here (next session)
 
 **Handoff after session 170 (2026-07-26): Praktisch toggle joins the squircle language;
-Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#PRNUM**). Founder: adapt the
+Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#730**). Founder: adapt the
 reduced-rounding toggle design from Bibliothek/Schreiben to Praktisch, restore the previous
 Bibliothek icon, and give Fortschritt the leaderboard-cup icon from an earlier preview batch. All
 three were direct, unambiguous ports of already-approved designs (no new preview round needed).

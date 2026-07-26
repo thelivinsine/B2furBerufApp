@@ -1384,7 +1384,7 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   running app screenshot tooling was pre-wired in this session (Playwright installed on the fly,
   pointed at the pre-installed Chromium binary). Gates: typecheck · lint (0 errors, pre-existing
   warnings only) · test:unit 317/317 · build · check:bundle (118.1 kB).
-- **Artifacts:** PR **#PRNUM** · `src/features/dashboard/Dashboard.tsx` ·
+- **Artifacts:** PR **#730** · `src/features/dashboard/Dashboard.tsx` ·
   `src/components/layout/route-icons.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
   `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
