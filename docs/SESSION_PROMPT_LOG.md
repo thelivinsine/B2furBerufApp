@@ -1060,3 +1060,51 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 2):** `src/features/writing/useFillEditor.ts` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-26):** `for focus, I want you to generate some previews. I want to make
+  changes to only mobile view. The idea is that the learner doesn't seem to know there's a feature to
+  reform the sentence hidden within the grammar filter drop down. what if the grammar filter doesn't work
+  same as ausgabe wahlen folter drop down as in kurz and lang? what if it's a different UI piece which
+  lives below the writing field and some of the options in grammatik are always visible. At first there
+  shouldn't be page scrolling and the items should fit well within the screen, but there should be an
+  option to expand. Here it can go two ways.. one is to expand within the page with a page scroll or the
+  exapnd works as a pop up and thenthe learner can view all the options within. the transfomed sentence
+  can be appeared in the same place as the corrections tiles appear and for the original and corrected
+  toggle, transformed option should also be added. Generate some previews both for pop up grammatik
+  option and the in-page extend option with a page scroll.`
+- **Response summary:** Previews only, nothing implemented, awaiting a pick. `preview/fokus-grammatik-mobile.html`
+  (also published as artifact `https://claude.ai/code/artifact/dbc08865-71de-4ec2-94cb-99d23ca1d75b`) is
+  built from the real tokens and real component geometry, in 360x780 phone frames, light and dark.
+  **Shared by both variants:** the top "Grammatik" toggle is deleted (it was the cause: it sat exactly
+  where Kurz/Lang put a filter and looked identical); a **"Satz umformen"** tile moves BELOW the writing
+  field with three forms always visible, one per axis (Passiv, Perfekt, Konjunktiv II), an "Erkannt:
+  Aktiv · Präsens · Indikativ" line, and an "Alle Formen" expander; nothing scrolls at rest; the
+  transformed sentence appears where the correction tiles are, and the view toggle gains a third segment
+  **Umgeformt**, which retires the separate transform card. Two consequential sub-decisions are called
+  out for approval in the preview: the card title "Dein Satz" is dropped whenever the toggle is present
+  (it repeats what the segments already say) and the toggle moves to its own centred row so it sits
+  identically at two and three segments. **Variante A (Pop-up):** the app's standard centred dialog, so
+  page height never changes and all eight forms compare at once, at the cost of an overlay that hides
+  the sentence. **Variante B (in der Seite):** expands in place with the familiar panel motion, but
+  re-introduces exactly the page scroll just removed from Kurz/Lang and, on a 360x640 phone, pushes the
+  forms under the nav bar. Two further yes/no items flagged: keeping the KI-Hinweis after a correction
+  (it vanishes today, although transforming sends text to the AI again) and choosing the centred dialog
+  over a bottom sheet (better for thumbs, but a new pattern, and the retired "Mehr" sheet is a landmine).
+- **Artifacts (prompt 3):** `preview/fokus-grammatik-mobile.html` (new) · this log
+- **Prompt 4 (verbatim, 2026-07-26):** `wherever there is blue filter/selection rail, instead of the
+  bright blue outline which is currently the case, use a muted soft gray outline for the buttons or rails.
+  no previews needed for this - implement it directly. Except for the fokus movile view rework, push all
+  the changes done in this session live and document the session including the previews generated for fokus.`
+- **Response summary:** Implemented directly. `WritingRail` ("Aufgabe wählen"), `GrammarRail`
+  ("Grammatik"), both of their internal dividers, and the `accent` Button variant that opens them now use
+  `border-border`, the same neutral edge the Bibliothek FilterRail and every card wear; the Himmelblau
+  fill is untouched. New standing rule, written into CLAUDE.md, `/design` §3 and
+  `docs/areas/SCHREIBEN.md`: **the accent is a FILL, never an outline.** It also retires the s166
+  `accent-ink/70` border workaround, which only existed because no alpha of the 77%-light accent can
+  clear the 3:1 UI floor on the near-white page. Fix tiles and the Verlauf detail tile deliberately keep
+  their accent edge, since they are content rather than rails. Verified in the running app at 390x844 and
+  1280x900 in both themes. The Fokus mobile rework stayed at the preview stage as instructed; everything
+  else in the session went live.
+- **Artifacts (prompt 4):** `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/fokus/GrammarRail.tsx` · `src/components/ui/button.tsx` ·
+  `preview/fokus-grammatik-mobile.html` · `CLAUDE.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log

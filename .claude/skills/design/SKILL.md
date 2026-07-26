@@ -84,13 +84,17 @@ Ranked by how often the founder had to correct AI output:
 - **Brand Nachtblau `#3D74ED`** (`--primary`): the single loud accent. Actions, active tab text,
   card-title eyebrows.
 - **Himmelblau / Himmel Soft** (`--accent`, `197 93% 77%` both themes): selection rails and accent
-  tiles (`bg-accent/20` + `border-accent/50`, dark `bg-accent/10` + `/25`), key-press flashes,
-  fix-tile chips. Schreiben-style rails are Himmelblau tiles, NEVER grey slabs. A control that
-  OPENS such a rail wears its color too (`variant="accent"`, s166: the Schreiben "Aufgabe wählen" /
-  "Grammatik" toggles), never brand blue, which would compete with the CTA beside it.
-- **Accent borders on light ground must use `accent-ink`, not `accent`** (s166): the accent is a
-  77%-light sky, so no alpha of it clears the 3:1 UI-component floor against the near-white page
-  (measured 1.31:1); `accent-ink/70` lands at 3.07:1. Dark ground keeps `accent/45` (3.34:1).
+  tiles (`bg-accent/20`, dark `bg-accent/10`), key-press flashes, fix-tile chips. Schreiben-style
+  rails are Himmelblau tiles, NEVER grey slabs. A control that OPENS such a rail wears its color
+  too (`variant="accent"`, s166: the Schreiben "Aufgabe wählen" / "Grammatik" toggles), never brand
+  blue, which would compete with the CTA beside it.
+- **The accent is a FILL, never an outline** (founder s168): every filter/selection rail and every
+  button that opens one is outlined with the neutral `border` token, the same edge the Bibliothek
+  FilterRail and every card already wear. A blue wash inside a blue edge read as too loud. This
+  also retires the s166 `accent-ink/70` border workaround (it existed only because no alpha of the
+  77%-light accent clears the 3:1 UI floor on the near-white page); the rule now sidesteps the
+  problem instead of tuning around it. Fix tiles and result chips keep their accent edge: they are
+  content, not rails.
 - **White `bg-surface` cards** for content, with `border-border` + `shadow-soft`. AI output cards
   are white, never a grey wash.
 - **Grey `bg-muted`** only as recessed chrome: the Bibliothek FilterRail tile, switcher tracks,

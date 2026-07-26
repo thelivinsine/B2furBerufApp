@@ -104,10 +104,11 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile.
 - **Controls always visibly act:** no disabled-at-default buttons; zero-yield options grey out
   with honest counts.
-- **Color language:** Himmelblau accent tiles for selection rails (not grey); content on white
-  cards (no grey washes); card-title eyebrows bold brand blue, inner labels muted; a bold colored
-  word label over an i icon; green dot = detected fact; AI/legal disclaimers as standalone lines
-  below cards; labels neutral dark grey, never accent blue.
+- **Color language:** Himmelblau accent tiles for selection rails (not grey), but the accent is a
+  FILL only: rails and the buttons that open them are outlined with the neutral `border` token,
+  never an accent edge. Content on white cards (no grey washes); card-title eyebrows bold brand
+  blue, inner labels muted; a bold colored word label over an i icon; green dot = detected fact;
+  AI/legal disclaimers as standalone lines below cards; labels neutral dark grey, never accent blue.
 - **Consistency + motion:** primary actions in the same place across sibling modes; subtle
   micro-motion in one timing family (0.12-0.18s, reduced-motion safe); squircle corners on
   toggles/pills, round only for dots/badges/avatars/circular icon buttons.

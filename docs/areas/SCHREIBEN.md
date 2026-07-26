@@ -69,8 +69,9 @@ design as reference.**
   line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is NOT inside the
   card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
   pill; on mobile it rides the floating cluster's caption slot (s160, same as Fokus, see below).
-- **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
-  `border-accent/50`, dark `bg-accent/10` + `/25`; NOT grey) with a header reset icon and the
+- **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20`, dark
+  `bg-accent/10`; NOT grey) in a neutral `border-border` outline (founder s168: the accent is a
+  fill, never an edge) with a header reset icon and the
   scope hierarchy Niveau → Branche → Thema → Unterthema → Textsorte as single-select dropdowns
   (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
   Beschwerde & Antrag) (grouped listbox
@@ -82,11 +83,11 @@ design as reference.**
   (`layout="panel"`, no floating chip rows); Kurz/Lang get the floating Auswerten cluster (below).
 - **The panel toggles wear the rail's own Himmelblau** (s166): "Aufgabe wählen" (Kurz/Lang) and
   "Grammatik" (Fokus) are `variant="accent"` when closed, `default` (solid primary) when open.
-  `outline`'s `bg-surface/50` made them vanish into the page ground. The `accent` variant borders
-  with **`accent-ink/70` in light** (the 77%-light accent can never clear the 3:1 UI floor on a
-  near-white ground; measured 1.31:1 vs 3.07:1) and keeps `accent/45` in dark (3.34:1). Label
-  contrast 4.72:1 light / 7.71:1 dark. Reuse the variant for any panel toggle, never re-tint
-  `outline` itself.
+  `outline`'s `bg-surface/50` made them vanish into the page ground. Since s168 the `accent`
+  variant is outlined with the neutral `border` token, matching the rails it opens (the earlier
+  `accent-ink/70` edge existed only to clear the 3:1 UI floor that no alpha of the 77%-light accent
+  can reach on a near-white ground; a neutral edge sidesteps it). Label contrast is unchanged,
+  4.72:1 light / 7.71:1 dark. Reuse the variant for any panel toggle, never re-tint `outline`.
 - Umlaut keys (`UmlautKeys`, below) sit in the word-count row of `GuidedWritingTrainer.tsx`.
 - **The writing field is sized, not fixed-`rows`** (`useFillEditor.ts`, founder s168). At rest it
   fills from its own top down to whichever bottom chrome is laid out (mobile cluster / desktop
