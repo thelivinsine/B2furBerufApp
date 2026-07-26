@@ -430,12 +430,15 @@ export function WritingRail({
     <aside
       role={panel ? "region" : undefined}
       aria-label="Aufgabe wählen"
-      // Himmelblau tile (founder s149): a light accent wash instead of the grey
-      // bg-muted; dark mode gets its own quieter alphas so the wash reads as a
-      // cool sky tint, not murky teal. No overflow clipping on the tile: the
+      // Himmelblau FILL (founder s149): a light accent wash instead of the grey
+      // bg-muted; dark mode gets its own quieter alpha so the wash reads as a
+      // cool sky tint, not murky teal. The OUTLINE is the neutral `border`
+      // token, not the accent (founder s168): a blue wash inside a blue edge
+      // read as too loud, and this is the same edge the Bibliothek FilterRail
+      // and every card already use. No overflow clipping on the tile: the
       // dropdown popovers must escape it (their lists scroll internally).
       className={cn(
-        "rounded-xl border border-accent/50 bg-accent/20 shadow-soft dark:border-accent/25 dark:bg-accent/10",
+        "rounded-xl border border-border bg-accent/20 shadow-soft dark:bg-accent/10",
         className,
       )}
     >
@@ -467,7 +470,7 @@ export function WritingRail({
           </button>
         )}
       </div>
-      <div className="border-t border-accent/50 p-3 dark:border-accent/25">{body}</div>
+      <div className="border-t border-border p-3">{body}</div>
     </aside>
   );
 }

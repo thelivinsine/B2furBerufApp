@@ -20,17 +20,15 @@ const buttonVariants = cva(
         outline:
           "border border-border bg-surface/50 hover:bg-muted/60 hover:border-border",
         // Himmelblau tile as a button (s166): the panel toggles on Schreiben
-        // ("Grammatik", "Aufgabe wählen") wear the color of the accent rail they
+        // ("Grammatik", "Aufgabe wählen") wear the fill of the accent rail they
         // open, because `outline`'s half-transparent fill made them disappear
-        // into the ground. Same pairing as the Fokus fix tiles, one step
-        // stronger than the rails themselves so a 40px control still reads.
-        // Light mode borders with `accent-ink`, not `accent`: the accent is a
-        // 77%-light sky, so ANY alpha of it on the near-white ground stays under
-        // the 3:1 UI floor (measured 1.31:1). accent-ink/70 lands at 3.07:1 and
-        // gives the pill a crisp edge; dark mode keeps the accent border (3.34:1
-        // on the deep ground). Label contrast: 4.72:1 light, 7.71:1 dark.
+        // into the ground. One step stronger than the rails themselves so a
+        // 40px control still reads. The OUTLINE is the neutral `border` token
+        // (founder s168): a blue edge around a blue fill read as too loud, and
+        // the rails this opens now wear the same neutral edge. Label contrast
+        // is unchanged (accent-ink on accent/35): 4.72:1 light, 7.71:1 dark.
         accent:
-          "border border-accent-ink/70 bg-accent/35 text-accent-ink hover:bg-accent/50 dark:border-accent/[0.45] dark:bg-accent/[0.18] dark:hover:bg-accent/[0.28]",
+          "border border-border bg-accent/35 text-accent-ink hover:bg-accent/50 dark:bg-accent/[0.18] dark:hover:bg-accent/[0.28]",
         ghost: "hover:bg-muted/60",
         success: "bg-success text-success-foreground hover:bg-success/90",
         warning: "bg-warning text-warning-foreground hover:bg-warning/90",
