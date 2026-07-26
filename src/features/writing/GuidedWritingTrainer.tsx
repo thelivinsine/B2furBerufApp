@@ -2,7 +2,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Sparkles, Target, Loader2, Lightbulb, Clock, Info, Dices, ChevronDown } from "lucide-react";
+import {
+  Sparkles,
+  Target,
+  Loader2,
+  Lightbulb,
+  Clock,
+  Info,
+  Shuffle,
+  Maximize2,
+  ChevronDown,
+} from "lucide-react";
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import {
@@ -19,6 +29,13 @@ import { UmlautKeys } from "./UmlautKeys";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { useFillEditor } from "./useFillEditor";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
@@ -29,9 +46,11 @@ import { cn } from "@/lib/utils";
  * learner lands STRAIGHT on an Aufgabe + writing field; the topic is switched
  * in the "Aufgabe wählen" rail (desktop right column) or the toolbar button +
  * collapsible panel (mobile), both in the FilterRail language. Each theme
- * carries a POOL of prompts: picking a theme draws a random one, the dice on
- * the Aufgabe card re-rolls within the theme. Mode supplies `length` (Kurz =
- * short, Lang = long); auth is gated by the parent via `onRequireAuth`.
+ * carries a POOL of prompts: picking a theme draws a random one, the shuffle
+ * button on the Aufgabe card re-rolls within the theme, and the expand button
+ * beside it opens the whole task in the app's standard dialog (the card itself
+ * is capped to fit the viewport). Mode supplies `length` (Kurz = short, Lang =
+ * long); auth is gated by the parent via `onRequireAuth`.
  */
 
 const rangeByLength: Record<WritingLength, [number, number]> = {
@@ -49,6 +68,14 @@ const desktopFieldCap: Record<WritingLength, { min: number; share: number }> = {
   short: { min: 176, share: 0.22 },
   long: { min: 252, share: 0.32 },
 };
+
+/**
+ * The two Aufgabe-card icon buttons (founder s169 follow-up): 40px, no box.
+ * A border around them competed with the card's own edge; the hover tint is
+ * enough of an affordance, and it matches the rail header icons.
+ */
+const iconButton =
+  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground";
 
 function countWords(text: string): number {
   const t = text.trim();
@@ -112,7 +139,10 @@ export function GuidedWritingTrainer({
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<WritingEvalResult | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [diceSpin, setDiceSpin] = useState(0);
+  const [rollSpin, setRollSpin] = useState(0);
+  // The Aufgabe pop-up: the card can be capped to fit the viewport, so the full
+  // task (prompt, Adressat, every Leitpunkt) needs a place that never is.
+  const [taskOpen, setTaskOpen] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
   // Geometry refs for `useFillEditor`: the field fills the gap between the
   // Aufgabe card and whichever bottom chrome is laid out at this breakpoint.
@@ -186,7 +216,7 @@ export function GuidedWritingTrainer({
   const reroll = () => {
     setDrawn((cur) => randomTask(eligible, cur));
     setResult(null);
-    setDiceSpin((d) => d + 180);
+    setRollSpin((d) => d + 180);
   };
 
   // Rail reset (always active, founder s149 P2): clears every scope AND draws
@@ -203,7 +233,7 @@ export function GuidedWritingTrainer({
     const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", level: "", format: "", length });
     setDrawn((cur) => randomTask(fullPool, cur));
     setResult(null);
-    setDiceSpin((d) => d + 180);
+    setRollSpin((d) => d + 180);
   };
 
   const submit = async () => {
@@ -267,8 +297,50 @@ export function GuidedWritingTrainer({
     noteRef,
     desktopCap: desktopFieldCap[length],
     fill: !result,
-    revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}`,
+    revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}|${taskOpen}`,
   });
+
+  // The Aufgabe's Adressat + Leitpunkte, shared by the card (capped, animated)
+  // and the pop-up (never capped). Only tasks on the s167 schema carry them.
+  const taskPoints = task?.points?.length ? (
+    <>
+      {task.addressee && (
+        <p className="text-xs text-muted-foreground">
+          <span className="font-semibold text-accent-ink">An:</span> {task.addressee}
+          {task.register === "sie" ? " (Sie)" : task.register === "du" ? " (du)" : ""}
+        </p>
+      )}
+      <ul className="space-y-1">
+        {task.points.map((point) => (
+          <li key={point} className="flex gap-2 text-sm leading-relaxed">
+            <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink" />
+            <span>{point}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  ) : null;
+
+  // The pop-up behind the card's expand button: the app's standard centered
+  // dialog (soft darkening, no blur, no bottom sheet), carrying the same
+  // Aufgabe the card shows, at full length and scrolling on its own.
+  const taskDialog = (
+    <Dialog open={taskOpen} onOpenChange={setTaskOpen}>
+      <DialogContent className="gap-3">
+        <DialogHeader>
+          {/* Same eyebrow as the card, so the pop-up reads as the same object. */}
+          <DialogTitle className="pr-8 text-xs font-bold uppercase tracking-wide text-primary">
+            Aufgabe: {t.titleDe}
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            {task?.format ? `${writingFormatLabel(task.format)} · ` : ""}Ziel {min}–{max} Wörter
+          </DialogDescription>
+        </DialogHeader>
+        <p className="text-sm leading-relaxed">{prompt}</p>
+        {taskPoints && <div className="space-y-1.5">{taskPoints}</div>}
+      </DialogContent>
+    </Dialog>
+  );
 
   const evaluateButton = (
     <Button onClick={handleEvaluate} disabled={submitting || tooShort} variant="gradient">
@@ -325,19 +397,34 @@ export function GuidedWritingTrainer({
                 {task?.format ? `${writingFormatLabel(task.format)} · ` : ""}Ziel {min}–{max} Wörter
               </p>
             </div>
-            {/* Standard 40px icon-button size; the icon half-spins per roll. */}
-            <button
-              type="button"
-              onClick={reroll}
-              aria-label="Neue Aufgabe"
-              title="Neue Aufgabe"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-            >
-              <Dices
-                className="h-4 w-4 transition-transform duration-300"
-                style={reduce ? undefined : { transform: `rotate(${diceSpin}deg)` }}
-              />
-            </button>
+            {/* Two borderless 40px icon buttons (founder s169 follow-up: no box
+                around these). Read the whole Aufgabe, then draw another one. */}
+            <div className="flex shrink-0 items-center">
+              <button
+                type="button"
+                onClick={() => setTaskOpen(true)}
+                aria-label="Aufgabe vergrößern"
+                title="Aufgabe vergrößern"
+                className={iconButton}
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={reroll}
+                aria-label="Neue Aufgabe"
+                title="Neue Aufgabe"
+                className={iconButton}
+              >
+                {/* Shuffle instead of the dice (founder s169 follow-up). The
+                    icon is point-symmetric, so the half-turn per roll reads as
+                    motion and settles back into the same shape. */}
+                <Shuffle
+                  className="h-4 w-4 transition-transform duration-300"
+                  style={reduce ? undefined : { transform: `rotate(${rollSpin}deg)` }}
+                />
+              </button>
+            </div>
           </div>
           {/* The prompt + Inhaltspunkte region is the part `useFillEditor` caps
               (internal scroll) when a long Aufgabe would otherwise push the
@@ -357,7 +444,7 @@ export function GuidedWritingTrainer({
                 "Erfüllung", telc "Berücksichtigung der Leitpunkte"), so they are
                 part of the Aufgabe, not decoration. Only tasks upgraded to the
                 s167 schema carry them; the rest render as before. */}
-            {task?.points?.length ? (
+            {taskPoints ? (
               <motion.div
                 key={`points|${drawn.theme}|${length}|${drawn.ix}`}
                 initial={reduce ? false : { opacity: 0 }}
@@ -365,20 +452,7 @@ export function GuidedWritingTrainer({
                 transition={{ duration: 0.15 }}
                 className="space-y-1.5"
               >
-                {task.addressee && (
-                  <p className="text-xs text-muted-foreground">
-                    <span className="font-semibold text-accent-ink">An:</span> {task.addressee}
-                    {task.register === "sie" ? " (Sie)" : task.register === "du" ? " (du)" : ""}
-                  </p>
-                )}
-                <ul className="space-y-1">
-                  {task.points.map((point) => (
-                    <li key={point} className="flex gap-2 text-sm leading-relaxed">
-                      <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
+                {taskPoints}
               </motion.div>
             ) : null}
           </div>
@@ -562,6 +636,8 @@ export function GuidedWritingTrainer({
           className="hidden lg:block lg:sticky lg:top-24"
         />
       </div>
+
+      {taskDialog}
 
       {/* Both bits of bottom chrome are `position: fixed`, so they are portalled
           to <body>: WritingHub slides the tab panels with an `x` transform, and
