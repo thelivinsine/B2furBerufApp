@@ -1453,3 +1453,11 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts:** `src/features/writing/fokus/GrammarDials.tsx` ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/components/layout/route-icons.tsx` ·
   `docs/areas/SCHREIBEN.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` · this log
+
+- **Prompt 7 (verbatim, 2026-07-26):** `ignore the regenerate button issue. I missed out that it's
+  in umformen toggle. Found it now.`
+- **Response summary:** Non-issue, closed. The regenerate control ("Nochmal", cycling two
+  server-side phrasings) lives in the Umgeformt view and the founder found it. No code change; the
+  open question left in PR #731 is answered. Nothing was built for it, since the direction had been
+  put back to the founder rather than guessed at.
+- **Artifacts:** this log
