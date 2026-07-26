@@ -169,9 +169,11 @@ for rework; do not treat its current design as reference.)
 **Praktisch (`/`).** One centered column all breakpoints (two-column desktop was rejected);
 Üben = the soft SVG city map in a white `bg-surface` mat with neutral grey border, Spielen = the
 compact NeulandHub in the SAME mat geometry; both tiles land at the same screen position, page
-fits a phone viewport without scrolling. Bottom nav: 5 locked slots, label only under the active
-tab in neutral dark grey, compact flat `bg-border` squircle backdrop, two-tone + neon route marks
-at full opacity. Structure is locked; don't touch without an explicit founder request.
+fits a phone viewport without scrolling. The Trainieren/Spielen toggle shares the squircle-track +
+sliding-pill mechanism with `LibrarySwitcher`/`WritingModeSwitcher` (s170), content-sized rather
+than full width since it is only two segments. Bottom nav: 5 locked slots, label only under the
+active tab in neutral dark grey, compact flat `bg-border` squircle backdrop, two-tone + neon route
+marks at full opacity. Structure is locked; don't touch without an explicit founder request.
 
 ## 7. Landmines (shipped-then-reverted; do NOT reintroduce)
 

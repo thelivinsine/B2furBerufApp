@@ -701,3 +701,30 @@ between Fokus and Kurz/Lang), the rest were finishing work on the Fokus sentence
    separates). Changed on the shared `bg-dialog-overlay` token, never per dialog: the locked recipe
    exists so every dialog in the app reads the same, and a one-off override here would be exactly
    the parallel style rule zero forbids.
+
+## s170 — Praktisch toggle joins the squircle language; Bibliothek icon reverted; Fortschritt gets the Pokal (2026-07-26) — founder-requested
+
+1. **The Trainieren/Spielen toggle now uses the same squircle-track + sliding-pill mechanism as
+   `LibrarySwitcher`/`WritingModeSwitcher`**, in place of the older `rounded-full` track with a
+   per-button `bg-surface` flag. Track `rounded-lg`, pill `rounded-md`, `useSlidingPill` measures
+   the active segment so the white pill glides on a transform instead of two buttons independently
+   flipping their background. Kept content-sized (`w-fit`, centered) rather than stretched full
+   width: it is a two-segment toggle, and the landmine against full-width switchers (s149) was about
+   a four-label row, not this one. The section-tinted icon + label on the active segment (blue
+   Dumbbell / orange Play) is untouched, since that pairing is the Praktisch-specific part of this
+   control, not the part the founder asked to change.
+2. **Bibliothek's route icon reverts to the pre-s158 "stack of three books"** (`route-icons.tsx`,
+   founder request): same geometry and colours as the mark shipped before the s158 "closed book +
+   bookmark ribbon" pick replaced it. Restored verbatim from git history (`997e8a0`), including its
+   `NORM` bounding box, rather than redrawn, so the optical size matches exactly what shipped then.
+3. **Fortschritt's route icon becomes the "Pokal" (trophy/cup)**, option **T** from the session-158
+   icon-preview batch (`preview/fortschritt-icon-vorschlaege.html`) that the founder did not pick at
+   the time (S "Ring" won instead). Same mark, same `#0ea5e9` route colour, ported verbatim into
+   `route-icons.tsx` with its own `NORM` box rather than reusing the Ring's. The progress-ring mark
+   it replaces is not otherwise used elsewhere in the app, so nothing else needed a corresponding
+   change.
+- All three are direct, unambiguous ports of already-approved designs (an existing shipped
+  component's toggle language; a previously-shipped icon; a previously-drawn-but-unpicked icon
+  option), so this shipped without a new preview round. Verified in headless Chromium at 390×844
+  (bottom tab bar, both new icons in their active and inactive states) and at 1280×900 (desktop
+  Sidebar + the toggle), plus the full gate list.

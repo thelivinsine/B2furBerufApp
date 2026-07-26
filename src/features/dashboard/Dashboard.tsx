@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Dumbbell, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppConfigStore } from "@/lib/appConfig";
+import { useSlidingPill } from "@/features/shared/useSlidingPill";
 
 // Both tabs import the mission bank, so they load lazily to keep the content
 // bank off the Dashboard's eager path (bundle budget, CLAUDE.md). Üben is the
@@ -61,6 +62,7 @@ export function Dashboard() {
     center: { opacity: 1, x: 0 },
     exit: (d: number) => ({ opacity: 0, x: d >= 0 ? -shift : shift }),
   };
+  const { trackRef, registerItem, rect } = useSlidingPill(tab);
 
   return (
     // Single-column start page at full width (max-w-md) on every size. On
@@ -72,15 +74,29 @@ export function Dashboard() {
       {/* Trainieren / Spielen: the two ways into the day, centred. Trainieren
           opens by default. The greeting + streak live in the top row; the
           daily-goal ring moved to Fortschritt (s86), so Heute no longer repeats
-          progress. */}
+          progress. Same squircle-track + sliding-pill language as LibrarySwitcher
+          / WritingModeSwitcher (s170, founder request), content-sized (w-fit) since
+          it's only two segments. */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18, ease: "easeOut" }}
+        ref={trackRef as React.RefObject<HTMLDivElement>}
         role="tablist"
         aria-label="Modus"
-        className="mx-auto flex w-fit gap-1 rounded-full border border-border bg-muted p-1"
+        className="relative mx-auto flex w-fit items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft"
       >
+        {rect && (
+          <motion.span
+            aria-hidden
+            className="absolute top-1 bottom-1 left-0 rounded-md bg-surface shadow-soft"
+            initial={false}
+            animate={{ x: rect.left, width: rect.width }}
+            transition={
+              reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }
+            }
+          />
+        )}
         {(
           [
             { id: "ueben", label: "Trainieren", tint: "text-blue-600" },
@@ -89,21 +105,20 @@ export function Dashboard() {
         ).map(({ id, label, tint }) => (
           <button
             key={id}
+            ref={registerItem(id)}
             type="button"
             role="tab"
             aria-selected={tab === id}
             onClick={() => selectTab(id)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
-              // Active tab lifts on the white pill and picks up its section's
+              "relative z-10 inline-flex items-center gap-2 rounded-md px-5 py-2 text-sm font-semibold transition-colors",
+              // Active tab rides the shared pill and picks up its section's
               // subtle tint (Trainieren = blue + dumbbell icon, Spielen =
               // orange + play icon; "Üben" → "Lernen" in s105, → "Trainieren"
               // with the dumbbell restored in s158, both founder requests).
               // The tile mats keep a neutral gray border (founder: colored
               // borders read poorly), so the color lives on the toggle only.
-              tab === id
-                ? cn("bg-surface shadow-soft", tint)
-                : "text-muted-foreground hover:text-foreground",
+              tab === id ? tint : "text-muted-foreground hover:text-foreground",
             )}
           >
             {/* Both active icons fill on the lifted white pill. */}
