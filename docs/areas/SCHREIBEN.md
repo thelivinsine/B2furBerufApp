@@ -97,8 +97,11 @@ design as reference.**
   at most 1.8x the resting height, the space the screen actually offers, or 60% of the viewport,
   whichever is largest; past that it stops and scrolls internally. `resize-none`: the height is
   measured, so hand-resizing is gone and `rows` is only the pre-measurement fallback. Floor =
-  max(160px, 22% of the viewport): a long Aufgabe (Inhaltspunkte) can leave less room than that on
-  a phone, and a small page scroll beats a four-line writing slot. Once a result is on screen the
+  max(160px, 22% of the viewport). When a long Aufgabe (Inhaltspunkte) would push the field below
+  that floor, the shortfall comes out of the AUFGABE CARD first: its prompt + Inhaltspunkte region
+  is capped by exactly the deficit and scrolls internally (`slim-scrollbar`; the eyebrow + dice row
+  never scrolls away), down to a 96px minimum, past which a small page scroll is the lesser evil
+  (only sub-660px viewports hit it). Once a result is on screen the
   field drops to its text's own height so the feedback is not pushed a screen down. Measure it in
   JS, not a `dvh`/flex chain: the trainer sits inside AppShell → WritingHub → AnimatePresence,
   none of them height-constrained.

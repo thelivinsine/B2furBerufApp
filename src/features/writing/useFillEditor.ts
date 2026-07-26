@@ -23,9 +23,10 @@ import { useCallback, useEffect, useLayoutEffect, type RefObject } from "react";
 /**
  * Floor for the resting height, as a share of the viewport (never below 160px).
  * A long Aufgabe (one with Inhaltspunkte) can leave less room than this on a
- * phone; below the floor the page scrolls a little rather than the field
- * shrinking to an unusable four lines, because at that point the choice is not
- * "scroll or not" but "scroll a little or write in a slot".
+ * phone; the shortfall first comes out of the Aufgabe card's prompt region
+ * (capped + internal scroll, see TASK_BODY_MIN below), and only when that
+ * region hits ITS floor does the page scroll a little, because at that point
+ * the choice is "scroll a little or read the Aufgabe through a slot".
  */
 const MIN_SHARE = 0.22;
 const MIN_ABSOLUTE = 160;
@@ -40,12 +41,20 @@ const GROWTH_FLOOR = 0.6;
 const WIDE = "(min-width: 1024px)";
 /** Breathing room between the field (or the card below it) and fixed chrome. */
 const GAP = 12;
+/**
+ * The least of the Aufgabe text that must stay visible when the card is capped
+ * (~4 lines). Below this the card stops shrinking and the page scrolls after
+ * all: on a very short viewport, "a sliver of Aufgabe over a sliver of field"
+ * would be worse than a small scroll.
+ */
+const TASK_BODY_MIN = 96;
 
 export function useFillEditor({
   editorRef,
   cardRef,
   rootRef,
   aboveRef,
+  taskBodyRef,
   headerRef,
   clusterRef,
   noteRef,
@@ -61,6 +70,14 @@ export function useFillEditor({
   rootRef: RefObject<HTMLElement>;
   /** Aufgabe card above the field; its reflow moves the field's top. */
   aboveRef: RefObject<HTMLElement>;
+  /**
+   * The scrollable prompt + Inhaltspunkte region INSIDE the Aufgabe card.
+   * When the card's natural height would push the field below its floor (the
+   * old "a long Aufgabe still scrolls the page a little" case), this region is
+   * capped and scrolls internally instead, keeping the eyebrow + dice row
+   * visible and the page at exactly one viewport.
+   */
+  taskBodyRef: RefObject<HTMLElement>;
   /** Mobile "Aufgabe wählen" toolbar + panel, which also moves the field's top. */
   headerRef: RefObject<HTMLElement>;
   /** Mobile floating action cluster (laid out below `lg`). */
@@ -97,7 +114,7 @@ export function useFillEditor({
     // down with the field, so it comes off the budget.
     const tail = Math.max(0, cardRect.bottom - taRect.bottom);
     // Document coordinate, so it stays valid whatever the current scroll is.
-    const top = taRect.top + window.scrollY;
+    let top = taRect.top + window.scrollY;
 
     // Chrome pinned to the bottom of the viewport. Only one of the two is ever
     // laid out (the other is display:none at this breakpoint), so the larger
@@ -110,6 +127,32 @@ export function useFillEditor({
     }
 
     const min = Math.max(MIN_ABSOLUTE, Math.round(window.innerHeight * MIN_SHARE));
+
+    // A long Aufgabe (Inhaltspunkte) can leave less than the field's floor, in
+    // which case the page used to scroll at rest. Instead, cap the Aufgabe
+    // card's prompt region by exactly the shortfall and let IT scroll (down to
+    // TASK_BODY_MIN, past which a small page scroll is the lesser evil). The
+    // math works off scrollHeight, never by clearing the cap to re-measure, so
+    // the ResizeObserver watching the card cannot ping-pong.
+    const body = taskBodyRef.current;
+    if (body) {
+      const bodyVisible = body.getBoundingClientRect().height;
+      const bodyNatural = body.scrollHeight;
+      const availNatural =
+        window.innerHeight - top - tail - reserve - (bodyNatural - bodyVisible);
+      const deficit = min - availNatural;
+      const capped = Math.max(TASK_BODY_MIN, Math.round(bodyNatural - Math.max(0, deficit)));
+      if (deficit > 0.5 && capped < bodyNatural - 0.5) {
+        body.style.maxHeight = `${capped}px`;
+        body.style.overflowY = "auto";
+      } else {
+        body.style.maxHeight = "";
+        body.style.overflowY = "";
+      }
+      // The cap moved the field's top; re-read it (forced reflow, one per pass).
+      top = ta.getBoundingClientRect().top + window.scrollY;
+    }
+
     const available = Math.max(min, Math.floor(window.innerHeight - top - tail - reserve));
     // Desktop stops short of the bottom chrome on purpose; mobile fills it.
     const wide = window.matchMedia(WIDE).matches;
@@ -140,7 +183,7 @@ export function useFillEditor({
       const mainPad = main ? parseFloat(getComputedStyle(main).paddingBottom) || 0 : 0;
       root.style.paddingBottom = `${Math.max(0, Math.round(reserve - mainPad))}px`;
     }
-  }, [editorRef, cardRef, rootRef, clusterRef, noteRef, desktopCap.min, desktopCap.share, fill]);
+  }, [editorRef, cardRef, rootRef, taskBodyRef, clusterRef, noteRef, desktopCap.min, desktopCap.share, fill]);
 
   useLayoutEffect(() => {
     measure();

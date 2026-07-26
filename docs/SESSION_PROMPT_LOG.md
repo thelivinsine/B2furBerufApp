@@ -1200,3 +1200,19 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 9):** `src/features/writing/fokus/GrammarDials.tsx` (new) ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 10 (verbatim, 2026-07-26):** `fix the aufgabe card scrolling issue too`
+- **Response summary:** The remaining Kurz/Lang limit (long Aufgaben with Inhaltspunkte still
+  scrolled the page a little at rest) is fixed inside `useFillEditor`: when the Aufgabe card's
+  natural height would push the writing field below its floor, the card's prompt + Inhaltspunkte
+  region is capped by exactly the shortfall and scrolls internally (`slim-scrollbar`), keeping the
+  eyebrow + dice row fixed, down to a 96px minimum past which a small page scroll is accepted as the
+  lesser evil. The math works off `scrollHeight` rather than un-capping to re-measure, so the
+  ResizeObserver watching the card cannot loop. Measured with the 30-re-roll sampler: 0/30 page
+  scrolls at 390x844 in both modes (was up to 227px on a third of tasks); 360x640 keeps a structural
+  ~165px (field floor + minimum card + chrome exceed the viewport), down from ~430px. Verified
+  visually that a capped card cuts mid-line (the natural scroll cue) and that all Leitpunkte are
+  reachable by scrolling. Gates: typecheck · lint (0 errors) · test:unit 317/317 · build ·
+  check:bundle (117.2 kB).
+- **Artifacts (prompt 10):** `src/features/writing/useFillEditor.ts` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · this log
