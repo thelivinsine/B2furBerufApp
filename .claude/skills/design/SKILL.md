@@ -185,6 +185,15 @@ at full opacity. Structure is locked; don't touch without an explicit founder re
 - Colored per-section mat borders on Praktisch tiles (neutral grey won, s90); two-column desktop
   dashboard (s90).
 - Backdrop-blur / flat-black modal overlays (locked dialog recipe instead).
+- **Accent-colored borders anywhere** (s168): the accent is a fill, the edge is always `border`.
+- **Sticky bottom chrome on Schreiben** (s168): sticky parks at the end of the content whenever the
+  page fits, so it sits at a different height per mode and drifts per task. Fixed, always.
+- **The Fokus mobile rejects (four preview rounds, s168):** the grammar controls as a PANEL anywhere,
+  in-page-expanding or pop-up alike (they read as settings, which was the original bug); renaming
+  the feature away from "Grammatik"; one-tap action chips (`→ Passiv`, breaks once forms combine); a
+  card-per-attempt transformation timeline (page scroll by design); the dials in the bottom thumb
+  slot (four floating controls, no bar behind them); a deep navy "stage" tile (the app's only dark
+  surface in light mode).
 
 ## 8. Deeper record
 
