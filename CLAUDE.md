@@ -81,7 +81,8 @@ after pulling.
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
   lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the grey-tile/white-controls
   FilterRail answer, the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
-  `layoutId`).
+  `layoutId`), the Schreiben mobile anatomy (fixed bottom chrome + measured tile heights + the
+  Fokus dial tile — four preview rounds settled it, `docs/areas/SCHREIBEN.md`).
 - **Design landmines:** the `/design` skill §7 lists everything shipped-then-reverted; never
   reintroduce an item on that list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior
@@ -128,7 +129,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - `CONTENT.md` — banks, schemas, taxonomy, linter checklist, provenance. Pair with `/content`.
 - `BIBLIOTHEK.md` — the `/library` tabs, views, graphs, FilterRail, search, Grammatik lessons.
 - `SESSION.md` — the composed session engine, Üben auto-variety rules, focus mode, SRS engines.
-- `SCHREIBEN.md` — `/writing` Fokus/Kurz/Lang, rails, correction card, umlaut keys, AI cascade.
+- `SCHREIBEN.md` — `/writing` Fokus/Kurz/Lang, rails, correction card, the mobile anatomy (fixed
+  chrome, measured heights, Fokus dial tile), umlaut keys, AI cascade.
 - `PRAKTISCH-NAV.md` — dashboard Üben/Spielen, bottom tab bar (locked), header, feedback pill.
 - `GAME.md` — the Neuland layer: missions-as-data, scenes/sprites, pixel rules, hub surfaces.
 - `BRAND.md` — logo/wordmark rules, icons/favicons, theme tokens, dialog overlay convention.

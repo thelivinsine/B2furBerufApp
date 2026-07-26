@@ -1216,3 +1216,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 10):** `src/features/writing/useFillEditor.ts` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 11 (verbatim, 2026-07-26):** `document the session`
+- **Response summary:** Documentation pass over the whole of session 168 (prompts 1 to 10 had each
+  been logged as they happened; this pass made the rest of the docs coherent).
+  **`docs/PROJECT_STATUS.md`:** the session-168 handoff had grown as five chronological bolt-ons and
+  contradicted itself in two places (a bullet describing the page-scroll limit that #724 removed, and
+  one saying "Fokus was left alone" after #723 reworked it). Rewritten as ONE structured handoff with
+  four numbered parts (Kurz/Lang chrome + field · the accent-fill law · the Fokus rework and its four
+  preview rounds · the Aufgabe-card cap), plus the cross-cutting portal lesson, the full file list,
+  and the two small open items. The `_Last updated_` block was rewritten to describe the session as
+  one theme rather than a Kurz/Lang note with appendices. 201 lines, under the ~250 cap.
+  **`docs/DECISIONS.md`:** new s168 entry with eight decisions and the "why" behind each, including
+  the diagnosis that only emerged after a rejected preview round (the transform feature is a flow
+  step, not a filter, so its controls belong on the sentence). It also marks s166 decision 4
+  (`accent-ink/70` borders) **SUPERSEDED**, keeping its measurement, since s168 removed accent
+  borders entirely. The rejected preview variants are recorded there and in the skill.
+  **`.claude/skills/design/SKILL.md` §7:** three new landmines (accent-colored borders anywhere;
+  sticky bottom chrome on Schreiben; and the six rejected Fokus-mobile shapes).
+  **`CLAUDE.md`:** the Schreiben mobile anatomy added to the locked-structures list, and the
+  `SCHREIBEN.md` index line updated. **`docs/areas/SCHREIBEN.md`:** the preview header now names the
+  r1 to r4 series and flags r4 "Option 2" as the shipped one.
+- **Artifacts (prompt 11):** `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` ·
+  `.claude/skills/design/SKILL.md` · `CLAUDE.md` · `docs/areas/SCHREIBEN.md` · this log

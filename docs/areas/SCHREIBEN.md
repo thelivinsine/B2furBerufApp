@@ -2,8 +2,10 @@
 
 A visual EXTENSION of the Bibliothek design language (see the `/design` skill). Founder-approved
 previews: `preview/schreiben-bibliothek-extension*.html`, `preview/schreiben-design-review.html`,
-`preview/fokus-correction-*.html`. **Verlauf is slated for rework — do not treat its current
-design as reference.**
+`preview/fokus-correction-*.html`, and the s168 Fokus-mobile series
+`preview/fokus-grammatik-mobile{,-r2,-r3,-r4}.html` (**r4 "Option 2" is the shipped one**; the
+earlier rounds are kept as the record of what was rejected, see `/design` §7). **Verlauf is slated
+for rework — do not treat its current design as reference.**
 
 ## Page frame
 - 4-segment sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (no

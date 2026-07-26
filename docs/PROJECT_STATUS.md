@@ -1,21 +1,20 @@
 # Project Status
 
-_Last updated: 2026-07-26 (session 168). **Schreiben Kurz/Lang: the bottom chrome stopped moving
-and the writing field now fills the screen.** The Feedback/Auswerten row and its caption were
-`sticky`, so whenever the page fit the viewport they parked at the end of the content, at one
-height in Kurz and another in Lang. They are now `fixed` above the nav (portalled to `<body>`, so
-WritingHub's tab-slide transform cannot re-anchor them), and a new `useFillEditor` hook sizes the
-textarea to the space actually left: fills it at rest with no page scroll, grows with the text,
-then scrolls internally. On desktop that resting height is capped (Kurz shorter than Lang, neither
-filling the window); mobile still fills. Also this session: **the Himmelblau accent is a fill, never
-an outline** (every filter/selection rail and its opening button now wears the neutral card edge),
-and **the Fokus mobile rework shipped after four preview rounds**: the hidden Grammatik panel
-became an always-visible dial tile below the sentence card, with an Umgeformt view toggle, a
-corner "Neu", two-column corrections and the same fixed bottom chrome as Kurz/Lang. Prior s167 (merged and live, PRs #711 to #715): one shared Aufgabe-selection
-rule so the picker's counts stop lying, the exam-shaped task schema, and two content waves taking the
-bank to **643 tasks**; `docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest of that roadmap.
-`.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
-a CLI. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-26 (session 168). **The Schreiben mobile pass: every surface now rests at
+exactly one viewport, with its chrome pinned instead of drifting** (PRs #717 to #724, all live).
+Kurz/Lang: the Feedback/Auswerten row was `sticky`, so it parked at the end of the content whenever
+the page fit the screen, at one height in Kurz and another in Lang; it is now `fixed` above the nav,
+and a new `useFillEditor` hook sizes the textarea to the space actually left (capped on desktop,
+Kurz shorter than Lang). A long Aufgabe no longer scrolls the page either: its card caps and scrolls
+internally instead. **Fokus was reworked on mobile after four preview rounds**: the transform
+feature, hidden behind a filter-looking "Grammatik" toggle, is now an always-visible dial tile under
+the sentence card, with an **Umgeformt** view toggle, a corner "Neu" and two-column corrections.
+Also standing law now: **the Himmelblau accent is a FILL, never an outline** (every filter/selection
+rail and its opening button wears the neutral card edge). Prior s167 (PRs #711 to #715): one shared
+Aufgabe-selection rule so the picker's counts stop lying, the exam-shaped task schema, and two
+content waves taking the bank to **643 tasks**; `docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest
+of that roadmap. `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend
+changes no longer need a CLI. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -82,96 +81,92 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 168 (2026-07-26): Kurz/Lang bottom chrome pinned, writing field sized to
-the screen.** Founder (with two phone screenshots): "the feedback button, auswerten button and the
-line below keep moving up and down when switching between the toggles and tasks in Kurz and lang.
-Make them fixed at the bottom below. Also, the writing field below the aufgabe should occupy the
-rest of the space without any scrolling." Preview round explicitly waived.
+**Handoff after session 168 (2026-07-26): the Schreiben mobile pass. ALL MERGED AND LIVE**
+(PRs **#717** to **#724**). Eight PRs across one theme: on a phone, every Schreiben surface now
+rests at exactly one viewport, with its chrome pinned instead of drifting. Four of the eight are
+Fokus preview rounds; the rework they produced is the largest change.
 
-- **Cause of the jumping: the cluster was `sticky`, not `fixed`.** A sticky element only sticks
-  once the page actually scrolls; whenever the content fit the viewport it simply parked at the end
-  of the content, which is a different height in Kurz than in Lang and moves with every Aufgabe.
-  It is now `fixed` above the nav, mirroring AppShell's `<main>` offsets so it stays in the content
-  column. Verified: the cluster sits at the identical y in Kurz, in Lang, across 3 re-rolls, and
-  through the whole 150 ms tab slide.
-- **Both fixed layers (cluster + desktop Art. 50 line) are portalled to `<body>`.** WritingHub
-  slides tab panels with an `x` transform and a transformed ancestor becomes the containing block
-  for its `fixed` descendants, so without the portal they re-anchor to the panel mid-slide.
-- **`src/features/writing/useFillEditor.ts` (new) sizes the field.** Fills the gap between the
-  Aufgabe card and the bottom chrome at rest (no page scroll), grows with the text (page scroll on)
-  to 1.8x the resting height or 60% of the viewport, then stops and scrolls internally. `rows` no
-  longer decides anything and the field is `resize-none`. Measured in JS deliberately: the trainer
-  sits inside AppShell → WritingHub → AnimatePresence, none of them height-constrained, so a
-  `dvh`/flex chain would have meant touching every other Schreiben surface.
-- **The one honest limit:** on a phone, a long Aufgabe (one carrying Inhaltspunkte) can occupy
-  47-52% of the viewport on a 390x844 device and 65-72% on a 360x640 one. Sampled 30 re-rolls per
-  mode per size: about two thirds of tasks now fit with no page scroll at all; the rest keep a
-  usable field (floor = max(160px, 22% of the viewport)) and the page scrolls a little instead of
-  the field collapsing to four lines. Fully removing that would mean capping the Aufgabe card
-  itself with internal scroll, which the founder did not ask for.
-- **Fokus was left alone** (the founder named Kurz and Lang): it still uses the in-flow sticky
-  cluster. If the same jumping is reported there, the fix is the same three changes.
-- **Follow-up in the same session: the desktop field is capped.** Founder: "for desktop view
-  specifically.. it's looks odd to fill up the entire screen. reduce it to some extent. Keep kurz
-  writing field shorter than the lang but both never occupying the whole screen. Mobile view stays
-  intact." From `lg` up the RESTING height is now capped (`desktopFieldCap`): Kurz = max(176px,
-  22% of the viewport), Lang = max(252px, 32%). Measured at 1440x900 / 1680x1050 / 1280x800: the
-  field ends 220-480px above the window bottom and Lang runs ~45% taller than Kurz. **Mobile is
-  provably untouched** — below `lg` the cap is skipped, so `rest === available` and the formula
-  reduces to exactly what shipped in the first pass. The growth ceiling gained `available` as a
-  third term, because on desktop `rest` is deliberately short of the screen and 1.8x a capped
-  height would have started internal scrolling while empty window was still going spare.
-- **Second follow-up: the accent is a FILL, never an outline.** Founder: "wherever there is blue
-  filter/selection rail, instead of the bright blue outline which is currently the case, use a
-  muted soft gray outline for the buttons or rails" (preview round explicitly waived). Both
-  Schreiben rails (`WritingRail`, `GrammarRail`, incl. their internal dividers) and the `accent`
-  Button variant that opens them now carry `border-border`, the same neutral edge the Bibliothek
-  FilterRail and every card already wear. The Himmelblau fill is untouched. This **retires the
-  s166 `accent-ink/70` workaround**, which existed only because no alpha of the 77%-light accent
-  clears the 3:1 UI floor on a near-white ground. Fix tiles and Verlauf detail tiles keep their
-  accent edge on purpose: they are content, not rails. `check:contrast` still green.
-- **Files:** `src/features/writing/useFillEditor.ts` (new) ·
-  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingRail.tsx` ·
-  `src/features/writing/fokus/GrammarRail.tsx` · `src/components/ui/button.tsx` ·
-  `preview/fokus-grammatik-mobile.html` (new) · `CLAUDE.md` · `.claude/skills/design/SKILL.md` ·
-  `docs/areas/SCHREIBEN.md`. **Gates:** typecheck · lint (0 errors) · test:unit **317/317** ·
-  build · check:bundle (117.2 kB) · check:contrast · lint:content.
+**1 · Kurz/Lang bottom chrome + writing field (#717, #718).** Founder, with two phone screenshots:
+"the feedback button, auswerten button and the line below keep moving up and down when switching
+between the toggles and tasks in Kurz and lang." Preview round explicitly waived.
+- **Cause: the cluster was `sticky`, not `fixed`.** Sticky only sticks once the page actually
+  scrolls; whenever the content fit the viewport it parked at the END of the content, which is a
+  different height in Kurz than in Lang and moves with every Aufgabe. Now `fixed` above the nav,
+  mirroring AppShell's `<main>` offsets. Verified identical y across Kurz, Lang, 3 re-rolls and the
+  whole 150 ms tab slide.
+- **`src/features/writing/useFillEditor.ts` (new) sizes the field.** Fills to the bottom chrome at
+  rest, grows with the text (page scroll on) to 1.8x the resting height / the space the screen
+  offers / 60% of the viewport, whichever is largest, then scrolls internally. `resize-none`;
+  `rows` is only the pre-measurement fallback. Measured in JS deliberately: the trainer sits inside
+  AppShell → WritingHub → AnimatePresence, none height-constrained, so a `dvh`/flex chain would
+  have meant touching every other Schreiben surface.
+- **Desktop caps the RESTING height** (#718, `desktopFieldCap`): Kurz = max(176px, 22% of the
+  viewport), Lang = max(252px, 32%), because filling a whole desktop window "looks odd". Measured
+  at 1440x900 / 1680x1050 / 1280x800: the field ends 220-480px above the window bottom, Lang ~45%
+  taller than Kurz. Mobile is provably untouched (below `lg` the cap is skipped, so the formula
+  reduces to the first pass exactly).
 
-**Follow-up: the Aufgabe-card scroll remainder is fixed too.** The one honest limit from the
-Kurz/Lang pass (a third of tasks, the ones with Inhaltspunkte, still scrolled the page a little at
-rest) is gone: when a long Aufgabe would push the writing field below its floor, `useFillEditor`
-now caps the card's prompt + Inhaltspunkte region by exactly the shortfall and lets it scroll
-internally (eyebrow + dice stay put; 96px minimum). Sampled 30 re-rolls per mode: **0/30 page
-scrolls at 390x844** in both Kurz and Lang (was up to 227px on a third of tasks); on a 360x640
-viewport a structural remainder of ~165px stays (field floor + minimum card + chrome exceed 640),
-down from ~430px. The cap math works off `scrollHeight`, never by un-capping to re-measure, so the
-ResizeObserver watching the card cannot ping-pong.
+**2 · The accent is a FILL, never an outline (#719).** Founder: "wherever there is blue
+filter/selection rail, instead of the bright blue outline … use a muted soft gray outline."
+Both Schreiben rails (`WritingRail`, `GrammarRail`, incl. internal dividers) and the `accent`
+Button variant that opens them now carry `border-border`, the neutral edge the Bibliothek
+FilterRail and every card already wear; the Himmelblau fill is untouched. **Retires the s166
+`accent-ink/70` workaround**, which existed only because no alpha of the 77%-light accent clears
+the 3:1 UI floor on a near-white ground. Fix tiles and Verlauf detail tiles keep their accent edge
+on purpose: they are content, not rails. Written into CLAUDE.md + `/design` §3; `check:contrast`
+still green.
 
-**Fokus mobile rework: SHIPPED after four preview rounds.** The transform feature, which IS the
-Satzlabor, hid behind a "Grammatik" toggle that sat where Kurz/Lang put a filter and looked exactly
-like one. Rounds: r1 (move the panel; both variants rejected) → r2 ideation ("it is a flow step,
-not a filter"; concept C picked) → r3 (two tiles; Himmelblau treatment G picked) → r4 (full-height
-tiles, fixed KI line; "Option 2" picked with one amendment). All rounds live in
-`preview/fokus-grammatik-mobile*.html`, one artifact URL redeployed throughout.
-- **What shipped (mobile only, desktop untouched):** the toolbar toggle and collapsed panel are
-  gone. Two tiles fill the height between the switcher and the fixed bottom chrome (`measureMobile`
-  minHeight; no resting page scroll). The new **`GrammarDials`** tile ("Grammatik" header + reset)
-  carries one centered dial per axis: green dot = detected form, solid primary = target, tap opens
-  a picker popover; dimmed but visible before a correction. The sentence card owns every state
-  behind a centered Original / Korrigiert / **Umgeformt** toggle (transformed sentence in place,
-  green-marked via diff against the corrected one, Hinweis + Nochmal + speak beneath; the separate
-  transform card below is desktop-only now). **"Neu"** sits top-right (the Kurz/Lang dice corner;
-  icon-only beside three segments). **Corrections are two text columns with a vertical separator**
-  (founder amendment: no chip backgrounds on mobile; colors kept). Feedback + Korrigieren float
-  fixed above the KI line until a correction exists; the KI line is locked above the nav in every
-  state and carries the "Noch N Wörter" hint while the sentence is too short. All fixed chrome is
-  portalled to `<body>` (the WritingHub tab-slide transform lesson).
+**3 · Fokus mobile rework (#720 to #723), four preview rounds.** The transform feature, which IS
+the Satzlabor, hid behind a "Grammatik" toggle that sat where Kurz/Lang put a filter and looked
+exactly like one. Rounds: r1 (move the panel elsewhere; **both variants rejected**) → r2 ideation
+in chat ("it is a flow step, not a filter", four shapes offered, concept C picked) → r3 (two tiles;
+Himmelblau treatment G picked) → r4 (full-height tiles, fixed KI line; "Option 2" picked with one
+amendment). All rounds are in `preview/fokus-grammatik-mobile*.html`, one artifact URL redeployed
+throughout: `https://claude.ai/code/artifact/dbc08865-71de-4ec2-94cb-99d23ca1d75b`.
+- **Shipped (mobile only, desktop rail untouched):** toolbar toggle and collapsed panel gone. Two
+  tiles fill the height between the switcher and the fixed bottom chrome (`measureMobile` sets
+  minHeight). The new **`GrammarDials`** tile ("Grammatik" header + reset) carries one centered
+  dial per axis: green dot = detected form, solid primary = target, tap opens a picker popover;
+  dimmed but visible before a correction, so the feature announces itself. Its legend line doubles
+  as the refusal/error slot.
+- The sentence card owns every state behind a centered Original / Korrigiert / **Umgeformt**
+  toggle: the transformed sentence renders in place, green-marked via a diff against the corrected
+  one, with Hinweis + Nochmal + Vorlesen beneath. The separate transform card is desktop-only now.
+  **"Neu"** (not "Neuer Satz") sits top-right, the Kurz/Lang dice corner, icon-only beside three
+  segments. **Corrections are two text columns with a vertical separator** (founder amendment: no
+  chip backgrounds on mobile; category eyebrow, struck original and green fix keep their colors).
+- Feedback + Korrigieren float fixed above the KI line until a correction exists; the KI line is
+  locked above the nav in every state and carries the "Noch N Wörter" hint while the sentence is
+  too short.
 - **Verified in headless Chromium at 390x844** with stubbed check/transform responses: zero page
   scroll and one KI-line position across idle → too-short → corrected → picker → Passiv → Passiv +
-  Perfekt → back to Korrigiert → reset → Neu; desktop screenshot byte-identical anatomy.
-- **Files:** `src/features/writing/fokus/GrammarDials.tsx` (new) ·
-  `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md`.
-  **Gates:** typecheck · lint (0 errors) · test:unit **317/317** · build · check:bundle (117.2 kB).
+  Perfekt → view toggles → reset → Neu. Desktop anatomy unchanged.
+
+**4 · The Aufgabe card caps instead of scrolling the page (#724).** The one limit the first pass
+accepted (a third of tasks still scrolled a little at rest) is gone: when a long Aufgabe would push
+the field below its floor, `useFillEditor` caps the card's prompt + Inhaltspunkte region by exactly
+the shortfall and scrolls it internally (eyebrow + dice stay put; 96px minimum). Sampled 30
+re-rolls per mode: **0/30 page scrolls at 390x844** in both modes, was up to 227px. A 360x640
+viewport keeps a structural ~165px (field floor + minimum card + chrome exceed 640), down from
+~430px. The cap math works off `scrollHeight`, never by un-capping to re-measure, so the
+ResizeObserver watching the card cannot ping-pong.
+
+**Cross-cutting lesson worth keeping:** all fixed mobile chrome in Schreiben is **portalled to
+`<body>`**. WritingHub slides tab panels with an `x` transform, and a transformed ancestor becomes
+the containing block for its `fixed` descendants, so without the portal every pinned layer
+re-anchors to the panel mid-slide (and the measurement reads the wrong reserve on mount).
+
+- **Files:** `src/features/writing/useFillEditor.ts` (new) ·
+  `src/features/writing/fokus/GrammarDials.tsx` (new) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/writing/fokus/GrammarRail.tsx` ·
+  `src/components/ui/button.tsx` · `preview/fokus-grammatik-mobile{,-r2,-r3,-r4}.html` (new) ·
+  `CLAUDE.md` · `.claude/skills/design/SKILL.md` · `docs/areas/SCHREIBEN.md`.
+  **Gates (every PR):** typecheck · lint (0 errors) · test:unit **317/317** · build · check:bundle
+  (117.2 kB) · check:contrast · lint:content.
+- **Open, small:** Fokus's own `GrammarRail` panel layout (`layout="panel"`) is now dead code on
+  mobile but still used by the desktop rail; the `panel` branch itself could be retired. Sub-660px
+  viewports still page-scroll ~165px in Kurz/Lang, which is structural, not a bug.
 
 **Handoff after session 167 (2026-07-25), part 3: the Branche answer + wave 2. MERGED AND LIVE**
 (PRs **#714**, **#715**).

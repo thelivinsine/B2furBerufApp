@@ -556,8 +556,65 @@ straight over the content cards — that part is not the bug and was not touched
    "Schreiben rails are Himmelblau, never grey" rule); open, they keep the solid `default`, so the
    open/closed distinction survives. Brand blue was rejected: the Auswerten/Korrigieren CTA sits in
    the same viewport and a second blue control would compete with it.
-4. **A Himmelblau border needs `accent-ink` in light mode.** `--accent` is a 77%-light sky, so NO
-   alpha of it clears the 3:1 UI-component floor against the near-white light ground (measured
-   1.31:1). The light border therefore uses `accent-ink/70` (3.07:1); dark keeps `accent/45`
-   (3.34:1). Label contrast 4.72:1 light / 7.71:1 dark. Any future accent-tinted control on light
-   ground must border with `accent-ink`, not `accent`.
+4. ~~**A Himmelblau border needs `accent-ink` in light mode.**~~ **SUPERSEDED by s168 below**, which
+   removed accent borders altogether. Kept for the measurement, which still holds: `--accent` is a
+   77%-light sky, so NO alpha of it clears the 3:1 UI-component floor against the near-white light
+   ground (1.31:1); `accent-ink/70` reached 3.07:1. The s168 answer was simpler — stop outlining in
+   accent at all.
+
+## s168 — Schreiben on mobile: pinned chrome, measured heights, and the Fokus dial tile (2026-07-26) — founder-approved
+
+**Context.** Three founder reports in one session, all on `/writing` on a phone: the action buttons
+drifted up and down between modes and tasks; the writing field left dead space or overflowed; and
+the sentence-transform feature, which IS the Satzlabor, went undiscovered.
+
+**Decisions.**
+1. **Bottom chrome is `fixed`, not `sticky`.** A sticky element only sticks once the page actually
+   scrolls, so whenever the content fit the viewport the cluster parked at the END of the content —
+   a different height in Kurz than in Lang, moving with every Aufgabe. Fixed pins it once and for
+   all; the trainer carries the matching clearance instead. Applies to Kurz/Lang and Fokus alike.
+   The KI-Hinweis line is fixed on its own, locked just above the nav in every state.
+2. **All fixed mobile chrome is portalled to `<body>`.** WritingHub slides tab panels with an `x`
+   transform, and a transformed ancestor becomes the containing block for its `fixed` descendants,
+   so without the portal every pinned layer re-anchors to the panel mid-slide and any measurement
+   reads the wrong reserve on mount. This is a general trap, not a Schreiben quirk.
+3. **Heights are measured in JS (`useFillEditor`), not expressed as a `dvh`/flex chain.** The
+   trainer sits inside AppShell → WritingHub → AnimatePresence, none of them height-constrained;
+   constraining them would have changed every other Schreiben surface. The hook fills to the bottom
+   chrome at rest, grows with the text, then scrolls internally.
+4. **When space runs out, the AUFGABE gives way, not the page.** A long Aufgabe (Inhaltspunkte) can
+   exceed half a phone screen. Rather than shrinking the writing field to an unusable slot or
+   scrolling the whole page, the card's prompt region caps by exactly the shortfall and scrolls
+   internally, with the eyebrow + dice row always visible. Floors on both sides (field 160px / 22%
+   of viewport, card region 96px) mean sub-660px viewports still page-scroll a little; that is
+   structural and accepted.
+5. **Desktop caps the resting field height; mobile does not.** Filling a tall desktop window read as
+   "one giant empty box" (founder). Kurz = max(176px, 22% of viewport), Lang = max(252px, 32%), so
+   the two modes read as different sizes and neither reaches the bottom chrome. On mobile the space
+   is genuinely scarce, so it still fills.
+6. **The accent is a FILL, never an outline.** Every filter/selection rail and the button that opens
+   it wears the neutral `border` token; the Himmelblau fill is untouched. A blue wash inside a blue
+   edge read as too loud, and this is the same edge the Bibliothek FilterRail and every card already
+   use. Supersedes the s166 `accent-ink/70` workaround entirely. Fix tiles and Verlauf detail tiles
+   keep their accent edge on purpose: they are content, not rails.
+7. **The Fokus transform feature is a FLOW STEP, not a filter — so its controls live on the
+   sentence.** This was the whole diagnosis, reached only after a first preview round was rejected.
+   The old mobile UI put a "Grammatik" toggle exactly where Kurz/Lang put "Aufgabe wählen", so
+   learners read it as a filter and never opened it. Moving that same panel elsewhere (preview round
+   1) did not help, because a pill panel still reads as settings. The shipped answer: a **Himmelblau
+   dial tile below the sentence card**, one dial per grammar axis, each showing what the sentence
+   currently IS (green dot = detected form) and opening a picker to change it. Every corrected
+   sentence therefore arrives already classified, which teaches the taxonomy as a side effect.
+8. **The transformed sentence appears where the correction does, behind a third view segment.**
+   Original / Korrigiert / **Umgeformt** on one centered toggle; the separate transform card is
+   desktop-only now. "Neu" (not "Neuer Satz") sits in the card's top-right corner, the same spot
+   Kurz/Lang use for the dice. Corrections render as two text columns with a vertical separator —
+   **no chip backgrounds on mobile** (founder amendment), colors and formatting kept.
+
+**Rejected along the way (four preview rounds; do not reintroduce):** moving the Grammatik panel
+below the field but keeping it a panel, whether it expanded in-page or as a pop-up (round 1, both
+rejected); renaming the feature "Satz umformen" (round 2 proposal, founder kept "Grammatik");
+one-tap action chips (`→ Passiv`), which break as soon as forms combine; a transformation timeline
+that stacks a card per attempt (re-introduces page scroll by design); the dials in the bottom thumb
+slot (best ergonomics, but four floating controls with no bar behind them); and a deep navy "stage"
+panel for the Grammatik tile, which would have been the app's only dark surface in light mode.
