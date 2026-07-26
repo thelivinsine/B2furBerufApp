@@ -12,6 +12,9 @@ export interface WritingHistoryEntry {
   weakness: WeaknessCategory;
   insight: string;
   cached: boolean;
+  /** Permanent id of the Aufgabe this entry was written against (s167); lets
+   *  Verlauf resolve the task back, which pooled prompts alone could not. */
+  task_id?: string | null;
 }
 
 export type WritingLength = "short" | "long";
@@ -45,7 +48,7 @@ export async function getWritingHistory(
   try {
     const { data, error } = await supabase
       .from("writing_evaluations")
-      .select("id, created_at, theme, length, text, weakness, insight, cached")
+      .select("id, created_at, theme, length, text, weakness, insight, cached, task_id")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error || !data) return null;
@@ -85,6 +88,22 @@ export async function evaluateWriting(input: {
   theme: ThemeId;
   length: WritingLength;
   text: string;
+  /** Permanent id of the Aufgabe (s167). Also part of the AI cache key, so the
+   *  same text under a different task can never return a stale verdict. */
+  taskId?: string;
+  /** The Aufgabe itself, so the evaluator can judge Aufgabenerfüllung instead
+   *  of grading language in a vacuum. */
+  task?: string;
+  /** The Inhaltspunkte the learner had to cover. */
+  points?: string[];
+  /** CEFR band the task targets, so a B1 text is not marked against B2. */
+  level?: string;
+  format?: string;
+  /** Who the Aufgabe is addressed to, so the Anrede can be judged. */
+  addressee?: string;
+  register?: string;
+  /** Word target of the task, so underlength is detectable. */
+  words?: number;
 }): Promise<WritingEvalResult> {
   const auth = useAuthStore.getState();
   if (auth.status === "signedOut" || !auth.session) {

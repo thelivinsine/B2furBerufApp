@@ -91,99 +91,126 @@ export function AdminShell() {
 
   const initial = (user?.email?.[0] ?? "G").toUpperCase();
 
+  const backToApp = t("Zurück zur App", "Back to the app");
+
+  // The prominent "back to the app" affordance, pinned to the TOP of the nav
+  // panel (founder request): an accent-tinted tile so it stands out against the
+  // neutral nav rows without reading as loud brand chrome (Himmelblau selection-
+  // tile recipe, §3). `compact` is the mobile top-bar variant.
+  const backButton = (compact?: boolean) => (
+    <Link
+      to="/"
+      className={cn(
+        "flex shrink-0 items-center gap-2 rounded-lg border border-accent/40 bg-accent/15 font-semibold text-accent-ink transition-colors hover:bg-accent/25 dark:border-accent/25 dark:bg-accent/10 dark:hover:bg-accent/20",
+        compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
+      )}
+    >
+      <ArrowLeft className={compact ? "h-3.5 w-3.5" : "h-4 w-4 shrink-0"} />
+      {compact ? t("App", "App") : backToApp}
+    </Link>
+  );
+
+  const navRows = (compact?: boolean) =>
+    NAV.map((item) => {
+      const badge = item.badge?.(overview);
+      return (
+        <NavLink
+          key={item.to}
+          to={item.to}
+          end={item.end}
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+              compact ? "flex-col justify-center gap-1 px-2 py-2 text-xs" : "px-3 py-2",
+              isActive
+                ? "bg-muted font-semibold text-foreground"
+                : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+            )
+          }
+        >
+          <item.icon className="h-[18px] w-[18px] shrink-0" />
+          <span className={compact ? "text-[11px]" : undefined}>{t(item.de, item.en)}</span>
+          {badge != null && !compact && (
+            <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+              {badge}
+            </span>
+          )}
+        </NavLink>
+      );
+    });
+
   return (
     <div className="min-h-dvh bg-page text-foreground">
-      <div className="mx-auto grid min-h-dvh w-full max-w-[1240px] grid-cols-1 md:grid-cols-[256px_1fr]">
-        {/* Sidebar — spacing mirrors the app's desktop Sidebar (256px column,
-            p-4, 18px marks, px-3/gap-3 rows) so the two nav panels feel alike. */}
-        <aside className="flex flex-col gap-1 border-b border-border bg-surface/70 p-4 md:border-b-0 md:border-r">
-          {/* Header block mirrors the app Sidebar: wordmark logo with a
-              subtitle below it and mb-4 of space before the nav. */}
-          <div className="mb-4 flex flex-col items-start gap-1.5 px-2 py-2">
+      {/* Desktop sidebar — mirrors the app's AppShell: a fixed rail pinned to the
+          left viewport edge (w-64), NOT a centered grid column, so switching in
+          from the app keeps the same left anchor and margins. */}
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
+        <div className="flex h-full flex-col gap-1 p-4">
+          <div className="mb-3 flex flex-col items-start gap-1.5 px-2 py-2">
             <Logo variant="wordmark" className="h-7 w-auto" />
             <p className="text-xs text-muted-foreground">
               {t("Kontrollzentrum", "Control center")}
             </p>
           </div>
 
-          <nav className="grid grid-cols-4 gap-1 md:grid-cols-1">
-            {NAV.map((item) => {
-              const badge = item.badge?.(overview);
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                      "md:justify-start justify-center",
-                      isActive
-                        ? "bg-border font-semibold text-foreground"
-                        : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
-                    )
-                  }
-                >
-                  <item.icon className="h-[18px] w-[18px] shrink-0" />
-                  <span className="hidden md:inline">{t(item.de, item.en)}</span>
-                  {badge != null && (
-                    <span className="ml-auto hidden rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary md:inline">
-                      {badge}
-                    </span>
-                  )}
-                </NavLink>
-              );
-            })}
-          </nav>
+          {backButton()}
 
-          <div className="mt-auto hidden px-2 pt-4 md:block">
-            <Link
-              to="/"
-              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              {t("Zurück zur App", "Back to the app")}
-            </Link>
-            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+          <nav className="mt-2 flex flex-col gap-0.5">{navRows()}</nav>
+
+          <div className="mt-auto px-2 pt-4">
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
               {t(
                 "Angemeldet als Gründer. Alle Nutzerzahlen sind Aggregate, keine Einzelprofile.",
                 "Signed in as founder. All user figures are aggregates, never individual profiles.",
               )}
             </p>
           </div>
-        </aside>
-
-        {/* Main */}
-        <div className="flex min-w-0 flex-col">
-          <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
-            <div className="flex items-center gap-1 rounded-full border border-border bg-surface p-0.5 text-xs font-semibold">
-              {(["de", "en"] as const).map((l) => (
-                <button
-                  key={l}
-                  type="button"
-                  onClick={() => setLang(l)}
-                  aria-pressed={lang === l}
-                  className={cn(
-                    "rounded-full px-2.5 py-1 uppercase transition-colors",
-                    lang === l ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-xs font-medium text-muted-foreground shadow-soft">
-              <span className="grid h-6 w-6 place-items-center rounded-full bg-accent-gradient text-[10px] font-bold text-primary-foreground">
-                {initial}
-              </span>
-              {t("Gründer-Konto", "Founder account")}
-            </div>
-          </header>
-
-          <main className="min-w-0 flex-1 px-4 py-5 sm:px-6">
-            <Outlet context={{ overview, loading, supabaseOk: resolvedOk, reload } satisfies AdminOutletContext} />
-          </main>
         </div>
+      </aside>
+
+      {/* Mobile top nav bar — the fixed rail is desktop-only, so below lg the nav
+          rides a top bar (there is no admin bottom tab bar). Back button stays at
+          the top-right here so it is easy to spot on phones too. */}
+      <div className="border-b border-border bg-surface/70 lg:hidden">
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <Logo variant="wordmark" className="h-6 w-auto" />
+          {backButton(true)}
+        </div>
+        <nav className="grid grid-cols-4 gap-1 px-3 pb-3">{navRows(true)}</nav>
+      </div>
+
+      {/* Content — offset by the fixed rail (lg:pl-64) and capped + centered at
+          max-w-6xl, exactly like the app's main, so the content column width and
+          gutters match. */}
+      <div className="lg:pl-64">
+        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-1 rounded-full border border-border bg-surface p-0.5 text-xs font-semibold">
+            {(["de", "en"] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => setLang(l)}
+                aria-pressed={lang === l}
+                className={cn(
+                  "rounded-full px-2.5 py-1 uppercase transition-colors",
+                  lang === l ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-xs font-medium text-muted-foreground shadow-soft">
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-accent-gradient text-[10px] font-bold text-primary-foreground">
+              {initial}
+            </span>
+            {t("Gründer-Konto", "Founder account")}
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-6xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8">
+          <Outlet context={{ overview, loading, supabaseOk: resolvedOk, reload } satisfies AdminOutletContext} />
+        </main>
       </div>
     </div>
   );

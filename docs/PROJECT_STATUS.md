@@ -1,11 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-26 (session 160). **Verlauf + Fortschritt redesign (founder-picked C and 3):**
-Schreiben's Verlauf now leads with a weakness-trend card over a compact row list; Fortschritt leads with
-a Kompetenz curve (mastered words / Can-Dos over time) and pairs a Prüfung countdown with a
-writing-aware Diagnose. Competence is now SAMPLED daily (`masteryHistory`), since FSRS history cannot be
-backfilled. Prior s158: nav-icon family harmonization + Fortschritt pinned left of Einstellungen.
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-26 (session 171). **Verlauf + Fortschritt redesign (founder-picked C and 3):**
+Schreiben's Verlauf leads with a weakness-trend card over a compact row list (Aufgabe -> Dein Text ->
+Tipp inside the row disclosure); Fortschritt leads with a Kompetenz curve (mastered words / Can-Dos
+over time) and pairs a Prüfung countdown with a writing-aware Diagnose, XP demoted to Details.
+Competence is now SAMPLED daily (`masteryHistory`), since FSRS history cannot be backfilled. Also: the
+desktop Sidebar's active row is a lighter grey. Prior s170 (PR #730): the Praktisch toggle joined the
+squircle language, Bibliothek reverted to the book stack and Fortschritt became the Pokal.
+`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
+`.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
+a CLI. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,6 +62,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
+- [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
+      **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
+      live).
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
       now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
@@ -69,75 +76,78 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 160 (2026-07-26). Verlauf + Fortschritt redesign (founder picks C and 3),
-branch `claude/selection-color-contrast-3upqkz`.** Started with a one-line fix (the sidebar active-row
-grey was too dark: `bg-border` -> `bg-muted`, PR #685), then a four-agent analysis of Schreiben's
-Verlauf and the Fortschritt page (purpose, current state, docs/founder record, learner value), then
-preview-first design (`preview/verlauf-fortschritt-redesign.html`, artifact c3df428e, 3 variants per
-surface). Founder picked **C "Entwicklung zuerst"** for Verlauf and **3 "Kompetenzkurve"** for
-Fortschritt; both implemented in this session.
-- **Verlauf (`WritingHistory.tsx`, rewritten):** a "Deine Entwicklung" card leads (top-3 weakness
-  categories as 3-month mini bar groups, trend arrows, "X % weniger" success badge, "Jetzt üben"
-  footer), then a COMPACT row list whose disclosure holds the tip, the learner's text, delete and the
-  practice CTA. Kurz/Lang `ModeSwitcher` only when both kinds exist. **Honesty guards:** a month
-  needs >=2 texts to count as a comparison point (`MIN_TEXTS_PER_MONTH`), a month with no texts
-  prints "-" not 0, and under two comparable months the card falls back to totals + "Der Trend
-  erscheint ab dem zweiten Monat."
-- **Fortschritt (`Analytics.tsx`):** new **Kompetenz** curve directly under the unchanged Überblick
-  (mastered words / Can-Dos over time, green dots on days a Can-Do was reached, "Zuletzt erreicht"
-  line, direction-only footer "+16 Wörter diese Woche"); XP chart stays in Details. **Dranbleiben**
-  is now Prüfung (days-remaining ring over a 90-day run-up + last simulation + `/exam` CTA, only
-  while `examDate` is ahead) + a **writing-aware Diagnose** (most-flagged weakness from the last 60
-  evaluations, falling back to the weakest band/theme) + Nächste Quest (spans both columns when the
-  Prüfung card shows). The duplicated writing-weakness panel was DELETED from Details (it disagreed
-  with the Verlauf panel: 60 vs 30 entries).
-- **New competence sampling:** `useProgressStore.masteryHistory` + `canDoAchievedAt` +
-  `recordCompetence`, sampled from Analytics on view and from `lib/competence.ts` at session end
-  (SessionPlayer `finish`). FSRS keeps current state only, so this history CANNOT be backfilled;
-  pre-existing achievements are stamped `SEEDED_MILESTONE` so they never plot as "reached today".
-  Both fields are local-only (the `progress` row has a fixed column set), same caveat as
-  `missionsDone`/`keyItems`. `lib/competence.ts` imports banks: never import it from eager code.
-- **`getWritingHistory` now returns `null` on failure** (was `[]`), so the Verlauf error card with
-  "Erneut versuchen" is finally reachable and an empty history is never faked.
-- **Verified in the real app**, not just the mockup: seeded a demo state and screenshotted
-  `/analytics` + `/writing?mode=verlauf` in light AND dark, incl. the expanded row. Two defects found
-  and fixed that way (the trend arrow was comparing against a 1-text month, so an improving category
-  read as worsening; a two-line weakness label pushed its arrow out of place).
-- **Gates:** typecheck · lint 0 errors (72 warnings = baseline) · test:unit **289/289** · build ·
-  check:bundle **117.3 kB** (banks stayed out of the eager chunk).
-- **Next:** the two high-value follow-ups both need a `writing_evaluations` migration and are NOT
-  done: (1) store the corrected text + the Aufgabe so Verlauf can show the actual correction in the
-  Fokus mark language, (2) give Fokus a history (the Fokus filter segment is deliberately absent
-  until then). Optional: "In die Wiederholung" (turn a correction into an FSRS card).
+**Handoff after session 171 (2026-07-26). Verlauf + Fortschritt redesign (founder picks C and 3),
+branch `claude/selection-color-contrast-3upqkz`, PRs #685 + #733.** Opened with a one-line contrast fix
+(the desktop Sidebar's active row was too dark: `bg-border` -> `bg-muted`, lighter than the old
+selection but still darker than the hover, PR #685, merged). Then a four-agent analysis of Schreiben's
+Verlauf and the Fortschritt page, preview-first design
+(`preview/verlauf-fortschritt-redesign.html`, artifact c3df428e, 3 named variants per surface), and
+implementation of the two picks.
+- **Verlauf = C "Entwicklung zuerst"** (`WritingHistory.tsx`, rewritten): a "Deine Entwicklung" card
+  leads (top-3 weaknesses as 3-month bar groups, trend arrows, "X % weniger" badge, "Jetzt üben"),
+  over a COMPACT row list. The disclosure now reads in event order: **Aufgabe** (from s167's
+  `task_id`) -> **Dein Text** -> **Tipp** next to the practice CTA, with delete + the standalone AI
+  line at the foot. Kurz/Lang `ModeSwitcher` only when both kinds exist.
+- **Honesty guards (do not weaken):** a month needs >=2 texts to be a comparison point
+  (`MIN_TEXTS_PER_MONTH`), a month with no texts prints "-" not 0, and under two comparable months
+  the card falls back to totals. The live check caught the bug this prevents: compared against a
+  one-text month, an improving category rendered as WORSENING.
+- **Fortschritt = 3 "Kompetenzkurve"** (`Analytics.tsx`): a competence curve sits directly under the
+  unchanged Überblick (mastered words / Can-Dos over time, green dots on days a Can-Do was reached,
+  "Zuletzt erreicht" line); the XP chart moved into Details, because XP measures effort and dips in a
+  quiet week, which reads as regression. The card states DIRECTION only ("+16 Wörter diese Woche");
+  the absolute count stays on the Vokabeln tile. **Dranbleiben** = Prüfung (days-remaining ring over
+  a 90-day run-up + last simulation + `/exam`, only while `examDate` is ahead) + a **writing-aware
+  Diagnose** (most-flagged weakness of the last 60 evaluations, falling back to the weakest
+  band/theme) + Nächste Quest (spans both columns when Prüfung shows). The duplicated
+  writing-weakness panel was DELETED from Details: fed 60 entries against Verlauf's 30, the two
+  surfaces could name different top weaknesses.
+- **Competence is SAMPLED, never reconstructed:** `useProgressStore.masteryHistory` +
+  `canDoAchievedAt` + `recordCompetence`, written from Analytics on view and from
+  `lib/competence.ts` at session end. FSRS keeps current card state only, so this history cannot be
+  backfilled; dating cards by `lastReview` was rejected (a word mastered in May but reviewed
+  yesterday would fake a hockey stick). Pre-existing milestones carry `SEEDED_MILESTONE` so they
+  never plot as "reached today". Both fields are local-only, same caveat as `missionsDone`/`keyItems`.
+  **`lib/competence.ts` imports content banks: never import it from eager code.**
+- **`getWritingHistory` returns `null` on failure** (was `[]`), so the Verlauf error card is
+  reachable and an empty history is never faked. `Analytics` treats null as "no data" and keeps its
+  vocabulary fallback.
+- **Verified in the real app, not the mockup:** seeded a demo state and screenshotted `/analytics`
+  and `/writing?mode=verlauf` in light AND dark plus the expanded row, which is what surfaced the
+  trend-arrow bug above and a two-line label pushing its arrow out of place.
+- **Merge note:** `main` advanced 47 commits (sessions 161-170) while this branch was open. Merged
+  in; `lib/writing.ts` auto-merged (our null return + s167's `task_id` select), `WritingHistory.tsx`
+  resolved by hand (our variant-C structure + main's Aufgabe tile), docs re-applied against main's
+  newer text. s167 had already shipped the "store the Aufgabe" follow-up, so only the CORRECTION and
+  Fokus history remain open.
+- **Gates:** typecheck · lint 0 errors · test:unit · build · check:bundle **117.3 kB** · lint:content.
+- **Next:** the two remaining follow-ups both need a `writing_evaluations` migration: (1) persist the
+  corrected text so Verlauf can show the real correction in the Fokus mark language, (2) give Fokus a
+  history (which also unlocks the Fokus filter segment). Optional: "In die Wiederholung" (turn a
+  correction into an FSRS card).
 
-**Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
-branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
-grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
-(dimension catalog, feasibility tiers, B2-marker ranking, guardrails, Now/Next/Later/Skip roadmap) +
-two previews (`preview/grammar-dimensions-satzlabor.html`, `-catalog.html`) + a combined claude.ai
-artifact (daa4dbb6). Then built the "easy half":
-- **Konjunktiv II** as a new **Modus** rail axis: `mood` promoted from the pinned `DEFAULT_MOOD` to a
-  real, combinable axis across `grammarDimensions.ts` / `useFokusMachine.ts` / `GrammarRail.tsx` /
-  `FokusTrainer.tsx` (rail is data-driven, so the Modus section renders itself).
-- **Zustandspassiv** as a third Genus-Verbi pill (data-only value add): a detected `passiv_zustand`
-  now maps to its own pill instead of null; also fixed a phantom "Aktiv looks selected" quirk on a
-  real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
-  check-sentence prompt.
-- **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
-  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder must redeploy `transform-sentence`** for the
-  better output; the pills already work against the live function (its enums already accept
-  konjunktiv2 / passiv_zustand as targets).
-- **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
-  umzuwandeln."
-- **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
-  Satzbau (HS<->NS), Nominalstil, Relativ<->Partizip. Plusquamperfekt deferred (needs a temporal
-  anchor). Roadmap: brainstorm-doc section 6.1.
-- **Merge note:** `main` force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation,
-  sessions 155-158) while this branch was open; merged it in - code auto-merged (mood/copy edits +
-  main's cosmetic tweaks both intact), the 4 doc conflicts resolved to main's new structure and the
-  docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
-- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
-  lint:content. Edge function is Deno (not deployed from the sandbox).
+**Handoff after session 170 (2026-07-26): Praktisch toggle joins the squircle language;
+Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#730**). Founder: adapt the
+reduced-rounding toggle design from Bibliothek/Schreiben to Praktisch, restore the previous
+Bibliothek icon, and give Fortschritt the leaderboard-cup icon from an earlier preview batch. All
+three were direct, unambiguous ports of already-approved designs (no new preview round needed).
+- **Trainieren/Spielen toggle** (`Dashboard.tsx`) now shares `LibrarySwitcher`/
+  `WritingModeSwitcher`'s exact language: `rounded-lg` track, `rounded-md` sliding pill measured by
+  `useSlidingPill`, instead of the older `rounded-full` track with two independently-flagged
+  buttons. Kept content-sized (`w-fit`, centered) since it's a two-segment toggle, not a full-width
+  one; the section-tinted active icon/label (blue Dumbbell / orange Play) is untouched.
+- **Bibliothek's route icon reverts to the "stack of three books"** shipped before session 158,
+  restored verbatim (mark + `NORM` box) from git history (`997e8a0`), replacing the "closed book +
+  bookmark ribbon" mark that had been in place since.
+- **Fortschritt's route icon becomes the "Pokal" (trophy/cup)**, option T from the session-158
+  icon-preview batch (`preview/fortschritt-icon-vorschlaege.html`) that lost to the Ring at the
+  time. Ported verbatim (`#0ea5e9`, own `NORM` box) in place of the progress ring.
+- **Verified in headless Chromium** at 390×844 (bottom tab bar, both icons active/inactive, the
+  toggle sliding between Trainieren/Spielen) and 1280×900 (desktop Sidebar + toggle).
+- **Files:** `src/features/dashboard/Dashboard.tsx` · `src/components/layout/route-icons.tsx` ·
+  `docs/areas/PRAKTISCH-NAV.md` · `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md`.
+  **Gates:** typecheck · lint (0 errors, pre-existing warnings only) · test:unit **317/317** ·
+  build · check:bundle (118.1 kB).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

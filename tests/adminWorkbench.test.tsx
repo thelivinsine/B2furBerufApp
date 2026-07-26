@@ -38,21 +38,43 @@ describe("admin workbench (/sources)", () => {
     });
   });
 
-  it("saves a review mark through the api when the checkbox is toggled", () => {
+  it("approves a review through the api when the Freigeben control is clicked", () => {
     const api = makeApi();
     // Unfiltered, unsorted: the first table row is provenance[0].
     render(<AdminWorkbench api={api} lang="de" />);
-    const checkbox = document.querySelector('tbody input[type="checkbox"]') as HTMLInputElement;
-    expect(checkbox).not.toBeNull();
-    fireEvent.click(checkbox);
-    expect(api.onChange).toHaveBeenCalledWith(provenance[0].content_id, { verified: true });
+    const approve = document.querySelector('tbody button[aria-label="Freigeben"]') as HTMLButtonElement;
+    expect(approve).not.toBeNull();
+    fireEvent.click(approve);
+    expect(api.onChange).toHaveBeenCalledWith(provenance[0].content_id, { decision: "approve" });
+  });
+
+  it("rejects a review through the api when the Ablehnen control is clicked", () => {
+    const api = makeApi();
+    render(<AdminWorkbench api={api} lang="de" />);
+    const reject = document.querySelector('tbody button[aria-label="Ablehnen"]') as HTMLButtonElement;
+    expect(reject).not.toBeNull();
+    fireEvent.click(reject);
+    expect(api.onChange).toHaveBeenCalledWith(provenance[0].content_id, { decision: "reject" });
   });
 
   it("shows saved marks from the review map", () => {
-    const api = makeApi([{ content_id: provenance[0].content_id, verified: true, comment: "ok" }]);
+    const api = makeApi([
+      { content_id: provenance[0].content_id, verified: true, decision: "approve", comment: "ok" },
+    ]);
     render(<AdminWorkbench api={api} lang="de" />);
-    const checkbox = document.querySelector('tbody input[type="checkbox"]') as HTMLInputElement;
-    expect(checkbox.checked).toBe(true);
+    const approve = document.querySelector('tbody button[aria-label="Freigeben"]') as HTMLButtonElement;
+    expect(approve.getAttribute("aria-pressed")).toBe("true");
     expect((document.querySelector('tbody input[type="text"]') as HTMLInputElement).value).toBe("ok");
+  });
+
+  it("surfaces a Save button once the note is edited", () => {
+    const api = makeApi();
+    render(<AdminWorkbench api={api} lang="de" />);
+    const note = document.querySelector('tbody input[type="text"]') as HTMLInputElement;
+    expect(screen.queryByText("Speichern")).toBeNull();
+    fireEvent.change(note, { target: { value: "check the source" } });
+    const save = screen.getByText("Speichern");
+    fireEvent.click(save);
+    expect(api.onChange).toHaveBeenCalledWith(provenance[0].content_id, { comment: "check the source" });
   });
 });

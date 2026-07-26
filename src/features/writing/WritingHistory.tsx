@@ -17,6 +17,7 @@ import {
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
+import { writingTaskById } from "@/lib/writingScope";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import {
   getWritingHistory,
@@ -341,6 +342,8 @@ function HistoryEntry({
   const navigate = useNavigate();
   const reduce = useReducedMotion();
   const theme = themeById(entry.theme);
+  // s167: resolve the recorded task id back to the Aufgabe.
+  const task = writingTaskById(entry.task_id);
   const area = practiceAreaById(entry.weakness);
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -384,6 +387,41 @@ function HistoryEntry({
 
         {expanded && (
           <CardContent className="space-y-3 border-t border-border p-4">
+            {/* Read in the order it happened: the task, the answer, then the
+                advice, which lands next to the practice button. The Aufgabe is
+                resolvable again since evaluations record the permanent
+                `task_id` (s167); older rows without one simply omit it. */}
+            {task && (
+              <div className="space-y-1.5 rounded-xl border border-accent/50 bg-accent/20 p-3.5 dark:border-accent/25 dark:bg-accent/10">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent-ink">
+                  <Target className="h-3.5 w-3.5" /> Aufgabe
+                </p>
+                <p className="text-sm leading-relaxed text-foreground/90">{task.text}</p>
+                {task.points?.length ? (
+                  <ul className="space-y-1 pt-0.5">
+                    {task.points.map((point) => (
+                      <li key={point} className="flex gap-2 text-sm leading-relaxed">
+                        <span
+                          aria-hidden
+                          className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink"
+                        />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            )}
+
+            <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <PenLine className="h-3.5 w-3.5" /> Dein Text
+              </p>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
+              </p>
+            </div>
+
             {/* The headline result of the evaluation. */}
             <div className="space-y-2 rounded-xl border border-primary/15 bg-primary/5 p-3.5">
               <div className="flex items-center gap-2">
@@ -393,17 +431,6 @@ function HistoryEntry({
                 </p>
               </div>
               <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
-            </div>
-
-            {/* The learner's own text. (The Aufgabe behind an old entry is not
-                recoverable: since the s148 random pools it is not stored.) */}
-            <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
-              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <PenLine className="h-3.5 w-3.5" /> Dein Text
-              </p>
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3">

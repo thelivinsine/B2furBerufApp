@@ -65,7 +65,7 @@ StatCard ride them too (streak = celebration, not warning).
 relocated theme-mastery grid. The daily-goal ring lives on Fortschritt (`/analytics`), not on
 the dashboard.
 
-Page order (variant 3 "Kompetenzkurve", founder-picked s160; preview
+Page order (variant 3 "Kompetenzkurve", founder-picked s171; preview
 `preview/verlauf-fortschritt-redesign.html`): Überblick (ring + level + 4 tiles, unchanged) →
 **Kompetenz** → claim moment → **Dranbleiben** → Was du schon kannst → Sammlung → Details.
 - **Kompetenz** = the headline chart: mastered words (or Can-Dos, via the small pill toggle) over

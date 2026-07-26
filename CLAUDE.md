@@ -62,7 +62,8 @@ after pulling.
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` (mounted, off the nav) ·
-  `/sources` (+ founder `/sources/werkbank`) · `/admin/*` (founder) · `/hilfe`, `/privacy`,
+  `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) · `/hilfe`,
+  `/privacy`,
   `/terms`, `/about`, `/welcome` (public)
 
 ## Hard invariants (cross-cutting; never break without an explicit founder request)
@@ -80,7 +81,12 @@ after pulling.
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
   lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the grey-tile/white-controls
   FilterRail answer, the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
-  `layoutId`).
+  `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
+  Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
+  `docs/areas/SCHREIBEN.md`).
+- **A freshly opened page never scrolls.** Every trainer sizes its elastic element (the writing
+  field, the tile column) to the room actually left, and gives up its preferred floor rather than
+  push the resting page past one viewport (`useFillEditor`, `measureMobile`).
 - **Design landmines:** the `/design` skill §7 lists everything shipped-then-reverted; never
   reintroduce an item on that list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior
@@ -103,10 +109,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile.
 - **Controls always visibly act:** no disabled-at-default buttons; zero-yield options grey out
   with honest counts.
-- **Color language:** Himmelblau accent tiles for selection rails (not grey); content on white
-  cards (no grey washes); card-title eyebrows bold brand blue, inner labels muted; a bold colored
-  word label over an i icon; green dot = detected fact; AI/legal disclaimers as standalone lines
-  below cards; labels neutral dark grey, never accent blue.
+- **Color language:** Himmelblau accent tiles for selection rails (not grey), and the accent is a
+  FILL with NO visible edge: rails and the buttons that open them border in their own fill color
+  and separate from the page by `shadow-soft` alone, like the Bibliothek cards (never an accent
+  edge, never a grey one). Content on white cards (no grey washes); card-title eyebrows bold brand
+  blue, inner labels muted; a bold colored word label over an i icon; green dot = detected fact;
+  AI/legal disclaimers as standalone lines below cards; labels neutral dark grey, never accent blue.
 - **Consistency + motion:** primary actions in the same place across sibling modes; subtle
   micro-motion in one timing family (0.12-0.18s, reduced-motion safe); squircle corners on
   toggles/pills, round only for dots/badges/avatars/circular icon buttons.
@@ -126,7 +134,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - `CONTENT.md` — banks, schemas, taxonomy, linter checklist, provenance. Pair with `/content`.
 - `BIBLIOTHEK.md` — the `/library` tabs, views, graphs, FilterRail, search, Grammatik lessons.
 - `SESSION.md` — the composed session engine, Üben auto-variety rules, focus mode, SRS engines.
-- `SCHREIBEN.md` — `/writing` Fokus/Kurz/Lang, rails, correction card, umlaut keys, AI cascade.
+- `SCHREIBEN.md` — `/writing` Fokus/Kurz/Lang, rails, correction card, the mobile anatomy (fixed
+  chrome, measured heights, Fokus dial tile), umlaut keys, AI cascade.
 - `PRAKTISCH-NAV.md` — dashboard Üben/Spielen, bottom tab bar (locked), header, feedback pill.
 - `GAME.md` — the Neuland layer: missions-as-data, scenes/sprites, pixel rules, hub surfaces.
 - `BRAND.md` — logo/wordmark rules, icons/favicons, theme tokens, dialog overlay convention.
@@ -134,8 +143,16 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - `COMPONENTS.md` — help/blog section, Artikel-Visuals gender system, domain buildings.
 
 ## Deployment (GitHub Pages)
-- **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml`
-  (the only deploy path; `validate.yml` is the content-lint + test gate and never deploys).
+- **`main` is production.** Pushing/merging to `main` triggers TWO deploys (s167):
+  `.github/workflows/pages.yml` ships the site, and `.github/workflows/supabase.yml` deploys every
+  Supabase Edge Function (and applies migrations first, when `SUPABASE_DB_PASSWORD` is set).
+  `validate.yml` is the content-lint + test gate and never deploys.
+- **No CLI is needed for backend changes any more.** The Supabase workflow needs the
+  `SUPABASE_ACCESS_TOKEN` repo secret (set; carries an expiry, and the run fails with an explicit
+  "regenerate it" error when it lapses). `SUPABASE_DB_PASSWORD` is deliberately NOT set, so
+  migrations are skipped in CI and each new migration is pasted into the Dashboard SQL editor.
+  **Keep migrations idempotent** (`add column if not exists`), since a hand-applied one is absent
+  from `schema_migrations` and CI may re-apply it later.
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.

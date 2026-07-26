@@ -5,6 +5,7 @@ import type {
   MCQQuestion,
   WordOrderQuestion,
   MatchingQuestion,
+  TypedQuestion,
   RedemittelPhrase,
   ThemeId,
   VocabItem,
@@ -175,11 +176,75 @@ function articleQ(item: VocabItem, difficulty: Difficulty): MCQQuestion {
   };
 }
 
+/** Strip the leading article off a display form ("die Praxis" -> "Praxis"). */
+function bareNoun(form: string): string {
+  return form.replace(/^(der|die|das)\s+/i, "").trim();
+}
+
+/** Umlaut the last stem vowel (a/o/u, and the a of a trailing "au"), or null
+ *  when the stem has none. Used to build tempting wrong plural forms. */
+function umlautLast(stem: string): string | null {
+  const idx = Math.max(stem.lastIndexOf("a"), stem.lastIndexOf("o"), stem.lastIndexOf("u"));
+  if (idx < 0) return null;
+  if (stem[idx] === "u" && stem[idx - 1] === "a") {
+    return `${stem.slice(0, idx - 1)}äu${stem.slice(idx + 1)}`;
+  }
+  const map: Record<string, string> = { a: "ä", o: "ö", u: "ü" };
+  return `${stem.slice(0, idx)}${map[stem[idx]]}${stem.slice(idx + 1)}`;
+}
+
+/**
+ * Plausible but WRONG plural forms built from the noun's own stem (add
+ * -e/-en/-n/-er/-s, a Nullplural, and umlauted variants), so a plural question
+ * tests the actual pattern instead of mere word recognition against unrelated
+ * distractors (s-session: the old form let learners pick by matching the stem,
+ * an A1 move). The correct plural is removed; caller tops up from the pool if a
+ * short stem yields too few.
+ */
+function sameStemPluralForms(item: VocabItem): string[] {
+  const sg = bareNoun(item.de);
+  const forms = new Set<string>();
+  const add = (f: string) => forms.add(`die ${f}`);
+  add(sg); // Nullplural
+  add(`${sg}e`);
+  add(`${sg}en`);
+  add(sg.endsWith("e") ? `${sg}n` : `${sg}en`);
+  add(`${sg}er`);
+  add(`${sg}s`);
+  const um = umlautLast(sg);
+  if (um) {
+    add(`${um}e`);
+    add(`${um}er`);
+  }
+  forms.delete(item.plural!);
+  return shuffle([...forms]);
+}
+
+/**
+ * A predictable plural is the singular stem plus -e/-en/-n/-s with no stem
+ * change; everything else (umlaut, -er, Nullplural, stem-changing / foreign
+ * plurals like Praxis -> Praxen) is "tricky". At higher competency (difficulty
+ * 3) only the tricky plurals are worth asking, so the easy ones drop out.
+ */
+function isTrickyPlural(item: VocabItem): boolean {
+  const sg = bareNoun(item.de).toLowerCase();
+  const pl = bareNoun(item.plural!).toLowerCase();
+  return !["e", "en", "n", "s"].some((suf) => pl === sg + suf);
+}
+
 function pluralQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQQuestion {
-  const distractors = sample(
-    pool.filter((v) => v.id !== item.id && v.plural),
-    3,
-  ).map((v) => v.plural!);
+  const options = new Set<string>([item.plural!]);
+  for (const d of sameStemPluralForms(item)) {
+    if (options.size >= 4) break;
+    options.add(d);
+  }
+  if (options.size < 4) {
+    // Short stems can yield too few distinct forms; top up from other nouns.
+    for (const pl of shuffle(pool.filter((v) => v.id !== item.id && v.plural).map((v) => v.plural!))) {
+      if (options.size >= 4) break;
+      options.add(pl);
+    }
+  }
   return {
     id: qid("plural"),
     kind: "plural",
@@ -187,7 +252,25 @@ function pluralQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MC
     themeId: item.themeId,
     prompt: `Plural von „${item.de}"?`,
     answer: item.plural!,
-    options: shuffle([item.plural!, ...distractors]),
+    options: shuffle([...options]),
+    sourceId: item.id,
+    hint: "Wie lautet die Pluralform?",
+  };
+}
+
+/** Typed plural variant (production): the learner types the plural instead of
+ *  picking it. Accepts the bare form and the full "die …" form. */
+function pluralTypeQ(item: VocabItem, difficulty: Difficulty): TypedQuestion {
+  const full = item.plural!;
+  const bare = bareNoun(full);
+  return {
+    id: qid("pluralType"),
+    kind: "pluralType",
+    difficulty,
+    themeId: item.themeId,
+    prompt: `Plural von „${item.de}"?`,
+    answer: full,
+    accept: bare && bare !== full ? [bare, full] : [full],
     sourceId: item.id,
     hint: "Wie lautet die Pluralform?",
   };
@@ -488,12 +571,36 @@ function oddOneOutQ(anchor: VocabItem, difficulty: Difficulty): MCQQuestion | nu
     }
   }
   if (related.length < 2) return null;
-  const cluster = [anchor, ...sample(related, 2)];
-  const clusterIds = new Set(cluster.map((v) => v.id));
-  const relatedIds = new Set(related.map((v) => v.id));
+
+  // Two flavours, mixed for variety:
+  //  - part-of-speech matched: all four options share the anchor's POS, so the
+  //    only discriminator is the topic (removes the "odd one = the verb"
+  //    shortcut that made a mixed set answerable without knowing the meanings).
+  //  - mixed POS (like before), kept for variety.
+  // Both flavours require the outsider to be genuinely UNRELATED to the cluster
+  // (different theme AND no shared "related" link either way), so a word that
+  // half-belongs (e.g. abdichten near Blech) is never the odd one out.
+  const samePos = related.filter((v) => v.pos === anchor.pos);
+  const posMatch = Math.random() < 0.5 && samePos.length >= 2;
+  const cluster = [anchor, ...sample(posMatch ? samePos : related, 2)];
+
+  // Ids the cluster links to (its members + everything in their `related`), so
+  // the outsider can be excluded when it shares any link with the cluster.
+  const clusterForms = new Set(cluster.map((v) => normForm(v.de)));
+  const linkedIds = new Set<string>(cluster.map((v) => v.id));
+  for (const v of cluster) {
+    for (const rel of v.related) {
+      const hit = resolve.get(normForm(rel));
+      if (hit) linkedIds.add(hit.id);
+    }
+  }
   const outsider = sample(
     vocabulary.filter(
-      (v) => v.themeId !== anchor.themeId && !clusterIds.has(v.id) && !relatedIds.has(v.id),
+      (v) =>
+        v.themeId !== anchor.themeId &&
+        (!posMatch || v.pos === anchor.pos) &&
+        !linkedIds.has(v.id) &&
+        !v.related.some((rel) => clusterForms.has(normForm(rel))),
     ),
     1,
   )[0];
@@ -639,7 +746,18 @@ export function buildPoolQuiz(
   const themeId: ThemeId | "general" = opts.themeId ?? vocab[0]?.themeId ?? "general";
   const nouns = vocab.filter((v) => v.pos === "noun" && v.article);
   const withPlural = vocab.filter((v) => v.plural && !/nur Plural/i.test(v.plural));
+  // Higher competency (difficulty 3): only the tricky plurals are worth asking.
+  const withTrickyPlural = withPlural.filter(isTrickyPlural);
   const uniqueCols = distinctCols(cols); // noun/verb-distinct pool for the match grid
+
+  // A plural question is sometimes a pick (MCQ, same-stem distractors) and
+  // sometimes a type-the-answer (production); ~half and half.
+  const pluralSlot = (items: VocabItem[]): QuizQuestion => {
+    const it = sample(items, 1)[0];
+    return Math.random() < 0.5
+      ? pluralTypeQ(it, difficulty)
+      : pluralQ(it, vocabDistr, difficulty);
+  };
 
   const out: QuizQuestion[] = [];
   const guardN = count * 6;
@@ -694,8 +812,8 @@ export function buildPoolQuiz(
     } else if (difficulty === 2) {
       // production-lite: plural, cloze, collocationFill, connectorChoice
       const roll = Math.random();
-      if (roll < 0.3 && withPlural.length >= 4) {
-        pushUnique(pluralQ(sample(withPlural, 1)[0], vocabDistr, difficulty));
+      if (roll < 0.3 && withPlural.length >= 1) {
+        pushUnique(pluralSlot(withPlural));
       } else if (roll < 0.52 && vocab.length >= 4) {
         pushUnique(clozeQ(sample(vocab, 1)[0], vocabDistr, difficulty));
       } else if (roll < 0.72 && cols.length >= 4) {
@@ -706,11 +824,13 @@ export function buildPoolQuiz(
         pushUnique(includeGeneric ? connectorChoiceQ(difficulty) : anyContent());
       }
     } else {
-      // application: wordOrder, relativePronoun, daWord
+      // application: tricky plurals (competency-gated), wordOrder, relativePronoun, daWord
       const roll = Math.random();
-      if (roll < 0.4 && cols.length > 0) {
+      if (roll < 0.25 && withTrickyPlural.length >= 1) {
+        pushUnique(pluralSlot(withTrickyPlural));
+      } else if (roll < 0.5 && cols.length > 0) {
         pushUnique(wordOrderQ(sample(cols, 1)[0], difficulty));
-      } else if (roll < 0.7) {
+      } else if (roll < 0.75) {
         pushUnique(includeGeneric ? relativePronounQ(difficulty) : anyContent());
       } else {
         pushUnique(includeGeneric ? daWordQ(difficulty) : anyContent());

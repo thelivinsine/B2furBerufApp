@@ -1,0 +1,45 @@
+<meta charset="utf-8">
+<title>Lücke hint preview</title>
+<style>
+  :root{
+    --page-from:144 45% 98%; --page-mid:150 50% 98%; --page-to:198 83% 98%;
+    --surface:0 0% 100%; --muted-foreground:220 8% 36%; --border:218 13% 84%;
+    --primary:221 83% 54%; --foreground:224 40% 14%;
+  }
+  *{box-sizing:border-box;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  body{min-height:100vh;display:flex;flex-direction:column;gap:32px;align-items:center;justify-content:center;
+    padding:48px 24px;background:linear-gradient(135deg,hsl(var(--page-from)),hsl(var(--page-mid)),hsl(var(--page-to)));color:hsl(var(--foreground))}
+  .col{width:100%;max-width:720px;display:flex;flex-direction:column;gap:12px}
+  .cap{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:hsl(var(--muted-foreground));opacity:.7}
+  .badge{align-self:flex-end;font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));background:hsl(220 14% 93%);padding:4px 12px;border-radius:999px}
+  .card{min-height:13rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    border:1px solid hsl(var(--border));background:hsl(var(--surface));border-radius:16px;padding:24px;
+    box-shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.06)}
+  .eyebrow{font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:hsl(var(--muted-foreground))}
+  .sentence{text-align:center;font-size:24px;font-weight:500;line-height:1.5}
+  .hint{text-align:center;font-size:14px;color:hsl(var(--muted-foreground))}
+  .hint b{font-weight:600;color:hsl(var(--primary))}
+  .input{display:flex;gap:8px}
+  .input input{flex:1;height:44px;border:1px solid hsl(var(--border));border-radius:8px;padding:0 14px;font-size:14px;color:hsl(var(--muted-foreground))}
+  .input button{height:44px;padding:0 22px;border:none;border-radius:8px;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,hsl(221 83% 58%),hsl(233 80% 60%))}
+</style>
+
+<div class="col">
+  <div class="cap">Neu (mit Hinweis)</div>
+  <span class="badge">Lücke</span>
+  <div class="card">
+    <p class="eyebrow">Ergänze das fehlende Wort:</p>
+    <p class="sentence">Regelmäßige ___ sind wichtig.</p>
+    <p class="hint"><b>Hinweis:</b> break / rest</p>
+  </div>
+  <div class="input"><input placeholder="Deutsches Wort tippen …"><button>Prüfen</button></div>
+</div>
+
+<div class="col">
+  <div class="cap" style="opacity:.55">Vorher (ohne Hinweis)</div>
+  <div class="card" style="opacity:.6">
+    <p class="eyebrow">Ergänze das fehlende Wort:</p>
+    <p class="sentence">Regelmäßige ___ sind wichtig.</p>
+  </div>
+</div>

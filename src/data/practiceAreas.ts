@@ -7,6 +7,15 @@ import type { PracticeArea, WeaknessCategory } from "@/types";
  */
 export const practiceAreas: PracticeArea[] = [
   {
+    id: "taskCompletion",
+    label: "Task completion",
+    labelDe: "Aufgabenerfüllung",
+    // Back into Kurz: the fix for a missed Inhaltspunkt is writing the task
+    // again with all points covered, not a grammar lesson.
+    route: "/writing?mode=kurz",
+    description: "Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen.",
+  },
+  {
     id: "verbPosition",
     label: "Verb position",
     labelDe: "Verbstellung",

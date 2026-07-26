@@ -167,10 +167,12 @@ export function GrammarRail({
     <aside
       role={panel ? "region" : undefined}
       aria-label="Grammatik"
-      // Same Himmelblau tile as the Aufgabe-wählen rail (s149 harmonization;
-      // was grey), with quieter dark-mode alphas.
+      // Same Himmelblau fill as the Aufgabe-wählen rail (s149 harmonization;
+      // was grey), with a quieter dark-mode alpha, and no visible outline: the
+      // border wears the fill's own colour and `shadow-soft` does the lifting
+      // (founder s169, both rails).
       className={cn(
-        "flex flex-col overflow-hidden rounded-xl border border-accent/50 bg-accent/20 shadow-soft dark:border-accent/25 dark:bg-accent/10",
+        "flex flex-col overflow-hidden rounded-xl border border-accent/20 bg-accent/20 shadow-soft dark:border-accent/10 dark:bg-accent/10",
         panel && "max-h-[45dvh]",
         className,
       )}
@@ -211,13 +213,13 @@ export function GrammarRail({
         )}
       </div>
 
-      <div className="slim-scrollbar min-h-0 flex-1 overflow-y-auto border-t border-accent/50 p-3 dark:border-accent/25">
+      <div className="slim-scrollbar min-h-0 flex-1 overflow-y-auto border-t border-accent-ink/10 p-3">
         {body}
       </div>
 
       {/* Footer (desktop rail only): start over with a fresh sentence. */}
       {!panel && onNewSentence && (
-        <div className="shrink-0 border-t border-accent/50 p-3 dark:border-accent/25">
+        <div className="shrink-0 border-t border-accent-ink/10 p-3">
           <Button
             variant="outline"
             className="h-10 w-full"

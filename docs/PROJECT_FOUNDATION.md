@@ -57,11 +57,15 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   Guest sign-in is the primary path. Email sign-in works but hits Supabase free-SMTP rate limits
   (fix: add Resend SMTP — deferred, see action items).
 - **2C writing UI:** `/writing` route; short/long tasks per theme; one insight card + "Üben" deep-link.
-- **2D edge function:** `evaluate-writing` deployed via the Supabase dashboard code editor (NOT CLI —
-  sandbox network blocks `api.supabase.com`). Daily limit (5/day) + monthly auto-shutoff ($5 cap) +
-  input-hash cache + LanguageTool pre-check + one Haiku call fallback chain. Verified end-to-end.
-- **Deployment quirk:** the dashboard pre-fills a "Hello [name]!" boilerplate when creating a
-  function — select-all-delete before pasting real code.
+- **2D edge function:** `evaluate-writing`. Monthly auto-shutoff ($5 cap) + input-hash cache +
+  LanguageTool pre-check + a provider fallback chain. Per-MODE daily limits since s167
+  (Kurz 4 / Lang 2, counted separately; Fokus is 10 in `check-sentence`) — the old shared 5/day is
+  retired. Since s167 it also receives the Aufgabe and its Inhaltspunkte and grades content first
+  (see `docs/areas/SCHREIBEN.md`).
+- **Deployment:** since s167, `.github/workflows/supabase.yml` deploys every Edge Function on merge
+  to `main`, so neither the CLI nor the dashboard editor is needed. If you ever do paste into the
+  dashboard editor by hand, note it pre-fills a "Hello [name]!" boilerplate: select-all-delete
+  first. Migrations are still applied by hand in the SQL editor (no `SUPABASE_DB_PASSWORD` in CI).
 - **Anthropic key:** rotated by the founder; the live secret lives only in Supabase Edge Functions →
   Secrets → `ANTHROPIC_API_KEY`.
 - Bundle carries supabase-js; the writing path is code-split.
@@ -117,3 +121,8 @@ and "Post-deploy GitHub housekeeping"). The load-bearing facts:
   origin/main` → `git push --force-with-lease`) so it doesn't diverge and conflict on the next PR.
 - The sandbox can't reach the live `*.github.io` site, the Actions tab, or run Docker — live
   verification (Pages deploy, Supabase) is handed to the founder.
+- **`main` is protected by a GitHub branch ruleset (founder-created 2026-07-24, s162):** targets
+  the default branch; restrict deletions + block force pushes; NO required PR approvals and no
+  required status checks, so the approved auto-ship squash-merge flow is unaffected. Session
+  branches are not targeted; force-with-lease pushes to them stay routine. Don't add required
+  approvals without a founder decision (it would block self-merged PRs).

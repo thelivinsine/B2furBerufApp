@@ -19,6 +19,17 @@ const buttonVariants = cva(
           "bg-muted text-foreground hover:bg-muted/70",
         outline:
           "border border-border bg-surface/50 hover:bg-muted/60 hover:border-border",
+        // Himmelblau tile as a button (s166): the panel toggles on Schreiben
+        // ("Grammatik", "Aufgabe wählen") wear the fill of the accent rail they
+        // open, because `outline`'s half-transparent fill made them disappear
+        // into the ground. One step stronger than the rails themselves so a
+        // 40px control still reads. NO visible edge (founder s169): the border
+        // carries the same colour as the fill and the lift comes from
+        // `shadow-soft`, exactly like the rails this opens and the Bibliothek
+        // cards. Label contrast is unchanged (accent-ink on accent/35):
+        // 4.72:1 light, 7.71:1 dark.
+        accent:
+          "border border-accent/35 bg-accent/35 text-accent-ink shadow-soft hover:border-accent/50 hover:bg-accent/50 dark:border-accent/[0.18] dark:bg-accent/[0.18] dark:hover:border-accent/[0.28] dark:hover:bg-accent/[0.28]",
         ghost: "hover:bg-muted/60",
         success: "bg-success text-success-foreground hover:bg-success/90",
         warning: "bg-warning text-warning-foreground hover:bg-warning/90",

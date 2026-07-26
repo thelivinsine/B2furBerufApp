@@ -127,8 +127,14 @@ const config: Config = {
         // the card and deepens toward the screen edges (a subtle spotlight). Uses
         // the cool-slate `--shadow` token instead of flat black, so it adapts to
         // dark mode automatically. No blur.
+        // Deepened 0.30/0.62 -> 0.48/0.76 (founder s169: "the pop up window
+        // doesn't have any contrast with the background"). A white card on a
+        // near-white page needs the BACKDROP to define it: `shadow-elevated-soft`
+        // is invisible over a dark wash, so the separation has to come from here.
+        // Kept as one token rather than a per-dialog override, so every dialog in
+        // the app reads the same.
         "dialog-overlay":
-          "radial-gradient(120% 120% at 50% 45%, hsl(var(--shadow) / 0.30), hsl(var(--shadow) / 0.62))",
+          "radial-gradient(120% 120% at 50% 45%, hsl(var(--shadow) / 0.48), hsl(var(--shadow) / 0.76))",
       },
       keyframes: {
         "fade-in": {

@@ -79,10 +79,10 @@ const VOCAB_COLUMNS: DataColumn<VocabItem>[] = [
     cell: (v) => {
       const gender = genderOf(v);
       return (
-        <div className="flex min-w-0 items-center gap-1">
-          {gender && <Wesen gender={gender} size={16} />}
-          <span className="font-semibold">{v.de}</span>
-          <SpeakButton text={v.de} />
+        <div className="flex min-w-0 items-center gap-2">
+          {gender && <Wesen gender={gender} size={16} className="shrink-0" />}
+          <span className="min-w-0 font-semibold">{v.de}</span>
+          <SpeakButton text={v.de} className="ml-auto shrink-0" />
         </div>
       );
     },

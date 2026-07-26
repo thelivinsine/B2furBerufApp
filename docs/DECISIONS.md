@@ -415,7 +415,11 @@ shipped (PRs #679-#683):
 1. **Schreiben = Federspitze (pick E).** A fountain-pen nib in brand blue with neon-cyan breather
    hole + slit. The route accent moved rose → brand blue `#3D74ED` WITH the mark: the founder
    explicitly wanted "similar colors as other icons, not red". Feather/quill and upright-pen
-   alternates were rejected in favor of the nib.
+   alternates were rejected in favor of the nib. **Superseded s170 (pick AB): a pencil on the
+   diagonal**, blue body + neon-cyan tip, same accent. Twelve of the marks proposed across s158
+   and s170 were pens and all of them stood upright; round 4 offered a sheet-with-pen, a pilcrow,
+   a clipboard and this one. The diagonal is the only slanted silhouette in the bar, so it is
+   found without learning a new shape.
 2. **Praktisch = Wegweiser (pick I).** Two direction boards on a post (blue + cyan), replacing the
    compass but keeping its "finding your way in real life" motif as a solid upright silhouette.
    Stadt, Zuhause and Route alternates rejected.
@@ -435,42 +439,339 @@ next to the already-picked marks (the founder judges the future bar, not a lone 
 variant letters across rounds (A-T) so picks stay unambiguous, and keep all marks two-tone with a
 neon-cyan companion on the 20x20 grid with `NORM` optical normalisation.
 
-## Session 160 (2026-07-26) — Verlauf + Fortschritt redesign
+## Schreiben AI-disclaimer relocated + "Feedback" pill label (session 160, 2026-07-24) — founder-requested
 
-Preview-first round on the two surfaces that had almost no recorded founder direction (the entire
-prior record was "except the verlauf - I want to rework it", s155, and "Redesign fortschritt section
-- it's chaotic at the moment", s105). Three variants each
-(`preview/verlauf-fortschritt-redesign.html`); the founder picked **C** and **3**.
+Founder, verbatim across two prompts: move the Fokus KI-Hinweis "to be horizontally in-line with
+feedback button for the computer view ... for mobile view ... condensed as much as possible and
+reside below the auswerten button ... with just 'Mehr'"; then, correcting round 1's bordered bar:
+"I like the floating button as before and the text should just be moved downwards to the horizontal
+level of the feedback button ... For mobile view ... bring the feedback button next to the auswerten
+button. Both the buttons should be floating not in a separate section along with the short text below
+the buttons." Follow-up: "kurz and lang should also have same design. Also, for the floating button
+'Mit KI gebaut · Feedback' - make it just 'Feedback' with an icon ... Do this across the app".
 
-1. **Verlauf = "Entwicklung zuerst" (pick C).** The tab leads with a development card (per-category
-   monthly bars + trend arrows + a "X % weniger" badge) over a COMPACT row list. Rejected: A
-   "Korrekturkarten" (correction-first cards) and B "Archiv mit Filter-Rail" (Bibliothek-style rail +
-   month groups). A's premise, showing the actual correction, remains the top follow-up but needs a
-   schema migration; C was implementable against today's data without faking anything.
-2. **Fortschritt = "Kompetenzkurve" (pick 3).** A curve of mastered words / Can-Dos over time becomes
-   the headline; XP moves down into Details. Rationale: XP measures effort and DIPS in a quiet week,
-   which a plateau learner reads as regression, while mastered-words only goes up (the LingQ
-   known-words lesson). Rejected: 1 "Prüfungs-Cockpit" (full exam block with readiness bars per
-   pillar) and 2 "Diagnose zuerst" (weakness tiles as the hero). Both contributed pieces: the exam
-   countdown card and the writing-aware diagnosis shipped in compact form.
+Decisions:
+1. **The Schreiben Art. 50 disclaimer is now bottom-anchored, not centered-in-flow.** On desktop it
+   is a `fixed bottom-4` line level with the floating Feedback pill (no bordered bar); on mobile it
+   is a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line under the floating action buttons.
+   This **explicitly overrides** the general design guideline that disclaimers sit "centered in
+   normal flow (not bottom-pinned)" (`design` skill §2.6) — but ONLY for the Schreiben trainers
+   (Fokus + Kurz/Lang). The earlier "bottom-pinning was tried and reverted" note (s151) is
+   superseded here by direct founder instruction; do NOT re-center these two.
+2. **Round 1 (a bordered bottom bar holding text + pill) was rejected.** Keep the existing floating
+   pill untouched; only the text drops to its level. No separate section/border.
+3. **Mobile action bars in Schreiben lose their bar chrome.** The Feedback icon button floats beside
+   Auswerten/Korrigieren (both squircle), condensed note beneath. Applies to both trainers.
+4. **The feedback affordance label is shortened to "Feedback" app-wide** (was "Mit KI gebaut ·
+   Feedback"): pill default, in-session button, icon-button aria/title, admin placeholder. Icons
+   unchanged; remote-config `feedback.label` still overrides the pill.
+
+Shipped in PR #688 (squash-merged to `main`, 2026-07-24).
+
+---
+
+## Control-center comment saves reliably next to approve (session 164, 2026-07-24)
+
+**Prompt (verbatim):** "In the control center, if I write a comment and then reject or approve, are
+the comments being saved? it's unclear" → then "do both" (fix + run `pnpm apply:reviews`).
+
+**Finding.** The `/sources/werkbank` workbench row exposes only a verified **checkbox** (= the
+`approve` decision) and a **Notiz** text field. There is **no reject / needs_fix control** in the UI,
+even though the `ReviewDecision` type supports them. The note commits on blur/Enter; the checkbox
+saves separately. Both went through `useWorkbench.onChange` (`src/features/legal/Sources.tsx`), which
+read its base row from the memoized `reviews` snapshot and `upsert`ed the WHOLE row. Typing a note
+and then ticking approve fired two writes off the same stale base, so the approve write (carrying the
+pre-note empty comment) overwrote the note, in local state and in Supabase.
+
+**Decisions.**
+1. **`onChange` merges from an always-latest `reviewsRef`, not the memo closure**, and pushes the ref
+   forward on a successful save, so a sibling write already sees the committed row.
+2. **Writes are serialised per `content_id`** via a `writeChains` promise map: back-to-back edits to
+   one row run strictly in order, so the approve write merges on top of the note write's result
+   (and vice-versa). Neither field can clobber the other regardless of blur/click ordering.
+3. **Row-level call sites stay unchanged** (`AdminWorkbench.tsx` still sends `{ verified }` and
+   `{ comment }` separately) so the pinned `onChange(id, { verified: true })` test contract holds.
+4. **A real reject/needs_fix control was NOT added** in this pass (would be a design change needing a
+   founder-reviewed preview); logged as a follow-up. Today "reject" is not expressible in the UI.
+
+---
+
+## Review harmonised into the Control Center (session 164, 2026-07-24)
+
+**Prompts (verbatim):** "Can you merge and harmonize the source list with checkboxes page in sources
+page by bringing it to control center? Integrate all the features from the source list page to the
+existing review page in control center. Aim for the highest quality." · "Can you add a save button
+for the Notes field - increase the notes field width if needed." · "Make sure there's no redundancy
+in the review mode/prufmodus/warteschlange page. No need of previews anymore. Implement the design
+directly and merge to main."
+
+**Context.** Founder review lived in two places: the Control Center's keyboard cockpit
+(`/admin/pruefen`) and a separate full-register table on `/sources/werkbank`. A preview offered two
+integration layouts; the founder picked **Variant A — two areas**.
+
+**Decisions.**
+1. **One Prüfen page, two segments.** `/admin/pruefen` heads with a two-segment sliding-pill switcher
+   (`useSlidingPill`, the locked mechanism — no per-segment `layoutId`): **Warteschlange** (priority
+   queue + keyboard cockpit) and **Alle Inhalte** (the full `AdminWorkbench` table). `?view=table`
+   deep-links the table. `/sources/werkbank` is **retired**; `/sources` links admins into the
+   Control Center instead.
+2. **One shared review store.** `useWorkbench` was extracted to
+   `src/features/legal/useWorkbench.ts`, exported, and is now the single review state behind BOTH the
+   cockpit and the table — a decision in one shows in the other. `onChange` is decision-centric
+   (`approve` / `reject` / `needs_fix` / null-to-clear) and serialised per content_id.
+3. **Reject in the table + a note Save button.** The table cell replaced the approve-only checkbox
+   with a segmented **Freigeben / Ablehnen** control (reject was previously impossible in the table),
+   widened the note field, and added an explicit **Save button** that appears once the note is edited
+   (still saves on blur/Enter). The button appears only when dirty, so it never sits disabled at rest
+   (the "no dead controls at default" rule).
+4. **No redundancy on the queue page.** Dropped the description sentence under the "Prüfen" header
+   and the duplicated open-count; the as-of date appears once (preview-list caption), the open count
+   once (start card).
+
+## s166 — The mobile floating action cluster on Schreiben (opacity is the contract, not a bar)
+
+**Prompts (verbatim):** "[screenshot] there's a button overlap issue here. Fix it." · "make sure the
+fixes are applied across the app" · "increase the contrast of the grammatik and aufgabe wahlen
+buttons in schreiben section." · "no need of a new preview. Refer to the previous designs and take my
+preference into account"
+
+**Context.** The founder's screenshot of `/writing` (Lang, mobile, dark) showed the Feedback pill,
+the Auswerten button and the card's "Noch N Wörter schreiben …" hint all drawn on top of each other.
+The cluster is `sticky` and carries **no bar chrome** by the s159/s160 decision, so it floats
+straight over the content cards — that part is not the bug and was not touched.
+
+**Decisions.**
+1. **The no-bar-chrome rule stands; opacity becomes its contract.** Because there is no bar, nothing
+   in the cluster may be see-through. `src/features/writing/floatingCluster.ts` holds the two class
+   names: `floatingSlot` (opaque `bg-background` behind each control) and `floatingNote`
+   (`bg-background/90` + `backdrop-blur-sm` behind the caption, the same treatment the four other
+   mobile bars use). `--background` equals the page stops, so both are invisible against the page
+   ground and only mask where they float over a card. This is what makes the founder-approved
+   chrome-less look survivable — do not "fix" a future overlap by re-adding a bar.
+2. **Transient hint lines ride the cluster, never the card tail.** The "Noch N Wörter …" line is the
+   honest reason the primary button is inactive, and a card-tail line lands exactly under the pinned
+   cluster. It now shares the cluster's single caption slot with the Art. 50 note: hint while the
+   text is too short, note once prüfen/auswerten is possible, never both. The card keeps the hint on
+   `lg:` only, where there is no cluster. Bottom padding was considered and rejected: a bottom-pinned
+   sticky element floats over content at every scroll position except the very end.
+3. **The panel toggles wear the rail's Himmelblau.** "Aufgabe wählen" and "Grammatik" were the shared
+   `outline` variant, whose `bg-surface/50` fill reads as a ghost on the page ground. Closed, they now
+   use a new **`accent` Button variant** (the tile language of the rail each one opens, per the s149
+   "Schreiben rails are Himmelblau, never grey" rule); open, they keep the solid `default`, so the
+   open/closed distinction survives. Brand blue was rejected: the Auswerten/Korrigieren CTA sits in
+   the same viewport and a second blue control would compete with it.
+4. ~~**A Himmelblau border needs `accent-ink` in light mode.**~~ **SUPERSEDED by s168 below**, which
+   removed accent borders altogether. Kept for the measurement, which still holds: `--accent` is a
+   77%-light sky, so NO alpha of it clears the 3:1 UI-component floor against the near-white light
+   ground (1.31:1); `accent-ink/70` reached 3.07:1. The s168 answer was simpler — stop outlining in
+   accent at all.
+
+## s168 — Schreiben on mobile: pinned chrome, measured heights, and the Fokus dial tile (2026-07-26) — founder-approved
+
+**Context.** Three founder reports in one session, all on `/writing` on a phone: the action buttons
+drifted up and down between modes and tasks; the writing field left dead space or overflowed; and
+the sentence-transform feature, which IS the Satzlabor, went undiscovered.
+
+**Decisions.**
+1. **Bottom chrome is `fixed`, not `sticky`.** A sticky element only sticks once the page actually
+   scrolls, so whenever the content fit the viewport the cluster parked at the END of the content —
+   a different height in Kurz than in Lang, moving with every Aufgabe. Fixed pins it once and for
+   all; the trainer carries the matching clearance instead. Applies to Kurz/Lang and Fokus alike.
+   The KI-Hinweis line is fixed on its own, locked just above the nav in every state.
+2. **All fixed mobile chrome is portalled to `<body>`.** WritingHub slides tab panels with an `x`
+   transform, and a transformed ancestor becomes the containing block for its `fixed` descendants,
+   so without the portal every pinned layer re-anchors to the panel mid-slide and any measurement
+   reads the wrong reserve on mount. This is a general trap, not a Schreiben quirk.
+3. **Heights are measured in JS (`useFillEditor`), not expressed as a `dvh`/flex chain.** The
+   trainer sits inside AppShell → WritingHub → AnimatePresence, none of them height-constrained;
+   constraining them would have changed every other Schreiben surface. The hook fills to the bottom
+   chrome at rest, grows with the text, then scrolls internally.
+4. **When space runs out, the AUFGABE gives way, not the page.** A long Aufgabe (Inhaltspunkte) can
+   exceed half a phone screen. Rather than shrinking the writing field to an unusable slot or
+   scrolling the whole page, the card's prompt region caps by exactly the shortfall and scrolls
+   internally, with the eyebrow + dice row always visible. Floors on both sides (field 160px / 22%
+   of viewport, card region 96px) mean sub-660px viewports still page-scroll a little; that is
+   structural and accepted.
+5. **Desktop caps the resting field height; mobile does not.** Filling a tall desktop window read as
+   "one giant empty box" (founder). Kurz = max(176px, 22% of viewport), Lang = max(252px, 32%), so
+   the two modes read as different sizes and neither reaches the bottom chrome. On mobile the space
+   is genuinely scarce, so it still fills.
+6. **The accent is a FILL, never an outline.** Every filter/selection rail and the button that opens
+   it wears the neutral `border` token; the Himmelblau fill is untouched. A blue wash inside a blue
+   edge read as too loud, and this is the same edge the Bibliothek FilterRail and every card already
+   use. Supersedes the s166 `accent-ink/70` workaround entirely. Fix tiles and Verlauf detail tiles
+   keep their accent edge on purpose: they are content, not rails.
+7. **The Fokus transform feature is a FLOW STEP, not a filter — so its controls live on the
+   sentence.** This was the whole diagnosis, reached only after a first preview round was rejected.
+   The old mobile UI put a "Grammatik" toggle exactly where Kurz/Lang put "Aufgabe wählen", so
+   learners read it as a filter and never opened it. Moving that same panel elsewhere (preview round
+   1) did not help, because a pill panel still reads as settings. The shipped answer: a **Himmelblau
+   dial tile below the sentence card**, one dial per grammar axis, each showing what the sentence
+   currently IS (green dot = detected form) and opening a picker to change it. Every corrected
+   sentence therefore arrives already classified, which teaches the taxonomy as a side effect.
+8. **The transformed sentence appears where the correction does, behind a third view segment.**
+   Original / Korrigiert / **Umgeformt** on one centered toggle; the separate transform card is
+   desktop-only now. "Neu" (not "Neuer Satz") sits in the card's top-right corner, the same spot
+   Kurz/Lang use for the dice. Corrections render as two text columns with a vertical separator —
+   **no chip backgrounds on mobile** (founder amendment), colors and formatting kept.
+
+**Rejected along the way (four preview rounds; do not reintroduce):** moving the Grammatik panel
+below the field but keeping it a panel, whether it expanded in-page or as a pop-up (round 1, both
+rejected); renaming the feature "Satz umformen" (round 2 proposal, founder kept "Grammatik");
+one-tap action chips (`→ Passiv`), which break as soon as forms combine; a transformation timeline
+that stacks a card per attempt (re-introduces page scroll by design); the dials in the bottom thumb
+slot (best ergonomics, but four floating controls with no bar behind them); and a deep navy "stage"
+panel for the Grammatik tile, which would have been the app's only dark surface in light mode.
+
+## s169 — Schreiben follow-up: no resting scroll, one bottom-chrome geometry, edgeless rails (2026-07-26) — founder-requested
+
+**Context.** The founder reviewed the shipped s168 rework on a phone and sent an eight-point list.
+Two points were bugs (a persistent page scroll on all three trainers; the action buttons jumping
+between Fokus and Kurz/Lang), the rest were finishing work on the Fokus sentence tile and the rails.
+
+**Decisions.**
+1. **A freshly opened page never scrolls, and the elastic element pays for it.** `useFillEditor`
+   handed the writing field its floor (`max(160px, 22vh)`) even when the screen did not have the
+   room, which is exactly where the ~60px of resting scroll came from: the floor was written as a
+   guarantee when it is only a preference. Order of concession is now Aufgabe card (its prompt
+   region caps + scrolls internally, down to 72px) → field (down to `HARD_MIN` 72px) → page scroll,
+   and in practice the page never gets there on a 360x740 screen or larger. Typing grows the field
+   again immediately, so a short resting field costs nothing.
+2. **Fokus's tile column gets a fixed `height` before a correction, a `minHeight` after.** A minimum
+   alone let the tiles' natural height win: on a narrow phone the dial row wraps and the legend runs
+   to three lines, and the column silently outgrew the screen. A fixed height forces the writing
+   field to absorb it. After a correction it must be a minimum again, because a long list of fixes
+   has to be able to grow the page. Verified headless from 320x568 to 412x915 with and without
+   simulated safe-area insets.
+3. **The three trainers share ONE bottom-chrome geometry.** Both clusters sit at
+   `bottom-[calc(nav + safe-area + 2rem)]` and both carry the KI line as a separately fixed line at
+   `+0.5rem`. Kurz/Lang used to keep its note INSIDE the cluster, which pushed its buttons ~13px
+   below the Fokus ones; that difference was visible as a jump on every tab switch. The lift came
+   down from 2.5rem to 2rem to pay for the extra reservation this costs Kurz/Lang.
+4. **The "Noch N Wörter" hint belongs in the card being typed in, under the umlaut keys.** This
+   reverses the s168 rule that parked transient hints in the cluster's caption slot. Two reasons:
+   the slot's job is the Art. 50 note, and a bottom line that swaps content between states reads as
+   chrome that cannot be trusted; and the original hazard (a card-tail line landing under the pinned
+   cluster) is gone now that the cluster sits 2rem higher and the field is sized to end above it.
+5. **The rails have no visible edge at all.** Third and final answer after an accent edge (s166) and
+   a neutral grey one (s168): the border wears the fill's own colour and `shadow-soft` does the
+   separating, exactly like the Bibliothek word cards the founder pointed at. Inner dividers are
+   tinted to match, so no hard grey line survives. Applies to `WritingRail`, `GrammarRail`,
+   `GrammarDials` and the `accent` button variant that opens them. Label contrast is untouched
+   (4.72:1 light / 7.71:1 dark), so this is a pure edge change.
+6. **The Fokus sentence tile is two stacked regions.** Sentence centered in a `flex-1` region, the
+   detail block anchored under it. One centered group put all its slack above the sentence, which
+   the founder read as "more space before the sentence than after". The horizontal rule under the
+   sentence is gone with it: the gap separates them.
+7. **The correction separator is one full-height rule, not a per-cell border.** With three fixes the
+   per-cell `border-l` stopped after row 1 and looked broken. An absolutely-positioned
+   `inset-y-0 left-1/2` line spans whatever the grid ends up being. The eyebrow also hugs its own
+   fix now (`mb-0.5`) while the row gap widened (`gap-y-5`), so each category + edit reads as one
+   unit rather than an evenly spaced list.
+8. **Waiting is shown in the tile the answer will appear in.** A skeleton of three tapering rounded
+   bars with a slow Himmelblau sweep (`.fx-skeleton-bar`, reduced-motion safe) replaces the sentence
+   line while the KI works, during both the correction and a transform. The spinning dial and the
+   "Wird geprüft …" button label were the only signals before, and the founder did not read them as
+   "something is happening".
+
+## s169 follow-up — the Grammatik legend, the Aufgabe pop-up, and the shuffle button (2026-07-26) — founder-requested
+
+1. **The Grammatik tile's legend sits at the tile's foot.** Dials centered in the room above,
+   legend on the bottom edge. Same two-region split as the Fokus sentence card, so the two tiles
+   rhyme instead of each centering their own contents.
+2. **The Aufgabe card gets an expand button that opens the task in a pop-up.** This is the
+   consequence of the s168/s169 capping rule: the card is deliberately capped so the page fits one
+   viewport, which means a long Aufgabe gets cut mid-line, so there has to be one place that shows
+   all of it. The founder pointed at the round-1 Fokus preview's "Variante A" as the reference: the
+   app's standard centered dialog, soft darkening, no blur, explicitly NOT a bottom sheet (the
+   retired "Mehr" sheet is on the landmine list). The pop-up repeats the card's eyebrow and Ziel
+   line so it reads as the same object, not a new surface.
+3. **Shuffle replaces the dice, and neither icon button wears a box.** A border around a 40px icon
+   inside a card competed with the card's own edge; the hover tint is affordance enough, and it
+   matches the rail header icons. The shuffle glyph is point-symmetric, so the existing half-turn
+   per roll still reads as motion and settles back into the same shape.
+
+## s169 second follow-up — button order and a dialog backdrop that actually separates (2026-07-26) — founder-requested
+
+1. **Shuffle left, expand right** on the Aufgabe card. Founder's order. It also happens to be the
+   defensible one: the button that CHANGES the task keeps away from the card's outer corner, the one
+   that only opens it takes the corner.
+2. **The dialog backdrop deepened from 0.30/0.62 to 0.48/0.76.** Founder: "the pop up window doesn't
+   have any contrast with the background." Measured in the running app rather than judged by eye: a
+   white card on the near-white page ground came out at **1.9:1** against the old backdrop, because
+   the card's `shadow-elevated-soft` (2.4% and 6% alpha) is invisible over a dark wash, so the
+   backdrop is the ONLY thing defining the card. 0.48 puts it at **3.3:1**, clear of the 3:1 UI
+   floor, and dark mode stays comfortable (its `--shadow` is near-black, and the 18%-L card still
+   separates). Changed on the shared `bg-dialog-overlay` token, never per dialog: the locked recipe
+   exists so every dialog in the app reads the same, and a one-off override here would be exactly
+   the parallel style rule zero forbids.
+
+## s170 — Praktisch toggle joins the squircle language; Bibliothek icon reverted; Fortschritt gets the Pokal (2026-07-26) — founder-requested
+
+1. **The Trainieren/Spielen toggle now uses the same squircle-track + sliding-pill mechanism as
+   `LibrarySwitcher`/`WritingModeSwitcher`**, in place of the older `rounded-full` track with a
+   per-button `bg-surface` flag. Track `rounded-lg`, pill `rounded-md`, `useSlidingPill` measures
+   the active segment so the white pill glides on a transform instead of two buttons independently
+   flipping their background. Kept content-sized (`w-fit`, centered) rather than stretched full
+   width: it is a two-segment toggle, and the landmine against full-width switchers (s149) was about
+   a four-label row, not this one. The section-tinted icon + label on the active segment (blue
+   Dumbbell / orange Play) is untouched, since that pairing is the Praktisch-specific part of this
+   control, not the part the founder asked to change.
+2. **Bibliothek's route icon reverts to the pre-s158 "stack of three books"** (`route-icons.tsx`,
+   founder request): same geometry and colours as the mark shipped before the s158 "closed book +
+   bookmark ribbon" pick replaced it. Restored verbatim from git history (`997e8a0`), including its
+   `NORM` bounding box, rather than redrawn, so the optical size matches exactly what shipped then.
+3. **Fortschritt's route icon becomes the "Pokal" (trophy/cup)**, option **T** from the session-158
+   icon-preview batch (`preview/fortschritt-icon-vorschlaege.html`) that the founder did not pick at
+   the time (S "Ring" won instead). Same mark, same `#0ea5e9` route colour, ported verbatim into
+   `route-icons.tsx` with its own `NORM` box rather than reusing the Ring's. The progress-ring mark
+   it replaces is not otherwise used elsewhere in the app, so nothing else needed a corresponding
+   change.
+- All three are direct, unambiguous ports of already-approved designs (an existing shipped
+  component's toggle language; a previously-shipped icon; a previously-drawn-but-unpicked icon
+  option), so this shipped without a new preview round. Verified in headless Chromium at 390×844
+  (bottom tab bar, both new icons in their active and inactive states) and at 1280×900 (desktop
+  Sidebar + the toggle), plus the full gate list.
+
+## Session 171 (2026-07-26) — Verlauf + Fortschritt redesign
+
+Preview-first round on the two surfaces with almost no recorded founder direction (the whole prior
+record was "except the verlauf - I want to rework it", s155, and "Redesign fortschritt section - it's
+chaotic at the moment", s105). Three variants each in
+`preview/verlauf-fortschritt-redesign.html`; the founder picked **C** and **3**.
+
+1. **Verlauf = "Entwicklung zuerst" (pick C).** A development card (per-category monthly bars, trend
+   arrows, "X % weniger" badge) leads, over a COMPACT row list. Rejected: A "Korrekturkarten"
+   (correction-first cards) and B "Archiv mit Filter-Rail" (rail + month groups). A's premise, showing
+   the real correction, is still the top follow-up but needs a schema migration; C shipped against
+   today's data without faking anything.
+2. **Fortschritt = "Kompetenzkurve" (pick 3).** Mastered words / Can-Dos over time became the
+   headline and XP moved into Details: XP measures effort and DIPS in a quiet week, which a plateau
+   learner reads as regression, while mastered-words only rises (the LingQ known-words lesson).
+   Rejected: 1 "Prüfungs-Cockpit" (full readiness bars per pillar) and 2 "Diagnose zuerst" (weakness
+   tiles as hero) — though both donated pieces: the exam countdown and the writing-aware diagnosis
+   shipped in compact form.
 3. **Competence history is sampled, never reconstructed.** FSRS keeps only current card state, so
-   "am I getting better" cannot be derived retroactively. Rejected approach: dating each mastered
-   card by its `lastReview` — a word mastered in May but reviewed yesterday would be dated yesterday,
-   producing a fake hockey stick. Instead `masteryHistory` samples daily (Analytics on view, session
-   end via `lib/competence.ts`), the card degrades to a plain number under two samples, and
-   pre-existing milestones carry `SEEDED_MILESTONE` so they are never drawn as "reached today".
-4. **A trend needs a comparable month.** `MIN_TEXTS_PER_MONTH = 2`: comparing against a month with a
+   "am I getting better" cannot be derived retroactively. Rejected: dating each mastered card by its
+   `lastReview`, which would date a word mastered in May but reviewed yesterday as yesterday and fake
+   a hockey stick. Instead `masteryHistory` samples daily (Analytics on view, session end via
+   `lib/competence.ts`), the card degrades to a plain number under two samples, and pre-existing
+   milestones carry `SEEDED_MILESTONE` so they never plot as "reached today".
+4. **A trend needs a comparable month.** `MIN_TEXTS_PER_MONTH = 2`. Comparing against a month with a
    single text made an improving category (June 3 -> July 2) render as WORSENING in the first live
-   check. Months without texts print "-", never 0, because no writing is not the same as no mistakes.
+   check. Months without texts print "-", never 0: no writing is not the same as no mistakes.
 5. **One weakness ranking, one home.** The duplicated writing-weakness panel in Fortschritt's Details
-   (fed 60 entries against Verlauf's 30, so the two pages could name different top weaknesses) was
-   deleted; the aggregate lives in the Diagnose card, and the per-text artifacts live in Verlauf.
+   (60 entries against Verlauf's 30, so the pages could name different top weaknesses) was deleted.
+   The aggregate lives in the Diagnose card; the per-text artifacts live in Verlauf.
 6. **The Kompetenz card owns direction, not the count.** Its footer states only "+16 Wörter diese
-   Woche"; the absolute number already rides the Vokabeln tile and the Kompetenzen badge. This
-   deviates from the approved preview (which showed both) in service of the no-redundancy rule.
+   Woche"; the absolute number already rides the Vokabeln tile and the Kompetenzen badge. A deliberate
+   deviation from the approved preview (which printed both) in service of the no-redundancy rule.
 7. **The Fokus filter segment was deliberately omitted** from Verlauf's Kurz/Lang switcher: Fokus
    persists nothing yet, so shipping the segment would have shipped a dead control.
+8. **Verlauf's disclosure reads in event order:** Aufgabe (s167 `task_id`) -> Dein Text -> Tipp, with
+   the Tipp deliberately adjacent to the practice CTA. The tip used to sit outside the disclosure and
+   always visible; in a compact list the weakness chip carries that signal in the collapsed row.
 
-Method note: the two defects in item 4 and a label/arrow layout bug were only caught by seeding a
-demo state and screenshotting the REAL pages (light + dark + expanded row), not the static mockup.
-Worth repeating: verify in the app, not only in the preview.
+Method note: items 4 and the label/arrow layout bug were caught ONLY by seeding a demo state and
+screenshotting the REAL pages (light + dark + expanded row), not the static mockup. Verify in the
+app, not only in the preview.

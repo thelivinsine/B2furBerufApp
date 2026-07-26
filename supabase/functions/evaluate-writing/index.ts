@@ -17,7 +17,8 @@
 //   LANGUAGETOOL_API_URL     (optional, defaults to public api)
 //   LANGUAGETOOL_API_KEY     (optional, for hosted/premium)
 //   LANGUAGETOOL_USERNAME    (optional, for hosted/premium)
-//   DAILY_LIMIT              (optional, default 5)
+//   DAILY_LIMIT_SHORT        (optional, default 4)  Kurz-Auswertungen pro Tag
+//   DAILY_LIMIT_LONG         (optional, default 2)  Lang-Auswertungen pro Tag
 //   MONTHLY_SPEND_CAP_USD    (optional, default 5)
 // SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 // ---------------------------------------------------------------------------
@@ -64,6 +65,7 @@ function corsHeaders(origin: string): Record<string, string> {
 }
 
 type Weakness =
+  | "taskCompletion"
   | "verbPosition"
   | "cases"
   | "vocabularyRange"
@@ -75,11 +77,17 @@ type Weakness =
   | "spelling";
 
 const VALID_WEAKNESS: Weakness[] = [
+  "taskCompletion",
   "verbPosition", "cases", "vocabularyRange", "cohesion", "relativeClauses",
   "daWords", "collocations", "register", "spelling",
 ];
 
-const DAILY_LIMIT = Number(Deno.env.get("DAILY_LIMIT") ?? "5");
+// Per-MODE daily allowances (founder s167). Kurz and Lang cost very different
+// amounts of model output, so they get separate budgets instead of one shared
+// counter: a learner who spends the day on Kurz can no longer exhaust their
+// Lang allowance, and vice versa. Counted per length against writing_evaluations.
+const DAILY_LIMIT_SHORT = Number(Deno.env.get("DAILY_LIMIT_SHORT") ?? "4");
+const DAILY_LIMIT_LONG = Number(Deno.env.get("DAILY_LIMIT_LONG") ?? "2");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 // Per-user monthly call ceiling so a single account (or bot-farmed guest)
 // can't drain the shared global $ budget and lock everyone else out.
@@ -98,9 +106,16 @@ const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
 // `json` is defined inside the request handler (see Deno.serve) so every
 // response carries the correct per-request CORS headers.
 
-/** Stable hash of normalized text for the dedup cache. */
-async function hashText(text: string): Promise<string> {
-  const norm = text.trim().toLowerCase().replace(/\s+/g, " ");
+/**
+ * Stable hash of the normalized text PLUS the task identity (s167). The task
+ * now shapes the prompt, so keying on the text alone would hand back a verdict
+ * produced for a different Aufgabe. `taskKey` folds in the task id and the
+ * level, and PROMPT_REV invalidates every entry when the rubric changes.
+ */
+const PROMPT_REV = "s167.1";
+async function hashText(text: string, taskKey = ""): Promise<string> {
+  const norm =
+    `${PROMPT_REV}|${taskKey}|` + text.trim().toLowerCase().replace(/\s+/g, " ");
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(norm));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
@@ -164,18 +179,95 @@ const TEMPLATED: Record<string, { weakness: Weakness; insight: string }> = {
 
 /* -------------------------------- LLM calls ------------------------------- */
 
-const SYSTEM_PROMPT =
-  `Du bist Prüfer:in für Goethe/telc "Deutsch B2 Beruf". Du bewertest einen kurzen ` +
-  `deutschen Text aus dem Berufskontext. Nenne NUR die EINE wichtigste Schwachstelle ` +
-  `(die mit dem größten Hebel für eine bessere Note) und gib einen kurzen, konkreten, ` +
-  `ermutigenden Tipp auf Deutsch (2–3 Sätze, Du-Form). Antworte AUSSCHLIESSLICH als JSON ` +
-  `mit den Feldern {"weakness","insight"}. "weakness" ist genau einer dieser Werte: ` +
-  VALID_WEAKNESS.join(", ") +
-  `. Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zäune und ohne ` +
-  `weiteren Text.`;
+/** Coarse label per CEFR content band, so a B1 text is not marked to a B2 bar. */
+function levelLabel(level: string | null): string {
+  if (!level) return "B2";
+  if (level.startsWith("B1")) return "B1";
+  if (level.startsWith("C1") || level.startsWith("C2")) return "C1";
+  if (level.startsWith("A")) return "A2";
+  return "B2";
+}
 
-function buildUserPrompt(text: string, lt: LtBuckets | null): string {
-  let s = `Text:\n"""${text}"""`;
+/**
+ * The rubric prompt (s167 P2). Before this the system prompt was a fixed
+ * "Prüfer:in für Deutsch B2 Beruf" string and the model never saw the Aufgabe,
+ * so it could only ever comment on language. It now grades CONTENT FIRST,
+ * mirroring how the real rubrics work: Goethe zeroes an Aufgabe whose
+ * "Erfüllung" fails, and telc grades "Berücksichtigung der Leitpunkte" by
+ * counting covered points.
+ */
+function buildSystemPrompt(level: string | null, hasTask: boolean): string {
+  const lv = levelLabel(level);
+  let s =
+    `Du bist Prüfer:in für Deutsch als Fremdsprache und bewertest einen Text auf Niveau ${lv}. ` +
+    `Bewerte streng auf ${lv}-Niveau: markiere nichts als Schwäche, was auf ${lv} noch normal ist, ` +
+    `und beschönige nichts, was auf ${lv} erwartet wird. `;
+  if (hasTask) {
+    s +=
+      `Du bekommst die AUFGABE mit ihren Inhaltspunkten und den Text der lernenden Person. ` +
+      `Prüfe ZUERST die Aufgabenerfüllung: Ist jeder Inhaltspunkt inhaltlich bearbeitet? ` +
+      `Stimmen Anrede und Anredeform (du/Sie) zum genannten Adressaten? Ist die Länge ungefähr erreicht? ` +
+      `Wenn ein Inhaltspunkt fehlt, die Anredeform falsch ist oder der Text deutlich zu kurz ist, ` +
+      `ist "taskCompletion" die wichtigste Schwachstelle und dein Tipp benennt konkret, WAS fehlt ` +
+      `(z. B. welcher Inhaltspunkt). Erst wenn die Aufgabe erfüllt ist, nenne die wichtigste ` +
+      `sprachliche Schwachstelle. `;
+  }
+  s +=
+    `Nenne NUR die EINE wichtigste Schwachstelle (die mit dem größten Hebel) und gib einen kurzen, ` +
+    `konkreten, ermutigenden Tipp auf Deutsch (2–3 Sätze, Du-Form). ` +
+    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern {"weakness","insight"}. ` +
+    `"weakness" ist genau einer dieser Werte: ` + VALID_WEAKNESS.join(", ") +
+    `. Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zäune und ohne weiteren Text.`;
+  return s;
+}
+
+/** Learner-facing Textsorte labels. Mirrors the rail's FORMAT_GROUPS; the raw
+ *  enum value ("email_halbformell") means nothing to the model. */
+const FORMAT_LABEL: Record<string, string> = {
+  email_informell: "private E-Mail",
+  email_halbformell: "halbformelle E-Mail",
+  email_formell: "formelle E-Mail",
+  nachricht: "Kurznachricht",
+  notiz: "Notiz",
+  uebergabe: "Übergabe",
+  forumsbeitrag: "Forumsbeitrag",
+  stellungnahme: "Stellungnahme",
+  bericht: "Bericht",
+  protokoll: "Protokoll",
+  beschwerde: "Beschwerde",
+  reklamation: "Reklamation",
+  antrag: "Antrag",
+  widerspruch: "Widerspruch",
+  kuendigung: "Kündigung",
+  bewerbung: "Bewerbung",
+};
+
+interface TaskBrief {
+  task: string | null;
+  points: string[];
+  addressee?: string | null;
+  register: string | null;
+  format: string | null;
+  words: number | null;
+}
+
+function buildUserPrompt(text: string, lt: LtBuckets | null, brief?: TaskBrief): string {
+  let s = "";
+  if (brief?.task) {
+    s += `Aufgabe:\n"""${brief.task}"""\n`;
+    if (brief.points.length) {
+      s += `\nInhaltspunkte, die der Text abdecken muss:\n`;
+      s += brief.points.map((p, i) => `${i + 1}. ${p}`).join("\n") + "\n";
+    }
+    if (brief.format && FORMAT_LABEL[brief.format])
+      s += `\nTextsorte: ${FORMAT_LABEL[brief.format]}`;
+    if (brief.addressee) s += `\nAdressat: ${brief.addressee}`;
+    if (brief.register)
+      s += `\nGeforderte Anredeform: ${brief.register === "sie" ? "Sie (formell)" : "du (informell)"}`;
+    if (brief.words) s += `\nZielumfang: etwa ${brief.words} Wörter`;
+    s += `\n\n`;
+  }
+  s += `Text:\n"""${text}"""`;
   if (lt) {
     s += `\n\nLanguageTool-Hinweise: ${lt.total} Treffer ` +
       `(Rechtschreibung ${lt.spelling}, Grammatik ${lt.grammar}, Zeichensetzung ${lt.punctuation}) ` +
@@ -204,7 +296,7 @@ interface LlmOut {
   cost: number;
 }
 
-async function callAnthropic(text: string, lt: LtBuckets | null): Promise<LlmOut | null> {
+async function callAnthropic(text: string, lt: LtBuckets | null, sys: string, brief?: TaskBrief): Promise<LlmOut | null> {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) return null;
   try {
@@ -222,8 +314,8 @@ async function callAnthropic(text: string, lt: LtBuckets | null): Promise<LlmOut
         // could consume the 400-token budget and truncate the JSON. No
         // temperature is sent (removed on the Sonnet 5 / Opus 4.8 family).
         thinking: { type: "disabled" },
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: buildUserPrompt(text, lt) }],
+        system: sys,
+        messages: [{ role: "user", content: buildUserPrompt(text, lt, brief) }],
       }),
     });
     if (!res.ok) return null;
@@ -242,7 +334,7 @@ async function callAnthropic(text: string, lt: LtBuckets | null): Promise<LlmOut
   }
 }
 
-async function callGemini(text: string, lt: LtBuckets | null): Promise<LlmOut | null> {
+async function callGemini(text: string, lt: LtBuckets | null, sys: string, brief?: TaskBrief): Promise<LlmOut | null> {
   const key = Deno.env.get("GEMINI_API_KEY");
   if (!key) return null;
   try {
@@ -252,8 +344,8 @@ async function callGemini(text: string, lt: LtBuckets | null): Promise<LlmOut | 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: [{ parts: [{ text: buildUserPrompt(text, lt) }] }],
+          systemInstruction: { parts: [{ text: sys }] },
+          contents: [{ parts: [{ text: buildUserPrompt(text, lt, brief) }] }],
           // 2.5 Flash is a thinking model: force pure-JSON output and give a
           // generous budget so reasoning tokens cannot truncate the answer.
           generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
@@ -272,7 +364,7 @@ async function callGemini(text: string, lt: LtBuckets | null): Promise<LlmOut | 
   }
 }
 
-async function callOpenAI(text: string, lt: LtBuckets | null): Promise<LlmOut | null> {
+async function callOpenAI(text: string, lt: LtBuckets | null, sys: string, brief?: TaskBrief): Promise<LlmOut | null> {
   const key = Deno.env.get("OPENAI_API_KEY");
   if (!key) return null;
   try {
@@ -288,8 +380,8 @@ async function callOpenAI(text: string, lt: LtBuckets | null): Promise<LlmOut | 
         max_completion_tokens: 2048,
         reasoning_effort: "minimal",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: buildUserPrompt(text, lt) },
+          { role: "system", content: sys },
+          { role: "user", content: buildUserPrompt(text, lt, brief) },
         ],
       }),
     });
@@ -333,7 +425,19 @@ Deno.serve(async (req) => {
   // Service-role client for limit/cache/usage bookkeeping (bypasses RLS).
   const admin = createClient(supabaseUrl, serviceKey);
 
-  let body: { theme?: string; length?: string; text?: string };
+  let body: {
+    theme?: string;
+    length?: string;
+    text?: string;
+    taskId?: string;
+    task?: string;
+    points?: string[];
+    level?: string;
+    format?: string;
+    addressee?: string;
+    register?: string;
+    words?: number;
+  };
   try {
     body = await req.json();
   } catch {
@@ -349,6 +453,26 @@ Deno.serve(async (req) => {
   const length = body.length === "long" ? "long" : "short";
   const theme = body.theme ?? null;
 
+  // The Aufgabe (s167 P2). All optional: legacy tasks carry no structure, and
+  // the evaluator degrades to language-only feedback when it gets nothing.
+  // Every field is bounded before it reaches a prompt, because this is
+  // learner-supplied input on the wire, not trusted content.
+  const clip = (v: unknown, max: number) =>
+    typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null;
+  const taskId = clip(body.taskId, 64);
+  const task = clip(body.task, 600);
+  const points = Array.isArray(body.points)
+    ? body.points.map((p) => clip(p, 200)).filter((p): p is string => !!p).slice(0, 5)
+    : [];
+  const level = clip(body.level, 8);
+  const format = clip(body.format, 32);
+  const addressee = clip(body.addressee, 120);
+  const register = body.register === "du" || body.register === "sie" ? body.register : null;
+  const words =
+    typeof body.words === "number" && body.words >= 30 && body.words <= 300
+      ? Math.round(body.words)
+      : null;
+
   const month = monthKey();
 
   // (1a) Monthly auto-shutoff.
@@ -362,19 +486,22 @@ Deno.serve(async (req) => {
     });
   }
 
-  // (1b) Per-user daily limit.
+  // (1b) Per-user daily limit, SEPARATE per mode (Kurz 4 / Lang 2, s167).
+  const dailyLimit = length === "long" ? DAILY_LIMIT_LONG : DAILY_LIMIT_SHORT;
+  const modeLabel = length === "long" ? "lange" : "kurze";
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
   const { count: todayCount } = await admin
     .from("writing_evaluations")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
+    .eq("length", length)
     .gte("created_at", startOfDay.toISOString());
-  if ((todayCount ?? 0) >= DAILY_LIMIT) {
+  if ((todayCount ?? 0) >= dailyLimit) {
     return json({
       ok: false,
       limitReached: true,
-      message: `Du hast heute schon ${DAILY_LIMIT} Texte ausgewertet. Komm morgen wieder!`,
+      message: `Du hast heute schon ${dailyLimit} ${modeLabel} Texte ausgewertet. Komm morgen wieder!`,
     });
   }
 
@@ -396,8 +523,8 @@ Deno.serve(async (req) => {
     });
   }
 
-  // (2) Cache lookup by input hash.
-  const inputHash = await hashText(text);
+  // (2) Cache lookup by input hash (task-aware since s167).
+  const inputHash = await hashText(text, `${taskId ?? ""}|${level ?? ""}`);
   const { data: cachedRow } = await admin
     .from("writing_evaluations")
     .select("weakness, insight, practice_area, model")
@@ -437,7 +564,11 @@ Deno.serve(async (req) => {
   // Claude spend across ALL AI features is under budget, else GPT-5 leads.
   if (!weakness) {
     const monthIso = startOfMonth.toISOString();
-    let out = await callGemini(text, lt);
+    // The Aufgabe travels with every provider call (s167 P2), so the cascade
+    // cannot silently downgrade to language-only grading on a fallback.
+    const brief: TaskBrief = { task, points, addressee, register, format, words };
+    const sys = buildSystemPrompt(level, !!task);
+    let out = await callGemini(text, lt, sys, brief);
     if (!out) {
       const [opsRows, writRows] = await Promise.all([
         admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
@@ -446,8 +577,8 @@ Deno.serve(async (req) => {
       const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
         .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
       out = claudeSpend < CLAUDE_BUDGET_USD
-        ? (await callAnthropic(text, lt)) || (await callOpenAI(text, lt))
-        : (await callOpenAI(text, lt)) || (await callAnthropic(text, lt));
+        ? (await callAnthropic(text, lt, sys, brief)) || (await callOpenAI(text, lt, sys, brief))
+        : (await callOpenAI(text, lt, sys, brief)) || (await callAnthropic(text, lt, sys, brief));
     }
     if (!out) {
       return json({
@@ -462,7 +593,13 @@ Deno.serve(async (req) => {
   }
 
   // (6) Persist + bump global usage.
-  await admin.from("writing_evaluations").insert({
+  //
+  // `task_id` needs migration 0011. If this function is ever deployed before
+  // that migration runs, an unguarded insert would fail silently (the result is
+  // not awaited for errors elsewhere either) and the row would be lost, which
+  // would ALSO stop the daily limit counting, since the limit counts rows. So
+  // retry once without the column rather than degrade a cost guardrail.
+  const row = {
     user_id: user.id,
     theme,
     length,
@@ -474,7 +611,14 @@ Deno.serve(async (req) => {
     cached: false,
     model,
     cost_estimate: cost,
-  });
+  };
+  const { error: insertErr } = await admin
+    .from("writing_evaluations")
+    .insert({ ...row, task_id: taskId });
+  if (insertErr) {
+    console.error("writing_evaluations insert failed", insertErr.message);
+    await admin.from("writing_evaluations").insert(row);
+  }
 
   await admin.rpc("bump_ai_usage", { p_month: month, p_cost: cost }).then(
     () => {},

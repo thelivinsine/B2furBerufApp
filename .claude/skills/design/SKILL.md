@@ -63,19 +63,40 @@ Ranked by how often the founder had to correct AI output:
    switchers, filter pills (s154). Fully round stays ONLY for dots, meters, count badges, avatars,
    circular icon buttons.
 6. **Placement.** AI/legal disclaimers are standalone muted lines BELOW cards, never inside them,
-   horizontally centered in normal flow (not bottom-pinned). Primary actions sit in the same place
-   across sibling modes (sticky bottom bars on mobile everywhere).
+   horizontally centered in normal flow (not bottom-pinned) — EXCEPT the two Schreiben trainers
+   (Fokus + Kurz/Lang), where the founder moved the Art. 50 note to a fixed bottom line level with
+   the floating Feedback pill on desktop and a condensed line under the floating action buttons on
+   mobile (s160, `docs/DECISIONS.md`; do not re-center these two). Primary actions sit in the same place
+   across sibling modes (sticky bottom bars on mobile everywhere) — and "the same place" means to
+   the pixel: the three Schreiben trainers share ONE fixed-cluster offset and ONE fixed KI line,
+   because a 13px difference reads as a jump on every tab switch (s169).
 7. **Motion.** One timing family: 0.12-0.18s panels/popovers, directional tab slides ~0.16s,
    everything reduced-motion safe. Snappy, never slow. Opacity-only enter/exit on framer `layout`/
    `Reorder` elements (scale fights layout projection, locked s26).
+8. **Nothing see-through inside a chrome-less floating cluster** (s166). The two Schreiben trainers
+   float their mobile action row over the cards with no bar behind it, so every control needs an
+   opaque backing and the caption a `bg-background/90` plate (`features/writing/floatingCluster.ts`):
+   otherwise a `disabled:opacity-50` or `outline` button lets the card text bleed through and reads
+   as two labels stacked (the founder reported exactly this). Transient "you can't submit yet" hints
+   belong in that cluster's caption slot, never at the card tail, which is where the pinned row
+   parks. Never answer a future overlap here by re-adding a bar.
 
 ## 3. Color language (locked)
 
 - **Brand Nachtblau `#3D74ED`** (`--primary`): the single loud accent. Actions, active tab text,
   card-title eyebrows.
 - **Himmelblau / Himmel Soft** (`--accent`, `197 93% 77%` both themes): selection rails and accent
-  tiles (`bg-accent/20` + `border-accent/50`, dark `bg-accent/10` + `/25`), key-press flashes,
-  fix-tile chips. Schreiben-style rails are Himmelblau tiles, NEVER grey slabs.
+  tiles (`bg-accent/20`, dark `bg-accent/10`), key-press flashes, fix-tile chips. Schreiben-style
+  rails are Himmelblau tiles, NEVER grey slabs. A control that OPENS such a rail wears its color
+  too (`variant="accent"`, s166: the Schreiben "Aufgabe wählen" / "Grammatik" toggles), never brand
+  blue, which would compete with the CTA beside it.
+- **The accent is a FILL with NO visible edge** (founder s168, sharpened s169): every
+  filter/selection rail and every button that opens one borders in its OWN fill colour
+  (`border-accent/20` over `bg-accent/20`) and separates from the page by `shadow-soft` alone, the
+  same lift the Bibliothek word cards use. Inner dividers on such a tile are tinted to match
+  (`border-accent-ink/10`), never left grey. Two edges have now been tried and rejected: an accent
+  edge (s166 `accent-ink/70`, too loud) and a neutral grey one (s168, "doesn't look good" around a
+  blue wash). Fix tiles and result chips keep their accent edge: they are content, not rails.
 - **White `bg-surface` cards** for content, with `border-border` + `shadow-soft`. AI output cards
   are white, never a grey wash.
 - **Grey `bg-muted`** only as recessed chrome: the Bibliothek FilterRail tile, switcher tracks,
@@ -126,7 +147,9 @@ Ranked by how often the founder had to correct AI output:
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).
 - Modals/sheets inherit `bg-dialog-overlay` + `shadow-elevated-soft` from the shared dialog
-  primitive. No flat `bg-black/*`, no `backdrop-blur`.
+  primitive. No flat `bg-black/*`, no `backdrop-blur`. The backdrop is what separates a white card
+  from a near-white page (the soft shadow is invisible over it), so its alphas are 0.48/0.76 and
+  never overridden per dialog (s169, `docs/areas/BRAND.md`).
 
 ## 6. Per-section anchors
 
@@ -141,13 +164,13 @@ interstitial); dice re-rolls in scope; "Aufgabe: <Thema>" eyebrow bold brand blu
 once. Fokus: detected form = white pill + green dot; correction card = Original/Korrigiert toggle
 (coral marks on Original, green on Korrigiert) + Himmelblau fix tiles + "Neuer Satz" outline
 button on the tile row. Rails are Himmelblau tiles with header reset icons. **Verlauf** (picked
-s160, variant C "Entwicklung zuerst"): a "Deine Entwicklung" card leads with per-category monthly
+s171, variant C "Entwicklung zuerst"): a "Deine Entwicklung" card leads with per-category monthly
 bars + trend arrows (down = green, up = amber) and a "X % weniger" success badge, then a COMPACT
-row list (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron) whose disclosure holds
-the tip, the text, delete, and the practice CTA. A trend is only ever claimed from months with
+row list (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron) whose disclosure holds, in
+event order, the Aufgabe, Dein Text, then the Tipp beside the practice CTA. A trend is only ever claimed from months with
 ≥2 texts; months without texts print "–".
 
-**Fortschritt (`/analytics`)** (picked s160, variant 3 "Kompetenzkurve"): the Überblick block is
+**Fortschritt (`/analytics`)** (picked s171, variant 3 "Kompetenzkurve"): the Überblick block is
 unchanged; directly below it a Kompetenz curve (mastered words / Can-Dos over time, green
 milestone dots) replaces XP as the headline, XP stays in Details. Dranbleiben = Prüfung
 (countdown + last simulation, only while the exam date is ahead) + a writing-aware Diagnose +
@@ -156,9 +179,11 @@ Nächste Quest. The curve card shows the direction only; absolute counts stay on
 **Praktisch (`/`).** One centered column all breakpoints (two-column desktop was rejected);
 Üben = the soft SVG city map in a white `bg-surface` mat with neutral grey border, Spielen = the
 compact NeulandHub in the SAME mat geometry; both tiles land at the same screen position, page
-fits a phone viewport without scrolling. Bottom nav: 5 locked slots, label only under the active
-tab in neutral dark grey, compact flat `bg-border` squircle backdrop, two-tone + neon route marks
-at full opacity. Structure is locked; don't touch without an explicit founder request.
+fits a phone viewport without scrolling. The Trainieren/Spielen toggle shares the squircle-track +
+sliding-pill mechanism with `LibrarySwitcher`/`WritingModeSwitcher` (s170), content-sized rather
+than full width since it is only two segments. Bottom nav: 5 locked slots, label only under the
+active tab in neutral dark grey, compact flat `bg-border` squircle backdrop, two-tone + neon route
+marks at full opacity. Structure is locked; don't touch without an explicit founder request.
 
 ## 7. Landmines (shipped-then-reverted; do NOT reintroduce)
 
@@ -176,6 +201,23 @@ at full opacity. Structure is locked; don't touch without an explicit founder re
 - Colored per-section mat borders on Praktisch tiles (neutral grey won, s90); two-column desktop
   dashboard (s90).
 - Backdrop-blur / flat-black modal overlays (locked dialog recipe instead).
+- **Accent-colored borders anywhere** (s168) AND grey outlines on accent rails (s169): the accent
+  is a fill with no visible edge at all; shadow does the separating.
+- **A caption line that swaps content between states** (s169): the pinned bottom line under the
+  Schreiben action cluster is the Art. 50 note in every state; transient hints go in the card.
+- **Per-cell borders as a column separator** (s169): with an odd number of items the rule stops
+  mid-grid. Use one absolutely-positioned full-height line.
+- **A page that scrolls the moment it opens** (s169): size the elastic element (writing field, tile
+  column) to the room actually left and let it fall below its preferred floor. A resting scroll on a
+  freshly opened trainer is a bug, not a trade-off.
+- **Sticky bottom chrome on Schreiben** (s168): sticky parks at the end of the content whenever the
+  page fits, so it sits at a different height per mode and drifts per task. Fixed, always.
+- **The Fokus mobile rejects (four preview rounds, s168):** the grammar controls as a PANEL anywhere,
+  in-page-expanding or pop-up alike (they read as settings, which was the original bug); renaming
+  the feature away from "Grammatik"; one-tap action chips (`→ Passiv`, breaks once forms combine); a
+  card-per-attempt transformation timeline (page scroll by design); the dials in the bottom thumb
+  slot (four floating controls, no bar behind them); a deep navy "stage" tile (the app's only dark
+  surface in light mode).
 
 ## 8. Deeper record
 

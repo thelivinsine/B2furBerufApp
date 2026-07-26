@@ -617,7 +617,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=travel. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -3845,7 +3847,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=logistics. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -4613,7 +4617,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=logistics. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -4697,7 +4703,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=logistics. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -4901,7 +4909,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=customer. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -9198,7 +9208,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=meetings. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=meetings. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_scheduling",
@@ -9210,7 +9220,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=scheduling. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=scheduling. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_logistics",
@@ -9222,7 +9232,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=logistics. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=logistics. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_customer",
@@ -9234,7 +9244,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=customer. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=customer. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_conflict",
@@ -9246,7 +9256,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=conflict. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=conflict. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_project",
@@ -9258,7 +9268,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=project. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=project. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_technology",
@@ -9270,7 +9280,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=technology. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=technology. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_sustainability",
@@ -9282,7 +9292,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=sustainability. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=sustainability. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_safety",
@@ -9294,7 +9304,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=safety. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=safety. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_travel",
@@ -9306,7 +9316,7 @@ const provenancePart1: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=travel. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=travel. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_behoerde",
@@ -9533,7 +9543,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun (plural use); themeId=behoerde."
   },
   {
@@ -12959,7 +12971,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=behoerde. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=behoerde. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_schicht",
@@ -13762,7 +13774,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=arzt."
   },
   {
@@ -14531,7 +14545,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=arzt. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=arzt. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_wohnungssuche",
@@ -14722,7 +14736,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=wohnen."
   },
   {
@@ -15082,7 +15098,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=bank."
   },
   {
@@ -15118,7 +15136,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=bank."
   },
   {
@@ -15190,7 +15210,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=bank."
   },
   {
@@ -16223,7 +16245,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=wohnen. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=wohnen. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "wp_bank",
@@ -16235,7 +16257,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=bank. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=bank. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_sprachkurs",
@@ -17135,7 +17157,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=bildung. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=bildung. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_werkstoff",
@@ -29182,7 +29204,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "themeId=wohnen. Service-Branche coverage review (2026-07-14)."
   },
   {
@@ -31246,7 +31270,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "themeId=wohnen. Daily-life scale-up Phase A (2026-07-17)."
   },
   {
@@ -32627,7 +32653,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=einkaufen. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=einkaufen. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_tisch",
@@ -33791,7 +33817,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=essen. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=essen. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_haltestelle",
@@ -34955,7 +34981,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=mobilitaet. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=mobilitaet. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_hobby",
@@ -36119,7 +36145,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=freizeit. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=freizeit. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "v_mobilfunkvertrag",
@@ -37271,7 +37297,7 @@ const provenancePart2: ProvenanceEntry[] = [
     attribution_required: false,
     added_by: "assistant",
     review_status: "draft",
-    notes: "themeId=digitales. Authored prompts; verify B2-level appropriateness when back-filling."
+    notes: "themeId=digitales. Authored prompts. Wave 1 (s167) adds structured Aufgaben carrying points/addressee/register/level/format/exam/words, modelled on the Goethe B1-C1 and telc B2 Beruf task SHAPES as reference, not reproductions of exam material. Untagged legacy tasks remain universal across the Niveau and Textsorte filters; verify level appropriateness when back-filling."
   },
   {
     content_id: "c_das_smartphone_einrichten",

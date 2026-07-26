@@ -87,6 +87,43 @@ export type WorkSector =
 // authoring plan, so they only invited tagging against half-designed axes.
 // Zero data was lost; re-declare if a real authoring plan ever exists.)
 
+// Schreiben axes (s167). Textsorte is what a learner actually thinks in ("ich
+// muss eine Beschwerde schreiben"), and it is the axis that makes a writing
+// task feel like exam practice. A scope DROPDOWN like Branche, so it escapes
+// the ≤12-option pill cap; grouped by family in the rail.
+export type WritingFormat =
+  | "email_informell"
+  | "email_halbformell"
+  | "email_formell"
+  | "nachricht"
+  | "notiz"
+  | "uebergabe"
+  | "forumsbeitrag"
+  | "stellungnahme"
+  | "bericht"
+  | "protokoll"
+  | "beschwerde"
+  | "reklamation"
+  | "antrag"
+  | "widerspruch"
+  | "kuendigung"
+  | "bewerbung";
+
+// Which exam task shape a writing Aufgabe is modelled on. Reference only: the
+// tasks are Genauly's own, not reproductions of exam material (founder s167).
+// "alltag" = a real-world genre that appears on no exam (Widerspruch,
+// Mängelanzeige) but matters more in daily life.
+export type WritingExam =
+  | "goethe_b1"
+  | "goethe_b2"
+  | "goethe_c1"
+  | "telc_b2_beruf"
+  | "dtb"
+  | "alltag";
+
+/** Who the learner writes to; drives Anrede and the du/Sie choice. */
+export type WritingRegister = "du" | "sie";
+
 // (The former WorkSituation enum/facet was retired in the categorization audit
 // 2026-07-09: "Situation" is the fine grain of Thema, carried by subThemeId,
 // not a separate axis. Its values duplicated themes, e.g. "meeting" restated
@@ -419,7 +456,24 @@ export interface MatchingQuestion extends QuizQuestionBase {
   pairs: { left: string; right: string }[];
 }
 
-export type QuizQuestion = MCQQuestion | WordOrderQuestion | MatchingQuestion;
+/**
+ * Type-the-answer question (production, no options). Currently the typed plural
+ * variant: the learner must produce the plural form rather than recognise it
+ * among distractors. `accept` holds every normalized target that grades correct
+ * (e.g. the bare "Praxen" and the full "die Praxen"); `answer` is the canonical
+ * form shown on reveal.
+ */
+export interface TypedQuestion extends QuizQuestionBase {
+  kind: "pluralType";
+  answer: string;
+  accept: string[];
+}
+
+export type QuizQuestion =
+  | MCQQuestion
+  | WordOrderQuestion
+  | MatchingQuestion
+  | TypedQuestion;
 
 /* ---------------- Composed session (UX overhaul Phase 1) ---------------- */
 
@@ -512,6 +566,11 @@ export interface SessionPlan {
 
 /** Weakness buckets the writing coach (Phase 2) maps onto practice deep-links. */
 export type WeaknessCategory =
+  // Content before form (s167): the evaluator now receives the Aufgabe and its
+  // Inhaltspunkte, so it can report a missed content point or the wrong
+  // register-for-addressee, which is what an exam grades first (Goethe
+  // "Erfüllung", telc "Berücksichtigung der Leitpunkte").
+  | "taskCompletion"
   | "verbPosition"
   | "cases"
   | "vocabularyRange"

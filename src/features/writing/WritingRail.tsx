@@ -3,9 +3,9 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { domains } from "@/data/domains";
-import { writingPrompts, type WritingTask } from "@/data/writingPrompts";
 import { SECTOR_OPTIONS } from "@/lib/facets";
-import type { ThemeId, WorkSector } from "@/types";
+import { countExact, countTasks } from "@/lib/writingScope";
+import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { cn } from "@/lib/utils";
 
@@ -22,9 +22,77 @@ import { cn } from "@/lib/utils";
  * folds into Alltag** in the Thema grouping (founder rule).
  */
 
+/** Niveau options: the three levels the Schreiben module targets (founder
+ *  s167). `ContentCefr` is the shared content band, so B2 spans B2.1/B2.2 and
+ *  the coarse label is what the learner picks. */
+export const WRITING_LEVELS: { value: string; label: string }[] = [
+  { value: "B1.2", label: "B1" },
+  { value: "B2.1", label: "B2" },
+  { value: "C1", label: "C1.1" },
+];
+
+/** Textsorte options, grouped by family so a 16-value list stays scannable. */
+const FORMAT_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+  {
+    label: "E-Mail & Nachricht",
+    options: [
+      { value: "email_informell", label: "E-Mail (privat)" },
+      { value: "email_halbformell", label: "E-Mail (halbformell)" },
+      { value: "email_formell", label: "E-Mail (formell)" },
+      { value: "nachricht", label: "Kurznachricht" },
+      { value: "notiz", label: "Notiz" },
+      { value: "uebergabe", label: "Übergabe" },
+    ],
+  },
+  {
+    label: "Meinung & Öffentlichkeit",
+    options: [
+      { value: "forumsbeitrag", label: "Forumsbeitrag" },
+      { value: "stellungnahme", label: "Stellungnahme" },
+    ],
+  },
+  {
+    label: "Bericht",
+    options: [
+      { value: "bericht", label: "Bericht" },
+      { value: "protokoll", label: "Protokoll" },
+    ],
+  },
+  {
+    label: "Beschwerde & Antrag",
+    options: [
+      { value: "beschwerde", label: "Beschwerde" },
+      { value: "reklamation", label: "Reklamation" },
+      { value: "antrag", label: "Antrag" },
+      { value: "widerspruch", label: "Widerspruch" },
+      { value: "kuendigung", label: "Kündigung" },
+      { value: "bewerbung", label: "Bewerbung" },
+    ],
+  },
+];
+
+const FORMAT_LABEL: Record<string, string> = Object.fromEntries(
+  FORMAT_GROUPS.flatMap((g) => g.options).map((o) => [o.value, o.label]),
+);
+
+/** Valid Textsorte values, for URL-param validation in the trainer. */
+export const WRITING_FORMATS: string[] = FORMAT_GROUPS.flatMap((g) => g.options).map(
+  (o) => o.value,
+);
+
+/** Learner-facing Textsorte label, e.g. for the Aufgabe card. */
+export const writingFormatLabel = (format: string): string => FORMAT_LABEL[format] ?? format;
+
 interface WritingRailProps {
-  value: ThemeId;
-  onChange: (id: ThemeId) => void;
+  /** Selected Thema ("" = all Themen). */
+  value: ThemeId | "";
+  onChange: (id: ThemeId | "") => void;
+  /** Selected Niveau ("" = alle Niveaus). */
+  level: string;
+  onLevelChange: (level: string) => void;
+  /** Selected Textsorte ("" = alle Textsorten). */
+  format: string;
+  onFormatChange: (format: string) => void;
   /** Selected sub-theme slug ("" = whole theme). */
   sub: string;
   onSubChange: (sub: string) => void;
@@ -40,8 +108,6 @@ interface WritingRailProps {
   onClose?: () => void;
   className?: string;
 }
-
-export const DEFAULT_WRITING_THEME: ThemeId = themes[0].id;
 
 // Domain-grouped themes, with the gesundheit domain folded into Alltag
 // (founder rule): the writing dropdown shows Berufsleben / Alltag / Bildung.
@@ -181,15 +247,13 @@ function ScopeSelect({
   );
 }
 
-/** Tasks of one theme + length matching a sub-theme filter ("" = all). */
-function tasksForSub(theme: ThemeId, length: WritingLength, sub: string): WritingTask[] {
-  const pool = writingPrompts[theme][length];
-  return sub ? pool.filter((t) => t.sub === sub) : pool;
-}
-
 export function WritingRail({
   value,
   onChange,
+  level,
+  onLevelChange,
+  format,
+  onFormatChange,
   sub,
   onSubChange,
   sector,
@@ -204,18 +268,59 @@ export function WritingRail({
   const theme = themeById(value);
   const subThemes = theme?.subThemes ?? [];
 
-  // Branche counts respect the current Thema/Unterthema scope; zero-yield
-  // Branchen grey out (their tag exists nowhere in this pool, so choosing
-  // them would change nothing).
-  const scopedTasks = tasksForSub(value, length, sub);
-  const sectorCount = (s: string) =>
-    scopedTasks.filter((t) => t.sectors?.includes(s as WorkSector)).length;
+  // ONE counting rule for every dropdown (s167): the number next to an option
+  // is how many tasks picking it would actually draw from, computed by the same
+  // `eligibleTasks` selector the trainer draws with. Before this, Branche
+  // counted only sector-TAGGED tasks and greyed out at zero, which contradicted
+  // the untagged-=-universal rule and made most Branchen look unavailable while
+  // the engine would have served the full pool behind them.
+  const countWith = (
+    over: Partial<{
+      theme: ThemeId | "";
+      sub: string;
+      sector: string;
+      level: string;
+      format: string;
+    }>,
+  ) => countTasks({ theme: value, sub, sector, level, format, length, ...over });
+
+  // Niveau and Textsorte count WITHOUT the fallback and grey out at zero: they
+  // are not universal axes, so an option that would silently serve a different
+  // Textsorte must read as unavailable rather than as a match.
+  const countExactWith = (over: Partial<{ level: string; format: string }>) =>
+    countExact({ theme: value, sub, sector, level, format, length, ...over });
 
   const sectionLabel = "text-xs font-semibold uppercase tracking-wide text-muted-foreground";
 
   const body = (
     <div className="space-y-4">
-      {/* Bibliothek hierarchy order: Branche -> Thema -> Unterthema. */}
+      {/* Niveau -> Branche -> Thema -> Unterthema -> Textsorte (s167): the
+          Bibliothek hierarchy with the level axis in front (it is the coarsest
+          scope) and Textsorte last (it narrows within everything else). */}
+      <section>
+        <p className={cn("mb-2", sectionLabel)}>Niveau</p>
+        <ScopeSelect
+          ariaLabel="Niveau"
+          triggerLabel={
+            level ? WRITING_LEVELS.find((l) => l.value === level)?.label ?? level : "Alle Niveaus"
+          }
+          value={level}
+          onChange={onLevelChange}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
+                ...WRITING_LEVELS.map((l) => {
+                  const count = countExactWith({ level: l.value });
+                  return { value: l.value, label: l.label, count, disabled: count === 0 };
+                }),
+              ],
+            },
+          ]}
+        />
+      </section>
+
       <section>
         <p className={cn("mb-2", sectionLabel)}>Branche</p>
         <ScopeSelect
@@ -226,13 +331,16 @@ export function WritingRail({
           value={sector}
           onChange={onSectorChange}
           groups={[
-            { label: "", options: [{ value: "", label: "Alle Branchen" }] },
             {
               label: "",
-              options: SECTOR_OPTIONS.map((o) => {
-                const count = sectorCount(o.value);
-                return { value: o.value, label: o.label, count, disabled: count === 0 };
-              }),
+              options: [
+                { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
+                ...SECTOR_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                  count: countWith({ sector: o.value }),
+                })),
+              ],
             },
           ]}
         />
@@ -242,13 +350,26 @@ export function WritingRail({
         <p className={cn("mb-2", sectionLabel)}>Thema</p>
         <ScopeSelect
           ariaLabel="Thema"
-          triggerLabel={theme?.titleDe ?? value}
+          triggerLabel={value ? theme?.titleDe ?? value : "Alle Themen"}
           value={value}
-          onChange={(id) => onChange(id as ThemeId)}
-          groups={GROUPS.map((g) => ({
-            label: g.domain.titleDe,
-            options: g.list.map((t) => ({ value: t.id, label: t.titleDe })),
-          }))}
+          onChange={(id) => onChange(id as ThemeId | "")}
+          groups={[
+            // Generic option on every dropdown (founder s167).
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Themen", count: countWith({ theme: "", sub: "" }) },
+              ],
+            },
+            ...GROUPS.map((g) => ({
+              label: g.domain.titleDe,
+              options: g.list.map((t) => ({
+                value: t.id,
+                label: t.titleDe,
+                count: countWith({ theme: t.id, sub: "" }),
+              })),
+            })),
+          ]}
         />
       </section>
 
@@ -266,13 +387,9 @@ export function WritingRail({
               {
                 label: "",
                 options: [
-                  {
-                    value: "",
-                    label: "Gesamtes Thema",
-                    count: writingPrompts[value][length].length,
-                  },
+                  { value: "", label: "Gesamtes Thema", count: countWith({ sub: "" }) },
                   ...subThemes.map((s) => {
-                    const count = tasksForSub(value, length, s.id).length;
+                    const count = countWith({ sub: s.id });
                     return { value: s.id, label: s.titleDe, count, disabled: count === 0 };
                   }),
                 ],
@@ -281,6 +398,31 @@ export function WritingRail({
           />
         </section>
       )}
+
+      <section>
+        <p className={cn("mb-2", sectionLabel)}>Textsorte</p>
+        <ScopeSelect
+          ariaLabel="Textsorte"
+          triggerLabel={format ? FORMAT_LABEL[format] ?? format : "Alle Textsorten"}
+          value={format}
+          onChange={onFormatChange}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Textsorten", count: countWith({ format: "" }) },
+              ],
+            },
+            ...FORMAT_GROUPS.map((g) => ({
+              label: g.label,
+              options: g.options.map((o) => {
+                const count = countExactWith({ format: o.value });
+                return { value: o.value, label: o.label, count, disabled: count === 0 };
+              }),
+            })),
+          ]}
+        />
+      </section>
     </div>
   );
 
@@ -288,12 +430,16 @@ export function WritingRail({
     <aside
       role={panel ? "region" : undefined}
       aria-label="Aufgabe wählen"
-      // Himmelblau tile (founder s149): a light accent wash instead of the grey
-      // bg-muted; dark mode gets its own quieter alphas so the wash reads as a
-      // cool sky tint, not murky teal. No overflow clipping on the tile: the
-      // dropdown popovers must escape it (their lists scroll internally).
+      // Himmelblau FILL (founder s149): a light accent wash instead of the grey
+      // bg-muted; dark mode gets its own quieter alpha so the wash reads as a
+      // cool sky tint, not murky teal. NO visible outline (founder s169): the
+      // border carries the fill's own colour and the tile is separated from the
+      // page by `shadow-soft` alone, the same lift the Bibliothek word cards
+      // use. A grey edge around a blue wash read as dirty. No overflow clipping
+      // on the tile: the dropdown popovers must escape it (their lists scroll
+      // internally).
       className={cn(
-        "rounded-xl border border-accent/50 bg-accent/20 shadow-soft dark:border-accent/25 dark:bg-accent/10",
+        "rounded-xl border border-accent/20 bg-accent/20 shadow-soft dark:border-accent/10 dark:bg-accent/10",
         className,
       )}
     >
@@ -325,7 +471,9 @@ export function WritingRail({
           </button>
         )}
       </div>
-      <div className="border-t border-accent/50 p-3 dark:border-accent/25">{body}</div>
+      {/* Divider tinted to the tile, not the neutral `border` grey: with the
+          outline gone a grey rule would be the only hard edge left (s169). */}
+      <div className="border-t border-accent-ink/10 p-3">{body}</div>
     </aside>
   );
 }

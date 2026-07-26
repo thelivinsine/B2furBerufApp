@@ -1,0 +1,604 @@
+<title>Fokus · Grammatik auf Mobil · Runde 3</title>
+<style>
+  :root {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --warning: 38 92% 46%;
+    --reward: 11 82% 54%; --reward-bg: 16 77% 93%;
+    --shadow: 221 40% 22%;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 226 44% 6%;
+      --page-from: 226 44% 6%; --page-mid: 226 44% 6%; --page-to: 226 44% 6%;
+      --foreground: 224 24% 94%;
+      --surface: 224 26% 18%;
+      --muted: 224 22% 25%; --muted-foreground: 224 13% 77%;
+      --border: 216 28% 36%;
+      --primary: 219 96% 76%; --primary-foreground: 228 30% 8%;
+      --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
+      --success: 153 50% 52%;
+      --warning: 43 90% 62%;
+      --reward: 11 88% 66%; --reward-bg: 11 45% 15%;
+      --shadow: 221 60% 3%;
+      --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+    }
+  }
+  :root[data-theme="light"] {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --warning: 38 92% 46%;
+    --reward: 11 82% 54%; --reward-bg: 16 77% 93%;
+    --shadow: 221 40% 22%;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+  }
+  :root[data-theme="dark"] {
+    --background: 226 44% 6%;
+    --page-from: 226 44% 6%; --page-mid: 226 44% 6%; --page-to: 226 44% 6%;
+    --foreground: 224 24% 94%;
+    --surface: 224 26% 18%;
+    --muted: 224 22% 25%; --muted-foreground: 224 13% 77%;
+    --border: 216 28% 36%;
+    --primary: 219 96% 76%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
+    --success: 153 50% 52%;
+    --warning: 43 90% 62%;
+    --reward: 11 88% 66%; --reward-bg: 11 45% 15%;
+    --shadow: 221 60% 3%;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 24px 72px;
+    font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: hsl(var(--background)); color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet { max-width: 1360px; margin: 0 auto; }
+  .sheet h1 { font-size: 26px; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .sheet h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .09em;
+    color: hsl(var(--primary)); margin: 44px 0 4px; font-weight: 800;
+  }
+  .sheet h2 span { color: hsl(var(--muted-foreground)); font-weight: 600; letter-spacing: .04em; text-transform: none; }
+  .lede { color: hsl(var(--muted-foreground)); font-size: 14px; line-height: 1.65; max-width: 68ch; margin: 0 0 4px; }
+  .lede b { color: hsl(var(--foreground)); }
+  .themebtn {
+    position: fixed; right: 20px; top: 20px; z-index: 20;
+    height: 36px; padding: 0 14px; border-radius: 10px; cursor: pointer;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    color: hsl(var(--foreground)); font: inherit; font-size: 13px; font-weight: 600;
+  }
+  .rack { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 18px; }
+  .slot { width: 360px; }
+  .cap { font-size: 13px; font-weight: 700; margin: 12px 0 2px; }
+  .cap b { color: hsl(var(--primary)); }
+  .capsub { font-size: 12.5px; line-height: 1.55; color: hsl(var(--muted-foreground)); margin: 0; }
+  .notes { max-width: 78ch; font-size: 14px; line-height: 1.7; padding-left: 18px; }
+  .notes li { margin-bottom: 9px; }
+  .notes b { color: hsl(var(--primary)); }
+
+  .phone {
+    position: relative; width: 360px; height: 780px; overflow: hidden;
+    border-radius: 26px; border: 1px solid hsl(var(--border));
+    box-shadow: 0 2px 4px hsl(var(--shadow)/.05), 0 12px 32px hsl(var(--shadow)/.12);
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary)/.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent)/.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+  }
+  .appbar {
+    position: absolute; inset: 0 0 auto 0; height: 64px; z-index: 4;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    background: hsl(var(--surface)/.9); border-bottom: 1px solid hsl(var(--border));
+  }
+  .logo { position: relative; width: 30px; height: 30px; }
+  .logo i { position: absolute; right: 0; top: 4px; width: 20px; height: 20px; border-radius: 3px; background: hsl(var(--accent)); }
+  .logo b { position: absolute; left: 1px; top: -2px; font-size: 27px; font-weight: 800; font-style: normal; line-height: 1; color: hsl(var(--foreground)); }
+  .streak {
+    display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 11px;
+    border-radius: 999px; background: hsl(var(--reward-bg)); font-size: 12px; font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+  .streak b { color: hsl(var(--reward)); font-weight: 800; }
+  .avatar { width: 26px; height: 26px; border-radius: 999px; border: 2px solid hsl(var(--foreground)); margin-left: 8px; }
+  .navbar {
+    position: absolute; inset: auto 0 0 0; height: 63px; z-index: 4;
+    display: flex; align-items: center; justify-content: space-around;
+    background: hsl(var(--surface)/.95); border-top: 1px solid hsl(var(--border));
+  }
+  .navbar i { display: block; width: 20px; height: 20px; border-radius: 4px; background: hsl(var(--primary)/.55); }
+  .navbar .on { position: relative; text-align: center; }
+  .navbar .on i { background: hsl(var(--primary)); margin: 0 auto; }
+  .navbar .on span { display: block; font-size: 10px; font-weight: 700; margin-top: 3px; color: hsl(var(--muted-foreground)); }
+  .navbar .on::before {
+    content: ""; position: absolute; left: 50%; top: -5px; width: 40px; height: 30px;
+    transform: translateX(-50%); border-radius: 10px; background: hsl(var(--border)); z-index: -1;
+  }
+  .screen { position: absolute; inset: 64px 0 63px 0; padding: 16px; overflow: hidden; }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    border-radius: 12px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow)/.06), 0 6px 16px -3px hsl(var(--shadow)/.12);
+    padding: 20px;
+  }
+
+  .segrow { display: flex; justify-content: center; }
+  .seg {
+    display: inline-flex; margin: 0 auto; padding: 2px; border-radius: 8px;
+    background: hsl(var(--muted)); font-size: 12px; font-weight: 800;
+  }
+  .seg button {
+    border: 0; cursor: pointer; font: inherit; border-radius: 6px; padding: 5px 11px;
+    background: transparent; color: hsl(var(--muted-foreground));
+  }
+  .seg button.on {
+    background: hsl(var(--surface)); color: hsl(var(--foreground));
+    box-shadow: 0 1px 2px hsl(var(--shadow)/.06), 0 6px 16px -3px hsl(var(--shadow)/.12);
+  }
+  .sentence { font-size: 15.5px; line-height: 1.7; margin: 14px 0 0; }
+  .mk-g { font-weight: 600; box-shadow: inset 0 -2px 0 hsl(var(--success)/.9); border-radius: 1px; padding-bottom: 1px; }
+  .hr { height: 1px; background: hsl(var(--border)); margin: 14px 0; }
+
+  .fixrow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+  .fix {
+    min-width: 8rem; border-radius: 12px; padding: 10px;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--accent)/.3);
+  }
+  :root[data-theme="dark"] .fix { background: hsl(var(--accent)/.18); }
+  .fix em {
+    display: block; font-style: normal; font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .05em; color: hsl(var(--accent-ink)); margin-bottom: 4px;
+  }
+  .fix s { color: hsl(var(--muted-foreground)); }
+  .fix .to { font-weight: 700; color: hsl(var(--success)); }
+  .fix small { font-size: 13.5px; }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px;
+    border-radius: 12px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface)/.5);
+    font: inherit; font-size: 13px; font-weight: 500; color: hsl(var(--foreground)); cursor: pointer;
+    align-self: flex-end; margin-left: auto;
+  }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 9px;
+    border-radius: 8px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    font: inherit; font-size: 12px; font-weight: 500; color: hsl(var(--muted-foreground)); cursor: pointer;
+  }
+  .icon-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid hsl(var(--border));
+    background: hsl(var(--surface)); display: grid; place-items: center; color: hsl(var(--muted-foreground));
+  }
+
+  /* ---------- the Grammatik tile (three treatments) ---------- */
+  .gtile {
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 2px hsl(var(--shadow)/.06), 0 6px 16px -3px hsl(var(--shadow)/.12);
+  }
+  /* F: white card, eyebrow header */
+  .gtile.white { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); padding: 20px; }
+  .gtile.white .gehead {
+    text-align: center; font-size: 12px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .04em; color: hsl(var(--primary)); margin: 0 0 16px;
+  }
+  /* G: Himmelblau rail tile, header row + divided body */
+  .gtile.sky { border: 1px solid hsl(var(--border)); background: hsl(var(--accent)/.2); }
+  :root[data-theme="dark"] .gtile.sky { background: hsl(var(--accent)/.1); }
+  .gtile.sky .ghead {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    font-size: 14px; font-weight: 600; color: hsl(var(--primary));
+  }
+  .gtile.sky .ghead .sp { flex: 1; }
+  .gtile.sky .gbody { border-top: 1px solid hsl(var(--border)); padding: 16px 14px; }
+  .ghreset {
+    width: 32px; height: 32px; border-radius: 8px; border: 0; background: transparent;
+    display: grid; place-items: center; color: hsl(var(--muted-foreground)); cursor: pointer;
+  }
+
+  .gaxes { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .gax { text-align: center; }
+  .gaxlabel {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: hsl(var(--muted-foreground)); margin: 0 0 5px;
+  }
+  .sky .gaxlabel, .deep .gaxlabel { color: hsl(var(--accent-ink)); }
+  .dial {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 40px; padding: 0 8px 0 9px; border-radius: 10px; cursor: pointer;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    font: inherit; font-size: 12px; font-weight: 600; color: hsl(var(--foreground));
+    box-shadow: 0 1px 2px hsl(var(--shadow)/.05);
+  }
+  .dial em { font-style: normal; white-space: nowrap; }
+  .dial svg.ic.sm { width: 11px; height: 11px; }
+  .dial.changed { border-color: hsl(var(--primary)); background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+  .dot { width: 6px; height: 6px; border-radius: 999px; background: hsl(var(--success)); flex: none; }
+  .ghint { text-align: center; font-size: 12px; line-height: 1.55; color: hsl(var(--muted-foreground)); margin: 14px 0 0; }
+  .ghint b { color: hsl(var(--success)); }
+
+  /* H: deep panel — the dark navy surface as a stage for the dials */
+  .gtile.deep {
+    border: 1px solid hsl(var(--border));
+    background:
+      radial-gradient(at 100% 0%, hsl(var(--accent)/.18) 0px, transparent 55%),
+      hsl(226 44% 14%);
+    padding: 18px 14px; text-align: center;
+  }
+  :root[data-theme="dark"] .gtile.deep {
+    background:
+      radial-gradient(at 100% 0%, hsl(var(--accent)/.14) 0px, transparent 55%),
+      hsl(226 40% 12%);
+  }
+  .gtile.deep .ghead2 {
+    display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px;
+    font-size: 14px; font-weight: 600; color: hsl(197 93% 82%);
+  }
+  .gtile.deep .gaxlabel { color: hsl(224 15% 68%); }
+  .gtile.deep .dial { border-color: hsl(226 20% 34%); background: hsl(226 30% 20%); color: hsl(224 24% 94%); }
+  .gtile.deep .dial.changed { border-color: hsl(197 93% 77%); background: hsl(197 93% 77%); color: hsl(202 71% 13%); }
+  .gtile.deep .ghint { color: hsl(224 15% 68%); }
+  .gtile.deep .ghint b { color: hsl(153 50% 62%); }
+
+  /* picker popover */
+  .pop {
+    position: absolute; z-index: 7; width: 172px; padding: 6px;
+    border-radius: 10px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    box-shadow: 0 2px 4px hsl(var(--shadow)/.05), 0 12px 32px hsl(var(--shadow)/.12);
+  }
+  .pop button {
+    display: flex; align-items: center; gap: 7px; width: 100%; border: 0; cursor: pointer;
+    border-radius: 7px; padding: 8px 9px; font: inherit; font-size: 13px; text-align: left;
+    background: transparent; color: hsl(var(--foreground));
+  }
+  .pop button.sel { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-weight: 600; }
+  .pop .en { margin-left: auto; font-size: 10.5px; color: hsl(var(--muted-foreground)); }
+  .pop button.sel .en { color: hsl(var(--primary-foreground)/.75); }
+
+  .ainote { text-align: center; font-size: 11px; line-height: 1.4; color: hsl(var(--muted-foreground)); margin: 8px 0 0; }
+  .ainote a { color: hsl(var(--primary)); font-weight: 500; }
+
+  svg.ic { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  svg.ic.sm { width: 13px; height: 13px; }
+</style>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="i-speak" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M16 9a5 5 0 0 1 0 6"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.4-2-1-3 2 2 3 4.3 3 7a8 8 0 0 1-16 0c0-4 3-8 8-11"/></symbol>
+</svg>
+
+<button class="themebtn" id="tt">Hell / Dunkel</button>
+<script>
+  const root = document.documentElement;
+  if (!root.dataset.theme) {
+    root.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  document.getElementById("tt").addEventListener("click", () => {
+    root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+  });
+</script>
+
+<div class="sheet">
+  <h1>Fokus auf dem Handy · Runde 3</h1>
+  <p class="lede">
+    Konzept C, verfeinert nach deinen Punkten: <b>zwei getrennte Kacheln</b> (Satz oben, Grammatik unten),
+    der Titel <b>Grammatik</b> sitzt in der unteren Kachel, die <b>Regler-Chips sind zentriert</b>, und die
+    Abstände sind großzügiger. Die drei Varianten unterscheiden sich nur darin, wie die untere Kachel
+    die Farbpalette trägt.
+  </p>
+
+  <h2>Variante F <span>· Weiße Karte</span></h2>
+  <div class="rack">
+    <div class="slot">
+      <div class="phone">
+        <div class="appbar">
+          <div class="logo"><i></i><b>g</b></div>
+          <div style="display:flex;align-items:center">
+            <span class="streak"><svg class="ic sm" style="color:hsl(var(--reward))"><use href="#i-flame"/></svg><b>0</b> Tage</span>
+            <span class="avatar"></span>
+          </div>
+        </div>
+        <div class="screen">
+          <div class="stack">
+            <div class="card">
+              <div class="segrow">
+                <div class="seg"><button>Original</button><button class="on">Korrigiert</button></div>
+              </div>
+              <p class="sentence">Der Chef <span class="mk-g">schreibt</span> die <span class="mk-g">E-Mail</span>.</p>
+              <div class="hr"></div>
+              <div class="fixrow">
+                <div class="fix"><em>Grammatik</em><small><s>schreiben</s> → <span class="to">schreibt</span></small></div>
+                <div class="fix"><em>Rechtschreibung</em><small><s>Email</s> → <span class="to">E-Mail</span></small></div>
+                <button class="btn-outline"><svg class="ic sm"><use href="#i-undo"/></svg>Neuer Satz</button>
+              </div>
+            </div>
+            <div class="gtile white">
+              <p class="gehead">Grammatik</p>
+              <div class="gaxes">
+                <div class="gax">
+                  <p class="gaxlabel">Genus Verbi</p>
+                  <button class="dial"><span class="dot"></span><em>Aktiv</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                </div>
+                <div class="gax">
+                  <p class="gaxlabel">Zeitform</p>
+                  <button class="dial"><span class="dot"></span><em>Präsens</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                </div>
+                <div class="gax">
+                  <p class="gaxlabel">Modus</p>
+                  <button class="dial"><span class="dot"></span><em>Indikativ</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                </div>
+              </div>
+              <p class="ghint"><b>Grüner Punkt = dein Satz.</b> Tippe eine Form, um ihn umzuwandeln.</p>
+            </div>
+            <p class="ainote">KI-geprüft, kann Fehler enthalten. <a>Mehr</a></p>
+          </div>
+        </div>
+        <div class="navbar">
+          <i></i><i></i>
+          <span class="on"><i></i><span>Schreiben</span></span>
+          <i></i><i></i>
+        </div>
+      </div>
+      <p class="cap">F · <b>Weiße Karte</b> · Eyebrow-Titel mittig</p>
+      <p class="capsub">Ruhigste Lesart: die Grammatik-Kachel ist eine normale Inhaltskarte, GRAMMATIK als
+        Eyebrow in Markenblau, Chips auf Weiß. Farbe kommt nur aus Punkt, Blau und den Chips selbst.</p>
+    </div>
+
+    <div class="slot" style="max-width:360px">
+      <p class="cap" style="margin-top:0">Einordnung</p>
+      <ul class="notes" style="margin-top:6px">
+        <li>Folgt der Regel „Inhalt auf weißen Karten“. Am wenigsten Farbfläche, edelste Ruhe.</li>
+        <li>Risiko: die Kachel sieht der Satzkarte sehr ähnlich; als eigenständiges Instrument
+          geht sie leichter unter als in G und H.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Variante G <span>· Himmelblau-Kachel, die Rail-Sprache</span></h2>
+  <div class="rack">
+    <div class="slot">
+      <div class="phone">
+        <div class="appbar">
+          <div class="logo"><i></i><b>g</b></div>
+          <div style="display:flex;align-items:center">
+            <span class="streak"><svg class="ic sm" style="color:hsl(var(--reward))"><use href="#i-flame"/></svg><b>0</b> Tage</span>
+            <span class="avatar"></span>
+          </div>
+        </div>
+        <div class="screen">
+          <div class="stack">
+            <div class="card">
+              <div class="segrow">
+                <div class="seg"><button>Original</button><button class="on">Korrigiert</button></div>
+              </div>
+              <p class="sentence">Der Chef <span class="mk-g">schreibt</span> die <span class="mk-g">E-Mail</span>.</p>
+              <div class="hr"></div>
+              <div class="fixrow">
+                <div class="fix"><em>Grammatik</em><small><s>schreiben</s> → <span class="to">schreibt</span></small></div>
+                <div class="fix"><em>Rechtschreibung</em><small><s>Email</s> → <span class="to">E-Mail</span></small></div>
+                <button class="btn-outline"><svg class="ic sm"><use href="#i-undo"/></svg>Neuer Satz</button>
+              </div>
+            </div>
+            <div class="gtile sky">
+              <div class="ghead">
+                <svg class="ic"><use href="#i-sliders"/></svg>Grammatik<span class="sp"></span>
+                <button class="ghreset"><svg class="ic"><use href="#i-undo"/></svg></button>
+              </div>
+              <div class="gbody">
+                <div class="gaxes">
+                  <div class="gax">
+                    <p class="gaxlabel">Genus Verbi</p>
+                    <button class="dial"><span class="dot"></span><em>Aktiv</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                  </div>
+                  <div class="gax">
+                    <p class="gaxlabel">Zeitform</p>
+                    <button class="dial"><span class="dot"></span><em>Präsens</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                  </div>
+                  <div class="gax">
+                    <p class="gaxlabel">Modus</p>
+                    <button class="dial"><span class="dot"></span><em>Indikativ</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                  </div>
+                </div>
+                <p class="ghint"><b>Grüner Punkt = dein Satz.</b> Tippe eine Form, um ihn umzuwandeln.</p>
+              </div>
+            </div>
+            <p class="ainote">KI-geprüft, kann Fehler enthalten. <a>Mehr</a></p>
+          </div>
+        </div>
+        <div class="navbar">
+          <i></i><i></i>
+          <span class="on"><i></i><span>Schreiben</span></span>
+          <i></i><i></i>
+        </div>
+      </div>
+      <p class="cap">G1 · <b>Nach der Korrektur</b></p>
+      <p class="capsub">Die untere Kachel ist die bekannte Himmelblau-Fläche mit Kopfzeile (Grammatik +
+        Reset) und Trennlinie; weiße Chips liegen zentriert auf dem Blau und springen sofort heraus.</p>
+    </div>
+
+    <div class="slot">
+      <div class="phone">
+        <div class="appbar">
+          <div class="logo"><i></i><b>g</b></div>
+          <div style="display:flex;align-items:center">
+            <span class="streak"><svg class="ic sm" style="color:hsl(var(--reward))"><use href="#i-flame"/></svg><b>0</b> Tage</span>
+            <span class="avatar"></span>
+          </div>
+        </div>
+        <div class="screen">
+          <div class="stack">
+            <div class="card">
+              <div class="segrow">
+                <div class="seg"><button>Original</button><button>Korrigiert</button><button class="on">Umgeformt</button></div>
+              </div>
+              <p class="sentence">Die <span class="mk-g">E-Mail wird</span> vom Chef <span class="mk-g">geschrieben</span>.</p>
+              <div class="hr"></div>
+              <p style="font-size:13.5px;line-height:1.6;margin:0">
+                <b style="color:hsl(var(--primary))">Hinweis:</b>
+                <span style="color:hsl(var(--muted-foreground))">Im Passiv wird das Objekt zum Subjekt. Wer handelt, folgt mit „von“.</span>
+              </p>
+              <div class="fixrow" style="margin-top:14px;align-items:center">
+                <button class="btn-ghost"><svg class="ic sm"><use href="#i-redo"/></svg>Nochmal</button>
+                <span class="icon-btn"><svg class="ic sm"><use href="#i-speak"/></svg></span>
+                <button class="btn-outline"><svg class="ic sm"><use href="#i-undo"/></svg>Neuer Satz</button>
+              </div>
+            </div>
+            <div class="gtile sky">
+              <div class="ghead">
+                <svg class="ic"><use href="#i-sliders"/></svg>Grammatik<span class="sp"></span>
+                <button class="ghreset" style="color:hsl(var(--foreground))"><svg class="ic"><use href="#i-undo"/></svg></button>
+              </div>
+              <div class="gbody">
+                <div class="gaxes">
+                  <div class="gax">
+                    <p class="gaxlabel">Genus Verbi</p>
+                    <button class="dial changed"><em>Passiv</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                  </div>
+                  <div class="gax">
+                    <p class="gaxlabel">Zeitform</p>
+                    <button class="dial"><span class="dot"></span><em>Präsens</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                  </div>
+                  <div class="gax">
+                    <p class="gaxlabel">Modus</p>
+                    <button class="dial"><span class="dot"></span><em>Indikativ</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="ainote">KI-geprüft, kann Fehler enthalten. <a>Mehr</a></p>
+          </div>
+        </div>
+        <!-- picker anchored under the Zeitform dial -->
+        <div class="pop" style="left:118px; top:560px">
+          <button><span class="dot"></span>Präsens</button>
+          <button class="sel">Perfekt<span class="en">hat …</span></button>
+          <button>Präteritum<span class="en">schrieb</span></button>
+        </div>
+        <div class="navbar">
+          <i></i><i></i>
+          <span class="on"><i></i><span>Schreiben</span></span>
+          <i></i><i></i>
+        </div>
+      </div>
+      <p class="cap">G2 · <b>Umgeformt, Regler offen</b></p>
+      <p class="capsub">Passiv gewählt (blau gefüllt), das Zeitform-Menü gerade offen. Der Satz oben trägt
+        schon die Passiv-Fassung mit grünen Linien unter den neuen Wörtern.</p>
+    </div>
+
+    <div class="slot" style="max-width:360px">
+      <p class="cap" style="margin-top:0">Einordnung</p>
+      <ul class="notes" style="margin-top:6px">
+        <li>Stärkster Kontrast im hellen Modus: weiße Chips auf Himmelblau, das erprobte
+          Grau-Kachel/weiße-Controls-Prinzip, nur in Blau.</li>
+        <li>Gleiche Sprache wie „Aufgabe wählen“ in Kurz/Lang: die App bleibt aus einem Guss.</li>
+        <li>Kopfzeile trägt Reset gratis mit (das Verhalten von heute bleibt erhalten).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Variante H <span>· Die Bühne, tiefes Nachtblau</span></h2>
+  <div class="rack">
+    <div class="slot">
+      <div class="phone">
+        <div class="appbar">
+          <div class="logo"><i></i><b>g</b></div>
+          <div style="display:flex;align-items:center">
+            <span class="streak"><svg class="ic sm" style="color:hsl(var(--reward))"><use href="#i-flame"/></svg><b>0</b> Tage</span>
+            <span class="avatar"></span>
+          </div>
+        </div>
+        <div class="screen">
+          <div class="stack">
+            <div class="card">
+              <div class="segrow">
+                <div class="seg"><button>Original</button><button class="on">Korrigiert</button></div>
+              </div>
+              <p class="sentence">Der Chef <span class="mk-g">schreibt</span> die <span class="mk-g">E-Mail</span>.</p>
+              <div class="hr"></div>
+              <div class="fixrow">
+                <div class="fix"><em>Grammatik</em><small><s>schreiben</s> → <span class="to">schreibt</span></small></div>
+                <div class="fix"><em>Rechtschreibung</em><small><s>Email</s> → <span class="to">E-Mail</span></small></div>
+                <button class="btn-outline"><svg class="ic sm"><use href="#i-undo"/></svg>Neuer Satz</button>
+              </div>
+            </div>
+            <div class="gtile deep">
+              <p class="ghead2"><svg class="ic"><use href="#i-sliders"/></svg>Grammatik</p>
+              <div class="gaxes">
+                <div class="gax">
+                  <p class="gaxlabel">Genus Verbi</p>
+                  <button class="dial"><span class="dot"></span><em>Aktiv</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                </div>
+                <div class="gax">
+                  <p class="gaxlabel">Zeitform</p>
+                  <button class="dial"><span class="dot"></span><em>Präsens</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                </div>
+                <div class="gax">
+                  <p class="gaxlabel">Modus</p>
+                  <button class="dial"><span class="dot"></span><em>Indikativ</em><svg class="ic sm"><use href="#i-down"/></svg></button>
+                </div>
+              </div>
+              <p class="ghint"><b>Grüner Punkt = dein Satz.</b> Tippe eine Form, um ihn umzuwandeln.</p>
+            </div>
+            <p class="ainote">KI-geprüft, kann Fehler enthalten. <a>Mehr</a></p>
+          </div>
+        </div>
+        <div class="navbar">
+          <i></i><i></i>
+          <span class="on"><i></i><span>Schreiben</span></span>
+          <i></i><i></i>
+        </div>
+      </div>
+      <p class="cap">H · <b>Die Bühne</b> · tiefes Nachtblau mit Himmel-Schimmer</p>
+      <p class="capsub">Die Grammatik-Kachel als dunkle Bühne (das warme Marine der dunklen Oberflächen,
+        oben rechts ein Himmelblau-Schimmer). Maximale Eigenständigkeit: das Instrument sieht nach
+        Instrument aus.</p>
+    </div>
+
+    <div class="slot" style="max-width:360px">
+      <p class="cap" style="margin-top:0">Einordnung</p>
+      <ul class="notes" style="margin-top:6px">
+        <li>Größter „Premium“-Sprung und unübersehbar: niemand übersieht dieses Feature.</li>
+        <li>Aber: eine dunkle Fläche im hellen Modus ist ein NEUES Muster; nichts anderes in der App
+          macht das heute. Es müsste eine bewusste Grundsatzentscheidung sein, kein Einzelfall.</li>
+        <li>Im dunklen Modus schrumpft der Effekt naturgemäß (dunkel auf dunkel).</li>
+      </ul>
+      <p class="cap">Für alle drei gilt</p>
+      <ul class="notes" style="margin-top:6px">
+        <li>Zwei getrennte Kacheln mit 16 px Abstand; die Satzkarte endet mit den Korrektur-Kacheln.</li>
+        <li>Titel Grammatik in der unteren Kachel; Chips und Achsen-Labels zentriert.</li>
+        <li>Chips 40 px hoch (Tippziel), Labels in 10 px Kapitälchen darüber, eine Hinweiszeile darunter.</li>
+        <li>Vor der Korrektur steht die Kachel gedämpft da (Chips ohne Punkt, Hinweis „Prüf zuerst
+          deinen Satz.“); nichts ist tot, der Zustand ist ehrlich.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="lede" style="margin-top:28px">
+    Meine Empfehlung: <b>G</b>. Es erfüllt alle deine Punkte, nutzt die Palette kräftig, aber mit der
+    bereits gelernten Bedeutung (Himmelblau = Auswahlfläche), und die weißen Chips auf Blau geben genau
+    den klaren, trotzdem leisen Kontrast. F ist die ruhige Alternative, H der auffällige Ausreißer, der
+    ein neues Muster einführen würde.
+  </p>
+</div>
