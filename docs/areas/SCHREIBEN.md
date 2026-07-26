@@ -64,9 +64,16 @@ for rework — do not treat its current design as reference.**
   module is not advertised as a mock exam. Alltag tasks carry the formal apparatus (Betreff,
   Aktenzeichen, Bezugsdatum, Frist, Grußformel) as Inhaltspunkte, and **never assert a statutory
   deadline or euro amount**: they ask the learner to name the date instead.
-- The dice on the Aufgabe card (standard 40px icon button, half-spin per roll) re-rolls within
-  the current scope (keeps typed text, clears a stale result). Scope changes (`?sub=`/`?sector=`;
-  theme switch clears sub, Branche travels) reset the draft.
+- **The Aufgabe card header carries two 40px icon buttons, both BORDERLESS** (founder s169
+  follow-up: no box around them; hover tint only, matching the rail header icons).
+  **Expand** (`Maximize2`) opens the whole task in the app's standard centered dialog: the card is
+  capped so the page fits one viewport and can therefore cut a long Aufgabe mid-line, so there has
+  to be one place that shows all of it. Same eyebrow + Ziel line as the card, so it reads as the
+  same object; standard dialog recipe (soft darkening, no blur), never a bottom sheet. **Shuffle**
+  (`Shuffle`, replacing the dice, s169) re-rolls within the current scope (keeps typed text, clears
+  a stale result); the icon is point-symmetric, so the half-turn per roll reads as motion and
+  settles back into the same shape. Scope changes (`?sub=`/`?sector=`; theme switch clears sub,
+  Branche travels) reset the draft.
 - Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel
   line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is NOT inside the
   card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
@@ -151,7 +158,9 @@ for rework — do not treat its current design as reference.**
   - **`GrammarDials`** (mobile-only) is a Himmelblau tile headed "Grammatik" (+ reset icon) with
     ONE content-sized dial per axis, centered, axis eyebrows above: green dot = detected form,
     solid primary = chosen target, tap opens a small picker popover. Dimmed but visible before a
-    correction, so the feature announces itself. The legend line doubles as the refusal/error slot.
+    correction, so the feature announces itself. The legend line doubles as the refusal/error slot
+    and is **parked at the tile's bottom edge** (founder s169 follow-up), with the dials centered in
+    the room above it: the same two-region split the sentence card uses, so the two tiles rhyme.
   - **The sentence card owns every state** behind a centered view toggle: Original (coral marks) /
     Korrigiert (green marks) / **Umgeformt** (the transformed sentence, green-marked via a diff
     against the corrected one, plus the Hinweis + Nochmal + speak row). The separate transform card

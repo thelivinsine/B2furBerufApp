@@ -1302,3 +1302,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/writing/fokus/GrammarDials.tsx` · `src/components/ui/button.tsx` · `src/index.css` ·
   `CLAUDE.md` · `.claude/skills/design/SKILL.md` · `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 2 (verbatim, 2026-07-26):** `1. Fokus: keep the line "Prüf zuerst deinen Satz, dann
+  erkennt die KI Aktiv/Passiv, Zeitform und Modus." line to the bottom of the bottom tile.` /
+  `2. Kurz/Lang: Add an expand button to the task tile and when it's clicked the aufgabe should
+  appear as a pop up. Refer to the previews created for Grammatik tile from the previous session.
+  Replace the dice button with a shuffle button - no need of a separate border for these icons.`
+- **Response summary:** (1) `GrammarDials` splits into two regions like the Fokus sentence card:
+  the dials centre in the room left over (`flex-1` + `content-center`), the legend is parked on the
+  tile's bottom edge. (2) The Aufgabe card header now carries two BORDERLESS 40px icon buttons.
+  **Expand** (`Maximize2`) opens the task in the app's standard centred dialog, styled after the
+  round-1 Fokus preview's "Variante A" (`preview/fokus-grammatik-mobile.html`: soft darkening, no
+  blur, explicitly not a bottom sheet), repeating the card's eyebrow + Ziel line so it reads as the
+  same object. This closes the loop on the s169 capping rule: the card is capped so the page fits one
+  viewport, which cuts a long Aufgabe mid-line, so one place has to show all of it. **Shuffle**
+  replaces `Dices`; the glyph is point-symmetric, so the existing half-turn per roll still reads as
+  motion and settles into the same shape. The Adressat + Leitpunkte block is now shared between the
+  card (capped, animated) and the pop-up (never capped), and `taskOpen` is in the `useFillEditor`
+  revision key so Radix's scroll lock cannot leave a stale measurement behind. Verified at 360x800
+  and 1440x900: zero page overflow before, during and after the pop-up. Gates: typecheck · lint
+  (0 errors) · lint:content · test:unit 317/317 · build · check:bundle (117.3 kB) · check:contrast.
+- **Artifacts (prompt 2):** commit `16f285c` · `src/features/writing/fokus/GrammarDials.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log
