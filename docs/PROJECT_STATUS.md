@@ -9,8 +9,9 @@ textarea to the space actually left: fills it at rest with no page scroll, grows
 then scrolls internally. On desktop that resting height is capped (Kurz shorter than Lang, neither
 filling the window); mobile still fills. Also this session: **the Himmelblau accent is a fill, never
 an outline** (every filter/selection rail and its opening button now wears the neutral card edge),
-and **two previews for reworking Fokus Grammatik on mobile are waiting on a founder pick** (not
-implemented). Prior s167 (merged and live, PRs #711 to #715): one shared Aufgabe-selection
+and **the Fokus mobile rework shipped after four preview rounds**: the hidden Grammatik panel
+became an always-visible dial tile below the sentence card, with an Umgeformt view toggle, a
+corner "Neu", two-column corrections and the same fixed bottom chrome as Kurz/Lang. Prior s167 (merged and live, PRs #711 to #715): one shared Aufgabe-selection
 rule so the picker's counts stop lying, the exam-shaped task schema, and two content waves taking the
 bank to **643 tasks**; `docs/plans/SCHREIBEN-OVERHAUL.md` carries the rest of that roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
@@ -136,25 +137,31 @@ rest of the space without any scrolling." Preview round explicitly waived.
   `docs/areas/SCHREIBEN.md`. **Gates:** typecheck · lint (0 errors) · test:unit **317/317** ·
   build · check:bundle (117.2 kB) · check:contrast · lint:content.
 
-**OPEN, waiting on the founder: Fokus Grammatik on mobile.** Two previews are ready and NOT
-implemented (`preview/fokus-grammatik-mobile.html`, artifact
-`https://claude.ai/code/artifact/dbc08865-71de-4ec2-94cb-99d23ca1d75b`). Founder's diagnosis: the
-transform feature, which IS the Satzlabor, hides behind a "Grammatik" toggle that sits where
-Kurz/Lang put a filter and looks exactly like one, so learners never find it.
-- **Shared across both variants:** the top toggle is deleted; a "Satz umformen" tile moves BELOW
-  the writing field with three forms always visible (Passiv, Perfekt, Konjunktiv II, one per
-  axis) plus an "Erkannt: Aktiv · Präsens · Indikativ" line; nothing scrolls at rest; the
-  transformed sentence lands where the correction tiles are, and the Original/Korrigiert toggle
-  gains a third segment, **Umgeformt**, which lets the separate transform card disappear entirely.
-- **Variante A · Pop-up:** "Alle Formen" opens the app's standard centered dialog. Page height
-  never changes; all eight forms comparable at once; costs an overlay and hides the sentence.
-- **Variante B · In der Seite:** the tile expands in place and the page becomes scrollable. No
-  overlay and the same motion as the Aufgabe panel, but it re-introduces the page scroll that was
-  just removed from Kurz/Lang, and on small phones it pushes the forms under the nav bar.
-- Two smaller calls are flagged in the preview for a yes/no: keeping the KI-Hinweis visible after
-  a correction (today it vanishes, though transforming sends text to the AI again), and using the
-  centered dialog rather than a bottom sheet (a sheet is better for thumbs but would be a new
-  pattern, and the retired "Mehr" sheet is on the landmine list).
+**Fokus mobile rework: SHIPPED after four preview rounds.** The transform feature, which IS the
+Satzlabor, hid behind a "Grammatik" toggle that sat where Kurz/Lang put a filter and looked exactly
+like one. Rounds: r1 (move the panel; both variants rejected) → r2 ideation ("it is a flow step,
+not a filter"; concept C picked) → r3 (two tiles; Himmelblau treatment G picked) → r4 (full-height
+tiles, fixed KI line; "Option 2" picked with one amendment). All rounds live in
+`preview/fokus-grammatik-mobile*.html`, one artifact URL redeployed throughout.
+- **What shipped (mobile only, desktop untouched):** the toolbar toggle and collapsed panel are
+  gone. Two tiles fill the height between the switcher and the fixed bottom chrome (`measureMobile`
+  minHeight; no resting page scroll). The new **`GrammarDials`** tile ("Grammatik" header + reset)
+  carries one centered dial per axis: green dot = detected form, solid primary = target, tap opens
+  a picker popover; dimmed but visible before a correction. The sentence card owns every state
+  behind a centered Original / Korrigiert / **Umgeformt** toggle (transformed sentence in place,
+  green-marked via diff against the corrected one, Hinweis + Nochmal + speak beneath; the separate
+  transform card below is desktop-only now). **"Neu"** sits top-right (the Kurz/Lang dice corner;
+  icon-only beside three segments). **Corrections are two text columns with a vertical separator**
+  (founder amendment: no chip backgrounds on mobile; colors kept). Feedback + Korrigieren float
+  fixed above the KI line until a correction exists; the KI line is locked above the nav in every
+  state and carries the "Noch N Wörter" hint while the sentence is too short. All fixed chrome is
+  portalled to `<body>` (the WritingHub tab-slide transform lesson).
+- **Verified in headless Chromium at 390x844** with stubbed check/transform responses: zero page
+  scroll and one KI-line position across idle → too-short → corrected → picker → Passiv → Passiv +
+  Perfekt → back to Korrigiert → reset → Neu; desktop screenshot byte-identical anatomy.
+- **Files:** `src/features/writing/fokus/GrammarDials.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md`.
+  **Gates:** typecheck · lint (0 errors) · test:unit **317/317** · build · check:bundle (117.2 kB).
 
 **Handoff after session 167 (2026-07-25), part 3: the Branche answer + wave 2. MERGED AND LIVE**
 (PRs **#714**, **#715**).

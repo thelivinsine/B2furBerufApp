@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
   Loader2,
   Info,
   Clock,
   Check,
-  SlidersHorizontal,
-  ChevronDown,
   RotateCcw,
   RefreshCw,
 } from "lucide-react";
@@ -18,11 +17,12 @@ import { SpeakButton } from "@/components/shared/SpeakButton";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { EnPeek } from "@/features/grammar/EnPeek";
 import { GrammarRail } from "./GrammarRail";
+import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
 import { floatingNote, floatingSlot } from "../floatingCluster";
 import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
-import { diffWords } from "@/lib/wordDiff";
+import { diffWords, type DiffToken } from "@/lib/wordDiff";
 import { cn } from "@/lib/utils";
 
 /**
@@ -47,11 +47,17 @@ export function FokusTrainer({
   const m = useFokusMachine(initialText);
   const reduce = useReducedMotion();
   const [peek, setPeek] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(false);
-  // Correction result view: the learner's original (coral marks) or the
-  // corrected sentence (green marks). Defaults to the corrected sentence.
-  const [view, setView] = useState<"orig" | "corr">("corr");
+  // Result view: the learner's original (coral marks), the corrected sentence
+  // (green marks), or, on mobile, the transformed sentence ("Umgeformt", the
+  // r4 rework). Defaults to the corrected sentence.
+  const [view, setView] = useState<"orig" | "corr" | "trans">("corr");
   const taRef = useRef<HTMLTextAreaElement>(null);
+  const taMobileRef = useRef<HTMLTextAreaElement>(null);
+  // Mobile geometry: the two tiles fill the height down to the fixed bottom
+  // chrome (cluster + KI line), so the resting screen has no dead zone.
+  const mobileRootRef = useRef<HTMLDivElement>(null);
+  const clusterRef = useRef<HTMLDivElement>(null);
+  const kiNoteRef = useRef<HTMLParagraphElement>(null);
 
   // Restore a resumed draft's text once (after sign-in), without auto-submitting:
   // the learner presses Korrigieren themselves, matching the guided-mode choice.
@@ -74,6 +80,23 @@ export function FokusTrainer({
   useEffect(() => {
     setView("corr");
   }, [m.corrected]);
+
+  // A transformed sentence exists: word-level diff against the CORRECTED
+  // sentence, so the mobile Umgeformt view can green-mark what the transform
+  // changed (the same mark language as the correction itself).
+  const hasTrans =
+    m.transform.status === "done" && m.transform.applicable && !!m.transform.transformed;
+  const transTokens = useMemo<DiffToken[] | null>(
+    () => (hasTrans ? diffWords(m.corrected, m.transform.transformed).tokens : null),
+    [hasTrans, m.corrected, m.transform.transformed],
+  );
+
+  // A completed transform pulls the mobile view onto it; losing the transform
+  // (reset, re-selection of the detected base) drops back to Korrigiert.
+  useEffect(() => {
+    if (hasTrans) setView("trans");
+    else setView((v) => (v === "trans" ? "corr" : v));
+  }, [hasTrans]);
 
   const onSubmit = () => {
     if (!isSignedIn) {
@@ -117,10 +140,41 @@ export function FokusTrainer({
       m.selection.tense !== m.detected.tense ||
       m.selection.mood !== m.detected.mood);
 
-  // A fresh sentence disables the grammar controls again; close a stale panel.
+  // Mobile fill: the two tiles own the space between their top and the fixed
+  // bottom chrome, mirroring the Kurz/Lang treatment (s168). minHeight rather
+  // than height, so overflowing content (many corrections) still scrolls.
+  const measureMobile = useCallback(() => {
+    const root = mobileRootRef.current;
+    if (!root) return;
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+      root.style.minHeight = "";
+      return;
+    }
+    const topDoc = root.getBoundingClientRect().top + window.scrollY;
+    let reserve = 12;
+    for (const el of [clusterRef.current, kiNoteRef.current]) {
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (r.height > 0) reserve = Math.max(reserve, window.innerHeight - r.top + 12);
+    }
+    root.style.minHeight = `${Math.max(360, Math.floor(window.innerHeight - topDoc - reserve))}px`;
+  }, []);
+  useLayoutEffect(() => {
+    measureMobile();
+  });
   useEffect(() => {
-    if (!railEnabled) setPanelOpen(false);
-  }, [railEnabled]);
+    window.addEventListener("resize", measureMobile);
+    window.addEventListener("orientationchange", measureMobile);
+    let live = true;
+    void document.fonts?.ready.then(() => {
+      if (live) measureMobile();
+    });
+    return () => {
+      live = false;
+      window.removeEventListener("resize", measureMobile);
+      window.removeEventListener("orientationchange", measureMobile);
+    };
+  }, [measureMobile]);
 
   const korrigierenButton = (
     <Button onClick={onSubmit} disabled={m.status === "submitting" || tooShort} variant="gradient">
@@ -390,63 +444,216 @@ export function FokusTrainer({
     </Card>
   );
 
+  // Mobile view toggle segments (r4): Original / Korrigiert, plus Umgeformt
+  // once a transform exists. An error-free correction has no Original to show,
+  // so its toggle only appears once there is a transform to switch to.
+  const mobileSegments: { id: "orig" | "corr" | "trans"; label: string }[] =
+    m.status === "corrected"
+      ? m.hasErrors
+        ? [
+            { id: "orig" as const, label: "Original" },
+            { id: "corr" as const, label: "Korrigiert" },
+            ...(hasTrans ? [{ id: "trans" as const, label: "Umgeformt" }] : []),
+          ]
+        : hasTrans
+          ? [
+              { id: "corr" as const, label: "Korrigiert" },
+              { id: "trans" as const, label: "Umgeformt" },
+            ]
+          : []
+      : [];
+
+  // One line under the dials: the legend, or the honest reason a transform
+  // did not happen (refusal / error), closest to the controls that caused it.
+  const dialsLegend =
+    m.status !== "corrected" ? (
+      <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.</>
+    ) : m.transform.status === "error" ? (
+      <>{m.transform.message ?? "Diese Umformung war gerade nicht möglich."}</>
+    ) : m.transform.status === "done" && !m.transform.applicable ? (
+      <>{refusalCopy(m.transform.reason)}</>
+    ) : canReset ? (
+      <>
+        <b className="font-bold text-success">Grüner Punkt = dein Satz.</b> Blau = dein Ziel.
+      </>
+    ) : (
+      <>
+        <b className="font-bold text-success">Grüner Punkt = dein Satz.</b> Tippe eine andere Form.
+      </>
+    );
+
+  const marked = (tokens: DiffToken[], mark: "coral" | "green") => (
+    <p className="text-center text-base leading-relaxed">
+      {tokens.map((tk, i) => (
+        <span key={i}>
+          {tk.changed ? (
+            <span className={cn("font-semibold", mark === "coral" ? "fx-mark-coral" : "fx-mark-green")}>
+              {tk.text}
+            </span>
+          ) : (
+            tk.text
+          )}
+          {i < tokens.length - 1 ? " " : ""}
+        </span>
+      ))}
+    </p>
+  );
+
+  // The mobile sentence card (r4 "Option 2"): centered view toggle with the
+  // compact "Neu" control in the top-right corner (the Kurz/Lang dice spot;
+  // icon-only beside a three-segment toggle), content vertically centered.
+  const mobileSentenceCard = (
+    <Card className="flex grow-[1.15] flex-col">
+      {m.status === "corrected" ? (
+        <CardContent className="flex flex-1 flex-col gap-4 p-5">
+          <div className="relative flex min-h-9 items-center justify-center px-9">
+            {mobileSegments.length > 0 && (
+              <div
+                className={cn(
+                  "inline-flex rounded-lg bg-muted p-0.5 font-bold",
+                  mobileSegments.length === 3 ? "text-[11px]" : "text-xs",
+                )}
+              >
+                {mobileSegments.map((seg) => (
+                  <button
+                    key={seg.id}
+                    type="button"
+                    aria-pressed={view === seg.id}
+                    onClick={() => setView(seg.id)}
+                    className={cn(
+                      "rounded-md py-1 transition-colors",
+                      mobileSegments.length === 3 ? "px-2" : "px-3",
+                      view === seg.id
+                        ? "bg-surface text-foreground shadow-soft"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {seg.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={m.startOver}
+              aria-label="Neuer Satz"
+              title="Neuer Satz"
+              className="absolute right-0 top-1/2 inline-flex h-9 -translate-y-1/2 items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              {mobileSegments.length < 3 && "Neu"}
+            </button>
+          </div>
+
+          <div className="flex flex-1 flex-col justify-center gap-4">
+            {view === "trans" && hasTrans && transTokens ? (
+              <>
+                {marked(transTokens, "green")}
+                <div className="h-px bg-border" />
+                {m.transform.note && (
+                  <p className="text-center text-sm leading-relaxed text-muted-foreground">
+                    <b className="font-bold text-primary">Hinweis:</b>{" "}
+                    {peek && m.transform.noteEn ? m.transform.noteEn : m.transform.note}
+                    {m.transform.noteEn && (
+                      <EnPeek active={peek} onChange={setPeek} className="ml-1.5 align-middle" />
+                    )}
+                  </p>
+                )}
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={m.regenerate}
+                    title="Andere Formulierung von der KI"
+                    className="inline-flex h-8 items-center gap-1 rounded-lg border border-border bg-surface px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" /> Nochmal
+                  </button>
+                  <SpeakButton text={m.transform.transformed} />
+                </div>
+              </>
+            ) : showResult && diff ? (
+              <>
+                {marked(view === "orig" ? diff.originalTokens : diff.tokens, view === "orig" ? "coral" : "green")}
+                <div className="h-px bg-border" />
+                {/* Corrections as two text columns with a vertical separator
+                    (founder r4 amendment: no chip backgrounds; the category
+                    eyebrow, struck original and green fix keep their colors). */}
+                <div className="grid grid-cols-2 gap-y-3.5">
+                  {diff.changes.map((c, i) => (
+                    <div
+                      key={i}
+                      className={cn("px-3 text-center", i % 2 === 1 && "border-l border-border")}
+                    >
+                      <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
+                        {c.category}
+                      </span>
+                      {c.moved ? (
+                        <span className="text-sm font-bold text-success">{c.to}</span>
+                      ) : (
+                        <span className="text-sm">
+                          <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
+                          <span className="text-muted-foreground/80">→</span>{" "}
+                          <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-center text-base leading-relaxed">{m.corrected}</p>
+                <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-success">
+                  <Check className="h-4 w-4" /> Alles korrekt. Wähle eine Umformung.
+                </p>
+              </>
+            )}
+          </div>
+        </CardContent>
+      ) : (
+        <CardContent className="flex flex-1 flex-col gap-3 p-5">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">Dein Satz</p>
+          <textarea
+            ref={taMobileRef}
+            value={m.input}
+            onChange={(e) => m.setInput(e.target.value)}
+            disabled={m.status === "submitting"}
+            rows={3}
+            placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
+            className="min-h-[96px] w-full flex-1 resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+          />
+          <UmlautKeys textareaRef={taMobileRef} value={m.input} onChange={m.setInput} />
+          {m.words > 25 && (
+            <p className="text-right text-xs text-muted-foreground">
+              Tipp: In Fokus funktioniert ein Satz am besten.
+            </p>
+          )}
+        </CardContent>
+      )}
+    </Card>
+  );
+
   return (
     <div>
-      {/* Mobile: the Bibliothek pattern, a toolbar row (Grammatik panel toggle)
-          above the content. Neuer Satz now lives on the correction card (s150). */}
-      <div className="space-y-4 lg:hidden">
-        <div className="space-y-3">
-          <div className="flex justify-center gap-2">
-            {/* Always tappable (founder s151): before a correction the panel opens
-                to the GrammarRail's "Prüf zuerst deinen Satz …" hint (matching the
-                always-visible desktop rail), instead of a dead disabled button that
-                reads as broken. */}
-            <Button
-              /* Closed = the Himmelblau tile of the rail it opens (founder s166,
-                 the `outline` fill was too faint against the page ground). */
-              variant={panelOpen ? "default" : "accent"}
-              aria-expanded={panelOpen}
-              aria-pressed={panelOpen}
-              className="h-10 rounded-lg font-semibold"
-              onClick={() => setPanelOpen((o) => !o)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Grammatik
-              <ChevronDown className={`h-4 w-4 transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-            </Button>
-          </div>
-          <AnimatePresence initial={false}>
-            {panelOpen && (
-              <motion.div
-                key="grammar-panel"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                // 0.18s: the shared panel timing (micro-motion pass, s149 P2).
-                transition={reduce ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
-                className="overflow-hidden"
-              >
-                <GrammarRail
-                  layout="panel"
-                  detected={m.detected}
-                  selection={m.selection}
-                  enabled={railEnabled}
-                  loadingValue={loadingValue}
-                  onSelect={(axis, value) => {
-                    onSelect(axis, value);
-                    setPanelOpen(false);
-                  }}
-                  onReset={m.reset}
-                  canReset={canReset}
-                  onClose={() => setPanelOpen(false)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        {inputCard}
-        {errorCard}
-        {bottomBox}
+      {/* Mobile (r4 rework, founder-approved "Option 2"): two tiles fill the
+          height down to the fixed bottom chrome. The sentence card carries the
+          view toggle + corner Neu; the Grammatik dial tile below it makes the
+          transform feature visible from the first second (the old toolbar
+          toggle read as a filter and hid it). */}
+      <div ref={mobileRootRef} className="flex flex-col gap-4 lg:hidden">
+        {mobileSentenceCard}
+        {errorCard && <div className="shrink-0">{errorCard}</div>}
+        <GrammarDials
+          detected={m.detected}
+          selection={m.selection}
+          enabled={railEnabled}
+          loadingValue={loadingValue}
+          onSelect={onSelect}
+          onReset={m.reset}
+          canReset={canReset}
+          legend={dialsLegend}
+          className="grow"
+        />
       </div>
 
       {/* Desktop: content column + sticky grammar rail (Bibliothek 16rem grid). */}
@@ -473,30 +680,48 @@ export function FokusTrainer({
       {/* (The old idle helper line was removed in s149: it duplicated the
           rail's "Prüf zuerst deinen Satz …" hint.) */}
 
-      {/* Mobile: Feedback + Korrigieren float side by side above the nav, no bar
-          chrome (founder s159), with the condensed KI-Hinweis directly beneath.
-          Gone once corrected (the toolbar owns Grammatik; the card owns Neuer Satz). */}
-      {m.status !== "corrected" && (
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mt-4 lg:hidden">
-          {/* Every control sits on its own opaque backing (see `floatingCluster`);
-              FeedbackIconButton is already solid. */}
-          <div className="flex items-stretch gap-2">
-            <FeedbackIconButton />
-            <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
-              {korrigierenButton}
+      {/* Mobile fixed chrome, portalled to <body>: WritingHub slides tab panels
+          with an `x` transform, and a transformed ancestor would re-anchor
+          `fixed` descendants mid-slide (the Kurz/Lang lesson, s168).
+
+          FIXED, not sticky: the KI line is locked just above the nav in every
+          state (founder r4), with the Feedback + Korrigieren cluster floating
+          above it until a correction exists. `measureMobile` gives the tile
+          column the matching height. */}
+      {createPortal(
+        <>
+          {m.status !== "corrected" && (
+            <div
+              ref={clusterRef}
+              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2.5rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
+            >
+              {/* Every control sits on its own opaque backing (see
+                  `floatingCluster`); FeedbackIconButton is already solid. */}
+              <div className="flex items-stretch gap-2">
+                <FeedbackIconButton />
+                <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
+                  {korrigierenButton}
+                </div>
+              </div>
             </div>
-          </div>
-          {/* One line slot under the buttons: the "how many words to go" hint
-              (the honest reason the button is inactive) while the sentence is
-              too short, the Art. 50 note whenever prüfen is actually possible. */}
+          )}
+          {/* The one bottom line: the "how many words to go" hint (the honest
+              reason Korrigieren is inactive) while the sentence is too short,
+              the Art. 50 note otherwise. Never both. */}
           {tooShort && m.status === "idle" && m.words > 0 ? (
-            <p className="mt-2 text-center text-[11px] font-medium leading-snug text-warning">
+            <p
+              ref={kiNoteRef}
+              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] font-medium leading-snug text-warning lg:hidden"
+            >
               <span className={floatingNote}>
                 Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du prüfen.
               </span>
             </p>
           ) : (
-            <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
+            <p
+              ref={kiNoteRef}
+              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden"
+            >
               <span className={floatingNote}>
                 KI-geprüft, kann Fehler enthalten.{" "}
                 <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
@@ -505,7 +730,8 @@ export function FokusTrainer({
               </span>
             </p>
           )}
-        </div>
+        </>,
+        document.body,
       )}
 
       {aiNoteDesktop}

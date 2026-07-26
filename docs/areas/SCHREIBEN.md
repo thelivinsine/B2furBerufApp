@@ -79,10 +79,12 @@ design as reference.**
   sub-themes; Thema groups = Domain categorization with gesundheit folded into Alltag). No
   overflow clipping on the tile (popovers must escape); the mobile panel animates via fade/slide,
   not height collapse, for the same reason.
-- Mobile = the Bibliothek pattern: a toolbar button toggles the collapsible panel
-  (`layout="panel"`, no floating chip rows); Kurz/Lang get the floating Auswerten cluster (below).
-- **The panel toggles wear the rail's own Himmelblau** (s166): "Aufgabe wählen" (Kurz/Lang) and
-  "Grammatik" (Fokus) are `variant="accent"` when closed, `default` (solid primary) when open.
+- Mobile Kurz/Lang = the Bibliothek pattern: a toolbar button toggles the collapsible panel
+  (`layout="panel"`, no floating chip rows) plus the floating Auswerten cluster (below). Fokus has
+  NO toolbar toggle since the s168 rework; its mobile grammar controls live in the always-visible
+  `GrammarDials` tile (see §Fokus).
+- **The panel toggle wears the rail's own Himmelblau** (s166): "Aufgabe wählen" (Kurz/Lang) is
+  `variant="accent"` when closed, `default` (solid primary) when open.
   `outline`'s `bg-surface/50` made them vanish into the page ground. Since s168 the `accent`
   variant is outlined with the neutral `border` token, matching the rails it opens (the earlier
   `accent-ink/70` edge existed only to clear the 3:1 UI floor that no alpha of the 77%-light accent
@@ -118,10 +120,27 @@ design as reference.**
   `passiv_zustand` maps straight to it). `GrammarRail` is the same Himmelblau tile:
   detected form = **white pill + green `bg-success` dot** (never a blue fill/ring), target solid
   primary, pre-correction all idle, header reset icon (back to the detected form), hint breaks
-  after "Grüner Punkt = dein Satz.". Mobile (pre-correction) floats the **Feedback icon button next
-  to Korrigieren** (both squircle, no bordered bar chrome) with the condensed KI-Hinweis centered
-  directly beneath them (s160; opacity rules in §Mobile floating action cluster); the mobile
-  Grammatik button always opens (never `disabled`).
+  after "Grüner Punkt = dein Satz.". Desktop only since s168; the founder-approved
+  mobile rework (preview rounds r2 to r4, "Option 2") replaced the collapsed panel + toolbar toggle,
+  which read as a filter and hid the transform feature:
+  - **Two tiles fill the height** between the switcher and the fixed bottom chrome (`measureMobile`
+    sets `minHeight`; sentence card `grow-[1.15]`, tile `grow`, content vertically centered). No
+    resting page scroll.
+  - **`GrammarDials`** (mobile-only) is a Himmelblau tile headed "Grammatik" (+ reset icon) with
+    ONE content-sized dial per axis, centered, axis eyebrows above: green dot = detected form,
+    solid primary = chosen target, tap opens a small picker popover. Dimmed but visible before a
+    correction, so the feature announces itself. The legend line doubles as the refusal/error slot.
+  - **The sentence card owns every state** behind a centered view toggle: Original (coral marks) /
+    Korrigiert (green marks) / **Umgeformt** (the transformed sentence, green-marked via a diff
+    against the corrected one, plus the Hinweis + Nochmal + speak row). The separate transform card
+    below is desktop-only. **"Neu"** (not "Neuer Satz") sits top-right of the card, the Kurz/Lang
+    dice corner; icon-only beside the three-segment toggle.
+  - **Corrections are two text columns with a vertical separator** (founder r4 amendment: no
+    Himmelblau chip backgrounds on mobile; category eyebrow, struck original and green fix keep
+    their colors). Desktop keeps the fix tiles.
+  - **Feedback + Korrigieren float fixed** above the KI line until a correction exists (portalled,
+    see §Mobile floating action cluster); the KI line is locked just above the nav in every state,
+    and carries the "Noch N Wörter" hint instead while the sentence is too short.
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. Its header row carries a
   **"Nochmal" button** (RefreshCw, beside the speaker) that asks the AI for an alternative phrasing
@@ -165,10 +184,12 @@ disabled Auswerten button and the card's hint line read as two labels on top of 
   and jumped on every task change. It is now pinned above the nav at one height for good, with
   AppShell's `<main>` offsets mirrored (`mx-auto max-w-6xl px-4 sm:px-6`) so it stays in the
   content column, and `useFillEditor` gives the trainer root the matching bottom clearance.
-- **Both fixed layers are portalled to `<body>`.** WritingHub slides tab panels with an `x`
+- **Fokus followed in the same session** (the s168 mobile rework): its cluster is `fixed` too,
+  raised 2.5rem above the nav so the locked KI line fits beneath it, and it disappears once a
+  correction exists (the card corner "Neu" and the dial tile take over).
+- **All fixed layers are portalled to `<body>`.** WritingHub slides tab panels with an `x`
   transform, and a transformed ancestor becomes the containing block for its `fixed` descendants;
-  without the portal the cluster and the Art. 50 line re-anchor to the panel mid-slide. Fokus still
-  uses the in-flow sticky cluster.
+  without the portal the clusters and the KI lines re-anchor to the panel mid-slide.
 - **Opacity is the contract, not the bar.** `src/features/writing/floatingCluster.ts` holds the two
   class names: `floatingSlot` (opaque `bg-background` behind a control, because `variant="outline"`
   is `bg-surface/50` and `disabled:` is `opacity-50`) and `floatingNote` (the caption plate,

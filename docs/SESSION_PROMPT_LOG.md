@@ -1175,3 +1175,28 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Recommendation: Option 1, because Neu stays the same size and place in every state while Option 2
   shrinks to an icon next to the three-segment toggle.
 - **Artifacts (prompt 8):** `preview/fokus-grammatik-mobile-r4.html` (new) · this log
+- **Prompt 9 (verbatim, 2026-07-26):** `option 2 but for the upper tile, no need of blue colored chips
+  for showing the corrections. Just write it in two columns with a vertical separator. Keep the colors
+  and formatting of the text intact for the corrections.`
+- **Response summary:** The pick, so IMPLEMENTED (no further preview round requested). Mobile-only
+  rework of the Fokus Satzlabor, desktop untouched. The toolbar "Grammatik" toggle and its collapsed
+  panel are gone. Two tiles fill the height between the switcher and the fixed bottom chrome
+  (`measureMobile` sets minHeight; no resting page scroll): the sentence card with a centered
+  Original / Korrigiert / Umgeformt toggle and a compact top-right "Neu" (icon-only beside three
+  segments), and below it the new **`GrammarDials`** Himmelblau tile ("Grammatik" header + reset, one
+  centered dial per axis with green detected dot / primary target fill, picker popovers, dimmed but
+  visible before a correction; its legend line doubles as the refusal/error slot). The transformed
+  sentence renders IN the sentence card, green-marked via a client diff against the corrected
+  sentence, with Hinweis + EnPeek + Nochmal + Vorlesen beneath; the separate transform card is
+  desktop-only now. **Corrections are two text columns with a vertical separator** per the amendment
+  (no chip backgrounds; category eyebrow, struck original, green fix keep their colors). Feedback +
+  Korrigieren float fixed above the KI line until a correction exists; the KI line is locked above
+  the nav in every state (the too-short hint takes its slot while Korrigieren is inactive); all fixed
+  chrome portalled to `<body>`. Verified in headless Chromium at 390x844 with stubbed
+  check/transform responses across the full flow (idle, too-short, corrected, picker, Passiv,
+  Passiv + Perfekt, view toggles, reset, Neu): zero page scroll and one KI-line position everywhere;
+  desktop screenshot unchanged. Gates: typecheck · lint (0 errors) · test:unit 317/317 · build ·
+  check:bundle (117.2 kB).
+- **Artifacts (prompt 9):** `src/features/writing/fokus/GrammarDials.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · this log
