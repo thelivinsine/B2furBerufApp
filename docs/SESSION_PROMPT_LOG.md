@@ -1153,3 +1153,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   learned meaning (Himmelblau = selection surface) and the white-chips-on-blue gives clear but subtle
   contrast; F is the quiet alternative, H the outlier.
 - **Artifacts (prompt 7):** `preview/fokus-grammatik-mobile-r3.html` (new) · this log
+- **Prompt 8 (verbatim, 2026-07-26):** `I like G variant but why is there no preview for G2? Also, for
+  the top tile the neuer satz can could be in a different position because it's disturbing the aesthetics
+  of the correction chips? It could be positioned either below the chips centered (also the korrigieren
+  button should definitely stay there), or to the top right corner, I'm not sure. Also, it need not say
+  neuer satz, just Neu would suffice. Also, there's a lot of empty space below the cards - fix it by
+  expanding the two tiles a bit and keep generous spacing all round. the KI-gepruft line should be locked
+  at the bottom just above the navigation menu. By taking all of this feedback into consideration, build
+  upon the preview G and provide some options.`
+- **Response summary:** Round-4 sheet (same artifact URL), variant G built out with every point. Noted
+  that G2 did exist in round 3 (the second phone, transformed with picker open) and answered the concern
+  structurally: every option now shows its own Umgeformt state. Changes shared by all phones: the two
+  tiles now SHARE THE FULL HEIGHT between header and bottom (sentence card slightly larger than the
+  Grammatik tile, content vertically centered, no dead zone), the KI line is fixed just above the nav in
+  every state, the button says just **Neu**, and a new "Ausgangszustand" phone shows pre-correction with
+  Korrigieren staying in the bottom thumb slot and the Grammatik tile visible but dimmed. The founder's
+  two candidate positions for Neu became the round's options: **Option 1 · Neu zentriert unter den
+  Chips** (one center axis through the whole screen; shown korrigiert + umgeformt) and **Option 2 · Neu
+  oben rechts** (the Kurz/Lang dice corner; compact chip beside the 2-segment toggle, icon-only beside
+  the 3-segment one; shown korrigiert + umgeformt with a combined Passiv + Perfekt state).
+  Recommendation: Option 1, because Neu stays the same size and place in every state while Option 2
+  shrinks to an icon next to the three-segment toggle.
+- **Artifacts (prompt 8):** `preview/fokus-grammatik-mobile-r4.html` (new) · this log
