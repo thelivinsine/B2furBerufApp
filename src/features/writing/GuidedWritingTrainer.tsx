@@ -417,11 +417,14 @@ export function GuidedWritingTrainer({
               {evaluateButton}
             </div>
           </div>
-          {/* Desktop only: on mobile the floating action cluster pins exactly
-              over the card's last line, so this hint rides in the cluster
-              instead (see below) and never ends up under the buttons. */}
+          {/* The "why can't I press Auswerten yet" line lives in the card the
+              learner is typing in, right under the umlaut keys (founder s169).
+              It used to ride the mobile action cluster's caption slot, which
+              cost that slot its permanent Art. 50 note; the cluster now sits
+              2.5rem higher (matching Fokus) so a card-tail line cannot land
+              under it any more. */}
           {tooShort && (
-            <p className="hidden items-center gap-1.5 text-xs font-medium text-warning lg:flex">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
               Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
             </p>
           )}
@@ -568,8 +571,7 @@ export function GuidedWritingTrainer({
       {createPortal(
         <>
           {/* Mobile: Feedback + Auswerten (and Neu schreiben after a result)
-              float side by side above the nav, no bar chrome, with the condensed
-              KI-Hinweis directly beneath (founder s160, matching Fokus).
+              float side by side above the nav, no bar chrome (founder s160).
 
               FIXED, not sticky (founder s168): sticky parks the cluster at the
               end of the content whenever the page fits the viewport, so it sat
@@ -577,10 +579,16 @@ export function GuidedWritingTrainer({
               change. Fixed pins it above the nav at one height for good; the
               trainer root carries the matching clearance (`useFillEditor`), and
               the container offsets mirror AppShell's `<main>` so the cluster
-              stays in the content column. */}
+              stays in the content column.
+
+              ONE geometry across the three trainers (founder s169): the same
+              2.5rem lift and the same permanently locked KI line beneath as
+              Fokus, so switching Fokus <-> Kurz <-> Lang no longer moves the
+              buttons. Anything mode-specific in this row would show up as a
+              jump on every tab switch. */}
           <div
             ref={clusterRef}
-            className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
+            className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
           >
             {/* Every control sits on its own opaque backing (see
                 `floatingCluster`); FeedbackIconButton is already solid. */}
@@ -602,27 +610,19 @@ export function GuidedWritingTrainer({
                 {evaluateButton}
               </div>
             </div>
-            {/* One line slot under the buttons: while the text is too short to
-                evaluate it carries the "how many words to go" hint (the honest
-                reason the button is inactive), otherwise the Art. 50 note. Only
-                one of them is ever true, so this stays a single line. */}
-            {tooShort ? (
-              <p className="mt-2 text-center text-[11px] font-medium leading-snug text-warning">
-                <span className={floatingNote}>
-                  Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
-                </span>
-              </p>
-            ) : (
-              <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
-                <span className={floatingNote}>
-                  KI-geprüft, kann Fehler enthalten.{" "}
-                  <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                    Mehr
-                  </Link>
-                </span>
-              </p>
-            )}
           </div>
+          {/* The KI line is locked just above the nav in EVERY state, exactly
+              like Fokus: the "how many words to go" hint moved into the editor
+              card (founder s169), so this slot carries the Art. 50 note alone
+              and never swaps content under the learner. */}
+          <p className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden">
+            <span className={floatingNote}>
+              KI-geprüft, kann Fehler enthalten.{" "}
+              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+                Mehr
+              </Link>
+            </span>
+          </p>
           {aiNoteDesktop}
         </>,
         document.body,

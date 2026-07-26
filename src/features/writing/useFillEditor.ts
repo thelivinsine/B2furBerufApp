@@ -30,6 +30,17 @@ import { useCallback, useEffect, useLayoutEffect, type RefObject } from "react";
  */
 const MIN_SHARE = 0.22;
 const MIN_ABSOLUTE = 160;
+/**
+ * The floor above is a PREFERENCE, not a guarantee (founder s169: "there should
+ * be no scrolling when opened newly"). On a short phone the Aufgabe card, the
+ * field's preferred floor and the fixed bottom chrome together ask for more
+ * than the viewport has, and the old code handed the field its floor anyway,
+ * which is exactly the ~60px of resting page scroll the founder saw on Kurz and
+ * Lang. The field now gives that shortfall back and only stops shrinking here.
+ * A field this short is not the normal case: it only happens on a small phone
+ * with a long Aufgabe, and typing immediately grows it again (state 2 above).
+ */
+const HARD_MIN = 72;
 /** How far past the resting height typing may push the field. */
 const GROWTH = 1.8;
 /**
@@ -43,11 +54,11 @@ const WIDE = "(min-width: 1024px)";
 const GAP = 12;
 /**
  * The least of the Aufgabe text that must stay visible when the card is capped
- * (~4 lines). Below this the card stops shrinking and the page scrolls after
- * all: on a very short viewport, "a sliver of Aufgabe over a sliver of field"
- * would be worse than a small scroll.
+ * (~3 lines). Below this the card stops shrinking and the field gives up the
+ * rest instead: on a very short viewport, "a sliver of Aufgabe over a sliver of
+ * field" would be worse than one of the two scrolling internally.
  */
-const TASK_BODY_MIN = 96;
+const TASK_BODY_MIN = 72;
 
 export function useFillEditor({
   editorRef,
@@ -126,7 +137,7 @@ export function useFillEditor({
       if (r.height > 0) reserve = Math.max(reserve, window.innerHeight - r.top + GAP);
     }
 
-    const min = Math.max(MIN_ABSOLUTE, Math.round(window.innerHeight * MIN_SHARE));
+    const preferred = Math.max(MIN_ABSOLUTE, Math.round(window.innerHeight * MIN_SHARE));
 
     // A long Aufgabe (Inhaltspunkte) can leave less than the field's floor, in
     // which case the page used to scroll at rest. Instead, cap the Aufgabe
@@ -140,7 +151,7 @@ export function useFillEditor({
       const bodyNatural = body.scrollHeight;
       const availNatural =
         window.innerHeight - top - tail - reserve - (bodyNatural - bodyVisible);
-      const deficit = min - availNatural;
+      const deficit = preferred - availNatural;
       const capped = Math.max(TASK_BODY_MIN, Math.round(bodyNatural - Math.max(0, deficit)));
       if (deficit > 0.5 && capped < bodyNatural - 0.5) {
         body.style.maxHeight = `${capped}px`;
@@ -153,7 +164,11 @@ export function useFillEditor({
       top = ta.getBoundingClientRect().top + window.scrollY;
     }
 
-    const available = Math.max(min, Math.floor(window.innerHeight - top - tail - reserve));
+    // What the screen actually offers, floored at HARD_MIN rather than at the
+    // preferred height: overshooting here is what put the resting page into
+    // scroll on short phones (s169). The Aufgabe card gave up what it could
+    // just above; anything still missing comes out of the field.
+    const available = Math.max(HARD_MIN, Math.floor(window.innerHeight - top - tail - reserve));
     // Desktop stops short of the bottom chrome on purpose; mobile fills it.
     const wide = window.matchMedia(WIDE).matches;
     const rest = wide
@@ -169,7 +184,7 @@ export function useFillEditor({
       available,
       Math.round(window.innerHeight * GROWTH_FLOOR),
     );
-    const height = Math.min(Math.max(content, fill ? rest : min), max);
+    const height = Math.min(Math.max(content, fill ? rest : Math.min(preferred, available)), max);
     ta.style.height = `${height}px`;
     ta.style.overflowY = content > max ? "auto" : "hidden";
 

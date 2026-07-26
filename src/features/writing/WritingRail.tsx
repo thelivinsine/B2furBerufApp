@@ -432,13 +432,14 @@ export function WritingRail({
       aria-label="Aufgabe wählen"
       // Himmelblau FILL (founder s149): a light accent wash instead of the grey
       // bg-muted; dark mode gets its own quieter alpha so the wash reads as a
-      // cool sky tint, not murky teal. The OUTLINE is the neutral `border`
-      // token, not the accent (founder s168): a blue wash inside a blue edge
-      // read as too loud, and this is the same edge the Bibliothek FilterRail
-      // and every card already use. No overflow clipping on the tile: the
-      // dropdown popovers must escape it (their lists scroll internally).
+      // cool sky tint, not murky teal. NO visible outline (founder s169): the
+      // border carries the fill's own colour and the tile is separated from the
+      // page by `shadow-soft` alone, the same lift the Bibliothek word cards
+      // use. A grey edge around a blue wash read as dirty. No overflow clipping
+      // on the tile: the dropdown popovers must escape it (their lists scroll
+      // internally).
       className={cn(
-        "rounded-xl border border-border bg-accent/20 shadow-soft dark:bg-accent/10",
+        "rounded-xl border border-accent/20 bg-accent/20 shadow-soft dark:border-accent/10 dark:bg-accent/10",
         className,
       )}
     >
@@ -470,7 +471,9 @@ export function WritingRail({
           </button>
         )}
       </div>
-      <div className="border-t border-border p-3">{body}</div>
+      {/* Divider tinted to the tile, not the neutral `border` grey: with the
+          outline gone a grey rule would be the only hard edge left (s169). */}
+      <div className="border-t border-accent-ink/10 p-3">{body}</div>
     </aside>
   );
 }

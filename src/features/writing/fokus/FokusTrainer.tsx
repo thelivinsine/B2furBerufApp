@@ -141,13 +141,22 @@ export function FokusTrainer({
       m.selection.mood !== m.detected.mood);
 
   // Mobile fill: the two tiles own the space between their top and the fixed
-  // bottom chrome, mirroring the Kurz/Lang treatment (s168). minHeight rather
-  // than height, so overflowing content (many corrections) still scrolls.
+  // bottom chrome, mirroring the Kurz/Lang treatment (s168).
+  //
+  // Before a correction exists the column is given an exact `height` rather
+  // than a minimum (founder s169: "no scrolling when opened newly"). A minimum
+  // let the tiles' natural height win whenever the sum of card chrome, the
+  // three dials and a wrapping legend came to more than the screen offered,
+  // which is where the resting page scroll came from; with a fixed height the
+  // writing field (`min-h-0` + a small floor) absorbs the shortfall instead.
+  // Once a correction is on screen it goes back to a minimum, because a long
+  // list of fixes MUST be able to grow the page.
   const measureMobile = useCallback(() => {
     const root = mobileRootRef.current;
     if (!root) return;
     if (window.matchMedia("(min-width: 1024px)").matches) {
       root.style.minHeight = "";
+      root.style.height = "";
       return;
     }
     const topDoc = root.getBoundingClientRect().top + window.scrollY;
@@ -157,8 +166,11 @@ export function FokusTrainer({
       const r = el.getBoundingClientRect();
       if (r.height > 0) reserve = Math.max(reserve, window.innerHeight - r.top + 12);
     }
-    root.style.minHeight = `${Math.max(360, Math.floor(window.innerHeight - topDoc - reserve))}px`;
-  }, []);
+    const fits = `${Math.max(260, Math.floor(window.innerHeight - topDoc - reserve))}px`;
+    const grows = m.status === "corrected";
+    root.style.minHeight = fits;
+    root.style.height = grows ? "" : fits;
+  }, [m.status]);
   useLayoutEffect(() => {
     measureMobile();
   });
@@ -482,6 +494,28 @@ export function FokusTrainer({
       </>
     );
 
+  // "The KI is working" (founder s169): the sentence line is replaced by three
+  // shimmering bars in its own shape, so the wait is visible in the tile the
+  // answer will appear in, not only in the button label and the dial spinner.
+  // Widths taper like a real sentence; the sweep is the one `.fx-skeleton-bar`
+  // utility (reduced-motion safe) with a small per-bar delay so it cascades.
+  const sentenceSkeleton = (
+    <div
+      role="status"
+      aria-label="Die KI prüft deinen Satz"
+      className="flex w-full flex-col items-center gap-2.5"
+    >
+      {["86%", "72%", "45%"].map((w, i) => (
+        <span
+          key={w}
+          aria-hidden
+          className="fx-skeleton-bar block h-3.5 rounded-full"
+          style={{ width: w, animationDelay: reduce ? undefined : `${i * 0.14}s` }}
+        />
+      ))}
+    </div>
+  );
+
   const marked = (tokens: DiffToken[], mark: "coral" | "green") => (
     <p className="text-center text-base leading-relaxed">
       {tokens.map((tk, i) => (
@@ -503,9 +537,9 @@ export function FokusTrainer({
   // compact "Neu" control in the top-right corner (the Kurz/Lang dice spot;
   // icon-only beside a three-segment toggle), content vertically centered.
   const mobileSentenceCard = (
-    <Card className="flex grow-[1.15] flex-col">
+    <Card className="flex min-h-0 grow-[1.15] flex-col">
       {m.status === "corrected" ? (
-        <CardContent className="flex flex-1 flex-col gap-4 p-5">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-4 p-5">
           <div className="relative flex min-h-9 items-center justify-center px-9">
             {mobileSegments.length > 0 && (
               <div
@@ -545,11 +579,28 @@ export function FokusTrainer({
             </button>
           </div>
 
-          <div className="flex flex-1 flex-col justify-center gap-4">
-            {view === "trans" && hasTrans && transTokens ? (
-              <>
-                {marked(transTokens, "green")}
-                <div className="h-px bg-border" />
+          {/* Two stacked regions (founder s169): the sentence floats centered
+              in whatever room is left, the detail block is anchored under it.
+              The old single centered group pushed all the slack ABOVE the
+              sentence, which read as "more space before the sentence than
+              after". No horizontal rule between them either (founder s169):
+              the gap alone separates them. */}
+          <div className="flex min-h-0 flex-1 flex-col gap-5">
+            <div className="flex flex-1 items-center justify-center">
+              {m.transform.status === "loading"
+                ? sentenceSkeleton
+                : view === "trans" && hasTrans && transTokens
+                  ? marked(transTokens, "green")
+                  : showResult && diff
+                    ? marked(
+                        view === "orig" ? diff.originalTokens : diff.tokens,
+                        view === "orig" ? "coral" : "green",
+                      )
+                    : <p className="text-center text-base leading-relaxed">{m.corrected}</p>}
+            </div>
+
+            {m.transform.status === "loading" ? null : view === "trans" && hasTrans ? (
+              <div className="space-y-3">
                 {m.transform.note && (
                   <p className="text-center text-sm leading-relaxed text-muted-foreground">
                     <b className="font-bold text-primary">Hinweis:</b>{" "}
@@ -570,63 +621,85 @@ export function FokusTrainer({
                   </button>
                   <SpeakButton text={m.transform.transformed} />
                 </div>
-              </>
+              </div>
             ) : showResult && diff ? (
-              <>
-                {marked(view === "orig" ? diff.originalTokens : diff.tokens, view === "orig" ? "coral" : "green")}
-                <div className="h-px bg-border" />
-                {/* Corrections as two text columns with a vertical separator
-                    (founder r4 amendment: no chip backgrounds; the category
-                    eyebrow, struck original and green fix keep their colors). */}
-                <div className="grid grid-cols-2 gap-y-3.5">
-                  {diff.changes.map((c, i) => (
-                    <div
-                      key={i}
-                      className={cn("px-3 text-center", i % 2 === 1 && "border-l border-border")}
-                    >
-                      <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
-                        {c.category}
+              // Corrections as two text columns (founder r4 amendment: no
+              // Himmelblau chip backgrounds on mobile). The separator is ONE
+              // full-height rule down the middle of the grid, not a per-cell
+              // left border: with three fixes the per-cell version stopped
+              // after the first row and looked broken (founder s169).
+              <div className="relative grid grid-cols-2 gap-x-2 gap-y-5">
+                <span
+                  aria-hidden
+                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border"
+                />
+                {diff.changes.map((c, i) => (
+                  <div key={i} className="px-2 text-center">
+                    {/* The eyebrow hugs ITS correction (founder s169): the gap
+                        above a category label is deliberately wider than the
+                        gap below it, so each pair reads as one unit. */}
+                    <span className="mb-0.5 block text-[10px] font-extrabold uppercase leading-tight tracking-wide text-accent-ink">
+                      {c.category}
+                    </span>
+                    {c.moved ? (
+                      <span className="text-sm font-bold text-success">{c.to}</span>
+                    ) : (
+                      <span className="text-sm">
+                        <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
+                        <span className="text-muted-foreground/80">→</span>{" "}
+                        <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
                       </span>
-                      {c.moved ? (
-                        <span className="text-sm font-bold text-success">{c.to}</span>
-                      ) : (
-                        <span className="text-sm">
-                          <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
-                          <span className="text-muted-foreground/80">→</span>{" "}
-                          <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </>
+                    )}
+                  </div>
+                ))}
+              </div>
             ) : (
-              <>
-                <p className="text-center text-base leading-relaxed">{m.corrected}</p>
-                <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-success">
-                  <Check className="h-4 w-4" /> Alles korrekt. Wähle eine Umformung.
-                </p>
-              </>
+              <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-success">
+                <Check className="h-4 w-4" /> Alles korrekt. Wähle eine Umformung.
+              </p>
             )}
           </div>
         </CardContent>
       ) : (
-        <CardContent className="flex flex-1 flex-col gap-3 p-5">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary">Dein Satz</p>
-          <textarea
-            ref={taMobileRef}
-            value={m.input}
-            onChange={(e) => m.setInput(e.target.value)}
-            disabled={m.status === "submitting"}
-            rows={3}
-            placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
-            className="min-h-[96px] w-full flex-1 resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
-          />
-          <UmlautKeys textareaRef={taMobileRef} value={m.input} onChange={m.setInput} />
-          {m.words > 25 && (
-            <p className="text-right text-xs text-muted-foreground">
-              Tipp: In Fokus funktioniert ein Satz am besten.
-            </p>
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-3 p-5">
+          {m.status === "submitting" ? (
+            // The whole tile becomes the waiting state: the sentence the KI is
+            // working on, then the shimmering bars where its answer will land
+            // (founder s169).
+            <div className="flex min-h-0 flex-1 flex-col justify-center gap-6 py-2">
+              <p className="text-center text-base leading-relaxed text-muted-foreground">
+                {m.input}
+              </p>
+              {sentenceSkeleton}
+            </div>
+          ) : (
+            <>
+              <p className="text-xs font-bold uppercase tracking-wide text-primary">Dein Satz</p>
+              <textarea
+                ref={taMobileRef}
+                value={m.input}
+                onChange={(e) => m.setInput(e.target.value)}
+                rows={3}
+                placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
+                className="min-h-[72px] w-full flex-1 resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+              />
+              <UmlautKeys textareaRef={taMobileRef} value={m.input} onChange={m.setInput} />
+              {/* The "why can't I press Korrigieren yet" line sits in the card
+                  being typed in, under the umlaut keys (founder s169), which
+                  frees the bottom KI line to stay the Art. 50 note in every
+                  state. Same placement as Kurz/Lang. */}
+              {tooShort && m.words > 0 && (
+                <p className="text-xs font-medium text-warning">
+                  Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du
+                  prüfen.
+                </p>
+              )}
+              {m.words > 25 && (
+                <p className="text-right text-xs text-muted-foreground">
+                  Tipp: In Fokus funktioniert ein Satz am besten.
+                </p>
+              )}
+            </>
           )}
         </CardContent>
       )}
@@ -652,7 +725,7 @@ export function FokusTrainer({
           onReset={m.reset}
           canReset={canReset}
           legend={dialsLegend}
-          className="grow"
+          className="min-h-0 grow"
         />
       </div>
 
@@ -693,7 +766,7 @@ export function FokusTrainer({
           {m.status !== "corrected" && (
             <div
               ref={clusterRef}
-              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2.5rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
+              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
             >
               {/* Every control sits on its own opaque backing (see
                   `floatingCluster`); FeedbackIconButton is already solid. */}
@@ -705,31 +778,20 @@ export function FokusTrainer({
               </div>
             </div>
           )}
-          {/* The one bottom line: the "how many words to go" hint (the honest
-              reason Korrigieren is inactive) while the sentence is too short,
-              the Art. 50 note otherwise. Never both. */}
-          {tooShort && m.status === "idle" && m.words > 0 ? (
-            <p
-              ref={kiNoteRef}
-              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] font-medium leading-snug text-warning lg:hidden"
-            >
-              <span className={floatingNote}>
-                Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du prüfen.
-              </span>
-            </p>
-          ) : (
-            <p
-              ref={kiNoteRef}
-              className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden"
-            >
-              <span className={floatingNote}>
-                KI-geprüft, kann Fehler enthalten.{" "}
-                <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                  Mehr
-                </Link>
-              </span>
-            </p>
-          )}
+          {/* The one bottom line, and it never changes content (founder s169):
+              the "how many words to go" hint moved into the card, under the
+              umlaut keys, so this slot is the Art. 50 note in every state. */}
+          <p
+            ref={kiNoteRef}
+            className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden"
+          >
+            <span className={floatingNote}>
+              KI-geprüft, kann Fehler enthalten.{" "}
+              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+                Mehr
+              </Link>
+            </span>
+          </p>
         </>,
         document.body,
       )}
