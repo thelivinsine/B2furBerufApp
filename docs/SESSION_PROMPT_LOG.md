@@ -1867,3 +1867,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `tests/authCallback.test.ts` (new) · `tests/authDialog.test.tsx` (new) ·
   `docs/reference/auth-emails/{README.md,confirm-signup.html,reset-password.html}` (new) ·
   `preview/auth-dialog.html` + `preview/auth-dialog-entry.tsx` (new) · this log
+- **Prompt 5 (verbatim, 2026-07-27):** `I'll do the smtp a bit later, I just bought the email for the
+  domain. Document the session` → Session documentation pass. Recorded the founder's state (the
+  `genauly.de` mailbox is bought; Resend domain verification + the Supabase SMTP fields are the
+  remaining steps) and swept the docs the session made stale rather than only appending a handoff:
+  - `docs/PROJECT_STATUS.md`: header rewritten around both halves of the session (audit, then the
+    sign-up flow the audit's own recommendation uncovered); the s174 handoff gained the two auth
+    bugs, the dialog rework and the effect-dependency bug the tests caught; the founder action list
+    now leads with migration 0013 and a no-longer-optional Resend SMTP item carrying the mailbox
+    status.
+  - `CLAUDE.md`: `/auth/confirm` added to the route list (ungated on purpose).
+  - `docs/PROJECT_FOUNDATION.md`: the 2B auth entry rewritten (email confirmation is ON, the
+    `/auth/confirm` + `authCallback.ts` mechanism, the pinned `emailRedirectTo`), and the completed
+    action item "Disable Confirm email (2026-06-01, founder-verified)" struck through as REVERSED,
+    since leaving a checked box saying the opposite of today's setting is how a future session
+    re-breaks this.
+  - `docs/areas/LEGAL-ADMIN.md`: consent checkbox placement (now above the button it gates, and it
+    does not disable that button).
+  - `docs/strategy/SECURITY.md`: Resend SMTP promoted from "(Optional, pre-existing)" to required
+    with the reason, plus a new done-item for enabling "Confirm email".
+  - No code changed; gates unchanged from prompt 4 (test:unit 363/363).
+- **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` ·
+  `docs/areas/LEGAL-ADMIN.md` · `docs/strategy/SECURITY.md` · this log

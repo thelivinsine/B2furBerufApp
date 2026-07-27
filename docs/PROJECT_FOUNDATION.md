@@ -52,10 +52,18 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   live only in Supabase Edge Function secrets (never in the repo or browser).
 - **2A schema:** `profiles`, `progress`, `writing_evaluations`, `ai_usage`, owner-only RLS,
   auto-provision trigger on auth.users, `bump_ai_usage` atomic RPC. `profiles.tier` flag present.
-- **2B auth + sync:** `useAuthStore` (guest anon + email magic-link); `cloudSync.ts` (offline-first:
-  localStorage stays cache, pull+MERGE on login, debounced write-through). `AccountPanel` in Settings.
-  Guest sign-in is the primary path. Email sign-in works but hits Supabase free-SMTP rate limits
-  (fix: add Resend SMTP — deferred, see action items).
+- **2B auth + sync:** `useAuthStore` (guest anon + email/password + Google); `cloudSync.ts`
+  (offline-first: localStorage stays cache, pull+MERGE on login, debounced write-through).
+  `AccountPanel` in Settings. Guest sign-in is the primary path.
+  **Email confirmation is ON since s174** (founder enabled it in the dashboard), so a new
+  email/password account is not signed in until the link is clicked. The link lands on
+  **`/auth/confirm`** (`src/features/auth/ConfirmEmail.tsx`), which finishes the sign-in; the
+  parameters it needs are snapshotted by `src/lib/authCallback.ts` at module-eval time, because
+  Supabase's default template returns them in the URL hash and React Router wipes that on mount.
+  `signUp` pins `emailRedirectTo` to the running origin, so the landing page never depends on the
+  dashboard's Site URL. Mail still goes out through Supabase's built-in sender (rate-limited, a few
+  per hour); Resend SMTP is the fix and is a pending founder action, with the steps and the branded
+  templates in `docs/reference/auth-emails/`.
 - **2C writing UI:** `/writing` route; short/long tasks per theme; one insight card + "Üben" deep-link.
 - **2D edge function:** `evaluate-writing`. Monthly auto-shutoff ($5 cap) + input-hash cache +
   LanguageTool pre-check + a provider fallback chain. Per-MODE daily limits since s167
@@ -97,7 +105,10 @@ All of the following are DONE (the open/optional ones live in `PROJECT_STATUS.md
 - [x] Apply schema via SQL editor. (2026-05-31)
 - [x] Enable Anonymous sign-in. (email also enabled — **must stay ON**: guest flow, AI writing coach,
       and guest→account upgrade all depend on it.)
-- [x] **Disable "Confirm email"** so sign-up logs in instantly. (2026-06-01, founder-verified)
+- [x] ~~**Disable "Confirm email"** so sign-up logs in instantly. (2026-06-01)~~ **REVERSED
+      2026-07-27 (s174):** the founder turned confirmation back ON, so nobody can register an
+      address they do not own (security audit F1). Sign-up is now a two-step flow; see the 2B entry
+      above for the `/auth/confirm` handling this required.
 - [x] Set Site URL in Auth settings.
 - [x] Deploy `evaluate-writing` function via dashboard code editor. (2026-05-31)
 - [x] Smoke-test end-to-end. (spelling insight returned correctly)

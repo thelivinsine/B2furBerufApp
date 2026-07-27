@@ -1,12 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-27 (session 174). **Full security audit shipped:**
+_Last updated: 2026-07-27 (session 174). **Security audit + the sign-up flow it uncovered.**
 `docs/reports/security-audit-2026-07-27.md` covers the bundle, the five Edge Functions, all twelve
-migrations, CI and the dependency tree. Architecture held; three findings fixed in the same pass
-(local writing drafts now leave the device with the account, the unauthenticated feedback endpoint
-has a storage ceiling, the GDPR export includes the Satzlabor sentences). **One item needs the
-founder: the admin gate trusts an unverified email claim** (F1). Prior s173: **a deploy can no
-longer refresh a learner's work away.**
+migrations, CI and the dependency tree; the architecture held, and three findings were fixed in the
+same pass. Acting on finding F1 the founder turned **"Confirm email" ON**, which exposed that
+**email sign-up had never actually worked end to end**: the confirmation link confirmed the account
+but could not sign anyone in. Fixed, with the auth dialog reworked around it. Still open for the
+founder: paste `supabase/migrations/0013_admins_table.sql`, and set up Resend SMTP so mail comes
+from Genauly. Prior s173: **a deploy can no longer refresh a learner's work away.**
 The PWA's auto-update reload now waits while any surface holds unsaved work (`src/lib/liveWork.ts`),
 and both kinds of work persist so even an unavoidable reload is recoverable: writing drafts autosave
 per mode (`draftAutosave.ts`), and a running Üben session snapshots its plan + position
@@ -62,7 +63,15 @@ see `strategy/DATA_GOVERNANCE.md`).
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
 done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
-- [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
+- [ ] **Paste `supabase/migrations/0013_admins_table.sql`** into the Supabase SQL editor, then sign
+      out/in and open `/admin` to confirm. Moves the admin gate off the email claim (audit F1). The
+      migration refuses to install a gate that would lock you out, so a wrong seed errors instead.
+- [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
+      is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
+      `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
+      then pasting the two branded templates. Full steps: `docs/reference/auth-emails/README.md`.
+- [x] ~~Enable "Confirm email".~~ **DONE 2026-07-27**, closing half of audit F1 (nobody can register
+      an address they do not own). Required the `/auth/confirm` work in the s174 handoff.
 - [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
@@ -157,10 +166,39 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   a rule worth keeping). Lower: `*.github.io` is still wildcard-allowlisted on every function; the AI
   daily/monthly limits are check-then-act so parallel requests slip past them (bounded by the $5
   fuse); `log_gdpr_event()` is callable by `anon`; no retention job on learner text.
+- **Then the audit's own recommendation broke sign-up, which turned out to be a good thing.** The
+  founder switched "Confirm email" ON, and email sign-up stopped working: clicking the link
+  confirmed the account server-side but never signed anyone in, and coming back to the (default)
+  "Konto erstellen" tab produced a "confirm your email" toast that would never come true. TWO
+  independent bugs, neither introduced by the audit, both live since email sign-up existed:
+  - **The link could not deliver a session.** Supabase's default template returns it in the URL
+    HASH; React Router rewrites the URL as it mounts, so the tokens were gone before any code read
+    them, and the client runs PKCE, which does not look there anyway (the same collision
+    `lib/supabase.ts` documents for Google). `src/lib/authCallback.ts` now snapshots the parameters
+    at module-eval time (imported FIRST in `main.tsx`, before `createRoot`), and the new ungated
+    route **`/auth/confirm`** (`features/auth/ConfirmEmail.tsx`) completes the sign-in. It accepts
+    all three shapes (`token_hash` → `verifyOtp`, hash tokens → `setSession`, `?code=` already
+    consumed by supabase-js), so it works with or without the branded template. `signUp` pins
+    `emailRedirectTo` to the running origin, so a wrong Site URL can no longer strand a learner.
+  - **A second sign-up with the same address looked like a fresh one.** With confirmations ON,
+    Supabase answers an already-registered address with a success-shaped response and NO error (it
+    will not reveal which addresses exist), so `needsConfirmation` was true. The tell is an empty
+    `identities` array: `signUp` now returns `alreadyRegistered` and the dialog switches to Anmelden
+    with the address kept. The existing `friendlyError` "already registered" mapping never fired
+    because that path produces no error to map.
+- **Auth dialog reworked** (all three founder complaints): password reveal toggle; the AGB checkbox
+  moved from the top of the dialog to directly above the button it gates; the primary and Google
+  buttons no longer sit disabled-at-default but always act and NAME the first unmet requirement in
+  one message slot; and the confirmation state became a panel that keeps the dialog open, shows the
+  address and offers "E-Mail erneut senden". Screenshot from the real component:
+  `preview/auth-dialog.html` (open it with `pnpm dev`).
+- **Caught by the new tests:** the dialog's reset effect listed `clearError` in its dependencies, so
+  any store handing back a fresh action identity per render wiped the consent tick and the pending
+  panel the instant they were set. Now a ref synced in its own effect.
 - **Gates:** typecheck · lint 0 errors (75 warnings, same as the untouched tree) · test:unit
-  **351/351** · build · check:bundle 119.7 kB.
-- **Next:** the founder pastes migration 0013 into the Supabase SQL editor (the whole action list is
-  at the end of the report). Nothing in this session changes what a learner sees.
+  **363/363** · build · check:bundle 122.9 kB.
+- **Next:** the two founder actions above (migration 0013, then Resend SMTP). Note the email work is
+  the ONLY learner-visible change this session; the audit fixes are invisible.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

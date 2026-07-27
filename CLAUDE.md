@@ -62,7 +62,8 @@ after pulling.
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` (mounted, off the nav) ·
-  `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) · `/hilfe`,
+  `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
+  `/auth/confirm` (email-confirmation landing, ungated on purpose) · `/hilfe`,
   `/privacy`,
   `/terms`, `/about`, `/welcome` (public)
 

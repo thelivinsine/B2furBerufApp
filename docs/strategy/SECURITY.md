@@ -60,8 +60,16 @@ this section: three findings were fixed in that pass, and it carries the open fo
    - `MAX_TEXT_LEN` — max characters per submission (default `3000`).
    - `USER_MONTHLY_LIMIT` — max AI evaluations per user per month (default `50`).
 
-4. **(Optional, pre-existing) Add Resend SMTP** to fix the email magic-link rate limit:
-   Authentication → SMTP settings.
+4. **Add Resend SMTP** (Authentication → SMTP settings). No longer optional: the founder turned
+   **"Confirm email" ON** on 2026-07-27, so every new sign-up now depends on Supabase's built-in
+   sender, which is rate-limited to a handful of messages an hour and is test-only by Supabase's own
+   documentation. Until this is done, sign-ups can silently fail to receive their link during any
+   busy hour. Steps and the branded German templates: `docs/reference/auth-emails/README.md`.
+   Status: the founder bought the `genauly.de` mailbox on 2026-07-27; the domain still needs
+   verifying in Resend, then the SMTP fields in Supabase.
+
+5. **✅ DONE 2026-07-27 — "Confirm email" enabled.** Closes the half of audit finding F1 that let
+   somebody register an address they do not own.
 
 ## Known low-severity items (documented, not blocking)
 
