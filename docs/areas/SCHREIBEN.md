@@ -185,12 +185,28 @@ Kurz. Design = variant C, "development first" (founder-picked s171):
   - The evaluator asks for a MINIMAL repair, never a rewrite (a diff against a re-imagined text is
     unreadable), and `sanitizeCorrected` drops anything that is a rewrite, a truncated stump, an echo
     of the Aufgabe or an unchanged copy.
-- **Open follow-up:** give **Fokus** a history. The Fokus filter segment stays absent until then,
-  never a dead control. The Kurz/Lang RESULT card still shows only weakness + tip: surfacing the
-  correction there touches the locked trainer geometry and needs its own preview round.
+- **Fokus sentences share the list** (s171): ONE chronological Verlauf across both trainers, newest
+  first, capped at 30. This needed **no migration** — every check has been persisted to
+  `sentence_checks` since s147 (migration 0009) with its correction and detected grammar, and the
+  table already carries owner-read + owner-delete RLS, so the history reaches back over everything
+  already practised.
+  - A Fokus row reads like a writing row: date · "Fokus" · a Himmelblau chip with the correction
+    COUNT (or a green "fehlerfrei" badge) · chevron. Expanded it shows the same `CorrectionView`, the
+    detected form as one muted "Erkannt: Aktiv · Perfekt · Indikativ" line, and delete.
+  - The filter offers only the kinds ON RECORD (`Alle` + Fokus/Kurz/Lang as they exist) and appears
+    only when there is more than one, so a segment can never yield nothing.
+  - **"Deine Entwicklung" stays sourced from Kurz/Lang only.** Its axis is the evaluator's single
+    prioritised `WeaknessCategory`; Fokus produces diff categories from a different taxonomy, and
+    mixing the two would rank incomparable things.
+  - A partial load failure is reported under the list with a retry, never silently shown as a shorter
+    history; only a failure of BOTH sources replaces the page.
+- **Open follow-up:** the Kurz/Lang RESULT card still shows only weakness + tip. Surfacing the
+  correction there touches the locked trainer geometry, so it goes through its own preview round.
 
 
 ## Fokus (Satzlabor)
+- Every check lands in `sentence_checks` and is surfaced in **Verlauf** (s171), so a corrected
+  sentence stays re-studiable instead of vanishing on reset.
 - Single-sentence write → correct → transform lab. **Grammar rail = three combinable axes,
   data-driven from `grammarDimensions.ts`: Genus Verbi (Aktiv · Passiv · Zustandspassiv), Zeitform
   (Präsens · Perfekt · Präteritum), Modus (Indikativ · Konjunktiv II)** (s159, Wave 2). `mood` is a

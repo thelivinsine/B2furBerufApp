@@ -818,3 +818,23 @@ app, not only in the preview.
     crops the screenshot, which is indistinguishable from real horizontal overflow and nearly sent this
     session chasing a non-existent bug. Verify phone widths with the app in an iframe of the target
     width inside a wider window.
+
+### s171 follow-up — the Fokus history
+
+19. **No new schema was needed.** `sentence_checks` (migration 0009, s147) already stored every
+    check's `source_text`, `corrected`, `has_errors` and detected `grammar`, with owner-read and
+    owner-delete RLS. Reading what was already there meant the founder's existing sentences showed up
+    the moment the feature shipped, instead of a history that starts empty. Look for the data before
+    designing a table.
+20. **One list, not a second tab.** A Fokus sentence and a Kurz text are both "something I wrote and
+    got corrected", so they share one chronological list and one correction language; the kind lives in
+    a badge and the filter. A separate Fokus history would have split the same question across two
+    surfaces.
+21. **The trend card stays Kurz/Lang-only.** It ranks the evaluator's single prioritised
+    `WeaknessCategory`. Fokus yields diff categories (Rechtschreibung / Wortstellung / …) from a
+    different taxonomy, so feeding both into one ranking would compare incomparable things.
+22. **A swapped run is ONE word-order fix.** `wordDiff` reported "weil ich war krank." ->
+    "weil ich krank war." as two spelling errors, because `collapseMoves` only caught a single word
+    moving past matching tokens. A run whose words are a permutation now collapses to one
+    "Wortstellung" change. This was visible in Fokus's live card all along; the history just made it
+    impossible to ignore.

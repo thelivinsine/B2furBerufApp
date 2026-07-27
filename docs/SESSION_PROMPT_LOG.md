@@ -1583,3 +1583,23 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   **#736** the founder's live-mobile review round. Open, both needing a founder go-ahead: give **Fokus**
   a history (which also unlocks the Fokus filter segment), and surface the correction on the Kurz/Lang
   RESULT card, which touches the locked trainer geometry and therefore needs its own preview round.
+- **Prompt 12 (verbatim, 2026-07-26):** `1. Yes, give it a history \n2. show right after` →
+  Approved both open follow-ups. Item 1 shipped in this pass; item 2 goes through previews first, as
+  promised, because it touches the locked trainer geometry.
+  **Fokus history:** needed NO migration — `sentence_checks` (0009, s147) already stored every check's
+  `source_text`, `corrected`, `has_errors` and detected `grammar` with owner-read/delete RLS, so the
+  founder's existing sentences appear immediately. Added `getFokusHistory` / `deleteSentenceCheck` to
+  `lib/sentenceStudio.ts`; Verlauf now merges both sources into ONE chronological list (capped 30),
+  a Fokus row carries a correction-count chip (or a green "fehlerfrei") and expands into the same
+  `CorrectionView` plus one "Erkannt: Aktiv · Perfekt · Indikativ" line; the filter offers only the
+  kinds on record, so the Fokus segment is finally live and never dead. The trend card stays
+  Kurz/Lang-only (different taxonomy). A partial load failure is reported with a retry instead of
+  masquerading as a shorter history.
+  **Bug the history exposed:** `wordDiff` reported "weil ich war krank." -> "weil ich krank war." as
+  TWO Rechtschreibung fixes ("war → krank", "krank. → war."). A run whose words are a permutation now
+  collapses into one **Wortstellung** change, which also fixes Fokus's own correction card; pinned in
+  `tests/wordDiff.test.ts`. Gates: typecheck · lint 0 errors · test:unit **319/319** · build ·
+  check:bundle 118.4 kB · lint:content.
+- **Artifacts (prompt 12, part 1):** `src/lib/sentenceStudio.ts` · `src/features/writing/WritingHistory.tsx` ·
+  `src/lib/wordDiff.ts` · `tests/wordDiff.test.ts` · `docs/areas/SCHREIBEN.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` · this log
