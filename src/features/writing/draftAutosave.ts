@@ -75,3 +75,19 @@ export function clearAutosavedDraft(mode: WritingMode): void {
   delete store[mode];
   write(store);
 }
+
+/**
+ * Drop every autosaved draft. Called when the device stops belonging to the
+ * account that wrote them (sign-out, account deletion, a different account
+ * starting to sync on a shared device). Drafts are the learner's own words and
+ * can carry personal detail (an Arzt mail, a Beschwerde with an address), so
+ * they must not survive into the next person's session, and an erasure request
+ * has to take the local copy with it.
+ */
+export function clearAllAutosavedDrafts(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    /* private mode / quota: nothing to clear. */
+  }
+}

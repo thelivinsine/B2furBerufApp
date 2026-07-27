@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Lock, Mail, Cloud } from "lucide-react";
+import { Lock, Mail, Cloud, Eye, EyeOff, MailCheck } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -43,13 +43,21 @@ export function AuthDialog({
   onOpenChange: (open: boolean) => void;
   intent?: AuthIntent;
 }) {
-  const { busy, error, status, signUp, signIn, signInWithGoogle, clearError } = useAuthStore();
+  const { busy, error, status, signUp, signIn, signInWithGoogle, resendConfirmation, clearError } =
+    useAuthStore();
   const showToast = useSessionStore((s) => s.showToast);
   const [mode, setMode] = useState<AuthIntent>(intent);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+  /** Why the primary action could not run yet. Set on click, never at rest, so
+   *  the button stays live instead of sitting disabled (design landmine). */
+  const [hint, setHint] = useState<string | null>(null);
+  /** Address we mailed a confirmation link to; switches the dialog to the
+   *  "check your inbox" panel instead of closing behind a small toast. */
+  const [pending, setPending] = useState<string | null>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -63,45 +71,120 @@ export function AuthDialog({
   };
 
   // Sync to the requested intent each time the dialog is opened.
+  // Held in a ref so the reset effect below depends on OPENING the dialog, not
+  // on the identity of a store action. With `clearError` in the dependency list
+  // any caller whose store hands back a fresh function each render re-runs the
+  // effect on every render, which wipes the consent tick and the pending panel
+  // the moment they are set.
+  const clearErrorRef = useRef(clearError);
+  // Kept current in its own effect (never during render) so the reset effect
+  // below can call the latest action without listing it as a dependency.
+  // Declared first, so it runs before the reset effect on every commit.
   useEffect(() => {
-    if (open) {
-      setMode(intent);
-      clearError();
-      setCaptchaToken(null); // widget re-renders and re-solves on each open
-      // Always start unchecked on sign-up so a new user must actively agree to
-      // the AGB + Datenschutz in this dialog before the sign-up buttons (incl.
-      // "Weiter mit Google") become clickable. Log-in does not require it.
-      setConsent(false);
-    }
-  }, [open, intent, clearError]);
+    clearErrorRef.current = clearError;
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    setMode(intent);
+    clearErrorRef.current();
+    setCaptchaToken(null); // widget re-renders and re-solves on each open
+    // Always start unchecked on sign-up so a new user must actively agree to
+    // the AGB + Datenschutz in this dialog before we create an account.
+    setConsent(false);
+    setShowPassword(false);
+    setHint(null);
+    setPending(null);
+  }, [open, intent]);
 
   const isSignup = mode === "signup";
   const captchaReady = !TURNSTILE_ENABLED || captchaToken !== null;
   // Sign-up requires accepting the AGB + Datenschutzerklärung; log-in does not.
   const consentReady = !isSignup || consent;
-  const canSubmit =
-    email.trim().length > 3 && password.length >= 6 && !busy && captchaReady && consentReady;
+
+  /**
+   * The FIRST unmet requirement, named. Returned on click rather than used to
+   * disable the button: a dead control reads as a broken app, and the founder
+   * hit exactly that ("it's very unclear why the signup button doesn't work").
+   */
+  const blockingReason = (): string | null => {
+    if (email.trim().length <= 3) return "Bitte gib deine E-Mail-Adresse ein.";
+    if (password.length < 6) return "Das Passwort muss mindestens 6 Zeichen haben.";
+    if (!consentReady) return "Bitte stimme den AGB und der Datenschutzerklärung zu.";
+    if (!captchaReady) return "Die Sicherheitsprüfung läuft noch. Einen Moment.";
+    return null;
+  };
+
+  const startGoogle = () => {
+    if (!consentReady) {
+      setHint("Bitte stimme den AGB und der Datenschutzerklärung zu.");
+      return;
+    }
+    if (!captchaReady) {
+      setHint("Die Sicherheitsprüfung läuft noch. Einen Moment.");
+      return;
+    }
+    // OAuth redirects away immediately, so record consent first.
+    if (isSignup) recordConsent();
+    signInWithGoogle(captchaToken ?? undefined);
+  };
 
   const submit = async () => {
-    if (!canSubmit) return;
+    if (busy) return;
+    const blocked = blockingReason();
+    if (blocked) {
+      setHint(blocked);
+      return;
+    }
+    setHint(null);
     // Record consent before the call so it persists locally and syncs to the
     // cloud once the session resolves (covers the email + guest-upgrade paths).
     if (isSignup) recordConsent();
     const fn = isSignup ? signUp : signIn;
-    const { ok, needsConfirmation } = await fn(email.trim(), password, captchaToken ?? undefined);
-    if (!ok) return;
-    if (needsConfirmation) {
-      // Account created but not logged in yet — Supabase requires email
-      // confirmation. Tell the user honestly instead of a false "welcome".
-      showToast(
-        "Fast geschafft! Bestätige deine E-Mail über den Link, den wir dir geschickt haben.",
-        "default",
-      );
-    } else {
-      showToast(isSignup ? "Konto erstellt – willkommen!" : "Willkommen zurück!", "success");
+    const address = email.trim();
+    const { ok, needsConfirmation, alreadyRegistered } = await fn(
+      address,
+      password,
+      captchaToken ?? undefined,
+    );
+
+    // Signing UP with an address that already has an account. Supabase returns a
+    // success-shaped response here (it refuses to confirm which addresses are
+    // registered), so without this the learner was told to go and confirm an
+    // email that is never sent. Send them to the log-in tab instead, with their
+    // address kept.
+    if (alreadyRegistered) {
+      setMode("login");
+      setPassword("");
+      setHint("Diese E-Mail hat schon ein Konto. Melde dich hier an.");
+      return;
     }
+
+    if (!ok) {
+      // The unconfirmed-account case is recoverable, so offer the way out
+      // instead of leaving a red line the learner can do nothing about.
+      if (needsConfirmation) setPending(address);
+      return;
+    }
+
+    if (needsConfirmation) {
+      setPending(address);
+      setPassword("");
+      return;
+    }
+
+    showToast(isSignup ? "Konto erstellt – willkommen!" : "Willkommen zurück!", "success");
     onOpenChange(false);
     setPassword("");
+  };
+
+  const resend = async () => {
+    if (!pending) return;
+    const sent = await resendConfirmation(pending);
+    showToast(
+      sent ? "Neue E-Mail ist unterwegs." : "Konnte nicht gesendet werden. Versuch es später.",
+      sent ? "success" : "default",
+    );
   };
 
   return (
@@ -118,14 +201,51 @@ export function AuthDialog({
       >
         <DialogHeader>
           <Logo variant="wordmark" className="mb-1 h-8 w-auto self-start" />
-          <DialogTitle>{isSignup ? "Konto erstellen" : "Anmelden"}</DialogTitle>
+          <DialogTitle>
+            {pending ? "E-Mail bestätigen" : isSignup ? "Konto erstellen" : "Anmelden"}
+          </DialogTitle>
           <DialogDescription>
-            {isSignup
-              ? "Sichere deinen Fortschritt und lerne auf allen Geräten weiter."
-              : "Melde dich an, um auf allen Geräten weiterzulernen."}
+            {pending
+              ? "Nur noch ein Klick, dann geht es los."
+              : isSignup
+                ? "Sichere deinen Fortschritt und lerne auf allen Geräten weiter."
+                : "Melde dich an, um auf allen Geräten weiterzulernen."}
           </DialogDescription>
         </DialogHeader>
 
+        {/* Confirmation pending. Deliberately a full panel that KEEPS the dialog
+            open: this used to close the dialog behind a small toast, which the
+            founder could barely see and which offered no way to get a new link
+            (s174). */}
+        {pending ? (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-accent/20 bg-accent/20 p-4 text-sm text-accent-ink shadow-soft">
+              <MailCheck className="mb-2 h-5 w-5" />
+              <p>
+                Wir haben dir einen Link an <strong className="font-semibold">{pending}</strong>{" "}
+                geschickt. Öffne ihn, dann bist du direkt angemeldet.
+              </p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Nichts angekommen? Schau im Spam-Ordner nach.
+            </p>
+            <Button variant="outline" className="w-full" onClick={resend} disabled={busy}>
+              E-Mail erneut senden
+            </Button>
+            <button
+              type="button"
+              onClick={() => {
+                setPending(null);
+                setHint(null);
+                clearError();
+              }}
+              className="w-full text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Andere E-Mail-Adresse verwenden
+            </button>
+          </div>
+        ) : (
+          <>
         {/* Segmented toggle: makes "Anmelden" for returning users obvious right
             next to "Konto erstellen", instead of a buried link at the bottom. */}
         <div
@@ -170,53 +290,9 @@ export function AuthDialog({
         </div>
 
         <div className="space-y-3">
-          {/* Sign-up requires agreeing to the AGB + Datenschutz before any
-              sign-up method (Google or email) becomes available. Placed above
-              the buttons so the dependency is obvious. Log-in skips this. */}
-          {isSignup && (
-            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
-              />
-              <span>
-                Ich stimme den{" "}
-                <a
-                  href="/terms"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline underline-offset-2"
-                >
-                  AGB
-                </a>{" "}
-                und der{" "}
-                <a
-                  href="/privacy"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline underline-offset-2"
-                >
-                  Datenschutzerklärung
-                </a>{" "}
-                zu.
-              </span>
-            </label>
-          )}
-
           {GOOGLE_ENABLED && (
             <>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  // OAuth redirects away immediately, so record consent first.
-                  if (isSignup) recordConsent();
-                  signInWithGoogle(captchaToken ?? undefined);
-                }}
-                disabled={busy || !captchaReady || !consentReady}
-              >
+              <Button variant="outline" className="w-full" onClick={startGoogle} disabled={busy}>
                 <GoogleIcon /> Weiter mit Google
               </Button>
 
@@ -245,27 +321,93 @@ export function AuthDialog({
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Passwort</label>
-            <div className="flex items-center gap-2 rounded-lg border border-input bg-surface px-3 focus-within:ring-2 focus-within:ring-ring">
-              <Lock className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-2 rounded-lg border border-input bg-surface pl-3 pr-1 focus-within:ring-2 focus-within:ring-ring">
+              <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 ref={passwordRef}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete={isSignup ? "new-password" : "current-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onAnimationStart={syncAutofilled}
                 onKeyDown={(e) => e.key === "Enter" && submit()}
                 placeholder={isSignup ? "Mindestens 6 Zeichen" : "Dein Passwort"}
-                className="h-11 flex-1 bg-transparent text-sm outline-none"
+                className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"
               />
+              {/* Typing a password you cannot see is the single most common
+                  reason a sign-up is abandoned on a phone keyboard. */}
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+                aria-pressed={showPassword}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
           </div>
 
           <TurnstileWidget onToken={setCaptchaToken} />
 
-          {error && <p className="text-sm font-medium text-danger">{error}</p>}
+          {/* Consent sits DIRECTLY above the button it gates, so the dependency
+              is visible without scrolling back up (it used to head the dialog,
+              far from the action it blocked). Log-in skips it. */}
+          {isSignup && (
+            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => {
+                  setConsent(e.target.checked);
+                  if (e.target.checked) setHint(null);
+                }}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+              />
+              <span>
+                Ich stimme den{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  AGB
+                </a>{" "}
+                und der{" "}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  Datenschutzerklärung
+                </a>{" "}
+                zu.
+              </span>
+            </label>
+          )}
 
-          <Button variant="gradient" className="w-full" onClick={submit} disabled={!canSubmit}>
+          {/* One message slot: a server error, or the reason the last tap could
+              not act. Never both, and never a bare red line the learner has to
+              guess at. */}
+          {(error || hint) && (
+            <p
+              role="alert"
+              className={cn(
+                "rounded-lg px-3 py-2.5 text-sm font-medium",
+                error
+                  ? "bg-danger/10 text-danger"
+                  : "bg-accent/20 text-accent-ink",
+              )}
+            >
+              {error ?? hint}
+            </p>
+          )}
+
+          {/* Always live. If something is missing it says so above, rather than
+              sitting greyed out with no explanation (design landmine). */}
+          <Button variant="gradient" className="w-full" onClick={submit} disabled={busy}>
             {isSignup ? "Konto erstellen" : "Anmelden"}
           </Button>
 
@@ -275,6 +417,8 @@ export function AuthDialog({
             </p>
           )}
         </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

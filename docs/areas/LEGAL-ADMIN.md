@@ -10,7 +10,10 @@
   links remotely; the route stays mounted lazily there.)
 - Sign-up (`AuthDialog`) and the final onboarding step require an "I agree to AGB + Datenschutz"
   checkbox; consent recorded via `recordConsent()` (`src/lib/consent.ts`) into the settings
-  store (rides `profiles.settings` jsonb via cloudSync). **Keep `CONSENT_VERSION` in lockstep
+  store (rides `profiles.settings` jsonb via cloudSync). In the dialog the checkbox sits
+  **directly above the button it gates** (s174: it used to head the dialog, far from the action,
+  and the founder could not tell why sign-up did nothing). It does NOT disable that button, which
+  stays live and names the first unmet requirement instead, per the no-dead-controls rule. **Keep `CONSENT_VERSION` in lockstep
   with the `LAST_UPDATED` date on the legal pages**: on material Terms/Privacy changes bump both
   so a future re-consent prompt can detect it.
 - GDPR self-service in Settings: data export (`src/lib/dataExport.ts`), account deletion

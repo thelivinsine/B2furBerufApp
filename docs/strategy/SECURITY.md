@@ -26,7 +26,7 @@ The full audit and remediation plan is in `docs/reference/SECURITY_AUDIT_PLAN.pd
 
 | Area | Change | Status |
 |---|---|---|
-| Dependencies | Fixed react-router open redirect (GHSA-2j2x-hqr9-3h42). `pnpm audit` → 0 vulns. | ✅ shipped (PR 1) |
+| Dependencies | Fixed react-router open redirect (GHSA-2j2x-hqr9-3h42); `pnpm audit` was clean at the time. **No longer true: see the 2026-07-27 audit, F2.** | ⚠️ regressed |
 | Supply chain | Migrated to **pnpm** with `minimum-release-age` (24h cooldown), integrity verification, and a default-deny on dependency build scripts. | ✅ shipped (PR 1) |
 | Edge Function CORS | Replaced `Access-Control-Allow-Origin: *` with an **allowlist** (genauly.de, localhost, `*.github.io`; override via `ALLOWED_ORIGINS`). | ✅ shipped (PR 2) |
 | AI abuse | Added a **max input length** (`MAX_TEXT_LEN`, default 3000) and a **per-user monthly cap** (`USER_MONTHLY_LIMIT`, default 50). | ✅ shipped (PR 2) |
@@ -34,8 +34,14 @@ The full audit and remediation plan is in `docs/reference/SECURITY_AUDIT_PLAN.pd
 | CI | GitHub Actions pinned to commit SHAs; minimal workflow permissions. | ✅ shipped (PR 4) |
 | Bot protection | Cloudflare Turnstile CAPTCHA on all auth flows (guest, sign-up, login, Google). | ✅ shipped (PR 5, 2026-06-06) |
 
-_All hardening is complete and live. Remaining: flip CSP report-only → enforcing once the
-live console is confirmed clean (one-line change in `index.html`)._
+_The CSP is now **enforcing** (`index.html`), so that series is closed._
+
+## Current audit
+
+**`docs/reports/security-audit-2026-07-27.md` is the live picture** — a full-surface review of the
+bundle, the five Edge Functions, all twelve migrations, CI and the dependency tree. Read it before
+this section: three findings were fixed in that pass, and it carries the open founder action list
+(the admin gate keyed on an unverified email is the one that matters).
 
 ## Founder action items (Supabase dashboard — only you can do these)
 
@@ -54,8 +60,16 @@ live console is confirmed clean (one-line change in `index.html`)._
    - `MAX_TEXT_LEN` — max characters per submission (default `3000`).
    - `USER_MONTHLY_LIMIT` — max AI evaluations per user per month (default `50`).
 
-4. **(Optional, pre-existing) Add Resend SMTP** to fix the email magic-link rate limit:
-   Authentication → SMTP settings.
+4. **Add Resend SMTP** (Authentication → SMTP settings). No longer optional: the founder turned
+   **"Confirm email" ON** on 2026-07-27, so every new sign-up now depends on Supabase's built-in
+   sender, which is rate-limited to a handful of messages an hour and is test-only by Supabase's own
+   documentation. Until this is done, sign-ups can silently fail to receive their link during any
+   busy hour. Steps and the branded German templates: `docs/reference/auth-emails/README.md`.
+   Status: the founder bought the `genauly.de` mailbox on 2026-07-27; the domain still needs
+   verifying in Resend, then the SMTP fields in Supabase.
+
+5. **✅ DONE 2026-07-27 — "Confirm email" enabled.** Closes the half of audit finding F1 that let
+   somebody register an address they do not own.
 
 ## Known low-severity items (documented, not blocking)
 

@@ -29,11 +29,26 @@ export async function buildExport(): Promise<Record<string, unknown>> {
   let cloud: Record<string, unknown> | null = null;
   if (user && (status === "signedIn" || status === "anonymous")) {
     try {
-      const [profile, progress, writing] = await Promise.all([
+      const [profile, progress, writing, checks, aiOps] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
         supabase.from("progress").select("*").eq("user_id", user.id).maybeSingle(),
         supabase
           .from("writing_evaluations")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        // Fokus/Satzlabor: every sentence the learner submitted, its correction
+        // and detected grammar (migration 0009). This is their own writing and
+        // belongs in an Art. 15/20 export just as much as the long texts do.
+        supabase
+          .from("sentence_checks")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        // The paid-op ledger backing their AI allowance, so the export explains
+        // why a limit was reached.
+        supabase
+          .from("sentence_ai_ops")
           .select("*")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
@@ -43,6 +58,8 @@ export async function buildExport(): Promise<Record<string, unknown>> {
         progress: progress.data ?? null,
         // Includes the full essay text so the export is genuinely portable.
         writingEvaluations: writing.data ?? [],
+        sentenceChecks: checks.data ?? [],
+        sentenceAiOps: aiOps.data ?? [],
       };
     } catch {
       // Offline or transient failure: fall back to a local-only export.

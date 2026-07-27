@@ -1,3 +1,5 @@
+import { clearAllAutosavedDrafts } from "@/features/writing/draftAutosave";
+import { clearWritingDraft } from "@/features/writing/resumeDraft";
 import { remapProgressIds } from "@/lib/idRenames";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -78,6 +80,14 @@ function resetLocalStores() {
 export function clearLocalAccountData() {
   resetLocalStores();
   clearSyncedUid();
+  // The Schreiben drafts live outside the zustand stores (their own
+  // localStorage keys), so resetLocalStores() does not reach them. They hold the
+  // learner's own text and must leave the device with the account: on sign-out
+  // so the next person on a shared device never sees it, and on deletion so
+  // erasure is not only server-side. Both drafts go here because sign-out ends
+  // the sign-in hand-off too (nothing is left to resume into).
+  clearAllAutosavedDrafts();
+  clearWritingDraft();
 }
 
 type ProgressSnapshot = ReturnType<typeof useProgressStore.getState>;
@@ -324,6 +334,12 @@ export async function startCloudSync(uid: string) {
   const prevUid = readSyncedUid();
   if (prevUid && prevUid !== uid) {
     resetLocalStores();
+    // Same reason as in clearLocalAccountData: the autosaved drafts belong to
+    // the account that wrote them. The one-shot RESUME draft is deliberately
+    // kept: this branch is also the "wrote something, hit the login wall, signed
+    // in" path, where the text in flight is the arriving learner's own and
+    // WritingHub consumes it immediately.
+    clearAllAutosavedDrafts();
   }
   writeSyncedUid(uid);
 

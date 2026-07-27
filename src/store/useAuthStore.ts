@@ -1,9 +1,23 @@
 import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
+import { confirmRedirectUrl } from "@/lib/authCallback";
 import { supabase } from "@/lib/supabase";
 import { startCloudSync, stopCloudSync, flushCloudSync, clearLocalAccountData } from "@/lib/cloudSync";
 
 type AuthStatus = "loading" | "anonymous" | "signedIn" | "signedOut";
+
+/** What a sign-up / sign-in attempt actually resulted in. */
+export interface AuthOutcome {
+  /** The call went through without an error. */
+  ok: boolean;
+  /** Account exists but has no session yet: the email link must be clicked. */
+  needsConfirmation: boolean;
+  /**
+   * The address already has an account, so this was a sign-IN attempt wearing a
+   * sign-up form. Only ever true on the sign-up path.
+   */
+  alreadyRegistered: boolean;
+}
 
 /** Turnstile is active only when a site key is configured (matches the auth UI).
  *  When active, guest sign-in must carry a captcha token so the AI budget can't
@@ -31,10 +45,13 @@ interface AuthState {
   /** Create an account with email + password (instant, no email round-trip
    *  when "Confirm email" is disabled in Supabase). Upgrades a guest in place.
    *  `needsConfirmation` is true when Supabase requires the user to click a
-   *  confirmation link before a session is created. */
-  signUp: (email: string, password: string, captchaToken?: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
+   *  confirmation link before a session is created. `alreadyRegistered` is true
+   *  when the address already has an account (see the note in the action). */
+  signUp: (email: string, password: string, captchaToken?: string) => Promise<AuthOutcome>;
   /** Sign in with an existing email + password. */
-  signIn: (email: string, password: string, captchaToken?: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
+  signIn: (email: string, password: string, captchaToken?: string) => Promise<AuthOutcome>;
+  /** Send the confirmation mail again (link expired, never arrived, wrong tab). */
+  resendConfirmation: (email: string) => Promise<boolean>;
   /** One-click sign-in via Google OAuth (redirect flow). */
   signInWithGoogle: (captchaToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -116,9 +133,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Whether the account exists but isn't logged in yet (Supabase "Confirm
     // email" is on → a confirmation link must be clicked first).
     let needsConfirmation: boolean;
+    let alreadyRegistered = false;
     if (current?.is_anonymous) {
       // updateUser upgrades an existing authenticated session — no captchaToken needed.
-      const { data, error: e } = await supabase.auth.updateUser({ email, password });
+      const { data, error: e } = await supabase.auth.updateUser(
+        { email, password },
+        { emailRedirectTo: confirmRedirectUrl() },
+      );
       error = e;
       // With email confirmation on, the email change is pending and the user
       // stays anonymous until the link is clicked.
@@ -127,14 +148,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data, error: e } = await supabase.auth.signUp({
         email,
         password,
-        options: captchaToken ? { captchaToken } : undefined,
+        options: {
+          // Pin the landing page to THIS origin. Without it the link follows the
+          // project's Site URL, which is a dashboard setting that can still say
+          // localhost, and the learner lands on a dead page.
+          emailRedirectTo: confirmRedirectUrl(),
+          ...(captchaToken ? { captchaToken } : {}),
+        },
       });
       error = e;
+      // With "Confirm email" ON, signing up with an address that ALREADY has an
+      // account does not error: Supabase deliberately returns a success-shaped
+      // response so nobody can probe which addresses are registered. The tell is
+      // an empty `identities` array. Without this check the caller cannot
+      // distinguish "we mailed you a link" from "you already have an account",
+      // and tells a returning user to go and confirm an email that will never
+      // arrive (which is exactly what happened, s174).
+      alreadyRegistered = !e && (data.user?.identities?.length ?? 1) === 0;
       // No session returned → email confirmation is required before login.
-      needsConfirmation = !e && !data.session;
+      needsConfirmation = !e && !data.session && !alreadyRegistered;
     }
     set({ busy: false, error: error ? friendlyError(error.message) : null });
-    return { ok: !error, needsConfirmation };
+    return { ok: !error, needsConfirmation, alreadyRegistered };
   },
 
   signIn: async (email, password, captchaToken) => {
@@ -144,8 +179,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       password,
       options: captchaToken ? { captchaToken } : undefined,
     });
+    // An unconfirmed account comes back as an ERROR here, not as a session-less
+    // success, so the caller gets `needsConfirmation` from the message rather
+    // than from a missing session.
+    const unconfirmed = !!error && error.message.toLowerCase().includes("email not confirmed");
     set({ busy: false, error: error ? friendlyError(error.message) : null });
-    return { ok: !error, needsConfirmation: !error && !data.session };
+    return {
+      ok: !error,
+      needsConfirmation: unconfirmed || (!error && !data.session),
+      alreadyRegistered: false,
+    };
+  },
+
+  resendConfirmation: async (email) => {
+    set({ busy: true, error: null });
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: confirmRedirectUrl() },
+    });
+    set({ busy: false, error: error ? friendlyError(error.message) : null });
+    return !error;
   },
 
   signInWithGoogle: async (captchaToken) => {

@@ -1723,3 +1723,192 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   neither is sufficient alone) and the deliberate no-update-banner decision; and the prompt-1 entry
   above gained its ship record. No code changed.
 - **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 174 — 2026-07-27 — branch `claude/app-security-audit-giuaqy`
+
+- **Prompt 1 (verbatim, 2026-07-27):** `do a thorough and comprehensive security audit of the app`
+- **Response summary:** Full-surface audit rather than a diff review: the browser bundle, all five
+  Supabase Edge Functions, all twelve migrations (RLS policies, SECURITY DEFINER RPCs, grants), the
+  five CI workflows, the build scripts, and the dependency tree. Report written to
+  `docs/reports/security-audit-2026-07-27.md` (13 findings, plus a "checked and found clean" section
+  so the next audit knows what has been ruled out).
+  - **Clean:** RLS on every table with owner-only policies (`ai_usage`, `feedback`,
+    `sentence_transforms`, `gdpr_events` have RLS on and NO policies, so service-role only); no
+    `dangerouslySetInnerHTML` / `eval` / `new Function` anywhere in `src/`; the help prerenderer
+    escapes every interpolation; CSP enforcing; no secrets committed (regex sweep for provider keys,
+    JWTs, PEM blocks came back empty); `delete-account` takes the user id ONLY from the verified JWT;
+    admin RPCs return aggregates with `assert_founder()` first and `revoke … from anon`; SW precaches
+    static assets only; CI has no `pull_request_target`, minimal `permissions:`, SHA-pinned actions;
+    build scripts shell out via `execFileSync`/`spawnSync` argument arrays; every `target="_blank"`
+    carries `rel="noreferrer"`.
+  - **Fixed in this pass (3).** F3: `genauly.writing.autosave` + `genauly.writing.resume` were in no
+    teardown path, so on a shared device learner B opened Schreiben into learner A's text (7-day TTL,
+    and these tasks are Beschwerden/Arzt-Mails/Anträge), and Art. 17 erasure left the learner's own
+    words on disk. Added `clearAllAutosavedDrafts()`; called with `clearWritingDraft()` from
+    `clearLocalAccountData()` (sign-out + deletion) and, autosave only, from the shared-device branch
+    of `startCloudSync()` — the one-shot resume draft is deliberately kept there because that branch
+    is ALSO the "hit the login wall, signed in" hand-off. F4: `submit-feedback` is unauthenticated by
+    design and its per-IP burst guard reads the caller-supplied leftmost `x-forwarded-for`, so row
+    insertion was unbounded (the inbox was already capped); the hourly count that gates email is now
+    also a hard storage ceiling (`FEEDBACK_HOURLY_ROW_CAP`, default 300, one query serves both).
+    Deliberately did NOT switch to the rightmost XFF entry: if a second proxy is ever added that
+    collapses every visitor into one 5-per-10-min bucket. F5: the GDPR export omitted
+    `sentence_checks` / `sentence_ai_ops`, i.e. every sentence written in Fokus.
+  - **F1 (high, founder action, NOT applied).** `is_founder()` is
+    `auth.jwt() ->> 'email' in (two Gmail addresses)` with no verified-email check, and
+    `supabase/config.toml` carries `enable_confirmations = false`. If the hosted project matches,
+    the existing guest-upgrade path (`updateUser({email})`, `useAuthStore.ts:121`) sets an address
+    with no proof of ownership — so the whole admin boundary rests on both addresses already being
+    registered. The report carries a drafted `admins(user_id)` migration; it is written but NOT
+    applied, because a wrong seed locks the founder out of their own admin panel.
+  - **F2 (high).** `pnpm audit` is no longer 0 as `SECURITY.md` claimed: 7 high + 3 moderate.
+    react-router 6.x has an open-redirect→XSS advisory with **no fix in the 6.x line**. Verified the
+    app is not reachable through it today (every dynamic `navigate()` / `to={}` builds its target
+    from internal ids and constants, never from a query param, hash or API response), so this is a
+    scheduling question, not an incident.
+  - Documented-not-fixed: check-then-act AI rate limits (F6, bounded by the $5 monthly fuse),
+    `*.github.io` CORS wildcard (F7), no clickjacking defence since `frame-ancestors` is ignored in a
+    meta CSP (F8), `log_gdpr_event()` executable by `anon` (F9), the optional `checkId` gate
+    contradicting migration 0009's comment (F10), no retention job on learner text (F11), missing
+    `set search_path` on the two founder helpers (F12).
+  - **Gates:** typecheck clean · lint 0 errors (75 warnings, unchanged from the untouched tree) ·
+    test:unit **345/345** · build green · check:bundle 119.7 kB (budget 400).
+  - No PR opened (none was asked for); pushed to the session branch.
+- **Artifacts (prompt 1):** `docs/reports/security-audit-2026-07-27.md` (new) ·
+  `src/features/writing/draftAutosave.ts` · `src/lib/cloudSync.ts` · `src/lib/dataExport.ts` ·
+  `supabase/functions/submit-feedback/index.ts` · `docs/strategy/SECURITY.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 2 (verbatim, 2026-07-27):** `1. what concrete action point do I have here?\n2.  You lost
+  me - explain it in plain language?` → The audit was written for a reader who already knew the
+  system; the founder is non-technical, so the report handed them a decision rather than a task.
+  Fixed the substance, not just the wording: F1's remediation was "drafted, deliberately not applied
+  because a wrong seed locks you out", which offloaded the risk onto the person least able to carry
+  it. Made it safe to apply instead, so the highest finding became ONE copy-paste.
+  - **`supabase/migrations/0013_admins_table.sql` (new).** Creates `public.admins` (RLS on, NO client
+    policies, so not even an admin can grant admin from the browser); seeds it from the accounts
+    holding the two founder addresses TODAY, reading `auth.users` server-side (the one moment the
+    email is still trustworthy); a `do $$ … if v_n = 0 then raise exception` guard that REFUSES to
+    swap the gate when the seed matched nobody, so a wrong address gives a readable error instead of
+    an admin panel that admits no one; then replaces the `is_founder()` body with
+    `exists (select 1 from public.admins where user_id = auth.uid())`. SECURITY DEFINER (the table
+    has no policies) with `set search_path = pg_catalog, public`, which also closes F12. Every policy
+    and RPC already routes through that one function, so all of them re-point at once; the
+    `provenance_reviews` policy from 0007 was the last place still carrying the literal email list
+    and is re-pointed too. Idempotent, rollback to the 0008 gate in a trailing comment.
+  - **`tests/admin.test.ts` +6 cases** pinning the replacement: gates on `auth.uid()` against
+    `public.admins`, never touches `auth.jwt()` or a gmail literal, is SECURITY DEFINER with a pinned
+    search_path, keeps `admins` free of client policies, and carries the lock-out guard. 0008's own
+    lockstep assertions stay as they are: a migration is history, not a live file.
+  - **`src/lib/admin.ts` deliberately unchanged.** It decides whether the admin UI renders, not
+    whether data is reachable; noted in the migration and the report that a future third admin needs
+    adding in both places.
+  - **Corrected a recommendation rather than repeating it:** the first draft said "turn Confirm email
+    on today". Supabase's built-in mailer is rate-limited to a handful of messages an hour, so doing
+    that before real SMTP is configured would silently break sign-ups. It is now a separate, later
+    task, and the migration is what closes the admin exposure on its own.
+  - Report, status doc and the founder action list rewritten around the one concrete step.
+    Gates: typecheck · lint 0 errors · test:unit **351/351**.
+- **Artifacts (prompt 2):** `supabase/migrations/0013_admins_table.sql` (new) · `tests/admin.test.ts` ·
+  `docs/reports/security-audit-2026-07-27.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-27):** `I turned on the confirm email before running the query. Is
+  that a problem?` → No: the migration reads `auth.users`, which the setting does not touch, and
+  existing accounts are not retroactively un-confirmed. Flagged the real consequence instead, that
+  every new sign-up now depends on Supabase's built-in mailer (a handful of messages an hour,
+  test-only by Supabase's own docs), and asked them to test a sign-up and check
+  Auth → URL Configuration → Site URL. No code changed.
+- **Prompt 4 (verbatim, 2026-07-27):** `I signed up with a new email and I got a confirmation email
+  (attached). But even after clicking the link and logging-in, the app doesn't let me in and says me
+  with a barely noticeable toast in the bottom to confirm an email again! There are several issues
+  here, firstly, the login pop-up is quite messy, the user creating account using email can't see the
+  password if they wish, it's very unclear why the signup button doesn't work if the terms and
+  conditons check box is not ticked as it's somewhere on the top. The email a user receives should be
+  from genauly, not Supabase. And, finally, the sign-up with email confirmation should work!` →
+  TWO independent bugs produced the founder's experience, plus three UX defects and the sender.
+  - **Bug 1, the link confirmed but never signed anyone in.** Supabase's default "Confirm signup"
+    template returns the session in the URL **hash** (`#access_token=…`). React Router rewrites the
+    URL as it mounts, so the tokens were gone before any code looked, and the client is on PKCE,
+    which does not expect them there anyway (the same collision documented in `lib/supabase.ts` for
+    Google sign-in). The account WAS confirmed server-side; the learner just landed on an ordinary
+    signed-out page. Fix: `src/lib/authCallback.ts` snapshots the parameters at module-eval time
+    (imported FIRST in `main.tsx`, before `createRoot`), and a new unguarded route `/auth/confirm`
+    (`src/features/auth/ConfirmEmail.tsx`) completes the sign-in. It accepts all three shapes a
+    confirmation link arrives in (`token_hash` → `verifyOtp`, hash tokens → `setSession`, `?code=`
+    → already consumed by supabase-js), so the flow works whether or not the template is updated.
+    `signUp` now also pins `emailRedirectTo` to the running origin, so the landing page no longer
+    depends on the dashboard Site URL being right.
+  - **Bug 2, the "confirm your email" toast on a SECOND sign-up.** With confirmations ON, signing up
+    with an address that already has an account returns a success-shaped response with NO error
+    (Supabase refuses to reveal which addresses are registered), so `needsConfirmation` was true and
+    the founder was told to confirm a mail that is never sent. The tell is an empty `identities`
+    array; `signUp` now returns `alreadyRegistered` and the dialog switches to the Anmelden tab with
+    "Diese E-Mail hat schon ein Konto." The `friendlyError` "already registered" mapping never fired
+    because that path produces no error at all.
+  - **Dialog (all three founder points).** Password field gained a reveal toggle; the AGB/Datenschutz
+    checkbox moved from the top of the dialog to directly above the button it gates; the button and
+    the Google button are no longer disabled-at-default (design landmine) but always act and NAME the
+    first unmet requirement in one message slot. The confirmation state is now a panel that KEEPS the
+    dialog open, shows the address, and offers "E-Mail erneut senden" (`resendConfirmation`), instead
+    of closing behind the toast the founder could barely see.
+  - **Found while testing:** the dialog's reset effect listed `clearError` in its dependencies, so any
+    caller whose store returns a fresh action identity per render wiped the consent tick and the
+    pending panel the moment they were set. Moved to a ref synced in its own effect.
+  - **Sender.** `docs/reference/auth-emails/` holds branded German templates for Confirm signup and
+    Reset password plus a README with the Resend SMTP steps. Note recorded there: feedback mail could
+    use Resend's shared `onboarding@resend.dev` because it goes to the founder, but auth mail goes to
+    strangers, so `genauly.de` has to be verified as a sending domain first.
+  - **Verification:** `tests/authCallback.test.ts` (6, incl. the hash shape that caused bug 1) and
+    `tests/authDialog.test.tsx` (6, incl. "button never disabled at rest" and the already-registered
+    path). Real-component screenshot of the reworked dialog via `preview/auth-dialog.html`. Gates:
+    typecheck · lint 0 errors (75 warnings, unchanged) · test:unit **363/363** · build ·
+    check:bundle 122.9 kB.
+- **Artifacts (prompts 3-4):** `src/lib/authCallback.ts` (new) ·
+  `src/features/auth/ConfirmEmail.tsx` (new) · `src/features/auth/AuthDialog.tsx` ·
+  `src/store/useAuthStore.ts` · `src/router.tsx` · `src/main.tsx` ·
+  `tests/authCallback.test.ts` (new) · `tests/authDialog.test.tsx` (new) ·
+  `docs/reference/auth-emails/{README.md,confirm-signup.html,reset-password.html}` (new) ·
+  `preview/auth-dialog.html` + `preview/auth-dialog-entry.tsx` (new) · this log
+- **Prompt 5 (verbatim, 2026-07-27):** `I'll do the smtp a bit later, I just bought the email for the
+  domain. Document the session` → Session documentation pass. Recorded the founder's state (the
+  `genauly.de` mailbox is bought; Resend domain verification + the Supabase SMTP fields are the
+  remaining steps) and swept the docs the session made stale rather than only appending a handoff:
+  - `docs/PROJECT_STATUS.md`: header rewritten around both halves of the session (audit, then the
+    sign-up flow the audit's own recommendation uncovered); the s174 handoff gained the two auth
+    bugs, the dialog rework and the effect-dependency bug the tests caught; the founder action list
+    now leads with migration 0013 and a no-longer-optional Resend SMTP item carrying the mailbox
+    status.
+  - `CLAUDE.md`: `/auth/confirm` added to the route list (ungated on purpose).
+  - `docs/PROJECT_FOUNDATION.md`: the 2B auth entry rewritten (email confirmation is ON, the
+    `/auth/confirm` + `authCallback.ts` mechanism, the pinned `emailRedirectTo`), and the completed
+    action item "Disable Confirm email (2026-06-01, founder-verified)" struck through as REVERSED,
+    since leaving a checked box saying the opposite of today's setting is how a future session
+    re-breaks this.
+  - `docs/areas/LEGAL-ADMIN.md`: consent checkbox placement (now above the button it gates, and it
+    does not disable that button).
+  - `docs/strategy/SECURITY.md`: Resend SMTP promoted from "(Optional, pre-existing)" to required
+    with the reason, plus a new done-item for enabling "Confirm email".
+  - No code changed; gates unchanged from prompt 4 (test:unit 363/363).
+- **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` ·
+  `docs/areas/LEGAL-ADMIN.md` · `docs/strategy/SECURITY.md` · this log
+- **Prompt 6 (verbatim, 2026-07-27):** `I ran the sql code in 1 successfully.` → Migration 0013
+  applied by the founder in the Supabase SQL editor. A clean run is itself evidence the seed worked:
+  the migration raises rather than swapping the gate when `public.admins` ends up empty, so "no
+  error" means the founder accounts were found and `is_founder()` now reads user ids, not the email
+  claim. Marked **audit F1 closed** in the report (headline, findings table, F1 body, action list),
+  in `docs/PROJECT_STATUS.md` (action list + s174 handoff) and in `docs/strategy/SECURITY.md`; the
+  stale "still worth doing separately: turn Confirm email on" paragraph in F1 was replaced, since
+  they had already done it. Remaining verification is live-only (that `/admin` still opens); the
+  rollback to the 0008 email gate sits in a comment at the foot of the migration.
+- **Prompt 7 (verbatim, 2026-07-27):** `complete documentation and merge to main` → Final doc pass
+  plus the ship, under the standing auto-ship approval and this explicit instruction.
+  - Docs closed out F1 across every place it was recorded (report headline, findings table, F1 body
+    and action list; `PROJECT_STATUS`; `SECURITY`), and the report's stale "still worth doing
+    separately: turn Confirm email on" paragraph was replaced with what enabling it actually cost
+    (the built-in mailer's hourly limit, now its own action item).
+  - Gates before shipping: typecheck · lint 0 errors (75 warnings) · lint:content · test:unit
+    **363/363** · build · check:bundle 122.9 kB.
+  - **PR #742** into `main`, squash-merged, then the required post-merge housekeeping
+    (`git fetch origin main` → `git reset --hard origin/main` → `git push --force-with-lease`).
+  - Two founder checks remain and are stated in the PR body: that `/admin` still opens after 0013
+    (rollback sits in the migration's trailing comment), and the Resend SMTP setup.
+- **Artifacts (prompts 6-7):** `docs/reports/security-audit-2026-07-27.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/strategy/SECURITY.md` · this log · **PR #742**
