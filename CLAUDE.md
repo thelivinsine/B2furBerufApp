@@ -84,6 +84,11 @@ after pulling.
   `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
   Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
   `docs/areas/SCHREIBEN.md`).
+- **Never reload over a learner's unsaved work.** The PWA adopts deploys by reloading; every
+  automatic reload is gated on `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later
+  resume. Any new surface holding in-memory work claims it with `useLiveWork(active, label, flush)`
+  AND persists itself, so an unavoidable reload (chunk-load self-heal, manual refresh, iOS
+  discarding the tab) is recoverable rather than lost work.
 - **A freshly opened page never scrolls.** Every trainer sizes its elastic element (the writing
   field, the tile column) to the room actually left, and gives up its preferred floor rather than
   push the resting page past one viewport (`useFillEditor`, `measureMobile`).

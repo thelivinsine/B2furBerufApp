@@ -15,6 +15,8 @@
  * a genuine, persistent failure (offline, server down) shows the error boundary
  * instead of looping forever — while a later deploy can still trigger recovery.
  */
+import { flushLiveWork } from "./liveWork";
+
 let recovering = false;
 
 export async function recoverFromStaleAssets(): Promise<void> {
@@ -23,6 +25,10 @@ export async function recoverFromStaleAssets(): Promise<void> {
   if (Date.now() - last < 10_000) return; // recovered very recently — avoid a reload loop
   recovering = true;
   sessionStorage.setItem("_chunkReloadAt", String(Date.now()));
+  // Unlike the deploy-adoption reload, this one is unavoidable (the app is
+  // already broken), so instead of waiting for a safe moment we give every
+  // open draft / session a last chance to write itself to localStorage.
+  flushLiveWork();
 
   try {
     if ("caches" in window) {

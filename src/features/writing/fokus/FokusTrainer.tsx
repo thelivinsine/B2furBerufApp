@@ -22,6 +22,8 @@ import { UmlautKeys } from "../UmlautKeys";
 import { floatingNote, floatingSlot } from "../floatingCluster";
 import { CorrectionToggle, FixTiles, MarkedTokens } from "../correction";
 import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
+import { loadAutosavedDraft, saveAutosavedDraft } from "../draftAutosave";
+import { useLiveWork } from "@/lib/liveWork";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
 import { diffWords, type DiffToken } from "@/lib/wordDiff";
 import { cn } from "@/lib/utils";
@@ -45,7 +47,12 @@ export function FokusTrainer({
   onRequireAuth: (sentence: string) => void;
   initialText?: string;
 }) {
-  const m = useFokusMachine(initialText);
+  // Autosave restore (s172): the sentence survives ANY reload, not just the
+  // sign-in hand-off. Read once, before the machine is seeded, so a restore
+  // never fights a later render.
+  const [boot] = useState(() => initialText || loadAutosavedDraft("fokus")?.text || "");
+
+  const m = useFokusMachine(boot);
   const reduce = useReducedMotion();
   const [peek, setPeek] = useState(false);
   // Result view: the learner's original (coral marks), the corrected sentence
@@ -66,6 +73,16 @@ export function FokusTrainer({
     if (initialText && !m.input) m.setInput(initialText);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialText]);
+
+  // Keep the sentence on disk while it is being written, and block the
+  // deploy-adoption reload until the learner is done with it (lib/liveWork).
+  useLiveWork(m.input.trim().length > 0, "writing:fokus", () =>
+    saveAutosavedDraft({ mode: "fokus", text: m.input }),
+  );
+  useEffect(() => {
+    const t = window.setTimeout(() => saveAutosavedDraft({ mode: "fokus", text: m.input }), 500);
+    return () => window.clearTimeout(t);
+  }, [m.input]);
 
   const tooShort = m.words < MIN_WORDS;
   const remaining = Math.max(0, MIN_WORDS - m.words);
