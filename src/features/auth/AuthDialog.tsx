@@ -55,9 +55,20 @@ export function AuthDialog({
   /** Why the primary action could not run yet. Set on click, never at rest, so
    *  the button stays live instead of sitting disabled (design landmine). */
   const [hint, setHint] = useState<string | null>(null);
-  /** Address we mailed a confirmation link to; switches the dialog to the
-   *  "check your inbox" panel instead of closing behind a small toast. */
+  /**
+   * Address we ACTUALLY mailed a confirmation link to, i.e. a fresh sign-up.
+   * Switches the dialog to the "check your inbox" panel instead of closing
+   * behind a small toast. Never set from the log-in path: see `resendFor`.
+   */
   const [pending, setPending] = useState<string | null>(null);
+  /**
+   * Address whose log-in was refused because it is not confirmed yet. This is
+   * NOT the same state as `pending`: no mail was just sent, and the form has to
+   * stay on screen. Taking the log-in form away here and replacing it with
+   * "we sent you a link" would both lie and remove the only way in, which is
+   * precisely how a stale unconfirmed account reads as "log-in is broken".
+   */
+  const [resendFor, setResendFor] = useState<string | null>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -95,6 +106,7 @@ export function AuthDialog({
     setShowPassword(false);
     setHint(null);
     setPending(null);
+    setResendFor(null);
   }, [open, intent]);
 
   const isSignup = mode === "signup";
@@ -137,6 +149,7 @@ export function AuthDialog({
       return;
     }
     setHint(null);
+    setResendFor(null);
     // Record consent before the call so it persists locally and syncs to the
     // cloud once the session resolves (covers the email + guest-upgrade paths).
     if (isSignup) recordConsent();
@@ -161,12 +174,16 @@ export function AuthDialog({
     }
 
     if (!ok) {
-      // The unconfirmed-account case is recoverable, so offer the way out
-      // instead of leaving a red line the learner can do nothing about.
-      if (needsConfirmation) setPending(address);
+      // Refused because the address is not confirmed yet. Recoverable, so offer
+      // the way out UNDER the error, with the form left exactly where it is:
+      // the learner may want to try a different address or password, and no
+      // mail was sent just now, so the "check your inbox" panel would be a lie.
+      if (needsConfirmation) setResendFor(address);
       return;
     }
 
+    // Sign-up only. A confirmation link really was just sent, so the panel that
+    // says so is accurate here.
     if (needsConfirmation) {
       setPending(address);
       setPassword("");
@@ -179,8 +196,9 @@ export function AuthDialog({
   };
 
   const resend = async () => {
-    if (!pending) return;
-    const sent = await resendConfirmation(pending);
+    const address = pending ?? resendFor;
+    if (!address) return;
+    const sent = await resendConfirmation(address);
     showToast(
       sent ? "Neue E-Mail ist unterwegs." : "Konnte nicht gesendet werden. Versuch es später.",
       sent ? "success" : "default",
@@ -403,6 +421,14 @@ export function AuthDialog({
             >
               {error ?? hint}
             </p>
+          )}
+
+          {/* The unblock for an unconfirmed account, offered WITHOUT taking the
+              form away, so logging in stays possible on the same screen. */}
+          {resendFor && (
+            <Button variant="outline" className="w-full" onClick={resend} disabled={busy}>
+              E-Mail erneut senden
+            </Button>
           )}
 
           {/* Always live. If something is missing it says so above, rather than

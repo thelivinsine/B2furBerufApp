@@ -134,7 +134,7 @@ describe("sign-up dialog", () => {
     await waitFor(() => expect(resendConfirmation).toHaveBeenCalledWith("neu@example.com"));
   });
 
-  it("offers the same escape hatch when log-in reports an unconfirmed account", async () => {
+  it("offers the escape hatch on an unconfirmed log-in WITHOUT taking the form away", async () => {
     signIn.mockResolvedValue({ ok: false, needsConfirmation: true, alreadyRegistered: false });
     render(<AuthDialog open onOpenChange={() => {}} intent="login" />);
     fireEvent.change(screen.getByPlaceholderText("du@beispiel.de"), {
@@ -145,8 +145,31 @@ describe("sign-up dialog", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Anmelden" }));
 
-    expect(
-      await screen.findByRole("button", { name: "E-Mail erneut senden" }),
-    ).toBeDefined();
+    expect(await screen.findByRole("button", { name: "E-Mail erneut senden" })).toBeDefined();
+    // The regression this pins: swapping in the "check your inbox" panel here
+    // removed the only way in AND claimed a mail had just been sent, so a stale
+    // unconfirmed account read as "log-in is broken".
+    expect(screen.getByPlaceholderText("Dein Passwort")).toBeDefined();
+    expect(screen.getByRole("button", { name: "Anmelden" })).toBeDefined();
+    expect(screen.queryByText(/Wir haben dir einen Link/)).toBeNull();
+  });
+
+  it("lets a successful log-in through even if no session came back on the payload", async () => {
+    // `signIn` must derive needsConfirmation from the ERROR alone. A version
+    // that also inferred it from a missing session answered a correct password
+    // with "check your inbox" and never signed anyone in.
+    signIn.mockResolvedValue({ ok: true, needsConfirmation: false, alreadyRegistered: false });
+    const onOpenChange = vi.fn();
+    render(<AuthDialog open onOpenChange={onOpenChange} intent="login" />);
+    fireEvent.change(screen.getByPlaceholderText("du@beispiel.de"), {
+      target: { value: "neu@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Dein Passwort"), {
+      target: { value: "geheim123" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Anmelden" }));
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(showToast).toHaveBeenCalledWith("Willkommen zurück!", "success");
   });
 });
