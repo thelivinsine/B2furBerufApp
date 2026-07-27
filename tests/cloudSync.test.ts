@@ -134,3 +134,56 @@ describe("cloud sync account isolation", () => {
     expect(localStorage.getItem(SYNC_UID_KEY)).toBeNull();
   });
 });
+
+/**
+ * The onboarding loop (s174). `onboarded` rides the profile's `settings` jsonb
+ * and was being pushed up correctly, but the read path gated adoption on
+ * `profile.name`, which onboarding never collects. So the flag never came back
+ * and every sign-in on a device restarted onboarding.
+ */
+describe("onboarded survives a re-login", () => {
+  it("adopts the cloud profile of an account that finished onboarding, with no name set", async () => {
+    remoteRows.profiles["acct-a"] = {
+      id: "acct-a",
+      // Exactly what onboarding produces: goal + level, and an empty name.
+      name: "",
+      goal: "pruefung",
+      level: "B2",
+      settings: { onboarded: true, mode: "beides" },
+    };
+    // A different account synced here last, so the local cache is wiped first
+    // and `onboarded` can ONLY come back from the cloud.
+    localStorage.setItem(SYNC_UID_KEY, "acct-b");
+
+    await startCloudSync("acct-a");
+
+    expect(useSettingsStore.getState().onboarded).toBe(true);
+    expect(useSettingsStore.getState().level).toBe("B2");
+  });
+
+  it("does NOT adopt the empty row the sign-up trigger creates", async () => {
+    // A brand-new account: the trigger made a profile of nulls, nothing else.
+    remoteRows.profiles["fresh"] = { id: "fresh", name: null, settings: {} };
+    localStorage.setItem(SYNC_UID_KEY, "acct-b");
+
+    await startCloudSync("fresh");
+
+    // Still not onboarded, so the route guard sends them to onboarding once.
+    expect(useSettingsStore.getState().onboarded).toBe(false);
+  });
+
+  it("keeps local settings when this device already onboarded", async () => {
+    useSettingsStore.getState().completeOnboarding({ goal: "beruf", level: "B1" });
+    remoteRows.profiles["acct-a"] = {
+      id: "acct-a",
+      name: "",
+      settings: { onboarded: true },
+      level: "C1",
+    };
+
+    await startCloudSync("acct-a");
+
+    // Local wins; the write-through pushes local → cloud, not the reverse.
+    expect(useSettingsStore.getState().level).toBe("B1");
+  });
+});

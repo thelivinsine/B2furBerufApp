@@ -170,7 +170,17 @@ function mergeRemoteSettings(profile: Record<string, unknown> | null) {
   // completed onboarding yet (fresh device); otherwise keep local and let the
   // write-through push local → cloud.
   if (local.onboarded) return;
-  if (!profile.name) return;
+  // Is this cloud profile worth adopting, or is it the empty row the
+  // auto-provision trigger creates at sign-up? Ask the flag that answers that
+  // question directly.
+  //
+  // This used to test `profile.name`, on the assumption that a real profile has
+  // one. Onboarding never asks for a name (it collects goal, mode and level),
+  // so `name` is "" for EVERY account, and this bailed every time: `onboarded`
+  // was pushed to the cloud but never read back, so each new sign-in on a
+  // device wiped the local flag and started onboarding again. The founder saw
+  // the onboarding screen on every single log-in (s174).
+  if (remoteSettings.onboarded !== true) return;
   applyingRemote = true;
   useSettingsStore.setState({
     name: (profile.name as string) ?? local.name,
