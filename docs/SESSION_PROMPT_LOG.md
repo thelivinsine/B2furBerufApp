@@ -1912,3 +1912,52 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
     (rollback sits in the migration's trailing comment), and the Resend SMTP setup.
 - **Artifacts (prompts 6-7):** `docs/reports/security-audit-2026-07-27.md` ·
   `docs/PROJECT_STATUS.md` · `docs/strategy/SECURITY.md` · this log · **PR #742**
+- **Prompt 8 (verbatim, 2026-07-27):** `login with email doesn't work now.` → Diagnosed from the code
+  without the one fact that mattered, and shipped two fixes that were real but not the reported
+  fault. **PR #743:** (a) `signIn` inferred `needsConfirmation` from a response carrying no session
+  as well as from the error message, so a correct password could be answered with "check your inbox"
+  and never sign anyone in; it now reads the explicit `Email not confirmed` error and nothing else.
+  (b) An unconfirmed account had the whole log-in form replaced by the sign-up "check your inbox"
+  panel, which claims a link was just sent (untrue on the log-in path) and removed the only way in;
+  the resend is now a button UNDER the error with the form left in place, and `pending` (mail
+  genuinely sent) and `resendFor` (log-in refused) became separate states. Verified the Pages deploy
+  had succeeded first, so the live site was running the new code. Gates: typecheck · lint 0 errors ·
+  test:unit 364/364 · build.
+- **Prompt 9 (verbatim, 2026-07-27):** `the login with email is still not working` → Tried to get
+  evidence rather than guess again: probed the live Supabase auth endpoints by curl, which the
+  sandbox network blocks (empty responses), so no server-side facts were available.
+- **Prompt 10 (verbatim, 2026-07-27, arrived mid-turn):** `when I try it with a secondary account, it
+  redirects me to landing page` → **The sentence that reframed the whole thing:** the sign-in was
+  SUCCEEDING, and the problem was where the app put the learner afterwards. **PR #744:**
+  `RequireOnboarding` sent every resolved not-onboarded visitor to `/welcome`, the page whose job is
+  to ask for a sign-up, which is indistinguishable from a failed log-in; signed-out still goes there,
+  an account holder now goes to `/start`. And signing in FROM a public page left the learner standing
+  on it (the landing page kept showing "Start free"), so a successful sign-in from a public route now
+  hands over to `/`; sign-ins inside the app deliberately do not move the learner. `authDialog` tests
+  now render through a `MemoryRouter` and pin all three destinations. Gates: test:unit 367/367.
+- **Prompt 11 (verbatim, 2026-07-27, with a screenshot of the onboarding screen):** `I'm able to
+  login with email but I'm seeing this everytime I log in!` → **The root cause, which explains all
+  three reports.** `mergeRemoteSettings` decided whether to adopt a cloud profile with
+  `if (!profile.name) return`, treating "has a name" as a proxy for "is a real profile". Onboarding
+  collects goal, mode and level and NO name, so `name` was `""` for every account ever created and
+  the guard bailed every time. Because a sign-in wipes the device-global cache first (account
+  isolation, deliberate), `onboarded` could ONLY come back from the cloud, and never did: the flag
+  was write-only, every sign-in restarted onboarding, and the learner's level and goal were
+  discarded. Latent since that line was written, not a regression from this session; it surfaced only
+  because working email sign-up meant accounts were being logged into repeatedly for the first time.
+  **PR #745:** adoption tests `settings.onboarded === true`, which still rejects the empty row the
+  sign-up trigger creates (`settings` is `{}`). `tests/cloudSync.test.ts` covers the nameless-but-
+  onboarded profile, the freshly-provisioned empty row, and local-wins-when-already-onboarded.
+  Gates: test:unit 370/370.
+- **Prompt 12 (verbatim, 2026-07-27):** `go ahead` → Documentation pass for the debugging round.
+  `docs/DECISIONS.md` gained an s174 section (seven entries: the adopt-on-the-flag rule, where a
+  not-onboarded visitor goes, why a public-page sign-in must navigate, `needsConfirmation` from the
+  error alone, "we sent you a link" only when one was sent, why the confirmation link needs its own
+  route, and a diagnostic note on how three rounds were lost re-reading the file I had just edited).
+  **CLAUDE.md gained a hard invariant** for the restore rule, because this fault silently destroyed
+  learner state and is easy to reintroduce. `PROJECT_FOUNDATION.md` 2B records the restore contract;
+  `PROJECT_STATUS.md` header and handoff carry the round.
+- **Artifacts (prompts 8-12):** `src/store/useAuthStore.ts` · `src/features/auth/AuthDialog.tsx` ·
+  `src/router.tsx` · `src/lib/cloudSync.ts` · `tests/authDialog.test.tsx` · `tests/cloudSync.test.ts` ·
+  `CLAUDE.md` · `docs/DECISIONS.md` · `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_STATUS.md` ·
+  this log · **PR #743**, **PR #744**, **PR #745**

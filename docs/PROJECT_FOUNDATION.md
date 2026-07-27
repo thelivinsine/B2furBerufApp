@@ -55,6 +55,12 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
 - **2B auth + sync:** `useAuthStore` (guest anon + email/password + Google); `cloudSync.ts`
   (offline-first: localStorage stays cache, pull+MERGE on login, debounced write-through).
   `AccountPanel` in Settings. Guest sign-in is the primary path.
+  **Profile restore (s174):** a sign-in wipes the device-global cache first for account isolation,
+  so the learner's `onboarded` flag, level and goal come back ONLY from `profiles.settings`.
+  `mergeRemoteSettings` adopts a cloud profile on `settings.onboarded === true`; it must never gate
+  on a display field (it gated on `profile.name`, which onboarding does not collect, so every
+  sign-in restarted onboarding). `RequireOnboarding` waits for `syncHydrated` before deciding, then
+  routes signed-out visitors to `/welcome` and account holders to `/start`.
   **Email confirmation is ON since s174** (founder enabled it in the dashboard), so a new
   email/password account is not signed in until the link is clicked. The link lands on
   **`/auth/confirm`** (`src/features/auth/ConfirmEmail.tsx`), which finishes the sign-in; the
