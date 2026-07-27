@@ -838,3 +838,39 @@ app, not only in the preview.
     moving past matching tokens. A run whose words are a permutation now collapses to one
     "Wortstellung" change. This was visible in Fokus's live card all along; the history just made it
     impossible to ignore.
+
+## Session 173 (2026-07-27) — a deploy never refreshes a learner's work away — founder-reported bug
+
+Founder: "whenever the user is working on something like writing an email or practicing an Übung
+session, the update takes place and the app refreshes! ... the uben session progress or the writing
+draft is lost." The cause was `lib/swUpdate.ts` reloading unconditionally once a new service worker
+took control, in particular on the next `visibilitychange` back to visible.
+
+1. **A reload is gated on unsaved work, not on a timer.** The old code was already trying to be
+   polite (reload immediately only inside the first 30s, otherwise defer). It deferred to the wrong
+   event: "the learner came back to the app" is the single worst moment to reload, because it is
+   exactly when someone returns to a half-written email. The condition that matters is not *when* but
+   *whether anything would be destroyed*, so `hasLiveWork()` now gates every automatic reload and the
+   update simply waits for a resume with nothing open.
+2. **A module-level registry, not a zustand store.** The reloaders (`swUpdate`, `recover`) run
+   outside React and must answer synchronously during an event handler. `lib/liveWork.ts` is plain
+   module state with a thin `useLiveWork` hook for the React side.
+3. **Claiming and persisting are BOTH required; neither is sufficient.** Claiming alone still loses
+   work to the reloads nobody controls (chunk-load self-heal, manual refresh, iOS discarding the
+   tab). Persisting alone still yanks the surrounding on-screen state away mid-task. The CLAUDE.md
+   invariant therefore demands both of any new surface.
+4. **sessionStorage for the Üben run, localStorage for the writing draft.** Not an implementation
+   detail: it IS the resume policy. A draft is a document, so it should still be there tomorrow.
+   A practice session is a moment, so resuming one the learner walked away from yesterday would be
+   surprising; sessionStorage survives a reload of the tab and dies with it, which is exactly the
+   "only recover from an interruption" semantics wanted, with no TTL guesswork.
+5. **The session snapshot points at the next UNANSWERED block.** An answered block has already been
+   written to FSRS and XP, so resuming onto it would grade it twice. `finish`/`Beenden`/`Neue Runde`
+   clear the snapshot and set an `abandoned` ref first, since the unmount that follows would
+   otherwise flush it straight back.
+6. **The autosave is a SEPARATE store from `resumeDraft.ts`.** That file is the sign-in hand-off, and
+   its `resume: true` flag is what makes AppShell redirect to `/writing` after the OAuth round trip.
+   Reusing it for a continuous autosave would have turned every signed-in launch into a redirect.
+7. **No "a new version is available, reload?" banner.** The complaint was interruption; a prompt is a
+   second interruption, and it moves a decision the app can make correctly onto the learner. Revisit
+   only if a deploy ever has to be forced out mid-session (e.g. a broken backend contract).
