@@ -18,6 +18,7 @@ import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
 import { writingTaskById } from "@/lib/writingScope";
+import { diffWords } from "@/lib/wordDiff";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import {
   getWritingHistory,
@@ -66,6 +67,127 @@ function lastMonthKeys(n: number): string[] {
     out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
   }
   return out;
+}
+
+/** How many fix tiles a long text shows before collapsing the rest into a count. */
+const MAX_FIX_TILES = 6;
+
+/**
+ * The learner's text with its correction (s171): the same Original/Korrigiert
+ * language as Fokus, so a correction reads identically wherever it appears.
+ * Coral marks the wrong words in the original, green marks the fixes, and the
+ * Himmelblau tiles name the category of each edit. Everything is computed in the
+ * browser from the two texts (`diffWords`), so there is no extra AI cost.
+ */
+function CorrectionView({ original, corrected }: { original: string; corrected: string }) {
+  const [view, setView] = useState<"orig" | "corr">("corr");
+  // Diff paragraph by paragraph, so a letter keeps its shape (salutation, body,
+  // sign-off). The diff tokenizes on whitespace, so one diff over the whole text
+  // would rejoin it as a single block. If the model changed the paragraph count
+  // the pairing would be wrong, so that case falls back to one whole-text diff.
+  const paragraphs = useMemo(() => {
+    const split = (s: string) =>
+      s.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+    const a = split(original);
+    const b = split(corrected);
+    if (a.length > 1 && a.length === b.length) return a.map((p, i) => diffWords(p, b[i]));
+    return [diffWords(original, corrected)];
+  }, [original, corrected]);
+
+  const allChanges = paragraphs.flatMap((p) => p.changes);
+  const shownFixes = allChanges.slice(0, MAX_FIX_TILES);
+  const hiddenFixes = allChanges.length - shownFixes.length;
+
+  return (
+    <div className="space-y-3 rounded-xl border border-border bg-muted/20 p-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <PenLine className="h-3.5 w-3.5" /> Dein Text
+        </p>
+        <div className="inline-flex rounded-lg bg-muted p-0.5 text-xs font-bold">
+          {(
+            [
+              { id: "orig" as const, label: "Original" },
+              { id: "corr" as const, label: "Korrigiert" },
+            ]
+          ).map((seg) => (
+            <button
+              key={seg.id}
+              type="button"
+              aria-pressed={view === seg.id}
+              onClick={() => setView(seg.id)}
+              className={cn(
+                "rounded-md px-3 py-1 transition-colors",
+                view === seg.id
+                  ? "bg-surface text-foreground shadow-soft"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {seg.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {paragraphs.map((para, pi) => {
+          const tokens = view === "orig" ? para.originalTokens : para.tokens;
+          return (
+            <p key={pi} className="text-sm leading-relaxed text-foreground/90">
+              {tokens.map((tk, i) => (
+                <span key={i}>
+                  {tk.changed ? (
+                    <span
+                      className={cn(
+                        "font-semibold",
+                        view === "orig" ? "fx-mark-coral" : "fx-mark-green",
+                      )}
+                    >
+                      {tk.text}
+                    </span>
+                  ) : (
+                    tk.text
+                  )}
+                  {i < tokens.length - 1 ? " " : ""}
+                </span>
+              ))}
+            </p>
+          );
+        })}
+      </div>
+
+      {shownFixes.length > 0 && (
+        <>
+          <div className="h-px bg-border" />
+          <div className="flex flex-wrap items-stretch gap-2.5">
+            {shownFixes.map((c, i) => (
+              <div
+                key={i}
+                className="min-w-[8rem] rounded-xl border border-accent/70 bg-accent/30 p-2.5 dark:border-accent/[0.45] dark:bg-accent/[0.18]"
+              >
+                <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
+                  {c.category}
+                </span>
+                {c.moved ? (
+                  <span className="text-sm font-bold text-success">{c.to}</span>
+                ) : (
+                  <span className="text-sm">
+                    <span className="text-muted-foreground line-through">{c.from || "—"}</span>{" "}
+                    <span className="font-bold text-success">{c.to || "—"}</span>
+                  </span>
+                )}
+              </div>
+            ))}
+            {hiddenFixes > 0 && (
+              <p className="self-center text-xs tabular-nums text-muted-foreground">
+                +{hiddenFixes} weitere
+              </p>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 /** Himmelblau weakness chip (squircle, never a fully round badge). */
@@ -413,14 +535,18 @@ function HistoryEntry({
               </div>
             )}
 
-            <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
-              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <PenLine className="h-3.5 w-3.5" /> Dein Text
-              </p>
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
-              </p>
-            </div>
+            {entry.text?.trim() && entry.corrected_text?.trim() ? (
+              <CorrectionView original={entry.text} corrected={entry.corrected_text} />
+            ) : (
+              <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <PenLine className="h-3.5 w-3.5" /> Dein Text
+                </p>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                  {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
+                </p>
+              </div>
+            )}
 
             {/* The headline result of the evaluation. */}
             <div className="space-y-2 rounded-xl border border-primary/15 bg-primary/5 p-3.5">

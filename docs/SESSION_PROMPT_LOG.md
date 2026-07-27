@@ -1503,3 +1503,34 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/session/SessionPlayer.tsx` · `preview/verlauf-fortschritt-redesign.html` ·
   `docs/areas/SCHREIBEN.md` · `docs/areas/SESSION.md` · `.claude/skills/design/SKILL.md` ·
   `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log · PRs #685, #733 · artifact c3df428e
+- **Prompt 6 (verbatim, 2026-07-26):** `didn't you setup a supabse.yml to carryout the backend changes yourself?` →
+  Correct, and the earlier "needs a database change" understated it. Checked the run history rather
+  than the docs: `.github/workflows/supabase.yml` (added s167) deploys every Edge Function on a merge
+  to `main` touching `supabase/**`, and the last run (25 July 16:25) shows "Deploy Edge Functions:
+  success" with "Apply migrations: **skipped**". Only the migration step is gated, on
+  `SUPABASE_DB_PASSWORD`, which was unset at that moment (the founder asked how to add it minutes
+  later, so it may be set by now; secrets are not readable and no Supabase run has happened since).
+  Reported the split plainly: function/prompt changes are fully automatic, schema changes are
+  automatic only if that secret exists, else one Dashboard paste each.
+- **Prompt 7 (verbatim, 2026-07-26):** `yes` (build the correction follow-up) →
+  Shipped the correction end to end. **Migration 0012** adds `writing_evaluations.corrected_text`
+  (idempotent). **`evaluate-writing`** requests `corrected` (a minimal repair, explicitly never a
+  rewrite, since a diff against a re-imagined text teaches nothing), Anthropic `max_tokens` 400 ->
+  2000, `PROMPT_REV` -> `s171.0`. Degradation is layered, because CI deploys code while migrations may
+  lag: `parseInsight` salvages weakness + insight from a truncated payload and drops the correction,
+  `sanitizeCorrected` rejects rewrites/stumps/Aufgabe echoes/unchanged copies, the cache read and the
+  client select fall back to the legacy column list, and the insert steps down through the optional
+  columns so a row always lands (the daily limit counts rows). **Verlauf** renders it in the Fokus
+  language (Original/Korrigiert, coral on the original, green on the corrected, Himmelblau category
+  tiles capped at 6). Marks come from `wordDiff` client-side, so no AI cost per view. Screenshotting
+  the real page caught two flaws: a single whole-text diff collapsed a letter into one block (now a
+  per-paragraph diff with a whole-text fallback when the paragraph count changes) and a bare comma fix
+  was labelled "Groß-/Kleinschreibung" (new **Zeichensetzung** category, `tests/wordDiff.test.ts`
+  extended). Gates: typecheck · lint 0 errors · test:unit **318/318** · build · check:bundle 118.4 kB ·
+  lint:content. Deliberately NOT done: the Kurz/Lang result card still shows weakness + tip only
+  (surfacing the correction there touches the locked trainer geometry and needs a preview round), and
+  Fokus still has no history.
+- **Artifacts (prompts 6-7):** `supabase/migrations/0012_writing_corrected_text.sql` ·
+  `supabase/functions/evaluate-writing/index.ts` · `src/lib/writing.ts` · `src/lib/wordDiff.ts` ·
+  `src/features/writing/WritingHistory.tsx` · `tests/wordDiff.test.ts` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` · this log · PR (this one)

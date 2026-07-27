@@ -35,14 +35,17 @@ const UMLAUT_MAP: Record<string, string> = {
 function deUmlaut(s: string): string {
   return s.replace(/[äöüßÄÖÜ]/g, (m) => UMLAUT_MAP[m] ?? m);
 }
-// Lowercase + strip surrounding punctuation, so the category ignores trailing
-// commas/question marks and case when deciding what KIND of edit this was.
-function normWord(s: string): string {
+/** Strip surrounding punctuation, keeping case. */
+function stripPunct(s: string): string {
   return s
-    .toLowerCase()
     .replace(/^[.,!?;:„“”»«"'()]+/u, "")
     .replace(/[.,!?;:„“”»«"'()]+$/u, "")
     .trim();
+}
+// Lowercase + strip surrounding punctuation, so the category ignores trailing
+// commas/question marks and case when deciding what KIND of edit this was.
+function normWord(s: string): string {
+  return stripPunct(s.toLowerCase());
 }
 
 /** Classify a single before -> after edit into a coarse, learner-facing bucket. */
@@ -55,7 +58,12 @@ export function classifyChange(from: string, to: string): string {
   if (/\s/.test(f) || /\s/.test(t)) return "Grammatik";
   const nf = normWord(f);
   const nt = normWord(t);
-  if (nf === nt) return "Groß-/Kleinschreibung";
+  if (nf === nt) {
+    // Same letters: separate a pure comma/period fix from a case fix. Longer
+    // texts (Verlauf, s171) are full of added commas, and labelling those
+    // "Groß-/Kleinschreibung" taught the wrong rule.
+    return stripPunct(f) === stripPunct(t) ? "Zeichensetzung" : "Groß-/Kleinschreibung";
+  }
   if (deUmlaut(nf) === deUmlaut(nt)) return "Umlaut";
   return "Rechtschreibung";
 }

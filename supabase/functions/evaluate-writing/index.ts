@@ -112,7 +112,7 @@ const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
  * produced for a different Aufgabe. `taskKey` folds in the task id and the
  * level, and PROMPT_REV invalidates every entry when the rubric changes.
  */
-const PROMPT_REV = "s167.1";
+const PROMPT_REV = "s171.0";
 async function hashText(text: string, taskKey = ""): Promise<string> {
   const norm =
     `${PROMPT_REV}|${taskKey}|` + text.trim().toLowerCase().replace(/\s+/g, " ");
@@ -215,7 +215,15 @@ function buildSystemPrompt(level: string | null, hasTask: boolean): string {
   s +=
     `Nenne NUR die EINE wichtigste Schwachstelle (die mit dem größten Hebel) und gib einen kurzen, ` +
     `konkreten, ermutigenden Tipp auf Deutsch (2–3 Sätze, Du-Form). ` +
-    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern {"weakness","insight"}. ` +
+    // The corrected text is what Verlauf renders as an Original/Korrigiert diff,
+    // so it must be the learner's OWN text minimally repaired, never a rewrite:
+    // a diff against a re-imagined text is unreadable and teaches nothing.
+    `Gib zusätzlich unter "corrected" den KORRIGIERTEN Text zurück: dieselbe Struktur, ` +
+    `dieselben Sätze und derselbe Inhalt wie im Original, nur mit den nötigen ` +
+    `sprachlichen Korrekturen (Rechtschreibung, Grammatik, Wortstellung, Wortwahl). ` +
+    `Formuliere NICHT neu, kürze nicht, ergänze keine Inhalte und kommentiere nicht. ` +
+    `Wenn der Text keine Fehler hat, gib das Original unverändert zurück. ` +
+    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern {"weakness","insight","corrected"}. ` +
     `"weakness" ist genau einer dieser Werte: ` + VALID_WEAKNESS.join(", ") +
     `. Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zäune und ohne weiteren Text.`;
   return s;
@@ -276,22 +284,77 @@ function buildUserPrompt(text: string, lt: LtBuckets | null, brief?: TaskBrief):
   return s;
 }
 
-function parseInsight(raw: string): { weakness: Weakness; insight: string } | null {
+/** Pull one JSON string field out of a payload too broken to `JSON.parse`. */
+function salvageField(raw: string, field: string): string | null {
+  const m = raw.match(new RegExp(`"${field}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`));
+  if (!m) return null;
   try {
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) return null;
-    const obj = JSON.parse(match[0]);
-    const weakness = VALID_WEAKNESS.includes(obj.weakness) ? obj.weakness : "vocabularyRange";
-    if (typeof obj.insight !== "string" || !obj.insight.trim()) return null;
-    return { weakness, insight: obj.insight.trim() };
+    return JSON.parse(`"${m[1]}"`);
   } catch {
     return null;
   }
 }
 
+/**
+ * The verdict, plus the corrected text when the model returned one.
+ *
+ * `corrected` is strictly OPTIONAL: adding it (s171) roughly doubles the output
+ * tokens, so a long text can still bump the token ceiling and truncate the JSON.
+ * A truncated payload must never cost the learner their verdict, so on a parse
+ * failure the two fields that existed before are salvaged from the raw string
+ * and the correction is simply dropped.
+ */
+function parseInsight(
+  raw: string,
+): { weakness: Weakness; insight: string; corrected: string | null } | null {
+  const pick = (w: unknown): Weakness =>
+    VALID_WEAKNESS.includes(w as Weakness) ? (w as Weakness) : "vocabularyRange";
+  try {
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("no object");
+    const obj = JSON.parse(match[0]);
+    if (typeof obj.insight !== "string" || !obj.insight.trim()) throw new Error("no insight");
+    return {
+      weakness: pick(obj.weakness),
+      insight: obj.insight.trim(),
+      corrected: typeof obj.corrected === "string" && obj.corrected.trim()
+        ? obj.corrected.trim()
+        : null,
+    };
+  } catch {
+    const insight = salvageField(raw, "insight");
+    if (!insight?.trim()) return null;
+    const weakness = salvageField(raw, "weakness");
+    return { weakness: pick(weakness), insight: insight.trim(), corrected: null };
+  }
+}
+
+/**
+ * Accept the model's corrected text only when it is plausibly the SAME text
+ * repaired. Rejects a rewrite, a truncated stump, an echo of the prompt, and an
+ * unchanged copy (nothing to show, so the UI gets no empty toggle).
+ */
+function sanitizeCorrected(original: string, candidate: string | null): string | null {
+  if (!candidate) return null;
+  const c = candidate.trim();
+  if (!c) return null;
+  const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+  if (norm(c) === norm(original)) return null;
+  const words = (s: string) => norm(s).split(" ").filter(Boolean).length;
+  const wo = words(original);
+  const wc = words(c);
+  if (wo === 0 || wc === 0) return null;
+  // A correction stays close in length: much shorter means truncated, much
+  // longer means the model added commentary or restated the Aufgabe.
+  if (wc < wo * 0.6 || wc > wo * 1.6 + 12) return null;
+  if (c.length > MAX_TEXT_LEN * 2) return null;
+  return c;
+}
+
 interface LlmOut {
   weakness: Weakness;
   insight: string;
+  corrected: string | null;
   model: string;
   cost: number;
 }
@@ -309,9 +372,13 @@ async function callAnthropic(text: string, lt: LtBuckets | null, sys: string, br
       },
       body: JSON.stringify({
         model: EVAL_MODEL,
-        max_tokens: 400,
+        // Raised 400 -> 2000 (s171): the response now carries the corrected text,
+        // which for a MAX_TEXT_LEN submission is ~750 tokens on its own. This is
+        // a CEILING, not a spend: billing follows the tokens actually produced,
+        // and the monthly/Claude fuses are unchanged.
+        max_tokens: 2000,
         // Thinking disabled: leaving adaptive thinking on (the Sonnet 5 default)
-        // could consume the 400-token budget and truncate the JSON. No
+        // could consume the token budget and truncate the JSON. No
         // temperature is sent (removed on the Sonnet 5 / Opus 4.8 family).
         thinking: { type: "disabled" },
         system: sys,
@@ -525,14 +592,24 @@ Deno.serve(async (req) => {
 
   // (2) Cache lookup by input hash (task-aware since s167).
   const inputHash = await hashText(text, `${taskId ?? ""}|${level ?? ""}`);
-  const { data: cachedRow } = await admin
-    .from("writing_evaluations")
-    .select("weakness, insight, practice_area, model")
-    .eq("user_id", user.id)
-    .eq("input_hash", inputHash)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // `corrected_text` needs migration 0012. CI deploys functions but SKIPS
+  // migrations (no SUPABASE_DB_PASSWORD), so this function can be live before
+  // the column exists and selecting it would fail the whole cache read. Try the
+  // richer select, fall back to the columns that have always been there.
+  const cacheQuery = (cols: string) =>
+    admin
+      .from("writing_evaluations")
+      .select(cols)
+      .eq("user_id", user.id)
+      .eq("input_hash", inputHash)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+  const withCorrected = await cacheQuery("weakness, insight, practice_area, model, corrected_text");
+  const cacheRes = withCorrected.error
+    ? await cacheQuery("weakness, insight, practice_area, model")
+    : withCorrected;
+  const cachedRow = (cacheRes.data as Record<string, unknown> | null) ?? null;
   if (cachedRow) {
     return json({
       ok: true,
@@ -541,6 +618,7 @@ Deno.serve(async (req) => {
       insight: cachedRow.insight,
       practiceArea: cachedRow.practice_area,
       model: cachedRow.model,
+      corrected: cachedRow.corrected_text ?? null,
     });
   }
 
@@ -552,6 +630,8 @@ Deno.serve(async (req) => {
   let insight = "";
   let model: string | null = null;
   let cost = 0;
+  // Stays null on the templated path: no LLM ran, so there is no correction.
+  let correctedText: string | null = null;
   if (lt && lt.words > 0) {
     const spellRate = lt.spelling / lt.words;
     if (lt.spelling >= 3 && spellRate > 0.08 && lt.spelling >= lt.grammar * 2) {
@@ -590,15 +670,17 @@ Deno.serve(async (req) => {
     insight = out.insight;
     model = out.model;
     cost = out.cost;
+    correctedText = sanitizeCorrected(text, out.corrected);
   }
 
   // (6) Persist + bump global usage.
   //
-  // `task_id` needs migration 0011. If this function is ever deployed before
-  // that migration runs, an unguarded insert would fail silently (the result is
-  // not awaited for errors elsewhere either) and the row would be lost, which
-  // would ALSO stop the daily limit counting, since the limit counts rows. So
-  // retry once without the column rather than degrade a cost guardrail.
+  // `task_id` needs migration 0011 and `corrected_text` migration 0012. If this
+  // function is deployed before a migration runs (CI deploys functions but skips
+  // migrations), an unguarded insert would fail silently and the row would be
+  // lost, which would ALSO stop the daily limit counting, since the limit counts
+  // rows. So step DOWN through the optional columns rather than degrade a cost
+  // guardrail: full row, then without the newest column, then the base row.
   const row = {
     user_id: user.id,
     theme,
@@ -612,12 +694,13 @@ Deno.serve(async (req) => {
     model,
     cost_estimate: cost,
   };
-  const { error: insertErr } = await admin
-    .from("writing_evaluations")
-    .insert({ ...row, task_id: taskId });
-  if (insertErr) {
-    console.error("writing_evaluations insert failed", insertErr.message);
-    await admin.from("writing_evaluations").insert(row);
+  const insert = (extra: Record<string, unknown>) =>
+    admin.from("writing_evaluations").insert({ ...row, ...extra });
+  const full = await insert({ task_id: taskId, corrected_text: correctedText });
+  if (full.error) {
+    console.error("writing_evaluations insert failed", full.error.message);
+    const withTask = await insert({ task_id: taskId });
+    if (withTask.error) await insert({});
   }
 
   await admin.rpc("bump_ai_usage", { p_month: month, p_cost: cost }).then(
@@ -638,5 +721,6 @@ Deno.serve(async (req) => {
     insight,
     practiceArea: weakness,
     model,
+    corrected: correctedText,
   });
 });

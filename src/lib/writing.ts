@@ -15,6 +15,11 @@ export interface WritingHistoryEntry {
   /** Permanent id of the Aufgabe this entry was written against (s167); lets
    *  Verlauf resolve the task back, which pooled prompts alone could not. */
   task_id?: string | null;
+  /** AI-corrected version of `text` (s171, migration 0012). Null for rows
+   *  written before it, for the templated verdict (no model call) and for a text
+   *  that needed no changes, so the Verlauf toggle only appears when there is a
+   *  real correction to study. */
+  corrected_text?: string | null;
 }
 
 export type WritingLength = "short" | "long";
@@ -29,6 +34,9 @@ export interface WritingEvalResult {
   practiceArea?: WeaknessCategory;
   /** True when served from the input-hash cache (no AI cost). */
   cached?: boolean;
+  /** The corrected text (s171). Persisted for Verlauf; null when the model
+   *  returned none, the text needed no changes, or the verdict was templated. */
+  corrected?: string | null;
   model?: string | null;
   /** Set when the daily per-user or global monthly cap is hit. */
   limitReached?: boolean;
@@ -46,13 +54,26 @@ export async function getWritingHistory(
   limit = 30,
 ): Promise<WritingHistoryEntry[] | null> {
   try {
+    // `corrected_text` arrives with migration 0012, and CI deploys code without
+    // applying migrations, so the richer select can 400 on a database that has
+    // not been migrated yet. Fall back to the always-present columns rather than
+    // show a load error for a column the UI treats as optional anyway. Both
+    // column lists stay literal, or the client's type inference collapses.
     const { data, error } = await supabase
+      .from("writing_evaluations")
+      .select(
+        "id, created_at, theme, length, text, weakness, insight, cached, task_id, corrected_text",
+      )
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (!error && data) return data as WritingHistoryEntry[];
+    const legacy = await supabase
       .from("writing_evaluations")
       .select("id, created_at, theme, length, text, weakness, insight, cached, task_id")
       .order("created_at", { ascending: false })
       .limit(limit);
-    if (error || !data) return null;
-    return data as WritingHistoryEntry[];
+    if (legacy.error || !legacy.data) return null;
+    return legacy.data as WritingHistoryEntry[];
   } catch {
     return null;
   }
