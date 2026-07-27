@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import type { AuthOutcome } from "@/store/useAuthStore";
 
 /**
@@ -39,6 +40,26 @@ vi.mock("@/store/useSessionStore", () => ({
 
 const { AuthDialog } = await import("@/features/auth/AuthDialog");
 
+/** Reports the current path so a test can assert where a sign-in landed. */
+function PathProbe() {
+  return <span data-testid="path">{useLocation().pathname}</span>;
+}
+
+/**
+ * The dialog navigates on success, so it needs a router. `at` is the page the
+ * learner signed in FROM, which decides whether they get moved.
+ */
+function renderDialog(props: Parameters<typeof AuthDialog>[0], at = "/settings") {
+  return render(
+    <MemoryRouter initialEntries={[at]}>
+      <PathProbe />
+      <Routes>
+        <Route path="*" element={<AuthDialog {...props} />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 const ok = (over: Partial<AuthOutcome> = {}): AuthOutcome => ({
   ok: true,
   needsConfirmation: false,
@@ -68,7 +89,7 @@ afterEach(cleanup);
 
 describe("sign-up dialog", () => {
   it("keeps the primary button live and NAMES what is missing", async () => {
-    render(<AuthDialog open onOpenChange={() => {}} />);
+    renderDialog({ open: true, onOpenChange: () => {} });
     // Nothing filled in: the button must still be pressable (a dead control
     // reads as a broken app), and pressing it must explain itself.
     const button = submitButton();
@@ -86,7 +107,7 @@ describe("sign-up dialog", () => {
   });
 
   it("submits once consent is given", async () => {
-    render(<AuthDialog open onOpenChange={() => {}} />);
+    renderDialog({ open: true, onOpenChange: () => {} });
     fillCredentials();
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(submitButton());
@@ -94,7 +115,7 @@ describe("sign-up dialog", () => {
   });
 
   it("reveals the password on demand", () => {
-    render(<AuthDialog open onOpenChange={() => {}} />);
+    renderDialog({ open: true, onOpenChange: () => {} });
     const field = screen.getByPlaceholderText("Mindestens 6 Zeichen");
     expect(field.getAttribute("type")).toBe("password");
     fireEvent.click(screen.getByLabelText("Passwort anzeigen"));
@@ -106,7 +127,7 @@ describe("sign-up dialog", () => {
   it("sends a known address to the log-in tab instead of a phantom confirmation", async () => {
     signUp.mockResolvedValue(ok({ alreadyRegistered: true }));
     const onOpenChange = vi.fn();
-    render(<AuthDialog open onOpenChange={onOpenChange} />);
+    renderDialog({ open: true, onOpenChange });
     fillCredentials();
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(submitButton());
@@ -121,7 +142,7 @@ describe("sign-up dialog", () => {
   it("holds the dialog open on a real confirmation, with a way to resend", async () => {
     signUp.mockResolvedValue(ok({ needsConfirmation: true }));
     const onOpenChange = vi.fn();
-    render(<AuthDialog open onOpenChange={onOpenChange} />);
+    renderDialog({ open: true, onOpenChange });
     fillCredentials();
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(submitButton());
@@ -136,7 +157,7 @@ describe("sign-up dialog", () => {
 
   it("offers the escape hatch on an unconfirmed log-in WITHOUT taking the form away", async () => {
     signIn.mockResolvedValue({ ok: false, needsConfirmation: true, alreadyRegistered: false });
-    render(<AuthDialog open onOpenChange={() => {}} intent="login" />);
+    renderDialog({ open: true, onOpenChange: () => {}, intent: "login" });
     fireEvent.change(screen.getByPlaceholderText("du@beispiel.de"), {
       target: { value: "neu@example.com" },
     });
@@ -160,7 +181,7 @@ describe("sign-up dialog", () => {
     // with "check your inbox" and never signed anyone in.
     signIn.mockResolvedValue({ ok: true, needsConfirmation: false, alreadyRegistered: false });
     const onOpenChange = vi.fn();
-    render(<AuthDialog open onOpenChange={onOpenChange} intent="login" />);
+    renderDialog({ open: true, onOpenChange, intent: "login" });
     fireEvent.change(screen.getByPlaceholderText("du@beispiel.de"), {
       target: { value: "neu@example.com" },
     });
@@ -171,5 +192,42 @@ describe("sign-up dialog", () => {
 
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
     expect(showToast).toHaveBeenCalledWith("Willkommen zurück!", "success");
+  });
+});
+
+/**
+ * The founder's actual report was not "log-in errors" but "it redirects me to
+ * landing page": the sign-in worked, and then the app left them looking at the
+ * marketing page, which is indistinguishable from a failure.
+ */
+describe("where a successful sign-in lands", () => {
+  const loginFrom = async (at: string) => {
+    signIn.mockResolvedValue(ok());
+    renderDialog({ open: true, onOpenChange: () => {}, intent: "login" }, at);
+    fireEvent.change(screen.getByPlaceholderText("du@beispiel.de"), {
+      target: { value: "neu@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Dein Passwort"), {
+      target: { value: "geheim123" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Anmelden" }));
+  };
+
+  it("moves off the landing page, which still shows a signed-out story", async () => {
+    await loginFrom("/welcome");
+    await waitFor(() => expect(screen.getByTestId("path").textContent).toBe("/"));
+  });
+
+  it("moves off the other public pages too", async () => {
+    await loginFrom("/about");
+    await waitFor(() => expect(screen.getByTestId("path").textContent).toBe("/"));
+  });
+
+  it("leaves the learner where they are inside the app", async () => {
+    await loginFrom("/settings");
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+    // Settings already renders the signed-in state in place; yanking someone
+    // out of the page they were reading would be its own bug.
+    expect(screen.getByTestId("path").textContent).toBe("/settings");
   });
 });

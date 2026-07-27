@@ -129,6 +129,13 @@ function RequireOnboarding({ children }: { children: React.ReactNode }) {
   // before we treat them as "not onboarded". Only a truly signed-out visitor,
   // or one whose cloud pull finished still-not-onboarded, goes to /welcome.
   if (status !== "signedOut" && !syncHydrated) return null;
+  // Resolved, and genuinely not onboarded. WHERE they go depends on whether
+  // they have an account: a signed-out visitor belongs on the marketing page,
+  // but someone who just signed in belongs in onboarding. Sending an account
+  // holder to /welcome was indistinguishable from a failed log-in (founder
+  // report, s174: "it redirects me to landing page"), because the page they
+  // land on is the one that asks them to sign up.
+  if (status !== "signedOut") return <Navigate to="/start" replace />;
   return <Navigate to="/welcome" replace />;
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Lock, Mail, Cloud, Eye, EyeOff, MailCheck } from "lucide-react";
 import {
   Dialog,
@@ -28,6 +29,15 @@ export type AuthIntent = "signup" | "login";
 const GOOGLE_ENABLED = true;
 
 /**
+ * Routes that live OUTSIDE the app shell and keep rendering a signed-out story
+ * (the landing page still says "Start free"). Signing in on one of these has to
+ * navigate away, or nothing visibly happens. Every other route already shows
+ * the signed-in state in place, so we leave the learner where they are, e.g. in
+ * Settings.
+ */
+const PUBLIC_PATHS = new Set(["/welcome", "/about", "/privacy", "/terms", "/sources"]);
+
+/**
  * Email + password sign-up / log-in dialog. Instant and in-app (no email
  * round-trip) as long as "Confirm email" is disabled in Supabase. A guest's
  * progress is preserved when they upgrade (the email is attached to the same
@@ -46,6 +56,8 @@ export function AuthDialog({
   const { busy, error, status, signUp, signIn, signInWithGoogle, resendConfirmation, clearError } =
     useAuthStore();
   const showToast = useSessionStore((s) => s.showToast);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [mode, setMode] = useState<AuthIntent>(intent);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -193,6 +205,12 @@ export function AuthDialog({
     showToast(isSignup ? "Konto erstellt – willkommen!" : "Willkommen zurück!", "success");
     onOpenChange(false);
     setPassword("");
+    // Signing in from a PUBLIC page has to move the learner off it. Closing the
+    // dialog used to leave them standing on the marketing page, which still
+    // shows "Start free", so a successful log-in looked exactly like a failed
+    // one. Hand over to "/" and let RequireOnboarding decide: into the app, or
+    // on to onboarding if this account never finished it.
+    if (PUBLIC_PATHS.has(pathname)) navigate("/", { replace: true });
   };
 
   const resend = async () => {
