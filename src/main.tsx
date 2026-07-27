@@ -1,3 +1,8 @@
+// FIRST import on purpose: it snapshots the auth parameters out of the URL at
+// module-eval time. Supabase's default confirmation template returns the session
+// in the URL *hash*, and React Router wipes that as it mounts, so the read has to
+// happen before createRoot(). See src/lib/authCallback.ts.
+import "./lib/authCallback";
 import { Component, StrictMode } from "react";
 import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";

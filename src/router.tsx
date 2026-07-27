@@ -34,6 +34,9 @@ function lazyWithReload<T extends React.ComponentType<unknown>>(
 const Onboarding = lazyWithReload(() =>
   import("@/features/onboarding/Onboarding").then((m) => ({ default: m.Onboarding })),
 );
+const ConfirmEmail = lazyWithReload(() =>
+  import("@/features/auth/ConfirmEmail").then((m) => ({ default: m.ConfirmEmail })),
+);
 const LibraryHub = lazyWithReload(() =>
   import("@/features/library/LibraryHub").then((m) => ({ default: m.LibraryHub })),
 );
@@ -223,6 +226,20 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={null}>
         <Impressum />
+      </Suspense>
+    ),
+  },
+  {
+    // Landing page for the confirmation link in the sign-up email. Outside the
+    // AppShell and outside every guard: the visitor is BY DEFINITION not signed
+    // in yet when they arrive, and a guard would bounce them to the landing page
+    // before the token could be redeemed. Lazy, so a route almost nobody reaches
+    // twice stays off the eager chunk.
+    path: "/auth/confirm",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <ConfirmEmail />
       </Suspense>
     ),
   },

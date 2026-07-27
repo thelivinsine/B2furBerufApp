@@ -1810,3 +1810,60 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
     Gates: typecheck · lint 0 errors · test:unit **351/351**.
 - **Artifacts (prompt 2):** `supabase/migrations/0013_admins_table.sql` (new) · `tests/admin.test.ts` ·
   `docs/reports/security-audit-2026-07-27.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-27):** `I turned on the confirm email before running the query. Is
+  that a problem?` → No: the migration reads `auth.users`, which the setting does not touch, and
+  existing accounts are not retroactively un-confirmed. Flagged the real consequence instead, that
+  every new sign-up now depends on Supabase's built-in mailer (a handful of messages an hour,
+  test-only by Supabase's own docs), and asked them to test a sign-up and check
+  Auth → URL Configuration → Site URL. No code changed.
+- **Prompt 4 (verbatim, 2026-07-27):** `I signed up with a new email and I got a confirmation email
+  (attached). But even after clicking the link and logging-in, the app doesn't let me in and says me
+  with a barely noticeable toast in the bottom to confirm an email again! There are several issues
+  here, firstly, the login pop-up is quite messy, the user creating account using email can't see the
+  password if they wish, it's very unclear why the signup button doesn't work if the terms and
+  conditons check box is not ticked as it's somewhere on the top. The email a user receives should be
+  from genauly, not Supabase. And, finally, the sign-up with email confirmation should work!` →
+  TWO independent bugs produced the founder's experience, plus three UX defects and the sender.
+  - **Bug 1, the link confirmed but never signed anyone in.** Supabase's default "Confirm signup"
+    template returns the session in the URL **hash** (`#access_token=…`). React Router rewrites the
+    URL as it mounts, so the tokens were gone before any code looked, and the client is on PKCE,
+    which does not expect them there anyway (the same collision documented in `lib/supabase.ts` for
+    Google sign-in). The account WAS confirmed server-side; the learner just landed on an ordinary
+    signed-out page. Fix: `src/lib/authCallback.ts` snapshots the parameters at module-eval time
+    (imported FIRST in `main.tsx`, before `createRoot`), and a new unguarded route `/auth/confirm`
+    (`src/features/auth/ConfirmEmail.tsx`) completes the sign-in. It accepts all three shapes a
+    confirmation link arrives in (`token_hash` → `verifyOtp`, hash tokens → `setSession`, `?code=`
+    → already consumed by supabase-js), so the flow works whether or not the template is updated.
+    `signUp` now also pins `emailRedirectTo` to the running origin, so the landing page no longer
+    depends on the dashboard Site URL being right.
+  - **Bug 2, the "confirm your email" toast on a SECOND sign-up.** With confirmations ON, signing up
+    with an address that already has an account returns a success-shaped response with NO error
+    (Supabase refuses to reveal which addresses are registered), so `needsConfirmation` was true and
+    the founder was told to confirm a mail that is never sent. The tell is an empty `identities`
+    array; `signUp` now returns `alreadyRegistered` and the dialog switches to the Anmelden tab with
+    "Diese E-Mail hat schon ein Konto." The `friendlyError` "already registered" mapping never fired
+    because that path produces no error at all.
+  - **Dialog (all three founder points).** Password field gained a reveal toggle; the AGB/Datenschutz
+    checkbox moved from the top of the dialog to directly above the button it gates; the button and
+    the Google button are no longer disabled-at-default (design landmine) but always act and NAME the
+    first unmet requirement in one message slot. The confirmation state is now a panel that KEEPS the
+    dialog open, shows the address, and offers "E-Mail erneut senden" (`resendConfirmation`), instead
+    of closing behind the toast the founder could barely see.
+  - **Found while testing:** the dialog's reset effect listed `clearError` in its dependencies, so any
+    caller whose store returns a fresh action identity per render wiped the consent tick and the
+    pending panel the moment they were set. Moved to a ref synced in its own effect.
+  - **Sender.** `docs/reference/auth-emails/` holds branded German templates for Confirm signup and
+    Reset password plus a README with the Resend SMTP steps. Note recorded there: feedback mail could
+    use Resend's shared `onboarding@resend.dev` because it goes to the founder, but auth mail goes to
+    strangers, so `genauly.de` has to be verified as a sending domain first.
+  - **Verification:** `tests/authCallback.test.ts` (6, incl. the hash shape that caused bug 1) and
+    `tests/authDialog.test.tsx` (6, incl. "button never disabled at rest" and the already-registered
+    path). Real-component screenshot of the reworked dialog via `preview/auth-dialog.html`. Gates:
+    typecheck · lint 0 errors (75 warnings, unchanged) · test:unit **363/363** · build ·
+    check:bundle 122.9 kB.
+- **Artifacts (prompts 3-4):** `src/lib/authCallback.ts` (new) ·
+  `src/features/auth/ConfirmEmail.tsx` (new) · `src/features/auth/AuthDialog.tsx` ·
+  `src/store/useAuthStore.ts` · `src/router.tsx` · `src/main.tsx` ·
+  `tests/authCallback.test.ts` (new) · `tests/authDialog.test.tsx` (new) ·
+  `docs/reference/auth-emails/{README.md,confirm-signup.html,reset-password.html}` (new) ·
+  `preview/auth-dialog.html` + `preview/auth-dialog-entry.tsx` (new) · this log
