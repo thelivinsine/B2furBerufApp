@@ -259,3 +259,28 @@ same shape. Adressat + Leitpunkte are shared between card and pop-up.
 - **Open, small:** SE-class (667px) viewports still page-scroll on Kurz/Lang; closing that needs
   chrome to go, not elasticity (the "Aufgabe wählen" toggle row and the two-card split are the
   candidates). Fokus's `GrammarRail` `layout="panel"` branch is still dead code on mobile.
+
+**Handoff after session 170 (2026-07-26): Praktisch toggle joins the squircle language;
+Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#730**). Founder: adapt the
+reduced-rounding toggle design from Bibliothek/Schreiben to Praktisch, restore the previous
+Bibliothek icon, and give Fortschritt the leaderboard-cup icon from an earlier preview batch. All
+three were direct, unambiguous ports of already-approved designs (no new preview round needed).
+- **Trainieren/Spielen toggle** (`Dashboard.tsx`) now shares `LibrarySwitcher`/
+  `WritingModeSwitcher`'s exact language: `rounded-lg` track, `rounded-md` sliding pill measured by
+  `useSlidingPill`, instead of the older `rounded-full` track with two independently-flagged
+  buttons. Kept content-sized (`w-fit`, centered) since it's a two-segment toggle, not a full-width
+  one; the section-tinted active icon/label (blue Dumbbell / orange Play) is untouched.
+- **Bibliothek's route icon reverts to the "stack of three books"** shipped before session 158,
+  restored verbatim (mark + `NORM` box) from git history (`997e8a0`), replacing the "closed book +
+  bookmark ribbon" mark that had been in place since.
+- **Fortschritt's route icon becomes the "Pokal" (trophy/cup)**, option T from the session-158
+  icon-preview batch (`preview/fortschritt-icon-vorschlaege.html`) that lost to the Ring at the
+  time. Ported verbatim (`#0ea5e9`, own `NORM` box) in place of the progress ring.
+- **Verified in headless Chromium** at 390×844 (bottom tab bar, both icons active/inactive, the
+  toggle sliding between Trainieren/Spielen) and 1280×900 (desktop Sidebar + toggle).
+- **Files:** `src/features/dashboard/Dashboard.tsx` · `src/components/layout/route-icons.tsx` ·
+  `docs/areas/PRAKTISCH-NAV.md` · `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md`.
+  **Gates:** typecheck · lint (0 errors, pre-existing warnings only) · test:unit **317/317** ·
+  build · check:bundle (118.1 kB).
+
+---

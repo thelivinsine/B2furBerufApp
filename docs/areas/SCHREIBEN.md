@@ -200,8 +200,46 @@ Kurz. Design = variant C, "development first" (founder-picked s171):
     mixing the two would rank incomparable things.
   - A partial load failure is reported under the list with a retry, never silently shown as a shorter
     history; only a failure of BOTH sources replaces the page.
-- **Open follow-up:** the Kurz/Lang RESULT card still shows only weakness + tip. Surfacing the
-  correction there touches the locked trainer geometry, so it goes through its own preview round.
+## The correction in Kurz/Lang (founder pick A, s172)
+`preview/kurz-lang-korrektur.html` offered three places for it (A im Schreibfeld · B alles im
+Ergebnis · C zum Aufklappen); the founder picked **A**, and asked for tiles harmonious with Fokus.
+`preview/kurz-lang-korrektur-r2.html` (+ `-dark`, generator `gen-kurz-lang-korrektur-r2.mjs`) is the
+verification sheet: unlike the older generators it SSR-renders the real components next to the Fokus
+card, so it cannot drift from what ships.
+- **The editor card becomes the correction card** once an evaluation lands, exactly as Fokus swaps its
+  input for the corrected sentence: bold brand-blue "Dein Text" eyebrow sharing its row with the
+  Original/Korrigiert toggle, the marked text (coral on Original, green on Korrigiert), a divider, then
+  the Himmelblau fix tiles. The RESULT card below stays short (tip + Übungs-CTA), which is why A won
+  over B.
+- **The plain field returns for everything without a correction**: an error-free text, the templated
+  spelling verdict, a failed or limit-reached call. Those keep the textarea, the umlaut keys, the word
+  count and both desktop buttons, so fixing and resubmitting still works.
+- **"Neu schreiben" rides the tile row on desktop** (`ml-auto self-end`), the Fokus "Neuer Satz" spot,
+  and Auswerten drops out there while a correction is on screen: re-pressing it returns the same
+  cached verdict. On mobile nothing moves, the floating cluster keeps Feedback + Neu schreiben +
+  Auswerten at the locked geometry.
+- **`useFillEditor` no longer needs a textarea to exist.** The bottom clearance is measured first, so
+  the state with no field still reserves the fixed chrome; the Aufgabe-card cap is RELEASED there,
+  since the page scrolls for the result anyway and the whole task should be readable next to the
+  correction.
+- No backend work: `evaluate-writing` has returned `corrected` (and served it from cache) since s171.
+
+## ONE correction language (`src/features/writing/correction.tsx`, s172)
+Fokus, the Kurz/Lang result and the Verlauf render corrections from the SAME pieces:
+`useCorrectionDiff` (per-paragraph diff), `CorrectionToggle`, `MarkedTokens`/`MarkedParagraphs`,
+`FixTiles` (optional `max` → "+N weitere", optional `action` slot). The markup used to be copied per
+surface and had already drifted: the Verlauf tiles had lost the "→" and printed an em dash for an
+empty side, so one edit read differently depending on where the learner met it. `tests/correction.test.tsx`
+pins the tile anatomy (category eyebrow, struck original, arrow, green fix, `∅`/`(entfernt)`, the cap,
+the moved-word single word).
+- Fokus **mobile** keeps its own two-column correction list (no chip backgrounds, founder r4
+  amendment): that card has a measured height, so tiles cannot grow in it. Kurz/Lang shows tiles at
+  both breakpoints, because its result page scrolls.
+- `classifyChange` gained **"Kasus & Artikel"** (s172): a swap between two article/possessive/
+  determiner forms ("meine → meiner", "der → den") is a declension fix, and calling it
+  "Rechtschreibung" taught the wrong rule in the mistake B1/B2 learners make most. Both sides must be
+  in the closed set, so "das → dass" stays Rechtschreibung and a case-only change stays
+  Groß-/Kleinschreibung.
 
 
 ## Fokus (Satzlabor)
