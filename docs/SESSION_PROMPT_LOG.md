@@ -1899,4 +1899,16 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   they had already done it. Remaining verification is live-only (that `/admin` still opens); the
   rollback to the 0008 email gate sits in a comment at the foot of the migration.
 - **Prompt 7 (verbatim, 2026-07-27):** `complete documentation and merge to main` → Final doc pass
-  plus the ship. See the artifacts line for the PR.
+  plus the ship, under the standing auto-ship approval and this explicit instruction.
+  - Docs closed out F1 across every place it was recorded (report headline, findings table, F1 body
+    and action list; `PROJECT_STATUS`; `SECURITY`), and the report's stale "still worth doing
+    separately: turn Confirm email on" paragraph was replaced with what enabling it actually cost
+    (the built-in mailer's hourly limit, now its own action item).
+  - Gates before shipping: typecheck · lint 0 errors (75 warnings) · lint:content · test:unit
+    **363/363** · build · check:bundle 122.9 kB.
+  - **PR #742** into `main`, squash-merged, then the required post-merge housekeeping
+    (`git fetch origin main` → `git reset --hard origin/main` → `git push --force-with-lease`).
+  - Two founder checks remain and are stated in the PR body: that `/admin` still opens after 0013
+    (rollback sits in the migration's trailing comment), and the Resend SMTP setup.
+- **Artifacts (prompts 6-7):** `docs/reports/security-audit-2026-07-27.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/strategy/SECURITY.md` · this log · **PR #742**
