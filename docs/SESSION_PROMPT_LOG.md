@@ -1603,3 +1603,64 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 12, part 1):** `src/lib/sentenceStudio.ts` · `src/features/writing/WritingHistory.tsx` ·
   `src/lib/wordDiff.ts` · `tests/wordDiff.test.ts` · `docs/areas/SCHREIBEN.md` ·
   `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` · this log
+- **Prompt 13 (verbatim, 2026-07-27):** `2. show right after: previews` (round 1) → Built
+  `preview/kurz-lang-korrektur.html`: three variants for showing the correction the moment the
+  learner presses Auswerten, each a real 390px phone in the post-submit state, with the fixed bottom
+  cluster + Aufgabe card held IDENTICAL across all three (locked geometry) so only the correction's
+  location varies. **A "Im Schreibfeld"** (the editor card shows the corrected text with the
+  Original/Korrigiert toggle, Fokus-style; result card stays short) · **B "Alles im Ergebnis"** (field
+  untouched, the result card carries tip + toggle + marked text + tiles) · **C "Zum Aufklappen"** (tip
+  is the headline, correction one tap behind "2 Korrekturen ansehen"). Recommended A. No app code
+  touched.
+- **Artifacts (prompt 13):** `preview/kurz-lang-korrektur.html` (commit `d491b09`)
+- **Prompt 14 (verbatim, 2026-07-27):** `give the preview again` → Re-shared the same round-1 sheet
+  (artifact link + the file itself), no changes.
+- **Prompt 15 (verbatim, 2026-07-27):** `I'm leaning towards A but make sure both the tiles are
+  harmonious with Fokus design.` → Implemented **A**, and the "harmonious" ask turned out to be
+  literal: the round-1 tiles were missing Fokus's `→`, and the VERLAUF copies had drifted too (an em
+  dash where Fokus prints `∅`). Rather than hand-match a third copy, the Fokus pieces were extracted to
+  **`src/features/writing/correction.tsx`** (`useCorrectionDiff`, `CorrectionToggle`, `MarkedTokens`,
+  `MarkedParagraphs`, `FixTiles` with optional `max` + `action` slot) and all three surfaces now render
+  from it, so they cannot drift again; `tests/correction.test.tsx` pins the tile anatomy. Fokus MOBILE
+  keeps its own two-column list (measured height, founder r4 amendment).
+  **Kurz/Lang:** the editor card becomes the correction card once a result lands (bold brand-blue "Dein
+  Text" + toggle, marked text, divider, capped Himmelblau tiles), with "Neu schreiben" on the tile row
+  at `lg` (the Fokus "Neuer Satz" spot) and Auswerten dropping out there while a correction is up (it
+  would re-serve the cached verdict). Anything WITHOUT a correction (error-free, templated spelling
+  verdict, failure, limit) keeps the plain field, so fixing and resubmitting still works. Mobile cluster
+  untouched (locked). `useFillEditor` measures the bottom clearance FIRST, so the field-less state still
+  reserves the fixed chrome, and it releases the Aufgabe cap there. No backend change: `corrected` has
+  shipped in the evaluate-writing response (cache included) since s171.
+  **Bug the comparison exposed:** "in meine Wohnung → in meiner Wohnung" was labelled
+  **Rechtschreibung**. `classifyChange` gained **"Kasus & Artikel"** (both sides must be in a closed
+  article/possessive/determiner set, so "das → dass" stays Rechtschreibung and a case-only change stays
+  Groß-/Kleinschreibung) — the app's own category name, from `practiceAreas`.
+  **Verification:** `preview/gen-kurz-lang-korrektur-r2.mjs` SSR-renders the REAL components beside the
+  Fokus card through Vite and inlines the app's built CSS, so the round-2 sheet cannot flatter the
+  implementation; screenshotted light + dark in headless Chromium. Gates: typecheck · lint 0 errors ·
+  test:unit **327/327** · build · check:bundle 118.4 kB. Not merged: waiting for the founder to confirm
+  the tiles now sit.
+- **Artifacts (prompt 15):** `src/features/writing/correction.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/WritingHistory.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/features/writing/useFillEditor.ts` · `src/lib/wordDiff.ts` · `tests/correction.test.tsx` ·
+  `tests/wordDiff.test.ts` · `preview/gen-kurz-lang-korrektur-r2.mjs` +
+  `preview/kurz-lang-korrektur-r2{,-dark,-artifact}.html` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · this log
+- **Prompt 16 (2026-07-27, verbatim text not preserved in this session's context; a request to re-share
+  the round-1 preview sheet):** Re-shared the round-2 artifact and re-sent the preview files. The
+  round-1 artifact (three variants) had been published from an earlier context window, so this session
+  could not redeploy that URL; repeated attempts failed for the same reason and were stopped. Both links
+  were reported side by side instead. No code, docs or content changed.
+- **Prompt 17 (verbatim, 2026-07-27):** `go ahead with your recommendation` → Shipped the correction
+  work: opened **PR #739** into `main` from `claude/selection-color-contrast-3upqkz` and squash-merged it
+  (auto-ship), then the required post-merge housekeeping (`git fetch origin main` →
+  `git reset --hard origin/main` → `git push --force-with-lease`). Docs flipped from "NOT MERGED" to
+  merged in `docs/PROJECT_STATUS.md` (header, s172 handoff, Next block). Nothing in the diff changed
+  between the founder's review and the merge, so the gates from prompt 15 stand: typecheck · lint 0
+  errors · test:unit **327/327** · build · check:bundle 118.4 kB · lint:content.
+- **Prompt 18 (verbatim, 2026-07-27):** `why are you responding in German with me?` → No good reason.
+  The app's UI-language rule (German in-app) had bled into the founder-facing chat, which the founder
+  writes in English. Answered plainly and switched to English for the rest of the session. **Standing
+  rule going forward: German is for the product's user-facing strings ONLY; conversation with the
+  founder follows the founder's language.** No code change.
+- **Artifacts (prompts 16-18):** PR #739 (squash-merged) · `docs/PROJECT_STATUS.md` · this log

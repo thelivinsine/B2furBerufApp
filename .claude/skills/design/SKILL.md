@@ -163,7 +163,12 @@ button right. Noun+verb combos live in Kollokationen, never as Wörter entries.
 interstitial); dice re-rolls in scope; "Aufgabe: <Thema>" eyebrow bold brand blue, Ziel stated
 once. Fokus: detected form = white pill + green dot; correction card = Original/Korrigiert toggle
 (coral marks on Original, green on Korrigiert) + Himmelblau fix tiles + "Neuer Satz" outline
-button on the tile row. Rails are Himmelblau tiles with header reset icons. **Verlauf** (picked
+button on the tile row. Rails are Himmelblau tiles with header reset icons. **A correction looks the
+same on every surface** (s172): Fokus, the Kurz/Lang result and the Verlauf all render it from
+`src/features/writing/correction.tsx` (toggle, coral/green marks, fix tiles with the category eyebrow +
+struck original + "→" + green fix). Never hand-build a fourth copy; extend that module. In Kurz/Lang the
+EDITOR CARD becomes that correction card once an evaluation lands (founder pick A,
+`preview/kurz-lang-korrektur*.html`), so the result card stays tip-only. **Verlauf** (picked
 s171, variant C "Entwicklung zuerst"): a "Deine Entwicklung" card leads with per-category monthly
 bars + trend arrows (down = green, up = amber) and a "X % weniger" success badge, then a COMPACT
 row list (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron; on mobile the row stays ONE

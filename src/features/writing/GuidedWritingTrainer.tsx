@@ -12,6 +12,7 @@ import {
   Shuffle,
   Maximize2,
   ChevronDown,
+  RotateCcw,
 } from "lucide-react";
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
@@ -28,6 +29,14 @@ import { WritingRail, WRITING_FORMATS, WRITING_LEVELS, writingFormatLabel } from
 import { UmlautKeys } from "./UmlautKeys";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { useFillEditor } from "./useFillEditor";
+import {
+  CorrectionToggle,
+  FixTiles,
+  MarkedParagraphs,
+  MAX_FIX_TILES,
+  useCorrectionDiff,
+  type CorrectionViewMode,
+} from "./correction";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -138,6 +147,13 @@ export function GuidedWritingTrainer({
   const [text, setText] = useState(initialText);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<WritingEvalResult | null>(null);
+  /**
+   * The exact text the result was computed against, so the correction diff can
+   * never be drawn against something the learner changed afterwards.
+   */
+  const [submitted, setSubmitted] = useState("");
+  /** Correction view, Fokus's default: Korrigiert first, Original one tap away. */
+  const [view, setView] = useState<CorrectionViewMode>("corr");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [rollSpin, setRollSpin] = useState(0);
   // The Aufgabe pop-up: the card can be capped to fit the viewport, so the full
@@ -237,14 +253,18 @@ export function GuidedWritingTrainer({
   };
 
   const submit = async () => {
+    const body = text.trim();
     setSubmitting(true);
     setResult(null);
+    setSubmitted(body);
+    // Each new evaluation opens on Korrigiert, like Fokus.
+    setView("corr");
     // Send the AUFGABE, not just the text (s167 P2): without it the evaluator
     // grades language in a vacuum and Aufgabenerfüllung is uncheckable.
     const res = await evaluateWriting({
       theme: drawn.theme,
       length,
-      text: text.trim(),
+      text: body,
       taskId: task?.id,
       task: task?.text,
       points: task?.points,
@@ -283,6 +303,28 @@ export function GuidedWritingTrainer({
 
   const area = result?.practiceArea ? practiceAreaById(result.practiceArea) : undefined;
 
+  /**
+   * The correction, shown IN the editor card the moment the result lands
+   * (founder pick A, s172), exactly the way Fokus shows a corrected sentence:
+   * the field the learner just typed in becomes the corrected text with the
+   * Original/Korrigiert toggle, and the fix tiles name every edit. Before this it
+   * only existed in Verlauf, so the one moment the learner is actually reading
+   * feedback was the one place the correction was missing.
+   *
+   * `corrected` is null for an error-free text, for the templated spelling
+   * verdict (no model call) and for a failed evaluation; those keep the plain
+   * editor exactly as before, so the learner can fix and resubmit.
+   */
+  const corrected = result?.ok ? result.corrected?.trim() : undefined;
+  const correction = useCorrectionDiff(submitted, corrected ?? "");
+  const showCorrection = !!corrected && !!result && correction.changes.length > 0;
+
+  /** Back to a blank field for the same Aufgabe (mobile cluster + tile row). */
+  const startOver = () => {
+    setResult(null);
+    setText("");
+  };
+
   // The field owns the rest of the viewport (founder s168). Once a result is on
   // screen it drops back to its text's own height so the feedback is not pushed
   // a full screen down.
@@ -297,7 +339,7 @@ export function GuidedWritingTrainer({
     noteRef,
     desktopCap: desktopFieldCap[length],
     fill: !result,
-    revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}|${taskOpen}`,
+    revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}|${taskOpen}|${showCorrection}|${view}`,
   });
 
   // The Aufgabe's Adressat + Leitpunkte, shared by the card (capped, animated)
@@ -461,48 +503,82 @@ export function GuidedWritingTrainer({
         </CardContent>
       </Card>
 
-      {/* Editor */}
+      {/* Editor, and after an evaluation the CORRECTION in its place (founder
+          pick A, s172): the same card, the same spot on screen, the Fokus
+          language. The plain field returns for anything without a correction (an
+          error-free text, the templated spelling verdict, a failed call), so
+          fixing and resubmitting still works. */}
       <Card ref={editorCardRef}>
         <CardContent className="space-y-3 p-5">
-          {/* `useFillEditor` owns the height (fill the viewport, then grow, then
-              scroll internally), so the field is not hand-resizable any more and
-              `rows` is only the pre-measurement fallback. */}
-          <textarea
-            ref={editorRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            disabled={submitting}
-            rows={length === "long" ? 10 : 6}
-            placeholder="Schreibe hier deinen Text auf Deutsch …"
-            className="block w-full resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
-          />
-          <div className="flex flex-wrap items-center gap-2">
-            {/* German special-character keys for non-German keyboards (s150). */}
-            <UmlautKeys textareaRef={editorRef} value={text} onChange={setText} />
-            {/* The Ziel range lives on the Aufgabe card only (founder s149). */}
-            <span className={cn("ml-auto text-xs tabular-nums", enough ? "text-success" : "text-muted-foreground")}>
-              {words} {words === 1 ? "Wort" : "Wörter"}
-            </span>
-            {/* Desktop actions; on mobile they live in the sticky bottom bar. */}
-            <div className="hidden gap-2 lg:flex">
-              {result && (
-                <Button variant="ghost" onClick={() => { setResult(null); setText(""); }} disabled={submitting}>
-                  Neu schreiben
-                </Button>
+          {showCorrection ? (
+            <>
+              {/* Card-title eyebrow = bold brand blue, sharing its row with the
+                  view toggle: Fokus's "Dein Satz" header, one word apart. */}
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">Dein Text</p>
+                <CorrectionToggle view={view} onChange={setView} />
+              </div>
+              <MarkedParagraphs paragraphs={correction.paragraphs} view={view} />
+              <div className="h-px bg-border" />
+              {/* Himmelblau fix tiles, capped so a long text cannot wall off the
+                  card. "Neu schreiben" rides the tile row on desktop, the Fokus
+                  "Neuer Satz" spot; on mobile it is in the floating cluster
+                  already, whose geometry is locked. */}
+              <FixTiles
+                changes={correction.changes}
+                max={MAX_FIX_TILES}
+                action={
+                  <div className="ml-auto hidden self-end lg:block">
+                    <Button variant="outline" onClick={startOver} className="h-9 rounded-xl">
+                      <RotateCcw className="h-3.5 w-3.5" /> Neu schreiben
+                    </Button>
+                  </div>
+                }
+              />
+            </>
+          ) : (
+            <>
+              {/* `useFillEditor` owns the height (fill the viewport, then grow, then
+                  scroll internally), so the field is not hand-resizable any more and
+                  `rows` is only the pre-measurement fallback. */}
+              <textarea
+                ref={editorRef}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                disabled={submitting}
+                rows={length === "long" ? 10 : 6}
+                placeholder="Schreibe hier deinen Text auf Deutsch …"
+                className="block w-full resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                {/* German special-character keys for non-German keyboards (s150). */}
+                <UmlautKeys textareaRef={editorRef} value={text} onChange={setText} />
+                {/* The Ziel range lives on the Aufgabe card only (founder s149). */}
+                <span className={cn("ml-auto text-xs tabular-nums", enough ? "text-success" : "text-muted-foreground")}>
+                  {words} {words === 1 ? "Wort" : "Wörter"}
+                </span>
+                {/* Desktop actions; on mobile they live in the sticky bottom bar. */}
+                <div className="hidden gap-2 lg:flex">
+                  {result && (
+                    <Button variant="ghost" onClick={startOver} disabled={submitting}>
+                      Neu schreiben
+                    </Button>
+                  )}
+                  {evaluateButton}
+                </div>
+              </div>
+              {/* The "why can't I press Auswerten yet" line lives in the card the
+                  learner is typing in, right under the umlaut keys (founder s169).
+                  It used to ride the mobile action cluster's caption slot, which
+                  cost that slot its permanent Art. 50 note; the cluster now sits
+                  2.5rem higher (matching Fokus) so a card-tail line cannot land
+                  under it any more. */}
+              {tooShort && (
+                <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
+                  Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
+                </p>
               )}
-              {evaluateButton}
-            </div>
-          </div>
-          {/* The "why can't I press Auswerten yet" line lives in the card the
-              learner is typing in, right under the umlaut keys (founder s169).
-              It used to ride the mobile action cluster's caption slot, which
-              cost that slot its permanent Art. 50 note; the cluster now sits
-              2.5rem higher (matching Fokus) so a card-tail line cannot land
-              under it any more. */}
-          {tooShort && (
-            <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
-              Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
-            </p>
+            </>
           )}
         </CardContent>
       </Card>
@@ -677,7 +753,7 @@ export function GuidedWritingTrainer({
                   <Button
                     variant="outline"
                     className="h-11 rounded-xl"
-                    onClick={() => { setResult(null); setText(""); }}
+                    onClick={startOver}
                     disabled={submitting}
                   >
                     Neu schreiben

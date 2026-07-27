@@ -93,4 +93,18 @@ describe("diffWords", () => {
     // Case still wins when the letters themselves change case.
     expect(classifyChange("antwort,", "Antwort,")).toBe("Groß-/Kleinschreibung");
   });
+
+  it("calls a swapped article or possessive a Kasus fix, not a spelling one (s172)", () => {
+    // The most common B1/B2 mistake there is. "Rechtschreibung" taught the wrong
+    // rule, and the Kurz/Lang correction now shows these tiles on every text.
+    expect(classifyChange("die", "der")).toBe("Kasus & Artikel");
+    expect(classifyChange("der", "den")).toBe("Kasus & Artikel");
+    expect(classifyChange("meine", "meiner")).toBe("Kasus & Artikel");
+    expect(classifyChange("ein", "einen")).toBe("Kasus & Artikel");
+    expect(classifyChange("dieser", "diesem")).toBe("Kasus & Artikel");
+    // Only when BOTH sides are determiners: "das → dass" stays a spelling fix,
+    // and a case-only change is still Groß-/Kleinschreibung.
+    expect(classifyChange("das", "dass")).toBe("Rechtschreibung");
+    expect(classifyChange("Der", "der")).toBe("Groß-/Kleinschreibung");
+  });
 });

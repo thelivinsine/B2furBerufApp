@@ -20,6 +20,7 @@ import { GrammarRail } from "./GrammarRail";
 import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
 import { floatingNote, floatingSlot } from "../floatingCluster";
+import { CorrectionToggle, FixTiles, MarkedTokens } from "../correction";
 import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
 import { diffWords, type DiffToken } from "@/lib/wordDiff";
@@ -229,29 +230,10 @@ export function FokusTrainer({
             Dein Satz
           </p>
           {showResult && (
-            <div className="inline-flex rounded-lg bg-muted p-0.5 text-xs font-bold">
-              {(
-                [
-                  { id: "orig" as const, label: "Original" },
-                  { id: "corr" as const, label: "Korrigiert" },
-                ]
-              ).map((seg) => (
-                <button
-                  key={seg.id}
-                  type="button"
-                  aria-pressed={view === seg.id}
-                  onClick={() => setView(seg.id)}
-                  className={cn(
-                    "rounded-md px-3 py-1 transition-colors",
-                    view === seg.id
-                      ? "bg-surface text-foreground shadow-soft"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {seg.label}
-                </button>
-              ))}
-            </div>
+            <CorrectionToggle
+              view={view === "trans" ? "corr" : view}
+              onChange={setView}
+            />
           )}
         </div>
 
@@ -261,58 +243,30 @@ export function FokusTrainer({
               {/* One sentence: original with coral marks, or corrected with
                   green marks. A calm underline, not a loud fill. */}
               <p className="text-base leading-relaxed">
-                {resultTokens.map((tk, i) => (
-                  <span key={i}>
-                    {tk.changed ? (
-                      <span
-                        className={cn(
-                          "font-semibold",
-                          view === "orig" ? "fx-mark-coral" : "fx-mark-green",
-                        )}
-                      >
-                        {tk.text}
-                      </span>
-                    ) : (
-                      tk.text
-                    )}
-                    {i < resultTokens.length - 1 ? " " : ""}
-                  </span>
-                ))}
+                <MarkedTokens
+                  tokens={resultTokens}
+                  mark={view === "orig" ? "coral" : "green"}
+                />
               </p>
               <div className="h-px bg-border" />
               {/* Himmelblau fix tiles (light kräftig, dark weich): each carries
                   the learning category + the before → after edit. Neuer Satz
-                  shares the row, right- and bottom-aligned. */}
-              <div className="flex flex-wrap items-stretch gap-2.5">
-                {diff.changes.map((c, i) => (
-                  <div
-                    key={i}
-                    className="min-w-[8rem] rounded-xl border border-accent/70 bg-accent/30 p-2.5 dark:border-accent/[0.45] dark:bg-accent/[0.18]"
+                  shares the row, right- and bottom-aligned. Shared with the
+                  Kurz/Lang result and the Verlauf (s172), so one correction
+                  language covers every surface. No cap here: a single sentence
+                  cannot produce a wall of tiles. */}
+              <FixTiles
+                changes={diff.changes}
+                action={
+                  <Button
+                    variant="outline"
+                    onClick={m.startOver}
+                    className="ml-auto h-9 self-end rounded-xl"
                   >
-                    <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
-                      {c.category}
-                    </span>
-                    {c.moved ? (
-                      // A word that only moved: show it once (no struck "before"),
-                      // the eyebrow already says it was a word-order fix.
-                      <span className="text-sm font-bold text-success">{c.to}</span>
-                    ) : (
-                      <span className="text-sm">
-                        <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
-                        <span className="text-muted-foreground/80">→</span>{" "}
-                        <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
-                      </span>
-                    )}
-                  </div>
-                ))}
-                <Button
-                  variant="outline"
-                  onClick={m.startOver}
-                  className="ml-auto h-9 self-end rounded-xl"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" /> Neuer Satz
-                </Button>
-              </div>
+                    <RotateCcw className="h-3.5 w-3.5" /> Neuer Satz
+                  </Button>
+                }
+              />
             </div>
           ) : (
             <p className="flex items-center gap-1.5 text-sm font-semibold text-success">
@@ -531,18 +485,7 @@ export function FokusTrainer({
 
   const marked = (tokens: DiffToken[], mark: "coral" | "green") => (
     <p className="text-center text-base leading-relaxed">
-      {tokens.map((tk, i) => (
-        <span key={i}>
-          {tk.changed ? (
-            <span className={cn("font-semibold", mark === "coral" ? "fx-mark-coral" : "fx-mark-green")}>
-              {tk.text}
-            </span>
-          ) : (
-            tk.text
-          )}
-          {i < tokens.length - 1 ? " " : ""}
-        </span>
-      ))}
+      <MarkedTokens tokens={tokens} mark={mark} />
     </p>
   );
 

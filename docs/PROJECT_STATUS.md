@@ -1,13 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-26 (session 171). **Verlauf + Fortschritt redesign (founder-picked C and 3):**
-Schreiben's Verlauf leads with a weakness-trend card over a compact row list (Aufgabe -> Dein Text ->
-Tipp inside the row disclosure); Fortschritt leads with a Kompetenz curve (mastered words / Can-Dos
-over time) and pairs a Prüfung countdown with a writing-aware Diagnose, XP demoted to Details.
-Competence is now SAMPLED daily (`masteryHistory`), since FSRS history cannot be backfilled. Also: the
-desktop Sidebar's active row is a lighter grey. Prior s170 (PR #730): the Praktisch toggle joined the
-squircle language, Bibliothek reverted to the book stack and Fortschritt became the Pokal.
-`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
+_Last updated: 2026-07-27 (session 172). **The correction now appears in the Kurz/Lang trainer**
+(founder pick A): once an evaluation lands, the editor card becomes the correction card with the
+Original/Korrigiert toggle and the Himmelblau fix tiles, Fokus-style, and the result card stays short.
+Fokus, Kurz/Lang and Verlauf render corrections from ONE shared module
+(`src/features/writing/correction.tsx`), so the tile language cannot drift; `classifyChange` gained
+"Kasus & Artikel". **Merged (PR #739).** Prior s171: Verlauf leads with a
+weakness-trend card over a compact row list, Fortschritt with a Kompetenz curve, and Verlauf covers
+both trainers. `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
 a CLI. Product name: **Genauly** (`genauly.de`)._
 
@@ -76,6 +76,43 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 172 (2026-07-27). The correction in Kurz/Lang (founder pick A), merged as
+PR #739.**
+Prompt 13/14 built and re-shared `preview/kurz-lang-korrektur.html` (three places for the correction:
+A im Schreibfeld · B alles im Ergebnis · C zum Aufklappen, bottom cluster + Aufgabe card held identical
+across all three). The founder picked **A** and asked to "make sure both the tiles are harmonious with
+Fokus design", which was literal: the round-1 tiles lacked Fokus's `→`, and the Verlauf copies had
+drifted too (em dash where Fokus prints `∅`).
+- **ONE correction language:** the Fokus pieces now live in `src/features/writing/correction.tsx`
+  (`useCorrectionDiff`, `CorrectionToggle`, `MarkedTokens`, `MarkedParagraphs`, `FixTiles` with optional
+  `max` + `action`), and Fokus desktop, Kurz/Lang and Verlauf all render from it, so a fourth copy
+  cannot drift. `tests/correction.test.tsx` pins the tile anatomy. Fokus MOBILE keeps its own
+  two-column list (measured height, founder r4 amendment); Kurz/Lang shows tiles at both breakpoints
+  because its result page scrolls anyway.
+- **Kurz/Lang variant A:** the editor card becomes the correction card once a result lands. "Neu
+  schreiben" rides the tile row at `lg` (the Fokus "Neuer Satz" spot) and Auswerten drops out there
+  while a correction is up (it would only re-serve the cached verdict); the mobile cluster is
+  untouched. Any result WITHOUT a correction (error-free, templated spelling verdict, failure, limit)
+  keeps the plain field, so fixing and resubmitting still works. `useFillEditor` measures the bottom
+  clearance FIRST, so the field-less state still reserves the fixed chrome, and releases the Aufgabe cap
+  there. **No backend change:** `corrected` has been in the evaluate-writing response, cache included,
+  since s171.
+- **`classifyChange` gained "Kasus & Artikel"**: "in meine Wohnung → in meiner Wohnung" was labelled
+  Rechtschreibung, i.e. the tile taught the wrong rule on the most common B1/B2 mistake. Both sides must
+  be in a closed article/possessive/determiner set, so "das → dass" stays Rechtschreibung and a
+  case-only change stays Groß-/Kleinschreibung.
+- **Verification pattern worth reusing:** `preview/gen-kurz-lang-korrektur-r2.mjs` SSR-renders the REAL
+  components (via Vite `ssrLoadModule` + `react-dom/server`) beside the Fokus card and inlines the app's
+  built CSS, so a preview sheet cannot flatter the implementation. Emits light, dark and an
+  artifact-body variant (artifact `575786f8`). Note this sandbox has the Chromium binary at
+  `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` but NO playwright module, so screenshots go
+  through `chrome --headless --screenshot`.
+- **Gates:** typecheck · lint 0 errors · test:unit **327/327** · build · check:bundle 118.4 kB.
+- **Next:** the founder verifies the live result (Pages deploy from the squash-merge of #739). Open
+  question they may raise: the round-1 mock drew "Kasus üben" in the phone's bottom row, which the
+  shipped cluster does not do (the practice CTA stays inside the result card); changing that touches the
+  locked cluster and needs an explicit ask.
+
 **Handoff after session 171 (2026-07-26). Verlauf + Fortschritt redesign (founder picks C and 3),
 branch `claude/selection-color-contrast-3upqkz`, PRs #685 + #733.** Opened with a one-line contrast fix
 (the desktop Sidebar's active row was too dark: `bg-border` -> `bg-muted`, lighter than the old
@@ -142,10 +179,9 @@ implementation of the two picks.
     computed client-side by `wordDiff`, so no AI cost per view. Two fixes found by screenshotting the
     real page: the diff now runs PER PARAGRAPH (one whole-text diff collapsed a letter into a block)
     and `classifyChange` gained **Zeichensetzung** (a bare comma fix read as "Groß-/Kleinschreibung").
-- **Next:** (1) give **Fokus** a history, which also unlocks the Fokus filter segment in Verlauf;
-  (2) the Kurz/Lang RESULT card still shows only weakness + tip, so the correction appears first in
-  Verlauf, not right after submitting: surfacing it there touches the locked trainer geometry and
-  needs its own preview round. Optional: "In die Wiederholung" (turn a correction into an FSRS card).
+- **Next (both done since):** (1) Fokus history, shipped later the same session; (2) the correction
+  right after submitting, shipped in s172 above. Still optional: "In die Wiederholung" (turn a
+  correction into an FSRS card).
 - **What actually happened on merge:** the Supabase workflow run for #734 shows "Deploy Edge
   Functions: success" and "Apply migrations: **skipped**" — `SUPABASE_DB_PASSWORD` is still unset, so
   the founder applied **0012 by hand** in the Dashboard SQL editor. Like 0011 it is therefore absent
@@ -183,29 +219,6 @@ implementation of the two picks.
 - **Not verifiable from the sandbox:** the network policy blocks `*.supabase.co` (403 on CONNECT), so
   whether the column is live has to be confirmed in the app: write a Kurz text, open it in Verlauf,
   and the Original/Korrigiert toggle should appear.
-
-**Handoff after session 170 (2026-07-26): Praktisch toggle joins the squircle language;
-Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#730**). Founder: adapt the
-reduced-rounding toggle design from Bibliothek/Schreiben to Praktisch, restore the previous
-Bibliothek icon, and give Fortschritt the leaderboard-cup icon from an earlier preview batch. All
-three were direct, unambiguous ports of already-approved designs (no new preview round needed).
-- **Trainieren/Spielen toggle** (`Dashboard.tsx`) now shares `LibrarySwitcher`/
-  `WritingModeSwitcher`'s exact language: `rounded-lg` track, `rounded-md` sliding pill measured by
-  `useSlidingPill`, instead of the older `rounded-full` track with two independently-flagged
-  buttons. Kept content-sized (`w-fit`, centered) since it's a two-segment toggle, not a full-width
-  one; the section-tinted active icon/label (blue Dumbbell / orange Play) is untouched.
-- **Bibliothek's route icon reverts to the "stack of three books"** shipped before session 158,
-  restored verbatim (mark + `NORM` box) from git history (`997e8a0`), replacing the "closed book +
-  bookmark ribbon" mark that had been in place since.
-- **Fortschritt's route icon becomes the "Pokal" (trophy/cup)**, option T from the session-158
-  icon-preview batch (`preview/fortschritt-icon-vorschlaege.html`) that lost to the Ring at the
-  time. Ported verbatim (`#0ea5e9`, own `NORM` box) in place of the progress ring.
-- **Verified in headless Chromium** at 390×844 (bottom tab bar, both icons active/inactive, the
-  toggle sliding between Trainieren/Spielen) and 1280×900 (desktop Sidebar + toggle).
-- **Files:** `src/features/dashboard/Dashboard.tsx` · `src/components/layout/route-icons.tsx` ·
-  `docs/areas/PRAKTISCH-NAV.md` · `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md`.
-  **Gates:** typecheck · lint (0 errors, pre-existing warnings only) · test:unit **317/317** ·
-  build · check:bundle (118.1 kB).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

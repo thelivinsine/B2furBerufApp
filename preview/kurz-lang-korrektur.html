@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Korrektur direkt nach dem Auswerten · Runde 1</title>
+<style>
+  :root {
+    --background: 180 45% 98%; --foreground: 252 16% 12%; --surface: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%; --border: 218 13% 84%;
+    --input: 218 13% 84%; --primary: 221 83% 54%; --accent: 197 93% 77%;
+    --accent-ink: 198 90% 32%; --success: 153 55% 40%; --warning: 38 92% 46%;
+    --reward: 11 82% 54%; --shadow: 221 40% 22%; --radius: 0.875rem;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: hsl(var(--foreground)); background: hsl(210 20% 96%);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 40px 24px 90px; }
+  .pv-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 6px; }
+  .pv-sub { color: hsl(var(--muted-foreground)); font-size: 14px; margin: 0 0 6px; max-width: 90ch; }
+  .note { font-size: 13px; color: hsl(var(--muted-foreground)); max-width: 90ch; margin: 4px 0 0; }
+
+  .row { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 34px; align-items: flex-start; }
+  .col { flex: 0 0 auto; }
+  .vhead { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+  .vletter { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: hsl(var(--primary)); color: #fff; font-weight: 800; font-size: 14px; }
+  .vname { font-size: 16px; font-weight: 800; }
+  .vnote { font-size: 12.5px; color: hsl(var(--muted-foreground)); max-width: 390px; margin: 0 0 10px; min-height: 3.2em; }
+
+  /* Phone frame at a real 390px */
+  .phone { width: 390px; border: 1px solid hsl(var(--border)); border-radius: 22px; overflow: hidden; background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / .10) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / .09) 0, transparent 50%),
+      linear-gradient(120deg, hsl(144 45% 98%) 0%, hsl(150 50% 98%) 38%, hsl(198 83% 98%) 100%);
+      box-shadow: 0 2px 4px hsl(var(--shadow)/.05), 0 12px 32px hsl(var(--shadow)/.12); }
+  .screen { height: 720px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  .scroll { flex: 1; overflow: hidden; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 78px; height: 26px; background: linear-gradient(to bottom, transparent, hsl(190 40% 97%)); }
+
+  .switcher { display: flex; gap: 4px; padding: 4px; border-radius: var(--radius); border: 1px solid hsl(var(--border)); background: hsl(var(--muted)); box-shadow: 0 1px 2px hsl(var(--shadow)/.06), 0 6px 16px -3px hsl(var(--shadow)/.12); }
+  .seg { flex: 1; text-align: center; padding: 8px 4px; font-size: 13px; font-weight: 500; color: hsl(var(--muted-foreground)); border-radius: calc(var(--radius) - 4px); }
+  .seg.active { background: hsl(var(--surface)); font-weight: 700; color: hsl(var(--primary)); box-shadow: 0 1px 2px hsl(var(--shadow)/.06); }
+
+  .card { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: calc(var(--radius) + 4px); box-shadow: 0 1px 2px hsl(var(--shadow)/.06), 0 6px 16px -3px hsl(var(--shadow)/.12); overflow: hidden; }
+  .card.result { border-color: hsl(var(--primary) / .3); }
+  .cc { padding: 14px; }
+  .topbar { height: 6px; background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%); }
+  .eyebrow-blue { font-size: 11.5px; font-weight: 800; color: hsl(var(--primary)); }
+  .label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: hsl(var(--muted-foreground)); display: flex; align-items: center; gap: 5px; }
+  .body { font-size: 13.5px; line-height: 1.6; }
+  .muted { color: hsl(var(--muted-foreground)); }
+  .tiny { font-size: 11.5px; }
+
+  .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 500; }
+  .badge.primary { background: hsl(var(--primary)/.1); color: hsl(var(--primary)); }
+  .badge.muted { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+
+  .field { border: 1px solid hsl(var(--input)); background: hsl(var(--surface)); border-radius: calc(var(--radius) - 4px); padding: 10px; font-size: 13px; line-height: 1.6; }
+  .keys { display: flex; gap: 5px; align-items: center; }
+  .key { border: 1px solid hsl(var(--border)); border-radius: 6px; padding: 1px 6px; font-size: 12px; background: hsl(var(--surface)); }
+
+  .toggle { display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: hsl(var(--muted)); font-size: 11.5px; font-weight: 700; }
+  .toggle span { padding: 3px 10px; border-radius: 7px; color: hsl(var(--muted-foreground)); }
+  .toggle span.on { background: hsl(var(--surface)); color: hsl(var(--foreground)); box-shadow: 0 1px 2px hsl(var(--shadow)/.1); }
+
+  .fx-green { box-shadow: inset 0 -2px 0 hsl(var(--success) / .9); border-radius: 1px; padding-bottom: 1px; font-weight: 600; }
+  .fx-coral { box-shadow: inset 0 -2px 0 hsl(var(--reward) / .95); border-radius: 1px; padding-bottom: 1px; font-weight: 600; }
+
+  .tiles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tile { min-width: 7rem; border: 1px solid hsl(var(--accent)/.7); background: hsl(var(--accent)/.3); border-radius: 12px; padding: 8px; }
+  .tile .cat { display: block; font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: hsl(var(--accent-ink)); margin-bottom: 2px; }
+  .tile .pair { font-size: 12.5px; }
+  .strike { color: hsl(var(--muted-foreground)); text-decoration: line-through; }
+  .fix { font-weight: 700; color: hsl(var(--success)); }
+
+  .disclosure { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid hsl(var(--border)); padding-top: 10px; font-size: 12.5px; font-weight: 600; color: hsl(var(--muted-foreground)); }
+
+  .cluster { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 12px 8px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .btnrow { display: flex; gap: 8px; width: 100%; }
+  .btn { flex: 1; height: 40px; border-radius: calc(var(--radius) - 4px); font-size: 13.5px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; border: 1px solid transparent; }
+  .btn-grad { background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%); color: #fff; }
+  .btn-out { border-color: hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground)); }
+  .ki { font-size: 10.5px; color: hsl(var(--muted-foreground)); background: hsl(var(--background)/.9); padding: 1px 6px; border-radius: 6px; }
+  .navbar { height: 54px; border-top: 1px solid hsl(var(--border)); background: hsl(var(--surface)); display: flex; align-items: center; justify-content: space-around; font-size: 10px; color: hsl(var(--muted-foreground)); }
+  .dot { width: 20px; height: 20px; border-radius: 6px; background: hsl(var(--primary)/.25); }
+  .dot.on { background: hsl(var(--primary)); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pv-eyebrow">Preview · Runde 1</div>
+  <h1>Korrektur direkt nach dem Auswerten</h1>
+  <p class="pv-sub">Drei Wege, die Korrektur schon im Trainer zu zeigen, statt erst im Verlauf. Alles auf einem echten 390px-Handy, im Zustand NACH dem Auswerten. Bitte per Buchstabe wählen.</p>
+  <p class="note"><b>Randbedingung:</b> Die feste untere Leiste (Buttons + KI-Zeile) und ihre Höhe bleiben in allen drei Varianten unverändert, ebenso die Aufgabe-Karte. Unterschiedlich ist nur, WO die Korrektur erscheint.</p>
+
+  <div class="row">
+
+    <!-- ============ A ============ -->
+    <div class="col">
+      <div class="vhead"><span class="vletter">A</span><span class="vname">Im Schreibfeld</span></div>
+      <p class="vnote">Wie in Fokus: das Schreibfeld selbst zeigt nach dem Auswerten den korrigierten Text mit Original/Korrigiert. Die Ergebnis-Karte bleibt kurz (nur der Tipp). Kürzester Weg von "abgeschickt" zu "so ist es richtig".</p>
+      <div class="phone"><div class="screen">
+        <div class="scroll">
+          <div class="switcher"><div class="seg">Fokus</div><div class="seg active">Kurz</div><div class="seg">Lang</div><div class="seg">Verlauf</div></div>
+
+          <div class="card"><div class="cc">
+            <div class="eyebrow-blue">Aufgabe: Wohnen</div>
+            <p class="body" style="margin:5px 0 0">Ihre Heizung ist seit drei Tagen kaputt. Schreiben Sie der Hausverwaltung.</p>
+          </div></div>
+
+          <div class="card"><div class="cc" style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span class="label">Dein Text</span>
+              <span class="toggle"><span>Original</span><span class="on">Korrigiert</span></span>
+            </div>
+            <div class="field" style="border-color:hsl(var(--border))">
+              Sehr geehrte Damen und Herren,<br><br>
+              seit drei Tagen funktioniert die Heizung in <span class="fx-green">meiner</span> Wohnung nicht. Ich bitte Sie, <span class="fx-green">den</span> Schaden bis Freitag zu beheben.
+            </div>
+            <div class="tiles">
+              <div class="tile"><span class="cat">Rechtschreibung</span><span class="pair"><span class="strike">meine</span> <span class="fix">meiner</span></span></div>
+              <div class="tile"><span class="cat">Rechtschreibung</span><span class="pair"><span class="strike">der</span> <span class="fix">den</span></span></div>
+            </div>
+          </div></div>
+
+          <div class="card result">
+            <div class="topbar"></div>
+            <div class="cc" style="display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13.5px;font-weight:700">Dein wichtigster Tipp</span>
+                <span class="badge primary">Kasus &amp; Artikel</span>
+              </div>
+              <p class="body">Achte auf den Dativ nach "in": "in meiner Wohnung".</p>
+            </div>
+          </div>
+        </div>
+        <div class="fade"></div>
+        <div class="cluster">
+          <div class="btnrow"><div class="btn btn-out">Neu schreiben</div><div class="btn btn-grad">Kasus üben</div></div>
+          <span class="ki">KI-generierte Rückmeldung · kann Fehler machen</span>
+        </div>
+      </div>
+      <div class="navbar"><span class="dot"></span><span class="dot"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+
+    <!-- ============ B ============ -->
+    <div class="col">
+      <div class="vhead"><span class="vletter">B</span><span class="vname">Alles im Ergebnis</span></div>
+      <p class="vnote">Das Schreibfeld bleibt unverändert stehen, und die Ergebnis-Karte trägt alles: Tipp, Umschalter, markierter Text und Fix-Kacheln. Ein Ort für alles, was die KI gesagt hat, dafür die längste Karte.</p>
+      <div class="phone"><div class="screen">
+        <div class="scroll">
+          <div class="switcher"><div class="seg">Fokus</div><div class="seg active">Kurz</div><div class="seg">Lang</div><div class="seg">Verlauf</div></div>
+
+          <div class="card"><div class="cc">
+            <div class="eyebrow-blue">Aufgabe: Wohnen</div>
+            <p class="body" style="margin:5px 0 0">Ihre Heizung ist seit drei Tagen kaputt. Schreiben Sie der Hausverwaltung.</p>
+          </div></div>
+
+          <div class="card result">
+            <div class="topbar"></div>
+            <div class="cc" style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13.5px;font-weight:700">Dein wichtigster Tipp</span>
+                <span class="badge primary">Kasus &amp; Artikel</span>
+              </div>
+              <p class="body">Achte auf den Dativ nach "in": "in meiner Wohnung".</p>
+              <div style="height:1px;background:hsl(var(--border))"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <span class="label">Korrektur</span>
+                <span class="toggle"><span>Original</span><span class="on">Korrigiert</span></span>
+              </div>
+              <p class="body">Sehr geehrte Damen und Herren,</p>
+              <p class="body">seit drei Tagen funktioniert die Heizung in <span class="fx-green">meiner</span> Wohnung nicht. Ich bitte Sie, <span class="fx-green">den</span> Schaden bis Freitag zu beheben.</p>
+              <div class="tiles">
+                <div class="tile"><span class="cat">Rechtschreibung</span><span class="pair"><span class="strike">meine</span> <span class="fix">meiner</span></span></div>
+                <div class="tile"><span class="cat">Rechtschreibung</span><span class="pair"><span class="strike">der</span> <span class="fix">den</span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fade"></div>
+        <div class="cluster">
+          <div class="btnrow"><div class="btn btn-out">Neu schreiben</div><div class="btn btn-grad">Kasus üben</div></div>
+          <span class="ki">KI-generierte Rückmeldung · kann Fehler machen</span>
+        </div>
+      </div>
+      <div class="navbar"><span class="dot"></span><span class="dot"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+
+    <!-- ============ C ============ -->
+    <div class="col">
+      <div class="vhead"><span class="vletter">C</span><span class="vname">Zum Aufklappen</span></div>
+      <p class="vnote">Der Tipp bleibt die Schlagzeile; die Korrektur liegt eine Zeile darunter zum Aufklappen ("2 Korrekturen ansehen"). Der erste Blick bleibt kurz, der Lernende entscheidet, wann er ins Detail geht.</p>
+      <div class="phone"><div class="screen">
+        <div class="scroll">
+          <div class="switcher"><div class="seg">Fokus</div><div class="seg active">Kurz</div><div class="seg">Lang</div><div class="seg">Verlauf</div></div>
+
+          <div class="card"><div class="cc">
+            <div class="eyebrow-blue">Aufgabe: Wohnen</div>
+            <p class="body" style="margin:5px 0 0">Ihre Heizung ist seit drei Tagen kaputt. Schreiben Sie der Hausverwaltung.</p>
+          </div></div>
+
+          <div class="card"><div class="cc" style="display:flex;flex-direction:column;gap:9px">
+            <span class="label">Dein Text</span>
+            <div class="field muted">
+              Sehr geehrte Damen und Herren,<br><br>
+              seit drei Tagen funktioniert die Heizung in meine Wohnung nicht. Ich bitte Sie, der Schaden bis Freitag zu beheben.
+            </div>
+            <div class="keys"><span class="key">ä</span><span class="key">ö</span><span class="key">ü</span><span class="key">ß</span><span style="margin-left:auto" class="tiny muted">34 Wörter</span></div>
+          </div></div>
+
+          <div class="card result">
+            <div class="topbar"></div>
+            <div class="cc" style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13.5px;font-weight:700">Dein wichtigster Tipp</span>
+                <span class="badge primary">Kasus &amp; Artikel</span>
+              </div>
+              <p class="body">Achte auf den Dativ nach "in": "in meiner Wohnung".</p>
+              <div class="disclosure"><span>2 Korrekturen ansehen</span><span>⌄</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="fade"></div>
+        <div class="cluster">
+          <div class="btnrow"><div class="btn btn-out">Neu schreiben</div><div class="btn btn-grad">Kasus üben</div></div>
+          <span class="ki">KI-generierte Rückmeldung · kann Fehler machen</span>
+        </div>
+      </div>
+      <div class="navbar"><span class="dot"></span><span class="dot"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="note" style="margin-top:30px"><b>Hinweis zu C:</b> aufgeklappt sieht C genauso aus wie B, nur eben erst auf Wunsch. <b>Hinweis zu A:</b> "Neu schreiben" stellt das leere Schreibfeld wieder her.</p>
+</div>
+</body>
+</html>

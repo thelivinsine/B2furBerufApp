@@ -73,7 +73,11 @@ export function useFillEditor({
   fill,
   revision,
 }: {
-  /** The textarea being sized. */
+  /**
+   * The textarea being sized. Null in the states that have no field at all (the
+   * correction card takes its place once an evaluation lands, s172); the bottom
+   * clearance is still measured then.
+   */
   editorRef: RefObject<HTMLTextAreaElement>;
   /** Card wrapping the textarea; everything it renders below travels with it. */
   cardRef: RefObject<HTMLElement>;
@@ -109,27 +113,13 @@ export function useFillEditor({
   const measure = useCallback(() => {
     const ta = editorRef.current;
     const card = cardRef.current;
-    if (!ta || !card) return;
-
-    // Collapse to zero first, NOT to `auto`: a textarea's auto height is its
-    // `rows` attribute, so `auto` would report 6 (Kurz) or 10 (Lang) rows as the
-    // "content" and the field could never size below that. At height 0,
-    // scrollHeight is the text's real height plus padding; the borders come off
-    // the offset/client delta (both are border-box here).
-    ta.style.height = "0px";
-    const content = ta.scrollHeight + (ta.offsetHeight - ta.clientHeight);
-
-    const taRect = ta.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    // Umlaut keys, word count, desktop actions, card padding: all of it moves
-    // down with the field, so it comes off the budget.
-    const tail = Math.max(0, cardRect.bottom - taRect.bottom);
-    // Document coordinate, so it stays valid whatever the current scroll is.
-    let top = taRect.top + window.scrollY;
 
     // Chrome pinned to the bottom of the viewport. Only one of the two is ever
     // laid out (the other is display:none at this breakpoint), so the larger
-    // reservation simply wins.
+    // reservation simply wins. Measured FIRST, because the trainer root needs
+    // this clearance even in the state that has no field at all: once an
+    // evaluation lands, the editor card becomes the correction card (s172), and
+    // an early return here would leave the page without its bottom clearance.
     let reserve = GAP;
     for (const el of [clusterRef.current, noteRef.current]) {
       if (!el) continue;
@@ -137,56 +127,83 @@ export function useFillEditor({
       if (r.height > 0) reserve = Math.max(reserve, window.innerHeight - r.top + GAP);
     }
 
-    const preferred = Math.max(MIN_ABSOLUTE, Math.round(window.innerHeight * MIN_SHARE));
+    if (ta && card) {
+      // Collapse to zero first, NOT to `auto`: a textarea's auto height is its
+      // `rows` attribute, so `auto` would report 6 (Kurz) or 10 (Lang) rows as the
+      // "content" and the field could never size below that. At height 0,
+      // scrollHeight is the text's real height plus padding; the borders come off
+      // the offset/client delta (both are border-box here).
+      ta.style.height = "0px";
+      const content = ta.scrollHeight + (ta.offsetHeight - ta.clientHeight);
 
-    // A long Aufgabe (Inhaltspunkte) can leave less than the field's floor, in
-    // which case the page used to scroll at rest. Instead, cap the Aufgabe
-    // card's prompt region by exactly the shortfall and let IT scroll (down to
-    // TASK_BODY_MIN, past which a small page scroll is the lesser evil). The
-    // math works off scrollHeight, never by clearing the cap to re-measure, so
-    // the ResizeObserver watching the card cannot ping-pong.
-    const body = taskBodyRef.current;
-    if (body) {
-      const bodyVisible = body.getBoundingClientRect().height;
-      const bodyNatural = body.scrollHeight;
-      const availNatural =
-        window.innerHeight - top - tail - reserve - (bodyNatural - bodyVisible);
-      const deficit = preferred - availNatural;
-      const capped = Math.max(TASK_BODY_MIN, Math.round(bodyNatural - Math.max(0, deficit)));
-      if (deficit > 0.5 && capped < bodyNatural - 0.5) {
-        body.style.maxHeight = `${capped}px`;
-        body.style.overflowY = "auto";
-      } else {
+      const taRect = ta.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      // Umlaut keys, word count, desktop actions, card padding: all of it moves
+      // down with the field, so it comes off the budget.
+      const tail = Math.max(0, cardRect.bottom - taRect.bottom);
+      // Document coordinate, so it stays valid whatever the current scroll is.
+      let top = taRect.top + window.scrollY;
+
+      const preferred = Math.max(MIN_ABSOLUTE, Math.round(window.innerHeight * MIN_SHARE));
+
+      // A long Aufgabe (Inhaltspunkte) can leave less than the field's floor, in
+      // which case the page used to scroll at rest. Instead, cap the Aufgabe
+      // card's prompt region by exactly the shortfall and let IT scroll (down to
+      // TASK_BODY_MIN, past which a small page scroll is the lesser evil). The
+      // math works off scrollHeight, never by clearing the cap to re-measure, so
+      // the ResizeObserver watching the card cannot ping-pong.
+      const body = taskBodyRef.current;
+      if (body) {
+        const bodyVisible = body.getBoundingClientRect().height;
+        const bodyNatural = body.scrollHeight;
+        const availNatural =
+          window.innerHeight - top - tail - reserve - (bodyNatural - bodyVisible);
+        const deficit = preferred - availNatural;
+        const capped = Math.max(TASK_BODY_MIN, Math.round(bodyNatural - Math.max(0, deficit)));
+        if (deficit > 0.5 && capped < bodyNatural - 0.5) {
+          body.style.maxHeight = `${capped}px`;
+          body.style.overflowY = "auto";
+        } else {
+          body.style.maxHeight = "";
+          body.style.overflowY = "";
+        }
+        // The cap moved the field's top; re-read it (forced reflow, one per pass).
+        top = ta.getBoundingClientRect().top + window.scrollY;
+      }
+
+      // What the screen actually offers, floored at HARD_MIN rather than at the
+      // preferred height: overshooting here is what put the resting page into
+      // scroll on short phones (s169). The Aufgabe card gave up what it could
+      // just above; anything still missing comes out of the field.
+      const available = Math.max(HARD_MIN, Math.floor(window.innerHeight - top - tail - reserve));
+      // Desktop stops short of the bottom chrome on purpose; mobile fills it.
+      const wide = window.matchMedia(WIDE).matches;
+      const rest = wide
+        ? Math.min(available, Math.max(desktopCap.min, Math.round(window.innerHeight * desktopCap.share)))
+        : available;
+      // Growth is measured off the resting height, but never below what the
+      // screen actually offers: on desktop `rest` is deliberately short of that,
+      // and where a tall Aufgabe pushes `available` down to the floor, 1.8x a
+      // floor is still a floor. Without `available` in here, typing would hit
+      // internal scrolling while empty screen was still going spare.
+      const max = Math.max(
+        Math.round(rest * GROWTH),
+        available,
+        Math.round(window.innerHeight * GROWTH_FLOOR),
+      );
+      const height = Math.min(Math.max(content, fill ? rest : Math.min(preferred, available)), max);
+      ta.style.height = `${height}px`;
+      ta.style.overflowY = content > max ? "auto" : "hidden";
+    } else {
+      // No field on screen (the correction card took its place, s172): release
+      // the Aufgabe cap, since there is nothing left to protect from it and the
+      // whole task should be readable while the learner reads the correction.
+      const body = taskBodyRef.current;
+      if (body) {
         body.style.maxHeight = "";
         body.style.overflowY = "";
       }
-      // The cap moved the field's top; re-read it (forced reflow, one per pass).
-      top = ta.getBoundingClientRect().top + window.scrollY;
     }
-
-    // What the screen actually offers, floored at HARD_MIN rather than at the
-    // preferred height: overshooting here is what put the resting page into
-    // scroll on short phones (s169). The Aufgabe card gave up what it could
-    // just above; anything still missing comes out of the field.
-    const available = Math.max(HARD_MIN, Math.floor(window.innerHeight - top - tail - reserve));
-    // Desktop stops short of the bottom chrome on purpose; mobile fills it.
-    const wide = window.matchMedia(WIDE).matches;
-    const rest = wide
-      ? Math.min(available, Math.max(desktopCap.min, Math.round(window.innerHeight * desktopCap.share)))
-      : available;
-    // Growth is measured off the resting height, but never below what the
-    // screen actually offers: on desktop `rest` is deliberately short of that,
-    // and where a tall Aufgabe pushes `available` down to the floor, 1.8x a
-    // floor is still a floor. Without `available` in here, typing would hit
-    // internal scrolling while empty screen was still going spare.
-    const max = Math.max(
-      Math.round(rest * GROWTH),
-      available,
-      Math.round(window.innerHeight * GROWTH_FLOOR),
-    );
-    const height = Math.min(Math.max(content, fill ? rest : Math.min(preferred, available)), max);
-    ta.style.height = `${height}px`;
-    ta.style.overflowY = content > max ? "auto" : "hidden";
 
     // Clearance so whatever ends up last in the page (the field's own card once
     // it scrolls, or the result card) clears the floating chrome. AppShell's
