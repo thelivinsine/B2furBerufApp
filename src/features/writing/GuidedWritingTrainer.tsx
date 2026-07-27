@@ -26,6 +26,9 @@ import { SECTOR_OPTIONS } from "@/lib/facets";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingRail, WRITING_FORMATS, WRITING_LEVELS, writingFormatLabel } from "./WritingRail";
+import { loadAutosavedDraft, saveAutosavedDraft } from "./draftAutosave";
+import type { WritingMode } from "./resumeDraft";
+import { useLiveWork } from "@/lib/liveWork";
 import { UmlautKeys } from "./UmlautKeys";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { useFillEditor } from "./useFillEditor";
@@ -139,12 +142,21 @@ export function GuidedWritingTrainer({
     [themeScope, length, sub, sector, level, format],
   );
 
-  const [drawn, setDrawn] = useState<WritingTaskRef>(() =>
-    themeScope && initialPromptIndex != null && initialPromptIndex >= 0
-      ? { theme: themeScope, ix: initialPromptIndex }
-      : randomTask(eligible),
-  );
-  const [text, setText] = useState(initialText);
+  // Autosave restore (s172): a draft left behind by ANY reload (a deploy, a
+  // crash self-heal, iOS discarding the tab, a manual refresh) comes back with
+  // the Aufgabe it was written against. The sign-in hand-off wins when both
+  // exist, since that one is an explicit, just-now action.
+  const mode: WritingMode = length === "long" ? "lang" : "kurz";
+  const [saved] = useState(() => (initialText ? null : loadAutosavedDraft(mode)));
+
+  const [drawn, setDrawn] = useState<WritingTaskRef>(() => {
+    if (themeScope && initialPromptIndex != null && initialPromptIndex >= 0)
+      return { theme: themeScope, ix: initialPromptIndex };
+    if (saved?.theme && saved.promptIndex != null && saved.promptIndex >= 0)
+      return { theme: saved.theme, ix: saved.promptIndex };
+    return randomTask(eligible);
+  });
+  const [text, setText] = useState(initialText || saved?.text || "");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<WritingEvalResult | null>(null);
   /**
@@ -171,6 +183,21 @@ export function GuidedWritingTrainer({
   const noteRef = useRef<HTMLDivElement>(null);
 
   const words = useMemo(() => countWords(text), [text]);
+
+  // Persist the draft while it is being written, and hold a live-work claim so
+  // the deploy-adoption reload waits until the learner is done (lib/liveWork).
+  const persist = () => {
+    saveAutosavedDraft({ mode, text, theme: drawn.theme, length, promptIndex: drawn.ix });
+  };
+  useLiveWork(text.trim().length > 0, `writing:${mode}`, persist);
+  useEffect(() => {
+    // Debounced: writing is keystroke-heavy and localStorage writes are sync.
+    const t = window.setTimeout(
+      () => saveAutosavedDraft({ mode, text, theme: drawn.theme, length, promptIndex: drawn.ix }),
+      500,
+    );
+    return () => window.clearTimeout(t);
+  }, [mode, text, length, drawn.theme, drawn.ix]);
 
   // Reset draft + result and draw a fresh random Aufgabe when the task scope
   // (theme, length, Unterthema or Branche) changes, but NOT on mount (so a

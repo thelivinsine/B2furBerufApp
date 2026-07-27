@@ -28,6 +28,13 @@ import { matchesSpoken } from "@/engine/pronounce";
 import { gradeTyped, gradeTypedAny, type TypedGrade } from "@/engine/typing";
 import { ReadingBlock } from "@/features/session/ReadingBlock";
 import { recordCompetenceSnapshot } from "@/lib/competence";
+import {
+  clearSessionSnapshot,
+  loadSessionSnapshot,
+  saveSessionSnapshot,
+  sessionSignature,
+} from "@/features/session/sessionResume";
+import { useLiveWork } from "@/lib/liveWork";
 import { useCountdown } from "@/lib/hooks";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
 import { GrammarDrillCard } from "@/features/grammar/GrammarDrillCard";
@@ -85,7 +92,13 @@ interface SessionPlayerProps {
  */
 export function SessionPlayer(props: SessionPlayerProps) {
   const [runId, setRunId] = useState(0);
-  return <SessionRun key={runId} {...props} onRestart={() => setRunId((i) => i + 1)} />;
+  // "Neue Runde" is an explicit request for a fresh deck, so the resume
+  // snapshot of the finished run must go before the remount reads it back.
+  const restart = () => {
+    clearSessionSnapshot();
+    setRunId((i) => i + 1);
+  };
+  return <SessionRun key={runId} {...props} onRestart={restart} />;
 }
 
 function SessionRun({
@@ -104,7 +117,14 @@ function SessionRun({
   // in-app entry point pushes a history entry, so React Router's history index
   // is > 0 when there is a previous route to go back to; a deep link or fresh
   // load (index 0, no app history) falls back to the overview.
+  // Set once the run is deliberately over (finished or ended via the confirm
+  // dialog). The unmount that follows must not write the snapshot back.
+  const abandoned = useRef(false);
   const exit = () => {
+    // Leaving is deliberate (the confirm dialog asked), so drop the resume
+    // snapshot: the next Üben press should compose a fresh session.
+    abandoned.current = true;
+    clearSessionSnapshot();
     if ((window.history.state?.idx ?? 0) > 0) navigate(-1);
     else navigate("/");
   };
@@ -123,40 +143,54 @@ function SessionRun({
   const showToast = useSessionStore((s) => s.showToast);
   const setFocusMode = useSessionStore((s) => s.setFocusMode);
 
+  // Resume after a reload (s172). The snapshot only matches a run of this exact
+  // session launch inside this tab, so it can never resurrect something else.
+  const signature = sessionSignature({
+    minutes,
+    scope,
+    grammarTopicId,
+    contentScope,
+    libraryIds,
+    focus,
+  });
+  const [snap] = useState(() => loadSessionSnapshot(signature));
+
   // Build once on mount: the composer samples, so re-building each render would
   // reshuffle the deck under the learner.
-  const [plan] = useState(() =>
-    contentScope
-      ? buildScopedSession(contentScope, libraryIds ?? [], {
-          srs,
-          minutes,
-          difficulty: difficultyForLevel(level),
-          listening: ttsSupported() && speechEnabled,
-        })
-      : buildSession({
-          srs,
-          savedWords,
-          mode,
-          minutes,
-          difficulty: difficultyForLevel(level),
-          scope,
-          focus,
-          grammarTopicId,
-          speaking: recognitionEnabled && recognitionSupported(),
-          listening: ttsSupported(),
-        }),
+  const [plan] = useState(
+    () =>
+      snap?.plan ??
+      (contentScope
+        ? buildScopedSession(contentScope, libraryIds ?? [], {
+            srs,
+            minutes,
+            difficulty: difficultyForLevel(level),
+            listening: ttsSupported() && speechEnabled,
+          })
+        : buildSession({
+            srs,
+            savedWords,
+            mode,
+            minutes,
+            difficulty: difficultyForLevel(level),
+            scope,
+            focus,
+            grammarTopicId,
+            speaking: recognitionEnabled && recognitionSupported(),
+            listening: ttsSupported(),
+          })),
   );
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(snap?.index ?? 0);
   const [answered, setAnswered] = useState(false);
   // Fallback ladder (#27): after repeated STT failures the remaining speaking
   // blocks skip the mic entirely and start in the typed-input fallback.
   const sttErrorsRef = useRef(0);
-  const [sttDisabled, setSttDisabled] = useState(false);
-  const [xpEarned, setXpEarned] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [loot, setLoot] = useState<LootItem[]>([]);
+  const [sttDisabled, setSttDisabled] = useState(snap?.sttDisabled ?? false);
+  const [xpEarned, setXpEarned] = useState(snap?.xpEarned ?? 0);
+  const [correctCount, setCorrectCount] = useState(snap?.correctCount ?? 0);
+  const [combo, setCombo] = useState(snap?.combo ?? 0);
+  const [loot, setLoot] = useState<LootItem[]>(snap?.loot ?? []);
   const [done, setDone] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
   // Gender reveal effect (Artikel-Visuals Phase 3): plays over the stage on a
@@ -175,6 +209,57 @@ function SessionRun({
     setFocusMode(!done && total > 0);
     return () => setFocusMode(false);
   }, [done, total, setFocusMode]);
+
+  // Reload safety (s172). While a run is on screen it holds a live-work claim,
+  // so the deploy-adoption reload waits for the end screen instead of wiping
+  // the run mid-block; and the snapshot is refreshed at every block boundary so
+  // a reload we cannot avoid resumes where the learner was.
+  const running = !done && total > 0;
+  // Resume at the next block the learner still owes an answer for: an answered
+  // block has already been graded into FSRS and XP, so replaying it would
+  // double-count. When that lands past the end there is nothing to resume into
+  // and the stale snapshot is simply dropped on load.
+  const snapshot = () => {
+    if (!running || abandoned.current) return;
+    const resumeIndex = answered ? index + 1 : index;
+    if (resumeIndex >= total) return;
+    saveSessionSnapshot({
+      signature,
+      plan,
+      index: resumeIndex,
+      xpEarned,
+      correctCount,
+      combo,
+      loot,
+      sttDisabled,
+    });
+  };
+  useLiveWork(running, "session", snapshot);
+  useEffect(() => {
+    if (!running || answered) return;
+    saveSessionSnapshot({
+      signature,
+      plan,
+      index,
+      xpEarned,
+      correctCount,
+      combo,
+      loot,
+      sttDisabled,
+    });
+  }, [
+    running,
+    answered,
+    signature,
+    plan,
+    index,
+    total,
+    xpEarned,
+    correctCount,
+    combo,
+    loot,
+    sttDisabled,
+  ]);
 
   const award = (xp: number) => {
     addXp(xp);
@@ -218,6 +303,9 @@ function SessionRun({
   };
 
   const finish = () => {
+    // The run is over: nothing left to resume into.
+    abandoned.current = true;
+    clearSessionSnapshot();
     registerSession();
     // Sample competence here too, not just on the Fortschritt page: the curve
     // should have a point for every day the learner actually practised.

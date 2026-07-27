@@ -8,6 +8,7 @@ import {
   isServiceWorkerError,
 } from "./lib/recover";
 import { watchSwUpdates } from "./lib/swUpdate";
+import { installLiveWorkFlush } from "./lib/liveWork";
 // Self-hosted Inter (variable). Replaces the third-party rsms.me stylesheet —
 // no external font dependency, no IP leak, and a tighter CSP.
 import "@fontsource-variable/inter";
@@ -120,6 +121,10 @@ function paintFatal(_label: string, detail: unknown): void {
 // Application Error" before our React boundary can. Catch it here too and
 // self-heal by clearing the SW caches and reloading.
 watchSwUpdates();
+// Drafts and running sessions persist themselves on the way out, so even a
+// reload we do not control (a manual refresh, iOS discarding the tab) is
+// recoverable rather than lost work.
+installLiveWorkFlush();
 
 window.addEventListener("error", (e) => {
   const err = e.error ?? e.message;

@@ -1,3 +1,5 @@
+import { hasLiveWork } from "./liveWork";
+
 /**
  * Adopt a freshly deployed version without waiting for the user to relaunch
  * the app twice.
@@ -9,13 +11,18 @@
  * that means a deploy only becomes visible on the second relaunch, which reads
  * as "the fix didn't ship".
  *
- * Strategy, deliberately conservative about interrupting a learning session:
+ * Strategy, deliberately conservative about interrupting a learner:
+ * - A reload NEVER happens while a surface holds unsaved work (`hasLiveWork()`:
+ *   a writing draft, a running Üben session). Losing a half-written email to
+ *   pick up a deploy a few minutes earlier is a terrible trade, and it is
+ *   exactly what the founder reported in s172.
  * - If the new worker takes control within the first 30s after load (the
- *   normal update-on-launch case), reload immediately — the user has barely
- *   started, and this is exactly when they expect fresh content.
- * - If it takes control later (e.g. a deploy lands mid-session), defer the
- *   reload to the next time the app is resumed from the background, so an
- *   in-progress exercise is never yanked away.
+ *   normal update-on-launch case) and nothing is in progress, reload
+ *   immediately: the user has barely started, and this is when they expect
+ *   fresh content.
+ * - Otherwise the reload is deferred to the next time the app is resumed from
+ *   the background AND nothing is in progress. If work is still open at that
+ *   moment we simply keep waiting, re-checking on every later resume.
  * - When the app is resumed, also ask the browser to re-check `sw.js`
  *   (throttled to once a minute): iOS PWAs are usually resumed, not
  *   relaunched, so without this a long-lived app never sees new deploys.
@@ -29,15 +36,20 @@ export function watchSwUpdates(): void {
   let reloaded = false;
   let pendingReload = false;
 
-  const reload = () => {
+  /** Reload only when nothing would be destroyed; otherwise stay pending. */
+  const reloadIfSafe = () => {
     if (reloaded) return;
+    if (hasLiveWork()) {
+      pendingReload = true;
+      return;
+    }
     reloaded = true;
     window.location.reload();
   };
 
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (!hadController) return;
-    if (performance.now() < 30_000) reload();
+    if (performance.now() < 30_000) reloadIfSafe();
     else pendingReload = true;
   });
 
@@ -45,7 +57,9 @@ export function watchSwUpdates(): void {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") return;
     if (pendingReload) {
-      reload();
+      // Either this reloads, or work is still open and the update stays queued
+      // for the next resume. Re-checking `sw.js` is moot either way.
+      reloadIfSafe();
       return;
     }
     const now = Date.now();

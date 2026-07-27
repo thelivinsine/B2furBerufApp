@@ -410,6 +410,19 @@ and could not know a content point was missing, the Anredeform wrong, or the tex
   >8% of words, and at least 2x the grammar count): a text that misspelt is served the spelling
   tip with no LLM call at all, which is both the right feedback and free.
 
+## Drafts are never lost to a reload (s173)
+- Two different persistences, do not merge them:
+  - **`resumeDraft.ts`** — the sign-in hand-off. ONE draft, stashed deliberately when a guest hits
+    the login wall, consumed once, and its `resume: true` flag is what makes `AppShell` redirect
+    back to `/writing` after the OAuth round trip.
+  - **`draftAutosave.ts`** — the quiet autosave. localStorage, one draft PER mode (Fokus / Kurz /
+    Lang each keep their own, so a tab switch is not destructive), 7-day TTL. Written 500ms after
+    the last keystroke and again on unmount / pagehide; restored on mount, guided modes together
+    with the exact Aufgabe (`theme` + `promptIndex`) the text was written against. It must never
+    carry `resume`, or it would trigger the sign-in redirect.
+- Both trainers also hold a **live-work claim** (`lib/liveWork.ts`) while the editor is non-empty,
+  so the PWA's auto-update reload waits instead of throwing the draft away mid-sentence.
+
 ## Task ids and the evaluation reference
 - Every task carries a **permanent** `id` (`wt_<themeId>_<s|l><nn>`), enforced unique + pattern-
   matched by `lintWritingPrompts`. Same law as every other content id: retire from the surface,

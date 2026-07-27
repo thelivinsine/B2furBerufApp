@@ -1664,3 +1664,45 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   rule going forward: German is for the product's user-facing strings ONLY; conversation with the
   founder follows the founder's language.** No code change.
 - **Artifacts (prompts 16-18):** PR #739 (squash-merged) · `docs/PROJECT_STATUS.md` · this log
+
+## Session 173 (2026-07-27) — branch `claude/app-refresh-data-loss-01xd0e`
+
+- **Prompt 1 (verbatim, 2026-07-27):** `there's a frustrating bug in the app. Wheneevr the user is
+  working on something like writing an email or practicing an ubung session, the updates takes place
+  and the app refreshes! due to that the uben session progress or the writing draft is lost!!!!!!
+  This should be fixed asap!!` → Traced it to the ONLY automatic reload in the app,
+  `src/lib/swUpdate.ts`. With `registerType: "autoUpdate"` a new service worker takes control shortly
+  after a deploy, and the watcher then reloaded unconditionally: immediately if within 30s of load,
+  otherwise **at the next `visibilitychange` back to visible**, i.e. precisely when a learner returns
+  to the app from checking something else, mid-draft. Fixed in two layers.
+  - **Layer 1 (the actual bug): never reload over live work.** New `src/lib/liveWork.ts` holds a
+    module-level claim registry (module state, not a store, because the reloaders run outside React)
+    plus a `useLiveWork(active, label, flush)` hook. `hasLiveWork()` now gates both reload paths in
+    `swUpdate.ts`; an update that cannot be applied stays queued and retries on each later resume,
+    with the app running fine on the old bundle meanwhile. Claimed today by the Fokus / Kurz / Lang
+    editors (non-empty text) and by a running Üben run.
+  - **Layer 2: make an unavoidable reload recoverable.** The chunk-load self-heal
+    (`lib/recover.ts`), a manual refresh, and iOS discarding a backgrounded tab all still reload, so:
+    `src/features/writing/draftAutosave.ts` (localStorage, one draft per mode, 7-day TTL, debounced
+    500ms + on unmount/pagehide, restores with the Aufgabe it was written against, deliberately a
+    separate key from the `resumeDraft.ts` sign-in hand-off so it can never fire that redirect) and
+    `src/features/session/sessionResume.ts` (sessionStorage keyed by a launch-param signature, 3h
+    TTL; survives a tab reload, dies with the tab, so tomorrow's Üben press always composes fresh).
+    The session snapshot points at the next **unanswered** block, since an answered one is already
+    graded into FSRS/XP; it is cleared on finish, "Beenden" and "Neue Runde", each setting an
+    `abandoned` ref first so the unmount flush cannot write it straight back.
+    `installLiveWorkFlush()` in `main.tsx` flushes every claim on pagehide / beforeunload / hidden.
+  - **Verification:** `tests/liveWork.test.ts` adds 18 cases (registry claim/release/flush incl. a
+    throwing handler, per-mode draft isolation, blank + stale + corrupt storage, snapshot signature
+    mismatch, out-of-range index, TTL). Gates: typecheck clean · lint 0 errors (77 warning lines vs
+    78 on the untouched tree, so no new warnings) · test:unit **345/345** · build · check:bundle
+    119.1 kB. Service-worker update behavior itself is not testable from the sandbox; the founder
+    verifies on the live site.
+- **Artifacts (prompt 1):** `src/lib/liveWork.ts` (new) · `src/features/writing/draftAutosave.ts`
+  (new) · `src/features/session/sessionResume.ts` (new) · `tests/liveWork.test.ts` (new) ·
+  `src/lib/swUpdate.ts` · `src/lib/recover.ts` · `src/main.tsx` ·
+  `src/features/session/SessionPlayer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `CLAUDE.md` · `docs/areas/SESSION.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log

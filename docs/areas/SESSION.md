@@ -50,6 +50,19 @@ untouched (just not mounted). Reward tokens (`--reward`/`--reward-bg`, Koralle) 
 loot / combo / streak moments only; the header streak pill + the Fortschritt "Aktuelle Serie"
 StatCard ride them too (streak = celebration, not warning).
 
+## A running session survives a reload (s172)
+- `SessionPlayer` holds a **live-work claim** (`lib/liveWork.ts`) while a block is on screen, so the
+  PWA's auto-update reload waits for the end screen instead of wiping the run mid-block. See the
+  cross-cutting rule in `../../CLAUDE.md`.
+- `features/session/sessionResume.ts` snapshots the run (plan, index, XP/correct/combo tallies, loot,
+  the STT fallback flag) to **sessionStorage**, keyed by `sessionSignature()` of the launch params.
+  sessionStorage on purpose: it survives a reload of the tab and dies with it, so tomorrow's Üben
+  press always composes fresh, never silently resumes an abandoned run. 3h TTL as a backstop.
+- The snapshot always points at the next **unanswered** block: an answered block has already been
+  graded into FSRS and XP, so replaying it would double-count.
+- Cleared on finish, on "Beenden" and on "Neue Runde". Those set an `abandoned` ref first, since the
+  unmount that follows would otherwise flush the snapshot straight back.
+
 ## SRS & engines
 - `engine/srs.ts` — FSRS-6 spaced repetition (legacy SM-2 fields kept warm for rollback). Any
   edit → run `pnpm test:srs`.
