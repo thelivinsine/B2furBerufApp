@@ -122,8 +122,9 @@ step with an explicit "regenerate it" error and deploys nothing, rather than
 failing half-way; fix it by generating a new token and updating the same GitHub
 secret. Nothing else changes.
 
-**Migrations applied by hand.** Migration 0011 was run directly in the Dashboard
-SQL editor (s167), not through `supabase db push`, so it is NOT recorded in
+**Migrations applied by hand.** Migrations **0011** (s167) and **0012** (s171,
+`writing_evaluations.corrected_text`) were run directly in the Dashboard SQL
+editor, not through `supabase db push`, so neither is recorded in
 `supabase_migrations.schema_migrations`. That is safe: every statement in it is
 idempotent (`add column if not exists`, `create index if not exists`), so if
 `SUPABASE_DB_PASSWORD` is added later and CI re-applies it, the re-run is a

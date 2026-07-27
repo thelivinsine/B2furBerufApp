@@ -146,9 +146,18 @@ implementation of the two picks.
   (2) the Kurz/Lang RESULT card still shows only weakness + tip, so the correction appears first in
   Verlauf, not right after submitting: surfacing it there touches the locked trainer geometry and
   needs its own preview round. Optional: "In die Wiederholung" (turn a correction into an FSRS card).
-- **Founder ops note:** if `SUPABASE_DB_PASSWORD` is set, 0012 applies itself on merge; otherwise it
-  is one paste into the Dashboard SQL editor. Read the run summary of the Supabase workflow to tell
-  which happened ("Migrations skipped (no SUPABASE_DB_PASSWORD)").
+- **What actually happened on merge:** the Supabase workflow run for #734 shows "Deploy Edge
+  Functions: success" and "Apply migrations: **skipped**" — `SUPABASE_DB_PASSWORD` is still unset, so
+  the founder applied **0012 by hand** in the Dashboard SQL editor. Like 0011 it is therefore absent
+  from `supabase_migrations.schema_migrations`; both are idempotent, so a later CI `db push` is a
+  no-op (recorded in `docs/plans/PHASE2_SETUP.md`). The founder will look at the DB-password secret
+  later; until it exists every migration needs one paste. Note Supabase never re-displays the
+  database password after project creation, so obtaining a usable value means resetting it — safe
+  here, since the password appears nowhere in this project except that workflow (the app uses the
+  anon and service-role keys).
+- **Not verifiable from the sandbox:** the network policy blocks `*.supabase.co` (403 on CONNECT), so
+  whether the column is live has to be confirmed in the app: write a Kurz text, open it in Verlauf,
+  and the Original/Korrigiert toggle should appear.
 
 **Handoff after session 170 (2026-07-26): Praktisch toggle joins the squircle language;
 Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#730**). Founder: adapt the

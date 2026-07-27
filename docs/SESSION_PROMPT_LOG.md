@@ -1534,3 +1534,19 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `supabase/functions/evaluate-writing/index.ts` · `src/lib/writing.ts` · `src/lib/wordDiff.ts` ·
   `src/features/writing/WritingHistory.tsx` · `tests/wordDiff.test.ts` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` · this log · PR (this one)
+- **Prompt 8 (verbatim, 2026-07-26):** `when I tried to generate a db password last time, I saw that it's already generated in supabase` →
+  Explained the quirk: Supabase creates the database password at project creation and NEVER re-displays
+  it, so "already generated" is expected and the value is not retrievable; the only way to obtain a
+  usable one is a reset. Verified by grep that the password appears nowhere in this project except
+  `.github/workflows/supabase.yml` (the app authenticates with the anon key in the browser and the
+  service-role key in Edge Functions), so a reset cannot break the app or the data. Offered three
+  routes and recommended the smallest: paste the one-line `alter table ... add column if not exists`
+  into the SQL editor now, treat the secret as separate housekeeping.
+- **Prompt 9 (verbatim, 2026-07-26):** `i did the third steo for now. I'll check the password later` →
+  Migration 0012 is therefore hand-applied and, like 0011, NOT recorded in
+  `supabase_migrations.schema_migrations`; both are idempotent so a later CI `db push` is a no-op.
+  Recorded that in `docs/plans/PHASE2_SETUP.md` (which already tracked 0011) and in the s171 handoff.
+  Could NOT verify the column from the sandbox: the network policy answers 403 to CONNECT for
+  `*.supabase.co`, so the check is the app itself (write a Kurz text -> open it in Verlauf -> the
+  Original/Korrigiert toggle appears). No code change in this pass.
+- **Artifacts (prompts 8-9):** `docs/plans/PHASE2_SETUP.md` · `docs/PROJECT_STATUS.md` · this log
