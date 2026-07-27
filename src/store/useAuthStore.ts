@@ -179,16 +179,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       password,
       options: captchaToken ? { captchaToken } : undefined,
     });
-    // An unconfirmed account comes back as an ERROR here, not as a session-less
-    // success, so the caller gets `needsConfirmation` from the message rather
-    // than from a missing session.
+    // An unconfirmed account comes back as an ERROR here, so `needsConfirmation`
+    // is read from the message and NOTHING else. It deliberately does not fall
+    // back to "no session came back": a successful sign-in that returned a
+    // session-less payload for any reason would then be reported as needing
+    // confirmation, and the dialog would answer a correct password with "check
+    // your inbox". A sign-in with no error is a sign-in.
     const unconfirmed = !!error && error.message.toLowerCase().includes("email not confirmed");
     set({ busy: false, error: error ? friendlyError(error.message) : null });
-    return {
-      ok: !error,
-      needsConfirmation: unconfirmed || (!error && !data.session),
-      alreadyRegistered: false,
-    };
+    void data;
+    return { ok: !error, needsConfirmation: unconfirmed, alreadyRegistered: false };
   },
 
   resendConfirmation: async (email) => {
