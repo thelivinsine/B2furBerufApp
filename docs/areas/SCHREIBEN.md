@@ -145,15 +145,26 @@ Kurz. Design = variant C, "development first" (founder-picked s171):
   groups over `TREND_MONTHS` (3) calendar months, oldest bar lightest, with a per-category trend
   arrow (down = `--success`, up = `--warning`, flat = muted) and a success badge for the biggest
   drop ("Kasus & Artikel: 33 % weniger"). Footer = "Größte Schwachstelle: X" + "Jetzt üben".
+- **The monthly layout is ALWAYS the card's shape** (founder s171 follow-up: with only one month on
+  record the old totals-only fallback read as a different card from the approved preview). What waits
+  for evidence is the CLAIM, not the shape: the arrows and the "% weniger" badge appear only once two
+  months qualify, and until then a single muted line explains why ("Der Trend erscheint ab dem
+  zweiten Monat."). Never restore a second layout here.
 - **Honesty rules that must not be weakened:** a month only counts as a comparison point with
   `MIN_TEXTS_PER_MONTH` (2) texts or more, so a quiet month never reads as progress; a month with
-  no texts prints "–", never 0; with fewer than two comparable months the card falls back to plain
-  totals plus "Der Trend erscheint ab dem zweiten Monat." The first live check caught exactly this:
-  compared against a one-text month, an IMPROVING category rendered as worsening.
+  no texts prints "–", never 0. The first live check caught exactly what this prevents: compared
+  against a one-text month, an IMPROVING category rendered as worsening.
+- Bar groups sit on `grid-cols-2 sm:grid-cols-3` with a shorter bar area on mobile (`h-12 sm:h-16`),
+  so three categories stay compact on a phone.
 - **List = compact rows** (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron). The row
   disclosure holds, in the order it happened, the **Aufgabe** (resolved from `task_id`, s167; older
   rows without one omit it), **Dein Text**, then the **Tipp** next to the practice CTA, with delete
   and the standalone AI line at the foot.
+- **The row is ONE line at every width** (founder s171 follow-up). Below `sm` the date shortens
+  ("16. Jun") and the **Thema badge is dropped**, because a long Thema pushed the weakness chip onto a
+  second line; date + Art + chip are what the learner scans. The Thema then reappears as a badge at
+  the TOP of the expanded area (`sm:hidden`), so the topic is never invisible on a phone: an older
+  entry carries no stored Aufgabe to name it.
 - Kurz/Lang filter (`ModeSwitcher`, the shipped grey-track/white-pill language) appears ONLY when
   both kinds exist; the count badge next to "Letzte Auswertungen" reflects the filtered list.
 - `getWritingHistory` returns `null` on a failed query (never `[]`), so the error card with

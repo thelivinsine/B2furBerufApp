@@ -166,8 +166,11 @@ once. Fokus: detected form = white pill + green dot; correction card = Original/
 button on the tile row. Rails are Himmelblau tiles with header reset icons. **Verlauf** (picked
 s171, variant C "Entwicklung zuerst"): a "Deine Entwicklung" card leads with per-category monthly
 bars + trend arrows (down = green, up = amber) and a "X % weniger" success badge, then a COMPACT
-row list (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron) whose disclosure holds, in
-event order, the Aufgabe, Dein Text, then the Tipp beside the practice CTA. A trend is only ever claimed from months with
+row list (date · Thema · Kurz/Lang · Himmelblau weakness chip · chevron; on mobile the row stays ONE
+line by shortening the date and dropping the Thema, which returns inside the expanded area) whose
+disclosure holds, in event order, the Aufgabe, Dein Text, then the Tipp beside the practice CTA. The
+monthly bar layout is ALWAYS the card's shape, even with one month of data; only the arrows and the
+badge wait for evidence. A trend is only ever claimed from months with
 ≥2 texts; months without texts print "–".
 
 **Fortschritt (`/analytics`)** (picked s171, variant 3 "Kompetenzkurve"): the Überblick block is

@@ -48,6 +48,13 @@ function formatDate(iso: string): string {
   }).format(new Date(iso));
 }
 
+/** Compact date for narrow rows ("16. Jun"). */
+function formatDateShort(iso: string): string {
+  return new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(
+    new Date(iso),
+  );
+}
+
 function monthKeyOf(iso: string): string {
   const d = new Date(iso);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -281,9 +288,13 @@ function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
           )}
         </div>
 
-        {showTrend ? (
-          <div className="grid gap-4 sm:grid-cols-3">
-            {model.top.map(({ weakness, counts, direction }) => {
+        {/* The monthly layout is ALWAYS the shape of this card (founder s171
+            follow-up: the earlier totals-only fallback read as a different card
+            from the approved preview). What waits for evidence is the CLAIM: the
+            arrows and the "% weniger" badge appear only once two months carry
+            enough writing to compare. */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {model.top.map(({ weakness, counts, direction }) => {
               const area = practiceAreaById(weakness);
               const Arrow =
                 direction === "down"
@@ -295,7 +306,7 @@ function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
                       : null;
               return (
                 <div key={weakness}>
-                  <div className="flex h-16 items-end gap-1.5" aria-hidden>
+                  <div className="flex h-12 items-end gap-1.5 sm:h-16" aria-hidden>
                     {counts.map((n, i) => (
                       <div
                         key={i}
@@ -343,36 +354,14 @@ function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
                   </p>
                 </div>
               );
-            })}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="space-y-2.5">
-              {model.ranked.slice(0, 5).map(([weakness, count], i) => {
-                const area = practiceAreaById(weakness);
-                return (
-                  <div key={weakness} className="space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className={cn("font-medium", i === 0 && "text-primary")}>
-                        {area?.labelDe ?? weakness}
-                      </span>
-                      <span className="tabular-nums text-muted-foreground">{count}×</span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className={cn(
-                          "h-full rounded-full",
-                          i === 0 ? "bg-primary" : "bg-muted-foreground/40",
-                        )}
-                        style={{ width: `${Math.round((count / model.ranked[0][1]) * 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-xs text-muted-foreground">Der Trend erscheint ab dem zweiten Monat.</p>
-          </div>
+          })}
+        </div>
+
+        {/* Explains the missing arrows while the evidence is thin. */}
+        {!showTrend && (
+          <p className="text-xs text-muted-foreground">
+            Der Trend erscheint ab dem zweiten Monat.
+          </p>
         )}
 
         {topArea && (
@@ -491,10 +480,22 @@ function HistoryEntry({
           aria-expanded={expanded}
           className="flex w-full flex-wrap items-center gap-2 p-4 text-left transition-colors hover:bg-muted/40"
         >
-          <span className="text-xs font-medium tabular-nums text-muted-foreground">
+          {/* Narrow screens get the short date and NO Thema badge, so the row
+              stays ONE line (founder s171 follow-up): date + Art + weakness chip
+              are what the learner scans, and a long Thema pushed the chip onto a
+              second line. Nothing is lost, since the expanded row opens with the
+              Aufgabe, which names the topic in full. */}
+          <span className="text-xs font-medium tabular-nums text-muted-foreground sm:hidden">
+            {formatDateShort(entry.created_at)}
+          </span>
+          <span className="hidden text-xs font-medium tabular-nums text-muted-foreground sm:inline">
             {formatDate(entry.created_at)}
           </span>
-          {theme && <Badge variant="muted">{theme.titleDe}</Badge>}
+          {theme && (
+            <Badge variant="muted" className="hidden sm:inline-flex">
+              {theme.titleDe}
+            </Badge>
+          )}
           <Badge variant="outline">{entry.length === "short" ? "Kurz" : "Lang"}</Badge>
           <span className="ml-auto flex items-center gap-2">
             {area && <WeaknessChip>{area.labelDe}</WeaknessChip>}
@@ -509,6 +510,15 @@ function HistoryEntry({
 
         {expanded && (
           <CardContent className="space-y-3 border-t border-border p-4">
+            {/* The Thema left the collapsed row on narrow screens, so it reappears
+                here: an older entry carries no stored Aufgabe, and without this the
+                topic would be invisible on a phone. */}
+            {theme && (
+              <Badge variant="muted" className="sm:hidden">
+                {theme.titleDe}
+              </Badge>
+            )}
+
             {/* Read in the order it happened: the task, the answer, then the
                 advice, which lands next to the practice button. The Aufgabe is
                 resolvable again since evaluations record the permanent

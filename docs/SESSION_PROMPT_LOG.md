@@ -1550,3 +1550,18 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `*.supabase.co`, so the check is the app itself (write a Kurz text -> open it in Verlauf -> the
   Original/Korrigiert toggle appears). No code change in this pass.
 - **Artifacts (prompts 8-9):** `docs/plans/PHASE2_SETUP.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 10 (verbatim, 2026-07-26, with a screenshot of the live mobile Verlauf):** `is it how it's supposed to look? the first tile isn't looking like the preview` →
+  Diagnosed rather than patched: the card was in its totals-only FALLBACK because all four of their
+  texts are from June and July has none, so no trend was provable (`MIN_TEXTS_PER_MONTH`). Working as
+  designed, but the founder is right that it does not read as the approved preview. Also flagged that
+  their four entries predate the correction feature, so no Original/Korrigiert toggle on them, and
+  that the weakness chip wraps to a second line on mobile. Asked which they wanted; both answers were
+  "fix it": **always the monthly layout** (arrows and badge still gated on evidence, empty months print
+  "–") and **tighten the row**. Implemented: `grid-cols-2 sm:grid-cols-3` with `h-12 sm:h-16` bars, the
+  second layout deleted, short date + no Thema badge below `sm` with the Thema restored at the top of
+  the expanded area (an older entry has no Aufgabe to name the topic). Verified at true 360 and 390px
+  by loading the app in an iframe of that width: headless Chromium clamps its own viewport to 500px
+  minimum, so `--window-size=390` crops and fakes an overflow. Gates: typecheck · lint 0 errors ·
+  test:unit 318/318 · build · check:bundle 118.4 kB.
+- **Artifacts (prompt 10):** `src/features/writing/WritingHistory.tsx` · `docs/areas/SCHREIBEN.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` · this log
