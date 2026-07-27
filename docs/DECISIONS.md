@@ -802,3 +802,19 @@ app, not only in the preview.
 15. **The Kurz/Lang result card was left alone.** Showing the correction at the moment of submitting is
     the higher-value placement, but that surface carries the locked measured-height geometry from
     s166-s169, so it needs its own preview round instead of being changed as a side effect.
+
+### s171 review round — the card's shape does not wait for data
+
+16. **A surface must not change LAYOUT based on how much data exists.** The Entwicklung card used to
+    fall back to totals-only bars until two months qualified, which meant the first thing a new learner
+    saw was a card the founder had never approved. Now the monthly layout is always the shape, and only
+    the *claim* (arrows, "% weniger" badge) waits for evidence. Generalise this: gate the assertion, not
+    the design.
+17. **On a phone the Thema badge loses to the weakness chip.** A row must stay one line; date + Art +
+    weakness is what gets scanned, so below `sm` the date shortens and the Thema drops, reappearing at
+    the top of the expanded area. It cannot simply vanish, because an entry written before s167 has no
+    stored Aufgabe to name the topic.
+18. **Headless Chromium clamps its viewport to 500px minimum.** `--window-size=390` lays out at 500 and
+    crops the screenshot, which is indistinguishable from real horizontal overflow and nearly sent this
+    session chasing a non-existent bug. Verify phone widths with the app in an iframe of the target
+    width inside a wider window.

@@ -155,6 +155,19 @@ implementation of the two picks.
   database password after project creation, so obtaining a usable value means resetting it — safe
   here, since the password appears nowhere in this project except that workflow (the app uses the
   anon and service-role keys).
+- **Founder review round on the live mobile Verlauf** (screenshot): the Entwicklung card was showing
+  the totals-only FALLBACK, because all four of their texts sit in one month (June) and July has none,
+  so no trend was provable. Working as designed, but it read as "not the preview". Both fixes
+  founder-picked: (1) the **monthly layout is now always the card's shape** (empty months print "–");
+  only the arrows and the "% weniger" badge still wait for two qualifying months, with one muted line
+  explaining their absence. (2) The row is **one line at every width**: below `sm` the date shortens
+  and the Thema badge drops (a long Thema was pushing the weakness chip onto a second line), and the
+  Thema reappears at the top of the expanded area, since an older entry has no stored Aufgabe to name
+  the topic. Bar area is `h-12 sm:h-16` on `grid-cols-2 sm:grid-cols-3`.
+- **Screenshot lesson worth keeping:** headless Chromium clamps its viewport to a 500px MINIMUM, so
+  `--window-size=390` silently lays out at 500 and crops, which looks exactly like horizontal
+  overflow. Verify true phone widths by loading the app in an IFRAME of that width inside a wider
+  window (`public/__frame.html` pattern, deleted after use).
 - **Not verifiable from the sandbox:** the network policy blocks `*.supabase.co` (403 on CONNECT), so
   whether the column is live has to be confirmed in the app: write a Kurz text, open it in Verlauf,
   and the Original/Korrigiert toggle should appear.
