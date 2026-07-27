@@ -20,7 +20,7 @@ setting this sandbox cannot read.
 
 | # | Severity | Area | Finding | State |
 |---|---|---|---|---|
-| F1 | High (conditional) | Auth / admin | Founder gate keyed on an unverified email claim | **Founder action** |
+| F1 | High (conditional) | Auth / admin | Founder gate keyed on an unverified email claim | Migration 0013 ready to paste |
 | F2 | High | Dependencies | 10 advisories; react-router 6.x has an open redirect → XSS with **no fix in the 6.x line** | **Founder decision** |
 | F3 | Medium | Privacy | Writing drafts survived sign-out and account deletion on the device | ✅ Fixed here |
 | F4 | Medium | Abuse / cost | Feedback endpoint could be flooded with rows (per-IP guard is header-spoofable) | ✅ Fixed here |
@@ -70,37 +70,37 @@ dashboard:
 The gate also never checks that the email is confirmed, so it would accept an unverified address
 even where the platform allowed one.
 
-**Recommended fix, in order of durability:**
+**Fix: `supabase/migrations/0013_admins_table.sql`, ready to paste into the SQL editor.**
 
-1. Immediately: confirm in the dashboard that **both** addresses are registered accounts, and that
-   Authentication → Sign In / Providers → Email → "Confirm email" is **on**.
-2. Properly: stop deriving admin status from a mutable claim. Add an `admins(user_id uuid primary
-   key)` table seeded with the two real user ids, and make `is_founder()` read it:
+It stops deriving admin status from a mutable claim. A user id cannot be changed by its owner, so
+gating on `auth.uid()` against a service-role-only `admins` table removes the dependency on any auth
+setting — and on whether those two Gmail addresses stay claimed. The migration:
 
-```sql
-create table if not exists public.admins (
-  user_id uuid primary key references auth.users (id) on delete cascade,
-  added_at timestamptz not null default now()
-);
-alter table public.admins enable row level security;  -- no client policies: service-role only
+1. creates `public.admins` with RLS on and **no** client policies, so not even an admin can grant
+   admin from the browser;
+2. seeds it from the accounts that hold the two founder addresses today (reading `auth.users`
+   server-side, which is the one moment the email is still trustworthy);
+3. **refuses to swap the gate if that seed matched nobody** — a `do $$ … raise exception` block, so a
+   wrong address produces a readable error instead of a gate that admits no one;
+4. replaces the `is_founder()` body. Every policy and RPC already routes through that one function,
+   so all of them re-point at once;
+5. re-points the `provenance_reviews` policy, the last place still carrying the literal email list
+   (from 0007), at `is_founder()` too, and adds the pinned `search_path` from F12 to both helpers.
 
--- Seed FIRST, verify the ids are right, and only then swap the function body:
---   insert into public.admins (user_id)
---   select id from auth.users where lower(email) in
---     ('thelivinsine@gmail.com','thesuhaspala@gmail.com');
+Idempotent, and the rollback to the 0008 email gate is in a comment at the bottom of the file.
+`tests/admin.test.ts` pins the new gate (reads `auth.uid()`, never `auth.jwt()`, no client policies
+on `admins`, lock-out guard present).
 
-create or replace function public.is_founder()
-returns boolean language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.admins a where a.user_id = auth.uid());
-$$;
-```
+`src/lib/admin.ts` deliberately still lists the two emails: that gate only decides whether the admin
+UI *renders*, and the server is what protects the data. A third admin added to the table later needs
+adding there too, or they reach an `/admin` that redirects home.
 
-A user id cannot be changed by its owner, so the gate stops depending on any auth setting. Because
-this migration can lock the founder out if the seed is wrong, it is written here rather than
-applied: seed and verify the `admins` rows first, then replace the function in the same session.
-`src/lib/admin.ts` (the cosmetic client-side gate) and the `provenance_reviews` policy from 0007
-should be pointed at the same source at that time; `tests/admin.test.ts` pins the two lists in
-lockstep and will need updating with them.
+**Still worth doing separately:** turn Authentication → Sign In / Providers → Email → "Confirm
+email" **on**, so nobody can register an address they do not own. Note the cost: Supabase's built-in
+mailer is rate-limited to a handful of messages per hour, so confirmations should go live together
+with real SMTP (the Resend key already exists for the feedback mail) or sign-ups will start
+silently failing. That is why it is a separate task from the migration above, which fixes the admin
+exposure on its own.
 
 ---
 
@@ -376,9 +376,12 @@ Worth recording, so the next audit knows what has already been ruled out.
 
 ## Founder action list
 
-1. **Verify both admin addresses are registered accounts, and turn "Confirm email" on** in Supabase
-   Auth. (F1 — the one item that can hand someone else the admin panel.)
-2. Decide on the react-router 6 → 7 migration; run the safe toolchain updates meanwhile. (F2)
+1. **Paste `supabase/migrations/0013_admins_table.sql` into the Supabase SQL editor** (Dashboard →
+   SQL Editor → New query → paste → Run), then sign out and back in and open `/admin` to confirm you
+   still get in. ~2 minutes, and it closes F1 on its own. The migration refuses to install a gate
+   that would lock you out, so the worst case is a readable error and nothing changed.
+2. Decide on the react-router 6 → 7 migration; the safe toolchain updates can ship meanwhile. (F2)
 3. Optional, cheap, do-anytime: set `ALLOWED_ORIGINS` to the real domains (F7); revoke
-   `log_gdpr_event` from `anon` (F9); enable the leaked-password check (above).
+   `log_gdpr_event` from `anon` (F9); enable the leaked-password check (above); turn "Confirm email"
+   on once real SMTP is configured (F1's second half).
 4. Before a paid launch: close the limit race (F6) and schedule the retention job (F11).

@@ -1778,3 +1778,35 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/writing/draftAutosave.ts` · `src/lib/cloudSync.ts` · `src/lib/dataExport.ts` ·
   `supabase/functions/submit-feedback/index.ts` · `docs/strategy/SECURITY.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 2 (verbatim, 2026-07-27):** `1. what concrete action point do I have here?\n2.  You lost
+  me - explain it in plain language?` → The audit was written for a reader who already knew the
+  system; the founder is non-technical, so the report handed them a decision rather than a task.
+  Fixed the substance, not just the wording: F1's remediation was "drafted, deliberately not applied
+  because a wrong seed locks you out", which offloaded the risk onto the person least able to carry
+  it. Made it safe to apply instead, so the highest finding became ONE copy-paste.
+  - **`supabase/migrations/0013_admins_table.sql` (new).** Creates `public.admins` (RLS on, NO client
+    policies, so not even an admin can grant admin from the browser); seeds it from the accounts
+    holding the two founder addresses TODAY, reading `auth.users` server-side (the one moment the
+    email is still trustworthy); a `do $$ … if v_n = 0 then raise exception` guard that REFUSES to
+    swap the gate when the seed matched nobody, so a wrong address gives a readable error instead of
+    an admin panel that admits no one; then replaces the `is_founder()` body with
+    `exists (select 1 from public.admins where user_id = auth.uid())`. SECURITY DEFINER (the table
+    has no policies) with `set search_path = pg_catalog, public`, which also closes F12. Every policy
+    and RPC already routes through that one function, so all of them re-point at once; the
+    `provenance_reviews` policy from 0007 was the last place still carrying the literal email list
+    and is re-pointed too. Idempotent, rollback to the 0008 gate in a trailing comment.
+  - **`tests/admin.test.ts` +6 cases** pinning the replacement: gates on `auth.uid()` against
+    `public.admins`, never touches `auth.jwt()` or a gmail literal, is SECURITY DEFINER with a pinned
+    search_path, keeps `admins` free of client policies, and carries the lock-out guard. 0008's own
+    lockstep assertions stay as they are: a migration is history, not a live file.
+  - **`src/lib/admin.ts` deliberately unchanged.** It decides whether the admin UI renders, not
+    whether data is reachable; noted in the migration and the report that a future third admin needs
+    adding in both places.
+  - **Corrected a recommendation rather than repeating it:** the first draft said "turn Confirm email
+    on today". Supabase's built-in mailer is rate-limited to a handful of messages an hour, so doing
+    that before real SMTP is configured would silently break sign-ups. It is now a separate, later
+    task, and the migration is what closes the admin exposure on its own.
+  - Report, status doc and the founder action list rewritten around the one concrete step.
+    Gates: typecheck · lint 0 errors · test:unit **351/351**.
+- **Artifacts (prompt 2):** `supabase/migrations/0013_admins_table.sql` (new) · `tests/admin.test.ts` ·
+  `docs/reports/security-audit-2026-07-27.md` · `docs/PROJECT_STATUS.md` · this log

@@ -83,3 +83,56 @@ describe("server-side email gate lockstep", () => {
     }
   });
 });
+
+/**
+ * Migration 0013 (security audit F1) moves the gate off the email claim, which
+ * an account holder can change, and onto a table of user ids, which they
+ * cannot. 0008 keeps its original body on purpose (migrations are a history,
+ * not a live file), so these assertions pin the REPLACEMENT.
+ */
+describe("0013 founder gate (user ids, not emails)", () => {
+  const sql = readFileSync(
+    resolve(process.cwd(), "supabase/migrations", "0013_admins_table.sql"),
+    "utf8",
+  );
+  const gate = sql.match(
+    /create or replace function public\.is_founder\(\)[\s\S]*?\$\$;/,
+  )?.[0];
+
+  it("gates on auth.uid() against public.admins", () => {
+    expect(gate).toBeTruthy();
+    expect(gate).toContain("public.admins");
+    expect(gate).toContain("auth.uid()");
+  });
+
+  it("never reads the email claim", () => {
+    // The whole point: a changeable property must not decide access.
+    expect(gate).not.toContain("auth.jwt()");
+    expect(gate).not.toMatch(/@gmail\.com/);
+  });
+
+  it("can read the policy-free admins table, with a pinned search_path", () => {
+    expect(gate).toContain("security definer");
+    expect(gate).toContain("set search_path");
+  });
+
+  it("refuses to install the gate when the seed found no account", () => {
+    // Without this guard a bad seed would swap in a gate that admits nobody.
+    expect(sql).toMatch(/select count\(\*\) into v_n from public\.admins/);
+    expect(sql).toMatch(/if v_n = 0 then[\s\S]*?raise exception/);
+  });
+
+  it("leaves the admins table without client policies", () => {
+    expect(sql).toContain("alter table public.admins enable row level security");
+    expect(sql).not.toMatch(/create policy[^\n]*on public\.admins/);
+  });
+
+  it("re-points the last hard-coded email policy (provenance_reviews) at is_founder()", () => {
+    const policy = sql.match(
+      /create policy "provenance_reviews_founder_all"[\s\S]*?;/,
+    )?.[0];
+    expect(policy).toBeTruthy();
+    expect(policy).toContain("public.is_founder()");
+    expect(policy).not.toMatch(/@gmail\.com/);
+  });
+});

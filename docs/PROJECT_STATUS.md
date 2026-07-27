@@ -143,9 +143,14 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   `config.toml` has `enable_confirmations = false`. If the hosted project matches that, and if
   either address is not already registered, anyone can claim it via the guest-upgrade path
   (`updateUser({email})`, `useAuthStore.ts:121`) and get the feedback inbox plus `app_config` write.
-  Two steps: confirm both accounts exist and turn "Confirm email" on today; then move the gate to an
-  `admins(user_id)` table (migration drafted in the report, deliberately not applied — a wrong seed
-  locks the founder out).
+  **`supabase/migrations/0013_admins_table.sql` fixes it** and is the founder's one action: it moves
+  the gate onto an `admins(user_id)` table (service-role only, no client policies), seeds it from the
+  accounts holding those addresses today, and REFUSES to swap `is_founder()` if the seed matched
+  nobody, so a wrong address errors out instead of locking everyone out. It also re-points the last
+  hard-coded email policy (`provenance_reviews`, from 0007) at `is_founder()` and pins `search_path`
+  on both helpers (F12). Idempotent, rollback in a trailing comment, pinned by `tests/admin.test.ts`.
+  Turning "Confirm email" on is a SEPARATE, later task: Supabase's built-in mailer is rate-limited to
+  a few messages an hour, so it needs real SMTP first or sign-ups start failing.
 - **Also open:** `pnpm audit` is no longer 0 (7 high + 3 moderate); react-router 6.x has an open
   redirect with **no fix in the 6.x line**, so a 6→7 migration needs scheduling (the app is not
   reachable through it today — every `navigate()` target is built from internal ids, and that is now
@@ -153,9 +158,9 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   daily/monthly limits are check-then-act so parallel requests slip past them (bounded by the $5
   fuse); `log_gdpr_event()` is callable by `anon`; no retention job on learner text.
 - **Gates:** typecheck · lint 0 errors (75 warnings, same as the untouched tree) · test:unit
-  **345/345** · build · check:bundle 119.7 kB.
-- **Next:** the founder works the action list at the end of the report (item 1 first). Nothing in
-  this session changes what a learner sees.
+  **351/351** · build · check:bundle 119.7 kB.
+- **Next:** the founder pastes migration 0013 into the Supabase SQL editor (the whole action list is
+  at the end of the report). Nothing in this session changes what a learner sees.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
