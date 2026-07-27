@@ -315,7 +315,13 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       Exam mode, Quiz, and the Writing coach.
     - **Progress & data visualization:** the Dashboard (ties #1) and Analytics — SRS due/mastery
       views, XP/levels/streaks, per-theme and per-weakness breakdowns, using the existing `recharts`
-      dependency. Define a consistent chart language.
+      dependency. Define a consistent chart language. **PARTLY DELIVERED in s171** (founder-picked
+      variant 3): Fortschritt now leads with a Kompetenz curve sampled daily into
+      `masteryHistory`, XP moved into Details, and the weakness ranking has ONE home. Schreiben's
+      Verlauf got its weakness-trend card (variant C). What remains for this item is the rest of the
+      components (vocabulary, collocations, grammar, Redemittel, dialogues, exam, quiz) and the
+      written cross-component chart language; see `docs/areas/SESSION.md` §Fortschritt and
+      `docs/areas/SCHREIBEN.md` §Verlauf for the two shipped surfaces before redesigning them.
     - **Cross-cutting:** a shared visual vocabulary, empty/loading/error states, motion
       (`framer-motion`) guidelines, dark-mode, and accessibility (contrast, reduced-motion).
     - Deliver mockups/specs per component and a build order. Ties into #1 (Dashboard redesign) and #6

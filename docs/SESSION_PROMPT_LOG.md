@@ -1565,3 +1565,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   test:unit 318/318 · build · check:bundle 118.4 kB.
 - **Artifacts (prompt 10):** `src/features/writing/WritingHistory.tsx` · `docs/areas/SCHREIBEN.md` ·
   `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` · this log
+- **Prompt 11 (verbatim, 2026-07-26):** `document the session if everything is done` →
+  Most of session 171's documentation had already shipped inside its PRs (#733 the redesign, #734 the
+  correction, #735 the hand-applied-migration note, #736 the review round): PROJECT_STATUS header + s171
+  handoff with the s169 handoff rotated into the W30 archive, prompt-log entries 1-10, DECISIONS items
+  1-18, `docs/areas/SCHREIBEN.md` (new Verlauf section), `docs/areas/SESSION.md` (Fortschritt page
+  order + competence sampling), the `/design` skill anchors for both surfaces, and
+  `docs/plans/PHASE2_SETUP.md`. This pass closed the loop: swept for stale references (clean — no
+  "slated for rework" survives, nothing still lists the correction as an open follow-up, no
+  `WeaknessPanel` mentions remain anywhere), marked backlog item #23's "Progress & data visualization"
+  strand as PARTLY DELIVERED so a future session does not re-plan the two shipped surfaces, and logged
+  this prompt. PROJECT_STATUS is 199 lines (under the ~250 rule) holding s171 + s170.
+- **Artifacts (prompt 11):** `docs/PROJECT_REFERENCE.md` · this log
+- **Session 171 summary:** five merges. **#685** lighter Sidebar selection · **#733** Verlauf + Fortschritt
+  redesign (founder picks C and 3) + daily competence sampling · **#734** the correction stored and shown
+  in Verlauf (migration 0012, hand-applied by the founder) · **#735** the ops record for that ·
+  **#736** the founder's live-mobile review round. Open, both needing a founder go-ahead: give **Fokus**
+  a history (which also unlocks the Fokus filter segment), and surface the correction on the Kurz/Lang
+  RESULT card, which touches the locked trainer geometry and therefore needs its own preview round.
