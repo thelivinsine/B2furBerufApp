@@ -1698,6 +1698,14 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
     78 on the untouched tree, so no new warnings) · test:unit **345/345** · build · check:bundle
     119.1 kB. Service-worker update behavior itself is not testable from the sandbox; the founder
     verifies on the live site.
+  - **Shipped under the standing auto-ship approval** (the founder called the bug "asap" and a
+    feature-branch push does not touch the live site): commit `fbd4ba1`, **PR #740** into `main`,
+    squash-merged as `805fff0` once CI `lint-content` came back green, then the required post-merge
+    housekeeping (`git fetch origin main` → `git reset --hard origin/main` →
+    `git push --force-with-lease`), tree clean.
+  - **One design choice worth recording:** no "a new version is available, reload?" banner. The
+    complaint was interruption; a prompt is a second interruption. Deferring the update to the next
+    safe resume ships the same deploy without asking the learner for anything.
 - **Artifacts (prompt 1):** `src/lib/liveWork.ts` (new) · `src/features/writing/draftAutosave.ts`
   (new) · `src/features/session/sessionResume.ts` (new) · `tests/liveWork.test.ts` (new) ·
   `src/lib/swUpdate.ts` · `src/lib/recover.ts` · `src/main.tsx` ·
@@ -1705,4 +1713,13 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/writing/fokus/FokusTrainer.tsx` · `CLAUDE.md` · `docs/areas/SESSION.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
-  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log · commit `fbd4ba1` · PR #740 (`805fff0`)
+- **Prompt 2 (verbatim, 2026-07-27):** `document the session?` → The area docs, the CLAUDE.md
+  invariant and the s173 handoff had already shipped inside PR #740, but they were written **before**
+  the merge, so they recorded no PR number and no outcome. Closed that gap: the status header and the
+  s173 handoff now carry "Merged (PR #740, `805fff0`)" and the branch name; the handoff gained the
+  hard-refresh caveat (a stale service worker can serve the pre-fix build for one launch), a
+  "worth knowing for the next reload-ish change" note (claiming and persisting are each necessary,
+  neither is sufficient alone) and the deliberate no-update-banner decision; and the prompt-1 entry
+  above gained its ship record. No code changed.
+- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log

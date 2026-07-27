@@ -164,7 +164,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - The deploy job retries `actions/deploy-pages` up to 3 times to absorb GitHub's transient Pages
   flake; a green run may show a red attempt 1 (expected).
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
-  before diagnosing "missing" changes.
+  before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft
+  or session is open**, so a learner mid-task adopts the new build at their next clean resume.
 
 ## Workflow
 - **Token/context discipline:** prefer targeted Grep/Glob over whole-file reads; batch

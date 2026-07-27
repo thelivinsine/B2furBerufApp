@@ -4,7 +4,7 @@ _Last updated: 2026-07-27 (session 173). **A deploy can no longer refresh a lear
 The PWA's auto-update reload now waits while any surface holds unsaved work (`src/lib/liveWork.ts`),
 and both kinds of work persist so even an unavoidable reload is recoverable: writing drafts autosave
 per mode (`draftAutosave.ts`), and a running Üben session snapshots its plan + position
-(`sessionResume.ts`). Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
+(`sessionResume.ts`). **Merged (PR #740).** Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
 ONE shared module (`src/features/writing/correction.tsx`) with Fokus, Kurz/Lang and Verlauf
 (PR #739). `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
@@ -75,7 +75,8 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 173 (2026-07-27). The app no longer refreshes work away.**
+**Handoff after session 173 (2026-07-27). The app no longer refreshes work away. Merged as PR #740
+(`805fff0`), branch `claude/app-refresh-data-loss-01xd0e`.**
 Founder bug report: "whenever the user is working on something like writing an email or practicing an
 Übung session, the update takes place and the app refreshes", losing the draft or the session. Root
 cause was `src/lib/swUpdate.ts`: when a new service worker took control it reloaded unconditionally,
@@ -105,7 +106,16 @@ exactly the moment a learner returns to a half-written email. Fixed in two layer
   storage, and that a snapshot never resumes into a differently-scoped session.
 - **Not verifiable from the sandbox:** service-worker update behavior needs the live site. What the
   founder should see after the deploy: backgrounding the app mid-draft and returning no longer wipes
-  the editor, and a refresh restores both the text and its Aufgabe.
+  the editor, and a refresh restores both the text and its Aufgabe. Hard-refresh once first, since a
+  stale service worker can still serve the pre-fix build for one launch.
+- **Worth knowing for the next reload-ish change:** the rule is now a CLAUDE.md hard invariant, so any
+  new surface that holds in-memory work must both claim `useLiveWork` AND persist itself. Persisting
+  alone is not enough (the reload still throws away the on-screen state around the draft), and
+  claiming alone is not enough (a chunk-load self-heal ignores no-one's convenience).
+- **Deliberately NOT done:** no "a new version is available, reload?" toast. The founder's report was
+  about interruption, and a banner is a second interruption; the queued-update-on-next-safe-resume
+  path ships the same deploy without asking anything of the learner. Revisit only if a deploy ever
+  needs to be forced out mid-session (e.g. a broken backend contract).
 
 **Handoff after session 172 (2026-07-27). The correction in Kurz/Lang (founder pick A), merged as
 PR #739.**
