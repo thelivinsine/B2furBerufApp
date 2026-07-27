@@ -874,3 +874,43 @@ took control, in particular on the next `visibilitychange` back to visible.
 7. **No "a new version is available, reload?" banner.** The complaint was interruption; a prompt is a
    second interruption, and it moves a decision the app can make correctly onto the learner. Revisit
    only if a deploy ever has to be forced out mid-session (e.g. a broken backend contract).
+
+## s174 · Auth, sign-up and the profile-restore chain
+
+Recorded because one latent fault produced three different-looking bug reports over an evening, and
+the shape of the mistake is repeatable.
+
+1. **A cloud profile is adopted on the strength of `settings.onboarded`, never a display field.**
+   `mergeRemoteSettings` used to ask `if (!profile.name) return`, treating "has a name" as a proxy
+   for "is a real profile". Onboarding collects goal, mode and level, and no name, so `name` was `""`
+   for every account that has ever existed: the flag was pushed to the cloud and never read back.
+   Because signing in wipes the local cache first (account isolation, deliberate), `onboarded` could
+   ONLY come back from the cloud, so every sign-in on a device restarted onboarding and discarded the
+   learner's level and goal. The lesson generalizes past this one line: when a check needs to know
+   whether state exists, ask the flag that means that, not a field that usually accompanies it. A
+   proxy that is right most of the time fails silently and permanently when it is wrong.
+2. **Where a not-onboarded visitor goes depends on whether they hold a session.** Signed out belongs
+   on `/welcome`, which exists to ask for a sign-up. Someone who just signed in belongs in `/start`.
+   Sending an account holder to the marketing page is indistinguishable from a failed log-in, and
+   was reported as exactly that.
+3. **A successful sign-in from a public page must navigate.** The dialog closing was not enough: the
+   landing page kept rendering its signed-out story ("Start free"), so a correct password produced no
+   visible change. Sign-ins from inside the app deliberately do NOT navigate, since those surfaces
+   already show the signed-in state and moving someone out of Settings would be its own bug.
+4. **`needsConfirmation` comes from the error message alone.** An earlier version also inferred it
+   from a response that carried no session, which would answer a correct password with "check your
+   inbox". A sign-in with no error is a sign-in.
+5. **"We sent you a link" may only be shown when a link was actually sent.** The sign-up panel was
+   reused on the log-in path, where nothing had been sent, and it replaced the form, removing the
+   only way in. `pending` (mail genuinely sent) and `resendFor` (log-in refused) are separate states
+   for that reason.
+6. **The confirmation link needs its own landing route.** Supabase's default template returns the
+   session in the URL hash, which React Router wipes on mount, and the PKCE client does not look
+   there. `src/lib/authCallback.ts` snapshots the parameters at module-eval time and `/auth/confirm`
+   redeems them, accepting all three link shapes so the flow does not depend on which email template
+   the project happens to have.
+7. **Diagnostic note, for the next time a founder says a flow "doesn't work".** Three rounds were
+   spent in the auth code because that is where the last change had been. The report that solved it
+   ("with a secondary account, it redirects me to landing page") was a profile-restore symptom, not
+   an authentication one. Ask what is on screen and where the learner ends up BEFORE re-reading the
+   file you just edited.

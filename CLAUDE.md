@@ -85,6 +85,13 @@ after pulling.
   `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
   Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
   `docs/areas/SCHREIBEN.md`).
+- **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
+  device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
+  from `profiles.settings`. `mergeRemoteSettings` adopts on `settings.onboarded === true` and nothing
+  else: a proxy field (it was `profile.name`, which onboarding never collects) silently sent every
+  account back through onboarding and discarded its level and goal. Where a not-onboarded visitor
+  goes depends on their session: signed out → `/welcome`, signed in → `/start`
+  (`docs/DECISIONS.md` §s174).
 - **Never reload over a learner's unsaved work.** The PWA adopts deploys by reloading; every
   automatic reload is gated on `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later
   resume. Any new surface holding in-memory work claims it with `useLiveWork(active, label, flush)`

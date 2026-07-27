@@ -4,10 +4,12 @@ _Last updated: 2026-07-27 (session 174). **Security audit + the sign-up flow it 
 `docs/reports/security-audit-2026-07-27.md` covers the bundle, the five Edge Functions, all twelve
 migrations, CI and the dependency tree; the architecture held, and three findings were fixed in the
 same pass. Acting on finding F1 the founder turned **"Confirm email" ON**, which exposed that
-**email sign-up had never actually worked end to end**: the confirmation link confirmed the account
-but could not sign anyone in. Fixed, with the auth dialog reworked around it. Still open for the
-founder: paste `supabase/migrations/0013_admins_table.sql`, and set up Resend SMTP so mail comes
-from Genauly. Prior s173: **a deploy can no longer refresh a learner's work away.**
+**email sign-up had never actually worked end to end**, and pulling that thread reached a latent
+fault that had been quietly discarding learner profiles: `onboarded` was written to the cloud and
+never read back, so every sign-in on a device restarted onboarding and lost the learner's level and
+goal (#745). Sign-up, log-in, the confirmation link and the profile restore all work now; the auth
+dialog was reworked along the way. Still open for the founder: Resend SMTP so mail comes from
+Genauly (migration 0013 is applied). Prior s173: **a deploy can no longer refresh a learner's work away.**
 The PWA's auto-update reload now waits while any surface holds unsaved work (`src/lib/liveWork.ts`),
 and both kinds of work persist so even an unavoidable reload is recoverable: writing drafts autosave
 per mode (`draftAutosave.ts`), and a running Üben session snapshots its plan + position
@@ -201,8 +203,37 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   panel the instant they were set. Now a ref synced in its own effect.
 - **Gates:** typecheck · lint 0 errors (75 warnings, same as the untouched tree) · test:unit
   **363/363** · build · check:bundle 122.9 kB.
-- **Next:** the two founder actions above (migration 0013, then Resend SMTP). Note the email work is
-  the ONLY learner-visible change this session; the audit fixes are invisible.
+- **Then four rounds of live debugging (#743, #744, #745), all from one founder report that started
+  as "login with email doesn't work now".** Worth reading before touching auth or sync: the report
+  was accurate, my first two diagnoses were not, and the fault was nowhere near where I was looking.
+  - **#743, two real defects on the log-in path, neither the reported one.** `signIn` inferred
+    `needsConfirmation` from a response carrying no session as well as from the error, so a correct
+    password could be answered with "check your inbox"; and an unconfirmed account had the whole
+    log-in form replaced by the sign-up "check your inbox" panel, which claims a link was just sent
+    (untrue there) and removed the only way in. `pending` and `resendFor` are now separate states.
+  - **#744, after the founder added "with a secondary account, it redirects me to landing page".**
+    That sentence reframed everything: the sign-in was SUCCEEDING. `RequireOnboarding` sent every
+    resolved not-onboarded visitor to `/welcome`, i.e. the page that asks you to sign up, which is
+    indistinguishable from a failed log-in. Signed-out still goes there; an account holder now goes
+    to `/start`. A successful sign-in FROM a public page also now hands over to `/`, because the
+    dialog closing left the learner on a landing page still showing "Start free".
+  - **#745, the root cause, and it explains all three symptoms.** `mergeRemoteSettings` decided
+    whether to adopt a cloud profile with `if (!profile.name) return`. Onboarding collects goal,
+    mode and level and NO name, so `name` was `""` for every account ever created and the guard
+    bailed every time. Since a sign-in wipes the local cache first (account isolation, deliberate),
+    `onboarded` could only return from the cloud, and never did. Latent since that line was written:
+    any learner signing in on a second device silently lost their level and goal. Adoption now tests
+    `settings.onboarded`, which still rejects the empty row the sign-up trigger creates.
+  - **The rule that came out of it, now a CLAUDE.md invariant:** when a check needs to know whether
+    state exists, ask the flag that means that, never a field that usually accompanies it. A proxy
+    that is right most of the time fails silently and permanently when it is wrong.
+- **Gates across the round:** typecheck · lint 0 errors (75 warnings) · test:unit **370/370**
+  (+7 over the audit PR: `authDialog` router destinations, `cloudSync` profile adoption) · build ·
+  check:bundle within budget.
+- **Next:** Resend SMTP is the one open founder action (`docs/reference/auth-emails/README.md`).
+  Then, when scheduled, the react-router 6 → 7 migration from audit F2. **The founder should expect
+  onboarding ONCE more per account** after #745: that run is what finally writes a flag the app can
+  read back.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
