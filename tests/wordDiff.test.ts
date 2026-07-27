@@ -72,6 +72,19 @@ describe("diffWords", () => {
     expect(classifyChange("ins Buero", "ins Büro")).toBe("Grammatik");
   });
 
+  it("reads a swapped run as ONE word-order fix, not two spelling errors (s171)", () => {
+    // The classic verb-final fix. Before this it surfaced as "war → krank" plus
+    // "krank. → war.", both labelled Rechtschreibung.
+    const { changes } = diffWords(
+      "Ich habe den Termin abgesagt, weil ich war krank.",
+      "Ich habe den Termin abgesagt, weil ich krank war.",
+    );
+    expect(changes).toHaveLength(1);
+    expect(changes[0].category).toBe("Wortstellung");
+    expect(changes[0].moved).toBe(true);
+    expect(changes[0].to).toBe("krank war.");
+  });
+
   it("separates an added comma from a capitalisation fix (s171)", () => {
     // Longer Verlauf texts are full of comma fixes; calling those
     // "Groß-/Kleinschreibung" taught the wrong rule.

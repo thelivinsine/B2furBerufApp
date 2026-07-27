@@ -164,6 +164,18 @@ implementation of the two picks.
   and the Thema badge drops (a long Thema was pushing the weakness chip onto a second line), and the
   Thema reappears at the top of the expanded area, since an older entry has no stored Aufgabe to name
   the topic. Bar area is `h-12 sm:h-16` on `grid-cols-2 sm:grid-cols-3`.
+- **Fokus history (founder-approved follow-up, same session):** Verlauf is now ONE chronological list
+  across both trainers. It needed **no migration**: `sentence_checks` (0009) has stored every check's
+  correction and detected grammar since s147, with owner-read/delete RLS, so the founder's existing
+  sentences appeared immediately. A Fokus row carries a correction-COUNT chip (or a green
+  "fehlerfrei"), expands into the same `CorrectionView` plus one "Erkannt: …" line, and the filter now
+  offers only the kinds on record (`Alle` + Fokus/Kurz/Lang). The trend card stays Kurz/Lang-only, since
+  Fokus's diff categories are a different taxonomy from the evaluator's `WeaknessCategory`. A partial
+  load failure is reported with a retry rather than shown as a shorter history.
+- **`wordDiff` now collapses a swapped run into ONE "Wortstellung" fix.** "weil ich war krank." ->
+  "weil ich krank war." used to surface as "war → krank" + "krank. → war.", both labelled
+  Rechtschreibung, which taught the wrong rule. This fixes Fokus's own correction card too
+  (`tests/wordDiff.test.ts` pins it).
 - **Screenshot lesson worth keeping:** headless Chromium clamps its viewport to a 500px MINIMUM, so
   `--window-size=390` silently lays out at 500 and crops, which looks exactly like horizontal
   overflow. Verify true phone widths by loading the app in an IFRAME of that width inside a wider

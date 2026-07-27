@@ -19,6 +19,12 @@ import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
 import { writingTaskById } from "@/lib/writingScope";
 import { diffWords } from "@/lib/wordDiff";
+import { valueLabel } from "@/features/writing/fokus/grammarDimensions";
+import {
+  getFokusHistory,
+  deleteSentenceCheck,
+  type FokusHistoryEntry,
+} from "@/lib/sentenceStudio";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import {
   getWritingHistory,
@@ -380,20 +386,24 @@ function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
   );
 }
 
-type ModeFilter = "alle" | "short" | "long";
+type ModeFilter = "alle" | "fokus" | "short" | "long";
 
-const MODE_TABS: { id: ModeFilter; label: string }[] = [
-  { id: "alle", label: "Alle" },
-  { id: "short", label: "Kurz" },
-  { id: "long", label: "Lang" },
-];
+const MODE_LABEL: Record<ModeFilter, string> = {
+  alle: "Alle",
+  fokus: "Fokus",
+  short: "Kurz",
+  long: "Lang",
+};
 
 /** Compact segmented filter in the shipped switcher language (grey track, white pill). */
 function ModeSwitcher({
   value,
+  tabs,
   onChange,
 }: {
   value: ModeFilter;
+  /** Only the kinds actually on record, so no segment can yield nothing. */
+  tabs: ModeFilter[];
   onChange: (v: ModeFilter) => void;
 }) {
   const reduce = useReducedMotion();
@@ -414,13 +424,13 @@ function ModeSwitcher({
           transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }}
         />
       )}
-      {MODE_TABS.map((tab) => {
-        const active = tab.id === value;
+      {tabs.map((tab) => {
+        const active = tab === value;
         return (
           <button
-            key={tab.id}
-            ref={registerItem(tab.id)}
-            onClick={() => onChange(tab.id)}
+            key={tab}
+            ref={registerItem(tab)}
+            onClick={() => onChange(tab)}
             role="tab"
             aria-selected={active}
             className={cn(
@@ -428,7 +438,7 @@ function ModeSwitcher({
               active ? "font-bold text-primary" : "font-medium text-muted-foreground hover:text-foreground",
             )}
           >
-            {tab.label}
+            {MODE_LABEL[tab]}
           </button>
         );
       })}
@@ -615,11 +625,149 @@ function HistoryEntry({
   );
 }
 
+/**
+ * One checked Fokus sentence (s171). Every check has been persisted since s147,
+ * so this history reaches back over everything already practised. Same compact
+ * row and same correction language as a Kurz/Lang entry: the point of one Verlauf
+ * is that a correction reads identically whichever trainer produced it.
+ */
+function FokusEntry({
+  entry,
+  index,
+  onDelete,
+}: {
+  entry: FokusHistoryEntry;
+  index: number;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const reduce = useReducedMotion();
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const corrected =
+    entry.has_errors && entry.corrected?.trim() ? entry.corrected.trim() : null;
+  const fixCount = useMemo(
+    () => (corrected ? diffWords(entry.source_text, corrected).changes.length : 0),
+    [entry.source_text, corrected],
+  );
+  // The form the Satzlabor detected, which is what the transform pills act on.
+  const detected = [
+    valueLabel("voice", entry.grammar?.voice ?? null),
+    valueLabel("tense", entry.grammar?.tense ?? null),
+    valueLabel("mood", entry.grammar?.mood ?? null),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const remove = async () => {
+    setDeleting(true);
+    await onDelete(entry.id);
+    setDeleting(false);
+    setConfirming(false);
+  };
+
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(index, 8) * 0.03, duration: 0.16 }}
+    >
+      <Card className="overflow-hidden">
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className="flex w-full flex-wrap items-center gap-2 p-4 text-left transition-colors hover:bg-muted/40"
+        >
+          <span className="text-xs font-medium tabular-nums text-muted-foreground sm:hidden">
+            {formatDateShort(entry.created_at)}
+          </span>
+          <span className="hidden text-xs font-medium tabular-nums text-muted-foreground sm:inline">
+            {formatDate(entry.created_at)}
+          </span>
+          <Badge variant="outline">Fokus</Badge>
+          <span className="ml-auto flex items-center gap-2">
+            {fixCount > 0 ? (
+              <WeaknessChip>
+                {fixCount} {fixCount === 1 ? "Korrektur" : "Korrekturen"}
+              </WeaknessChip>
+            ) : (
+              <Badge variant="success">fehlerfrei</Badge>
+            )}
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                expanded && "rotate-180",
+              )}
+            />
+          </span>
+        </button>
+
+        {expanded && (
+          <CardContent className="space-y-3 border-t border-border p-4">
+            {corrected ? (
+              <CorrectionView original={entry.source_text} corrected={corrected} />
+            ) : (
+              <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <PenLine className="h-3.5 w-3.5" /> Dein Satz
+                </p>
+                <p className="text-sm leading-relaxed text-foreground/90">{entry.source_text}</p>
+              </div>
+            )}
+
+            {detected && (
+              <p className="text-xs text-muted-foreground">
+                Erkannt: <span className="font-medium text-foreground">{detected}</span>
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {confirming ? (
+                <span className="flex items-center gap-3">
+                  <button
+                    onClick={() => setConfirming(false)}
+                    disabled={deleting}
+                    className="text-xs text-muted-foreground hover:underline"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    onClick={remove}
+                    disabled={deleting}
+                    className="flex items-center gap-1 text-xs font-medium text-danger hover:underline"
+                  >
+                    {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                    Löschen
+                  </button>
+                </span>
+              ) : (
+                <button
+                  onClick={() => setConfirming(true)}
+                  aria-label="Satz löschen"
+                  className="text-muted-foreground transition-colors hover:text-danger"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Sparkles className="h-3 w-3 shrink-0" />
+                KI-generierte Rückmeldung
+              </p>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+    </motion.div>
+  );
+}
+
 export function WritingHistory() {
   const navigate = useNavigate();
   const [entries, setEntries] = useState<WritingHistoryEntry[]>([]);
+  const [fokus, setFokus] = useState<FokusHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [failed, setFailed] = useState({ writing: false, fokus: false });
   const [mode, setMode] = useState<ModeFilter>("alle");
   const showToast = useSessionStore((s) => s.showToast);
 
@@ -634,15 +782,22 @@ export function WritingHistory() {
     }
   };
 
+  const handleDeleteFokus = async (id: string) => {
+    const ok = await deleteSentenceCheck(id);
+    if (ok) {
+      setFokus((prev) => prev.filter((e) => e.id !== id));
+      showToast("Satz gelöscht.", "success");
+    } else {
+      showToast("Löschen fehlgeschlagen. Bitte versuche es erneut.", "warning");
+    }
+  };
+
   const load = async () => {
     setLoading(true);
-    setError(false);
-    const data = await getWritingHistory(30);
-    if (data === null) {
-      setError(true);
-    } else {
-      setEntries(data);
-    }
+    const [w, f] = await Promise.all([getWritingHistory(30), getFokusHistory(30)]);
+    setEntries(w ?? []);
+    setFokus(f ?? []);
+    setFailed({ writing: w === null, fokus: f === null });
     setLoading(false);
   };
 
@@ -650,11 +805,33 @@ export function WritingHistory() {
     load();
   }, []);
 
-  // The filter only appears when it can actually sort something: with a single
-  // kind of text on record it would be chrome with nothing to do.
-  const hasShort = entries.some((e) => e.length === "short");
-  const hasLong = entries.some((e) => e.length === "long");
-  const shown = mode === "alle" ? entries : entries.filter((e) => e.length === mode);
+  // One chronological list across both trainers, newest first, then capped: the
+  // section says "letzte Auswertungen", and each source is already limited to 30.
+  const rows = useMemo(() => {
+    const merged = [
+      ...entries.map((e) => ({ kind: "writing" as const, at: e.created_at, w: e })),
+      ...fokus.map((e) => ({ kind: "fokus" as const, at: e.created_at, f: e })),
+    ];
+    merged.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+    return merged.slice(0, 30);
+  }, [entries, fokus]);
+
+  // The filter offers only the kinds actually on record, and appears only when
+  // there is more than one: a segment that can yield nothing reads as broken.
+  const kinds: ModeFilter[] = [
+    ...(fokus.length > 0 ? (["fokus"] as ModeFilter[]) : []),
+    ...(entries.some((e) => e.length === "short") ? (["short"] as ModeFilter[]) : []),
+    ...(entries.some((e) => e.length === "long") ? (["long"] as ModeFilter[]) : []),
+  ];
+  const tabs: ModeFilter[] = ["alle", ...kinds];
+  const shown = rows.filter((r) => {
+    if (mode === "alle") return true;
+    if (mode === "fokus") return r.kind === "fokus";
+    return r.kind === "writing" && r.w.length === mode;
+  });
+  // A partial failure must not masquerade as a short history.
+  const partialFailure =
+    (failed.writing || failed.fokus) && !(failed.writing && failed.fokus);
 
   if (loading) {
     return (
@@ -664,7 +841,9 @@ export function WritingHistory() {
     );
   }
 
-  if (error) {
+  // Only a total failure replaces the page; a partial one is reported under the
+  // list, so the half that loaded is still usable.
+  if (failed.writing && failed.fokus) {
     return (
       <Card>
         <CardContent className="flex items-start gap-3 p-5">
@@ -680,7 +859,7 @@ export function WritingHistory() {
     );
   }
 
-  if (entries.length === 0) {
+  if (rows.length === 0) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
@@ -709,15 +888,31 @@ export function WritingHistory() {
           <Badge variant="muted" className="tabular-nums">
             {shown.length}
           </Badge>
-          {hasShort && hasLong && (
+          {kinds.length > 1 && (
             <div className="ml-auto">
-              <ModeSwitcher value={mode} onChange={setMode} />
+              <ModeSwitcher value={mode} tabs={tabs} onChange={setMode} />
             </div>
           )}
         </div>
-        {shown.map((e, i) => (
-          <HistoryEntry key={e.id} entry={e} index={i} onDelete={handleDelete} />
-        ))}
+        {shown.map((row, i) =>
+          row.kind === "writing" ? (
+            <HistoryEntry key={row.w.id} entry={row.w} index={i} onDelete={handleDelete} />
+          ) : (
+            <FokusEntry key={row.f.id} entry={row.f} index={i} onDelete={handleDeleteFokus} />
+          ),
+        )}
+
+        {partialFailure && (
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+            <p className="text-xs text-muted-foreground">
+              {failed.fokus ? "Deine Fokus-Sätze" : "Deine Textauswertungen"} konnten nicht geladen
+              werden.
+            </p>
+            <Button size="sm" variant="outline" onClick={load}>
+              Erneut versuchen
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

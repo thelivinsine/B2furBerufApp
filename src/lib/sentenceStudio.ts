@@ -116,3 +116,61 @@ export async function transformSentence(input: {
     return { ok: false, message: UNAVAILABLE };
   }
 }
+
+/* ------------------------------ Fokus history ----------------------------- */
+
+/**
+ * One checked sentence, as Verlauf shows it (s171). Every Fokus check has been
+ * persisted to `sentence_checks` since s147 (migration 0009), correction and
+ * detected grammar included, so this history needed no new schema and reaches
+ * back over everything the learner has already practised.
+ */
+export interface FokusHistoryEntry {
+  id: string;
+  created_at: string;
+  source_text: string;
+  /** The corrected sentence; null when the model returned none. */
+  corrected: string | null;
+  has_errors: boolean;
+  /** Detected form of the focal sentence: `{voice, tense, mood}`. */
+  grammar: { voice?: string; tense?: string; mood?: string } | null;
+}
+
+/**
+ * The learner's own checked sentences, newest first. Returns `null` on a failed
+ * query (never `[]`), so Verlauf can tell "nothing practised yet" apart from
+ * "could not load" — the same contract as `getWritingHistory`.
+ */
+export async function getFokusHistory(
+  limit = 30,
+): Promise<FokusHistoryEntry[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from("sentence_checks")
+      .select("id, created_at, source_text, corrected, has_errors, grammar")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error || !data) return null;
+    return data as FokusHistoryEntry[];
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Delete one checked sentence (GDPR per-item erasure, policy
+ * `sentence_checks_delete_own` from migration 0009). Returns true only when a row
+ * was actually removed, so the UI fails loudly instead of pretending.
+ */
+export async function deleteSentenceCheck(id: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("sentence_checks")
+      .delete()
+      .eq("id", id)
+      .select("id");
+    return !error && !!data && data.length > 0;
+  } catch {
+    return false;
+  }
+}
