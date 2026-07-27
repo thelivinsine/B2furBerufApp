@@ -121,10 +121,34 @@ implementation of the two picks.
   newer text. s167 had already shipped the "store the Aufgabe" follow-up, so only the CORRECTION and
   Fokus history remain open.
 - **Gates:** typecheck · lint 0 errors · test:unit · build · check:bundle **117.3 kB** · lint:content.
-- **Next:** the two remaining follow-ups both need a `writing_evaluations` migration: (1) persist the
-  corrected text so Verlauf can show the real correction in the Fokus mark language, (2) give Fokus a
-  history (which also unlocks the Fokus filter segment). Optional: "In die Wiederholung" (turn a
-  correction into an FSRS card).
+- **Then, same session: the correction itself now ships** (founder asked why the backend follow-up
+  needed them at all, given `supabase.yml`). Verified from the run history: the workflow DOES deploy
+  every Edge Function on merge (last run's "Deploy Edge Functions" = success), and only "Apply
+  migrations" is gated, skipped when `SUPABASE_DB_PASSWORD` is absent. So:
+  - **Migration 0012** adds `writing_evaluations.corrected_text` (idempotent, so a hand-paste and a
+    later CI `db push` cannot collide).
+  - **`evaluate-writing`** now asks for `corrected` too: a MINIMAL repair of the learner's own text,
+    never a rewrite. `max_tokens` 400 -> 2000 for Anthropic (the corrected text is ~750 tokens on a
+    MAX_TEXT_LEN submission); a CEILING, not a spend, and every existing fuse is untouched.
+    `PROMPT_REV` -> `s171.0` so cached verdicts without a correction are not served.
+  - **Nothing regresses if the migration lags the code**, which is the normal order here: `parseInsight`
+    salvages weakness + insight from a truncated payload and drops the correction; `sanitizeCorrected`
+    rejects a rewrite, a stump, an Aufgabe echo or an unchanged copy; the cache read and the client
+    select fall back to the legacy column list; and the insert steps DOWN through the optional columns
+    (full -> without corrected_text -> base) so a row always lands, which matters because the daily
+    limit counts rows.
+  - **Verlauf renders it** with the Fokus language (Original/Korrigiert toggle, coral on the original,
+    green on the corrected, Himmelblau category tiles, capped at 6 with "+N weitere"). Marks are
+    computed client-side by `wordDiff`, so no AI cost per view. Two fixes found by screenshotting the
+    real page: the diff now runs PER PARAGRAPH (one whole-text diff collapsed a letter into a block)
+    and `classifyChange` gained **Zeichensetzung** (a bare comma fix read as "Groß-/Kleinschreibung").
+- **Next:** (1) give **Fokus** a history, which also unlocks the Fokus filter segment in Verlauf;
+  (2) the Kurz/Lang RESULT card still shows only weakness + tip, so the correction appears first in
+  Verlauf, not right after submitting: surfacing it there touches the locked trainer geometry and
+  needs its own preview round. Optional: "In die Wiederholung" (turn a correction into an FSRS card).
+- **Founder ops note:** if `SUPABASE_DB_PASSWORD` is set, 0012 applies itself on merge; otherwise it
+  is one paste into the Dashboard SQL editor. Read the run summary of the Supabase workflow to tell
+  which happened ("Migrations skipped (no SUPABASE_DB_PASSWORD)").
 
 **Handoff after session 170 (2026-07-26): Praktisch toggle joins the squircle language;
 Bibliothek + Fortschritt icon swaps. MERGED AND LIVE** (PR **#730**). Founder: adapt the

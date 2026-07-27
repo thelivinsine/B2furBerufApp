@@ -775,3 +775,30 @@ chaotic at the moment", s105). Three variants each in
 Method note: items 4 and the label/arrow layout bug were caught ONLY by seeding a demo state and
 screenshotting the REAL pages (light + dark + expanded row), not the static mockup. Verify in the
 app, not only in the preview.
+
+### s171 follow-up — storing the correction (same session)
+
+9. **The corrected text is stored; the diff is not.** Only `corrected_text` goes in the row; the marks,
+   categories and fix tiles are recomputed in the browser by `lib/wordDiff.ts` on every view. Storing a
+   rendered diff would have frozen today's presentation into the database and cost tokens to produce.
+10. **A minimal repair, never a rewrite.** The prompt forbids reformulating, shortening or adding
+    content, and `sanitizeCorrected` drops a candidate that is much shorter (truncated), much longer
+    (commentary or an echoed Aufgabe), or identical to the original (nothing to toggle). A diff against
+    a re-imagined text is unreadable and teaches nothing.
+11. **The verdict must survive a truncated correction.** Adding `corrected` roughly doubles output
+    tokens, so `parseInsight` now falls back to salvaging `weakness` + `insight` out of a payload too
+    broken to parse, and simply drops the correction. The learner never loses their tip because the
+    optional extra did not fit.
+12. **The insert steps DOWN through optional columns.** CI deploys Edge Functions but skips migrations
+    (`SUPABASE_DB_PASSWORD` unset), so the function is expected to run before its column exists: full
+    row -> without `corrected_text` -> base row. A lost row would also stop the daily limit counting,
+    since that limit counts rows, so this protects a cost guardrail, not just a feature.
+13. **`Zeichensetzung` became its own edit category.** A bare added comma normalised to the same word
+    and therefore read as "Groß-/Kleinschreibung", which taught the wrong rule. Longer Verlauf texts are
+    full of comma fixes, unlike Fokus's single sentences, which is why this only surfaced now.
+14. **The diff runs per paragraph.** `diffWords` tokenizes on whitespace, so one diff over a whole
+    letter rejoined salutation, body and sign-off into a single block. A changed paragraph count falls
+    back to one whole-text diff rather than mispairing.
+15. **The Kurz/Lang result card was left alone.** Showing the correction at the moment of submitting is
+    the higher-value placement, but that surface carries the locked measured-height geometry from
+    s166-s169, so it needs its own preview round instead of being changed as a side effect.

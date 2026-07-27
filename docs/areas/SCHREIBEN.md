@@ -158,9 +158,25 @@ Kurz. Design = variant C, "development first" (founder-picked s171):
   both kinds exist; the count badge next to "Letzte Auswertungen" reflects the filtered list.
 - `getWritingHistory` returns `null` on a failed query (never `[]`), so the error card with
   "Erneut versuchen" is reachable and an empty history is never faked.
-- **Open follow-ups** (both need a `writing_evaluations` migration): store the CORRECTED text so the
-  entry can show the actual correction in the Fokus mark language, and give **Fokus** a history. The
-  Fokus filter segment is deliberately absent until the latter lands, never a dead control.
+- **The correction is stored and shown** (s171, migration **0012** adds `corrected_text`). The row
+  disclosure renders it with the Fokus language: an Original/Korrigiert toggle, coral marks on the
+  original, green on the corrected, and Himmelblau tiles naming each edit's category. Rules:
+  - The diff runs **per paragraph** (`\n{2,}`), so a letter keeps salutation / body / sign-off;
+    `diffWords` tokenizes on whitespace, so one diff over the whole text collapses it to a block. A
+    changed paragraph COUNT falls back to one whole-text diff.
+  - Marks and tiles are computed client-side by `lib/wordDiff.ts`. Only the corrected TEXT is stored,
+    so no extra AI cost per view, and `classifyChange` gained **Zeichensetzung** (a bare comma fix used
+    to read as "Groß-/Kleinschreibung", which taught the wrong rule).
+  - Tiles cap at `MAX_FIX_TILES` (6) with "+N weitere", so a long text cannot wall off the card.
+  - `corrected_text` is null for pre-s171 rows, for the templated spelling verdict (no model call) and
+    for an error-free text, so the toggle appears only when there is a real correction. The plain
+    "Dein Text" block is the fallback.
+  - The evaluator asks for a MINIMAL repair, never a rewrite (a diff against a re-imagined text is
+    unreadable), and `sanitizeCorrected` drops anything that is a rewrite, a truncated stump, an echo
+    of the Aufgabe or an unchanged copy.
+- **Open follow-up:** give **Fokus** a history. The Fokus filter segment stays absent until then,
+  never a dead control. The Kurz/Lang RESULT card still shows only weakness + tip: surfacing the
+  correction there touches the locked trainer geometry and needs its own preview round.
 
 
 ## Fokus (Satzlabor)

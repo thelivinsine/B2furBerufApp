@@ -71,4 +71,13 @@ describe("diffWords", () => {
     expect(classifyChange("sehr", "")).toBe("Streichung");
     expect(classifyChange("ins Buero", "ins Büro")).toBe("Grammatik");
   });
+
+  it("separates an added comma from a capitalisation fix (s171)", () => {
+    // Longer Verlauf texts are full of comma fixes; calling those
+    // "Groß-/Kleinschreibung" taught the wrong rule.
+    expect(classifyChange("Antwort", "Antwort,")).toBe("Zeichensetzung");
+    expect(classifyChange("Hause.", "Hause")).toBe("Zeichensetzung");
+    // Case still wins when the letters themselves change case.
+    expect(classifyChange("antwort,", "Antwort,")).toBe("Groß-/Kleinschreibung");
+  });
 });
