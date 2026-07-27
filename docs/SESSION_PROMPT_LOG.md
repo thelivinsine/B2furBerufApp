@@ -1646,3 +1646,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `tests/wordDiff.test.ts` · `preview/gen-kurz-lang-korrektur-r2.mjs` +
   `preview/kurz-lang-korrektur-r2{,-dark,-artifact}.html` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 16 (2026-07-27, verbatim text not preserved in this session's context; a request to re-share
+  the round-1 preview sheet):** Re-shared the round-2 artifact and re-sent the preview files. The
+  round-1 artifact (three variants) had been published from an earlier context window, so this session
+  could not redeploy that URL; repeated attempts failed for the same reason and were stopped. Both links
+  were reported side by side instead. No code, docs or content changed.
+- **Prompt 17 (verbatim, 2026-07-27):** `go ahead with your recommendation` → Shipped the correction
+  work: opened **PR #739** into `main` from `claude/selection-color-contrast-3upqkz` and squash-merged it
+  (auto-ship), then the required post-merge housekeeping (`git fetch origin main` →
+  `git reset --hard origin/main` → `git push --force-with-lease`). Docs flipped from "NOT MERGED" to
+  merged in `docs/PROJECT_STATUS.md` (header, s172 handoff, Next block). Nothing in the diff changed
+  between the founder's review and the merge, so the gates from prompt 15 stand: typecheck · lint 0
+  errors · test:unit **327/327** · build · check:bundle 118.4 kB · lint:content.
+- **Prompt 18 (verbatim, 2026-07-27):** `why are you responding in German with me?` → No good reason.
+  The app's UI-language rule (German in-app) had bled into the founder-facing chat, which the founder
+  writes in English. Answered plainly and switched to English for the rest of the session. **Standing
+  rule going forward: German is for the product's user-facing strings ONLY; conversation with the
+  founder follows the founder's language.** No code change.
+- **Artifacts (prompts 16-18):** PR #739 (squash-merged) · `docs/PROJECT_STATUS.md` · this log

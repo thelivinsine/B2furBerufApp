@@ -5,7 +5,7 @@ _Last updated: 2026-07-27 (session 172). **The correction now appears in the Kur
 Original/Korrigiert toggle and the Himmelblau fix tiles, Fokus-style, and the result card stays short.
 Fokus, Kurz/Lang and Verlauf render corrections from ONE shared module
 (`src/features/writing/correction.tsx`), so the tile language cannot drift; `classifyChange` gained
-"Kasus & Artikel". **On the session branch, not merged yet.** Prior s171: Verlauf leads with a
+"Kasus & Artikel". **Merged (PR #739).** Prior s171: Verlauf leads with a
 weakness-trend card over a compact row list, Fortschritt with a Kompetenz curve, and Verlauf covers
 both trainers. `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
@@ -76,8 +76,8 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 172 (2026-07-27). The correction in Kurz/Lang (founder pick A), branch
-`claude/selection-color-contrast-3upqkz`. NOT MERGED — waiting on the founder's read of the tiles.**
+**Handoff after session 172 (2026-07-27). The correction in Kurz/Lang (founder pick A), merged as
+PR #739.**
 Prompt 13/14 built and re-shared `preview/kurz-lang-korrektur.html` (three places for the correction:
 A im Schreibfeld · B alles im Ergebnis · C zum Aufklappen, bottom cluster + Aufgabe card held identical
 across all three). The founder picked **A** and asked to "make sure both the tiles are harmonious with
@@ -108,7 +108,7 @@ drifted too (em dash where Fokus prints `∅`).
   `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` but NO playwright module, so screenshots go
   through `chrome --headless --screenshot`.
 - **Gates:** typecheck · lint 0 errors · test:unit **327/327** · build · check:bundle 118.4 kB.
-- **Next:** if the founder confirms the tiles, squash-merge and do the post-merge housekeeping. Open
+- **Next:** the founder verifies the live result (Pages deploy from the squash-merge of #739). Open
   question they may raise: the round-1 mock drew "Kasus üben" in the phone's bottom row, which the
   shipped cluster does not do (the practice CTA stays inside the result card); changing that touches the
   locked cluster and needs an explicit ask.
