@@ -8,8 +8,11 @@ was a review of one PR's diff rather than of the whole system.
 **Headline:** the architecture is sound. Secrets are server-side only, every user table is
 owner-only RLS, there is no HTML-injection sink anywhere in `src/`, the CSP is enforcing, CI actions
 are SHA-pinned, and the AI cost fuses are layered properly. Three fixes shipped with this audit.
-The one item that genuinely needs founder action is **the admin gate: it trusts an email address
-that Supabase may not have verified** (F1).
+
+**Status, end of session 174:** the one high finding that needed the founder (F1, the admin gate
+trusting an unverified email claim) is **closed** — they enabled "Confirm email" and applied
+migration 0013 the same day. What remains open is F2, the react-router 6 advisory with no upstream
+fix, plus the low-severity items below.
 
 Severity uses the usual scale. "Conditional" means the exposure depends on a Supabase dashboard
 setting this sandbox cannot read.
@@ -20,7 +23,7 @@ setting this sandbox cannot read.
 
 | # | Severity | Area | Finding | State |
 |---|---|---|---|---|
-| F1 | High (conditional) | Auth / admin | Founder gate keyed on an unverified email claim | Migration 0013 ready to paste |
+| F1 | High (conditional) | Auth / admin | Founder gate keyed on an unverified email claim | ✅ Closed (migration 0013 applied 2026-07-27) |
 | F2 | High | Dependencies | 10 advisories; react-router 6.x has an open redirect → XSS with **no fix in the 6.x line** | **Founder decision** |
 | F3 | Medium | Privacy | Writing drafts survived sign-out and account deletion on the device | ✅ Fixed here |
 | F4 | Medium | Abuse / cost | Feedback endpoint could be flooded with rows (per-IP guard is header-spoofable) | ✅ Fixed here |
@@ -70,7 +73,9 @@ dashboard:
 The gate also never checks that the email is confirmed, so it would accept an unverified address
 even where the platform allowed one.
 
-**Fix: `supabase/migrations/0013_admins_table.sql`, ready to paste into the SQL editor.**
+**Fix: `supabase/migrations/0013_admins_table.sql`. Applied by the founder on 2026-07-27**, together
+with enabling "Confirm email", which closes the other half (nobody can now register an address they
+do not own). This finding is closed.
 
 It stops deriving admin status from a mutable claim. A user id cannot be changed by its owner, so
 gating on `auth.uid()` against a service-role-only `admins` table removes the dependency on any auth
@@ -95,12 +100,12 @@ on `admins`, lock-out guard present).
 UI *renders*, and the server is what protects the data. A third admin added to the table later needs
 adding there too, or they reach an `/admin` that redirects home.
 
-**Still worth doing separately:** turn Authentication → Sign In / Providers → Email → "Confirm
-email" **on**, so nobody can register an address they do not own. Note the cost: Supabase's built-in
-mailer is rate-limited to a handful of messages per hour, so confirmations should go live together
-with real SMTP (the Resend key already exists for the feedback mail) or sign-ups will start
-silently failing. That is why it is a separate task from the migration above, which fixes the admin
-exposure on its own.
+**The other half, also done (2026-07-27):** Authentication → "Confirm email" is now ON, so nobody
+can register an address they do not own. It carried one cost, which is now its own action item:
+Supabase's built-in mailer allows only a handful of messages an hour, so sign-up links can fail to
+arrive during a busy hour until Resend SMTP is configured (`docs/reference/auth-emails/README.md`).
+Turning it on also surfaced a pre-existing bug: email confirmation had never actually signed anyone
+in. That repair shipped in the same session; see `docs/PROJECT_STATUS.md` s174.
 
 ---
 
@@ -376,12 +381,12 @@ Worth recording, so the next audit knows what has already been ruled out.
 
 ## Founder action list
 
-1. **Paste `supabase/migrations/0013_admins_table.sql` into the Supabase SQL editor** (Dashboard →
-   SQL Editor → New query → paste → Run), then sign out and back in and open `/admin` to confirm you
-   still get in. ~2 minutes, and it closes F1 on its own. The migration refuses to install a gate
-   that would lock you out, so the worst case is a readable error and nothing changed.
-2. Decide on the react-router 6 → 7 migration; the safe toolchain updates can ship meanwhile. (F2)
-3. Optional, cheap, do-anytime: set `ALLOWED_ORIGINS` to the real domains (F7); revoke
-   `log_gdpr_event` from `anon` (F9); enable the leaked-password check (above); turn "Confirm email"
-   on once real SMTP is configured (F1's second half).
-4. Before a paid launch: close the limit race (F6) and schedule the retention job (F11).
+1. ~~Paste `supabase/migrations/0013_admins_table.sql`.~~ **DONE 2026-07-27**, alongside enabling
+   "Confirm email". F1 is closed.
+2. **Add Resend SMTP** (`docs/reference/auth-emails/README.md`). Not from the audit, but it became
+   required the moment "Confirm email" went on: Supabase's built-in sender allows only a handful of
+   messages an hour, so sign-up links can silently fail to arrive in a busy hour.
+3. Decide on the react-router 6 → 7 migration; the safe toolchain updates can ship meanwhile. (F2)
+4. Optional, cheap, do-anytime: set `ALLOWED_ORIGINS` to the real domains (F7); revoke
+   `log_gdpr_event` from `anon` (F9); enable the leaked-password check (above).
+5. Before a paid launch: close the limit race (F6) and schedule the retention job (F11).

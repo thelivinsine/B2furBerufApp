@@ -63,9 +63,12 @@ see `strategy/DATA_GOVERNANCE.md`).
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
 done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
-- [ ] **Paste `supabase/migrations/0013_admins_table.sql`** into the Supabase SQL editor, then sign
-      out/in and open `/admin` to confirm. Moves the admin gate off the email claim (audit F1). The
-      migration refuses to install a gate that would lock you out, so a wrong seed errors instead.
+- [x] ~~Paste `supabase/migrations/0013_admins_table.sql`.~~ **APPLIED 2026-07-27** by the founder in
+      the SQL editor, without the lock-out guard firing (it raises rather than swapping the gate when
+      the seed finds no account, so a clean run means `public.admins` is seeded). Audit F1 closed:
+      the admin gate is now a user-id table, not an email claim. Live confirmation that `/admin`
+      still opens is the founder's last check; the rollback to the 0008 email gate sits in a comment
+      at the foot of the migration if it ever does not.
 - [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
       is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
       `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
@@ -152,7 +155,8 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   `config.toml` has `enable_confirmations = false`. If the hosted project matches that, and if
   either address is not already registered, anyone can claim it via the guest-upgrade path
   (`updateUser({email})`, `useAuthStore.ts:121`) and get the feedback inbox plus `app_config` write.
-  **`supabase/migrations/0013_admins_table.sql` fixes it** and is the founder's one action: it moves
+  **`supabase/migrations/0013_admins_table.sql` fixes it, and the founder applied it on 2026-07-27**:
+  it moves
   the gate onto an `admins(user_id)` table (service-role only, no client policies), seeds it from the
   accounts holding those addresses today, and REFUSES to swap `is_founder()` if the seed matched
   nobody, so a wrong address errors out instead of locking everyone out. It also re-points the last

@@ -1889,3 +1889,14 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   - No code changed; gates unchanged from prompt 4 (test:unit 363/363).
 - **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` ·
   `docs/areas/LEGAL-ADMIN.md` · `docs/strategy/SECURITY.md` · this log
+- **Prompt 6 (verbatim, 2026-07-27):** `I ran the sql code in 1 successfully.` → Migration 0013
+  applied by the founder in the Supabase SQL editor. A clean run is itself evidence the seed worked:
+  the migration raises rather than swapping the gate when `public.admins` ends up empty, so "no
+  error" means the founder accounts were found and `is_founder()` now reads user ids, not the email
+  claim. Marked **audit F1 closed** in the report (headline, findings table, F1 body, action list),
+  in `docs/PROJECT_STATUS.md` (action list + s174 handoff) and in `docs/strategy/SECURITY.md`; the
+  stale "still worth doing separately: turn Confirm email on" paragraph in F1 was replaced, since
+  they had already done it. Remaining verification is live-only (that `/admin` still opens); the
+  rollback to the 0008 email gate sits in a comment at the foot of the migration.
+- **Prompt 7 (verbatim, 2026-07-27):** `complete documentation and merge to main` → Final doc pass
+  plus the ship. See the artifacts line for the PR.
