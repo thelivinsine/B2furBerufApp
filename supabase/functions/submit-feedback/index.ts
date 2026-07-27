@@ -69,15 +69,25 @@ const MAX_PAGE_LEN = 300;
 // both migration-free (no schema change → the founder only redeploys the
 // function):
 //   1. Per-IP burst limit — in-memory, catches a single source hammering the
-//      form. Best-effort: module state is per warm isolate and resets on cold
-//      start, so guard 2 is the hard ceiling.
+//      form. Best-effort in TWO ways: module state is per warm isolate and
+//      resets on cold start, AND the address comes from `x-forwarded-for`,
+//      which a caller reaching the function directly (this endpoint is
+//      deliberately unauthenticated) can put anything into. It slows an honest
+//      browser down; it does not stop a determined script.
 //   2. Global hourly email ceiling — a DB count over the existing feedback
 //      table. Once reached we STOP sending email (across every source) but
 //      still STORE the row, so nothing is lost and the inbox can never be
 //      flooded regardless of where the traffic originates.
+//   3. Global hourly STORAGE ceiling — because guard 1 is bypassable by
+//      rotating the forwarded-for header, guard 2 alone would leave row
+//      insertion unbounded: an attacker could not reach the founder's inbox but
+//      could still grow the table indefinitely. Past this ceiling the request is
+//      refused outright. It sits far above any plausible real hour of feedback,
+//      so honest submissions never meet it.
 const IP_WINDOW_MS = 10 * 60_000; // 10 minutes
 const IP_MAX_PER_WINDOW = 5; // ≤5 submissions per IP per window
 const GLOBAL_HOURLY_EMAIL_CAP = 60; // stop emailing past this many rows/hour
+const GLOBAL_HOURLY_ROW_CAP = Number(Deno.env.get("FEEDBACK_HOURLY_ROW_CAP") ?? "300");
 const RATE_LIMIT_MSG = "Zu viele Anfragen. Bitte versuche es in ein paar Minuten erneut.";
 
 /** Recent accepted submission timestamps per hashed IP (in-memory, transient). */
@@ -233,6 +243,9 @@ Deno.serve(async (req) => {
   // table, no schema change). Past the cap we stop emailing but still store the
   // row, so the inbox is hard-capped while no feedback is ever lost. On a count
   // error we allow the email (guard 1 still applies) rather than drop a legit one.
+  //
+  // The same count also drives guard 3 (the storage ceiling), so one query
+  // serves both: past GLOBAL_HOURLY_ROW_CAP nothing is stored or emailed.
   let emailAllowed: boolean;
   try {
     const since = new Date(Date.now() - 3_600_000).toISOString();
@@ -240,7 +253,11 @@ Deno.serve(async (req) => {
       .from("feedback")
       .select("id", { count: "exact", head: true })
       .gte("created_at", since);
-    emailAllowed = (count ?? 0) < GLOBAL_HOURLY_EMAIL_CAP;
+    const lastHour = count ?? 0;
+    if (lastHour >= GLOBAL_HOURLY_ROW_CAP) {
+      return json({ ok: false, message: RATE_LIMIT_MSG }, 429);
+    }
+    emailAllowed = lastHour < GLOBAL_HOURLY_EMAIL_CAP;
   } catch {
     emailAllowed = true;
   }

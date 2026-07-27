@@ -393,3 +393,41 @@ implementation of the two picks.
 - **Not verifiable from the sandbox:** the network policy blocks `*.supabase.co` (403 on CONNECT), so
   whether the column is live has to be confirmed in the app: write a Kurz text, open it in Verlauf,
   and the Original/Korrigiert toggle should appear.
+
+**Handoff after session 172 (2026-07-27). The correction in Kurz/Lang (founder pick A), merged as
+PR #739.**
+Prompt 13/14 built and re-shared `preview/kurz-lang-korrektur.html` (three places for the correction:
+A im Schreibfeld · B alles im Ergebnis · C zum Aufklappen, bottom cluster + Aufgabe card held identical
+across all three). The founder picked **A** and asked to "make sure both the tiles are harmonious with
+Fokus design", which was literal: the round-1 tiles lacked Fokus's `→`, and the Verlauf copies had
+drifted too (em dash where Fokus prints `∅`).
+- **ONE correction language:** the Fokus pieces now live in `src/features/writing/correction.tsx`
+  (`useCorrectionDiff`, `CorrectionToggle`, `MarkedTokens`, `MarkedParagraphs`, `FixTiles` with optional
+  `max` + `action`), and Fokus desktop, Kurz/Lang and Verlauf all render from it, so a fourth copy
+  cannot drift. `tests/correction.test.tsx` pins the tile anatomy. Fokus MOBILE keeps its own
+  two-column list (measured height, founder r4 amendment); Kurz/Lang shows tiles at both breakpoints
+  because its result page scrolls anyway.
+- **Kurz/Lang variant A:** the editor card becomes the correction card once a result lands. "Neu
+  schreiben" rides the tile row at `lg` (the Fokus "Neuer Satz" spot) and Auswerten drops out there
+  while a correction is up (it would only re-serve the cached verdict); the mobile cluster is
+  untouched. Any result WITHOUT a correction (error-free, templated spelling verdict, failure, limit)
+  keeps the plain field, so fixing and resubmitting still works. `useFillEditor` measures the bottom
+  clearance FIRST, so the field-less state still reserves the fixed chrome, and releases the Aufgabe cap
+  there. **No backend change:** `corrected` has been in the evaluate-writing response, cache included,
+  since s171.
+- **`classifyChange` gained "Kasus & Artikel"**: "in meine Wohnung → in meiner Wohnung" was labelled
+  Rechtschreibung, i.e. the tile taught the wrong rule on the most common B1/B2 mistake. Both sides must
+  be in a closed article/possessive/determiner set, so "das → dass" stays Rechtschreibung and a
+  case-only change stays Groß-/Kleinschreibung.
+- **Verification pattern worth reusing:** `preview/gen-kurz-lang-korrektur-r2.mjs` SSR-renders the REAL
+  components (via Vite `ssrLoadModule` + `react-dom/server`) beside the Fokus card and inlines the app's
+  built CSS, so a preview sheet cannot flatter the implementation. Emits light, dark and an
+  artifact-body variant (artifact `575786f8`). Note this sandbox has the Chromium binary at
+  `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` but NO playwright module, so screenshots go
+  through `chrome --headless --screenshot`.
+- **Gates:** typecheck · lint 0 errors · test:unit **327/327** · build · check:bundle 118.4 kB.
+- **Next:** the founder verifies the live result (Pages deploy from the squash-merge of #739). Open
+  question they may raise: the round-1 mock drew "Kasus üben" in the phone's bottom row, which the
+  shipped cluster does not do (the practice CTA stays inside the result card); changing that touches the
+  locked cluster and needs an explicit ask.
+

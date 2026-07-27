@@ -1723,3 +1723,58 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   neither is sufficient alone) and the deliberate no-update-banner decision; and the prompt-1 entry
   above gained its ship record. No code changed.
 - **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 174 — 2026-07-27 — branch `claude/app-security-audit-giuaqy`
+
+- **Prompt 1 (verbatim, 2026-07-27):** `do a thorough and comprehensive security audit of the app`
+- **Response summary:** Full-surface audit rather than a diff review: the browser bundle, all five
+  Supabase Edge Functions, all twelve migrations (RLS policies, SECURITY DEFINER RPCs, grants), the
+  five CI workflows, the build scripts, and the dependency tree. Report written to
+  `docs/reports/security-audit-2026-07-27.md` (13 findings, plus a "checked and found clean" section
+  so the next audit knows what has been ruled out).
+  - **Clean:** RLS on every table with owner-only policies (`ai_usage`, `feedback`,
+    `sentence_transforms`, `gdpr_events` have RLS on and NO policies, so service-role only); no
+    `dangerouslySetInnerHTML` / `eval` / `new Function` anywhere in `src/`; the help prerenderer
+    escapes every interpolation; CSP enforcing; no secrets committed (regex sweep for provider keys,
+    JWTs, PEM blocks came back empty); `delete-account` takes the user id ONLY from the verified JWT;
+    admin RPCs return aggregates with `assert_founder()` first and `revoke … from anon`; SW precaches
+    static assets only; CI has no `pull_request_target`, minimal `permissions:`, SHA-pinned actions;
+    build scripts shell out via `execFileSync`/`spawnSync` argument arrays; every `target="_blank"`
+    carries `rel="noreferrer"`.
+  - **Fixed in this pass (3).** F3: `genauly.writing.autosave` + `genauly.writing.resume` were in no
+    teardown path, so on a shared device learner B opened Schreiben into learner A's text (7-day TTL,
+    and these tasks are Beschwerden/Arzt-Mails/Anträge), and Art. 17 erasure left the learner's own
+    words on disk. Added `clearAllAutosavedDrafts()`; called with `clearWritingDraft()` from
+    `clearLocalAccountData()` (sign-out + deletion) and, autosave only, from the shared-device branch
+    of `startCloudSync()` — the one-shot resume draft is deliberately kept there because that branch
+    is ALSO the "hit the login wall, signed in" hand-off. F4: `submit-feedback` is unauthenticated by
+    design and its per-IP burst guard reads the caller-supplied leftmost `x-forwarded-for`, so row
+    insertion was unbounded (the inbox was already capped); the hourly count that gates email is now
+    also a hard storage ceiling (`FEEDBACK_HOURLY_ROW_CAP`, default 300, one query serves both).
+    Deliberately did NOT switch to the rightmost XFF entry: if a second proxy is ever added that
+    collapses every visitor into one 5-per-10-min bucket. F5: the GDPR export omitted
+    `sentence_checks` / `sentence_ai_ops`, i.e. every sentence written in Fokus.
+  - **F1 (high, founder action, NOT applied).** `is_founder()` is
+    `auth.jwt() ->> 'email' in (two Gmail addresses)` with no verified-email check, and
+    `supabase/config.toml` carries `enable_confirmations = false`. If the hosted project matches,
+    the existing guest-upgrade path (`updateUser({email})`, `useAuthStore.ts:121`) sets an address
+    with no proof of ownership — so the whole admin boundary rests on both addresses already being
+    registered. The report carries a drafted `admins(user_id)` migration; it is written but NOT
+    applied, because a wrong seed locks the founder out of their own admin panel.
+  - **F2 (high).** `pnpm audit` is no longer 0 as `SECURITY.md` claimed: 7 high + 3 moderate.
+    react-router 6.x has an open-redirect→XSS advisory with **no fix in the 6.x line**. Verified the
+    app is not reachable through it today (every dynamic `navigate()` / `to={}` builds its target
+    from internal ids and constants, never from a query param, hash or API response), so this is a
+    scheduling question, not an incident.
+  - Documented-not-fixed: check-then-act AI rate limits (F6, bounded by the $5 monthly fuse),
+    `*.github.io` CORS wildcard (F7), no clickjacking defence since `frame-ancestors` is ignored in a
+    meta CSP (F8), `log_gdpr_event()` executable by `anon` (F9), the optional `checkId` gate
+    contradicting migration 0009's comment (F10), no retention job on learner text (F11), missing
+    `set search_path` on the two founder helpers (F12).
+  - **Gates:** typecheck clean · lint 0 errors (75 warnings, unchanged from the untouched tree) ·
+    test:unit **345/345** · build green · check:bundle 119.7 kB (budget 400).
+  - No PR opened (none was asked for); pushed to the session branch.
+- **Artifacts (prompt 1):** `docs/reports/security-audit-2026-07-27.md` (new) ·
+  `src/features/writing/draftAutosave.ts` · `src/lib/cloudSync.ts` · `src/lib/dataExport.ts` ·
+  `supabase/functions/submit-feedback/index.ts` · `docs/strategy/SECURITY.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

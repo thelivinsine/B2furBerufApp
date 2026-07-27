@@ -1,6 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-27 (session 173). **A deploy can no longer refresh a learner's work away.**
+_Last updated: 2026-07-27 (session 174). **Full security audit shipped:**
+`docs/reports/security-audit-2026-07-27.md` covers the bundle, the five Edge Functions, all twelve
+migrations, CI and the dependency tree. Architecture held; three findings fixed in the same pass
+(local writing drafts now leave the device with the account, the unauthenticated feedback endpoint
+has a storage ceiling, the GDPR export includes the Satzlabor sentences). **One item needs the
+founder: the admin gate trusts an unverified email claim** (F1). Prior s173: **a deploy can no
+longer refresh a learner's work away.**
 The PWA's auto-update reload now waits while any surface holds unsaved work (`src/lib/liveWork.ts`),
 and both kinds of work persist so even an unavoidable reload is recoverable: writing drafts autosave
 per mode (`draftAutosave.ts`), and a running Üben session snapshots its plan + position
@@ -117,42 +123,39 @@ exactly the moment a learner returns to a half-written email. Fixed in two layer
   path ships the same deploy without asking anything of the learner. Revisit only if a deploy ever
   needs to be forced out mid-session (e.g. a broken backend contract).
 
-**Handoff after session 172 (2026-07-27). The correction in Kurz/Lang (founder pick A), merged as
-PR #739.**
-Prompt 13/14 built and re-shared `preview/kurz-lang-korrektur.html` (three places for the correction:
-A im Schreibfeld · B alles im Ergebnis · C zum Aufklappen, bottom cluster + Aufgabe card held identical
-across all three). The founder picked **A** and asked to "make sure both the tiles are harmonious with
-Fokus design", which was literal: the round-1 tiles lacked Fokus's `→`, and the Verlauf copies had
-drifted too (em dash where Fokus prints `∅`).
-- **ONE correction language:** the Fokus pieces now live in `src/features/writing/correction.tsx`
-  (`useCorrectionDiff`, `CorrectionToggle`, `MarkedTokens`, `MarkedParagraphs`, `FixTiles` with optional
-  `max` + `action`), and Fokus desktop, Kurz/Lang and Verlauf all render from it, so a fourth copy
-  cannot drift. `tests/correction.test.tsx` pins the tile anatomy. Fokus MOBILE keeps its own
-  two-column list (measured height, founder r4 amendment); Kurz/Lang shows tiles at both breakpoints
-  because its result page scrolls anyway.
-- **Kurz/Lang variant A:** the editor card becomes the correction card once a result lands. "Neu
-  schreiben" rides the tile row at `lg` (the Fokus "Neuer Satz" spot) and Auswerten drops out there
-  while a correction is up (it would only re-serve the cached verdict); the mobile cluster is
-  untouched. Any result WITHOUT a correction (error-free, templated spelling verdict, failure, limit)
-  keeps the plain field, so fixing and resubmitting still works. `useFillEditor` measures the bottom
-  clearance FIRST, so the field-less state still reserves the fixed chrome, and releases the Aufgabe cap
-  there. **No backend change:** `corrected` has been in the evaluate-writing response, cache included,
-  since s171.
-- **`classifyChange` gained "Kasus & Artikel"**: "in meine Wohnung → in meiner Wohnung" was labelled
-  Rechtschreibung, i.e. the tile taught the wrong rule on the most common B1/B2 mistake. Both sides must
-  be in a closed article/possessive/determiner set, so "das → dass" stays Rechtschreibung and a
-  case-only change stays Groß-/Kleinschreibung.
-- **Verification pattern worth reusing:** `preview/gen-kurz-lang-korrektur-r2.mjs` SSR-renders the REAL
-  components (via Vite `ssrLoadModule` + `react-dom/server`) beside the Fokus card and inlines the app's
-  built CSS, so a preview sheet cannot flatter the implementation. Emits light, dark and an
-  artifact-body variant (artifact `575786f8`). Note this sandbox has the Chromium binary at
-  `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` but NO playwright module, so screenshots go
-  through `chrome --headless --screenshot`.
-- **Gates:** typecheck · lint 0 errors · test:unit **327/327** · build · check:bundle 118.4 kB.
-- **Next:** the founder verifies the live result (Pages deploy from the squash-merge of #739). Open
-  question they may raise: the round-1 mock drew "Kasus üben" in the phone's bottom row, which the
-  shipped cluster does not do (the practice CTA stays inside the result card); changing that touches the
-  locked cluster and needs an explicit ask.
+**Handoff after session 174 (2026-07-27). Full security audit:
+`docs/reports/security-audit-2026-07-27.md`.**
+Full-surface review (bundle · five Edge Functions · twelve migrations · CI · dependency tree), not a
+diff review. The architecture held up: RLS covers every table, no injection sink exists in `src/`,
+the CSP is enforcing, CI actions are SHA-pinned, secrets are server-side only, and `delete-account`
+derives its user id from the JWT alone. Thirteen findings; three fixed in this pass.
+- **Fixed here.** (1) Writing drafts (`genauly.writing.autosave` / `.resume`) were in no teardown
+  path, so on a shared device the next learner opened Schreiben into the previous one's text, and an
+  erasure request left it on disk for a week. Now cleared from `clearLocalAccountData()` (sign-out +
+  deletion) and, autosave only, from the shared-device branch of `startCloudSync()` (the resume draft
+  is kept there on purpose: that branch is also the login-wall hand-off). (2) `submit-feedback` is
+  unauthenticated by design and its per-IP guard reads the caller-supplied `x-forwarded-for`, so row
+  insertion was unbounded; the hourly count that already gates email is now also a hard storage
+  ceiling (`FEEDBACK_HOURLY_ROW_CAP`, default 300). (3) The GDPR export omitted `sentence_checks` /
+  `sentence_ai_ops`, i.e. every sentence the learner wrote in Fokus.
+- **The one item that needs the founder (F1, high).** Admin access is `auth.jwt() ->> 'email' in
+  (two Gmail addresses)`, with no check that the address was ever verified, and
+  `config.toml` has `enable_confirmations = false`. If the hosted project matches that, and if
+  either address is not already registered, anyone can claim it via the guest-upgrade path
+  (`updateUser({email})`, `useAuthStore.ts:121`) and get the feedback inbox plus `app_config` write.
+  Two steps: confirm both accounts exist and turn "Confirm email" on today; then move the gate to an
+  `admins(user_id)` table (migration drafted in the report, deliberately not applied — a wrong seed
+  locks the founder out).
+- **Also open:** `pnpm audit` is no longer 0 (7 high + 3 moderate); react-router 6.x has an open
+  redirect with **no fix in the 6.x line**, so a 6→7 migration needs scheduling (the app is not
+  reachable through it today — every `navigate()` target is built from internal ids, and that is now
+  a rule worth keeping). Lower: `*.github.io` is still wildcard-allowlisted on every function; the AI
+  daily/monthly limits are check-then-act so parallel requests slip past them (bounded by the $5
+  fuse); `log_gdpr_event()` is callable by `anon`; no retention job on learner text.
+- **Gates:** typecheck · lint 0 errors (75 warnings, same as the untouched tree) · test:unit
+  **345/345** · build · check:bundle 119.7 kB.
+- **Next:** the founder works the action list at the end of the report (item 1 first). Nothing in
+  this session changes what a learner sees.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
