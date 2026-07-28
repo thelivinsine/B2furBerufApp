@@ -227,3 +227,32 @@ precache ceiling**, which fails `pnpm build` outright. The branch fixes it by ad
 on demand instead of being precached into every learner's cache (PWA precache 7,155 KiB → 5,174 KiB).
 **This will bite again on the next sizeable content addition, from any source.** Worth cherry-picking
 on its own.
+
+**Handoff after session 175 (2026-07-28), third task.** _(Archived from `PROJECT_STATUS.md` in
+session 177.)_
+
+**Handoff after session 175 (2026-07-28), third task. The PWA precache ceiling, defused on its own.**
+Merged as **PR #750** (docs) and **PR #751** (this fix). Branch `claude/pwa-precache-fix`.
+Salvaged from the parked word-field branch, because the problem is not about words at all.
+
+- **What was actually wrong.** The `/sources` + `/admin/pruefen` workbench chunk bundles the entire
+  provenance + verification register, so its size tracks the content banks and nothing else. Workbox
+  refuses to precache any single asset over **2 MiB** and **fails the build** when it meets one; it
+  does not warn and carry on. On `main` the chunk measured **1,963.67 kB** at 3,107 provenance rows.
+  The ceiling is 2,097 kB, and each new content item costs roughly 0.6 kB across the two registers,
+  so `main` was about **200 content items** from a build failure whose error message names the
+  service worker and never mentions the content that caused it.
+- **The fix.** `vite.config.ts` adds `**/useWorkbench-*.js` to `globIgnores`. The chunk is
+  founder-only and needs a live connection to load review data anyway, so precaching it into every
+  learner's cache bought nothing. It now loads on demand, unchanged in behaviour. The comment in the
+  config explains the trap so the line does not get "tidied away" later; `docs/areas/CONTENT.md`
+  carries the same warning next to the register description.
+- **Measured effect.** PWA precache **6,947 KiB → 5,029 KiB** (121 entries, was 122): a ~1.9 MB
+  smaller first load for every learner, on top of removing the build risk. The chunk itself is
+  unchanged at 1,963.67 kB; it is simply no longer precached.
+- **Proof it works.** On the parked branch the same build failed at a 2.11 MB chunk and passed with
+  this line present, chunk size unchanged. That is the before/after.
+- **Gates:** `typecheck` · `build` green · `lint` 0 errors (75 warnings, unchanged) · `test:unit`
+  370/370 · `check:bundle` 123.2 kB of 400 kB · `lint:content` clean (banks untouched).
+- **Correction to an earlier estimate in this session:** the headroom was reported to the founder as
+  "about 60 rows". Measured properly it is ~200 content items. Worth fixing, not an emergency.

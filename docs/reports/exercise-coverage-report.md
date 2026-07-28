@@ -20,8 +20,8 @@ Gezählt wird das **volle Menü, das ein Thema über alle Stufen (A2–C1) und m
 
 - **20 Themen** geprüft: 🟢 **20 reich** · 🟡 **0 ok** · 🔴 **0 dünn**.
 - **Auf Themen-Ebene ist die Vielfalt ausgeschöpft:** jedes Thema kann bereits alle Übungstypen bieten. Die restliche Arbeit ist Feinarbeit auf **Wort-Ebene** (unten).
-- **108 einzelne Wörter** haben keinen Beispielsatz, der das Wort selbst benutzt (diese Wörter erscheinen nie als Lückentext, Tipp-Lücke oder Hör-Übung).
-- **68 einzelne Wörter** haben keine verknüpften „verwandten Wörter“ (erscheinen nie als Ausreißer).
+- **116 einzelne Wörter** haben keinen Beispielsatz, der das Wort selbst benutzt (diese Wörter erscheinen nie als Lückentext, Tipp-Lücke oder Hör-Übung).
+- **67 einzelne Wörter** haben keine verknüpften „verwandten Wörter“ (erscheinen nie als Ausreißer).
 
 > Diese restlichen Lücken sind **günstig** zu schließen (kleine Inhaltsergänzungen, kein neuer Code). Der teure Schritt (Phase 4: eigens geschriebene oder KI-erzeugte Übungen) lohnt sich erst, wenn diese günstigen Lücken geschlossen sind UND Lernende sich trotzdem wiederholende Übungen ansehen – und das misst dieser Bericht bewusst nicht (dazu braucht es Nutzungsdaten).
 
@@ -74,13 +74,13 @@ Jedes Thema oben bietet zwar alle Typen, aber **einzelne Wörter** können nur w
 
 | Thema | Wörter ohne eigenen Beispielsatz | Wörter ohne verwandte Wörter |
 | --- | ---: | ---: |
-| Kundenkommunikation | 17 | 6 |
+| Kundenkommunikation | 21 | 5 |
+| Projektkoordination | 16 | 6 |
 | Technik & Digitalisierung | 15 | 7 |
-| Projektkoordination | 15 | 6 |
+| Arbeitssicherheit & Gesundheit | 12 | 3 |
+| Konfliktlösung | 4 | 11 |
 | Termine & Planung | 8 | 7 |
-| Arbeitssicherheit & Gesundheit | 11 | 3 |
 | Besprechungen & Teamarbeit | 5 | 9 |
-| Konfliktlösung | 2 | 11 |
 | Geschäftsreisen | 6 | 4 |
 | Logistik & Transport | 7 | 2 |
 | Arzt & Gesundheit | 5 | 2 |

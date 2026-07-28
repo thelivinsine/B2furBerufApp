@@ -2196,3 +2196,50 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   future session does not widen a closed enum for five items. Docs-only; no bank, code or config
   change, so no gates beyond `lint:content` staying clean.
 - **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/areas/CONTENT.md` · this log · **PR #754**
+
+## Session 177 — 2026-07-28 — branch `claude/complaint-response-vocab-cwlqvj`
+
+- **Prompt 1 (verbatim, 2026-07-28):** `can you add the following vocabulary similar to previous
+  sessions to the app?:` followed by a Markdown word field titled "B2/C1 Vocabulary – Complaint
+  Response (Reinigungsservice)", 12 numbered sections (1 Referring to the Complaint, 2 Apologising,
+  3 Talking about Problems [nouns + verbs], 4 Useful Collocations, 5 Explaining the Cause,
+  6 Talking about Employees, 7 Explaining Staff Shortages, 8 Taking Action, 9 Giving Assurance,
+  10 Future Improvements, 11 Customer Service Vocabulary, 12 Formal Closing Expressions) plus three
+  glossary sections (High-Frequency B2 Business Verbs, High-Frequency B2 Business Nouns, Connectors).
+- **Response summary:** Recognised the branch already sat exactly on `main` (`b151e35`, which itself
+  carries session 176's formal-complaint-response pack, PR #752), so this was a second, overlapping
+  word field rather than a resumed task. Loaded `vocabulary` / `collocations` / `redemittel` through
+  Vite's `ssrLoadModule` (same method as s176) and audited all ~150 requested items, including the
+  three glossary sections, against the live banks. **~90 items were already shipped** (mostly by the
+  s176 pack: `bezüglich`, `hinsichtlich`, `in Bezug auf`, `aufgrund`, `infolge`, `entstehen`,
+  `auftreten`, `vorkommen`, `verursachen`, `Beschwerde`, `Beanstandung`, `Mangel`, `Vorfall`,
+  `Verzögerung`, `Unannehmlichkeit`, `Maßnahmen ergreifen`, `alles daransetzen`, `um Entschuldigung
+  bitten`, `sich aufrichtig entschuldigen`, `Verständnis haben für`, `einen Engpass überbrücken` …).
+  **60 new items added**, split by the bank rules: 38 Wörter (`v_sich_ereignen`, `v_feststellen`,
+  `v_sich_ergeben`, `v_beeintraechtigen`, `v_hervorrufen`, `v_ausloesen`, `v_fuehren_zu`,
+  `v_einsetzen`, `v_einstellen`, `v_betreuen`, `v_untersuchen`, `v_analysieren`, `v_mitteilen`,
+  `v_verhindern`, `v_dafuer_sorgen`, `v_leidtun`, `v_schwierigkeit`, `v_unregelmaessigkeit`,
+  `v_mitarbeitende`, `v_personal`, `v_reinigungspersonal`, `v_ersatzpersonal`, `v_fachkraft`,
+  `v_personalmangel`, `v_personalengpass`, `v_krankheitsfall`, `v_dienstleistung`, `v_service`,
+  `v_reinigung`, `v_raeumlichkeiten`, `v_objekt`, `v_wegen`, `v_bedingt_durch`, `v_verursacht_durch`,
+  `v_kuenftig`, `v_zukuenftig`, `v_krankheitsbedingt`, `v_voruebergehend`); 18 Kollokationen
+  (`c_bezug_nehmen_auf`, `c_aufmerksam_machen`, `c_bedauern_ausdruecken`, `c_bedauern_aussprechen`,
+  `c_um_verstaendnis_bitten`, `c_es_kommt_zu`, `c_beschwerde_eingehen`, `c_ablauf_beeintraechtigen`,
+  `c_ersatzpersonal_einsetzen`, `c_personal_einstellen`, `c_ersatz_organisieren`,
+  `c_vorfall_untersuchen`, `c_sachverhalt_pruefen`, `c_verbesserungen_umsetzen`,
+  `c_mitarbeitende_schulen`, `c_qualitaetskontrollen_durchfuehren`, `c_massnahmen_treffen`,
+  `c_raeumlichkeiten_betreuen`); 4 Redemittel (`r_mail19`-`r_mail22`, category `emails`). Only
+  `die Reinigung` and `das Reinigungspersonal` carry `sectors: ["cleaning"]`; the rest of the
+  Reinigungsservice-framed vocabulary (staffing shortages, apology/assurance language, formal
+  closings) stays untagged since it applies to any service business, not just cleaning. 60 new
+  provenance rows, all `authored`/`OWNED`/`draft`. Regenerated `frequency.ts`, the noun oracles,
+  exercise-coverage and the review-queue report.
+  Gates: lint:content ✔ (1,743 vocab · 1,072 collocations · 158 Redemittel · 3,273 provenance) ·
+  build:frequency-subset + build:frequency (regenerated; `wordfreq` needed a fresh `pip install`) ·
+  build:oracles + verify:facts ✔ 0 gate errors · build · check:bundle 123.2 kB · lint 0 errors ·
+  test:unit 370/370 · report:exercise-coverage (20/20 green) · build:review-queue.
+- **Artifacts:** `src/data/vocabulary.ts` · `src/data/collocations.ts` · `src/data/redemittel.ts` ·
+  `src/data/provenance.ts` · `src/data/frequency.ts` (generated) · `scripts/vendor/*.json`
+  (generated) · `src/features/admin/reviewQueue.json` (generated) · `docs/reports/*` (generated) ·
+  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s175 third-task handoff aged into the W31
+  archive) · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log · **PR #755**

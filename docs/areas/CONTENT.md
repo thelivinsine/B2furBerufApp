@@ -2,7 +2,7 @@
 
 Read this before adding or editing anything under `src/data/`. The add-content workflow checklist
 lives in the `/content` skill (`.claude/skills/content/SKILL.md`); this file is the reference.
-Counts below are as of s176; re-verify against `pnpm lint:content` before quoting.
+Counts below are as of s177; re-verify against `pnpm lint:content` before quoting.
 
 ## Hard invariants (also in CLAUDE.md)
 - **Shipped content ids are PERMANENT.** Learner progress (FSRS cards, practice counts, saved
@@ -71,7 +71,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 - Helpers: `filterVocab({theme, sub, cefr})`, `vocabBySubTheme`, `collocationsBySubTheme`.
 
 ## Banks
-- **Vocabulary** (`src/data/vocabulary.ts`, ~1,705 words): each entry has `id` (`v_`), article
+- **Vocabulary** (`src/data/vocabulary.ts`, ~1,743 words): each entry has `id` (`v_`), article
   (nouns), plural (countable nouns), pronunciation hint, two example sentences, related terms; all
   tagged `cefr`, split themes carry `subThemeId`, sector-specific items a `sectors[]` multi-tag
   (1-4 typical; general words stay untagged). **The bank is two concatenated array literals**
@@ -87,7 +87,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `vocabulary` stay the FULL bank so ids still resolve. `lintVocabCollocationOverlap` **errors** if
   a vocab `de` equals a collocation `full` unless the id is retired: add the combo to Kollokationen
   + the id to `RETIRED_VOCAB_IDS`.
-- **Collocations** (`src/data/collocations.ts`, ~1,054 Nomen-Verb pairs): `id` (`c_` prefix +
+- **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
 - **Grammar** (`src/data/grammar.ts`, 24 topics / 117 drills): `GrammarTopic` with `id` (`g_`),
@@ -97,7 +97,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   Topics ordered by B2-marker priority (`grammarMeta.ts` `groupOrder`). Drills: `id`, `prompt`,
   `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
   the EN peek; sessions keep it visible).
-- **Redemittel** (`src/data/redemittel.ts`, ~154; `r_` prefix).
+- **Redemittel** (`src/data/redemittel.ts`, ~158; `r_` prefix).
 - **Can-Do milestones** (`src/data/canDo.ts`, 52): `id` (`cd_`), `themeId`, `cefr`, `statement`
   (German, must start with "Ich kann"), `en`, `threshold` (0..1 theme-mastery ratio). Aligned to
   the CoE CEFR self-assessment descriptors (cited in provenance, never reproduced). Keep ascending
@@ -141,7 +141,7 @@ word-graph edges, by design; visible, not a gate).
 ## Provenance register (`src/data/provenance.ts`)
 One `ProvenanceEntry` row per content_id: `origin` (authored/sourced/adapted), `reference`
 (Wiktionary/DWDS/Tatoeba URL), `license` (SPDX from the allowlist), `review_status`
-(draft/verified), who added/verified. All ~3,213 items have rows with non-empty `reference`; **all
+(draft/verified), who added/verified. All ~3,273 items have rows with non-empty `reference`; **all
 are `draft`, 0 `verified`** (human verification reset to zero 2026-07-22 at founder request; the
 `human` tier on `/sources` reads 0 until the review pass restarts). The register is **two
 concatenated array literals** (`provenancePart1/2`, TS2590); append new rows to the second. Game
