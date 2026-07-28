@@ -1,6 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-28 (session 175). **Fokus mobile tiles breathe.** The two mobile Fokus tiles
+_Last updated: 2026-07-28 (session 175). **A 238-item word-field pack is built, gated and PARKED, not
+shipped.** A founder word list was checked against every bank (36 headwords already there) and the
+gap closed on branch `claude/word-list-validation-br3u2g`, all gates green. It is **not on `main`**:
+the list came from photographed pages of a commercial telc B2 Beruf coursebook, and
+`strategy/DATA_GOVERNANCE.md` puts telc materials on the do-not-use list and forbids copying a
+published word list wholesale. **PR #749 was withdrawn.** Bank counts below are unchanged and still
+describe live `main`. Prior s175: **Fokus mobile tiles
+breathe.** The two mobile Fokus tiles
 filled the room down to the fixed bottom chrome to the last pixel and read as cramped; they now keep
 90% of it (`FILL_RATIO` in `FokusTrainer.tsx`), anchored at the same top, and sit `gap-5` apart, so
 the freed strip sits under the lower tile. Prior s174: **Security audit + the sign-up flow it uncovered.**
@@ -98,104 +105,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 174 (2026-07-27). Full security audit:
-`docs/reports/security-audit-2026-07-27.md`.**
-Full-surface review (bundle · five Edge Functions · twelve migrations · CI · dependency tree), not a
-diff review. The architecture held up: RLS covers every table, no injection sink exists in `src/`,
-the CSP is enforcing, CI actions are SHA-pinned, secrets are server-side only, and `delete-account`
-derives its user id from the JWT alone. Thirteen findings; three fixed in this pass.
-- **Fixed here.** (1) Writing drafts (`genauly.writing.autosave` / `.resume`) were in no teardown
-  path, so on a shared device the next learner opened Schreiben into the previous one's text, and an
-  erasure request left it on disk for a week. Now cleared from `clearLocalAccountData()` (sign-out +
-  deletion) and, autosave only, from the shared-device branch of `startCloudSync()` (the resume draft
-  is kept there on purpose: that branch is also the login-wall hand-off). (2) `submit-feedback` is
-  unauthenticated by design and its per-IP guard reads the caller-supplied `x-forwarded-for`, so row
-  insertion was unbounded; the hourly count that already gates email is now also a hard storage
-  ceiling (`FEEDBACK_HOURLY_ROW_CAP`, default 300). (3) The GDPR export omitted `sentence_checks` /
-  `sentence_ai_ops`, i.e. every sentence the learner wrote in Fokus.
-- **The one item that needs the founder (F1, high).** Admin access is `auth.jwt() ->> 'email' in
-  (two Gmail addresses)`, with no check that the address was ever verified, and
-  `config.toml` has `enable_confirmations = false`. If the hosted project matches that, and if
-  either address is not already registered, anyone can claim it via the guest-upgrade path
-  (`updateUser({email})`, `useAuthStore.ts:121`) and get the feedback inbox plus `app_config` write.
-  **`supabase/migrations/0013_admins_table.sql` fixes it, and the founder applied it on 2026-07-27**:
-  it moves
-  the gate onto an `admins(user_id)` table (service-role only, no client policies), seeds it from the
-  accounts holding those addresses today, and REFUSES to swap `is_founder()` if the seed matched
-  nobody, so a wrong address errors out instead of locking everyone out. It also re-points the last
-  hard-coded email policy (`provenance_reviews`, from 0007) at `is_founder()` and pins `search_path`
-  on both helpers (F12). Idempotent, rollback in a trailing comment, pinned by `tests/admin.test.ts`.
-  Turning "Confirm email" on is a SEPARATE, later task: Supabase's built-in mailer is rate-limited to
-  a few messages an hour, so it needs real SMTP first or sign-ups start failing.
-- **Also open:** `pnpm audit` is no longer 0 (7 high + 3 moderate); react-router 6.x has an open
-  redirect with **no fix in the 6.x line**, so a 6→7 migration needs scheduling (the app is not
-  reachable through it today — every `navigate()` target is built from internal ids, and that is now
-  a rule worth keeping). Lower: `*.github.io` is still wildcard-allowlisted on every function; the AI
-  daily/monthly limits are check-then-act so parallel requests slip past them (bounded by the $5
-  fuse); `log_gdpr_event()` is callable by `anon`; no retention job on learner text.
-- **Then the audit's own recommendation broke sign-up, which turned out to be a good thing.** The
-  founder switched "Confirm email" ON, and email sign-up stopped working: clicking the link
-  confirmed the account server-side but never signed anyone in, and coming back to the (default)
-  "Konto erstellen" tab produced a "confirm your email" toast that would never come true. TWO
-  independent bugs, neither introduced by the audit, both live since email sign-up existed:
-  - **The link could not deliver a session.** Supabase's default template returns it in the URL
-    HASH; React Router rewrites the URL as it mounts, so the tokens were gone before any code read
-    them, and the client runs PKCE, which does not look there anyway (the same collision
-    `lib/supabase.ts` documents for Google). `src/lib/authCallback.ts` now snapshots the parameters
-    at module-eval time (imported FIRST in `main.tsx`, before `createRoot`), and the new ungated
-    route **`/auth/confirm`** (`features/auth/ConfirmEmail.tsx`) completes the sign-in. It accepts
-    all three shapes (`token_hash` → `verifyOtp`, hash tokens → `setSession`, `?code=` already
-    consumed by supabase-js), so it works with or without the branded template. `signUp` pins
-    `emailRedirectTo` to the running origin, so a wrong Site URL can no longer strand a learner.
-  - **A second sign-up with the same address looked like a fresh one.** With confirmations ON,
-    Supabase answers an already-registered address with a success-shaped response and NO error (it
-    will not reveal which addresses exist), so `needsConfirmation` was true. The tell is an empty
-    `identities` array: `signUp` now returns `alreadyRegistered` and the dialog switches to Anmelden
-    with the address kept. The existing `friendlyError` "already registered" mapping never fired
-    because that path produces no error to map.
-- **Auth dialog reworked** (all three founder complaints): password reveal toggle; the AGB checkbox
-  moved from the top of the dialog to directly above the button it gates; the primary and Google
-  buttons no longer sit disabled-at-default but always act and NAME the first unmet requirement in
-  one message slot; and the confirmation state became a panel that keeps the dialog open, shows the
-  address and offers "E-Mail erneut senden". Screenshot from the real component:
-  `preview/auth-dialog.html` (open it with `pnpm dev`).
-- **Caught by the new tests:** the dialog's reset effect listed `clearError` in its dependencies, so
-  any store handing back a fresh action identity per render wiped the consent tick and the pending
-  panel the instant they were set. Now a ref synced in its own effect.
-- **Gates:** typecheck · lint 0 errors (75 warnings, same as the untouched tree) · test:unit
-  **363/363** · build · check:bundle 122.9 kB.
-- **Then four rounds of live debugging (#743, #744, #745), all from one founder report that started
-  as "login with email doesn't work now".** Worth reading before touching auth or sync: the report
-  was accurate, my first two diagnoses were not, and the fault was nowhere near where I was looking.
-  - **#743, two real defects on the log-in path, neither the reported one.** `signIn` inferred
-    `needsConfirmation` from a response carrying no session as well as from the error, so a correct
-    password could be answered with "check your inbox"; and an unconfirmed account had the whole
-    log-in form replaced by the sign-up "check your inbox" panel, which claims a link was just sent
-    (untrue there) and removed the only way in. `pending` and `resendFor` are now separate states.
-  - **#744, after the founder added "with a secondary account, it redirects me to landing page".**
-    That sentence reframed everything: the sign-in was SUCCEEDING. `RequireOnboarding` sent every
-    resolved not-onboarded visitor to `/welcome`, i.e. the page that asks you to sign up, which is
-    indistinguishable from a failed log-in. Signed-out still goes there; an account holder now goes
-    to `/start`. A successful sign-in FROM a public page also now hands over to `/`, because the
-    dialog closing left the learner on a landing page still showing "Start free".
-  - **#745, the root cause, and it explains all three symptoms.** `mergeRemoteSettings` decided
-    whether to adopt a cloud profile with `if (!profile.name) return`. Onboarding collects goal,
-    mode and level and NO name, so `name` was `""` for every account ever created and the guard
-    bailed every time. Since a sign-in wipes the local cache first (account isolation, deliberate),
-    `onboarded` could only return from the cloud, and never did. Latent since that line was written:
-    any learner signing in on a second device silently lost their level and goal. Adoption now tests
-    `settings.onboarded`, which still rejects the empty row the sign-up trigger creates.
-  - **The rule that came out of it, now a CLAUDE.md invariant:** when a check needs to know whether
-    state exists, ask the flag that means that, never a field that usually accompanies it. A proxy
-    that is right most of the time fails silently and permanently when it is wrong.
-- **Gates across the round:** typecheck · lint 0 errors (75 warnings) · test:unit **370/370**
-  (+7 over the audit PR: `authDialog` router destinations, `cloudSync` profile adoption) · build ·
-  check:bundle within budget.
-- **Next:** Resend SMTP is the one open founder action (`docs/reference/auth-emails/README.md`).
-  Then, when scheduled, the react-router 6 → 7 migration from audit F2. **The founder should expect
-  onboarding ONCE more per account** after #745: that run is what finally writes a flag the app can
-  read back.
-
 **Handoff after session 175 (2026-07-28). Fokus mobile tiles: 10% shorter from the bottom.**
 Branch `claude/fokus-tile-height-9lxw8g`.
 Founder: the two mobile Fokus tiles looked cramped. They filled the room between their top and the
@@ -213,6 +122,61 @@ Korrigieren cluster.
   records the 90% rule.
 - **Gates:** typecheck · lint 0 errors (75 warnings, unchanged) · build. Phone verification is the
   founder's, as usual.
+
+**Handoff after session 175 (2026-07-28), second task. A word-field pack built, gated, then PARKED
+on licensing grounds.** Branch `claude/word-list-validation-br3u2g` (commit `9032660`), **not merged**.
+Founder sent four photos of a **telc Deutsch B2 Beruf Wortschatzliste** and asked which words the app
+already had, with the rest added at audit-ready quality. The work was done and every gate passed. It
+was then parked, unshipped, because of where the list came from. Nothing reached `main`.
+
+**Why it is parked (read this before reviving the branch).** `docs/strategy/DATA_GOVERNANCE.md`
+§"What counts as traceable" already answers the question the founder asked afterwards:
+> "A specific published word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database
+> rights in its selection and arrangement, so we never copy a protected list wholesale. We verify
+> individual entries against open references instead."
+
+and the same file lists **telc materials** under "Sources we do NOT use", as does the "Sources to
+avoid" table in `PROJECT_REFERENCE.md`. The branch does the forbidden thing: it transcribes the list
+page by page, keeps the book's section order, and names the book's chapters in the code comments and
+in all 238 provenance notes. That rule should have been checked before transcribing, not after.
+
+**The legal shape of it, for whoever picks this up.**
+- **The words are safe.** Single German words, their articles and plurals are facts; nothing owns
+  "der Absolvent". Any of them is usable if verified against DWDS or Wiktionary, which is what the
+  policy prescribes and what the branch already did.
+- **The authored material is safe.** The 464 example sentences, glosses, pronunciation hints, context
+  notes, related terms, CEFR tags and theme assignments are original and appear in no book.
+- **The selection and arrangement are the exposure.** Two rights: §4 UrhG (creative compilation) and,
+  the sharper one, the **sui generis database right** (§§87a-87e UrhG, EU Directive 96/9/EC), which
+  needs no creativity, runs 15 years, and is infringed by extracting a substantial part.
+- **Trademark is already handled.** `TermsOfService.tsx` states in both languages that Genauly is not
+  affiliated with, endorsed by, or a source of Goethe-Institut or telc material. Naming the exam is
+  lawful nominative use; keep the disclaimer wherever telc appears.
+
+**If the branch is revived,** the fix is to remove the structural fingerprint rather than the
+vocabulary: drop the book's chapter names from the section comments and the 238 provenance notes,
+re-derive the selection from the app's own `frequency.ts` bands plus the sub-theme taxonomy (an
+independent, defensible rationale), and cut the handful of entries that only exist because they were
+on that page (`der Fluggerätemechaniker`, `das Zweigwerk`, `die Lagerliste`, `das Pflegezertifikat`,
+`das Präsenzseminar`). Most of the pack is ordinary B2 workplace German that any independent
+selection would reach anyway, so the overlap alone is not the problem.
+
+**What is on the branch, if it is ever wanted.** 232 vocabulary entries in `vocabularyPart2`, 6
+Nomen-Verb combos in the collocation bank (`Kenntnisse erwerben`, `zur Verfügung stehen`,
+`Produkte einführen`, `Ruhe bewahren`, `das Du anbieten`, `den Schluss nahelegen`), and 238 matching
+provenance rows. Gates all green: `lint:content` · `build` · `verify:facts` 0 errors at 98% oracle
+coverage · `build:frequency` · `build:verification` · `lint` 0 errors · `test:unit` 370/370 ·
+`check:bundle` 123.2 kB · `report:exercise-coverage` 20/20 · `build:review-queue`. Two gate findings
+were fixed in the branch: `die Geldsorgen` lost its `plural` field so the plurale-tantum detector
+recognises it, and `sich behaupten` moved B2.2 → B2.1, restoring `verify:cefr` to 0 FLAG.
+
+**One finding on the branch is worth salvaging independently of the content.** The growing provenance
+and verification register pushed the founder-only workbench chunk past workbox's **2 MiB per-asset
+precache ceiling**, which fails `pnpm build` outright. The branch fixes it by adding
+`**/useWorkbench-*.js` to `globIgnores` in `vite.config.ts`, so `/sources` and `/admin/pruefen` load
+on demand instead of being precached into every learner's cache (PWA precache 7,155 KiB → 5,174 KiB).
+**This will bite again on the next sizeable content addition, from any source.** Worth cherry-picking
+on its own.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
