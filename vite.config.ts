@@ -38,6 +38,12 @@ export default defineConfig({
         // Cache everything vite emits. The glob must cover hashed asset
         // filenames (js/css/html) as well as the root index.html.
         globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
+        // The provenance workbench chunk (/sources + /admin/pruefen) carries the
+        // whole provenance + verification register and is founder-only, so it is
+        // fetched on demand instead of precached into every learner's cache. It
+        // also passed workbox's 2 MiB per-asset precache ceiling as the register
+        // grew, which failed the build outright.
+        globIgnores: ["**/useWorkbench-*.js"],
         // Navigate fallback so direct clean-URL routes (e.g. /settings) are
         // served index.html by the SW instead of 404ing on reload, once the
         // SW is installed. (First-ever visits are handled by 404.html, see

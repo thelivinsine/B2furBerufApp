@@ -16,14 +16,14 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1330**
-- Covered by ≥1 oracle: **1300** (98%)  ·  not covered: **30**
-- ✔ Article verified: **1281**  (618 by both oracles, 663 by one)
-- ✔ Plural verified: **843**  (496 by both oracles, 347 by one)
+- Nouns checked: **1488**
+- Covered by ≥1 oracle: **1456** (98%)  ·  not covered: **32**
+- ✔ Article verified: **1431**  (667 by both oracles, 764 by one)
+- ✔ Plural verified: **922**  (533 by both oracles, 389 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
-- ⚑ Review signals (one oracle only, or oracles disagree): **8**
-- ◑ Plural-form headwords (gender not comparable): **11**
-- ~ We assert a plural, but no oracle lists one to compare: **159**
+- ⚑ Review signals (one oracle only, or oracles disagree): **13**
+- ◑ Plural-form headwords (gender not comparable): **12**
+- ~ We assert a plural, but no oracle lists one to compare: **191**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -41,10 +41,15 @@ A single oracle differs, or the two oracles differ from each other (usually a va
 |---|---|---|---|---|
 | `v_ansprechpartner` | der Ansprechpartner / die Ansprechpartnerin | article | der | B:die~head |
 | `v_bekannter` | der Bekannte | article | der | A:das |
+| `v_beschaeftigte` | die Beschäftigte | article | die | A:das |
+| `v_beschaeftigter` | der Beschäftigte | article | der | A:das |
 | `v_betriebskosten` | die Betriebskosten | article | die | B:der~head |
+| `v_erwerbstaetige` | die Erwerbstätige | article | die | A:das |
+| `v_erwerbstaetiger` | der Erwerbstätige | article | der | A:das |
 | `v_lkw_fahrer` | der LKW-Fahrer / die LKW-Fahrerin | article | der | B:die~head |
 | `v_onlinebanking` | das Online-Banking | article | das | B:der~head |
 | `v_scope_creep` | das Scope-Creep / die Aufgabenerweiterung | article | das | B:die~head |
+| `v_sie_form` | das Sie | article | das | B:die|der |
 | `v_vermittler` | der Vermittler / die Vermittlerin | article | der | B:die~head |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter | article | die | B:der~head |
 
@@ -56,6 +61,7 @@ Auto-detected and skipped, not counted as errors.
 | id | headword |
 |---|---|
 | `v_bedenken` | die Bedenken |
+| `v_geldsorgen` | die Geldsorgen |
 | `v_heizkosten` | die Heizkosten |
 | `v_lagerhaltungskosten` | die Lagerhaltungskosten |
 | `v_lagerkosten` | die Lagerkosten |
@@ -72,7 +78,7 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>30 items</summary>
+<details><summary>32 items</summary>
 
 | id | headword |
 |---|---|
@@ -86,6 +92,8 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_girocard` | die Girocard |
 | `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
+| `v_lagerlogistiker` | der Lagerlogistiker |
+| `v_lagerlogistikerin` | die Lagerlogistikerin |
 | `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
 | `v_nachbereitung` | die Nachbereitung |
@@ -114,7 +122,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>159 items</summary>
+<details><summary>191 items</summary>
 
 | id | headword |
 |---|---|
@@ -126,6 +134,8 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_anerkennungsverfahren` | das Anerkennungsverfahren |
 | `v_angehoerigengespraech` | das Angehörigengespräch |
 | `v_antragsfrist` | die Antragsfrist |
+| `v_arbeitsberater` | der Arbeitsberater |
+| `v_arbeitsberaterin` | die Arbeitsberaterin |
 | `v_aufenthaltsgestattung` | die Aufenthaltsgestattung |
 | `v_aufenthaltskarte` | die Aufenthaltskarte |
 | `v_aufenthaltszweck` | der Aufenthaltszweck |
@@ -136,6 +146,9 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_behoerdentermin` | der Behördentermin |
 | `v_berufsabschluss` | der Berufsabschluss |
 | `v_berufskraftfahrer` | der Berufskraftfahrer |
+| `v_berufsweg` | der Berufsweg |
+| `v_betreuungsdienst` | der Betreuungsdienst |
+| `v_betriebsbesichtigung` | die Betriebsbesichtigung |
 | `v_betriebskosten` | die Betriebskosten |
 | `v_bewilligungsbescheid` | der Bewilligungsbescheid |
 | `v_bildungsabschluss` | der Bildungsabschluss |
@@ -153,25 +166,34 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_einzelfahrschein` | der Einzelfahrschein |
 | `v_endgeraet` | das Endgerät |
 | `v_endkontrolle` | die Endkontrolle |
+| `v_entscheidungsspielraum` | der Entscheidungsspielraum |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll |
 | `v_ernaehrungsberatung` | die Ernährungsberatung |
 | `v_eskalationsstufe` | die Eskalationsstufe |
 | `v_fahrkartenkontrolle` | die Fahrkartenkontrolle |
 | `v_fallbesprechung` | die Fallbesprechung |
 | `v_fehlerbericht` | der Fehlerbericht |
+| `v_finanzabteilung` | die Finanzabteilung |
+| `v_flucht_rettungsweg` | der Flucht- und Rettungsweg |
+| `v_foerdermoeglichkeit` | die Fördermöglichkeit |
 | `v_fortschrittsbericht` | der Fortschrittsbericht |
 | `v_freistellungsauftrag` | der Freistellungsauftrag |
 | `v_freizeitangebot` | das Freizeitangebot |
 | `v_fuehrungszeugnis` | das Führungszeugnis |
 | `v_garantieanspruch` | der Garantieanspruch |
+| `v_gebotszeichen` | das Gebotszeichen |
 | `v_gefahrstoff` | der Gefahrstoff |
 | `v_geschaeftsessen` | das Geschäftsessen |
 | `v_gesichtsbehandlung` | die Gesichtsbehandlung |
 | `v_gesundheitskarte` | die Gesundheitskarte |
+| `v_gruendungsdatum` | das Gründungsdatum |
 | `v_grundgebuehr` | die Grundgebühr |
 | `v_haarkur` | die Haarkur |
+| `v_hauptbereich` | der Hauptbereich |
 | `v_hausbank` | die Hausbank |
+| `v_haushaltsfuehrung` | die Haushaltsführung |
 | `v_hautanalyse` | die Hautanalyse |
+| `v_hierarchieebene` | die Hierarchieebene |
 | `v_hygieneplan` | der Hygieneplan |
 | `v_ich_botschaft` | die Ich-Botschaft |
 | `v_indexmiete` | die Indexmiete |
@@ -190,9 +212,11 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_ladeliste` | die Ladeliste |
 | `v_ladezeit` | die Ladezeit |
 | `v_lagerbestand` | der Lagerbestand |
+| `v_lagerliste` | die Lagerliste |
 | `v_lieferadresse` | die Lieferadresse |
 | `v_liefertermin` | der Liefertermin |
 | `v_losgroesse` | die Losgröße |
+| `v_marktuntersuchung` | die Marktuntersuchung |
 | `v_materialpruefung` | die Materialprüfung |
 | `v_meldeadresse` | die Meldeadresse |
 | `v_meldebescheinigung` | die Meldebescheinigung |
@@ -205,11 +229,18 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
 | `v_niederlassungserlaubnis` | die Niederlassungserlaubnis |
 | `v_objektleitung` | die Objektleitung |
+| `v_pausengespraech` | das Pausengespräch |
 | `v_personaltrainer` | der Personaltrainer |
+| `v_pflegedienst` | der Pflegedienst |
 | `v_pflegegrad` | der Pflegegrad |
+| `v_pflegezertifikat` | das Pflegezertifikat |
+| `v_praesenzseminar` | das Präsenzseminar |
 | `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probestunde` | die Probestunde |
+| `v_produktionshelfer` | der Produktionshelfer |
+| `v_produktionshelferin` | die Produktionshelferin |
 | `v_produktionslinie` | die Produktionslinie |
+| `v_produktionsverfahren` | das Produktionsverfahren |
 | `v_projektphase` | die Projektphase |
 | `v_pruefprotokoll` | das Prüfprotokoll |
 | `v_punktzahl` | die Punktzahl |
@@ -218,6 +249,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_reinigungsmaschine` | die Reinigungsmaschine |
 | `v_reinigungsplan` | der Reinigungsplan |
 | `v_reisebuchung` | die Reisebuchung |
+| `v_rettungszeichen` | das Rettungszeichen |
 | `v_roentgengeraet` | das Röntgengerät |
 | `v_rueckgaberecht` | das Rückgaberecht |
 | `v_ruestzeit` | die Rüstzeit |
@@ -230,12 +262,14 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_sicherheitskonzept` | das Sicherheitskonzept |
 | `v_sicherheitsregel` | die Sicherheitsregel |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung |
+| `v_sicherheitsvorschrift` | die Sicherheitsvorschrift |
 | `v_sparziel` | das Sparziel |
 | `v_sperrhotline` | die Sperrhotline |
 | `v_sprachnachweis` | der Sprachnachweis |
 | `v_staplerschein` | der Staplerschein |
 | `v_startbildschirm` | der Startbildschirm |
 | `v_stoerfall` | der Störfall |
+| `v_stolpergefahr` | die Stolpergefahr |
 | `v_systemausfall` | der Systemausfall |
 | `v_tagegeld` | das Tagegeld |
 | `v_tagesgeldkonto` | das Tagesgeldkonto |
@@ -243,6 +277,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_taktzeit` | die Taktzeit |
 | `v_taschenkontrolle` | die Taschenkontrolle |
 | `v_teilnahmebescheinigung` | die Teilnahmebescheinigung |
+| `v_terminbestaetigung` | die Terminbestätigung |
 | `v_terminvorschlag` | der Terminvorschlag |
 | `v_ticketautomat` | der Ticketautomat |
 | `v_trainingsplan` | der Trainingsplan |
@@ -256,13 +291,16 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_umtauschschein` | der Umtauschschein |
 | `v_unfallmeldung` | die Unfallmeldung |
 | `v_verbandswechsel` | der Verbandswechsel |
+| `v_verbotszeichen` | das Verbotszeichen |
 | `v_verfuegungsrahmen` | der Verfügungsrahmen |
 | `v_vermittlungsgespraech` | das Vermittlungsgespräch |
 | `v_verpflichtungserklaerung` | die Verpflichtungserklärung |
 | `v_versichertenkarte` | die Versichertenkarte |
 | `v_vertragsabschluss` | der Vertragsabschluss |
 | `v_vertragslaufzeit` | die Vertragslaufzeit |
+| `v_vollzeitjob` | der Vollzeitjob |
 | `v_warenbestand` | der Warenbestand |
+| `v_warnzeichen` | das Warnzeichen |
 | `v_wartenummer` | die Wartenummer |
 | `v_wartungsfenster` | das Wartungsfenster |
 | `v_wertstellung` | die Wertstellung |
@@ -274,8 +312,10 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_zahlungsart` | die Zahlungsart |
 | `v_zahlungsausgang` | der Zahlungsausgang |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter |
+| `v_zentrallager` | das Zentrallager |
 | `v_zeugnisbewertung` | die Zeugnisbewertung |
 | `v_zutrittskontrolle` | die Zutrittskontrolle |
+| `v_zweigwerk` | das Zweigwerk |
 | `v_zwischenschritt` | der Zwischenschritt |
 
 </details>

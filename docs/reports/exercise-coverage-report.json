@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-23",
+  "generatedAt": "2026-07-28",
   "registerRows": 20,
   "scope": "themes",
   "rich": 20,
@@ -9,14 +9,15 @@
     {
       "id": "sustainability",
       "title": "Nachhaltigkeit",
-      "words": 56,
+      "words": 60,
       "cols": 41,
-      "vocabKinds": 12,
+      "vocabKinds": 13,
       "noExampleIds": [
         "v_oekologisch",
         "v_fussabdruck",
         "v_oeko_bilanz",
-        "v_erneuerbare_energie"
+        "v_erneuerbare_energie",
+        "v_entsorgen"
       ],
       "noRelatedIds": [
         "v_recyceln",
@@ -26,9 +27,9 @@
     {
       "id": "safety",
       "title": "Arbeitssicherheit & Gesundheit",
-      "words": 154,
-      "cols": 85,
-      "vocabKinds": 13,
+      "words": 199,
+      "cols": 86,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_verletzen",
         "v_ueberlastung",
@@ -37,7 +38,12 @@
         "v_abstuetzen",
         "v_einweisen",
         "v_aetzend",
-        "v_dosieren"
+        "v_dosieren",
+        "v_beaufsichtigen",
+        "v_ueberwachen",
+        "v_einschlagen",
+        "v_stolpern",
+        "v_ausrutschen"
       ],
       "noRelatedIds": [
         "v_sicherheitscheck",
@@ -50,9 +56,9 @@
     {
       "id": "arzt",
       "title": "Arzt & Gesundheit",
-      "words": 80,
+      "words": 85,
       "cols": 56,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_ueberweisung",
         "v_uebelkeit",
@@ -68,9 +74,9 @@
     {
       "id": "bank",
       "title": "Bank & Finanzen",
-      "words": 81,
+      "words": 82,
       "cols": 50,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_ueberweisen"
       ],
@@ -81,13 +87,14 @@
     {
       "id": "behoerde",
       "title": "Behörden & Ämter",
-      "words": 80,
+      "words": 84,
       "cols": 50,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_einreichen",
         "v_genehmigen",
-        "v_oeffnungszeiten"
+        "v_oeffnungszeiten",
+        "v_bearbeiten"
       ],
       "noRelatedIds": [
         "v_wartenummer"
@@ -96,15 +103,17 @@
     {
       "id": "meetings",
       "title": "Besprechungen & Teamarbeit",
-      "words": 64,
-      "cols": 37,
-      "vocabKinds": 13,
+      "words": 73,
+      "cols": 38,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_moderieren",
         "v_ausreden_lassen",
         "v_einbringen",
         "v_praesentieren",
-        "v_zeitwaechterin"
+        "v_zeitwaechterin",
+        "v_du_form",
+        "v_vertreten"
       ],
       "noRelatedIds": [
         "v_protokoll",
@@ -116,22 +125,24 @@
         "v_einbringen",
         "v_deshalb",
         "v_praesentieren",
-        "v_ergebnisoffen"
+        "v_ergebnisoffen",
+        "v_bedeutung"
       ]
     },
     {
       "id": "bildung",
       "title": "Bildung & Sprache",
-      "words": 80,
-      "cols": 50,
-      "vocabKinds": 13,
+      "words": 121,
+      "cols": 51,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_anlernen",
         "v_durchfallen",
-        "v_uebersetzung"
+        "v_uebersetzung",
+        "v_einstellen_jdn"
       ],
       "noRelatedIds": [
-        "v_handwerklich"
+        "v_erforderlich"
       ]
     },
     {
@@ -139,7 +150,7 @@
       "title": "Einkaufen & Geschäfte",
       "words": 49,
       "cols": 40,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_aermel"
       ],
@@ -153,7 +164,7 @@
       "title": "Essen & Restaurant",
       "words": 49,
       "cols": 40,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_aufrunden",
         "v_backen"
@@ -163,25 +174,26 @@
     {
       "id": "freizeit",
       "title": "Freizeit & Soziales",
-      "words": 49,
+      "words": 55,
       "cols": 40,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [],
       "noRelatedIds": []
     },
     {
       "id": "travel",
       "title": "Geschäftsreisen",
-      "words": 52,
+      "words": 62,
       "cols": 39,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_buchen",
         "v_reservieren",
         "v_uebernachten",
         "v_uebernachtung",
         "v_abrechnen",
-        "v_umleiten"
+        "v_umleiten",
+        "v_abfertigen"
       ],
       "noRelatedIds": [
         "v_gepaeck",
@@ -195,16 +207,16 @@
       "title": "Handy, Internet & Digitales",
       "words": 49,
       "cols": 40,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [],
       "noRelatedIds": []
     },
     {
       "id": "conflict",
       "title": "Konfliktlösung",
-      "words": 56,
+      "words": 65,
       "cols": 39,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [],
       "noRelatedIds": [
         "v_gereizt",
@@ -217,15 +229,16 @@
         "v_arbeitsklima",
         "v_vermittlungsgespraech",
         "v_einfuehlsam",
-        "v_betriebsrat"
+        "v_betriebsrat",
+        "v_vertrauen_auf"
       ]
     },
     {
       "id": "customer",
       "title": "Kundenkommunikation",
-      "words": 168,
-      "cols": 98,
-      "vocabKinds": 13,
+      "words": 182,
+      "cols": 99,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_zusichern",
         "v_servieren",
@@ -237,11 +250,12 @@
         "v_gang",
         "v_zapfen",
         "v_glaetten",
-        "v_auftragen"
+        "v_auftragen",
+        "v_oeffentlichkeitsarbeit",
+        "v_betreuen"
       ],
       "noRelatedIds": [
         "v_anliegen",
-        "v_zufrieden",
         "v_kundendienst",
         "v_zusichern",
         "v_weiterhelfen",
@@ -254,9 +268,9 @@
     {
       "id": "logistics",
       "title": "Logistik & Transport",
-      "words": 83,
+      "words": 97,
       "cols": 56,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_auffuellen",
         "v_ausliefern",
@@ -272,9 +286,9 @@
     {
       "id": "mobilitaet",
       "title": "Mobilität & Verkehr",
-      "words": 49,
+      "words": 50,
       "cols": 40,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [],
       "noRelatedIds": [
         "v_mitfahrgelegenheit",
@@ -284,9 +298,9 @@
     {
       "id": "project",
       "title": "Projektkoordination",
-      "words": 90,
-      "cols": 63,
-      "vocabKinds": 13,
+      "words": 141,
+      "cols": 65,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_koordinieren",
         "v_abschliessen",
@@ -295,7 +309,18 @@
         "v_entwerfen",
         "v_abreissen",
         "v_ausmessen",
-        "v_auslegen"
+        "v_auslegen",
+        "v_uebernehmen",
+        "v_einfuehren",
+        "v_anordnen",
+        "v_leiten",
+        "v_zuordnen",
+        "v_auffallen",
+        "v_verwalten",
+        "v_hervorgehen_aus",
+        "v_nahelegen",
+        "v_gruenden",
+        "v_betreiben"
       ],
       "noRelatedIds": [
         "v_fortschritt",
@@ -303,15 +328,16 @@
         "v_aufwand",
         "v_machbar",
         "v_einerseits",
-        "v_prototyp"
+        "v_prototyp",
+        "v_aufgrund_von"
       ]
     },
     {
       "id": "technology",
       "title": "Technik & Digitalisierung",
-      "words": 187,
+      "words": 193,
       "cols": 75,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_umstellen",
         "v_einrichten",
@@ -326,7 +352,8 @@
         "v_auslesen",
         "v_betonieren",
         "v_justieren",
-        "v_ueberwachungskamera"
+        "v_ueberwachungskamera",
+        "v_veralten"
       ],
       "noRelatedIds": [
         "v_geraet",
@@ -341,16 +368,17 @@
     {
       "id": "scheduling",
       "title": "Termine & Planung",
-      "words": 67,
+      "words": 76,
       "cols": 46,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_freihalten",
         "v_vorbereiten",
         "v_blockieren",
         "v_ueberschneidung",
         "v_terminvorschlag",
-        "v_uebergabe"
+        "v_uebergabe",
+        "v_im_anschluss_an"
       ],
       "noRelatedIds": [
         "v_passen",
@@ -359,15 +387,17 @@
         "v_erinnerung",
         "v_ueberschneidung",
         "v_sobald",
-        "v_anlaufphase"
+        "v_anlaufphase",
+        "v_im_anschluss_an",
+        "v_befristet"
       ]
     },
     {
       "id": "wohnen",
       "title": "Wohnen & Zuhause",
-      "words": 80,
+      "words": 83,
       "cols": 50,
-      "vocabKinds": 13,
+      "vocabKinds": 14,
       "noExampleIds": [
         "v_uebergabeprotokoll",
         "v_abdichten",

@@ -1990,3 +1990,41 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   working tree clean. This entry is the paper trail for the prompt itself. Docs-only, no gates
   beyond the merged PR's.
 - **Artifacts (prompt 2):** this log · **PR #748**
+
+## Session 175 (cont.) — 2026-07-28 — branch `claude/word-list-validation-br3u2g`
+
+- **Prompt 3 (verbatim, 2026-07-28):** `[four photos of a telc Deutsch B2 Beruf Wortschatzliste,
+  pages 28-29 and 48-49] check if these words are already part of the app.. otherwise add them`
+- **Prompt 3b (verbatim, sent mid-turn, 2026-07-28):** `I want you to run these words through linter
+  checks, match sources and maintain the same level of audit ready data quality`
+- **Response summary:** Transcribed all ~245 headwords from the four word-field pages (Berufliche
+  Einstiege · Bei der Berufsberatung · Eine Unternehmensbesichtigung · Die Organisation eines
+  Unternehmens · Du oder Sie? · Berufe und Branchen · Berufe am Flughafen · Sicherheit in Unternehmen ·
+  Arbeitsunfälle · Zufrieden leben in Deutschland), normalised them (article and `etw./jdn.` markers
+  stripped) and matched every one against the vocabulary, collocation and Redemittel banks:
+  **36 were already shipped**, the rest were not. Added **232 vocabulary entries** to
+  `vocabularyPart2` and **6 Nomen-Verb combos** to the collocation bank (the bank-split rule keeps
+  `Kenntnisse erwerben`, `zur Verfügung stehen`, `Produkte einführen`, `Ruhe bewahren`,
+  `das Du anbieten` and `den Schluss nahelegen` out of the Wörter surface), every entry carrying
+  article, plural, pronunciation hint, two examples, related terms, `themeId`, `cefr` and a
+  `sectors[]` tag only where the item is genuinely Branche-specific. Themes reuse the existing
+  taxonomy rather than adding one. **238 provenance rows** were appended in the same edit, one per
+  content id, each with a DWDS reference derived from the lemma, `origin: "authored"`,
+  `license: "OWNED"`, `review_status: "draft"` and a note naming the source word-field section.
+  Gates ran in the `/content` order and all pass: `lint:content` clean · `build` green ·
+  `build:oracles` + `verify:facts` 0 gate errors · `build:frequency-subset` + `build:frequency` ·
+  `build:verification` · `lint` 0 errors · `test:unit` 370/370 · `check:bundle` 123.2 kB ·
+  `report:exercise-coverage` 20/20 🟢 · `build:review-queue`. `verify:grammar` skipped (the
+  LanguageTool toolchain is not built in this sandbox; Layer 3 is warn-only). Two gate findings were
+  fixed rather than accepted: `die Geldsorgen` lost its `plural` field so the plurale-tantum detector
+  recognises it, and `sich behaupten` moved B2.2 → B2.1, restoring `verify:cefr` to 0 FLAG. One
+  config change was forced by the build: the grown register pushed the founder-only workbench chunk
+  past workbox's 2 MiB precache ceiling, so `vite.config.ts` now lists `**/useWorkbench-*.js` in
+  `globIgnores` (PWA precache 7,155 KiB → 5,174 KiB). Nothing was stamped `verified`.
+- **Artifacts:** `src/data/vocabulary.ts` · `src/data/collocations.ts` · `src/data/provenance.ts` ·
+  `src/data/frequency.ts` · `src/data/verification.ts` (generated) · `vite.config.ts` ·
+  `src/features/admin/reviewQueue.json` · `scripts/vendor/*.json` (oracle + frequency subsets) ·
+  `docs/reports/verify-facts-report.*` · `docs/reports/verify-cefr-report.*` ·
+  `docs/reports/exercise-coverage-report.*` · `docs/reports/related-terms-report.md` ·
+  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 handoff archived to
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log
