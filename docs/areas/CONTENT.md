@@ -144,3 +144,18 @@ are `draft`, 0 `verified`** (human verification reset to zero 2026-07-22 at foun
 concatenated array literals** (`provenancePart1/2`, TS2590); append new rows to the second. Game
 missions get one row per mission id. Full policy: `docs/strategy/DATA_GOVERNANCE.md` (traceability
 over ownership; Wiktionary/DWDS for word facts; Tatoeba CC-BY for example sentences).
+
+**Sourcing limit (read before transcribing anything):** individual word facts are free to use, but a
+specific *published* word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database
+rights in its **selection and arrangement**. Verify entries against open references; never copy a
+curated list wholesale, and never carry a source book's section names or ordering into ids, comments
+or provenance notes. telc/Goethe/Klett materials are on the explicit do-not-use list in
+`DATA_GOVERNANCE.md` and the "Sources to avoid" table in `PROJECT_REFERENCE.md`.
+
+**Register size is a build constraint (s175).** The `/sources` + `/admin/pruefen` workbench chunk
+bundles the whole register, so it grows with the banks and nothing else. Workbox refuses to precache
+any single asset over **2 MiB** and **fails `pnpm build`** when it meets one, with an error naming the
+service worker rather than the content that caused it. The chunk sat at ~1.96 MB at 3,107 rows, about
+**200 content items** short of the ceiling, so `vite.config.ts` now lists `**/useWorkbench-*.js` in
+`globIgnores`: founder-only, needs the network anyway, so it loads on demand instead of being
+precached. If that line is ever removed, a large content pack will break the build again.

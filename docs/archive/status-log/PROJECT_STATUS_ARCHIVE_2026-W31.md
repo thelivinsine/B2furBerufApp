@@ -144,3 +144,26 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   Then, when scheduled, the react-router 6 → 7 migration from audit F2. **The founder should expect
   onboarding ONCE more per account** after #745: that run is what finally writes a flag the app can
   read back.
+
+
+---
+
+**Handoff after session 175 (2026-07-28), first task.** _(Archived from `PROJECT_STATUS.md` in session 175.)_
+
+**Handoff after session 175 (2026-07-28). Fokus mobile tiles: 10% shorter from the bottom.**
+Branch `claude/fokus-tile-height-9lxw8g`.
+Founder: the two mobile Fokus tiles looked cramped. They filled the room between their top and the
+fixed bottom chrome exactly, so the sentence card and the Grammatik dial tile ran right into the
+Korrigieren cluster.
+- `measureMobile` in `src/features/writing/fokus/FokusTrainer.tsx` now keeps `FILL_RATIO = 0.9` of
+  the measured room (floor 240px, was 260px unscaled). The top of the column is unchanged, so the
+  10% comes off the BOTTOM and the tiles stop short of the chrome. Both the exact `height` used
+  before a correction and the `minHeight` used after are scaled, so a long correction still grows
+  the page as before.
+- The mobile column gap went `gap-4` → `gap-5`, which is the "breathing space between the tiles"
+  half of the request; the tiles keep their `grow-[1.15]` / `grow` ratio, so both shrink evenly.
+- Nothing else in the locked Schreiben mobile anatomy moved: the fixed cluster and KI line, the
+  `bottomLimit()` picker floor and the desktop layout are untouched. `docs/areas/SCHREIBEN.md`
+  records the 90% rule.
+- **Gates:** typecheck · lint 0 errors (75 warnings, unchanged) · build. Phone verification is the
+  founder's, as usual.

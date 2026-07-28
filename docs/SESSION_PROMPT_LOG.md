@@ -2081,3 +2081,44 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   opening one unasked.
 - **Artifacts (prompt 7):** `docs/PROJECT_STATUS.md` · `docs/areas/CONTENT.md` · this log ·
   branch `claude/word-list-validation-br3u2g` (parked, unmerged)
+
+- **Prompt 8 (verbatim, 2026-07-28):** `okay merge the docs to main without any content changes. also,
+  what the heck do you mean by this? "Separately, the workbox precache failure is not a content
+  problem. Any sizeable addition to the provenance and verification register will fail pnpm build the
+  same way, whatever the source of the words. The one-line globIgnores fix in vite.config.ts stands on
+  its own and is cheap to cherry-pick whenever you want it."?`
+- **Response summary:** Two parts. (1) Built `claude/word-list-session-docs` from `main` carrying only
+  `PROJECT_STATUS.md`, `SESSION_PROMPT_LOG.md` and the W31 archive chunk, verified the diff touched
+  nothing under `src/` and not `vite.config.ts`, and shipped it as **PR #750**, squash-merged as
+  `c73d9c1`. This needed a second branch off `main`, since the designated branch carries the parked
+  content; flagged to the founder. (2) Explained the workbox failure in plain terms: the PWA stores a
+  bundle of files for offline use, workbox refuses to precache any single file over 2 MiB and **fails
+  the build** instead of warning, and the founder-only `/sources` workbench chunk bundles the entire
+  provenance register, so its size tracks the number of content rows and nothing else. Any content
+  addition of that size, from any source, trips it identically, so the fix is independent of the
+  licensing question that parked the word list.
+- **Artifacts (prompt 8):** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · **PR #750** (squash-merged as
+  `c73d9c1`)
+
+## Session 175 (cont.) — 2026-07-28 — branch `claude/pwa-precache-fix`
+
+- **Prompt 9 (verbatim, 2026-07-28):** `alright go ahead with that change then and then document the
+  session`
+- **Response summary:** Cherry-picked the precache fix onto `main` on its own, with no content. First
+  measured the real headroom by building clean `main`: the workbench chunk is **1,963.67 kB** at 3,107
+  provenance rows against a 2,097 kB ceiling, and each content item costs ~0.6 kB across the provenance
+  and verification registers, so `main` sat about **200 content items** from a build failure. That
+  **corrects the "about 60 rows" figure given in the previous turn**; the fix is worth having but was
+  not as close to the edge as stated. `vite.config.ts` now lists `**/useWorkbench-*.js` in
+  `globIgnores`, with a comment recording that this is a build guard rather than a size tidy-up so the
+  line is not removed later, and `docs/areas/CONTENT.md` gains the matching warning beside the register
+  description plus the sourcing limit that parked the word-field pack. Measured effect: PWA precache
+  **6,947 KiB → 5,029 KiB** (122 → 121 entries), a ~1.9 MB smaller first load per learner; the chunk
+  itself is unchanged and simply no longer precached. Evidence the guard works: on the parked branch
+  the identical build failed at a 2.11 MB chunk without the line and passed with it. Gates: `typecheck`
+  · `build` · `lint` 0 errors (75 warnings, unchanged) · `test:unit` 370/370 · `check:bundle` 123.2 kB
+  · `lint:content` clean with the banks untouched. Session documented in the same PR.
+- **Artifacts (prompt 9):** `vite.config.ts` · `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md`
+  (s175 first-task handoff archived to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log · **PR #751**
