@@ -2243,3 +2243,13 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   (generated) · `src/features/admin/reviewQueue.json` (generated) · `docs/reports/*` (generated) ·
   `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s175 third-task handoff aged into the W31
   archive) · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log · **PR #755**
+  (squash-merged as `cbacc98`)
+- **Prompt 2 (verbatim, 2026-07-28):** `document the session`
+- **Response summary:** Most of the pass had already shipped inside PR #755 itself (bank counts,
+  the s177 handoff, the prompt-1 entry, `areas/CONTENT.md`, the s175 third-task handoff aged into
+  the W31 archive), opened before the merge so the PR body and the in-repo docs told the same story.
+  Verified rather than re-done, then closed the one remaining gap: the s177 handoff and the prompt-1
+  artifacts line now carry **the squash-merge SHA** (`cbacc98`), matching how s176 recorded `7197a44`
+  and `810a405`. Docs-only; no bank, code or config change, so no gates beyond `lint:content` staying
+  clean.
+- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log
