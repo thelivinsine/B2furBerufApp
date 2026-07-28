@@ -168,13 +168,12 @@ closings, idioms, connectors) and asked what was already in the app, with the re
   fresh sandbox) · build:oracles + verify:facts ✔ 0 gate errors, no new review signals ·
   build · check:bundle 123.2 kB · lint 0 errors · test:unit 370/370 ·
   report:exercise-coverage (20/20 green) · build:review-queue.
-- **Licensing, given the s175 precedent two handoffs up.** This list arrived as typed Markdown with
-  no publisher attribution, no page structure and no book chapter names, and every shipped artifact
-  (examples, glosses, pronunciation hints, context notes, CEFR tags, theme assignments) is authored
-  here. That is a different situation from the parked telc pack, where the exposure was the *selection
-  and arrangement* of a published list. The founder was asked to confirm the origin anyway. If it does
-  turn out to be a commercial word list, the remedy written up for the parked branch applies unchanged:
-  the words are facts and stay, the source's ordering and framing come out.
+- **Licensing: settled, given the s175 precedent one handoff up.** The founder confirmed the word
+  field is **personally curated**, not taken from a published source. A self-made selection carries no
+  third-party compilation right (§4 UrhG) and no database right (§§87a-87e UrhG), which were the two
+  exposures that parked the telc pack, and every shipped artifact here (examples, glosses,
+  pronunciation hints, context notes, CEFR tags, theme assignments) is authored in-repo. **Nothing
+  about this pack needs revisiting; do not re-open it by reading the s175 handoff alone.**
 - **Next for this content:** it is `draft` like everything else, so it lands in the `/admin/pruefen`
   queue for the human review pass. No writing prompt, Can-Do or text was added, so exercise coverage
   is unchanged.

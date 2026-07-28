@@ -2026,14 +2026,8 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/admin/reviewQueue.json` · `scripts/vendor/*.json` (oracle + frequency subsets) ·
   `docs/reports/verify-facts-report.*` · `docs/reports/verify-cefr-report.*` ·
   `docs/reports/exercise-coverage-report.*` · `docs/reports/related-terms-report.md` ·
-  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 and the s175 parked-pack handoff archived
-  to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log · **PR #752**
-- **Licensing note (raised with the founder, not a blocker):** this list arrived as typed Markdown
-  with no publisher attribution and no book structure, unlike the s175 telc pack that was parked, and
-  every shipped artifact (examples, glosses, pronunciation hints, context notes, CEFR tags, theme
-  assignments) is originally authored here. The founder was asked to confirm the list is not a
-  transcription of a commercial word list; if it is, the `DATA_GOVERNANCE.md` remedy is the same one
-  written up for the parked branch: keep the words, drop the source's selection and arrangement.
+  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 handoff archived to
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log
 - **Note on the outcome:** this pack was **parked, not shipped** (prompts 4 to 7 below). PR #749 was
   opened under the standing auto-ship rule, then withdrawn on the founder's instruction.
 
@@ -2177,6 +2171,17 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Licensing note (raised with the founder, not a blocker):** this list arrived as typed Markdown
   with no publisher attribution and no book structure, unlike the s175 telc pack that was parked, and
   every shipped artifact (examples, glosses, pronunciation hints, context notes, CEFR tags, theme
-  assignments) is originally authored here. The founder was asked to confirm the list is not a
-  transcription of a commercial word list; if it is, the `DATA_GOVERNANCE.md` remedy is the same one
-  written up for the parked branch: keep the words, drop the source's selection and arrangement.
+  assignments) is originally authored here. The founder was asked to confirm the origin and
+  **answered in prompt 2: the list is personally curated, not taken from a published source.** The
+  `DATA_GOVERNANCE.md` question is therefore closed for this pack.
+- **Prompt 2 (verbatim, 2026-07-28):** `The list in this session is curated by me personally.`
+- **Response summary:** Answers the licensing question raised at the end of prompt 1, which was asked
+  because session 175 had parked a 238-item pack transcribed from telc coursebook photos. A personally
+  curated word field carries no third-party compilation or database right, so nothing about the merged
+  pack needs revisiting: the selection is the founder's own and every example, gloss, pronunciation
+  hint and context note was authored here. Recorded in `PROJECT_STATUS.md` and in the prompt-1 entry
+  above so the question is not re-opened by a future session reading the s175 precedent. Also fixed a
+  real defect this pass introduced: the prompt-1 documentation edit used a whole-file string replace
+  whose anchor was not unique, so the licensing note and a `PR #752` reference were injected into the
+  **s175 parked-pack entry** as well. That entry is restored to what shipped in PR #750. Docs-only.
+- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log · **PR #753**
