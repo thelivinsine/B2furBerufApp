@@ -2026,8 +2026,14 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/admin/reviewQueue.json` · `scripts/vendor/*.json` (oracle + frequency subsets) ·
   `docs/reports/verify-facts-report.*` · `docs/reports/verify-cefr-report.*` ·
   `docs/reports/exercise-coverage-report.*` · `docs/reports/related-terms-report.md` ·
-  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 handoff archived to
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log
+  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 and the s175 parked-pack handoff archived
+  to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log · **PR #752**
+- **Licensing note (raised with the founder, not a blocker):** this list arrived as typed Markdown
+  with no publisher attribution and no book structure, unlike the s175 telc pack that was parked, and
+  every shipped artifact (examples, glosses, pronunciation hints, context notes, CEFR tags, theme
+  assignments) is originally authored here. The founder was asked to confirm the list is not a
+  transcription of a commercial word list; if it is, the `DATA_GOVERNANCE.md` remedy is the same one
+  written up for the parked branch: keep the words, drop the source's selection and arrangement.
 - **Note on the outcome:** this pack was **parked, not shipped** (prompts 4 to 7 below). PR #749 was
   opened under the standing auto-ship rule, then withdrawn on the founder's instruction.
 
@@ -2122,3 +2128,55 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 9):** `vite.config.ts` · `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md`
   (s175 first-task handoff archived to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log · **PR #751**
+
+## Session 176 — 2026-07-28 — branch `claude/business-german-vocabulary-36z6ua`
+
+- **Prompt 1 (verbatim, 2026-07-28):** `check if the following vocabulary is part of the app, else
+  add them to app with the complete provenance:` followed by a Markdown word field titled
+  "B2/C1 Business German Vocabulary – Formal Complaint Response", 13 sections: 1 Formal Opening &
+  Reference, 2 Apologizing, 3 Explaining the Cause, 4 Organizing Events, 5 Catering & Food,
+  6 Taking Responsibility, 7 Future Improvements, 8 Customer Relationship, 9 Formal Closing,
+  10 Business German Idiomatic Expressions (B2/C1), 11 C1 Connectors (Cause / Contrast / Addition /
+  Result / Conclusion), 12 Essential B2/C1 Verbs, 13 Essential B2/C1 Nouns.
+- **Response summary:** Audited all 151 requested items against the real banks (loaded via Vite
+  `ssrLoadModule`, since the bank files are one-line entries that defeat a naive regex), then added
+  the gap. **41 already shipped**, **110 added**, **4 covered by an existing phrase or entry**
+  (`r_mail8` for the Rückfragen closing, `v_einerseits … andererseits` for standalone `andererseits`,
+  `v_verlegen` for the trades sense of "verlegen", `v_entschuldigen` for "sich für etwas
+  entschuldigen"). Split by the bank rules rather than by the founder's headings: 82 new Wörter
+  (`v_bezueglich`, `v_hinsichtlich`, `v_in_bezug_auf`, `v_beziehen_auf`, `v_rueckfrage`, `v_bereuen`,
+  `v_unannehmlichkeit`, `v_beeintraechtigung`, the cause set `entstehen/auftreten/vorkommen/passieren/
+  verursachen/zurückführen auf/beruhen auf/zurückgehen auf/Ursache/Grund/Auslöser/Fehler/Problem`,
+  the event set `durchführen/organisieren/Schulungsraum/Ersatzraum/Renovierung`, the catering set
+  `Essenslieferant/Catering/bereitstellen/ausfallen/eintreffen/verspätet eintreffen`, the
+  responsibility set `sich kümmern um/beheben/lösen/bearbeiten/prüfen/sicherstellen/gewährleisten/
+  informieren/benachrichtigen/Bearbeitung`, the improvement set `verbessern/Verbesserung/einführen/
+  überprüfen/Optimierung/Qualität/Qualitätsstandard`, the relationship set `pflegen/aufrechterhalten/
+  stärken/fördern/ausbauen/Kundenbeziehung/Vertrauen/Zufriedenheit`, plus `versichern/beseitigen/
+  berücksichtigen/veranlassen/verweisen auf`, 19 connectors and `im Voraus`/`im Nachhinein`);
+  19 new Kollokationen for every Nomen-Verb idiom (`Maßnahmen ergreifen`, `Abhilfe schaffen`,
+  `zur Kenntnis nehmen`, `Verständnis entgegenbringen`, `auf Verständnis hoffen`, `in die Wege leiten`,
+  `alles daransetzen`, `dafür Sorge tragen`, `einer Angelegenheit nachgehen`, `sich als problematisch
+  erweisen`, `sich auf etwas zurückführen lassen`, `den Anforderungen entsprechen`, `den Erwartungen
+  gerecht werden`, `die Qualität sicherstellen`, `einen reibungslosen Ablauf gewährleisten`,
+  `sich aufrichtig entschuldigen`, `jemanden um Entschuldigung bitten`, `Verständnis haben für`,
+  `den Termin verlegen`), since a noun+verb combo in the Wörter list breaks the article rule and the
+  linter errors on the overlap; 5 new Redemittel (`r_mail14`-`r_mail18`, category `emails`) for the
+  formal closings and the two Bedauern openers. **106 provenance rows** generated from the banks
+  themselves (Wiktionary for single lemmas, DWDS for multi-word chunks and verbs), all
+  `origin: authored`, `license: OWNED`, `review_status: draft`. Regenerated `frequency.ts`, the noun
+  oracles and the admin reports. Kept the authored CEFR labels over the 8 `verify:cefr` frequency
+  flags (formal connectors are corpus-frequent but register-advanced; the check is warn-only).
+  Gates: lint:content ✔ · verify:facts ✔ 0 gate errors · build · check:bundle 123.2 kB · lint 0
+  errors · test:unit 370/370.
+- **Artifacts:** `src/data/vocabulary.ts` · `src/data/collocations.ts` · `src/data/redemittel.ts` ·
+  `src/data/provenance.ts` · `src/data/frequency.ts` (generated) · `scripts/vendor/*.json`
+  (generated) · `src/features/admin/reviewQueue.json` (generated) · `docs/reports/*` (generated) ·
+  `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 and the s175 parked-pack handoff archived
+  to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log · **PR #752**
+- **Licensing note (raised with the founder, not a blocker):** this list arrived as typed Markdown
+  with no publisher attribution and no book structure, unlike the s175 telc pack that was parked, and
+  every shipped artifact (examples, glosses, pronunciation hints, context notes, CEFR tags, theme
+  assignments) is originally authored here. The founder was asked to confirm the list is not a
+  transcription of a commercial word list; if it is, the `DATA_GOVERNANCE.md` remedy is the same one
+  written up for the parked branch: keep the words, drop the source's selection and arrangement.

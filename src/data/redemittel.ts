@@ -1545,6 +1545,58 @@ export const redemittel: RedemittelPhrase[] = [
     note: "'Feierabend' (end of the working day) has no English equivalent; the phrase is used daily.",
     example: { de: "Bis morgen, schönen Feierabend!", en: "See you tomorrow, have a nice evening!" },
   },
+
+  /* ---------------- Formal complaint response (B2/C1 business pack) ---------------- */
+  {
+    id: "r_mail14",
+    de: "Ich stehe Ihnen gerne zur Verfügung.",
+    en: "I am glad to be at your disposal.",
+    category: "emails",
+    register: "formal",
+    cefr: "B2.1",
+    note: "The general closing offer. Name the reason in front of it, for example 'Für Rückfragen …'.",
+    example: { de: "Bei Fragen zum neuen Termin stehe ich Ihnen gerne zur Verfügung.", en: "If you have questions about the new date, I am glad to help." },
+  },
+  {
+    id: "r_mail15",
+    de: "Bei weiteren Fragen können Sie sich jederzeit an mich wenden.",
+    en: "If you have further questions, you can contact me at any time.",
+    category: "emails",
+    register: "formal",
+    cefr: "B2.1",
+    note: "'sich an jemanden wenden' takes the accusative and sounds warmer than 'zur Verfügung stehen'.",
+    example: { de: "Bei weiteren Fragen können Sie sich jederzeit an mich wenden, telefonisch oder per E-Mail.", en: "If you have further questions, you can contact me at any time, by phone or email." },
+  },
+  {
+    id: "r_mail16",
+    de: "Für weitere Informationen stehen wir Ihnen gerne zur Verfügung.",
+    en: "We are glad to provide further information.",
+    category: "emails",
+    register: "formal",
+    cefr: "B2.2",
+    note: "The 'wir' form speaks for the company rather than for you personally.",
+    example: { de: "Für weitere Informationen zu unseren Qualitätsstandards stehen wir Ihnen gerne zur Verfügung.", en: "We are glad to provide further information on our quality standards." },
+  },
+  {
+    id: "r_mail17",
+    de: "Zu unserem Bedauern müssen wir Ihnen mitteilen, dass …",
+    en: "To our regret we have to inform you that …",
+    category: "emails",
+    register: "formal",
+    cefr: "C1",
+    note: "Opens bad news in a formal letter; the 'dass' clause sends the verb to the end.",
+    example: { de: "Zu unserem Bedauern müssen wir Ihnen mitteilen, dass die Fortbildung verlegt wird.", en: "To our regret we have to inform you that the training is being moved." },
+  },
+  {
+    id: "r_mail18",
+    de: "Wir bedauern außerordentlich, dass …",
+    en: "We deeply regret that …",
+    category: "emails",
+    register: "formal",
+    cefr: "C1",
+    note: "The strongest formal apology opener; 'außerordentlich' carries the weight.",
+    example: { de: "Wir bedauern außerordentlich, dass das Catering verspätet eingetroffen ist.", en: "We deeply regret that the catering arrived late." },
+  },
 ];
 
 export const redemittelByCategory = (cat: RedemittelCategory) =>

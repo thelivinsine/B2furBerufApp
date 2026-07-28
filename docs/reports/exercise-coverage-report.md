@@ -20,8 +20,8 @@ Gezählt wird das **volle Menü, das ein Thema über alle Stufen (A2–C1) und m
 
 - **20 Themen** geprüft: 🟢 **20 reich** · 🟡 **0 ok** · 🔴 **0 dünn**.
 - **Auf Themen-Ebene ist die Vielfalt ausgeschöpft:** jedes Thema kann bereits alle Übungstypen bieten. Die restliche Arbeit ist Feinarbeit auf **Wort-Ebene** (unten).
-- **85 einzelne Wörter** haben keinen Beispielsatz, der das Wort selbst benutzt (diese Wörter erscheinen nie als Lückentext, Tipp-Lücke oder Hör-Übung).
-- **74 einzelne Wörter** haben keine verknüpften „verwandten Wörter“ (erscheinen nie als Ausreißer).
+- **108 einzelne Wörter** haben keinen Beispielsatz, der das Wort selbst benutzt (diese Wörter erscheinen nie als Lückentext, Tipp-Lücke oder Hör-Übung).
+- **68 einzelne Wörter** haben keine verknüpften „verwandten Wörter“ (erscheinen nie als Ausreißer).
 
 > Diese restlichen Lücken sind **günstig** zu schließen (kleine Inhaltsergänzungen, kein neuer Code). Der teure Schritt (Phase 4: eigens geschriebene oder KI-erzeugte Übungen) lohnt sich erst, wenn diese günstigen Lücken geschlossen sind UND Lernende sich trotzdem wiederholende Übungen ansehen – und das misst dieser Bericht bewusst nicht (dazu braucht es Nutzungsdaten).
 
@@ -47,26 +47,26 @@ Gezählt wird das **volle Menü, das ein Thema über alle Stufen (A2–C1) und m
 
 | Thema | Vielfalt | Typen | Status |
 | --- | --- | ---: | --- |
-| Nachhaltigkeit | `████████████` | 12 | 🟢 reich |
-| Arbeitssicherheit & Gesundheit | `████████████` | 13 | 🟢 reich |
-| Arzt & Gesundheit | `████████████` | 13 | 🟢 reich |
-| Bank & Finanzen | `████████████` | 13 | 🟢 reich |
-| Behörden & Ämter | `████████████` | 13 | 🟢 reich |
-| Besprechungen & Teamarbeit | `████████████` | 13 | 🟢 reich |
-| Bildung & Sprache | `████████████` | 13 | 🟢 reich |
-| Einkaufen & Geschäfte | `████████████` | 13 | 🟢 reich |
-| Essen & Restaurant | `████████████` | 13 | 🟢 reich |
-| Freizeit & Soziales | `████████████` | 13 | 🟢 reich |
-| Geschäftsreisen | `████████████` | 13 | 🟢 reich |
-| Handy, Internet & Digitales | `████████████` | 13 | 🟢 reich |
-| Konfliktlösung | `████████████` | 13 | 🟢 reich |
-| Kundenkommunikation | `████████████` | 13 | 🟢 reich |
-| Logistik & Transport | `████████████` | 13 | 🟢 reich |
-| Mobilität & Verkehr | `████████████` | 13 | 🟢 reich |
-| Projektkoordination | `████████████` | 13 | 🟢 reich |
-| Technik & Digitalisierung | `████████████` | 13 | 🟢 reich |
-| Termine & Planung | `████████████` | 13 | 🟢 reich |
-| Wohnen & Zuhause | `████████████` | 13 | 🟢 reich |
+| Nachhaltigkeit | `████████████` | 13 | 🟢 reich |
+| Arbeitssicherheit & Gesundheit | `████████████` | 14 | 🟢 reich |
+| Arzt & Gesundheit | `████████████` | 14 | 🟢 reich |
+| Bank & Finanzen | `████████████` | 14 | 🟢 reich |
+| Behörden & Ämter | `████████████` | 14 | 🟢 reich |
+| Besprechungen & Teamarbeit | `████████████` | 14 | 🟢 reich |
+| Bildung & Sprache | `████████████` | 14 | 🟢 reich |
+| Einkaufen & Geschäfte | `████████████` | 14 | 🟢 reich |
+| Essen & Restaurant | `████████████` | 14 | 🟢 reich |
+| Freizeit & Soziales | `████████████` | 14 | 🟢 reich |
+| Geschäftsreisen | `████████████` | 14 | 🟢 reich |
+| Handy, Internet & Digitales | `████████████` | 14 | 🟢 reich |
+| Konfliktlösung | `████████████` | 14 | 🟢 reich |
+| Kundenkommunikation | `████████████` | 14 | 🟢 reich |
+| Logistik & Transport | `████████████` | 14 | 🟢 reich |
+| Mobilität & Verkehr | `████████████` | 14 | 🟢 reich |
+| Projektkoordination | `████████████` | 14 | 🟢 reich |
+| Technik & Digitalisierung | `████████████` | 14 | 🟢 reich |
+| Termine & Planung | `████████████` | 14 | 🟢 reich |
+| Wohnen & Zuhause | `████████████` | 14 | 🟢 reich |
 
 ### Restliche Feinarbeit: einzelne Wörter mit wenigen Übungstypen
 
@@ -74,16 +74,16 @@ Jedes Thema oben bietet zwar alle Typen, aber **einzelne Wörter** können nur w
 
 | Thema | Wörter ohne eigenen Beispielsatz | Wörter ohne verwandte Wörter |
 | --- | ---: | ---: |
-| Technik & Digitalisierung | 14 | 7 |
-| Kundenkommunikation | 11 | 9 |
-| Besprechungen & Teamarbeit | 5 | 10 |
-| Projektkoordination | 8 | 6 |
-| Arbeitssicherheit & Gesundheit | 8 | 5 |
-| Termine & Planung | 6 | 7 |
-| Konfliktlösung | – | 11 |
+| Kundenkommunikation | 17 | 6 |
+| Technik & Digitalisierung | 15 | 7 |
+| Projektkoordination | 15 | 6 |
+| Termine & Planung | 8 | 7 |
+| Arbeitssicherheit & Gesundheit | 11 | 3 |
+| Besprechungen & Teamarbeit | 5 | 9 |
+| Konfliktlösung | 2 | 11 |
 | Geschäftsreisen | 6 | 4 |
+| Logistik & Transport | 7 | 2 |
 | Arzt & Gesundheit | 5 | 2 |
-| Logistik & Transport | 5 | 2 |
 | Nachhaltigkeit | 4 | 2 |
 | Wohnen & Zuhause | 3 | 2 |
 | Behörden & Ämter | 3 | 1 |

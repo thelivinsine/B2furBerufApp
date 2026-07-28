@@ -16,14 +16,14 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1330**
-- Covered by ≥1 oracle: **1300** (98%)  ·  not covered: **30**
-- ✔ Article verified: **1281**  (618 by both oracles, 663 by one)
-- ✔ Plural verified: **843**  (496 by both oracles, 347 by one)
+- Nouns checked: **1351**
+- Covered by ≥1 oracle: **1321** (98%)  ·  not covered: **30**
+- ✔ Article verified: **1302**  (634 by both oracles, 668 by one)
+- ✔ Plural verified: **858**  (509 by both oracles, 349 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **8**
 - ◑ Plural-form headwords (gender not comparable): **11**
-- ~ We assert a plural, but no oracle lists one to compare: **159**
+- ~ We assert a plural, but no oracle lists one to compare: **162**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -114,7 +114,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>159 items</summary>
+<details><summary>162 items</summary>
 
 | id | headword |
 |---|---|
@@ -155,6 +155,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_endkontrolle` | die Endkontrolle |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll |
 | `v_ernaehrungsberatung` | die Ernährungsberatung |
+| `v_ersatzraum` | der Ersatzraum |
 | `v_eskalationsstufe` | die Eskalationsstufe |
 | `v_fahrkartenkontrolle` | die Fahrkartenkontrolle |
 | `v_fallbesprechung` | die Fallbesprechung |
@@ -185,6 +186,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_kontovollmacht` | die Kontovollmacht |
 | `v_kontowechsel` | der Kontowechsel |
 | `v_kostenvoranschlag` | der Kostenvoranschlag |
+| `v_kundenbeziehung` | die Kundenbeziehung |
 | `v_kundennummer` | die Kundennummer |
 | `v_kursgebuehr` | die Kursgebühr |
 | `v_ladeliste` | die Ladeliste |
@@ -226,6 +228,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_schichtplan` | der Schichtplan |
 | `v_schoenheitsreparatur` | die Schönheitsreparatur |
 | `v_schuldnerberatung` | die Schuldnerberatung |
+| `v_schulungsraum` | der Schulungsraum |
 | `v_selbstbedienungskasse` | die Selbstbedienungskasse |
 | `v_sicherheitskonzept` | das Sicherheitskonzept |
 | `v_sicherheitsregel` | die Sicherheitsregel |

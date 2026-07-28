@@ -1,16 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-28 (session 175). **A latent build-breaker is defused, and a 238-item word-field
-pack is parked.** The `/sources` workbench chunk bundles the whole provenance register, so it grows
-with the content banks; at ~1.96 MB it was roughly **200 content items** from workbox's 2 MiB
-precache ceiling, which **fails `pnpm build`** rather than warning. `vite.config.ts` now keeps that
-founder-only chunk out of the precache, so the next content pack cannot break the build, and every
-learner's first load drops **6,947 KiB → 5,029 KiB**. The pack that surfaced it stays parked on
-`claude/word-list-validation-br3u2g`: the word list came from photographed pages of a commercial telc
-B2 Beruf coursebook, and `strategy/DATA_GOVERNANCE.md` puts telc materials on the do-not-use list and
-forbids copying a published word list wholesale. **PR #749 was withdrawn**; bank counts below are
-unchanged and still describe live `main`. Prior s175: **Fokus mobile tiles
-breathe.** The two mobile Fokus tiles
+_Last updated: 2026-07-28 (session 176). **Formal complaint response pack (B2/C1 business German).**
+A founder-supplied word field for answering a written complaint was audited against the banks: 41 of
+151 items were already shipped, the other 110 are now in, split by the bank rules (82 Wörter, 19
+Nomen-Verb chunks into Kollokationen, 5 Redemittel sentence frames, 4 already covered by existing
+phrases). 106 new provenance rows, all `draft`. Prior s175: **a latent build-breaker is defused, and a
+238-item word-field pack is parked.** The `/sources` workbench chunk bundles the whole provenance
+register, so it grows with the content banks; at ~1.96 MB it was roughly **200 content items** from
+workbox's 2 MiB precache ceiling, which **fails `pnpm build`** rather than warning. `vite.config.ts`
+now keeps that founder-only chunk out of the precache (PR #751). The pack that surfaced it stays
+parked on `claude/word-list-validation-br3u2g`: the word list came from photographed pages of a
+commercial telc B2 Beruf coursebook, and `strategy/DATA_GOVERNANCE.md` puts telc materials on the
+do-not-use list and forbids copying a published word list wholesale. **PR #749 was withdrawn.**
+Also s175: **Fokus mobile tiles breathe.** The two mobile Fokus tiles
 filled the room down to the fixed bottom chrome to the last pixel and read as cramped; they now keep
 90% of it (`FILL_RATIO` in `FokusTrainer.tsx`), anchored at the same top, and sit `gap-5` apart, so
 the freed strip sits under the lower tile. Prior s174: **Security audit + the sign-up flow it uncovered.**
@@ -63,10 +65,10 @@ read that for the "what's built and how." The living detail of every feature are
 session engine, Bibliothek views, the game layer, content conventions) is in `docs/areas/` (index
 in `../CLAUDE.md`).
 
-**Content banks (as of 2026-07-21, session 142, verified against `pnpm lint:content` — re-verify
-before quoting):** vocab **1,623** (8 mis-filed noun+verb combos retired from the Wörter surface
-in s142, ids kept) · collocations **1,035** · Redemittel **149** ·
-grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **3,107
+**Content banks (as of 2026-07-28, session 176, verified against `pnpm lint:content` — re-verify
+before quoting):** vocab **1,705** (8 mis-filed noun+verb combos retired from the Wörter surface
+in s142, ids kept) · collocations **1,054** · Redemittel **154** ·
+grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **3,213
 rows** · themes **20** (five new `alltag` themes in s126: einkaufen/essen/mobilitaet/freizeit/
 digitales) · exam sets **15** · dialogues **30**. Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
@@ -108,61 +110,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 175 (2026-07-28), second task. A word-field pack built, gated, then PARKED
-on licensing grounds.** Branch `claude/word-list-validation-br3u2g` (commit `9032660`), **not merged**.
-Founder sent four photos of a **telc Deutsch B2 Beruf Wortschatzliste** and asked which words the app
-already had, with the rest added at audit-ready quality. The work was done and every gate passed. It
-was then parked, unshipped, because of where the list came from. Nothing reached `main`.
-
-**Why it is parked (read this before reviving the branch).** `docs/strategy/DATA_GOVERNANCE.md`
-§"What counts as traceable" already answers the question the founder asked afterwards:
-> "A specific published word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database
-> rights in its selection and arrangement, so we never copy a protected list wholesale. We verify
-> individual entries against open references instead."
-
-and the same file lists **telc materials** under "Sources we do NOT use", as does the "Sources to
-avoid" table in `PROJECT_REFERENCE.md`. The branch does the forbidden thing: it transcribes the list
-page by page, keeps the book's section order, and names the book's chapters in the code comments and
-in all 238 provenance notes. That rule should have been checked before transcribing, not after.
-
-**The legal shape of it, for whoever picks this up.**
-- **The words are safe.** Single German words, their articles and plurals are facts; nothing owns
-  "der Absolvent". Any of them is usable if verified against DWDS or Wiktionary, which is what the
-  policy prescribes and what the branch already did.
-- **The authored material is safe.** The 464 example sentences, glosses, pronunciation hints, context
-  notes, related terms, CEFR tags and theme assignments are original and appear in no book.
-- **The selection and arrangement are the exposure.** Two rights: §4 UrhG (creative compilation) and,
-  the sharper one, the **sui generis database right** (§§87a-87e UrhG, EU Directive 96/9/EC), which
-  needs no creativity, runs 15 years, and is infringed by extracting a substantial part.
-- **Trademark is already handled.** `TermsOfService.tsx` states in both languages that Genauly is not
-  affiliated with, endorsed by, or a source of Goethe-Institut or telc material. Naming the exam is
-  lawful nominative use; keep the disclaimer wherever telc appears.
-
-**If the branch is revived,** the fix is to remove the structural fingerprint rather than the
-vocabulary: drop the book's chapter names from the section comments and the 238 provenance notes,
-re-derive the selection from the app's own `frequency.ts` bands plus the sub-theme taxonomy (an
-independent, defensible rationale), and cut the handful of entries that only exist because they were
-on that page (`der Fluggerätemechaniker`, `das Zweigwerk`, `die Lagerliste`, `das Pflegezertifikat`,
-`das Präsenzseminar`). Most of the pack is ordinary B2 workplace German that any independent
-selection would reach anyway, so the overlap alone is not the problem.
-
-**What is on the branch, if it is ever wanted.** 232 vocabulary entries in `vocabularyPart2`, 6
-Nomen-Verb combos in the collocation bank (`Kenntnisse erwerben`, `zur Verfügung stehen`,
-`Produkte einführen`, `Ruhe bewahren`, `das Du anbieten`, `den Schluss nahelegen`), and 238 matching
-provenance rows. Gates all green: `lint:content` · `build` · `verify:facts` 0 errors at 98% oracle
-coverage · `build:frequency` · `build:verification` · `lint` 0 errors · `test:unit` 370/370 ·
-`check:bundle` 123.2 kB · `report:exercise-coverage` 20/20 · `build:review-queue`. Two gate findings
-were fixed in the branch: `die Geldsorgen` lost its `plural` field so the plurale-tantum detector
-recognises it, and `sich behaupten` moved B2.2 → B2.1, restoring `verify:cefr` to 0 FLAG.
-
-**One finding on the branch is worth salvaging independently of the content.** The growing provenance
-and verification register pushed the founder-only workbench chunk past workbox's **2 MiB per-asset
-precache ceiling**, which fails `pnpm build` outright. The branch fixes it by adding
-`**/useWorkbench-*.js` to `globIgnores` in `vite.config.ts`, so `/sources` and `/admin/pruefen` load
-on demand instead of being precached into every learner's cache (PWA precache 7,155 KiB → 5,174 KiB).
-**This will bite again on the next sizeable content addition, from any source.** Worth cherry-picking
-on its own.
-
 **Handoff after session 175 (2026-07-28), third task. The PWA precache ceiling, defused on its own.**
 Merged as **PR #750** (docs) and **PR #751** (this fix). Branch `claude/pwa-precache-fix`.
 Salvaged from the parked word-field branch, because the problem is not about words at all.
@@ -188,6 +135,49 @@ Salvaged from the parked word-field branch, because the problem is not about wor
   370/370 · `check:bundle` 123.2 kB of 400 kB · `lint:content` clean (banks untouched).
 - **Correction to an earlier estimate in this session:** the headroom was reported to the founder as
   "about 60 rows". Measured properly it is ~200 content items. Worth fixing, not an emergency.
+
+**Handoff after session 176 (2026-07-28). Formal complaint response pack: 110 new items.**
+Branch `claude/business-german-vocabulary-36z6ua`.
+Founder supplied a B2/C1 business-German word field (answering a written complaint: reference,
+apology, cause, event organisation, catering, responsibility, improvement, customer relationship,
+closings, idioms, connectors) and asked what was already in the app, with the rest added.
+- **Audit first, then add.** All 151 requested items were checked against `vocabulary` /
+  `collocations` / `redemittel` loaded through Vite (not grepped: the banks are one-line entries and
+  a naive `de:` regex finds only 3% of them). **41 already shipped** (`v_beschwerde`, `v_anliegen`,
+  `v_bedauern`, `v_entschuldigen`, `v_mangel`, `v_massnahme`, `v_verantwortung`, `c_verständnis_zeigen`,
+  `c_verantwortung_uebernehmen_sust`, the connectors `deshalb/jedoch/dennoch/zudem/außerdem/allerdings` …).
+  **110 added.** `r_mail8` ("Für Rückfragen stehe ich Ihnen gern zur Verfügung.") already covered one
+  requested closing, so it was not duplicated.
+- **Split by the bank rules, not by the founder's headings.** The 17 Nomen-Verb idioms in the
+  founder's "Redemittel" section went to **Kollokationen** (`Maßnahmen ergreifen`, `Abhilfe schaffen`,
+  `zur Kenntnis nehmen`, `in die Wege leiten`, `dafür Sorge tragen`, `einer Angelegenheit nachgehen`,
+  `den Erwartungen gerecht werden`, `einen reibungslosen Ablauf gewährleisten` …), because a noun+verb
+  combo in the Wörter list shows up article-less and the linter errors on the overlap. Only the
+  sentence frames became Redemittel (`r_mail14`-`r_mail18`, category `emails`).
+- **`verlegen` needed a collocation, not a second word.** `v_verlegen` already ships in the
+  `wohnen`/trades sense ("to lay tiles"); the business sense is now `c_termin_verlegen`.
+- **19 formal connectors + 5 genitive prepositions** are tagged `pos: "connector"` (there is no
+  `preposition` value and adding one would mean a new closed enum for four items); the genitive
+  government is stated in each `context`.
+- **`verify:cefr` flags 8 of the new connectors** (`somit`, `ferner`, `angesichts`, `vielmehr`,
+  `bezüglich`, `in Bezug auf`, `hingegen`, `beziehen auf`) as "common word, advanced label". Kept as
+  labelled: the check scores raw corpus frequency, and these are frequent in *written* German while
+  functionally B2/C1 by register. Warn-only by design.
+- **Gates:** lint:content ✔ (1,705 vocab · 1,054 collocations · 154 Redemittel · 3,213 provenance) ·
+  build:frequency-subset + build:frequency (regenerated; note `wordfreq` must be pip-installed in a
+  fresh sandbox) · build:oracles + verify:facts ✔ 0 gate errors, no new review signals ·
+  build · check:bundle 123.2 kB · lint 0 errors · test:unit 370/370 ·
+  report:exercise-coverage (20/20 green) · build:review-queue.
+- **Licensing, given the s175 precedent two handoffs up.** This list arrived as typed Markdown with
+  no publisher attribution, no page structure and no book chapter names, and every shipped artifact
+  (examples, glosses, pronunciation hints, context notes, CEFR tags, theme assignments) is authored
+  here. That is a different situation from the parked telc pack, where the exposure was the *selection
+  and arrangement* of a published list. The founder was asked to confirm the origin anyway. If it does
+  turn out to be a commercial word list, the remedy written up for the parked branch applies unchanged:
+  the words are facts and stay, the source's ordering and framing come out.
+- **Next for this content:** it is `draft` like everything else, so it lands in the `/admin/pruefen`
+  queue for the human review pass. No writing prompt, Can-Do or text was added, so exercise coverage
+  is unchanged.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
