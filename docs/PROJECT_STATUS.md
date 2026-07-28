@@ -1,6 +1,9 @@
 # Project Status
 
-_Last updated: 2026-07-27 (session 174). **Security audit + the sign-up flow it uncovered.**
+_Last updated: 2026-07-28 (session 175). **Fokus mobile tiles breathe.** The two mobile Fokus tiles
+filled the room down to the fixed bottom chrome to the last pixel and read as cramped; they now keep
+90% of it (`FILL_RATIO` in `FokusTrainer.tsx`), anchored at the same top, and sit `gap-5` apart, so
+the freed strip sits under the lower tile. Prior s174: **Security audit + the sign-up flow it uncovered.**
 `docs/reports/security-audit-2026-07-27.md` covers the bundle, the five Edge Functions, all twelve
 migrations, CI and the dependency tree; the architecture held, and three findings were fixed in the
 same pass. Acting on finding F1 the founder turned **"Confirm email" ON**, which exposed that
@@ -94,48 +97,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
-
-**Handoff after session 173 (2026-07-27). The app no longer refreshes work away. Merged as PR #740
-(`805fff0`), branch `claude/app-refresh-data-loss-01xd0e`.**
-Founder bug report: "whenever the user is working on something like writing an email or practicing an
-Übung session, the update takes place and the app refreshes", losing the draft or the session. Root
-cause was `src/lib/swUpdate.ts`: when a new service worker took control it reloaded unconditionally,
-either immediately (within 30s of load) or **at the next resume from the background**, which is
-exactly the moment a learner returns to a half-written email. Fixed in two layers:
-- **Layer 1, never reload over live work.** New `src/lib/liveWork.ts` is a tiny module-level registry
-  (not a store: the reloaders run outside React). A surface holding unsaved in-memory work claims it
-  via the `useLiveWork(active, label, flush)` hook; `hasLiveWork()` gates every automatic reload, so
-  a queued deploy simply waits and retries on each later resume. The app runs fine on the old bundle
-  meanwhile. Claimants today: the Fokus / Kurz / Lang editors (non-empty text) and a running Üben run.
-- **Layer 2, make any unavoidable reload recoverable.** Some reloads must still happen (a chunk-load
-  self-heal in `lib/recover.ts`, a manual refresh, iOS discarding the tab), so work now persists:
-  - `src/features/writing/draftAutosave.ts` (localStorage, one draft PER mode, 7-day TTL) autosaves
-    500ms after the last keystroke and on unmount/pagehide, and restores on mount. It is deliberately
-    a **separate key and record** from `resumeDraft.ts`: that one is the sign-in hand-off with the
-    `resume: true` flag AppShell redirects on, and an autosave must never trigger that redirect.
-  - `src/features/session/sessionResume.ts` (**sessionStorage**, keyed by a signature of the launch
-    params, 3h TTL) snapshots plan + index + tallies + loot. sessionStorage on purpose: it survives a
-    reload of the tab but dies with it, so a learner who opens Üben tomorrow gets a fresh session,
-    never a silent resume. The snapshot always points at the next **unanswered** block, since an
-    answered one is already graded into FSRS/XP and replaying it would double-count. Cleared on
-    finish, on "Beenden", and on "Neue Runde" (with an `abandoned` ref so the unmount flush cannot
-    write it back).
-- `installLiveWorkFlush()` in `main.tsx` flushes every claim on pagehide / beforeunload / hidden, so
-  even a reload nobody asked for lands on the restore path.
-- `tests/liveWork.test.ts` (18 cases) pins the registry, per-mode draft isolation, staleness, corrupt
-  storage, and that a snapshot never resumes into a differently-scoped session.
-- **Not verifiable from the sandbox:** service-worker update behavior needs the live site. What the
-  founder should see after the deploy: backgrounding the app mid-draft and returning no longer wipes
-  the editor, and a refresh restores both the text and its Aufgabe. Hard-refresh once first, since a
-  stale service worker can still serve the pre-fix build for one launch.
-- **Worth knowing for the next reload-ish change:** the rule is now a CLAUDE.md hard invariant, so any
-  new surface that holds in-memory work must both claim `useLiveWork` AND persist itself. Persisting
-  alone is not enough (the reload still throws away the on-screen state around the draft), and
-  claiming alone is not enough (a chunk-load self-heal ignores no-one's convenience).
-- **Deliberately NOT done:** no "a new version is available, reload?" toast. The founder's report was
-  about interruption, and a banner is a second interruption; the queued-update-on-next-safe-resume
-  path ships the same deploy without asking anything of the learner. Revisit only if a deploy ever
-  needs to be forced out mid-session (e.g. a broken backend contract).
 
 **Handoff after session 174 (2026-07-27). Full security audit:
 `docs/reports/security-audit-2026-07-27.md`.**
@@ -234,6 +195,24 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   Then, when scheduled, the react-router 6 → 7 migration from audit F2. **The founder should expect
   onboarding ONCE more per account** after #745: that run is what finally writes a flag the app can
   read back.
+
+**Handoff after session 175 (2026-07-28). Fokus mobile tiles: 10% shorter from the bottom.**
+Branch `claude/fokus-tile-height-9lxw8g`.
+Founder: the two mobile Fokus tiles looked cramped. They filled the room between their top and the
+fixed bottom chrome exactly, so the sentence card and the Grammatik dial tile ran right into the
+Korrigieren cluster.
+- `measureMobile` in `src/features/writing/fokus/FokusTrainer.tsx` now keeps `FILL_RATIO = 0.9` of
+  the measured room (floor 240px, was 260px unscaled). The top of the column is unchanged, so the
+  10% comes off the BOTTOM and the tiles stop short of the chrome. Both the exact `height` used
+  before a correction and the `minHeight` used after are scaled, so a long correction still grows
+  the page as before.
+- The mobile column gap went `gap-4` → `gap-5`, which is the "breathing space between the tiles"
+  half of the request; the tiles keep their `grow-[1.15]` / `grow` ratio, so both shrink evenly.
+- Nothing else in the locked Schreiben mobile anatomy moved: the fixed cluster and KI line, the
+  `bottomLimit()` picker floor and the desktop layout are untouched. `docs/areas/SCHREIBEN.md`
+  records the 90% rule.
+- **Gates:** typecheck · lint 0 errors (75 warnings, unchanged) · build. Phone verification is the
+  founder's, as usual.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

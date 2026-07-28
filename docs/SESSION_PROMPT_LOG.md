@@ -1961,3 +1961,23 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/router.tsx` · `src/lib/cloudSync.ts` · `tests/authDialog.test.tsx` · `tests/cloudSync.test.ts` ·
   `CLAUDE.md` · `docs/DECISIONS.md` · `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_STATUS.md` ·
   this log · **PR #743**, **PR #744**, **PR #745**
+
+## Session 175 — 2026-07-28 — branch `claude/fokus-tile-height-9lxw8g`
+
+- **Prompt 1 (verbatim, 2026-07-28):** `reduce the height of fokus tiles by 10% or something from the
+  bottom keeping the top starting point itact so that there's some breathing space between the tiles
+  as it looks a but cramped currently. no need of previews`
+- **Response summary:** The mobile Fokus column (`measureMobile` in
+  `src/features/writing/fokus/FokusTrainer.tsx`) sized the two tiles to every pixel between their own
+  top and the fixed bottom chrome, which is where the cramped look came from. It now keeps
+  `FILL_RATIO = 0.9` of that measured room, anchored at the unchanged top, so the 10% comes off the
+  bottom; the floor moved 260px → 240px to match the new scale, and both the exact `height` used
+  before a correction and the `minHeight` used after are scaled, so a long correction can still grow
+  the page. The mobile column gap went `gap-4` → `gap-5` for the space between the two tiles. The
+  rest of the locked Schreiben mobile anatomy (fixed cluster + KI line, `bottomLimit()` picker floor,
+  desktop grid) is untouched, and previews were waived by the founder. Gates: typecheck · lint 0
+  errors (75 warnings, same as the untouched tree) · build.
+- **Artifacts:** `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` (s173 handoff archived to
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log

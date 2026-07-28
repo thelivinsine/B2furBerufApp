@@ -38,6 +38,15 @@ import { cn } from "@/lib/utils";
  * (handled by the parent via `onRequireAuth`); the parent restores the draft
  * after sign-in.
  */
+
+/**
+ * Share of the room between the tile column's top and the fixed bottom chrome
+ * that the two mobile tiles actually take (founder s175). The remaining 10%
+ * stays empty under the lower tile: filling the room to the last pixel read as
+ * cramped.
+ */
+const FILL_RATIO = 0.9;
+
 export function FokusTrainer({
   isSignedIn,
   onRequireAuth,
@@ -184,7 +193,11 @@ export function FokusTrainer({
       const r = el.getBoundingClientRect();
       if (r.height > 0) reserve = Math.max(reserve, window.innerHeight - r.top + 12);
     }
-    const fits = `${Math.max(260, Math.floor(window.innerHeight - topDoc - reserve))}px`;
+    // The column gives back 10% of that room AT THE BOTTOM (founder s175): the
+    // tiles start where they always did, they just stop short of the bottom
+    // chrome, so the pair breathes instead of filling every last pixel.
+    const room = Math.floor(window.innerHeight - topDoc - reserve);
+    const fits = `${Math.max(240, Math.round(room * FILL_RATIO))}px`;
     const grows = m.status === "corrected";
     root.style.minHeight = fits;
     root.style.height = grows ? "" : fits;
@@ -686,7 +699,7 @@ export function FokusTrainer({
           view toggle + corner Neu; the Grammatik dial tile below it makes the
           transform feature visible from the first second (the old toolbar
           toggle read as a filter and hid it). */}
-      <div ref={mobileRootRef} className="flex flex-col gap-4 lg:hidden">
+      <div ref={mobileRootRef} className="flex flex-col gap-5 lg:hidden">
         {mobileSentenceCard}
         {errorCard && <div className="shrink-0">{errorCard}</div>}
         <GrammarDials
