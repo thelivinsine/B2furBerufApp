@@ -77,7 +77,10 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   (1-4 typical; general words stay untagged). **The bank is two concatenated array literals**
   (`vocabularyPart1/2`, split for the TS2590 union-complexity limit); append new packs to part 2.
   Source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields; verify with
-  `pnpm build` + `pnpm lint:content`. **Wörter-surface retire set:** a Nomen-Verb collocation must
+  `pnpm build` + `pnpm lint:content`. **`pos` has no `preposition` value on purpose:** text-organising
+  prepositions (`bezüglich`, `hinsichtlich`, `aufgrund`, `infolge`, `angesichts`) are tagged
+  `connector`, which is what they do for a learner, and their case government is stated in `context`.
+  Do NOT widen `PartOfSpeech` for them; that is a closed enum and every addition costs a linter mirror. **Wörter-surface retire set:** a Nomen-Verb collocation must
   live in the Kollokationen bank, not the single-word Wörter list. Mis-filed combos are listed in
   `RETIRED_VOCAB_IDS`; **`browsableVocabulary`** (= bank − retired) is what every "words" surface
   reads (Wörter browse, `lib/search.ts`, session word pools, `Sammlung.tsx`). `vocabById`/

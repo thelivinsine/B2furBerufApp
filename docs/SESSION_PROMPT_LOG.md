@@ -2185,3 +2185,14 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   whose anchor was not unique, so the licensing note and a `PR #752` reference were injected into the
   **s175 parked-pack entry** as well. That entry is restored to what shipped in PR #750. Docs-only.
 - **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log · **PR #753**
+- **Prompt 3 (verbatim, 2026-07-28):** `document the session`
+- **Response summary:** Most of the pass had already shipped inside PR #752 (bank counts, s176 handoff,
+  prompt-1 entry, `areas/CONTENT.md`, the s174 handoff aged into the W31 archive) and PR #753 (the
+  licensing answer, the restored s175 entry). Verified rather than re-done, then closed the three
+  remaining gaps: the s176 handoff now carries **the PR numbers and merge SHAs** (`7197a44`,
+  `810a405`) and the working-tree state, a bullet records **the append-only-log defect and the rule it
+  produced** (assert the match count before a whole-file replace, or edit by anchor with surrounding
+  context), and `areas/CONTENT.md` records **why `PartOfSpeech` has no `preposition` value** so a
+  future session does not widen a closed enum for five items. Docs-only; no bank, code or config
+  change, so no gates beyond `lint:content` staying clean.
+- **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/areas/CONTENT.md` · this log

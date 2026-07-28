@@ -174,9 +174,17 @@ closings, idioms, connectors) and asked what was already in the app, with the re
   exposures that parked the telc pack, and every shipped artifact here (examples, glosses,
   pronunciation hints, context notes, CEFR tags, theme assignments) is authored in-repo. **Nothing
   about this pack needs revisiting; do not re-open it by reading the s175 handoff alone.**
+- **A defect this session introduced and fixed, worth not repeating.** The documentation pass used a
+  whole-file string replace whose anchor text was not unique, so a licensing note landed inside the
+  **session-175 parked-pack prompt-log entry** as well as the intended one. `SESSION_PROMPT_LOG.md` is
+  append-only, so writing into a shipped entry is a real defect. It is restored to what shipped in
+  PR #750. **Rule: assert the match count before replacing in an append-only or long doc**, or edit by
+  anchor with surrounding context. The same check caught the next attempt before it wrote.
 - **Next for this content:** it is `draft` like everything else, so it lands in the `/admin/pruefen`
   queue for the human review pass. No writing prompt, Can-Do or text was added, so exercise coverage
   is unchanged.
+- **Shipped:** **PR #752** (the pack, squash-merged as `7197a44`) and **PR #753** (the licensing
+  answer + the log restore, squash-merged as `810a405`). Branch reset onto `main`, working tree clean.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
