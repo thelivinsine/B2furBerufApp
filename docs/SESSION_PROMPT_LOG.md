@@ -1980,4 +1980,13 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts:** `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` (s173 handoff archived to
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) ·
-  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · this log · **PR #747** (squash-merged as `1fa5c9c`)
+- **Prompt 2 (verbatim, 2026-07-28):** `merge to main and document the session`
+- **Response summary:** Both were already done in the prompt-1 turn under the standing auto-ship
+  rule: PR #747 was squash-merged into `main` as `1fa5c9c` (that merge is what triggers the Pages
+  and Supabase deploys), and the documentation pass shipped inside the same PR (`SCHREIBEN.md`,
+  `PROJECT_STATUS.md` header + s175 handoff, the s173 handoff aged out into the new W31 archive
+  chunk, this log). Verified rather than re-done: `main` at `1fa5c9c`, the branch reset onto it,
+  working tree clean. This entry is the paper trail for the prompt itself. Docs-only, no gates
+  beyond the merged PR's.
+- **Artifacts (prompt 2):** this log · **PR #748**
