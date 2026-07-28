@@ -16,14 +16,14 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1351**
-- Covered by ≥1 oracle: **1321** (98%)  ·  not covered: **30**
-- ✔ Article verified: **1302**  (634 by both oracles, 668 by one)
-- ✔ Plural verified: **858**  (509 by both oracles, 349 by one)
+- Nouns checked: **1366**
+- Covered by ≥1 oracle: **1334** (98%)  ·  not covered: **32**
+- ✔ Article verified: **1315**  (639 by both oracles, 676 by one)
+- ✔ Plural verified: **864**  (512 by both oracles, 352 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **8**
 - ◑ Plural-form headwords (gender not comparable): **11**
-- ~ We assert a plural, but no oracle lists one to compare: **162**
+- ~ We assert a plural, but no oracle lists one to compare: **163**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -72,7 +72,7 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>30 items</summary>
+<details><summary>32 items</summary>
 
 | id | headword |
 |---|---|
@@ -88,11 +88,13 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_iban` | die IBAN |
 | `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
+| `v_mitarbeitende` | die Mitarbeitenden (Pl.) |
 | `v_nachbereitung` | die Nachbereitung |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
 | `v_prepaid` | das Prepaid |
 | `v_probenahme` | die Probenahme |
+| `v_raeumlichkeiten` | die Räumlichkeiten (Pl.) |
 | `v_ressourcen` | die Ressourcen |
 | `v_rezeptur` | die Rezeptur |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
@@ -114,7 +116,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>162 items</summary>
+<details><summary>163 items</summary>
 
 | id | headword |
 |---|---|
@@ -207,6 +209,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
 | `v_niederlassungserlaubnis` | die Niederlassungserlaubnis |
 | `v_objektleitung` | die Objektleitung |
+| `v_personalengpass` | der Personalengpass |
 | `v_personaltrainer` | der Personaltrainer |
 | `v_pflegegrad` | der Pflegegrad |
 | `v_prepaidkarte` | die Prepaid-Karte |

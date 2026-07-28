@@ -7,11 +7,11 @@ word graph drops the edge, by design). Fix a typo to restore a lost
 connection, add the word to the bank, or leave it (a plain association
 that is not a bank entry is fine).
 
-- Related terms total: 3514
-- Resolve to a bank entry: 3002
-- Unresolved (edge dropped): 512
+- Related terms total: 3628
+- Resolve to a bank entry: 3121
+- Unresolved (edge dropped): 507
 
-## arzt (21)
+## arzt (20)
 
 - `v_ausschlag`: "die Haut"
 - `v_blutdruckmessung`: "der Blutdruck"
@@ -29,7 +29,6 @@ that is not a bank entry is fine).
 - `v_rehabilitation`: "die Genesung"
 - `v_rollstuhl`: "die Mobilität"
 - `v_schmerzen`: "das Schmerzmittel"
-- `v_untersuchung`: "untersuchen"
 - `v_visite`: "die Station"
 - `v_visite`: "der Befund"
 - `v_wartezimmer`: "die Wartezeit"
@@ -74,7 +73,7 @@ that is not a bank entry is fine).
 - `v_handwerklich`: "geschickt"
 - `v_integrationskurs`: "das Bundesamt"
 
-## conflict (53)
+## conflict (52)
 
 - `v_akkord`: "der Lohn"
 - `v_ansprechen`: "thematisieren"
@@ -88,7 +87,6 @@ that is not a bank entry is fine).
 - `v_einfuehlsam`: "das Einfühlungsvermögen"
 - `v_einfuehlsam`: "rücksichtsvoll"
 - `v_einwand`: "kritisieren"
-- `v_entschuldigung`: "leidtun"
 - `v_eskalieren`: "zuspitzen"
 - `v_gemeinsam`: "zusammen"
 - `v_gereizt`: "genervt"
@@ -130,7 +128,7 @@ that is not a bank entry is fine).
 - `v_zuhoeren`: "aufmerksam"
 - `v_zuhoeren`: "verstehen"
 
-## customer (58)
+## customer (60)
 
 - `v_anfrage`: "der Bedarf"
 - `v_angebot`: "anbieten"
@@ -142,15 +140,15 @@ that is not a bank entry is fine).
 - `v_aufrechterhalten`: "beibehalten"
 - `v_ausbauen`: "erweitern"
 - `v_bauherr`: "der Auftrag"
-- `v_bedauern`: "leidtun"
-- `v_beratung`: "der Service"
+- `v_beeintraechtigen`: "stören"
 - `v_betreuung`: "die Pflege"
+- `v_dafuer_sorgen`: "dafür Sorge tragen"
 - `v_dauerwelle`: "das Haar"
 - `v_einzelhandel`: "das Geschäft"
 - `v_erwartungsmanagement`: "kommunizieren"
+- `v_fachkraft`: "qualifiziert"
 - `v_foehnen`: "stylen"
 - `v_freundlich`: "zuvorkommend"
-- `v_gastfreundschaft`: "der Service"
 - `v_geduld`: "ruhig"
 - `v_gepflegt`: "ordentlich"
 - `v_hausgemacht`: "frisch"
@@ -164,12 +162,14 @@ that is not a bank entry is fine).
 - `v_kuemmern`: "erledigen"
 - `v_kunde`: "die Kundin"
 - `v_kundenbindung`: "die Treue"
-- `v_kundendienst`: "der Service"
 - `v_kundendienst`: "die Hotline"
 - `v_kundenzufriedenheit`: "zufrieden"
 - `v_lieferbedingungen`: "der Vertrag"
+- `v_mitarbeitende`: "schulen"
+- `v_personalengpass`: "überbrücken"
 - `v_pflegekraft`: "die Station"
 - `v_pflegen`: "der Kontakt"
+- `v_raeumlichkeiten`: "der Raum"
 - `v_rasur`: "der Bart"
 - `v_rechnung`: "der Betrag"
 - `v_rueckerstattung`: "zurückzahlen"
@@ -177,10 +177,10 @@ that is not a bank entry is fine).
 - `v_schminken`: "das Make-up"
 - `v_spliss`: "das Haar"
 - `v_stammdaten`: "das System"
-- `v_trinkgeld`: "der Service"
 - `v_umkleide`: "die Dusche"
 - `v_verweisen_auf`: "hinweisen auf"
 - `v_verweisen_auf`: "der Hinweis"
+- `v_voruebergehend`: "vorläufig"
 - `v_weiterhelfen`: "helfen"
 - `v_weiterhelfen`: "unterstützen"
 - `v_wimper`: "das Auge"
@@ -221,7 +221,7 @@ that is not a bank entry is fine).
 
 - `v_gemeinsamkeit`: "das Gespräch"
 
-## logistics (36)
+## logistics (35)
 
 - `v_allerdings`: "freilich"
 - `v_allerdings`: "indes"
@@ -236,7 +236,6 @@ that is not a bank entry is fine).
 - `v_empfaenger`: "der Absender"
 - `v_entladen`: "die Rampe"
 - `v_etikettieren`: "der Preis"
-- `v_infolge`: "wegen"
 - `v_ladeflaeche`: "die Ladung"
 - `v_lager`: "lagern"
 - `v_lager`: "der Vorrat"
@@ -260,7 +259,7 @@ that is not a bank entry is fine).
 - `v_ware`: "das Produkt"
 - `v_zoll`: "die Einfuhr"
 
-## meetings (51)
+## meetings (50)
 
 - `v_abschliessend`: "zum Schluss"
 - `v_abstimmen`: "die Absprache"
@@ -281,7 +280,6 @@ that is not a bank entry is fine).
 - `v_ergebnisoffen`: "die Diskussion"
 - `v_fallbesprechung`: "die Pflegeplanung"
 - `v_grund`: "begründen"
-- `v_informieren`: "mitteilen"
 - `v_kollege`: "die Kollegin"
 - `v_kollege`: "das Team"
 - `v_leitung`: "die Führung"
@@ -326,7 +324,7 @@ that is not a bank entry is fine).
 - `v_tarif`: "die Zone"
 - `v_zebrastreifen`: "die Straße"
 
-## project (43)
+## project (44)
 
 - `v_abnahme`: "abnehmen"
 - `v_abschluss`: "das Ende"
@@ -347,6 +345,7 @@ that is not a bank entry is fine).
 - `v_foerdern`: "unterstützen"
 - `v_fortschritt`: "der Stand"
 - `v_fortschritt`: "vorankommen"
+- `v_fuehren_zu`: "die Folge"
 - `v_grundriss`: "die Wohnung"
 - `v_hingegen`: "dagegen"
 - `v_im_nachhinein`: "rückblickend"
@@ -412,14 +411,12 @@ that is not a bank entry is fine).
 - `v_vorsicht`: "vorsichtig"
 - `v_warnschild`: "der Hinweis"
 
-## scheduling (40)
+## scheduling (38)
 
 - `v_ablauf`: "der Prozess"
 - `v_anlaufphase`: "die Phase"
 - `v_anlaufphase`: "der Start"
 - `v_aufgabenverteilung`: "zuständig"
-- `v_aufgrund`: "wegen"
-- `v_benachrichtigen`: "mitteilen"
 - `v_dringend`: "eilig"
 - `v_erinnerung`: "erinnern"
 - `v_erinnerung`: "der Hinweis"
@@ -455,11 +452,10 @@ that is not a bank entry is fine).
 - `v_vorziehen`: "früher"
 - `v_zeitfenster`: "die Lücke"
 
-## sustainability (26)
+## sustainability (24)
 
 - `v_abfall`: "der Müll"
 - `v_angesichts`: "in Anbetracht"
-- `v_angesichts`: "wegen"
 - `v_aushub`: "entsorgen"
 - `v_betriebsoekologie`: "oekologisch"
 - `v_bewusst`: "verantwortungsvoll"
@@ -476,7 +472,6 @@ that is not a bank entry is fine).
 - `v_solarenergie`: "die Energie"
 - `v_turbine`: "die Energie"
 - `v_verbrauch`: "verbrauchen"
-- `v_vermeiden`: "verhindern"
 - `v_verschwendung`: "sparsam"
 - `v_wiederverwendbar`: "der Mehrweg"
 - `v_wirkungsgrad`: "die Energie"

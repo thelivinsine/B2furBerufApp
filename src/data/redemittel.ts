@@ -1597,6 +1597,48 @@ export const redemittel: RedemittelPhrase[] = [
     note: "The strongest formal apology opener; 'außerordentlich' carries the weight.",
     example: { de: "Wir bedauern außerordentlich, dass das Catering verspätet eingetroffen ist.", en: "We deeply regret that the catering arrived late." },
   },
+
+  /* ---------------- Complaint response pack 2 (B2/C1, cleaning-service focus) ---------------- */
+  {
+    id: "r_mail19",
+    de: "Sollten Sie weitere Fragen haben, kontaktieren Sie mich jederzeit gerne.",
+    en: "Should you have further questions, please feel free to contact me at any time.",
+    category: "emails",
+    register: "formal",
+    cefr: "C1",
+    note: "Formal conditional inversion ('Sollten Sie …') replaces 'Wenn Sie … sollten' and sounds more elegant in writing.",
+    example: { de: "Sollten Sie weitere Fragen zu unserem Angebot haben, kontaktieren Sie mich jederzeit gerne.", en: "Should you have further questions about our offer, please feel free to contact me at any time." },
+  },
+  {
+    id: "r_mail20",
+    de: "Bitte zögern Sie nicht, uns zu kontaktieren.",
+    en: "Please do not hesitate to contact us.",
+    category: "emails",
+    register: "formal",
+    cefr: "B2.2",
+    note: "'nicht zögern, etwas zu tun' is the standard formal way to invite contact.",
+    example: { de: "Bei weiteren Fragen zögern Sie bitte nicht, uns zu kontaktieren.", en: "If you have further questions, please do not hesitate to contact us." },
+  },
+  {
+    id: "r_mail21",
+    de: "Vielen Dank für Ihr Verständnis.",
+    en: "Thank you for your understanding.",
+    category: "emails",
+    register: "formal",
+    cefr: "B2.1",
+    note: "A short, near-obligatory closing line after an apology or a piece of bad news.",
+    example: { de: "Vielen Dank für Ihr Verständnis und Ihre Geduld in dieser Angelegenheit.", en: "Thank you for your understanding and patience in this matter." },
+  },
+  {
+    id: "r_mail22",
+    de: "Wir freuen uns auf die weitere Zusammenarbeit.",
+    en: "We look forward to continuing our cooperation.",
+    category: "emails",
+    register: "formal",
+    cefr: "B2.1",
+    note: "Ends a letter on a positive, forward-looking note, even after a complaint.",
+    example: { de: "Trotz dieses Vorfalls freuen wir uns auf die weitere Zusammenarbeit mit Ihnen.", en: "Despite this incident we look forward to continuing our cooperation with you." },
+  },
 ];
 
 export const redemittelByCategory = (cat: RedemittelCategory) =>

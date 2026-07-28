@@ -26,8 +26,8 @@
     {
       "id": "safety",
       "title": "Arbeitssicherheit & Gesundheit",
-      "words": 163,
-      "cols": 86,
+      "words": 169,
+      "cols": 89,
       "vocabKinds": 14,
       "noExampleIds": [
         "v_verletzen",
@@ -40,7 +40,8 @@
         "v_dosieren",
         "v_passieren",
         "v_verursachen",
-        "v_ueberpruefen"
+        "v_ueberpruefen",
+        "v_ausloesen"
       ],
       "noRelatedIds": [
         "v_schutzkleidung",
@@ -202,12 +203,14 @@
     {
       "id": "conflict",
       "title": "Konfliktlösung",
-      "words": 64,
-      "cols": 43,
+      "words": 66,
+      "cols": 45,
       "vocabKinds": 14,
       "noExampleIds": [
         "v_bereuen",
-        "v_beruhen_auf"
+        "v_beruhen_auf",
+        "v_hervorrufen",
+        "v_leidtun"
       ],
       "noRelatedIds": [
         "v_gereizt",
@@ -226,8 +229,8 @@
     {
       "id": "customer",
       "title": "Kundenkommunikation",
-      "words": 191,
-      "cols": 106,
+      "words": 217,
+      "cols": 117,
       "vocabKinds": 14,
       "noExampleIds": [
         "v_zusichern",
@@ -246,11 +249,14 @@
         "v_zurueckfuehren_auf",
         "v_kuemmern",
         "v_versichern",
-        "v_verweisen_auf"
+        "v_verweisen_auf",
+        "v_beeintraechtigen",
+        "v_einsetzen",
+        "v_einstellen",
+        "v_betreuen"
       ],
       "noRelatedIds": [
         "v_anliegen",
-        "v_kundendienst",
         "v_zusichern",
         "v_weiterhelfen",
         "v_angehoeriger",
@@ -292,8 +298,8 @@
     {
       "id": "project",
       "title": "Projektkoordination",
-      "words": 102,
-      "cols": 67,
+      "words": 106,
+      "cols": 69,
       "vocabKinds": 14,
       "noExampleIds": [
         "v_koordinieren",
@@ -310,7 +316,8 @@
         "v_organisieren",
         "v_sicherstellen",
         "v_veranlassen",
-        "v_im_nachhinein"
+        "v_im_nachhinein",
+        "v_fuehren_zu"
       ],
       "noRelatedIds": [
         "v_fortschritt",

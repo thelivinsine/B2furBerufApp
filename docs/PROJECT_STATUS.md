@@ -1,7 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-28 (session 176). **Formal complaint response pack (B2/C1 business German).**
-A founder-supplied word field for answering a written complaint was audited against the banks: 41 of
+_Last updated: 2026-07-28 (session 177). **Complaint response pack 2, cleaning-service focus.** A
+second founder-supplied word field for answering a written complaint, this one framed around a
+Reinigungsservice customer relationship, was audited against the live banks (including the s176 pack
+it overlaps with): about 90 of ~150 requested items were already shipped, **60 are now in** (38
+Wörter, 18 Kollokationen, 4 Redemittel), all `draft`. Only `die Reinigung` and `das Reinigungspersonal`
+are sector-tagged `cleaning`; the rest (staffing, apology and assurance language, formal closings)
+stays universal. Prior s176: **formal complaint response pack (B2/C1 business German).** A
+founder-supplied word field for answering a written complaint was audited against the banks: 41 of
 151 items were already shipped, the other 110 are now in, split by the bank rules (82 Wörter, 19
 Nomen-Verb chunks into Kollokationen, 5 Redemittel sentence frames, 4 already covered by existing
 phrases). 106 new provenance rows, all `draft`. Prior s175: **a latent build-breaker is defused, and a
@@ -110,32 +116,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 175 (2026-07-28), third task. The PWA precache ceiling, defused on its own.**
-Merged as **PR #750** (docs) and **PR #751** (this fix). Branch `claude/pwa-precache-fix`.
-Salvaged from the parked word-field branch, because the problem is not about words at all.
-
-- **What was actually wrong.** The `/sources` + `/admin/pruefen` workbench chunk bundles the entire
-  provenance + verification register, so its size tracks the content banks and nothing else. Workbox
-  refuses to precache any single asset over **2 MiB** and **fails the build** when it meets one; it
-  does not warn and carry on. On `main` the chunk measured **1,963.67 kB** at 3,107 provenance rows.
-  The ceiling is 2,097 kB, and each new content item costs roughly 0.6 kB across the two registers,
-  so `main` was about **200 content items** from a build failure whose error message names the
-  service worker and never mentions the content that caused it.
-- **The fix.** `vite.config.ts` adds `**/useWorkbench-*.js` to `globIgnores`. The chunk is
-  founder-only and needs a live connection to load review data anyway, so precaching it into every
-  learner's cache bought nothing. It now loads on demand, unchanged in behaviour. The comment in the
-  config explains the trap so the line does not get "tidied away" later; `docs/areas/CONTENT.md`
-  carries the same warning next to the register description.
-- **Measured effect.** PWA precache **6,947 KiB → 5,029 KiB** (121 entries, was 122): a ~1.9 MB
-  smaller first load for every learner, on top of removing the build risk. The chunk itself is
-  unchanged at 1,963.67 kB; it is simply no longer precached.
-- **Proof it works.** On the parked branch the same build failed at a 2.11 MB chunk and passed with
-  this line present, chunk size unchanged. That is the before/after.
-- **Gates:** `typecheck` · `build` green · `lint` 0 errors (75 warnings, unchanged) · `test:unit`
-  370/370 · `check:bundle` 123.2 kB of 400 kB · `lint:content` clean (banks untouched).
-- **Correction to an earlier estimate in this session:** the headroom was reported to the founder as
-  "about 60 rows". Measured properly it is ~200 content items. Worth fixing, not an emergency.
-
 **Handoff after session 176 (2026-07-28). Formal complaint response pack: 110 new items.**
 Branch `claude/business-german-vocabulary-36z6ua`.
 Founder supplied a B2/C1 business-German word field (answering a written complaint: reference,
@@ -185,6 +165,63 @@ closings, idioms, connectors) and asked what was already in the app, with the re
   is unchanged.
 - **Shipped:** **PR #752** (the pack, squash-merged as `7197a44`) and **PR #753** (the licensing
   answer + the log restore, squash-merged as `810a405`). Branch reset onto `main`, working tree clean.
+
+**Handoff after session 177 (2026-07-28). Complaint response pack 2 (cleaning-service focus): 60 new
+items.** Branch `claude/complaint-response-vocab-cwlqvj`.
+Founder supplied a second B2/C1 word field for answering a written complaint, this one framed around
+a **Reinigungsservice** (cleaning-service) customer relationship: referring to the complaint,
+apologising, naming problems and causes, staff-shortage vocabulary, taking action, giving assurance,
+future improvements, customer-service nouns, formal closings, plus its own "high-frequency verbs /
+nouns / connectors" glossary sections.
+- **Audited against the s176 pack first, not just the live banks.** The two word fields overlap
+  heavily (both are "answering a complaint" business German), so the real risk was re-adding items
+  session 176 already shipped. Loaded `vocabulary` / `collocations` / `redemittel` through Vite
+  (same `ssrLoadModule` approach as s176; a `de:`/`full:` regex misses most one-line entries) and
+  checked every item, including the three glossary sections, against it. **~90 of the ~150 requested
+  items were already covered** (`bezüglich`, `hinsichtlich`, `in Bezug auf`, `aufgrund`, `infolge`,
+  `entstehen`, `auftreten`, `vorkommen`, `verursachen`, `Beschwerde`, `Beanstandung`, `Mangel`,
+  `Vorfall`, `Verzögerung`, `Unannehmlichkeit`, `Personalengpass überbrücken`, `Verständnis haben
+  für`, `Maßnahmen ergreifen`, `alles daransetzen`, `um Entschuldigung bitten`, `sich aufrichtig
+  entschuldigen` …). **60 new items.**
+- **Split by the bank rules, same as s176.** 38 Wörter (the cause set `sich ereignen/feststellen/
+  sich ergeben/beeinträchtigen/hervorrufen/auslösen/führen zu`, the staffing set `Personalmangel/
+  Personalengpass/Krankheitsfall/Ersatzpersonal/Reinigungspersonal/die Mitarbeitenden/das Personal/
+  die Fachkraft`, the customer-facing set `Dienstleistung/Service/Reinigung/Räumlichkeiten/Objekt/
+  betreuen/einsetzen/einstellen`, and connectors `wegen/bedingt durch/verursacht durch/künftig/
+  zukünftig/krankheitsbedingt/vorübergehend`); 18 Kollokationen for the idioms (`Bezug nehmen auf`,
+  `jemanden auf etwas aufmerksam machen`, `sein Bedauern ausdrücken/aussprechen`, `um Verständnis
+  bitten`, `es kommt zu etwas`, `eine Beschwerde geht ein`, `den Ablauf beeinträchtigen`,
+  `Ersatzpersonal einsetzen`, `zusätzliches Personal einstellen`, `kurzfristig Ersatz organisieren`,
+  `den Vorfall untersuchen`, `den Sachverhalt prüfen`, `Verbesserungen umsetzen`, `Mitarbeitende
+  schulen`, `Qualitätskontrollen durchführen`, `Maßnahmen treffen`, `Ihre Räumlichkeiten betreuen`);
+  4 Redemittel (`r_mail19`-`r_mail22`, category `emails`, for the two closing lines the s176 pack
+  had not covered plus the formal `Sollten Sie …` conditional-inversion opener).
+- **`das Reinigungspersonal` and `die Reinigung` are `sectors: ["cleaning"]`**, the only two items
+  tagged to the founder's own industry; every other item (staffing shortages, assurance language,
+  formal closings) stays untagged/universal, since that vocabulary applies to any service business
+  answering a complaint, not just cleaning. The app already ships a sizeable `cleaning`-sector pack
+  (`v_reinigungskraft`, `v_gebaeudereinigung`, `v_reinigungsplan` …); this adds the missing base
+  nouns (`die Reinigung`, `das Reinigungspersonal`) without duplicating the trade-specific compounds.
+- **Verbs that only ever appear inside one idiom stayed out of the Wörter list** (`untersuchen`,
+  `schulen`, `organisieren`'s new object, `der Sachverhalt`), matching how s176 left `ergreifen`,
+  `schaffen`, `nachgehen` etc. collocation-only. Verbs the founder listed in a dedicated
+  "High-Frequency B2 Business Verbs" glossary (`betreuen`, `einsetzen`, `einstellen`, `untersuchen`,
+  `analysieren`, `mitteilen`, `verhindern`, `dafür sorgen`) got standalone entries instead, since a
+  founder-authored glossary section is itself a request for reusable vocabulary, not just collocation
+  filler.
+- **`verify:cefr` flags 2 of the new items** (`v_sich_ergeben`, `v_verursacht_durch`, both claimed
+  C1 against a B1.1 raw-frequency score). Kept as labelled, same reasoning as the 8 flags in s176:
+  the check scores corpus frequency, not formal register, and both are ordinary in *spoken* German
+  while distinctly formal/written in this business sense. Warn-only by design.
+- **Gates:** lint:content ✔ (1,743 vocab · 1,072 collocations · 158 Redemittel · 3,273 provenance) ·
+  build:frequency-subset + build:frequency (regenerated; `wordfreq` needed a fresh `pip install` in
+  this sandbox) · build:oracles + verify:facts ✔ 0 gate errors, all 8 new-item signals are
+  "not covered" (no oracle entry for a compound/rare word), none is a real mismatch · build ·
+  check:bundle 123.2 kB · lint 0 errors (75 warnings, unchanged) · test:unit 370/370 ·
+  report:exercise-coverage (20/20 green) · build:review-queue.
+- **Next for this content:** `draft` like everything else; lands in the `/admin/pruefen` review
+  queue. No writing prompt, Can-Do or text was added, so exercise coverage is unchanged.
+- **Shipped:** **PR #\<pending\>**, squash-merge SHA to follow.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
