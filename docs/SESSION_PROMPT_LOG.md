@@ -2184,4 +2184,4 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   real defect this pass introduced: the prompt-1 documentation edit used a whole-file string replace
   whose anchor was not unique, so the licensing note and a `PR #752` reference were injected into the
   **s175 parked-pack entry** as well. That entry is restored to what shipped in PR #750. Docs-only.
-- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log
+- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log · **PR #753**
