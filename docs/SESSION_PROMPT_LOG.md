@@ -2195,4 +2195,4 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   context), and `areas/CONTENT.md` records **why `PartOfSpeech` has no `preposition` value** so a
   future session does not widen a closed enum for five items. Docs-only; no bank, code or config
   change, so no gates beyond `lint:content` staying clean.
-- **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/areas/CONTENT.md` · this log
+- **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/areas/CONTENT.md` · this log · **PR #754**
