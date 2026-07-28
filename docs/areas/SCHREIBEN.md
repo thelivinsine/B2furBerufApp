@@ -255,8 +255,11 @@ the moved-word single word).
   after "Grüner Punkt = dein Satz.". Desktop only since s168; the founder-approved
   mobile rework (preview rounds r2 to r4, "Option 2") replaced the collapsed panel + toolbar toggle,
   which read as a filter and hid the transform feature:
-  - **Two tiles fill the height** between the switcher and the fixed bottom chrome (sentence card
-    `grow-[1.15]`, tile `grow`, content vertically centered). `measureMobile` sets an exact
+  - **Two tiles fill 90% of the height** between the switcher and the fixed bottom chrome (sentence
+    card `grow-[1.15]`, tile `grow`, content vertically centered). `measureMobile` measures the room
+    down to that chrome and keeps `FILL_RATIO = 0.9` of it, anchored at the top, so the pair stops
+    short of the chrome instead of filling every pixel (founder s175: it read as cramped); the
+    tiles sit `gap-5` apart. `measureMobile` sets an exact
     **`height`** before a correction exists and a **`minHeight`** after (founder s169): a minimum
     alone let the tiles' natural height win whenever card chrome + three dials + a wrapping legend
     outgrew the screen, which is where Fokus's resting page scroll came from. With a fixed height
