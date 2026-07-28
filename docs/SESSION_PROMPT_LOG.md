@@ -2028,3 +2028,56 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `docs/reports/exercise-coverage-report.*` · `docs/reports/related-terms-report.md` ·
   `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s174 handoff archived to
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`) · this log
+- **Note on the outcome:** this pack was **parked, not shipped** (prompts 4 to 7 below). PR #749 was
+  opened under the standing auto-ship rule, then withdrawn on the founder's instruction.
+
+- **Prompt 4 (verbatim, 2026-07-28):** `don't merge yet`
+- **Response summary:** Stopped the pending squash-merge of PR #749 and the CI watch. Branch pushed
+  and left open for review; `main` untouched at `f0621a7`. No code change.
+- **Artifacts (prompt 4):** none (no commit)
+
+- **Prompt 5 (verbatim, 2026-07-28):** `withdraw the pr`
+- **Response summary:** Closed PR #749 unmerged via the GitHub MCP tools and confirmed the state
+  (`state: closed`, `merged: false`, `main` still at `f0621a7`). Commit `9032660` remains on the
+  pushed branch, so nothing was lost.
+- **Artifacts (prompt 5):** PR #749 closed unmerged
+
+- **Prompt 6 (verbatim, 2026-07-28):** `what kind of licensing and audit issues would arise from
+  using the content from the photos?`
+- **Response summary:** Checked the repo's own policy first and found it already answers the
+  question, against this work. `docs/strategy/DATA_GOVERNANCE.md` §"What counts as traceable" states
+  that a specific published word list (Goethe, telc, Klett) can carry compilation / EU database
+  rights in its selection and arrangement, "so we never copy a protected list wholesale. We verify
+  individual entries against open references instead", and the same file lists **telc materials**
+  under "Sources we do NOT use"; the "Sources to avoid" table in `PROJECT_REFERENCE.md` repeats it,
+  naming Klett's Linie 1 Beruf. The branch does the forbidden thing: page-by-page transcription, the
+  book's section order preserved, and its chapter names written into the code comments and all 238
+  provenance notes. That rule should have been read before transcribing. Legal shape reported to the
+  founder: the individual words are facts and not protectable (§2 UrhG, Schöpfungshöhe); all authored
+  material (464 examples, glosses, pron hints, contexts, related terms, CEFR and theme tags) is
+  original and safe; the exposure sits in the **selection and arrangement**, under §4 UrhG and,
+  more sharply, the sui generis **database right** (§§87a-87e UrhG, EU Directive 96/9/EC: no
+  creativity needed, 15 years, infringed by extracting a substantial part). The founder's private
+  photo is fine under §53 but does not license commercial republication of the selection. Trademark
+  is already handled: `TermsOfService.tsx` carries the not-affiliated-with-Goethe/telc disclaimer in
+  both languages, and naming the exam is lawful nominative use. Remediation offered (declined for
+  now): strip the structural fingerprint rather than the vocabulary, re-derive the selection from
+  `frequency.ts` bands plus the sub-theme taxonomy, and cut the few entries that only exist because
+  they were on that page. Analysis only, no code change.
+- **Artifacts (prompt 6):** none (no commit)
+
+- **Prompt 7 (verbatim, 2026-07-28):** `no need. I want to park this branch for now. document the
+  session.`
+- **Response summary:** Parked the branch and corrected the documentation, which had been written on
+  the assumption the pack would ship. Reverted the bank counts in `PROJECT_STATUS.md` and
+  `docs/areas/CONTENT.md` to live `main` values (vocab 1,623 · collocations 1,035 · provenance
+  3,107), since nothing was merged, and rewrote both the `_Last updated_` header and the s175
+  second-task handoff to describe a built-gated-parked pack with the licensing reason, the legal
+  shape, and the revival recipe. Flagged one branch finding worth salvaging on its own: the workbox
+  **2 MiB per-asset precache ceiling** that the grown register tripped will bite again on the next
+  sizeable content addition from any source, and the `globIgnores` fix in `vite.config.ts` is
+  independent of where the words came from. **The paper trail for prompts 3 to 7 currently lives only
+  on the parked branch**, since no PR into `main` was opened; raised with the founder rather than
+  opening one unasked.
+- **Artifacts (prompt 7):** `docs/PROJECT_STATUS.md` · `docs/areas/CONTENT.md` · this log ·
+  branch `claude/word-list-validation-br3u2g` (parked, unmerged)
