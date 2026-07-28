@@ -2242,4 +2242,4 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/data/provenance.ts` · `src/data/frequency.ts` (generated) · `scripts/vendor/*.json`
   (generated) · `src/features/admin/reviewQueue.json` (generated) · `docs/reports/*` (generated) ·
   `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` (s175 third-task handoff aged into the W31
-  archive) · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log · **PR #\<pending\>**
+  archive) · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log · **PR #755**

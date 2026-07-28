@@ -221,7 +221,7 @@ nouns / connectors" glossary sections.
   report:exercise-coverage (20/20 green) · build:review-queue.
 - **Next for this content:** `draft` like everything else; lands in the `/admin/pruefen` review
   queue. No writing prompt, Can-Do or text was added, so exercise coverage is unchanged.
-- **Shipped:** **PR #\<pending\>**, squash-merge SHA to follow.
+- **Shipped:** **PR #755**.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
