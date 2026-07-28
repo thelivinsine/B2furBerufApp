@@ -1,12 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-28 (session 175). **A 238-item word-field pack is built, gated and PARKED, not
-shipped.** A founder word list was checked against every bank (36 headwords already there) and the
-gap closed on branch `claude/word-list-validation-br3u2g`, all gates green. It is **not on `main`**:
-the list came from photographed pages of a commercial telc B2 Beruf coursebook, and
-`strategy/DATA_GOVERNANCE.md` puts telc materials on the do-not-use list and forbids copying a
-published word list wholesale. **PR #749 was withdrawn.** Bank counts below are unchanged and still
-describe live `main`. Prior s175: **Fokus mobile tiles
+_Last updated: 2026-07-28 (session 175). **A latent build-breaker is defused, and a 238-item word-field
+pack is parked.** The `/sources` workbench chunk bundles the whole provenance register, so it grows
+with the content banks; at ~1.96 MB it was roughly **200 content items** from workbox's 2 MiB
+precache ceiling, which **fails `pnpm build`** rather than warning. `vite.config.ts` now keeps that
+founder-only chunk out of the precache, so the next content pack cannot break the build, and every
+learner's first load drops **6,947 KiB → 5,029 KiB**. The pack that surfaced it stays parked on
+`claude/word-list-validation-br3u2g`: the word list came from photographed pages of a commercial telc
+B2 Beruf coursebook, and `strategy/DATA_GOVERNANCE.md` puts telc materials on the do-not-use list and
+forbids copying a published word list wholesale. **PR #749 was withdrawn**; bank counts below are
+unchanged and still describe live `main`. Prior s175: **Fokus mobile tiles
 breathe.** The two mobile Fokus tiles
 filled the room down to the fixed bottom chrome to the last pixel and read as cramped; they now keep
 90% of it (`FILL_RATIO` in `FokusTrainer.tsx`), anchored at the same top, and sit `gap-5` apart, so
@@ -105,24 +108,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 175 (2026-07-28). Fokus mobile tiles: 10% shorter from the bottom.**
-Branch `claude/fokus-tile-height-9lxw8g`.
-Founder: the two mobile Fokus tiles looked cramped. They filled the room between their top and the
-fixed bottom chrome exactly, so the sentence card and the Grammatik dial tile ran right into the
-Korrigieren cluster.
-- `measureMobile` in `src/features/writing/fokus/FokusTrainer.tsx` now keeps `FILL_RATIO = 0.9` of
-  the measured room (floor 240px, was 260px unscaled). The top of the column is unchanged, so the
-  10% comes off the BOTTOM and the tiles stop short of the chrome. Both the exact `height` used
-  before a correction and the `minHeight` used after are scaled, so a long correction still grows
-  the page as before.
-- The mobile column gap went `gap-4` → `gap-5`, which is the "breathing space between the tiles"
-  half of the request; the tiles keep their `grow-[1.15]` / `grow` ratio, so both shrink evenly.
-- Nothing else in the locked Schreiben mobile anatomy moved: the fixed cluster and KI line, the
-  `bottomLimit()` picker floor and the desktop layout are untouched. `docs/areas/SCHREIBEN.md`
-  records the 90% rule.
-- **Gates:** typecheck · lint 0 errors (75 warnings, unchanged) · build. Phone verification is the
-  founder's, as usual.
-
 **Handoff after session 175 (2026-07-28), second task. A word-field pack built, gated, then PARKED
 on licensing grounds.** Branch `claude/word-list-validation-br3u2g` (commit `9032660`), **not merged**.
 Founder sent four photos of a **telc Deutsch B2 Beruf Wortschatzliste** and asked which words the app
@@ -177,6 +162,32 @@ precache ceiling**, which fails `pnpm build` outright. The branch fixes it by ad
 on demand instead of being precached into every learner's cache (PWA precache 7,155 KiB → 5,174 KiB).
 **This will bite again on the next sizeable content addition, from any source.** Worth cherry-picking
 on its own.
+
+**Handoff after session 175 (2026-07-28), third task. The PWA precache ceiling, defused on its own.**
+Merged as **PR #750** (docs) and **PR #751** (this fix). Branch `claude/pwa-precache-fix`.
+Salvaged from the parked word-field branch, because the problem is not about words at all.
+
+- **What was actually wrong.** The `/sources` + `/admin/pruefen` workbench chunk bundles the entire
+  provenance + verification register, so its size tracks the content banks and nothing else. Workbox
+  refuses to precache any single asset over **2 MiB** and **fails the build** when it meets one; it
+  does not warn and carry on. On `main` the chunk measured **1,963.67 kB** at 3,107 provenance rows.
+  The ceiling is 2,097 kB, and each new content item costs roughly 0.6 kB across the two registers,
+  so `main` was about **200 content items** from a build failure whose error message names the
+  service worker and never mentions the content that caused it.
+- **The fix.** `vite.config.ts` adds `**/useWorkbench-*.js` to `globIgnores`. The chunk is
+  founder-only and needs a live connection to load review data anyway, so precaching it into every
+  learner's cache bought nothing. It now loads on demand, unchanged in behaviour. The comment in the
+  config explains the trap so the line does not get "tidied away" later; `docs/areas/CONTENT.md`
+  carries the same warning next to the register description.
+- **Measured effect.** PWA precache **6,947 KiB → 5,029 KiB** (121 entries, was 122): a ~1.9 MB
+  smaller first load for every learner, on top of removing the build risk. The chunk itself is
+  unchanged at 1,963.67 kB; it is simply no longer precached.
+- **Proof it works.** On the parked branch the same build failed at a 2.11 MB chunk and passed with
+  this line present, chunk size unchanged. That is the before/after.
+- **Gates:** `typecheck` · `build` green · `lint` 0 errors (75 warnings, unchanged) · `test:unit`
+  370/370 · `check:bundle` 123.2 kB of 400 kB · `lint:content` clean (banks untouched).
+- **Correction to an earlier estimate in this session:** the headroom was reported to the founder as
+  "about 60 rows". Measured properly it is ~200 content items. Worth fixing, not an emergency.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

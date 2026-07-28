@@ -38,6 +38,19 @@ export default defineConfig({
         // Cache everything vite emits. The glob must cover hashed asset
         // filenames (js/css/html) as well as the root index.html.
         globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
+        // The provenance workbench chunk (/sources + /admin/pruefen) carries the
+        // whole provenance + verification register, so it grows with the content
+        // banks and nothing else. It is founder-only and needs the network to
+        // load review data anyway, so it is fetched on demand rather than
+        // precached into every learner's cache.
+        // This is also a BUILD GUARD, not just a size tidy-up: workbox refuses to
+        // precache any single asset over 2 MiB and FAILS the build when it meets
+        // one (it does not warn and carry on). The chunk was at ~1.96 MB with
+        // 3,107 provenance rows, i.e. roughly 200 more content items from the
+        // ceiling, and a content pack that size would otherwise have broken
+        // `pnpm build` with an error that points at the service worker rather
+        // than at the words that were added. See docs/areas/CONTENT.md.
+        globIgnores: ["**/useWorkbench-*.js"],
         // Navigate fallback so direct clean-URL routes (e.g. /settings) are
         // served index.html by the SW instead of 404ing on reload, once the
         // SW is installed. (First-ever visits are handled by 404.html, see
