@@ -4,7 +4,15 @@ _Last updated: 2026-07-28 (session 176). **Formal complaint response pack (B2/C1
 A founder-supplied word field for answering a written complaint was audited against the banks: 41 of
 151 items were already shipped, the other 110 are now in, split by the bank rules (82 Wörter, 19
 Nomen-Verb chunks into Kollokationen, 5 Redemittel sentence frames, 4 already covered by existing
-phrases). 106 new provenance rows, all `draft`. Prior s175: **Fokus mobile tiles breathe.** The two mobile Fokus tiles
+phrases). 106 new provenance rows, all `draft`. Prior s175: **a latent build-breaker is defused, and a
+238-item word-field pack is parked.** The `/sources` workbench chunk bundles the whole provenance
+register, so it grows with the content banks; at ~1.96 MB it was roughly **200 content items** from
+workbox's 2 MiB precache ceiling, which **fails `pnpm build`** rather than warning. `vite.config.ts`
+now keeps that founder-only chunk out of the precache (PR #751). The pack that surfaced it stays
+parked on `claude/word-list-validation-br3u2g`: the word list came from photographed pages of a
+commercial telc B2 Beruf coursebook, and `strategy/DATA_GOVERNANCE.md` puts telc materials on the
+do-not-use list and forbids copying a published word list wholesale. **PR #749 was withdrawn.**
+Also s175: **Fokus mobile tiles breathe.** The two mobile Fokus tiles
 filled the room down to the fixed bottom chrome to the last pixel and read as cramped; they now keep
 90% of it (`FILL_RATIO` in `FokusTrainer.tsx`), anchored at the same top, and sit `gap-5` apart, so
 the freed strip sits under the lower tile. Prior s174: **Security audit + the sign-up flow it uncovered.**
@@ -102,23 +110,31 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 175 (2026-07-28). Fokus mobile tiles: 10% shorter from the bottom.**
-Branch `claude/fokus-tile-height-9lxw8g`.
-Founder: the two mobile Fokus tiles looked cramped. They filled the room between their top and the
-fixed bottom chrome exactly, so the sentence card and the Grammatik dial tile ran right into the
-Korrigieren cluster.
-- `measureMobile` in `src/features/writing/fokus/FokusTrainer.tsx` now keeps `FILL_RATIO = 0.9` of
-  the measured room (floor 240px, was 260px unscaled). The top of the column is unchanged, so the
-  10% comes off the BOTTOM and the tiles stop short of the chrome. Both the exact `height` used
-  before a correction and the `minHeight` used after are scaled, so a long correction still grows
-  the page as before.
-- The mobile column gap went `gap-4` → `gap-5`, which is the "breathing space between the tiles"
-  half of the request; the tiles keep their `grow-[1.15]` / `grow` ratio, so both shrink evenly.
-- Nothing else in the locked Schreiben mobile anatomy moved: the fixed cluster and KI line, the
-  `bottomLimit()` picker floor and the desktop layout are untouched. `docs/areas/SCHREIBEN.md`
-  records the 90% rule.
-- **Gates:** typecheck · lint 0 errors (75 warnings, unchanged) · build. Phone verification is the
-  founder's, as usual.
+**Handoff after session 175 (2026-07-28), third task. The PWA precache ceiling, defused on its own.**
+Merged as **PR #750** (docs) and **PR #751** (this fix). Branch `claude/pwa-precache-fix`.
+Salvaged from the parked word-field branch, because the problem is not about words at all.
+
+- **What was actually wrong.** The `/sources` + `/admin/pruefen` workbench chunk bundles the entire
+  provenance + verification register, so its size tracks the content banks and nothing else. Workbox
+  refuses to precache any single asset over **2 MiB** and **fails the build** when it meets one; it
+  does not warn and carry on. On `main` the chunk measured **1,963.67 kB** at 3,107 provenance rows.
+  The ceiling is 2,097 kB, and each new content item costs roughly 0.6 kB across the two registers,
+  so `main` was about **200 content items** from a build failure whose error message names the
+  service worker and never mentions the content that caused it.
+- **The fix.** `vite.config.ts` adds `**/useWorkbench-*.js` to `globIgnores`. The chunk is
+  founder-only and needs a live connection to load review data anyway, so precaching it into every
+  learner's cache bought nothing. It now loads on demand, unchanged in behaviour. The comment in the
+  config explains the trap so the line does not get "tidied away" later; `docs/areas/CONTENT.md`
+  carries the same warning next to the register description.
+- **Measured effect.** PWA precache **6,947 KiB → 5,029 KiB** (121 entries, was 122): a ~1.9 MB
+  smaller first load for every learner, on top of removing the build risk. The chunk itself is
+  unchanged at 1,963.67 kB; it is simply no longer precached.
+- **Proof it works.** On the parked branch the same build failed at a 2.11 MB chunk and passed with
+  this line present, chunk size unchanged. That is the before/after.
+- **Gates:** `typecheck` · `build` green · `lint` 0 errors (75 warnings, unchanged) · `test:unit`
+  370/370 · `check:bundle` 123.2 kB of 400 kB · `lint:content` clean (banks untouched).
+- **Correction to an earlier estimate in this session:** the headroom was reported to the founder as
+  "about 60 rows". Measured properly it is ~200 content items. Worth fixing, not an emergency.
 
 **Handoff after session 176 (2026-07-28). Formal complaint response pack: 110 new items.**
 Branch `claude/business-german-vocabulary-36z6ua`.
@@ -152,6 +168,13 @@ closings, idioms, connectors) and asked what was already in the app, with the re
   fresh sandbox) · build:oracles + verify:facts ✔ 0 gate errors, no new review signals ·
   build · check:bundle 123.2 kB · lint 0 errors · test:unit 370/370 ·
   report:exercise-coverage (20/20 green) · build:review-queue.
+- **Licensing, given the s175 precedent two handoffs up.** This list arrived as typed Markdown with
+  no publisher attribution, no page structure and no book chapter names, and every shipped artifact
+  (examples, glosses, pronunciation hints, context notes, CEFR tags, theme assignments) is authored
+  here. That is a different situation from the parked telc pack, where the exposure was the *selection
+  and arrangement* of a published list. The founder was asked to confirm the origin anyway. If it does
+  turn out to be a commercial word list, the remedy written up for the parked branch applies unchanged:
+  the words are facts and stay, the source's ordering and framing come out.
 - **Next for this content:** it is `draft` like everything else, so it lands in the `/admin/pruefen`
   queue for the human review pass. No writing prompt, Can-Do or text was added, so exercise coverage
   is unchanged.

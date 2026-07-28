@@ -42,7 +42,10 @@ exactly the moment a learner returns to a half-written email. Fixed in two layer
   path ships the same deploy without asking anything of the learner. Revisit only if a deploy ever
   needs to be forced out mid-session (e.g. a broken backend contract).
 
+
 ---
+
+**Handoff after session 174 (2026-07-27).** _(Archived from `PROJECT_STATUS.md` in session 175.)_
 
 **Handoff after session 174 (2026-07-27). Full security audit:
 `docs/reports/security-audit-2026-07-27.md`.**
@@ -141,3 +144,86 @@ derives its user id from the JWT alone. Thirteen findings; three fixed in this p
   Then, when scheduled, the react-router 6 → 7 migration from audit F2. **The founder should expect
   onboarding ONCE more per account** after #745: that run is what finally writes a flag the app can
   read back.
+
+
+---
+
+**Handoff after session 175 (2026-07-28), first task.** _(Archived from `PROJECT_STATUS.md` in session 175.)_
+
+**Handoff after session 175 (2026-07-28). Fokus mobile tiles: 10% shorter from the bottom.**
+Branch `claude/fokus-tile-height-9lxw8g`.
+Founder: the two mobile Fokus tiles looked cramped. They filled the room between their top and the
+fixed bottom chrome exactly, so the sentence card and the Grammatik dial tile ran right into the
+Korrigieren cluster.
+- `measureMobile` in `src/features/writing/fokus/FokusTrainer.tsx` now keeps `FILL_RATIO = 0.9` of
+  the measured room (floor 240px, was 260px unscaled). The top of the column is unchanged, so the
+  10% comes off the BOTTOM and the tiles stop short of the chrome. Both the exact `height` used
+  before a correction and the `minHeight` used after are scaled, so a long correction still grows
+  the page as before.
+- The mobile column gap went `gap-4` → `gap-5`, which is the "breathing space between the tiles"
+  half of the request; the tiles keep their `grow-[1.15]` / `grow` ratio, so both shrink evenly.
+- Nothing else in the locked Schreiben mobile anatomy moved: the fixed cluster and KI line, the
+  `bottomLimit()` picker floor and the desktop layout are untouched. `docs/areas/SCHREIBEN.md`
+  records the 90% rule.
+- **Gates:** typecheck · lint 0 errors (75 warnings, unchanged) · build. Phone verification is the
+  founder's, as usual.
+
+
+---
+
+**Handoff after session 175 (2026-07-28), second task.** _(Archived from `PROJECT_STATUS.md` in session 176.)_
+
+**Handoff after session 175 (2026-07-28), second task. A word-field pack built, gated, then PARKED
+on licensing grounds.** Branch `claude/word-list-validation-br3u2g` (commit `9032660`), **not merged**.
+Founder sent four photos of a **telc Deutsch B2 Beruf Wortschatzliste** and asked which words the app
+already had, with the rest added at audit-ready quality. The work was done and every gate passed. It
+was then parked, unshipped, because of where the list came from. Nothing reached `main`.
+
+**Why it is parked (read this before reviving the branch).** `docs/strategy/DATA_GOVERNANCE.md`
+§"What counts as traceable" already answers the question the founder asked afterwards:
+> "A specific published word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database
+> rights in its selection and arrangement, so we never copy a protected list wholesale. We verify
+> individual entries against open references instead."
+
+and the same file lists **telc materials** under "Sources we do NOT use", as does the "Sources to
+avoid" table in `PROJECT_REFERENCE.md`. The branch does the forbidden thing: it transcribes the list
+page by page, keeps the book's section order, and names the book's chapters in the code comments and
+in all 238 provenance notes. That rule should have been checked before transcribing, not after.
+
+**The legal shape of it, for whoever picks this up.**
+- **The words are safe.** Single German words, their articles and plurals are facts; nothing owns
+  "der Absolvent". Any of them is usable if verified against DWDS or Wiktionary, which is what the
+  policy prescribes and what the branch already did.
+- **The authored material is safe.** The 464 example sentences, glosses, pronunciation hints, context
+  notes, related terms, CEFR tags and theme assignments are original and appear in no book.
+- **The selection and arrangement are the exposure.** Two rights: §4 UrhG (creative compilation) and,
+  the sharper one, the **sui generis database right** (§§87a-87e UrhG, EU Directive 96/9/EC), which
+  needs no creativity, runs 15 years, and is infringed by extracting a substantial part.
+- **Trademark is already handled.** `TermsOfService.tsx` states in both languages that Genauly is not
+  affiliated with, endorsed by, or a source of Goethe-Institut or telc material. Naming the exam is
+  lawful nominative use; keep the disclaimer wherever telc appears.
+
+**If the branch is revived,** the fix is to remove the structural fingerprint rather than the
+vocabulary: drop the book's chapter names from the section comments and the 238 provenance notes,
+re-derive the selection from the app's own `frequency.ts` bands plus the sub-theme taxonomy (an
+independent, defensible rationale), and cut the handful of entries that only exist because they were
+on that page (`der Fluggerätemechaniker`, `das Zweigwerk`, `die Lagerliste`, `das Pflegezertifikat`,
+`das Präsenzseminar`). Most of the pack is ordinary B2 workplace German that any independent
+selection would reach anyway, so the overlap alone is not the problem.
+
+**What is on the branch, if it is ever wanted.** 232 vocabulary entries in `vocabularyPart2`, 6
+Nomen-Verb combos in the collocation bank (`Kenntnisse erwerben`, `zur Verfügung stehen`,
+`Produkte einführen`, `Ruhe bewahren`, `das Du anbieten`, `den Schluss nahelegen`), and 238 matching
+provenance rows. Gates all green: `lint:content` · `build` · `verify:facts` 0 errors at 98% oracle
+coverage · `build:frequency` · `build:verification` · `lint` 0 errors · `test:unit` 370/370 ·
+`check:bundle` 123.2 kB · `report:exercise-coverage` 20/20 · `build:review-queue`. Two gate findings
+were fixed in the branch: `die Geldsorgen` lost its `plural` field so the plurale-tantum detector
+recognises it, and `sich behaupten` moved B2.2 → B2.1, restoring `verify:cefr` to 0 FLAG.
+
+**One finding on the branch is worth salvaging independently of the content.** The growing provenance
+and verification register pushed the founder-only workbench chunk past workbox's **2 MiB per-asset
+precache ceiling**, which fails `pnpm build` outright. The branch fixes it by adding
+`**/useWorkbench-*.js` to `globIgnores` in `vite.config.ts`, so `/sources` and `/admin/pruefen` load
+on demand instead of being precached into every learner's cache (PWA precache 7,155 KiB → 5,174 KiB).
+**This will bite again on the next sizeable content addition, from any source.** Worth cherry-picking
+on its own.
