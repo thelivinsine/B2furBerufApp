@@ -44,6 +44,7 @@ const GRAMMAR_GROUPS = [
   "connectors", "relativeClauses", "prepositionalPronouns", "collocations",
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
   "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
+  "particles",
 ];
 const WEAKNESS_CATEGORIES = [
   // "taskCompletion" (Aufgabenerfüllung) added s167 once evaluate-writing began

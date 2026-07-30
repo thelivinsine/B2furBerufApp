@@ -24,6 +24,8 @@ export const groupMeta: Record<GrammarGroup, { labelDe: string; icon: string }> 
   wordFormation: { labelDe: "Nominalstil", icon: "Shuffle" },
   infinitives: { labelDe: "Infinitivsätze", icon: "ArrowRight" },
   future: { labelDe: "Futur & Vermutung", icon: "Clock" },
+  // C1 slice (s178 audit P1).
+  particles: { labelDe: "Modalpartikeln", icon: "Sparkles" },
 };
 
 // Ordered by B2-marker priority (categorization audit 2026-07-09): the
@@ -46,6 +48,9 @@ export const groupOrder: GrammarGroup[] = [
   "modals",
   "future",
   "collocations",
+  // Last on the priority spine on purpose: Modalpartikeln make German sound
+  // native, but they fix no error, so they are the polish after the levers.
+  "particles",
 ];
 
 /** The whole bank flattened into hub display order (B2-marker priority).

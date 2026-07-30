@@ -90,7 +90,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
-- **Grammar** (`src/data/grammar.ts`, 24 topics / 117 drills): `GrammarTopic` with `id` (`g_`),
+- **Grammar** (`src/data/grammar.ts`, 28 topics / 137 drills, 17 groups): `GrammarTopic` with `id` (`g_`),
   `group`, `cefr` (REQUIRED, completeness-checked), `title`, `titleDe`, `purpose`, `purposeDe`,
   `explanation`, `explanationDe` (the German-FIRST lesson text; EN shows only via the hold-to-peek
   chip), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (parallel, same order/length), `drills[]`.
@@ -98,16 +98,21 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
   the EN peek; sessions keep it visible).
 - **Redemittel** (`src/data/redemittel.ts`, ~158; `r_` prefix).
-- **Can-Do milestones** (`src/data/canDo.ts`, 52): `id` (`cd_`), `themeId`, `cefr`, `statement`
+- **Can-Do milestones** (`src/data/canDo.ts`, 57): `id` (`cd_`), `themeId`, `cefr`, `statement`
   (German, must start with "Ich kann"), `en`, `threshold` (0..1 theme-mastery ratio). Aligned to
   the CoE CEFR self-assessment descriptors (cited in provenance, never reproduced). Keep ascending
   `cefr`/`threshold` within a theme; add a `can_do` provenance row (`draft`).
-- **Lese-/Hörtexte** (`src/data/texts.ts`, 36 texts / 108 checks): `id` (`tx_`), `kind` (closed
+- **Lese-/Hörtexte** (`src/data/texts.ts`, 42 texts / 126 checks): `id` (`tx_`), `kind` (closed
   enum letter/email/memo/announcement/voicemail), `themeId`, `cefr`, `title`/`titleEn`, `de`
   (blank-line paragraphs), `en`, `checks` (2-3 MCQs: German `question`, `options`, `answer` among
   options, optional `explain`; check ids globally unique), optional `subThemeId`/`sector`.
   Authored authentic-STYLE (fictitious names/numbers), CEFR-calibrated. Results feed XP/theme
   progress, NOT vocab FSRS (no SRS fields). Voicemails double as TTS listening input.
+  **Two length bands (s178):** the original 36 run 57-116 words, which is fine for a quick check but
+  too short to train skimming or inference; the six `tx_c1_*` texts run 305-344 words with
+  inference-level checks, the band a B2/C1 reading task actually uses. New long texts follow the C1
+  six. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered side by
+  side).
 - **Writing prompts** (`src/data/writingPrompts.ts`, ~316 tasks): per-theme POOLS of task objects
   `{ text, sub?, sectors? }`; the whole pool rides ONE `wp_<themeId>` provenance row (the mission
   pattern). `sub` = declared sub-theme slug (coverage invariant: every sub-theme of the sub-themed

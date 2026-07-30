@@ -345,7 +345,11 @@ export type GrammarGroup =
   | "reportedSpeech"
   | "wordFormation"
   | "infinitives"
-  | "future";
+  | "future"
+  // C1 slice (s178 audit P1): Modalpartikeln fit none of the groups above.
+  // They are not connectors (they link nothing) and not modal verbs; they are
+  // the tone layer of spoken German, which is exactly why they read as C1.
+  | "particles";
 
 export interface GrammarExample {
   de: string;
