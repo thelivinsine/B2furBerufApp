@@ -79,3 +79,38 @@ describe("BrowseToolbar debounced search", () => {
     vi.useRealTimers();
   });
 });
+
+describe("verb forms on the Wörter card (s178 audit P2, founder pick C)", () => {
+  const byId = (id: string) => vocabulary.find((v) => v.id === id)!;
+
+  it("shows the Perfekt where a noun shows its plural, and the paradigm on the back", () => {
+    render(<VocabList items={[byId("v_verschieben")]} />);
+    // Front foot pill, same slot and styling as "Pl.: …".
+    expect(screen.getByText("Perf.: hat verschoben")).toBeDefined();
+    // Back face (both faces are always mounted; the flip is a CSS transform).
+    expect(screen.getByText("Präteritum")).toBeDefined();
+    expect(screen.getByText("verschob")).toBeDefined();
+    expect(screen.getByText("Perfekt")).toBeDefined();
+  });
+
+  it("says 'ist' for a sein-verb", () => {
+    render(<VocabList items={[byId("v_entstehen")]} />);
+    expect(screen.getByText("Perf.: ist entstanden")).toBeDefined();
+  });
+
+  it("marks a separable verb and offers its zu-infinitive", () => {
+    render(<VocabList items={[byId("v_abstimmen")]} />);
+    expect(screen.getByText("Perf.: hat abgestimmt")).toBeDefined();
+    expect(screen.getByText("trennbar")).toBeDefined();
+    expect(screen.getByText("abzustimmen")).toBeDefined();
+    // The particle detaches in the Präteritum: "stimmte ab", never "abstimmte".
+    expect(screen.getByText("stimmte ab")).toBeDefined();
+  });
+
+  it("leaves a noun's card untouched", () => {
+    render(<VocabList items={[byId("v_besprechung")]} />);
+    expect(screen.getByText("Pl.: die Besprechungen")).toBeDefined();
+    expect(screen.queryByText("Perfekt")).toBeNull();
+    expect(screen.queryByText("trennbar")).toBeNull();
+  });
+});

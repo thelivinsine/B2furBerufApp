@@ -25,6 +25,24 @@ buttons need their own `uppercase`, Tailwind preflight resets it on buttons) wit
 + compact lists in `vocabulary/VocabViews.tsx` / `collocations/CollocationViews.tsx` /
 `redemittel/RedemittelViews.tsx`. Branche chips show on Tabelle/Karten.
 
+## Wörter card (Karten view; `vocabulary/VocabList.tsx`)
+- Both faces are stacked in ONE grid cell by `FlipCard`, so the tile sizes to the TALLER face; the
+  back can grow without clipping.
+- **Front:** quiet headline (Wesen creature + word left, bookmark right), then the German example. NO
+  filter facets on the tile (founder 2026-07-13: Häufigkeit, Branche and the mastery badge were all
+  dropped as rail-redundant). Foot row: one grey pill left, speak button right.
+- **The foot pill is the word's inflection**, and it is per part of speech: a noun shows
+  `Pl.: die Termine`, a **verb shows `Perf.: hat verschoben`** (s178 audit P2, founder pick C from
+  `preview/verb-forms-card.html`). Same slot, same styling; a word with neither just right-aligns the
+  speak button.
+- **Back:** "Englisch" eyebrow, the gloss, then the inflection repeated in full. For nouns that is the
+  existing `Plural: …` line; for verbs a compact `dl` grid of Präteritum · Perfekt · mit zu · trennbar,
+  each row present only when the data has it. Values come from the generated `src/data/verbForms.ts`
+  via `perfekt()` in `src/lib/verbDisplay.ts` (which turns the stored infinitive auxiliary into the
+  citation form "hat"/"ist"). A verb the oracle does not cover shows nothing rather than a guess.
+- The label is **Perfekt**, not "Partizip II": "hat verschoben" is the Perfekt, the bare participle is
+  "verschoben", and a learner thinks in tenses. (The preview said Partizip II; corrected on implementation.)
+
 ## Graphs
 Both graphs are lazy chunks (d3-force rides ONLY there, shared `vendor-misc`; main chunk ~80 kB)
 and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale service worker).

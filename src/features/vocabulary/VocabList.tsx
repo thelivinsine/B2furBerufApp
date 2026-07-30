@@ -14,6 +14,8 @@ import { ArtikelEffect } from "@/components/artikel/ArtikelEffect";
 import { hasDoodle, loadDoodle } from "./doodles";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
 import { useAppConfigStore } from "@/lib/appConfig";
+import { verbFormsFor } from "@/data/verbForms";
+import { perfekt } from "@/lib/verbDisplay";
 
 /**
  * The cross-module "Verbunden" dropdown (RelatedPanel: links from a word to a
@@ -48,6 +50,12 @@ const VocabCard = memo(function VocabCard({
   const relatedEnabled = useAppConfigStore((s) => s.config.features.relatedPanel);
   const hasRelated = relatedEnabled && relatedRows(v).length > 0;
   const gender = genderOf(v);
+  // Verb morphology (s178 audit P2, founder pick C): a compact Perfekt pill in
+  // the card foot where a noun's plural pill sits, and the full paradigm on the
+  // flip side, which already repeats the plural for nouns. Undefined for
+  // non-verbs, and for any verb the oracle does not cover, so the card simply
+  // shows nothing rather than a guessed form.
+  const forms = v.pos === "verb" ? verbFormsFor(v.id) : undefined;
   // Replay trigger for the gender reveal effect: bumped on each front→back flip.
   const [effectPlay, setEffectPlay] = useState(0);
   // Fused doodle (Phase 2): the art chunk loads lazily on the FIRST flip of a
@@ -130,12 +138,21 @@ const VocabCard = memo(function VocabCard({
         {/* Card foot: plural pill on the left, speak on the right (fills where
             the Verbunden toggle sat). mt-auto pins it to the base so every card
             in a row shares one foot line. */}
-        <div className={cn("mt-auto flex items-center pt-3", v.plural ? "justify-between" : "justify-end")}>
-          {v.plural && (
+        <div
+          className={cn(
+            "mt-auto flex items-center pt-3",
+            v.plural || forms ? "justify-between" : "justify-end",
+          )}
+        >
+          {v.plural ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
               Pl.: {v.plural}
             </span>
-          )}
+          ) : forms ? (
+            <span className="truncate rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+              Perf.: {perfekt(forms)}
+            </span>
+          ) : null}
           <span onClick={(e) => e.stopPropagation()}>
             <SpeakButton text={v.de} />
           </span>
@@ -160,6 +177,33 @@ const VocabCard = memo(function VocabCard({
         )}
         <p className="mt-1 text-base font-semibold sm:text-lg">{v.en}</p>
         {v.plural && <p className="mt-1 text-xs text-muted-foreground">Plural: {v.plural}</p>}
+        {forms && (
+          <dl className="mt-2.5 grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5 border-t border-border pt-2 text-xs">
+            {forms.praeteritum && (
+              <>
+                <dt className="text-muted-foreground">Präteritum</dt>
+                <dd className="font-medium">{forms.praeteritum}</dd>
+              </>
+            )}
+            {/* "hat verschoben" is the PERFEKT; the Partizip II alone is
+                "verschoben". The preview said Partizip II, which was imprecise for
+                a language app, and a learner thinks in tenses anyway. */}
+            <dt className="text-muted-foreground">Perfekt</dt>
+            <dd className="font-medium">{perfekt(forms)}</dd>
+            {forms.zuInfinitiv && (
+              <>
+                <dt className="text-muted-foreground">mit zu</dt>
+                <dd className="font-medium">{forms.zuInfinitiv}</dd>
+              </>
+            )}
+            {forms.separable && (
+              <>
+                <dt className="text-muted-foreground">trennbar</dt>
+                <dd className="font-medium">ja</dd>
+              </>
+            )}
+          </dl>
+        )}
         {v.examples[0].en && (
           <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
             „{v.examples[0].en}"
