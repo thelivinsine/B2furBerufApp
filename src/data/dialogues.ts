@@ -2613,7 +2613,7 @@ const freundeverabreden: Scenario = {
       hints: ["Nenne eine Uhrzeit.", "Schlage einen Treffpunkt vor."],
       options: [
         { id: "v3a", text: "Sagen wir um 10 Uhr am Bahnhof? Von dort fahren wir zusammen los.", uses: "suggestions", quality: 1, feedback: "Sehr gut: konkrete Zeit und ein klarer Treffpunkt.", next: "v4" },
-        { id: "v3b", text: "Am Samstag Vormittag passt mir gut. Treffen wir uns bei dir?", uses: "clarification", quality: 0.9, feedback: "Gut: Zeit genannt und einen Treffpunkt vorgeschlagen.", next: "v4" },
+        { id: "v3b", text: "Am Samstagvormittag passt mir gut. Treffen wir uns bei dir?", uses: "clarification", quality: 0.9, feedback: "Gut: Zeit genannt und einen Treffpunkt vorgeschlagen.", next: "v4" },
         { id: "v3c", text: "Ist mir egal.", uses: "reactions", quality: 0.3, feedback: "Ein konkreter Vorschlag hilft beim Planen.", next: "v4" },
       ],
     },

@@ -143,10 +143,50 @@ const daWordBank: { prompt: string; answer: string; distractors: string[]; gloss
   },
 ];
 
+/* ---------------- Option assembly ---------------- */
+
+/**
+ * Build an MCQ option list that can never show the same label twice, and never a
+ * "distractor" that is really the answer under another id.
+ *
+ * Filtering candidates by `id !== item.id` is NOT enough: distinct bank entries
+ * legitimately share a rendered label. The s178 content audit found 5 English
+ * glosses colliding inside a single theme (`die Frist` / `die Deadline` both
+ * "deadline" in scheduling, `die Evakuierung` / `die Räumung` both "evacuation"
+ * in safety), plus duplicate German headwords across themes, so a translation
+ * question could render "deadline" as the answer AND as a wrong option. Two
+ * distractors sharing a label is the same defect one step quieter: a duplicated
+ * React key and an option the learner cannot tell apart from its twin.
+ *
+ * So options are keyed on the LABEL, case- and whitespace-insensitively.
+ * `candidates` is walked in order until `size` distinct labels exist; a pool too
+ * small or too collision-heavy yields a shorter list, which is correct
+ * degradation (a 3-option question beats a 4-option question with a twin).
+ * Callers that require a full set check `options.length`.
+ */
+/** The blankable first token of a headword: "die Besprechung" -> "Besprechung",
+ *  "sich abstimmen" -> "abstimmen". Shared by the cloze and listening builders so
+ *  the blank and its distractors are derived the same way. */
+function headword(item: VocabItem): string {
+  return item.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
+}
+
+function mcqOptions(answer: string, candidates: readonly string[], size = 4): string[] {
+  const key = (s: string) => s.trim().toLowerCase();
+  const seen = new Set<string>([key(answer)]);
+  const options: string[] = [answer];
+  for (const c of candidates) {
+    if (options.length >= size) break;
+    if (!c || !c.trim() || seen.has(key(c))) continue;
+    seen.add(key(c));
+    options.push(c);
+  }
+  return shuffle(options);
+}
+
 /* ---------------- Question builders ---------------- */
 
 function translationQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQQuestion {
-  const distractors = sample(pool.filter((v) => v.id !== item.id), 3).map((v) => v.en);
   return {
     id: qid("translation"),
     kind: "translation",
@@ -154,7 +194,10 @@ function translationQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty
     themeId: item.themeId,
     prompt: item.de,
     answer: item.en,
-    options: shuffle([item.en, ...distractors]),
+    options: mcqOptions(
+      item.en,
+      shuffle(pool.filter((v) => v.id !== item.id)).map((v) => v.en),
+    ),
     sourceId: item.id,
     hint: "Was bedeutet das Wort?",
   };
@@ -283,10 +326,6 @@ function clozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQ
   if (!ex || head.length < 3) return null;
   const blanked = ex.de.replace(new RegExp(`\\b${escapeReg(head)}\\w*`, "i"), "___");
   if (!blanked.includes("___")) return null;
-  const distractors = sample(
-    pool.filter((v) => v.id !== item.id),
-    3,
-  ).map((v) => v.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0]);
   return {
     id: qid("cloze"),
     kind: "cloze",
@@ -294,7 +333,10 @@ function clozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQ
     themeId: item.themeId,
     prompt: blanked,
     answer: head,
-    options: shuffle([head, ...distractors]),
+    options: mcqOptions(
+      head,
+      shuffle(pool.filter((v) => v.id !== item.id)).map(headword),
+    ),
     sourceId: item.id,
     hint: ex.en,
   };
@@ -305,10 +347,6 @@ function collocationFillQ(
   pool: Collocation[],
   difficulty: Difficulty,
 ): MCQQuestion {
-  const distractors = sample(
-    pool.filter((x) => x.id !== c.id && x.verb !== c.verb),
-    3,
-  ).map((x) => x.verb);
   return {
     id: qid("collocationFill"),
     kind: "collocationFill",
@@ -316,7 +354,10 @@ function collocationFillQ(
     themeId: (c.themeId ?? "general") as ThemeId | "general",
     prompt: `${c.noun} ___`,
     answer: c.verb,
-    options: shuffle([c.verb, ...distractors]),
+    options: mcqOptions(
+      c.verb,
+      shuffle(pool.filter((x) => x.id !== c.id)).map((x) => x.verb),
+    ),
     sourceId: c.id,
     hint: c.en,
     explain: `${c.full} – ${c.en}`,
@@ -366,7 +407,12 @@ function daWordQ(difficulty: Difficulty): MCQQuestion {
 }
 
 function matchingQ(items: VocabItem[], difficulty: Difficulty, themeId: ThemeId | "general"): MatchingQuestion | null {
-  const picked = sample(items, 4);
+  // Dedupe on BOTH sides before picking, for the reason spelled out on
+  // `distinctCols`: MatchingView keys the columns by their labels, so a repeated
+  // German headword or a repeated English gloss makes the match ambiguous and
+  // duplicates a React key. Colliding glosses inside one theme are real (s178
+  // audit: `die Frist` / `die Deadline` are both "deadline").
+  const picked = sample(distinctPairs(items), 4);
   if (picked.length < 3) return null;
   return {
     id: qid("matching"),
@@ -392,6 +438,23 @@ function wordOrderQ(c: Collocation, difficulty: Difficulty): WordOrderQuestion {
     sourceId: c.id,
     hint: c.example.en,
   };
+}
+
+/** Vocabulary deduped so neither the German (grid left) nor the English (grid
+ *  right) label repeats. Same contract as `distinctCols`, one bank over. */
+function distinctPairs(items: VocabItem[]): VocabItem[] {
+  const seenDe = new Set<string>();
+  const seenEn = new Set<string>();
+  const out: VocabItem[] = [];
+  for (const v of items) {
+    const de = v.de.toLowerCase();
+    const en = v.en.toLowerCase();
+    if (seenDe.has(de) || seenEn.has(en)) continue;
+    seenDe.add(de);
+    seenEn.add(en);
+    out.push(v);
+  }
+  return out;
 }
 
 /** Collocations deduped so no noun (grid left) or verb (grid right) repeats:
@@ -501,11 +564,11 @@ function listeningClozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficu
   if (!ex) return null;
   const blanked = ex.de.replace(new RegExp(`\\b${escapeReg(head)}\\w*`, "i"), "___");
   if (!blanked.includes("___")) return null;
-  const distractors = sample(
-    pool.filter((v) => v.id !== item.id),
-    3,
-  ).map((v) => v.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0]);
-  if (distractors.length < 3) return null;
+  const options = mcqOptions(
+    head,
+    shuffle(pool.filter((v) => v.id !== item.id)).map(headword),
+  );
+  if (options.length < 4) return null;
   return {
     id: qid("listeningCloze"),
     kind: "listeningCloze",
@@ -514,7 +577,7 @@ function listeningClozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficu
     prompt: blanked,
     audioPrompt: ex.de,
     answer: head,
-    options: shuffle([head, ...distractors]),
+    options,
     sourceId: item.id,
     explain: `${ex.de} – ${ex.en}`,
   };

@@ -5457,7 +5457,7 @@ const provenancePart1: ProvenanceEntry[] = [
   {
     content_id: "v_co2_kompensation",
     content_type: "vocabulary",
-    label: "die CO₂-Kompensation",
+    label: "die CO2-Kompensation",
     origin: "authored",
     reference: "https://www.dwds.de/r?q=CO%E2%82%82-Kompensation",
     license: "OWNED",
@@ -6993,7 +6993,7 @@ const provenancePart1: ProvenanceEntry[] = [
   {
     content_id: "c_co2_bilanz_verbessern",
     content_type: "collocation",
-    label: "die CO₂-Bilanz verbessern",
+    label: "die CO2-Bilanz verbessern",
     origin: "authored",
     reference: "https://www.dwds.de/wb/CO%E2%82%82-Bilanz",
     license: "OWNED",
