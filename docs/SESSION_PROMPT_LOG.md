@@ -2519,3 +2519,4 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   **What the session deliberately did NOT do:** implement any of P3-P10, restore the Anwenden nav
   entry (a founder decision from 2026-07-13, not mine to undo), or flip any content to `verified`.
 - **Artifacts (prompt 5):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md` · **PR #757**
+  (squash-merged as `1c4bc83`), which carried all nine session-178 commits into `main`.

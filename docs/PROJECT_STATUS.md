@@ -225,6 +225,9 @@ offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the lab
 - **Still open from the audit backlog:** P3 beyond these six texts (listening is still 6 TTS
   voicemails), P4 (the Sprechen + Prüfung content is still off the nav), P5-P10. The ranked list with
   cheapest-first-steps stays in §5 of `docs/reports/CONTENT_AUDIT_2026-07-30.md`.
+- **Shipped:** all of session 178 went to `main` as **PR #757**, squash-merged as `1c4bc83`
+  (the audit, P0, P2 and P1 in nine commits). Post-merge housekeeping done: branch reset onto
+  `main`, working tree clean.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
