@@ -37,6 +37,17 @@ npm/yarn. Run `pnpm install` after pulling.
   vocab/collocations. Warn-only. `pnpm verify:sentences` runs grammar + cefr together.
 
 ## Generated data
+- `pnpm build:verbs-subset` — refreshes `scripts/vendor/german-verbs-subset.json` from the
+  `german-verbs-dict` npm package (MIT, from LanguageTool's `german-pos-dict`, CC-BY-SA-4.0). Needs
+  the network (npm registry, the one allowed host); the 5.5 MB upstream is never committed, only the
+  small subset. Re-run after adding verbs. Prints how many verbs are dictionary-attested vs derived by
+  the regular weak paradigm, and any it cannot cover.
+- `pnpm build:verb-forms` — regenerates the **generated** `src/data/verbForms.ts` from that subset
+  (offline): Partizip II, auxiliary, Präteritum, `separable`, zu-infinitive per vocab id. Verbs get
+  their forms from an oracle rather than by hand because a wrong Partizip II teaches a lasting error;
+  `source` marks the ones the weak rule produced. The **auxiliary** (haben/sein) is the single
+  hand-maintained field, listed with a reason per verb inside the script. `pnpm lint:content` gates
+  coverage, so run both after adding a verb.
 - `pnpm build:frequency` — regenerates the **generated** `src/data/frequency.ts`: per-item
   Häufigkeit bins (core/common/specialized) from the vendored wordfreq Zipf subset, behind the
   Häufigkeit facet/badge (Wörter + Kollokationen) and the Fortschritt frequency chart. Items with

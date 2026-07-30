@@ -44,6 +44,7 @@ const GRAMMAR_GROUPS = [
   "connectors", "relativeClauses", "prepositionalPronouns", "collocations",
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
   "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
+  "particles",
 ];
 const WEAKNESS_CATEGORIES = [
   // "taskCompletion" (Aufgabenerfüllung) added s167 once evaluate-writing began
@@ -325,6 +326,115 @@ function lintVocabCollocationOverlap(vocab, collocations, retiredIds) {
   const ids = new Set(vocab.map((v) => v.id));
   for (const id of retiredIds)
     if (!ids.has(id)) error(ds, id, `RETIRED_VOCAB_IDS lists "${id}" but no such vocab entry exists`);
+}
+
+/* Guardrail (s178 content audit): the same LABEL must not be reachable twice on a
+ * word surface, in either language.
+ *
+ * Two entries with the same German headword show the word twice in the Wörter
+ * list and give the learner two independent SRS cards for one word (found:
+ * `der Reisepass` as v_ausweis_pass + v_reisepass, `der Konferenzraum` as
+ * v_konferenz_raum + v_konferenzraum_hotel, same theme and level).
+ *
+ * Two entries in ONE theme with the same English gloss are worse than untidy:
+ * the theme is a quiz pool, so the translation MCQ and the matching grid can put
+ * the same label on two buttons, one of which is the right answer (found:
+ * "deadline" = die Frist + die Deadline in scheduling, plus 4 more). The engine
+ * now dedupes options by label (`mcqOptions` / `distinctPairs` in
+ * `engine/quiz.ts`), which makes the question answerable, but it also silently
+ * shrinks the option set, so the content is still worth fixing at the source.
+ * Cross-theme gloss collisions are FINE (two synonyms in different domains never
+ * share a pool) and are not reported.
+ *
+ * Both checks read the BROWSABLE bank: a retired id is off the surface already. */
+function lintVocabLabelCollisions(vocab, retiredIds) {
+  const ds = "vocabulary";
+  const browsable = vocab.filter((v) => !retiredIds.has(v.id));
+
+  // A repeated headword is only a DUPLICATE when the entries teach the same
+  // thing. German homonyms are real and worth learning twice: `der Empfang` is
+  // the hotel front desk in `travel` and the phone signal in `digitales`. So a
+  // shared headword errors when the gloss matches too (one word taught twice),
+  // or when the theme matches (two rows a learner cannot tell apart in one
+  // list), and otherwise only warns so the pair stays visible.
+  const byHeadword = new Map();
+  for (const v of browsable) {
+    if (!isStr(v.de)) continue;
+    const key = normLexeme(v.de);
+    if (!key) continue;
+    if (!byHeadword.has(key)) byHeadword.set(key, []);
+    byHeadword.get(key).push(v);
+  }
+  for (const [, group] of byHeadword) {
+    if (group.length < 2) continue;
+    const [keep, ...rest] = group;
+    for (const dup of rest) {
+      const sameGloss =
+        isStr(dup.en) && isStr(keep.en) && dup.en.trim().toLowerCase() === keep.en.trim().toLowerCase();
+      const sameTheme = dup.themeId === keep.themeId;
+      if (sameGloss || sameTheme)
+        error(
+          ds,
+          dup.id ?? "?",
+          `"${dup.de}" duplicates ${keep.id} (${sameGloss ? "same English gloss" : "same theme"}) — one word, two SRS cards and two rows in the Wörter list. Keep the better-tagged entry and add the other id to RETIRED_VOCAB_IDS in src/data/vocabulary.ts (ids are permanent, so it stays resolvable).`,
+        );
+      else
+        warn(
+          ds,
+          dup.id ?? "?",
+          `"${dup.de}" shares a headword with ${keep.id} but a different sense ("${dup.en}" vs "${keep.en}") in a different theme. Reads as a homonym, which is fine; check it is deliberate.`,
+        );
+    }
+  }
+
+  const byThemeGloss = new Map();
+  for (const v of browsable) {
+    if (!isStr(v.en) || !isStr(v.themeId)) continue;
+    const key = `${v.themeId} ${v.en.trim().toLowerCase()}`;
+    if (!byThemeGloss.has(key)) byThemeGloss.set(key, []);
+    byThemeGloss.get(key).push(v);
+  }
+  for (const [, group] of byThemeGloss) {
+    if (group.length < 2) continue;
+    const [keep, ...rest] = group;
+    for (const dup of rest)
+      error(
+        ds,
+        dup.id ?? "?",
+        `English gloss "${dup.en}" is also ${keep.id}'s in theme "${dup.themeId}" — a theme is one quiz pool, so a translation question can show this label as both answer and distractor. Differentiate the glosses (e.g. add the register or the nuance in parentheses).`,
+      );
+  }
+}
+
+/* Guardrail (s178 content audit): no typographic digit in a field the learner
+ * TYPES or SEARCHES. `normalizeTyped` (engine/typing.ts) and the fuzzy search
+ * normalizer both strip anything outside [a-z0-9], so "CO₂-Ausstoß" normalizes
+ * to "co ausstoss" while a learner typing "CO2-Ausstoß" produces "co2 ausstoss":
+ * the typed-recall answer grades WRONG and a search for "co2" cannot find the
+ * entry. The bank shipped both spellings; ASCII is the reachable one.
+ * `context` prose is exempt (never a typed target, never searched for). */
+const TYPOGRAPHIC_DIGITS = /[₀-₉⁰-⁹²³]/;
+function lintTypographicDigits(datasets) {
+  for (const { ds, items, fields } of datasets) {
+    for (const item of items) {
+      for (const f of fields) {
+        const value = item[f];
+        if (!isStr(value) || !TYPOGRAPHIC_DIGITS.test(value)) continue;
+        error(
+          ds,
+          item.id ?? "?",
+          `${f} "${value}" contains a subscript/superscript digit. Typed answers and search fold to ASCII, so this form is unreachable: write "CO2", not "CO₂".`,
+        );
+      }
+      for (const ex of Array.isArray(item.examples) ? item.examples : []) {
+        if (isStr(ex?.de) && TYPOGRAPHIC_DIGITS.test(ex.de))
+          error(ds, item.id ?? "?", `example "${ex.de}" contains a subscript/superscript digit; write it in ASCII (the listening and cloze builders read this sentence).`);
+      }
+      const ex1 = item.example;
+      if (isStr(ex1?.de) && TYPOGRAPHIC_DIGITS.test(ex1.de))
+        error(ds, item.id ?? "?", `example "${ex1.de}" contains a subscript/superscript digit; write it in ASCII.`);
+    }
+  }
 }
 
 function lintGrammar(grammar) {
@@ -1315,6 +1425,8 @@ async function main() {
     const verif = await load("/src/data/verification.ts").catch(() => ({ verification: {} }));
     // Generated frequency map (pnpm build:frequency) — optional as well.
     const freq = await load("/src/data/frequency.ts").catch(() => ({ frequency: {} }));
+    // Generated verb morphology (pnpm build:verb-forms) — optional as well.
+    const vforms = await load("/src/data/verbForms.ts").catch(() => ({ verbForms: {} }));
     // ID-rename registry (shipped-ids-are-permanent contract) — optional.
     const renames = await load("/src/lib/idRenames.ts").catch(() => ({ ID_RENAMES: {} }));
     data = {
@@ -1338,6 +1450,7 @@ async function main() {
       chapters: miss.chapters,
       verification: verif.verification ?? {},
       frequency: freq.frequency ?? {},
+      verbForms: vforms.verbForms ?? {},
       idRenames: renames.ID_RENAMES ?? {},
     };
   } finally {
@@ -1350,6 +1463,12 @@ async function main() {
   lintVocabulary(data.vocabulary, subThemeIndex);
   lintCollocations(data.collocations, subThemeIndex);
   lintVocabCollocationOverlap(data.vocabulary, data.collocations, data.retiredVocabIds);
+  lintVocabLabelCollisions(data.vocabulary, data.retiredVocabIds);
+  lintTypographicDigits([
+    { ds: "vocabulary", items: data.vocabulary, fields: ["de", "plural", "en"] },
+    { ds: "collocations", items: data.collocations, fields: ["noun", "verb", "full", "en"] },
+    { ds: "redemittel", items: data.redemittel, fields: ["de", "en"] },
+  ]);
   lintGrammar(data.grammar);
   lintScenarios(data.scenarios);
   lintExamSets(data.examSets, new Set(data.scenarios.map((s) => s.id)));
@@ -1407,6 +1526,54 @@ async function main() {
       error("frequency", id, "frequency entry for unknown content_id (regenerate: pnpm build:frequency)");
     if (!FREQUENCIES.includes(entry?.bin))
       error("frequency", id, `invalid frequency bin "${entry?.bin}"`);
+  }
+
+  /* Generated verb-morphology integrity (pnpm build:verb-forms).
+   *
+   * Three things can rot here. A dangling key means the map is stale after a
+   * content change. A verb with NO entry means the surface silently shows no
+   * Partizip II, which is the whole point of the map, so coverage is a gate
+   * rather than a warning. And an entry on a non-verb is a category error.
+   *
+   * The fourth check is the interesting one: several `context` notes state the
+   * auxiliary in prose ("Perfect with 'sein'"), which is an unlintable claim
+   * until the auxiliary exists as data. Now that it does, the two must agree.
+   * This caught a real error: `sich ereignen` claimed sein, but a reflexive verb
+   * always takes haben. */
+  const VERB_AUX = ["haben", "sein", "haben/sein"];
+  const vocabById = new Map(data.vocabulary.map((v) => [v.id, v]));
+  for (const [id, entry] of Object.entries(data.verbForms)) {
+    const item = vocabById.get(id);
+    if (!item) {
+      error("verbForms", id, "entry for unknown content_id (regenerate: pnpm build:verb-forms)");
+      continue;
+    }
+    if (item.pos !== "verb")
+      error("verbForms", id, `entry for a non-verb (pos=${item.pos}); verb morphology belongs to verbs only`);
+    if (!isStr(entry?.partizip2))
+      error("verbForms", id, "missing partizip2");
+    if (!VERB_AUX.includes(entry?.aux))
+      error("verbForms", id, `invalid aux "${entry?.aux}" (expected ${VERB_AUX.join(" | ")})`);
+  }
+  for (const v of data.vocabulary) {
+    if (v.pos !== "verb" || data.retiredVocabIds.has(v.id)) continue;
+    if (!data.verbForms[v.id])
+      error(
+        "verbForms",
+        v.id,
+        `verb "${v.de}" has no Partizip II. Run pnpm build:verbs-subset && pnpm build:verb-forms; if the oracle does not cover it, extend the particle list or the weak-verb fallback in scripts/build-verbs-subset.mjs.`,
+      );
+  }
+  for (const v of data.vocabulary) {
+    if (v.pos !== "verb" || !isStr(v.context)) continue;
+    const claimsSein = /Perfect with 'sein'|Perfekt mit .sein./i.test(v.context);
+    const claimsHaben = /Perfect with 'haben'|Perfekt (?:takes|mit) .haben./i.test(v.context);
+    const aux = data.verbForms[v.id]?.aux;
+    if (!aux) continue;
+    if (claimsSein && aux === "haben")
+      error("verbForms", v.id, `context prose says the Perfekt takes "sein" but the auxiliary map says "haben". One of them is wrong (a reflexive verb always takes haben).`);
+    if (claimsHaben && aux === "sein")
+      error("verbForms", v.id, `context prose says the Perfekt takes "haben" but the auxiliary map says "sein".`);
   }
 
   // Em-dash sweep across every user-facing string in every bank

@@ -2253,3 +2253,269 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   and `810a405`. Docs-only; no bank, code or config change, so no gates beyond `lint:content` staying
   clean.
 - **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 178 — 2026-07-30 — branch `claude/app-content-audit-92sgh1`
+
+- **Prompt 1 (verbatim, 2026-07-30):** `do an audit of the content of the app and provide a detailed
+  and comprehensive analysis of coverage, quality, frequency of usage, usefulness for targeted
+  audience b1-c1 learners`
+- **Response summary:** Wrote **`docs/reports/CONTENT_AUDIT_2026-07-30.md`**, a measured audit of all
+  **3,896 content items** across the four axes the founder asked for. Every number was measured, not
+  estimated: the banks were loaded live through Vite `ssrLoadModule` (the `lint-content.mjs` pattern,
+  same reason as s176/s177: the entries are one-liners and a `de:`/`full:` regex finds a fraction of
+  them), then cross-read against the four generated reports (`verify-cefr`, `verify-facts`,
+  `verify-grammar`, `exercise-coverage`). Docs-only pass: no bank, code or config change, nothing
+  implemented, so the founder decides what to spend content effort on.
+  **Verdict: structurally excellent, pedagogically lopsided.** Hygiene is rare for a solo product
+  (100% provenance coverage, **0** gate-level article/plural errors across 1,366 nouns under two
+  independent oracles, **99.4%** of 5,236 German sentences clean through LanguageTool, 2 examples +
+  pron + context + related on every vocab item, explanations on 117/117 drills and 108/108 text
+  checks, feedback + quality + uses on 335/335 dialogue options, 95.3% of examples containing their
+  own headword so 20/20 themes generate the full 13-14 exercise menu). The **Nomen-Verb collocation
+  bank is the strongest asset**: 1,072 pairs, 71% at "häufig" or above, far better calibrated than
+  the single-word bank.
+  **The five findings that dominate:** (1) **C1 is a level with no content** (34 words, 16
+  collocations, 3 Redemittel, **0 grammar topics, 0 texts, 0 Can-Do**) while `CefrLevel` offers C1 at
+  onboarding and `defaultVisibleBands("C1")` just returns everything, so a C1 learner is sold the B2
+  app; (2) **79% nouns / 13% verbs / 5% adjectives**, and the schema gives nouns article + plural
+  while verbs get no Partizip II, no auxiliary, no Präteritum and **0 of 234 state their case or
+  preposition** (87 separable verbs unmarked), so the exact accuracy the plateau demands is
+  untrainable; (3) **texts median 90 words** (range 57-116) against 300-450 at B2 exam level, and
+  listening is 6 TTS voicemails, so skimming/scanning/note-taking have no home, and the composer takes
+  one random text per session with **no per-text completion tracking anywhere in `useProgressStore`**,
+  so scoped learners re-read the same 2-3 texts; (4) the **Sprechen + Prüfung content is dark**: 30
+  dialogues (158 nodes, 335 coached options) and 15 exam sets sit behind `/anwenden`, off the nav
+  since 2026-07-13 ("not needed for the demo", `nav-items.ts`), and 20 of the 30 scenarios are 100%
+  multiple-choice with no free-speak node; (5) **54.3% of vocabulary is below Zipf 3.5**, 21% below
+  2.5, only 162 items (9%) are Kernwortschatz, and **B2.2 is 82% specialized-or-rarer**, so "advanced"
+  is being encoded as "rare compound" rather than "structurally demanding" (the mirror error also
+  shows: `somit` at Zipf 5.04 is tagged B2.2, `allerdings` at 5.51 is B2.1).
+  **Two live defects, not just untidiness:** `translationQ` (`src/engine/quiz.ts:149`) draws
+  distractors with `pool.filter(v => v.id !== item.id)` and never compares `en`, while **5 English
+  glosses collide inside a single theme** (`deadline` = v_frist + v_deadline, `business trip`,
+  `user interface`, `evacuation`, `health insurance card`), so a translation MCQ can render the same
+  option string twice, one of them the answer. And `v_konferenz_raum` / `v_konferenzraum_hotel` are
+  the **same headword, same theme (travel), same CEFR, same pron** (a pure duplicate producing two SRS
+  cards); `v_ausweis_pass` / `v_reisepass` duplicate `der Reisepass` across two themes at two levels
+  with two different respellings.
+  **The `pron` field is two systems, now quantified:** /aɪ/ is `y`/`ey` in **176** items vs `ai` in
+  **83**; /ɔʏ/ is `oy` in 21 vs `oi` in 13; /x/ is `kh` in 148 vs `x` in 7. The split tracks authoring
+  waves (148 of the 176 `y` items are workplace themes, 69 of the 83 `ai` items are daily-life), and
+  `v_einerseits` mixes both inside one string (`EYE-ner-zaits`). No scheme is documented anywhere, so
+  nothing lints it.
+  **Other coverage findings:** the s21 repositioning has not reached the bank (**63% of vocabulary is
+  still `beruf`**; the five newest `alltag` packs are 49 words each; per-theme spread 49-217, 4.4x);
+  sub-themes are **inverted** (all 10 daily-life themes have 4 each, 8 of 10 workplace themes have
+  none, so 59% of vocab and 52% of collocations carry no `subThemeId` in exactly the themes with the
+  most content); **Redemittel carry `themeId` on 0 of 158** and all 15 categories are
+  workplace-discussion shaped, so the daily-life half of the product has no phrase bank; the writing
+  bank's s167 exam-realistic upgrade is **42% done** (270 of 643 tasks carry `points`; 14 of 20 themes
+  have exactly 6 upgraded tasks) and `source` is used by **0 of 643**; grammar is **111 of 117 drills
+  MCQ** with a 5-drill ceiling per topic and canon holes (no Adjektivdeklination, no Perfekt vs.
+  Präteritum, no Verben mit Präpositionen, no Komparativ/Superlativ); exam sets are all **one task
+  shape** (paired decision-finding), with no solo Vortrag, no Lesen mock and no Hören mock; **13 of
+  3,273 provenance rows are human-verified** (0.4%), so quality today is machine-attested, not
+  expert-attested, and the three founder rejects (`v_ansprechpartner`, `v_bedenken`, `v_scope_creep`)
+  are still unresolved in the bank.
+  Genuine linguistic defects worth fixing are few and named in §3.2: a missing comma in
+  `v_monatskarte#ex1`, `Samstag Vormittag` in `sc_freunde_verabreden`, and `CO2` vs `CO₂` spelled two
+  ways across `vocabulary.ts` and `collocations.ts`.
+  §5 closes with a **ranked P1-P10 backlog, each row carrying a cheapest-first-step column**, plus two
+  structural observations: the daily-life half is starter-sized but better built (better frequency
+  calibration, full sub-theme scaffolding), and structural quality is systematised while pedagogical
+  shape is not (there is a gate for every enum and every fact, but none for "is this word worth
+  learning" or "is this band plausible" - and the frequency data to build the first two already ships
+  in `frequency.ts`).
+  **Two stale doc claims corrected in the same pass:** `PROJECT_STATUS.md` said "none human-verified"
+  (it is 13, signed off 2026-07-24 after the 2026-07-22 reset), and its bank counts were still s176
+  values (1,705/1,054/154/3,213) rather than the live 1,743/1,072/158/3,273. The s176 handoff aged into
+  the W31 archive chunk to keep the file to the two most recent handoffs (231 lines, under the ~250
+  budget).
+  **Gates:** `lint:content` clean (banks untouched). No build, typecheck or test run: docs-only, no
+  source file changed.
+- **Artifacts:** `docs/reports/CONTENT_AUDIT_2026-07-30.md` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` (s176 handoff archived) · this log
+
+- **Prompt 2 (verbatim, 2026-07-30):** `for one of the defects you said ausweiss_pass is same as
+  resiepass. Clearly these two are different words!`
+- **Response summary:** The founder was reading the **id**, which is genuinely misleading; the finding
+  stands on the shipped data. Printed both entries side by side: `v_ausweis_pass` has
+  `de: "der Reisepass"`, `en: "passport"`, `plural: "die Reisepässe"` (travel, B1.2, pron
+  "RYE-ze-pass"), and `v_reisepass` has exactly the same headword, gloss and plural (behoerde, B1.1,
+  pron "RAI-ze-pas"). **No entry with the headword "der Ausweis" exists**; the id was just named
+  loosely when the travel pack was written, and `der Personalausweis` is a separate and correct entry
+  (`v_personalausweis`, line 1392). So a learner browsing Wörter unfiltered saw "der Reisepass -
+  passport" twice and accumulated two SRS cards for one word. Explained that the id cannot be renamed
+  (shipped ids are permanent, progress is id-keyed locally and in the cloud) and that the fix is
+  `RETIRED_VOCAB_IDS`, recommending `v_ausweis_pass` as the one to retire: B1.1 fits a high-frequency
+  word better than its B1.2, and its "RYE-" respelling is the minority convention. No code change in
+  this turn; the correction landed in prompt 3.
+- **Artifacts (prompt 2):** none (analysis only)
+
+- **Prompt 3 (verbatim, 2026-07-30):** `start one working with p0-p2 items`
+- **Response summary:** Read as P0 (the two live defects) through P2, in that order, with the audit's
+  own priority list as the plan. **Three commits**, each gated, plus docs. Loaded the `/content` skill
+  before touching `src/data/*` and the `/design` skill before the card work, as CLAUDE.md requires.
+  **P0 (`b8df93f`).** Fixed the option-assembly defect at BOTH ends. Engine: `translationQ`, `clozeQ`,
+  `listeningClozeQ`, `collocationFillQ` and `matchingQ` deduped distractors by `id` only, so the 5
+  same-theme gloss collisions could put one label on two buttons, one of them correct. New
+  `mcqOptions` + `distinctPairs` key options on the rendered LABEL (case/whitespace-insensitive) and
+  degrade to a 3-option question rather than an ambiguous 4. Content: the 5 glosses now carry real
+  nuance (`die Frist` "deadline / time limit" vs `die Deadline` "deadline (Anglicism)", Dienstreise
+  "employer-ordered" vs Geschäftsreise "commercial travel", `die Räumung` retitled "clearing (of a
+  building)" since Evakuierung is the people-moving word, the two health-insurance cards split into
+  official/older term, Nutzeroberfläche marked the shorter variant). Retired the two true duplicates
+  (`v_ausweis_pass`, `v_konferenzraum_hotel`). Fixed `v_monatskarte`'s missing comma and
+  `Samstag Vormittag` -> `Samstagvormittag`.
+  **CO2 was normalised to ASCII, deliberately overruling LanguageTool's "prefer CO₂" suggestion**,
+  because `normalizeTyped` (engine/typing.ts) and the fuzzy search normalizer both strip anything
+  outside `[a-z0-9]`: with the subscript, a learner typing "CO2-Ausstoß" normalised to "co2 ausstoss"
+  against a target of "co ausstoss" and was graded WRONG, and a search for "co2" could not find the
+  entry. Folding to CO2 also restored 5 `related` edges that would have silently dropped.
+  Three new linter gates: duplicate headwords (erroring only when the gloss OR the theme also matches,
+  so genuine homonyms like `der Empfang` = front desk / phone signal warn instead of failing, which is
+  the refinement the first draft of the rule needed), same-theme gloss collisions, and subscript digits
+  in any typed or searched field. `tests/quizOptions.test.ts`: the bank-wide assertions passed against
+  the OLD engine too (fixing the data removed the trigger), so the real pins are two SYNTHETIC
+  colliding-pair tests, verified to fail on the previous assembly and pass now.
+  **P2 (`63d0e4f`).** All 234 browsable verbs now carry Partizip II, auxiliary, Präteritum,
+  separability and zu-infinitive. Chose a GENERATED file (`src/data/verbForms.ts`, the frequency.ts /
+  verification.ts contract) over 234 hand edits to `VocabItem`, because a wrong Partizip II teaches an
+  error a learner repeats for years, so every form must trace to an authority. `build-verbs-subset.mjs`
+  vendors an oracle from `german-verbs-dict` (MIT, from LanguageTool's `german-pos-dict`) - the same
+  upstream family as the existing noun oracle - and `build-verb-forms.mjs` generates the module.
+  Coverage went 91% -> 100% by resolving reflexives, trailing prepositions and separable compounds
+  against their base verb; 225 forms are dictionary-attested and 9 come from the regular weak paradigm,
+  marked `source: "rule"` (safe because German strong verbs are a closed class of common verbs, all of
+  which an 8,400-entry dictionary carries).
+  **Spot-checking the output caught four upstream defects**, each fixed with a rule rather than a
+  patch: empty stubs (`aufrechterhalten` is `{}`) were truthy and short-circuited the particle rule;
+  `hasPrefix` is not always set, so separability is now read off the participle's internal ge-
+  (teilgenommen splits, unterschrieben does not), which turned "teilnahm" into "nahm teil"; a corrupt
+  strong variant of the `bereiten` family produced "beritt vor", so a weak participle now forces a weak
+  Präteritum ("bereitete vor"); and pre-1996 ß spellings were corrected using the participle's own
+  spelling as evidence rather than guessing vowel length ("faßte zusammen" -> "fasste zusammen", while
+  "schweißte" correctly keeps its ß).
+  The **auxiliary** is the single hand-maintained field, since no open lexicon in this pipeline carries
+  it: 14 sein-verbs are enumerated in the generator with a reason per verb, defaulting to haben, which
+  is correct for every transitive and every reflexive so an omission fails safe. Six are independently
+  corroborated by the bank's own `context` prose, and that comparison **found a real content error**:
+  `v_sich_ereignen` claimed "Perfect with 'sein'", but a reflexive verb always takes haben. Corrected,
+  and the linter now cross-checks the prose against the structured auxiliary so they cannot drift.
+  **Preview, not implementation (`6138801`).** The forms are inert until they appear on a Wörter card,
+  and the `/design` skill forbids implementing a surface without founder-reviewable variants, so
+  `preview/verb-forms-card.html` shows **A-D** from the real `src/index.css` tokens and the real
+  `VocabList.tsx` geometry (published as an artifact; screenshot-verified in headless Chromium, which
+  needed the browser's own CLI since Playwright is not a dependency here). Each variant uses real verbs
+  with their real generated forms so the awkward cases are visible: the reflexive, the sein-taker, the
+  splitting Präteritum, and an inseparable verb that merely looks separable.
+  **P1 was NOT started and was not silently dropped:** C1 has no content behind a level onboarding
+  offers (0 grammar topics, 0 texts, 0 Can-Dos), which is a content-authoring project rather than a
+  fix. Reported with a recommended shape (4 grammar topics that do not exist yet, 6 texts at 300-400
+  words which also starts P3, 5 Can-Dos) for the founder to schedule.
+  **Gates:** lint:content clean (1 warning, the deliberate homonym) · build · typecheck · lint 0 errors ·
+  test:unit 384/384 (up from 377) · check:bundle 123.2 kB of 400 kB.
+- **Artifacts (prompt 3):** `src/engine/quiz.ts` · `src/data/vocabulary.ts` · `src/data/dialogues.ts` ·
+  `src/data/collocations.ts` · `src/data/provenance.ts` · `src/data/verbForms.ts` (generated, new) ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `scripts/build-verbs-subset.mjs` (new) ·
+  `scripts/build-verb-forms.mjs` (new) · `scripts/vendor/german-verbs-subset.json` (generated, new) ·
+  `tests/quizOptions.test.ts` (new) · `tests/verbForms.test.ts` (new) · `package.json` ·
+  `preview/verb-forms-card.html` (new) · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
+  `docs/areas/COMMANDS.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log ·
+  commits `b8df93f`, `63d0e4f`, `6138801`
+
+- **Prompt 4 (verbatim, 2026-07-30):** `i like variant c`
+- **Response summary:** Implemented variant C exactly (`22015fc`), per the `/design` rule that a pick is
+  built to the pixel. Front foot: `Perf.: hat verschoben` in the SAME slot and with the same styling as
+  the shipped `Pl.: die Termine` pill, so the foot row became "this word's inflection" per part of
+  speech instead of a noun-only feature; a word with neither still right-aligns the speak button. Back:
+  the inflection repeated in full, mirroring the existing `Plural: …` line, as a compact `dl` grid of
+  Präteritum · Perfekt · mit zu · trennbar with each row present only when the data has it. Checked
+  `FlipCard` before committing to the taller back face: both faces sit in ONE grid cell, so the tile
+  sizes to the taller one and nothing clips (the back Card is `overflow-hidden`, so this mattered).
+  New `src/lib/verbDisplay.ts` holds `perfekt()`, converting the stored infinitive auxiliary into the
+  citation form a learner actually says ("haben" -> "hat verschoben", "sein" -> "ist entstanden",
+  "haben/sein" -> "hat/ist gependelt"), so the generated file stays a plain fact table.
+  **One deliberate deviation from the approved preview, flagged rather than slipped in:** the row reads
+  **Perfekt**, not "Partizip II". "hat verschoben" is the Perfekt; the bare Partizip II is "verschoben".
+  The preview label was imprecise for a language app and a learner thinks in tenses. The preview file
+  was updated to match so preview and implementation cannot disagree later; trivially revertible if the
+  founder prefers the original wording.
+  Verified by rendering rather than by eye: 4 new tests in `tests/components.test.tsx` assert the
+  Perfekt pill, "ist" for a sein-verb, the separable verb's detached Präteritum ("stimmte ab", never
+  "abstimmte") plus its zu-infinitive and trennbar row, and that a noun card is untouched. Also
+  re-rendered the implemented shape in headless Chromium and compared it against the approved preview.
+  `docs/areas/BIBLIOTHEK.md` gained a "Wörter card" section documenting the anatomy, since none existed.
+  **Gates:** lint:content clean · build · typecheck · lint 0 errors · test:unit 388/388 ·
+  check:bundle 123.2 kB of 400 kB.
+- **Artifacts (prompt 4):** `src/features/vocabulary/VocabList.tsx` · `src/lib/verbDisplay.ts` (new) ·
+  `tests/components.test.tsx` · `preview/verb-forms-card.html` · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/PROJECT_STATUS.md` · this log · commit `22015fc`
+
+- **Prompt 4 (verbatim, 2026-07-30):** `continue with the next step`
+- **Response summary:** Shipped **audit P1, the C1 slice** (commit `c781864`), the last of the
+  "start with p0-p2" thread and the audit's single biggest hole: `CefrLevel` offers C1 at onboarding
+  and `defaultVisibleBands("C1")` returns every band, but behind the label sat 34 words, **0 grammar
+  topics, 0 texts, 0 Can-Dos**, so a self-declared C1 learner got exactly the B2 app.
+  **Four C1 grammar topics with 20 drills**, picked so none overlapped an existing one:
+  `g_konzessiv` (obgleich / wenngleich / zwar…doch / sofern / insofern als / es sei denn),
+  `g_passiversatz` (sich lassen, sein + zu + Infinitiv, -bar/-lich, man), `g_subjektive_modalverben`
+  (soll/will + Infinitiv Perfekt to report a claim you do not own, muss/dürfte/könnte to grade
+  certainty) and `g_modalpartikeln` (doch, ja, mal, eben, wohl, denn). Each carries the full schema:
+  German-first `explanationDe`, 3 examples, 3 parallel pitfalls in both languages, 5 drills with
+  `explain` + `gloss`.
+  **A new grammar group `particles`**, mirrored in all three places the closed-enum rule requires
+  (the `GrammarGroup` union in `types/index.ts`, `GRAMMAR_GROUPS` in `lint-content.mjs`, and
+  `groupMeta` + `groupOrder` in `grammarMeta.ts`). Modalpartikeln fit none of the existing 16 groups:
+  they link nothing, so they are not connectors, and they are not modal verbs. Placed LAST on the
+  B2-marker priority spine on purpose, since they fix no error; they are the polish after the levers.
+  **Six C1 texts, which also start P3.** The bank's median text was 90 words against the 300-450 a
+  B2/C1 reading task runs to, and at 90 words a learner reads every word, so skimming, scanning and
+  inference cannot be trained at all. The six (Widerspruchsbescheid, Risikobericht als
+  Entscheidungsvorlage, Modernisierungsmieterhöhung, Stellungnahme zur Klimabilanz,
+  Unfalluntersuchung an einer Presse, Datenschutzauskunft nach Art. 15) run **305-344 German words**
+  and their 18 checks ask what the text IMPLIES rather than what it states, which was the other half
+  of the P3 finding. Written short first at 237-282 words and then extended with a substantive
+  paragraph each, because German is more compact than the estimate and the length was the entire
+  point of the exercise; padding would have defeated it. Noted in `areas/CONTENT.md`: **`de` and `en`
+  paragraph counts must match**, since both are blank-line split and rendered together.
+  **Five C1 Can-Dos** (meetings, conflict, customer, behoerde, project), each above its theme's
+  existing top threshold, describing what C1 actually adds over B2.2: handling the unplanned, the
+  implicit and the adversarial rather than the scripted case. Own wording aligned to the CoE
+  self-assessment descriptors, cited and never reproduced.
+  **35 provenance rows**, all `authored`/`OWNED`/`draft`, generated against the register's existing
+  reference conventions (German Wikipedia for grammar, the CoE grid for Can-Do, the CoE level
+  descriptions for texts). Nothing is claimed as verified, so the whole slice lands in the
+  `/admin/pruefen` queue like every other addition.
+  Gates: lint:content ✔ (28 grammar topics · 137 drills · 42 texts · 126 checks · 57 Can-Do · 3,308
+  provenance rows; 1 warning, the deliberate `der Empfang` homonym) · build · typecheck ·
+  lint 0 errors · test:unit 388/388 · check:bundle 123.2 kB · report:exercise-coverage 20/20 green ·
+  build:review-queue refreshed.
+  **Still open from the backlog:** P3 beyond these six texts (listening is still 6 TTS voicemails,
+  and the other 36 texts stay at 57-116 words), P4 (Sprechen + Prüfung still off the nav), P5-P10.
+  The ranked list with cheapest-first-steps stays in §5 of the audit report.
+- **Artifacts (prompt 4):** `src/data/grammar.ts` · `src/data/texts.ts` · `src/data/canDo.ts` ·
+  `src/data/provenance.ts` · `src/types/index.ts` · `scripts/lint-content.mjs` ·
+  `src/features/grammar/grammarMeta.ts` · `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md`
+  (s178 part-1 handoff aged into the W31 archive) ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · `docs/reports/*` (generated) ·
+  `src/features/admin/reviewQueue.json` (generated) · this log · commit `c781864`
+
+- **Prompt 5 (verbatim, 2026-07-30):** `document the session and merge everything`
+- **Response summary:** Closed out session 178 and shipped it. The per-prompt entries above were
+  already written as each piece landed (prompts 1-4), so this pass verified rather than re-wrote
+  them, added this entry, and opened the PR into `main` covering all nine commits: the audit itself,
+  P0 (the two live defects plus their linter gates), P2 (the generated verb-forms map, its two
+  build scripts and the variant-C card display) and P1 (the C1 slice). Squash-merged, then the
+  branch was reset onto `main` per the post-merge housekeeping rule.
+  **Session 178 in one line:** an audit that found the content structurally excellent and
+  pedagogically lopsided, followed by the top three items of its own backlog.
+  **What a learner sees differently after this session:** a quiz can no longer show the same option
+  twice; two words no longer appear twice in the Wörter list with two SRS cards each; every verb card
+  now carries `Perf.: hat verschoben` where a noun carries its plural, with the full forms on the flip
+  side; and a learner who picks C1 at onboarding now meets 4 grammar topics, 6 reading texts of
+  305-344 words and 5 milestones instead of the B2 app under a different label.
+  **What the session deliberately did NOT do:** implement any of P3-P10, restore the Anwenden nav
+  entry (a founder decision from 2026-07-13, not mine to undo), or flip any content to `verified`.
+- **Artifacts (prompt 5):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md` · **PR #757**

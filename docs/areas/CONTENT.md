@@ -90,7 +90,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
-- **Grammar** (`src/data/grammar.ts`, 24 topics / 117 drills): `GrammarTopic` with `id` (`g_`),
+- **Grammar** (`src/data/grammar.ts`, 28 topics / 137 drills, 17 groups): `GrammarTopic` with `id` (`g_`),
   `group`, `cefr` (REQUIRED, completeness-checked), `title`, `titleDe`, `purpose`, `purposeDe`,
   `explanation`, `explanationDe` (the German-FIRST lesson text; EN shows only via the hold-to-peek
   chip), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (parallel, same order/length), `drills[]`.
@@ -98,16 +98,21 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
   the EN peek; sessions keep it visible).
 - **Redemittel** (`src/data/redemittel.ts`, ~158; `r_` prefix).
-- **Can-Do milestones** (`src/data/canDo.ts`, 52): `id` (`cd_`), `themeId`, `cefr`, `statement`
+- **Can-Do milestones** (`src/data/canDo.ts`, 57): `id` (`cd_`), `themeId`, `cefr`, `statement`
   (German, must start with "Ich kann"), `en`, `threshold` (0..1 theme-mastery ratio). Aligned to
   the CoE CEFR self-assessment descriptors (cited in provenance, never reproduced). Keep ascending
   `cefr`/`threshold` within a theme; add a `can_do` provenance row (`draft`).
-- **Lese-/Hörtexte** (`src/data/texts.ts`, 36 texts / 108 checks): `id` (`tx_`), `kind` (closed
+- **Lese-/Hörtexte** (`src/data/texts.ts`, 42 texts / 126 checks): `id` (`tx_`), `kind` (closed
   enum letter/email/memo/announcement/voicemail), `themeId`, `cefr`, `title`/`titleEn`, `de`
   (blank-line paragraphs), `en`, `checks` (2-3 MCQs: German `question`, `options`, `answer` among
   options, optional `explain`; check ids globally unique), optional `subThemeId`/`sector`.
   Authored authentic-STYLE (fictitious names/numbers), CEFR-calibrated. Results feed XP/theme
   progress, NOT vocab FSRS (no SRS fields). Voicemails double as TTS listening input.
+  **Two length bands (s178):** the original 36 run 57-116 words, which is fine for a quick check but
+  too short to train skimming or inference; the six `tx_c1_*` texts run 305-344 words with
+  inference-level checks, the band a B2/C1 reading task actually uses. New long texts follow the C1
+  six. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered side by
+  side).
 - **Writing prompts** (`src/data/writingPrompts.ts`, ~316 tasks): per-theme POOLS of task objects
   `{ text, sub?, sectors? }`; the whole pool rides ONE `wp_<themeId>` provenance row (the mission
   pattern). `sub` = declared sub-theme slug (coverage invariant: every sub-theme of the sub-themed
@@ -116,8 +121,29 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   empty).
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
+- **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
+  (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
+  `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a
+  wrong Partizip II teaches a lasting error. Regenerate with `pnpm build:verbs-subset` (network, refreshes
+  `scripts/vendor/german-verbs-subset.json` from `german-verbs-dict`) then `pnpm build:verb-forms`
+  (offline). 225 of 234 forms are dictionary-attested, 9 come from the regular weak paradigm and are
+  marked `source: "rule"`. **The auxiliary is the one hand-maintained field** (no open lexicon carries
+  it): the sein-verbs are enumerated in `scripts/build-verb-forms.mjs` with a reason each, defaulting
+  to haben, which is right for every transitive and every reflexive. The linter gates coverage (a verb
+  with no forms is an ERROR), rejects entries on non-verbs, validates the auxiliary value, and
+  cross-checks it against any `context` prose claiming "Perfect with 'sein'" (that check caught
+  `sich ereignen`, where the prose was wrong: reflexives always take haben).
+- **Label collisions are linted (s178):** two browsable entries may not share a German headword when
+  the gloss or the theme also matches (genuine homonyms across themes, like `der Empfang`, warn
+  instead), and two entries in ONE theme may not share an English gloss, because a theme is a quiz
+  pool and the option would appear twice. Retire the loser via `RETIRED_VOCAB_IDS`, or differentiate
+  the glosses.
+- **No subscript/superscript digits** in `de`/`plural`/`en`/`noun`/`verb`/`full` or an example
+  (linted): `normalizeTyped` and the fuzzy search normalizer strip them, so "CO₂-Ausstoß" grades a
+  learner who types "CO2-Ausstoß" as wrong and cannot be found by searching "co2". Write CO2.
 - **Generated, do not hand-edit:** `src/data/frequency.ts` (`pnpm build:frequency`),
-  `src/data/verification.ts` (`pnpm build:verification`).
+  `src/data/verification.ts` (`pnpm build:verification`), `src/data/verbForms.ts`
+  (`pnpm build:verb-forms`).
 
 ## Linter (`pnpm lint:content`)
 `scripts/lint-content.mjs` loads every bank through Vite's `ssrLoadModule` and checks: duplicate

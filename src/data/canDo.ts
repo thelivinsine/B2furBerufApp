@@ -450,6 +450,53 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can cancel a contract, manage an online account and protect my data.",
     threshold: 0.7,
   },
+  /* ---------------- C1 slice (s178 audit P1) ----------------
+     The ladder stopped at B2.2, so a learner who selected C1 at onboarding had
+     no milestone left to reach. These five sit above each theme's existing top
+     threshold and describe what C1 actually adds: handling the unplanned, the
+     implicit and the adversarial rather than the scripted case. Aligned to the
+     Council of Europe C1 self-assessment descriptors (cited in provenance,
+     never reproduced). */
+  {
+    id: "cd_meetings_4",
+    themeId: "meetings",
+    cefr: "C1",
+    statement: "Ich kann eine kontroverse Besprechung leiten, Einwände aufgreifen und spontan zusammenfassen.",
+    en: "I can chair a contentious meeting, take up objections and summarise on the spot.",
+    threshold: 0.9,
+  },
+  {
+    id: "cd_conflict_3",
+    themeId: "conflict",
+    cefr: "C1",
+    statement: "Ich kann in einem Konflikt meine Position verteidigen, ohne die Beziehung zu belasten.",
+    en: "I can defend my position in a conflict without damaging the relationship.",
+    threshold: 0.85,
+  },
+  {
+    id: "cd_customer_4",
+    themeId: "customer",
+    cefr: "C1",
+    statement: "Ich kann eine unberechtigte Forderung sachlich zurückweisen und trotzdem eine Lösung anbieten.",
+    en: "I can reject an unjustified claim on the merits and still offer a solution.",
+    threshold: 0.9,
+  },
+  {
+    id: "cd_behoerde_4",
+    themeId: "behoerde",
+    cefr: "C1",
+    statement: "Ich kann einen Bescheid im Detail verstehen und einen begründeten Widerspruch formulieren.",
+    en: "I can understand an official decision in detail and formulate a reasoned objection.",
+    threshold: 0.9,
+  },
+  {
+    id: "cd_project_3",
+    themeId: "project",
+    cefr: "C1",
+    statement: "Ich kann Risiken im Projekt benennen, Folgen abwägen und eine Empfehlung begründen.",
+    en: "I can name project risks, weigh consequences and justify a recommendation.",
+    threshold: 0.8,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>
