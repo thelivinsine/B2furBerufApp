@@ -2253,3 +2253,85 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   and `810a405`. Docs-only; no bank, code or config change, so no gates beyond `lint:content` staying
   clean.
 - **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 178 — 2026-07-30 — branch `claude/app-content-audit-92sgh1`
+
+- **Prompt 1 (verbatim, 2026-07-30):** `do an audit of the content of the app and provide a detailed
+  and comprehensive analysis of coverage, quality, frequency of usage, usefulness for targeted
+  audience b1-c1 learners`
+- **Response summary:** Wrote **`docs/reports/CONTENT_AUDIT_2026-07-30.md`**, a measured audit of all
+  **3,896 content items** across the four axes the founder asked for. Every number was measured, not
+  estimated: the banks were loaded live through Vite `ssrLoadModule` (the `lint-content.mjs` pattern,
+  same reason as s176/s177: the entries are one-liners and a `de:`/`full:` regex finds a fraction of
+  them), then cross-read against the four generated reports (`verify-cefr`, `verify-facts`,
+  `verify-grammar`, `exercise-coverage`). Docs-only pass: no bank, code or config change, nothing
+  implemented, so the founder decides what to spend content effort on.
+  **Verdict: structurally excellent, pedagogically lopsided.** Hygiene is rare for a solo product
+  (100% provenance coverage, **0** gate-level article/plural errors across 1,366 nouns under two
+  independent oracles, **99.4%** of 5,236 German sentences clean through LanguageTool, 2 examples +
+  pron + context + related on every vocab item, explanations on 117/117 drills and 108/108 text
+  checks, feedback + quality + uses on 335/335 dialogue options, 95.3% of examples containing their
+  own headword so 20/20 themes generate the full 13-14 exercise menu). The **Nomen-Verb collocation
+  bank is the strongest asset**: 1,072 pairs, 71% at "häufig" or above, far better calibrated than
+  the single-word bank.
+  **The five findings that dominate:** (1) **C1 is a level with no content** (34 words, 16
+  collocations, 3 Redemittel, **0 grammar topics, 0 texts, 0 Can-Do**) while `CefrLevel` offers C1 at
+  onboarding and `defaultVisibleBands("C1")` just returns everything, so a C1 learner is sold the B2
+  app; (2) **79% nouns / 13% verbs / 5% adjectives**, and the schema gives nouns article + plural
+  while verbs get no Partizip II, no auxiliary, no Präteritum and **0 of 234 state their case or
+  preposition** (87 separable verbs unmarked), so the exact accuracy the plateau demands is
+  untrainable; (3) **texts median 90 words** (range 57-116) against 300-450 at B2 exam level, and
+  listening is 6 TTS voicemails, so skimming/scanning/note-taking have no home, and the composer takes
+  one random text per session with **no per-text completion tracking anywhere in `useProgressStore`**,
+  so scoped learners re-read the same 2-3 texts; (4) the **Sprechen + Prüfung content is dark**: 30
+  dialogues (158 nodes, 335 coached options) and 15 exam sets sit behind `/anwenden`, off the nav
+  since 2026-07-13 ("not needed for the demo", `nav-items.ts`), and 20 of the 30 scenarios are 100%
+  multiple-choice with no free-speak node; (5) **54.3% of vocabulary is below Zipf 3.5**, 21% below
+  2.5, only 162 items (9%) are Kernwortschatz, and **B2.2 is 82% specialized-or-rarer**, so "advanced"
+  is being encoded as "rare compound" rather than "structurally demanding" (the mirror error also
+  shows: `somit` at Zipf 5.04 is tagged B2.2, `allerdings` at 5.51 is B2.1).
+  **Two live defects, not just untidiness:** `translationQ` (`src/engine/quiz.ts:149`) draws
+  distractors with `pool.filter(v => v.id !== item.id)` and never compares `en`, while **5 English
+  glosses collide inside a single theme** (`deadline` = v_frist + v_deadline, `business trip`,
+  `user interface`, `evacuation`, `health insurance card`), so a translation MCQ can render the same
+  option string twice, one of them the answer. And `v_konferenz_raum` / `v_konferenzraum_hotel` are
+  the **same headword, same theme (travel), same CEFR, same pron** (a pure duplicate producing two SRS
+  cards); `v_ausweis_pass` / `v_reisepass` duplicate `der Reisepass` across two themes at two levels
+  with two different respellings.
+  **The `pron` field is two systems, now quantified:** /aɪ/ is `y`/`ey` in **176** items vs `ai` in
+  **83**; /ɔʏ/ is `oy` in 21 vs `oi` in 13; /x/ is `kh` in 148 vs `x` in 7. The split tracks authoring
+  waves (148 of the 176 `y` items are workplace themes, 69 of the 83 `ai` items are daily-life), and
+  `v_einerseits` mixes both inside one string (`EYE-ner-zaits`). No scheme is documented anywhere, so
+  nothing lints it.
+  **Other coverage findings:** the s21 repositioning has not reached the bank (**63% of vocabulary is
+  still `beruf`**; the five newest `alltag` packs are 49 words each; per-theme spread 49-217, 4.4x);
+  sub-themes are **inverted** (all 10 daily-life themes have 4 each, 8 of 10 workplace themes have
+  none, so 59% of vocab and 52% of collocations carry no `subThemeId` in exactly the themes with the
+  most content); **Redemittel carry `themeId` on 0 of 158** and all 15 categories are
+  workplace-discussion shaped, so the daily-life half of the product has no phrase bank; the writing
+  bank's s167 exam-realistic upgrade is **42% done** (270 of 643 tasks carry `points`; 14 of 20 themes
+  have exactly 6 upgraded tasks) and `source` is used by **0 of 643**; grammar is **111 of 117 drills
+  MCQ** with a 5-drill ceiling per topic and canon holes (no Adjektivdeklination, no Perfekt vs.
+  Präteritum, no Verben mit Präpositionen, no Komparativ/Superlativ); exam sets are all **one task
+  shape** (paired decision-finding), with no solo Vortrag, no Lesen mock and no Hören mock; **13 of
+  3,273 provenance rows are human-verified** (0.4%), so quality today is machine-attested, not
+  expert-attested, and the three founder rejects (`v_ansprechpartner`, `v_bedenken`, `v_scope_creep`)
+  are still unresolved in the bank.
+  Genuine linguistic defects worth fixing are few and named in §3.2: a missing comma in
+  `v_monatskarte#ex1`, `Samstag Vormittag` in `sc_freunde_verabreden`, and `CO2` vs `CO₂` spelled two
+  ways across `vocabulary.ts` and `collocations.ts`.
+  §5 closes with a **ranked P1-P10 backlog, each row carrying a cheapest-first-step column**, plus two
+  structural observations: the daily-life half is starter-sized but better built (better frequency
+  calibration, full sub-theme scaffolding), and structural quality is systematised while pedagogical
+  shape is not (there is a gate for every enum and every fact, but none for "is this word worth
+  learning" or "is this band plausible" - and the frequency data to build the first two already ships
+  in `frequency.ts`).
+  **Two stale doc claims corrected in the same pass:** `PROJECT_STATUS.md` said "none human-verified"
+  (it is 13, signed off 2026-07-24 after the 2026-07-22 reset), and its bank counts were still s176
+  values (1,705/1,054/154/3,213) rather than the live 1,743/1,072/158/3,273. The s176 handoff aged into
+  the W31 archive chunk to keep the file to the two most recent handoffs (231 lines, under the ~250
+  budget).
+  **Gates:** `lint:content` clean (banks untouched). No build, typecheck or test run: docs-only, no
+  source file changed.
+- **Artifacts:** `docs/reports/CONTENT_AUDIT_2026-07-30.md` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` (s176 handoff archived) · this log

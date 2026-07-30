@@ -256,3 +256,57 @@ Salvaged from the parked word-field branch, because the problem is not about wor
   370/370 · `check:bundle` 123.2 kB of 400 kB · `lint:content` clean (banks untouched).
 - **Correction to an earlier estimate in this session:** the headroom was reported to the founder as
   "about 60 rows". Measured properly it is ~200 content items. Worth fixing, not an emergency.
+
+---
+
+**Handoff after session 176 (2026-07-28).** _(Archived from `PROJECT_STATUS.md` in session 178.)_
+
+**Handoff after session 176 (2026-07-28). Formal complaint response pack: 110 new items.**
+Branch `claude/business-german-vocabulary-36z6ua`.
+Founder supplied a B2/C1 business-German word field (answering a written complaint: reference,
+apology, cause, event organisation, catering, responsibility, improvement, customer relationship,
+closings, idioms, connectors) and asked what was already in the app, with the rest added.
+- **Audit first, then add.** All 151 requested items were checked against `vocabulary` /
+  `collocations` / `redemittel` loaded through Vite (not grepped: the banks are one-line entries and
+  a naive `de:` regex finds only 3% of them). **41 already shipped** (`v_beschwerde`, `v_anliegen`,
+  `v_bedauern`, `v_entschuldigen`, `v_mangel`, `v_massnahme`, `v_verantwortung`, `c_verständnis_zeigen`,
+  `c_verantwortung_uebernehmen_sust`, the connectors `deshalb/jedoch/dennoch/zudem/außerdem/allerdings` …).
+  **110 added.** `r_mail8` ("Für Rückfragen stehe ich Ihnen gern zur Verfügung.") already covered one
+  requested closing, so it was not duplicated.
+- **Split by the bank rules, not by the founder's headings.** The 17 Nomen-Verb idioms in the
+  founder's "Redemittel" section went to **Kollokationen** (`Maßnahmen ergreifen`, `Abhilfe schaffen`,
+  `zur Kenntnis nehmen`, `in die Wege leiten`, `dafür Sorge tragen`, `einer Angelegenheit nachgehen`,
+  `den Erwartungen gerecht werden`, `einen reibungslosen Ablauf gewährleisten` …), because a noun+verb
+  combo in the Wörter list shows up article-less and the linter errors on the overlap. Only the
+  sentence frames became Redemittel (`r_mail14`-`r_mail18`, category `emails`).
+- **`verlegen` needed a collocation, not a second word.** `v_verlegen` already ships in the
+  `wohnen`/trades sense ("to lay tiles"); the business sense is now `c_termin_verlegen`.
+- **19 formal connectors + 5 genitive prepositions** are tagged `pos: "connector"` (there is no
+  `preposition` value and adding one would mean a new closed enum for four items); the genitive
+  government is stated in each `context`.
+- **`verify:cefr` flags 8 of the new connectors** (`somit`, `ferner`, `angesichts`, `vielmehr`,
+  `bezüglich`, `in Bezug auf`, `hingegen`, `beziehen auf`) as "common word, advanced label". Kept as
+  labelled: the check scores raw corpus frequency, and these are frequent in *written* German while
+  functionally B2/C1 by register. Warn-only by design.
+- **Gates:** lint:content ✔ (1,705 vocab · 1,054 collocations · 154 Redemittel · 3,213 provenance) ·
+  build:frequency-subset + build:frequency (regenerated; note `wordfreq` must be pip-installed in a
+  fresh sandbox) · build:oracles + verify:facts ✔ 0 gate errors, no new review signals ·
+  build · check:bundle 123.2 kB · lint 0 errors · test:unit 370/370 ·
+  report:exercise-coverage (20/20 green) · build:review-queue.
+- **Licensing: settled, given the s175 precedent one handoff up.** The founder confirmed the word
+  field is **personally curated**, not taken from a published source. A self-made selection carries no
+  third-party compilation right (§4 UrhG) and no database right (§§87a-87e UrhG), which were the two
+  exposures that parked the telc pack, and every shipped artifact here (examples, glosses,
+  pronunciation hints, context notes, CEFR tags, theme assignments) is authored in-repo. **Nothing
+  about this pack needs revisiting; do not re-open it by reading the s175 handoff alone.**
+- **A defect this session introduced and fixed, worth not repeating.** The documentation pass used a
+  whole-file string replace whose anchor text was not unique, so a licensing note landed inside the
+  **session-175 parked-pack prompt-log entry** as well as the intended one. `SESSION_PROMPT_LOG.md` is
+  append-only, so writing into a shipped entry is a real defect. It is restored to what shipped in
+  PR #750. **Rule: assert the match count before replacing in an append-only or long doc**, or edit by
+  anchor with surrounding context. The same check caught the next attempt before it wrote.
+- **Next for this content:** it is `draft` like everything else, so it lands in the `/admin/pruefen`
+  queue for the human review pass. No writing prompt, Can-Do or text was added, so exercise coverage
+  is unchanged.
+- **Shipped:** **PR #752** (the pack, squash-merged as `7197a44`) and **PR #753** (the licensing
+  answer + the log restore, squash-merged as `810a405`). Branch reset onto `main`, working tree clean.
