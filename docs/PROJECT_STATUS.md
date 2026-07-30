@@ -1,6 +1,6 @@
 # Project Status
 
-_Last updated: 2026-07-30 (session 178). **Content audit, then the first two fixes from it.**
+_Last updated: 2026-07-30 (session 178). **Content audit, then its P0-P2 fixes and the C1 slice.**
 `docs/reports/CONTENT_AUDIT_2026-07-30.md` measures coverage, quality, real-world usage frequency and
 fitness for B1-C1 across all 3,896 content items. Verdict: **structurally excellent, pedagogically
 lopsided.** Then P0 and P2 of its backlog shipped. **P0:** a quiz could render the same option twice
@@ -9,7 +9,9 @@ inside a theme; two words shipped twice (`der Reisepass`, `der Konferenzraum`); 
 ways, one of them unreachable for a learner who types it. All fixed and gated. **P2:** all 234 verbs
 now have Partizip II, auxiliary, Präteritum and separability in the generated
 `src/data/verbForms.ts`, derived from a vendored dictionary oracle rather than typed by hand.
-Displaying them on a card is a founder pick: `preview/verb-forms-card.html`, variants A-D.
+They now show on the Wörter card (founder picked variant C from `preview/verb-forms-card.html`).
+**P1:** the C1 band had 0 grammar topics, 0 texts and 0 Can-Dos behind a level onboarding offers; it
+now has 4 topics (20 drills), 6 texts of 305-344 words and 5 Can-Dos.
 Prior s177: **Complaint response pack 2, cleaning-service focus.** A
 second founder-supplied word field for answering a written complaint, framed around a
 Reinigungsservice customer relationship, was audited against the live banks (including the s176 pack
@@ -82,13 +84,13 @@ in `../CLAUDE.md`).
 **Content banks (as of 2026-07-30, session 178, measured against the live banks — re-verify with
 `pnpm lint:content` before quoting):** vocab **1,743** (**1,733 browsable**; 8 mis-filed noun+verb combos
 retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** · Redemittel **158** ·
-grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** (108 checks) · writing tasks **643** in 20
-pools · Can-Do **52** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
-provenance **3,273 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
+grammar **28 topics / 137 drills** (17 groups) · Lese-/Hörtexte **42** (126 checks) · writing tasks **643** in 20
+pools · Can-Do **57** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
+provenance **3,308 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
 einkaufen/essen/mobilitaet/freizeit/digitales). Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
-Standing governance debt: **3,260 of 3,273 provenance rows are AI-drafted `draft`**; only **13** are
+Standing governance debt: **3,295 of 3,308 provenance rows are AI-drafted `draft`**; only **13** are
 human-verified (13 vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset to restart the
 review pass; see `strategy/DATA_GOVERNANCE.md`). The full picture of what the banks do and do not
 cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178).
@@ -125,50 +127,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
-
-**Handoff after session 178 (2026-07-30). Full content audit: coverage, quality, real-world
-frequency, fitness for B1–C1.** Branch `claude/app-content-audit-92sgh1`.
-Founder asked for a detailed audit of the app's content. Report:
-**`docs/reports/CONTENT_AUDIT_2026-07-30.md`** (measured, not estimated: every bank loaded through
-Vite `ssrLoadModule`, cross-read against the four generated verify reports). **Docs-only session, no
-bank or code change.** The verdict in one line: *structurally excellent, pedagogically lopsided.*
-- **What is genuinely strong.** 3,896 content items, 100% provenance coverage, 0 gate-level
-  article/plural errors across 1,366 nouns (two-oracle), 99.4% of 5,236 German sentences clean
-  through LanguageTool, every vocab item with 2 examples + pron + context + related, 117/117 drills
-  and 108/108 text checks with explanations, 335/335 dialogue options with feedback + quality + uses.
-  95.3% of examples contain their own headword, so exercise generation is near-maxed (20/20 themes
-  green). The **collocation bank is the best asset**: 71% at "häufig" or above.
-- **The five findings that matter**, in order: (1) **C1 is a level with no content** (0 grammar,
-  0 texts, 0 Can-Do, 34 words) while onboarding offers it; (2) **the bank is 79% nouns / 13% verbs /
-  5% adjectives**, and verbs carry no Partizip II, no auxiliary and **0 of 234 state case or
-  preposition**, so plateau accuracy is untrainable; (3) **texts are 90 words median** (exam Lesen is
-  300-450) and listening is 6 TTS voicemails; (4) **the Sprechen + Prüfung content is dark** (30
-  dialogues, 335 coached options, 15 exam sets behind `/anwenden`, off the nav since 2026-07-13),
-  and 20 of 30 scenarios have no free-speak node; (5) **54.3% of vocabulary is below Zipf 3.5** and
-  B2.2 is 82% Fachsprache compounds, so "advanced" is being encoded as "rare".
-- **Two live defects found, not just untidiness.** `translationQ` (`engine/quiz.ts:149`) filters
-  distractors by id only, never by `en`, and **5 English glosses collide inside a single theme**
-  (`deadline`, `business trip`, `user interface`, `evacuation`, `health insurance card`), so a
-  translation MCQ can render the same option twice. And `v_konferenz_raum` / `v_konferenzraum_hotel`
-  are the **same word, same theme, same CEFR, same pron** (a pure duplicate = two SRS cards);
-  `v_ausweis_pass` / `v_reisepass` duplicate `der Reisepass` at two levels with two different
-  pronunciation respellings.
-- **The `pron` field is two systems, quantified.** /aɪ/ is spelled `y`/`ey` in 176 items and `ai` in
-  83; /ɔʏ/ is `oy` in 21 and `oi` in 13; /x/ is `kh` in 148 and `x` in 7. The split tracks authoring
-  waves (148 of the 176 `y` items are workplace themes; 69 of the 83 `ai` items are daily-life), and
-  `v_einerseits` mixes both inside one string (`EYE-ner-zaits`). No scheme is documented, so nothing
-  lints it.
-- **The s21 repositioning has not reached the bank.** 63% of vocabulary is still `beruf`; the five
-  newest `alltag` packs are 49 words each. Sub-themes are inverted: all 10 daily-life themes have 4
-  each, but 8 of 10 workplace themes have **none**, so 59% of vocab carries no `subThemeId` in exactly
-  the themes with the most content.
-- **A stale doc claim, corrected here.** The counts block said "none human-verified"; there are **13**
-  (vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset). Counts also refreshed from
-  s176 to live values.
-- **Ranked backlog (P1-P10) with a cheapest-first-step column is in §5 of the report.** Nothing was
-  implemented: the founder decides what to spend content effort on. The three open founder rejects
-  (`v_ansprechpartner`, `v_bedenken`, `v_scope_creep`) are still unresolved in the bank.
-- **Gates:** `lint:content` clean (banks untouched). No build/test run needed: docs-only.
 
 **Handoff after session 178, part 2 (2026-07-30). Audit P0 + P2 shipped; P2's display and P1 await a
 founder pick.** Branch `claude/app-content-audit-92sgh1`.
@@ -233,6 +191,40 @@ Founder: "start one working with p0-p2 items". Three commits on top of the audit
   300-400 words (which also starts P3, since today's median text is 90 words), 5 C1 Can-Dos.
 - **Gates (all four commits):** lint:content clean (1 warning, the deliberate `der Empfang` homonym) ·
   build · typecheck · lint 0 errors · test:unit **388/388** · check:bundle 123.2 kB of 400 kB.
+
+**Handoff after session 178, part 3 (2026-07-30). Audit P1 shipped: the C1 slice.** Branch
+`claude/app-content-audit-92sgh1`.
+Founder: "continue with the next step", after P0 and P2. P1 was the audit's biggest hole: onboarding
+offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the label sat 34 words,
+**0 grammar topics, 0 texts, 0 Can-Dos**. A self-declared C1 learner got exactly the B2 app.
+- **Four C1 grammar topics, 20 drills**, chosen so none overlapped an existing one: `g_konzessiv`
+  (obgleich / wenngleich / zwar…doch / sofern / insofern als / es sei denn), `g_passiversatz`
+  (sich lassen, sein + zu + Infinitiv, -bar/-lich, man), `g_subjektive_modalverben` (soll/will +
+  Infinitiv Perfekt for reporting a claim, muss/dürfte/könnte for grading certainty) and
+  `g_modalpartikeln` (doch, ja, mal, eben, wohl, denn).
+- **A new grammar group `particles`**, mirrored in all three places the closed-enum rule demands
+  (the `GrammarGroup` union, `GRAMMAR_GROUPS` in the linter, `groupMeta` + `groupOrder`). Modalpartikeln
+  fit none of the existing 16: they link nothing, so they are not connectors, and they are not modal
+  verbs. Placed LAST on the priority spine on purpose, since they fix no error.
+- **Six C1 texts, which also start P3.** The bank's median text was 90 words against the 300-450 a
+  B2/C1 reading task runs to, and at 90 words a learner reads every word, so skimming and inference
+  cannot be trained. The six run **305-344 words** (Widerspruchsbescheid, Risikobericht,
+  Modernisierungsmieterhöhung, Stellungnahme zur Klimabilanz, Unfalluntersuchung, Datenschutzauskunft)
+  and their 18 checks ask what the text IMPLIES, not what it states. They were written short first
+  (237-282) and extended, because German is more compact than the estimate and the length was the
+  whole point. **`de` and `en` paragraph counts must match** (both are blank-line split and rendered
+  together); noted in `areas/CONTENT.md` next to the schema.
+- **Five C1 Can-Dos** above each theme's existing top threshold (meetings, conflict, customer,
+  behoerde, project), describing what C1 adds: the unplanned, the implicit and the adversarial rather
+  than the scripted case.
+- 35 provenance rows, all `draft`. Nothing is claimed as verified, so the whole slice lands in the
+  `/admin/pruefen` queue like every other bank addition.
+- **Gates:** lint:content clean (1 known warning, the `der Empfang` homonym) · build · typecheck ·
+  lint 0 errors · test:unit 388/388 · check:bundle 123.2 kB · report:exercise-coverage 20/20 green ·
+  build:review-queue refreshed.
+- **Still open from the audit backlog:** P3 beyond these six texts (listening is still 6 TTS
+  voicemails), P4 (the Sprechen + Prüfung content is still off the nav), P5-P10. The ranked list with
+  cheapest-first-steps stays in §5 of `docs/reports/CONTENT_AUDIT_2026-07-30.md`.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

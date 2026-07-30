@@ -2452,3 +2452,52 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 4):** `src/features/vocabulary/VocabList.tsx` · `src/lib/verbDisplay.ts` (new) ·
   `tests/components.test.tsx` · `preview/verb-forms-card.html` · `docs/areas/BIBLIOTHEK.md` ·
   `docs/PROJECT_STATUS.md` · this log · commit `22015fc`
+
+- **Prompt 4 (verbatim, 2026-07-30):** `continue with the next step`
+- **Response summary:** Shipped **audit P1, the C1 slice** (commit `c781864`), the last of the
+  "start with p0-p2" thread and the audit's single biggest hole: `CefrLevel` offers C1 at onboarding
+  and `defaultVisibleBands("C1")` returns every band, but behind the label sat 34 words, **0 grammar
+  topics, 0 texts, 0 Can-Dos**, so a self-declared C1 learner got exactly the B2 app.
+  **Four C1 grammar topics with 20 drills**, picked so none overlapped an existing one:
+  `g_konzessiv` (obgleich / wenngleich / zwar…doch / sofern / insofern als / es sei denn),
+  `g_passiversatz` (sich lassen, sein + zu + Infinitiv, -bar/-lich, man), `g_subjektive_modalverben`
+  (soll/will + Infinitiv Perfekt to report a claim you do not own, muss/dürfte/könnte to grade
+  certainty) and `g_modalpartikeln` (doch, ja, mal, eben, wohl, denn). Each carries the full schema:
+  German-first `explanationDe`, 3 examples, 3 parallel pitfalls in both languages, 5 drills with
+  `explain` + `gloss`.
+  **A new grammar group `particles`**, mirrored in all three places the closed-enum rule requires
+  (the `GrammarGroup` union in `types/index.ts`, `GRAMMAR_GROUPS` in `lint-content.mjs`, and
+  `groupMeta` + `groupOrder` in `grammarMeta.ts`). Modalpartikeln fit none of the existing 16 groups:
+  they link nothing, so they are not connectors, and they are not modal verbs. Placed LAST on the
+  B2-marker priority spine on purpose, since they fix no error; they are the polish after the levers.
+  **Six C1 texts, which also start P3.** The bank's median text was 90 words against the 300-450 a
+  B2/C1 reading task runs to, and at 90 words a learner reads every word, so skimming, scanning and
+  inference cannot be trained at all. The six (Widerspruchsbescheid, Risikobericht als
+  Entscheidungsvorlage, Modernisierungsmieterhöhung, Stellungnahme zur Klimabilanz,
+  Unfalluntersuchung an einer Presse, Datenschutzauskunft nach Art. 15) run **305-344 German words**
+  and their 18 checks ask what the text IMPLIES rather than what it states, which was the other half
+  of the P3 finding. Written short first at 237-282 words and then extended with a substantive
+  paragraph each, because German is more compact than the estimate and the length was the entire
+  point of the exercise; padding would have defeated it. Noted in `areas/CONTENT.md`: **`de` and `en`
+  paragraph counts must match**, since both are blank-line split and rendered together.
+  **Five C1 Can-Dos** (meetings, conflict, customer, behoerde, project), each above its theme's
+  existing top threshold, describing what C1 actually adds over B2.2: handling the unplanned, the
+  implicit and the adversarial rather than the scripted case. Own wording aligned to the CoE
+  self-assessment descriptors, cited and never reproduced.
+  **35 provenance rows**, all `authored`/`OWNED`/`draft`, generated against the register's existing
+  reference conventions (German Wikipedia for grammar, the CoE grid for Can-Do, the CoE level
+  descriptions for texts). Nothing is claimed as verified, so the whole slice lands in the
+  `/admin/pruefen` queue like every other addition.
+  Gates: lint:content ✔ (28 grammar topics · 137 drills · 42 texts · 126 checks · 57 Can-Do · 3,308
+  provenance rows; 1 warning, the deliberate `der Empfang` homonym) · build · typecheck ·
+  lint 0 errors · test:unit 388/388 · check:bundle 123.2 kB · report:exercise-coverage 20/20 green ·
+  build:review-queue refreshed.
+  **Still open from the backlog:** P3 beyond these six texts (listening is still 6 TTS voicemails,
+  and the other 36 texts stay at 57-116 words), P4 (Sprechen + Prüfung still off the nav), P5-P10.
+  The ranked list with cheapest-first-steps stays in §5 of the audit report.
+- **Artifacts (prompt 4):** `src/data/grammar.ts` · `src/data/texts.ts` · `src/data/canDo.ts` ·
+  `src/data/provenance.ts` · `src/types/index.ts` · `scripts/lint-content.mjs` ·
+  `src/features/grammar/grammarMeta.ts` · `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md`
+  (s178 part-1 handoff aged into the W31 archive) ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · `docs/reports/*` (generated) ·
+  `src/features/admin/reviewQueue.json` (generated) · this log · commit `c781864`

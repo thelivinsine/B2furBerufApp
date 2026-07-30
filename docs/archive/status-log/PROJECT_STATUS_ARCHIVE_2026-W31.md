@@ -372,3 +372,51 @@ nouns / connectors" glossary sections.
   queue. No writing prompt, Can-Do or text was added, so exercise coverage is unchanged.
 - **Shipped:** **PR #755**, squash-merged as `cbacc98`. Post-merge housekeeping done: branch reset
   onto `main`, working tree clean.
+
+---
+
+**Handoff after session 178, part 1 (2026-07-30).** _(Archived from `PROJECT_STATUS.md` in session 178 part 3; the full report is `docs/reports/CONTENT_AUDIT_2026-07-30.md`.)_
+
+**Handoff after session 178 (2026-07-30). Full content audit: coverage, quality, real-world
+frequency, fitness for B1–C1.** Branch `claude/app-content-audit-92sgh1`.
+Founder asked for a detailed audit of the app's content. Report:
+**`docs/reports/CONTENT_AUDIT_2026-07-30.md`** (measured, not estimated: every bank loaded through
+Vite `ssrLoadModule`, cross-read against the four generated verify reports). **Docs-only session, no
+bank or code change.** The verdict in one line: *structurally excellent, pedagogically lopsided.*
+- **What is genuinely strong.** 3,896 content items, 100% provenance coverage, 0 gate-level
+  article/plural errors across 1,366 nouns (two-oracle), 99.4% of 5,236 German sentences clean
+  through LanguageTool, every vocab item with 2 examples + pron + context + related, 117/117 drills
+  and 108/108 text checks with explanations, 335/335 dialogue options with feedback + quality + uses.
+  95.3% of examples contain their own headword, so exercise generation is near-maxed (20/20 themes
+  green). The **collocation bank is the best asset**: 71% at "häufig" or above.
+- **The five findings that matter**, in order: (1) **C1 is a level with no content** (0 grammar,
+  0 texts, 0 Can-Do, 34 words) while onboarding offers it; (2) **the bank is 79% nouns / 13% verbs /
+  5% adjectives**, and verbs carry no Partizip II, no auxiliary and **0 of 234 state case or
+  preposition**, so plateau accuracy is untrainable; (3) **texts are 90 words median** (exam Lesen is
+  300-450) and listening is 6 TTS voicemails; (4) **the Sprechen + Prüfung content is dark** (30
+  dialogues, 335 coached options, 15 exam sets behind `/anwenden`, off the nav since 2026-07-13),
+  and 20 of 30 scenarios have no free-speak node; (5) **54.3% of vocabulary is below Zipf 3.5** and
+  B2.2 is 82% Fachsprache compounds, so "advanced" is being encoded as "rare".
+- **Two live defects found, not just untidiness.** `translationQ` (`engine/quiz.ts:149`) filters
+  distractors by id only, never by `en`, and **5 English glosses collide inside a single theme**
+  (`deadline`, `business trip`, `user interface`, `evacuation`, `health insurance card`), so a
+  translation MCQ can render the same option twice. And `v_konferenz_raum` / `v_konferenzraum_hotel`
+  are the **same word, same theme, same CEFR, same pron** (a pure duplicate = two SRS cards);
+  `v_ausweis_pass` / `v_reisepass` duplicate `der Reisepass` at two levels with two different
+  pronunciation respellings.
+- **The `pron` field is two systems, quantified.** /aɪ/ is spelled `y`/`ey` in 176 items and `ai` in
+  83; /ɔʏ/ is `oy` in 21 and `oi` in 13; /x/ is `kh` in 148 and `x` in 7. The split tracks authoring
+  waves (148 of the 176 `y` items are workplace themes; 69 of the 83 `ai` items are daily-life), and
+  `v_einerseits` mixes both inside one string (`EYE-ner-zaits`). No scheme is documented, so nothing
+  lints it.
+- **The s21 repositioning has not reached the bank.** 63% of vocabulary is still `beruf`; the five
+  newest `alltag` packs are 49 words each. Sub-themes are inverted: all 10 daily-life themes have 4
+  each, but 8 of 10 workplace themes have **none**, so 59% of vocab carries no `subThemeId` in exactly
+  the themes with the most content.
+- **A stale doc claim, corrected here.** The counts block said "none human-verified"; there are **13**
+  (vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset). Counts also refreshed from
+  s176 to live values.
+- **Ranked backlog (P1-P10) with a cheapest-first-step column is in §5 of the report.** Nothing was
+  implemented: the founder decides what to spend content effort on. The three open founder rejects
+  (`v_ansprechpartner`, `v_bedenken`, `v_scope_creep`) are still unresolved in the bank.
+- **Gates:** `lint:content` clean (banks untouched). No build/test run needed: docs-only.
