@@ -116,8 +116,29 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   empty).
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
+- **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
+  (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
+  `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a
+  wrong Partizip II teaches a lasting error. Regenerate with `pnpm build:verbs-subset` (network, refreshes
+  `scripts/vendor/german-verbs-subset.json` from `german-verbs-dict`) then `pnpm build:verb-forms`
+  (offline). 225 of 234 forms are dictionary-attested, 9 come from the regular weak paradigm and are
+  marked `source: "rule"`. **The auxiliary is the one hand-maintained field** (no open lexicon carries
+  it): the sein-verbs are enumerated in `scripts/build-verb-forms.mjs` with a reason each, defaulting
+  to haben, which is right for every transitive and every reflexive. The linter gates coverage (a verb
+  with no forms is an ERROR), rejects entries on non-verbs, validates the auxiliary value, and
+  cross-checks it against any `context` prose claiming "Perfect with 'sein'" (that check caught
+  `sich ereignen`, where the prose was wrong: reflexives always take haben).
+- **Label collisions are linted (s178):** two browsable entries may not share a German headword when
+  the gloss or the theme also matches (genuine homonyms across themes, like `der Empfang`, warn
+  instead), and two entries in ONE theme may not share an English gloss, because a theme is a quiz
+  pool and the option would appear twice. Retire the loser via `RETIRED_VOCAB_IDS`, or differentiate
+  the glosses.
+- **No subscript/superscript digits** in `de`/`plural`/`en`/`noun`/`verb`/`full` or an example
+  (linted): `normalizeTyped` and the fuzzy search normalizer strip them, so "CO₂-Ausstoß" grades a
+  learner who types "CO2-Ausstoß" as wrong and cannot be found by searching "co2". Write CO2.
 - **Generated, do not hand-edit:** `src/data/frequency.ts` (`pnpm build:frequency`),
-  `src/data/verification.ts` (`pnpm build:verification`).
+  `src/data/verification.ts` (`pnpm build:verification`), `src/data/verbForms.ts`
+  (`pnpm build:verb-forms`).
 
 ## Linter (`pnpm lint:content`)
 `scripts/lint-content.mjs` loads every bank through Vite's `ssrLoadModule` and checks: duplicate

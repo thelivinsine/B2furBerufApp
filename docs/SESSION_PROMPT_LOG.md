@@ -2335,3 +2335,92 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   source file changed.
 - **Artifacts:** `docs/reports/CONTENT_AUDIT_2026-07-30.md` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` (s176 handoff archived) · this log
+
+- **Prompt 2 (verbatim, 2026-07-30):** `for one of the defects you said ausweiss_pass is same as
+  resiepass. Clearly these two are different words!`
+- **Response summary:** The founder was reading the **id**, which is genuinely misleading; the finding
+  stands on the shipped data. Printed both entries side by side: `v_ausweis_pass` has
+  `de: "der Reisepass"`, `en: "passport"`, `plural: "die Reisepässe"` (travel, B1.2, pron
+  "RYE-ze-pass"), and `v_reisepass` has exactly the same headword, gloss and plural (behoerde, B1.1,
+  pron "RAI-ze-pas"). **No entry with the headword "der Ausweis" exists**; the id was just named
+  loosely when the travel pack was written, and `der Personalausweis` is a separate and correct entry
+  (`v_personalausweis`, line 1392). So a learner browsing Wörter unfiltered saw "der Reisepass -
+  passport" twice and accumulated two SRS cards for one word. Explained that the id cannot be renamed
+  (shipped ids are permanent, progress is id-keyed locally and in the cloud) and that the fix is
+  `RETIRED_VOCAB_IDS`, recommending `v_ausweis_pass` as the one to retire: B1.1 fits a high-frequency
+  word better than its B1.2, and its "RYE-" respelling is the minority convention. No code change in
+  this turn; the correction landed in prompt 3.
+- **Artifacts (prompt 2):** none (analysis only)
+
+- **Prompt 3 (verbatim, 2026-07-30):** `start one working with p0-p2 items`
+- **Response summary:** Read as P0 (the two live defects) through P2, in that order, with the audit's
+  own priority list as the plan. **Three commits**, each gated, plus docs. Loaded the `/content` skill
+  before touching `src/data/*` and the `/design` skill before the card work, as CLAUDE.md requires.
+  **P0 (`b8df93f`).** Fixed the option-assembly defect at BOTH ends. Engine: `translationQ`, `clozeQ`,
+  `listeningClozeQ`, `collocationFillQ` and `matchingQ` deduped distractors by `id` only, so the 5
+  same-theme gloss collisions could put one label on two buttons, one of them correct. New
+  `mcqOptions` + `distinctPairs` key options on the rendered LABEL (case/whitespace-insensitive) and
+  degrade to a 3-option question rather than an ambiguous 4. Content: the 5 glosses now carry real
+  nuance (`die Frist` "deadline / time limit" vs `die Deadline` "deadline (Anglicism)", Dienstreise
+  "employer-ordered" vs Geschäftsreise "commercial travel", `die Räumung` retitled "clearing (of a
+  building)" since Evakuierung is the people-moving word, the two health-insurance cards split into
+  official/older term, Nutzeroberfläche marked the shorter variant). Retired the two true duplicates
+  (`v_ausweis_pass`, `v_konferenzraum_hotel`). Fixed `v_monatskarte`'s missing comma and
+  `Samstag Vormittag` -> `Samstagvormittag`.
+  **CO2 was normalised to ASCII, deliberately overruling LanguageTool's "prefer CO₂" suggestion**,
+  because `normalizeTyped` (engine/typing.ts) and the fuzzy search normalizer both strip anything
+  outside `[a-z0-9]`: with the subscript, a learner typing "CO2-Ausstoß" normalised to "co2 ausstoss"
+  against a target of "co ausstoss" and was graded WRONG, and a search for "co2" could not find the
+  entry. Folding to CO2 also restored 5 `related` edges that would have silently dropped.
+  Three new linter gates: duplicate headwords (erroring only when the gloss OR the theme also matches,
+  so genuine homonyms like `der Empfang` = front desk / phone signal warn instead of failing, which is
+  the refinement the first draft of the rule needed), same-theme gloss collisions, and subscript digits
+  in any typed or searched field. `tests/quizOptions.test.ts`: the bank-wide assertions passed against
+  the OLD engine too (fixing the data removed the trigger), so the real pins are two SYNTHETIC
+  colliding-pair tests, verified to fail on the previous assembly and pass now.
+  **P2 (`63d0e4f`).** All 234 browsable verbs now carry Partizip II, auxiliary, Präteritum,
+  separability and zu-infinitive. Chose a GENERATED file (`src/data/verbForms.ts`, the frequency.ts /
+  verification.ts contract) over 234 hand edits to `VocabItem`, because a wrong Partizip II teaches an
+  error a learner repeats for years, so every form must trace to an authority. `build-verbs-subset.mjs`
+  vendors an oracle from `german-verbs-dict` (MIT, from LanguageTool's `german-pos-dict`) - the same
+  upstream family as the existing noun oracle - and `build-verb-forms.mjs` generates the module.
+  Coverage went 91% -> 100% by resolving reflexives, trailing prepositions and separable compounds
+  against their base verb; 225 forms are dictionary-attested and 9 come from the regular weak paradigm,
+  marked `source: "rule"` (safe because German strong verbs are a closed class of common verbs, all of
+  which an 8,400-entry dictionary carries).
+  **Spot-checking the output caught four upstream defects**, each fixed with a rule rather than a
+  patch: empty stubs (`aufrechterhalten` is `{}`) were truthy and short-circuited the particle rule;
+  `hasPrefix` is not always set, so separability is now read off the participle's internal ge-
+  (teilgenommen splits, unterschrieben does not), which turned "teilnahm" into "nahm teil"; a corrupt
+  strong variant of the `bereiten` family produced "beritt vor", so a weak participle now forces a weak
+  Präteritum ("bereitete vor"); and pre-1996 ß spellings were corrected using the participle's own
+  spelling as evidence rather than guessing vowel length ("faßte zusammen" -> "fasste zusammen", while
+  "schweißte" correctly keeps its ß).
+  The **auxiliary** is the single hand-maintained field, since no open lexicon in this pipeline carries
+  it: 14 sein-verbs are enumerated in the generator with a reason per verb, defaulting to haben, which
+  is correct for every transitive and every reflexive so an omission fails safe. Six are independently
+  corroborated by the bank's own `context` prose, and that comparison **found a real content error**:
+  `v_sich_ereignen` claimed "Perfect with 'sein'", but a reflexive verb always takes haben. Corrected,
+  and the linter now cross-checks the prose against the structured auxiliary so they cannot drift.
+  **Preview, not implementation (`6138801`).** The forms are inert until they appear on a Wörter card,
+  and the `/design` skill forbids implementing a surface without founder-reviewable variants, so
+  `preview/verb-forms-card.html` shows **A-D** from the real `src/index.css` tokens and the real
+  `VocabList.tsx` geometry (published as an artifact; screenshot-verified in headless Chromium, which
+  needed the browser's own CLI since Playwright is not a dependency here). Each variant uses real verbs
+  with their real generated forms so the awkward cases are visible: the reflexive, the sein-taker, the
+  splitting Präteritum, and an inseparable verb that merely looks separable.
+  **P1 was NOT started and was not silently dropped:** C1 has no content behind a level onboarding
+  offers (0 grammar topics, 0 texts, 0 Can-Dos), which is a content-authoring project rather than a
+  fix. Reported with a recommended shape (4 grammar topics that do not exist yet, 6 texts at 300-400
+  words which also starts P3, 5 Can-Dos) for the founder to schedule.
+  **Gates:** lint:content clean (1 warning, the deliberate homonym) · build · typecheck · lint 0 errors ·
+  test:unit 384/384 (up from 377) · check:bundle 123.2 kB of 400 kB.
+- **Artifacts (prompt 3):** `src/engine/quiz.ts` · `src/data/vocabulary.ts` · `src/data/dialogues.ts` ·
+  `src/data/collocations.ts` · `src/data/provenance.ts` · `src/data/verbForms.ts` (generated, new) ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `scripts/build-verbs-subset.mjs` (new) ·
+  `scripts/build-verb-forms.mjs` (new) · `scripts/vendor/german-verbs-subset.json` (generated, new) ·
+  `tests/quizOptions.test.ts` (new) · `tests/verbForms.test.ts` (new) · `package.json` ·
+  `preview/verb-forms-card.html` (new) · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
+  `docs/areas/COMMANDS.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log ·
+  commits `b8df93f`, `63d0e4f`, `6138801`

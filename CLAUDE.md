@@ -35,15 +35,16 @@ after pulling.
   `pnpm verify:facts` (noun fact gate; `pnpm build:oracles` first after adding nouns)
 - Warn-only checks: `pnpm verify:grammar` · `pnpm verify:cefr` (`pnpm verify:sentences` = both)
 - Generated data: `pnpm build:frequency` (→ `src/data/frequency.ts`) · `pnpm build:verification`
-  (→ `src/data/verification.ts`) — regenerate, never hand-edit
+  (→ `src/data/verification.ts`) · `pnpm build:verbs-subset` + `pnpm build:verb-forms`
+  (→ `src/data/verbForms.ts`, verb morphology) — regenerate, never hand-edit
 - Review loop: `pnpm review:queue` · `pnpm stamp:verified` (same commit as any verified flip) ·
   `pnpm apply:reviews` (founder decisions; integrity rules in COMMANDS.md, do not weaken) ·
   `pnpm build:review-queue` · `pnpm report:exercise-coverage`
 - `.npmrc` supply-chain cooldown + blocked dependency build scripts: keep it that way.
 
 ## Layout (`src/`)
-- `data/` — content banks + `provenance.ts` + generated `frequency.ts`/`verification.ts`
-  (see `docs/areas/CONTENT.md`)
+- `data/` — content banks + `provenance.ts` + generated `frequency.ts`/`verification.ts`/
+  `verbForms.ts` (see `docs/areas/CONTENT.md`)
 - `engine/` — `srs.ts` (FSRS-6), `pronounce.ts`, `session.ts` (composed-session composer),
   `mission.ts` (game runner), `collection.ts` (FSRS→Lv 1-5 mapping, stable game contract, don't
   drift the bands), `dialogue.ts`, `scoring.ts`, `speech.ts`, `quiz.ts`

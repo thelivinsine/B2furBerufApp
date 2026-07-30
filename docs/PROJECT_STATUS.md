@@ -1,15 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-30 (session 178). **Full content audit.**
+_Last updated: 2026-07-30 (session 178). **Content audit, then the first two fixes from it.**
 `docs/reports/CONTENT_AUDIT_2026-07-30.md` measures coverage, quality, real-world usage frequency and
-fitness for B1–C1 across all 3,896 content items. Verdict: **structurally excellent, pedagogically
-lopsided.** Hygiene is rare (100% provenance, 0 fact-gate errors on 1,366 nouns, 99.4% clean
-sentences, 20/20 themes generating the full exercise menu), but five gaps dominate: **C1 is a level
-with no content behind it**; the bank is **79% nouns** with no verb morphology or valency; **texts are
-90 words** against 300-450 at exam level; the **Sprechen + Prüfung content is off the nav**; and
-**54% of vocabulary is rarer than "häufig"**. Two live defects found (a translation MCQ that can
-render the same option twice, and two duplicate word pairs). Docs-only; ranked P1-P10 backlog in §5
-of the report. Prior s177: **Complaint response pack 2, cleaning-service focus.** A
+fitness for B1-C1 across all 3,896 content items. Verdict: **structurally excellent, pedagogically
+lopsided.** Then P0 and P2 of its backlog shipped. **P0:** a quiz could render the same option twice
+(one of them the answer), because distractors were filtered by id and 5 English glosses collided
+inside a theme; two words shipped twice (`der Reisepass`, `der Konferenzraum`); CO2 was spelled two
+ways, one of them unreachable for a learner who types it. All fixed and gated. **P2:** all 234 verbs
+now have Partizip II, auxiliary, Präteritum and separability in the generated
+`src/data/verbForms.ts`, derived from a vendored dictionary oracle rather than typed by hand.
+Displaying them on a card is a founder pick: `preview/verb-forms-card.html`, variants A-D.
+Prior s177: **Complaint response pack 2, cleaning-service focus.** A
 second founder-supplied word field for answering a written complaint, framed around a
 Reinigungsservice customer relationship, was audited against the live banks (including the s176 pack
 it overlaps with): about 90 of ~150 requested items were already shipped, **60 are now in** (38
@@ -79,8 +80,8 @@ session engine, Bibliothek views, the game layer, content conventions) is in `do
 in `../CLAUDE.md`).
 
 **Content banks (as of 2026-07-30, session 178, measured against the live banks — re-verify with
-`pnpm lint:content` before quoting):** vocab **1,743** (1,735 browsable; 8 mis-filed noun+verb combos
-retired from the Wörter surface in s142, ids kept) · collocations **1,072** · Redemittel **158** ·
+`pnpm lint:content` before quoting):** vocab **1,743** (**1,733 browsable**; 8 mis-filed noun+verb combos
+retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** · Redemittel **158** ·
 grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** (108 checks) · writing tasks **643** in 20
 pools · Can-Do **52** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
 provenance **3,273 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
@@ -125,64 +126,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 177 (2026-07-28). Complaint response pack 2 (cleaning-service focus): 60 new
-items.** Branch `claude/complaint-response-vocab-cwlqvj`.
-Founder supplied a second B2/C1 word field for answering a written complaint, this one framed around
-a **Reinigungsservice** (cleaning-service) customer relationship: referring to the complaint,
-apologising, naming problems and causes, staff-shortage vocabulary, taking action, giving assurance,
-future improvements, customer-service nouns, formal closings, plus its own "high-frequency verbs /
-nouns / connectors" glossary sections.
-- **Audited against the s176 pack first, not just the live banks.** The two word fields overlap
-  heavily (both are "answering a complaint" business German), so the real risk was re-adding items
-  session 176 already shipped. Loaded `vocabulary` / `collocations` / `redemittel` through Vite
-  (same `ssrLoadModule` approach as s176; a `de:`/`full:` regex misses most one-line entries) and
-  checked every item, including the three glossary sections, against it. **~90 of the ~150 requested
-  items were already covered** (`bezüglich`, `hinsichtlich`, `in Bezug auf`, `aufgrund`, `infolge`,
-  `entstehen`, `auftreten`, `vorkommen`, `verursachen`, `Beschwerde`, `Beanstandung`, `Mangel`,
-  `Vorfall`, `Verzögerung`, `Unannehmlichkeit`, `Personalengpass überbrücken`, `Verständnis haben
-  für`, `Maßnahmen ergreifen`, `alles daransetzen`, `um Entschuldigung bitten`, `sich aufrichtig
-  entschuldigen` …). **60 new items.**
-- **Split by the bank rules, same as s176.** 38 Wörter (the cause set `sich ereignen/feststellen/
-  sich ergeben/beeinträchtigen/hervorrufen/auslösen/führen zu`, the staffing set `Personalmangel/
-  Personalengpass/Krankheitsfall/Ersatzpersonal/Reinigungspersonal/die Mitarbeitenden/das Personal/
-  die Fachkraft`, the customer-facing set `Dienstleistung/Service/Reinigung/Räumlichkeiten/Objekt/
-  betreuen/einsetzen/einstellen`, and connectors `wegen/bedingt durch/verursacht durch/künftig/
-  zukünftig/krankheitsbedingt/vorübergehend`); 18 Kollokationen for the idioms (`Bezug nehmen auf`,
-  `jemanden auf etwas aufmerksam machen`, `sein Bedauern ausdrücken/aussprechen`, `um Verständnis
-  bitten`, `es kommt zu etwas`, `eine Beschwerde geht ein`, `den Ablauf beeinträchtigen`,
-  `Ersatzpersonal einsetzen`, `zusätzliches Personal einstellen`, `kurzfristig Ersatz organisieren`,
-  `den Vorfall untersuchen`, `den Sachverhalt prüfen`, `Verbesserungen umsetzen`, `Mitarbeitende
-  schulen`, `Qualitätskontrollen durchführen`, `Maßnahmen treffen`, `Ihre Räumlichkeiten betreuen`);
-  4 Redemittel (`r_mail19`-`r_mail22`, category `emails`, for the two closing lines the s176 pack
-  had not covered plus the formal `Sollten Sie …` conditional-inversion opener).
-- **`das Reinigungspersonal` and `die Reinigung` are `sectors: ["cleaning"]`**, the only two items
-  tagged to the founder's own industry; every other item (staffing shortages, assurance language,
-  formal closings) stays untagged/universal, since that vocabulary applies to any service business
-  answering a complaint, not just cleaning. The app already ships a sizeable `cleaning`-sector pack
-  (`v_reinigungskraft`, `v_gebaeudereinigung`, `v_reinigungsplan` …); this adds the missing base
-  nouns (`die Reinigung`, `das Reinigungspersonal`) without duplicating the trade-specific compounds.
-- **Verbs that only ever appear inside one idiom stayed out of the Wörter list** (`untersuchen`,
-  `schulen`, `organisieren`'s new object, `der Sachverhalt`), matching how s176 left `ergreifen`,
-  `schaffen`, `nachgehen` etc. collocation-only. Verbs the founder listed in a dedicated
-  "High-Frequency B2 Business Verbs" glossary (`betreuen`, `einsetzen`, `einstellen`, `untersuchen`,
-  `analysieren`, `mitteilen`, `verhindern`, `dafür sorgen`) got standalone entries instead, since a
-  founder-authored glossary section is itself a request for reusable vocabulary, not just collocation
-  filler.
-- **`verify:cefr` flags 2 of the new items** (`v_sich_ergeben`, `v_verursacht_durch`, both claimed
-  C1 against a B1.1 raw-frequency score). Kept as labelled, same reasoning as the 8 flags in s176:
-  the check scores corpus frequency, not formal register, and both are ordinary in *spoken* German
-  while distinctly formal/written in this business sense. Warn-only by design.
-- **Gates:** lint:content ✔ (1,743 vocab · 1,072 collocations · 158 Redemittel · 3,273 provenance) ·
-  build:frequency-subset + build:frequency (regenerated; `wordfreq` needed a fresh `pip install` in
-  this sandbox) · build:oracles + verify:facts ✔ 0 gate errors, all 8 new-item signals are
-  "not covered" (no oracle entry for a compound/rare word), none is a real mismatch · build ·
-  check:bundle 123.2 kB · lint 0 errors (75 warnings, unchanged) · test:unit 370/370 ·
-  report:exercise-coverage (20/20 green) · build:review-queue.
-- **Next for this content:** `draft` like everything else; lands in the `/admin/pruefen` review
-  queue. No writing prompt, Can-Do or text was added, so exercise coverage is unchanged.
-- **Shipped:** **PR #755**, squash-merged as `cbacc98`. Post-merge housekeeping done: branch reset
-  onto `main`, working tree clean.
-
 **Handoff after session 178 (2026-07-30). Full content audit: coverage, quality, real-world
 frequency, fitness for B1–C1.** Branch `claude/app-content-audit-92sgh1`.
 Founder asked for a detailed audit of the app's content. Report:
@@ -226,6 +169,64 @@ bank or code change.** The verdict in one line: *structurally excellent, pedagog
   implemented: the founder decides what to spend content effort on. The three open founder rejects
   (`v_ansprechpartner`, `v_bedenken`, `v_scope_creep`) are still unresolved in the bank.
 - **Gates:** `lint:content` clean (banks untouched). No build/test run needed: docs-only.
+
+**Handoff after session 178, part 2 (2026-07-30). Audit P0 + P2 shipped; P2's display and P1 await a
+founder pick.** Branch `claude/app-content-audit-92sgh1`.
+Founder: "start one working with p0-p2 items". Three commits on top of the audit.
+- **P0, two learner-visible defects, both gated so they cannot return.**
+  (1) A quiz could show the same option twice, one of them the answer: `translationQ` and the cloze,
+  listening-cloze, collocation-fill and matching builders filtered distractors by `id` only, while 5
+  English glosses collided INSIDE one theme (`deadline` = v_frist + v_deadline, plus business trip /
+  user interface / evacuation / health insurance card). Option assembly now dedupes on the rendered
+  LABEL (`mcqOptions`, `distinctPairs` in `engine/quiz.ts`) and degrades to a shorter option list
+  rather than an ambiguous question. (2) Two words shipped twice: `der Reisepass` as v_ausweis_pass +
+  v_reisepass and `der Konferenzraum` as v_konferenz_raum + v_konferenzraum_hotel (same theme, same
+  level, same pron), each giving a learner two SRS cards for one word; the weaker of each pair is
+  retired. **Note the id `v_ausweis_pass` reads like "der Ausweis" but its headword always was "der
+  Reisepass"**; `der Personalausweis` is a separate, correct entry.
+  Fixed at the source too: the 5 glosses now carry the real nuance, a missing comma in
+  `v_monatskarte`, and `Samstag Vormittag` -> `Samstagvormittag`.
+  **CO2 is now ASCII everywhere, overruling the LanguageTool suggestion on purpose:** the bank shipped
+  both spellings and `normalizeTyped`/the fuzzy search normalizer strip the subscript, so a learner
+  typing "CO2-Ausstoß" was graded WRONG against "CO₂-Ausstoß" and could not find it by search.
+  New linter gates: duplicate headwords (erroring only when the gloss or theme matches too, so real
+  homonyms like `der Empfang` warn instead), same-theme gloss collisions, and any subscript digit in a
+  typed or searched field. `tests/quizOptions.test.ts` pins the engine with a SYNTHETIC colliding pair,
+  verified to fail against the old assembly (the bank-wide assertions alone passed either way, since
+  fixing the data removed the trigger).
+- **P2, all 234 verbs now have the forms needed to PRODUCE them.** Nouns have carried article + plural
+  since day one; verbs carried nothing. New generated `src/data/verbForms.ts` (Partizip II, auxiliary,
+  Präteritum, `separable`, zu-infinitive), built by `pnpm build:verbs-subset` (vendors an oracle from
+  `german-verbs-dict`, MIT, LanguageTool upstream, the same family as the existing noun oracle) then
+  `pnpm build:verb-forms`. Generated rather than authored because a wrong Partizip II teaches an error
+  a learner repeats for years: 225 of 234 are dictionary-attested, 9 come from the regular weak
+  paradigm and are marked `source: "rule"`.
+  **Four upstream defects had to be corrected, each with a rule, all caught by spot-checking output:**
+  empty stubs (`aufrechterhalten` is `{}`) short-circuited the particle rule; `hasPrefix` is not always
+  set, so separability is now read off the participle's internal ge- (teilgenommen splits,
+  unterschrieben does not), fixing "teilnahm" -> "nahm teil"; a corrupt strong variant of the
+  `bereiten` family gave "beritt vor", so a weak participle now forces a weak Präteritum ("bereitete
+  vor"); and pre-1996 ß spellings ("faßte zusammen" -> "fasste zusammen"), decided by the participle's
+  own spelling rather than by guessing vowel length.
+  **The auxiliary is the one hand-maintained field** (no open lexicon carries it): 14 sein-verbs are
+  listed in the generator with a reason each, defaulting to haben, which is correct for every
+  transitive and every reflexive so an omission fails safe. That surfaced a real content error:
+  `v_sich_ereignen`'s prose claimed "Perfect with 'sein'", but a reflexive always takes haben. Fixed,
+  and the linter now cross-checks prose against the structured auxiliary. Coverage is an ERROR, not a
+  warning. `tests/verbForms.test.ts` adds 7 checks (participle endings, no fused separable Präteritum,
+  paradigm consistency, post-1996 spelling, reflexive-implies-haben, 8 spot-checked forms).
+- **Awaiting the founder, nothing blocked on code:** the verb forms are **inert until they appear on a
+  card**, and that is design work, so `preview/verb-forms-card.html` offers **variants A-D** (one foot
+  pill where a noun's "Pl.:" sits · two pills · pill + full list on the flip side · plus a separability
+  dot in the headword), built from the real tokens and the real `VocabList.tsx` geometry, published as
+  an artifact. Pick one and it gets implemented exactly.
+- **NOT started: P1 (C1 has no content).** It is the biggest hole (0 C1 grammar topics, 0 C1 texts,
+  0 C1 Can-Dos behind a level onboarding offers) and it is a content-authoring project, not a fix.
+  Recommended shape when it starts: 4 C1 grammar topics none of which exist yet (Konzessiv- und
+  Restriktivkonnektoren, Passiversatzformen, subjektive Modalverben, Modalpartikeln), 6 texts at
+  300-400 words (which also starts P3, since today's median text is 90 words), 5 C1 Can-Dos.
+- **Gates (all three commits):** lint:content clean (1 warning, the deliberate `der Empfang` homonym) ·
+  build · typecheck · lint 0 errors · test:unit **384/384** · check:bundle 123.2 kB of 400 kB.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
