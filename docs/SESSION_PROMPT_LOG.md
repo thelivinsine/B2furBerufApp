@@ -2501,3 +2501,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   (s178 part-1 handoff aged into the W31 archive) ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · `docs/reports/*` (generated) ·
   `src/features/admin/reviewQueue.json` (generated) · this log · commit `c781864`
+
+- **Prompt 5 (verbatim, 2026-07-30):** `document the session and merge everything`
+- **Response summary:** Closed out session 178 and shipped it. The per-prompt entries above were
+  already written as each piece landed (prompts 1-4), so this pass verified rather than re-wrote
+  them, added this entry, and opened the PR into `main` covering all nine commits: the audit itself,
+  P0 (the two live defects plus their linter gates), P2 (the generated verb-forms map, its two
+  build scripts and the variant-C card display) and P1 (the C1 slice). Squash-merged, then the
+  branch was reset onto `main` per the post-merge housekeeping rule.
+  **Session 178 in one line:** an audit that found the content structurally excellent and
+  pedagogically lopsided, followed by the top three items of its own backlog.
+  **What a learner sees differently after this session:** a quiz can no longer show the same option
+  twice; two words no longer appear twice in the Wörter list with two SRS cards each; every verb card
+  now carries `Perf.: hat verschoben` where a noun carries its plural, with the full forms on the flip
+  side; and a learner who picks C1 at onboarding now meets 4 grammar topics, 6 reading texts of
+  305-344 words and 5 milestones instead of the B2 app under a different label.
+  **What the session deliberately did NOT do:** implement any of P3-P10, restore the Anwenden nav
+  entry (a founder decision from 2026-07-13, not mine to undo), or flip any content to `verified`.
+- **Artifacts (prompt 5):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md` · **PR #757**
