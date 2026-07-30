@@ -2424,3 +2424,31 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `docs/areas/COMMANDS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log ·
   commits `b8df93f`, `63d0e4f`, `6138801`
+
+- **Prompt 4 (verbatim, 2026-07-30):** `i like variant c`
+- **Response summary:** Implemented variant C exactly (`22015fc`), per the `/design` rule that a pick is
+  built to the pixel. Front foot: `Perf.: hat verschoben` in the SAME slot and with the same styling as
+  the shipped `Pl.: die Termine` pill, so the foot row became "this word's inflection" per part of
+  speech instead of a noun-only feature; a word with neither still right-aligns the speak button. Back:
+  the inflection repeated in full, mirroring the existing `Plural: …` line, as a compact `dl` grid of
+  Präteritum · Perfekt · mit zu · trennbar with each row present only when the data has it. Checked
+  `FlipCard` before committing to the taller back face: both faces sit in ONE grid cell, so the tile
+  sizes to the taller one and nothing clips (the back Card is `overflow-hidden`, so this mattered).
+  New `src/lib/verbDisplay.ts` holds `perfekt()`, converting the stored infinitive auxiliary into the
+  citation form a learner actually says ("haben" -> "hat verschoben", "sein" -> "ist entstanden",
+  "haben/sein" -> "hat/ist gependelt"), so the generated file stays a plain fact table.
+  **One deliberate deviation from the approved preview, flagged rather than slipped in:** the row reads
+  **Perfekt**, not "Partizip II". "hat verschoben" is the Perfekt; the bare Partizip II is "verschoben".
+  The preview label was imprecise for a language app and a learner thinks in tenses. The preview file
+  was updated to match so preview and implementation cannot disagree later; trivially revertible if the
+  founder prefers the original wording.
+  Verified by rendering rather than by eye: 4 new tests in `tests/components.test.tsx` assert the
+  Perfekt pill, "ist" for a sein-verb, the separable verb's detached Präteritum ("stimmte ab", never
+  "abstimmte") plus its zu-infinitive and trennbar row, and that a noun card is untouched. Also
+  re-rendered the implemented shape in headless Chromium and compared it against the approved preview.
+  `docs/areas/BIBLIOTHEK.md` gained a "Wörter card" section documenting the anatomy, since none existed.
+  **Gates:** lint:content clean · build · typecheck · lint 0 errors · test:unit 388/388 ·
+  check:bundle 123.2 kB of 400 kB.
+- **Artifacts (prompt 4):** `src/features/vocabulary/VocabList.tsx` · `src/lib/verbDisplay.ts` (new) ·
+  `tests/components.test.tsx` · `preview/verb-forms-card.html` · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/PROJECT_STATUS.md` · this log · commit `22015fc`

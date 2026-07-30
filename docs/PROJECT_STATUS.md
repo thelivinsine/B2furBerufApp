@@ -215,18 +215,24 @@ Founder: "start one working with p0-p2 items". Three commits on top of the audit
   and the linter now cross-checks prose against the structured auxiliary. Coverage is an ERROR, not a
   warning. `tests/verbForms.test.ts` adds 7 checks (participle endings, no fused separable Präteritum,
   paradigm consistency, post-1996 spelling, reflexive-implies-haben, 8 spot-checked forms).
-- **Awaiting the founder, nothing blocked on code:** the verb forms are **inert until they appear on a
-  card**, and that is design work, so `preview/verb-forms-card.html` offers **variants A-D** (one foot
-  pill where a noun's "Pl.:" sits · two pills · pill + full list on the flip side · plus a separability
-  dot in the headword), built from the real tokens and the real `VocabList.tsx` geometry, published as
-  an artifact. Pick one and it gets implemented exactly.
+- **The card display shipped mid-session: founder picked variant C** from
+  `preview/verb-forms-card.html` (A-D were one foot pill · two pills · pill + full list on the flip
+  side · plus a separability dot). Implemented exactly: front foot shows `Perf.: hat verschoben` in the
+  SAME slot and styling as `Pl.: die Termine`, so that row is now "this word's inflection" per part of
+  speech; the back repeats it in full as a compact Präteritum · Perfekt · mit zu · trennbar grid, each
+  row only when the data has it. `FlipCard` stacks both faces in one grid cell, so the tile grows to the
+  taller face and nothing clips. New `src/lib/verbDisplay.ts` turns the stored infinitive auxiliary into
+  the citation form ("hat verschoben" / "ist entstanden" / "hat/ist gependelt").
+  **One deliberate deviation from the approved preview, flagged to the founder:** the row reads
+  **Perfekt**, not "Partizip II", because "hat verschoben" IS the Perfekt and the bare participle is
+  "verschoben"; easy to revert if they prefer the preview's wording.
 - **NOT started: P1 (C1 has no content).** It is the biggest hole (0 C1 grammar topics, 0 C1 texts,
   0 C1 Can-Dos behind a level onboarding offers) and it is a content-authoring project, not a fix.
   Recommended shape when it starts: 4 C1 grammar topics none of which exist yet (Konzessiv- und
   Restriktivkonnektoren, Passiversatzformen, subjektive Modalverben, Modalpartikeln), 6 texts at
   300-400 words (which also starts P3, since today's median text is 90 words), 5 C1 Can-Dos.
-- **Gates (all three commits):** lint:content clean (1 warning, the deliberate `der Empfang` homonym) ·
-  build · typecheck · lint 0 errors · test:unit **384/384** · check:bundle 123.2 kB of 400 kB.
+- **Gates (all four commits):** lint:content clean (1 warning, the deliberate `der Empfang` homonym) ·
+  build · typecheck · lint 0 errors · test:unit **388/388** · check:bundle 123.2 kB of 400 kB.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
