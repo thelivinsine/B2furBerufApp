@@ -1424,6 +1424,8 @@ async function main() {
     const verif = await load("/src/data/verification.ts").catch(() => ({ verification: {} }));
     // Generated frequency map (pnpm build:frequency) — optional as well.
     const freq = await load("/src/data/frequency.ts").catch(() => ({ frequency: {} }));
+    // Generated verb morphology (pnpm build:verb-forms) — optional as well.
+    const vforms = await load("/src/data/verbForms.ts").catch(() => ({ verbForms: {} }));
     // ID-rename registry (shipped-ids-are-permanent contract) — optional.
     const renames = await load("/src/lib/idRenames.ts").catch(() => ({ ID_RENAMES: {} }));
     data = {
@@ -1447,6 +1449,7 @@ async function main() {
       chapters: miss.chapters,
       verification: verif.verification ?? {},
       frequency: freq.frequency ?? {},
+      verbForms: vforms.verbForms ?? {},
       idRenames: renames.ID_RENAMES ?? {},
     };
   } finally {
@@ -1522,6 +1525,54 @@ async function main() {
       error("frequency", id, "frequency entry for unknown content_id (regenerate: pnpm build:frequency)");
     if (!FREQUENCIES.includes(entry?.bin))
       error("frequency", id, `invalid frequency bin "${entry?.bin}"`);
+  }
+
+  /* Generated verb-morphology integrity (pnpm build:verb-forms).
+   *
+   * Three things can rot here. A dangling key means the map is stale after a
+   * content change. A verb with NO entry means the surface silently shows no
+   * Partizip II, which is the whole point of the map, so coverage is a gate
+   * rather than a warning. And an entry on a non-verb is a category error.
+   *
+   * The fourth check is the interesting one: several `context` notes state the
+   * auxiliary in prose ("Perfect with 'sein'"), which is an unlintable claim
+   * until the auxiliary exists as data. Now that it does, the two must agree.
+   * This caught a real error: `sich ereignen` claimed sein, but a reflexive verb
+   * always takes haben. */
+  const VERB_AUX = ["haben", "sein", "haben/sein"];
+  const vocabById = new Map(data.vocabulary.map((v) => [v.id, v]));
+  for (const [id, entry] of Object.entries(data.verbForms)) {
+    const item = vocabById.get(id);
+    if (!item) {
+      error("verbForms", id, "entry for unknown content_id (regenerate: pnpm build:verb-forms)");
+      continue;
+    }
+    if (item.pos !== "verb")
+      error("verbForms", id, `entry for a non-verb (pos=${item.pos}); verb morphology belongs to verbs only`);
+    if (!isStr(entry?.partizip2))
+      error("verbForms", id, "missing partizip2");
+    if (!VERB_AUX.includes(entry?.aux))
+      error("verbForms", id, `invalid aux "${entry?.aux}" (expected ${VERB_AUX.join(" | ")})`);
+  }
+  for (const v of data.vocabulary) {
+    if (v.pos !== "verb" || data.retiredVocabIds.has(v.id)) continue;
+    if (!data.verbForms[v.id])
+      error(
+        "verbForms",
+        v.id,
+        `verb "${v.de}" has no Partizip II. Run pnpm build:verbs-subset && pnpm build:verb-forms; if the oracle does not cover it, extend the particle list or the weak-verb fallback in scripts/build-verbs-subset.mjs.`,
+      );
+  }
+  for (const v of data.vocabulary) {
+    if (v.pos !== "verb" || !isStr(v.context)) continue;
+    const claimsSein = /Perfect with 'sein'|Perfekt mit .sein./i.test(v.context);
+    const claimsHaben = /Perfect with 'haben'|Perfekt (?:takes|mit) .haben./i.test(v.context);
+    const aux = data.verbForms[v.id]?.aux;
+    if (!aux) continue;
+    if (claimsSein && aux === "haben")
+      error("verbForms", v.id, `context prose says the Perfekt takes "sein" but the auxiliary map says "haben". One of them is wrong (a reflexive verb always takes haben).`);
+    if (claimsHaben && aux === "sein")
+      error("verbForms", v.id, `context prose says the Perfekt takes "haben" but the auxiliary map says "sein".`);
   }
 
   // Em-dash sweep across every user-facing string in every bank

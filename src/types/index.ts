@@ -184,6 +184,37 @@ export interface VocabItem {
   sectors?: WorkSector[];
 }
 
+/* ---------------- Verb morphology (generated) ---------------- */
+
+/** Which auxiliary a verb takes in the Perfekt. `haben/sein` = both attested. */
+export type VerbAux = "haben" | "sein" | "haben/sein";
+
+/** How a set of forms was obtained, so the surface never has to trust a guess
+ *  the same as an attested fact. Absent = attested by the vendored dictionary. */
+export type VerbFormSource = "rule" | "mixed";
+
+/**
+ * The forms a B1-C1 learner needs to PRODUCE a verb, as opposed to recognising
+ * it: nouns have carried `article` + `plural` since day one, while verbs carried
+ * nothing (s178 content audit, P2). Served by the generated `src/data/verbForms.ts`
+ * and keyed by vocabulary id, never authored by hand on a `VocabItem`, because
+ * every form has to be traceable to the oracle.
+ */
+export interface VerbForms {
+  /** Partizip II, the form the Perfekt is built from ("verschoben"). */
+  partizip2: string;
+  aux: VerbAux;
+  /** Third person singular Präteritum, split for a separable verb ("nahm teil"). */
+  praeteritum?: string;
+  /** True when the prefix detaches ("er stimmt sich ab"). */
+  separable?: boolean;
+  /** Infinitive with zu ("abzustimmen"), which is where separability shows up. */
+  zuInfinitiv?: string;
+  /** Further attested participles ("versandt" / "versendet"). */
+  variants?: string[];
+  source?: VerbFormSource;
+}
+
 export type RedemittelCategory =
   | "suggestions"
   | "agree"
