@@ -914,3 +914,44 @@ the shape of the mistake is repeatable.
    ("with a secondary account, it redirects me to landing page") was a profile-restore symptom, not
    an authentication one. Ask what is on screen and where the learner ends up BEFORE re-reading the
    file you just edited.
+
+## s180 · A filter that "prefers" is not a filter
+
+The founder picked Textsorte "Forumsbeitrag" and got a Beschwerde an eine Fluggesellschaft. The
+selector had two kinds of axis and only one of them was honest.
+
+1. **Untagged-=-universal is a claim about the CONTENT, not a convenience.** It is true of Branche
+   ("besprechen" really does apply to every industry) and false of Niveau and Textsorte (an untagged
+   task is not "every level", and it is certainly not "every Textsorte"). s167 had already written
+   that distinction down and implemented it as *prefer tagged, else fall back to untagged, else keep
+   everything*, which is the same fallback wearing a different name. With 373 of 643 tasks untagged,
+   the fallback fired on most themes: 84% of the pool under "Alle Themen + Forumsbeitrag"
+   contradicted the filter. **A soft axis is a preference; a hard axis is a filter. Never implement
+   one with the other's code path.**
+2. **Two counting functions meant two answers to one question.** The rail counted Niveau/Textsorte
+   with `countExact` (no fallback, honest) while the trainer drew with the fallback, so the option
+   said 14 and the pool held 85. That is the exact rail-vs-engine split s167 fixed for Branche,
+   reintroduced on the next axis. There is now ONE function, `countTasks`, and it is definitionally
+   the draw pool. **If a count and a draw can disagree, they eventually will.**
+3. **The order of a hard and a soft axis is part of the semantics.** Branche used to narrow first, so
+   its preference could hide the only task carrying the chosen Textsorte. Soft axes apply LAST, over
+   whatever the hard ones left. This also preserves the older invariant "Branche never empties a
+   pool" for free: a preference cannot change emptiness.
+4. **"No scope is ever empty" was the wrong invariant to defend.** It is what forced the fallback in
+   the first place. Kurz + Forumsbeitrag genuinely has no task, and the honest answer is to say so
+   and name the one filter to drop (`blockingAxis`), not to serve a Notiz under a Forumsbeitrag
+   label. The escape hatches are the never-disabled generic "Alle …" option, the empty state's
+   button, and the rail reset. Where a fallback exists, its callers stop being able to tell "here is
+   your thing" from "here is something else".
+5. **A regression test that asserts `some` pins nothing.** `tests/writingScope.test.ts` checked that
+   a Textsorte scope contained *at least one* matching task, which was true throughout the bug's
+   whole life. It asserts EVERY task now, over every format and both lengths, and a rendered-trainer
+   test draws 20 times per scope. **For a filter, the assertion is always "nothing else got in".**
+6. **A dropdown option that can never yield anything is not a zero-yield option.** `bewerbung` had
+   sat in the rail at 0 since s167 because the list was hand-kept. Scope-dependent zeros grey out
+   with an honest count (they teach: "exists, but not at this length"); a value the bank has never
+   had is dead chrome, so the option list is derived from the bank and returns by itself.
+7. **A coarse label must match by band, not by one of its halves.** The option labelled "B2" matched
+   the tag `B2.1` with `===`, so the first `B2.2` task authored would have been silently unreachable
+   from the UI *and* excluded from every Niveau filter. Matching goes through `levelBand`. The same
+   sloppiness had the C1 option labelled "C1.1", a band `lib/cefr.ts` does not define.

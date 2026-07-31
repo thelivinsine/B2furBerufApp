@@ -17,9 +17,14 @@ import {
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import {
+  blockingAxis,
+  countTasks,
   eligibleTasks,
+  levelBand,
+  normalizeLevelScope,
   randomTask,
   taskAt,
+  type ScopeAxis,
   type WritingTaskRef,
 } from "@/lib/writingScope";
 import { SECTOR_OPTIONS } from "@/lib/facets";
@@ -43,6 +48,7 @@ import {
   useCorrectionDiff,
   type CorrectionViewMode,
 } from "./correction";
+import { EmptyState } from "@/components/shared/misc";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -74,6 +80,16 @@ const rangeByLength: Record<WritingLength, [number, number]> = {
 };
 
 /**
+ * The Ziel range a task's own word target implies. Rounded UP to a full ten,
+ * because a target is an orientation, not a measurement: `150 x 1.25` printed
+ * "Ziel 150–188 Wörter" on the card, which reads like a computed number the
+ * learner is supposed to hit exactly.
+ */
+function targetRange(words: number): [number, number] {
+  return [words, Math.ceil((words * 1.25) / 10) * 10];
+}
+
+/**
  * Desktop resting height of the writing field, `max(min, share x viewport)`
  * (founder s168 follow-up: filling a whole desktop window "looks odd"). Kurz is
  * deliberately shorter than Lang, in proportion to what each one asks for, and
@@ -101,11 +117,53 @@ function isThemeId(v: string | null): v is ThemeId {
   return !!v && themes.some((t) => t.id === v);
 }
 
+/**
+ * Why this scope has no Aufgabe, in the learner's words. The Kurz/Lang case is
+ * worth naming exactly: a Textsorte that exists at the OTHER length is not
+ * missing, it is somewhere else, and saying so is more useful than "nothing
+ * here".
+ */
+function emptyReason({
+  blocking,
+  format,
+  level,
+  themeScope,
+  sub,
+  sector,
+  length,
+}: {
+  blocking: ScopeAxis | null;
+  format: string;
+  level: string;
+  themeScope: ThemeId | "";
+  sub: string;
+  sector: string;
+  length: WritingLength;
+}): string {
+  if (blocking === "format") {
+    const elsewhere = countTasks({
+      theme: themeScope,
+      sub,
+      sector,
+      level,
+      format,
+      length: length === "short" ? "long" : "short",
+    });
+    if (elsewhere > 0)
+      return `${writingFormatLabel(format)} gibt es nur bei ${length === "short" ? "Lang" : "Kurz"}.`;
+    return `Zu ${writingFormatLabel(format)} gibt es hier keine Aufgabe.`;
+  }
+  if (blocking === "level") return `Auf Niveau ${level} gibt es hier keine Aufgabe.`;
+  if (blocking === "sub") return "Zu diesem Unterthema gibt es hier keine Aufgabe.";
+  return "Diese Filter passen zu keiner Aufgabe.";
+}
+
 export function GuidedWritingTrainer({
   length,
   isSignedIn,
   onRequireAuth,
   initialText = "",
+  initialTheme,
   initialPromptIndex,
 }: {
   length: WritingLength;
@@ -117,6 +175,14 @@ export function GuidedWritingTrainer({
     promptIndex?: number;
   }) => void;
   initialText?: string;
+  /**
+   * Theme of the Aufgabe a resumed draft was written against. A PROP, not the
+   * `?theme=` param the hub used to write: pinning the URL scope to the drawn
+   * task silently narrowed a learner who had been on "Alle Themen" to one Thema
+   * they never picked, and the param change also fired the scope-change effect,
+   * which clears the very draft that is being restored.
+   */
+  initialTheme?: ThemeId;
   /** Restores the exact Aufgabe a resumed draft was written against. */
   initialPromptIndex?: number;
 }) {
@@ -134,7 +200,8 @@ export function GuidedWritingTrainer({
   const sub = themeById(themeScope)?.subThemes?.some((s) => s.id === subParam) ? subParam : "";
   const sectorParam = params.get("sector") ?? "";
   const sector = SECTOR_OPTIONS.some((o) => o.value === sectorParam) ? sectorParam : "";
-  const levelParam = params.get("level") ?? "";
+  // A band, and older links carrying "B2.1" normalize into it (writingScope).
+  const levelParam = normalizeLevelScope(params.get("level") ?? "");
   const level = WRITING_LEVELS.some((l) => l.value === levelParam) ? levelParam : "";
   const formatParam = params.get("format") ?? "";
   const format = WRITING_FORMATS.includes(formatParam) ? formatParam : "";
@@ -160,9 +227,13 @@ export function GuidedWritingTrainer({
   const [tipEnglish, setTipEnglish] = useState(false);
   const [saved] = useState(() => (initialText ? null : loadAutosavedDraft(mode)));
 
-  const [drawn, setDrawn] = useState<WritingTaskRef>(() => {
-    if (themeScope && initialPromptIndex != null && initialPromptIndex >= 0)
-      return { theme: themeScope, ix: initialPromptIndex };
+  // Null = this scope has no Aufgabe at all (see `eligibleTasks`); the trainer
+  // says so instead of drawing something the learner did not ask for. A resumed
+  // draft always wins over the scope: the learner's own text outranks a filter.
+  const [drawn, setDrawn] = useState<WritingTaskRef | null>(() => {
+    const resumeTheme = initialTheme ?? (themeScope || undefined);
+    if (resumeTheme && initialPromptIndex != null && initialPromptIndex >= 0)
+      return { theme: resumeTheme, ix: initialPromptIndex };
     if (saved?.theme && saved.promptIndex != null && saved.promptIndex >= 0)
       return { theme: saved.theme, ix: saved.promptIndex };
     return randomTask(eligible);
@@ -198,17 +269,19 @@ export function GuidedWritingTrainer({
   // Persist the draft while it is being written, and hold a live-work claim so
   // the deploy-adoption reload waits until the learner is done (lib/liveWork).
   const persist = () => {
+    if (!drawn) return;
     saveAutosavedDraft({ mode, text, theme: drawn.theme, length, promptIndex: drawn.ix });
   };
   useLiveWork(text.trim().length > 0, `writing:${mode}`, persist);
   useEffect(() => {
+    if (!drawn) return;
     // Debounced: writing is keystroke-heavy and localStorage writes are sync.
     const t = window.setTimeout(
       () => saveAutosavedDraft({ mode, text, theme: drawn.theme, length, promptIndex: drawn.ix }),
       500,
     );
     return () => window.clearTimeout(t);
-  }, [mode, text, length, drawn.theme, drawn.ix]);
+  }, [mode, text, length, drawn]);
 
   // Reset draft + result and draw a fresh random Aufgabe when the task scope
   // (theme, length, Unterthema or Branche) changes, but NOT on mount (so a
@@ -231,39 +304,32 @@ export function GuidedWritingTrainer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeScope, length, sub, sector, level, format]);
 
-  const setTheme = (id: ThemeId | "") => {
+  /**
+   * Scope changes REPLACE the history entry (the ViewSwitcher rule). Pushing
+   * one per dropdown turned the phone's back gesture into "undo my last five
+   * filter taps" instead of "leave Schreiben".
+   */
+  const setScope = (mutate: (p: URLSearchParams) => void) => {
     const p = new URLSearchParams(params);
-    if (id) p.set("theme", id);
-    else p.delete("theme");
-    // A sub-theme belongs to its theme; Branche is a cross-theme context axis
-    // and travels (the Bibliothek rule).
-    p.delete("sub");
-    setParams(p);
+    mutate(p);
+    setParams(p, { replace: true });
   };
-  const setSub = (s: string) => {
-    const p = new URLSearchParams(params);
-    if (s) p.set("sub", s);
-    else p.delete("sub");
-    setParams(p);
-  };
-  const setSector = (s: string) => {
-    const p = new URLSearchParams(params);
-    if (s) p.set("sector", s);
-    else p.delete("sector");
-    setParams(p);
-  };
-  const setLevel = (l: string) => {
-    const p = new URLSearchParams(params);
-    if (l) p.set("level", l);
-    else p.delete("level");
-    setParams(p);
-  };
-  const setFormat = (f: string) => {
-    const p = new URLSearchParams(params);
-    if (f) p.set("format", f);
-    else p.delete("format");
-    setParams(p);
-  };
+  const setTheme = (id: ThemeId | "") =>
+    setScope((p) => {
+      if (id) p.set("theme", id);
+      else p.delete("theme");
+      // A sub-theme belongs to its theme; Branche is a cross-theme context axis
+      // and travels (the Bibliothek rule).
+      p.delete("sub");
+    });
+  const setSub = (s: string) =>
+    setScope((p) => (s ? p.set("sub", s) : p.delete("sub")));
+  const setSector = (s: string) =>
+    setScope((p) => (s ? p.set("sector", s) : p.delete("sector")));
+  const setLevel = (l: string) =>
+    setScope((p) => (l ? p.set("level", l) : p.delete("level")));
+  const setFormat = (f: string) =>
+    setScope((p) => (f ? p.set("format", f) : p.delete("format")));
 
   // The dice: another random Aufgabe within the current scope. Clears the field
   // with it (founder 2026-07-31: "the text I initially wrote is still in the
@@ -282,13 +348,13 @@ export function GuidedWritingTrainer({
   // a fresh random task. When the scopes are already default the URL doesn't
   // change, so the scope-change effect won't fire; roll explicitly here.
   const resetScope = () => {
-    const p = new URLSearchParams(params);
-    p.delete("theme");
-    p.delete("sub");
-    p.delete("sector");
-    p.delete("level");
-    p.delete("format");
-    setParams(p);
+    setScope((p) => {
+      p.delete("theme");
+      p.delete("sub");
+      p.delete("sector");
+      p.delete("level");
+      p.delete("format");
+    });
     const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", level: "", format: "", length });
     setDrawn((cur) => randomTask(fullPool, cur));
     setText("");
@@ -296,7 +362,22 @@ export function GuidedWritingTrainer({
     setRollSpin((d) => d + 180);
   };
 
+  /**
+   * The one-tap way out of a scope with no Aufgabe (Kurz + Forumsbeitrag, a
+   * stale deep link). `blockingAxis` names the single filter that is causing it,
+   * so the escape drops THAT one and keeps everything else the learner chose.
+   */
+  const blocking = drawn ? null : blockingAxis({ theme: themeScope, sub, sector, level, format, length });
+  const relax = () => {
+    if (!blocking) {
+      resetScope();
+      return;
+    }
+    setScope((p) => p.delete(blocking));
+  };
+
   const submit = async () => {
+    if (!drawn) return;
     const body = text.trim();
     setSubmitting(true);
     setResult(null);
@@ -324,6 +405,7 @@ export function GuidedWritingTrainer({
   };
 
   const handleEvaluate = () => {
+    if (!drawn) return;
     if (!isSignedIn) {
       onRequireAuth({ theme: drawn.theme, length, text, promptIndex: drawn.ix });
       return;
@@ -333,14 +415,24 @@ export function GuidedWritingTrainer({
 
   // The eyebrow names the DRAWN task's theme, which under "Alle Themen" is the
   // only place the learner learns what they are writing about.
-  const t = themeById(drawn.theme)!;
-  const task = taskAt(drawn, length);
+  const t = drawn ? themeById(drawn.theme) : undefined;
+  const task = drawn ? taskAt(drawn, length) : undefined;
   const prompt = task?.text ?? "";
   // Word target: per task where the Aufgabe declares one (real exam targets run
   // 40 to 200 and do NOT share one number), else the mode default (s167).
-  const [min, max] = task?.words
-    ? [task.words, Math.round(task.words * 1.25)]
-    : rangeByLength[length];
+  const [min, max] = task?.words ? targetRange(task.words) : rangeByLength[length];
+  /**
+   * The card's meta line: Niveau · Textsorte · Ziel. The Niveau is on it since
+   * the Textsorte fix (2026-07-31), because under "Alle Niveaus" nothing else on
+   * screen said whether the Aufgabe in front of the learner is a B1 or a C1 one.
+   */
+  const taskMeta = [
+    task?.level ? WRITING_LEVELS.find((l) => l.value === levelBand(task.level))?.label : null,
+    task?.format ? writingFormatLabel(task.format) : null,
+    `Ziel ${min}–${max} Wörter`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const enough = words >= Math.floor(min * 0.6);
   const minWords = 5;
   const remaining = Math.max(0, minWords - words);
@@ -384,7 +476,7 @@ export function GuidedWritingTrainer({
     noteRef,
     desktopCap: desktopFieldCap[length],
     fill: !result,
-    revision: `${text}|${length}|${drawn.theme}|${drawn.ix}|${tooShort}|${pickerOpen}|${submitting}|${taskOpen}|${showCorrection}|${view}`,
+    revision: `${text}|${length}|${drawn?.theme}|${drawn?.ix}|${tooShort}|${pickerOpen}|${submitting}|${taskOpen}|${showCorrection}|${view}`,
   });
 
   // The Aufgabe's Adressat + Leitpunkte, shared by the card (capped, animated)
@@ -417,11 +509,9 @@ export function GuidedWritingTrainer({
         <DialogHeader>
           {/* Same eyebrow as the card, so the pop-up reads as the same object. */}
           <DialogTitle className="pr-8 text-xs font-bold uppercase tracking-wide text-primary">
-            Aufgabe: {t.titleDe}
+            Aufgabe: {t?.titleDe}
           </DialogTitle>
-          <DialogDescription className="text-xs">
-            {task?.format ? `${writingFormatLabel(task.format)} · ` : ""}Ziel {min}–{max} Wörter
-          </DialogDescription>
+          <DialogDescription className="text-xs">{taskMeta}</DialogDescription>
         </DialogHeader>
         <p className="text-sm leading-relaxed">{prompt}</p>
         {taskPoints && <div className="space-y-1.5">{taskPoints}</div>}
@@ -469,7 +559,35 @@ export function GuidedWritingTrainer({
     </div>
   );
 
-  const content = (
+  /**
+   * No Aufgabe for this scope. Reachable only where greying cannot help: a
+   * Kurz/Lang switch carrying a length-specific Textsorte, or a stale deep link.
+   * An honest dead end with a one-tap escape, never a task that contradicts the
+   * selection (which is what the old fallback served).
+   */
+  const emptyScope = (
+    <EmptyState
+      icon={Target}
+      title="Keine Aufgabe für diese Auswahl"
+      description={emptyReason({ blocking, format, level, themeScope, sub, sector, length })}
+      action={
+        <Button onClick={relax} variant="gradient">
+          <RotateCcw className="h-4 w-4" />
+          {blocking === "format"
+            ? "Textsorte zurücksetzen"
+            : blocking === "level"
+              ? "Niveau zurücksetzen"
+              : blocking === "sub"
+                ? "Unterthema zurücksetzen"
+                : "Auswahl zurücksetzen"}
+        </Button>
+      }
+    />
+  );
+
+  const content = !drawn || !t ? (
+    emptyScope
+  ) : (
     <div className="space-y-4">
       {/* Aufgabe: eyebrow names the topic, dice draws another random task. */}
       <Card ref={taskCardRef}>
@@ -480,9 +598,7 @@ export function GuidedWritingTrainer({
               <p className="text-xs font-bold uppercase tracking-wide text-primary">
                 Aufgabe: {t.titleDe}
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {task?.format ? `${writingFormatLabel(task.format)} · ` : ""}Ziel {min}–{max} Wörter
-              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{taskMeta}</p>
             </div>
             {/* Two borderless 40px icon buttons (founder s169 follow-up: no box
                 around these). Shuffle left, expand right (founder order): the
@@ -820,7 +936,10 @@ export function GuidedWritingTrainer({
                 `floatingCluster`); FeedbackIconButton is already solid. */}
             <div className="flex items-stretch gap-2">
               <FeedbackIconButton />
-              {result && (
+              {/* Nothing to evaluate while the scope has no Aufgabe: the cluster
+                  keeps its geometry, the button that would only be disabled is
+                  not printed. */}
+              {drawn && result && (
                 <div className={floatingSlot}>
                   <Button
                     variant="outline"
@@ -832,9 +951,11 @@ export function GuidedWritingTrainer({
                   </Button>
                 </div>
               )}
-              <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
-                {evaluateButton}
-              </div>
+              {drawn && (
+                <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
+                  {evaluateButton}
+                </div>
+              )}
             </div>
           </div>
           {/* The KI line is locked just above the nav in EVERY state, exactly

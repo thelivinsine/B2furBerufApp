@@ -532,6 +532,65 @@ offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the lab
   code scopes by `themeId` throughout, so nothing shipped was wrong. Lesson for future banks: a
   `tx_c1_*` id is fine, but never assert content scope through an id prefix.
 
+
+**Handoff after session 179, parts 1 to 3 (2026-07-31).** _(Archived from `PROJECT_STATUS.md` in session 180.)_
+
+**Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
+English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
+Schreiben trainers.
+- **"+6 weitere" was a dead end.** The fix tiles cap at 6 so a long text cannot wall off the card, but
+  the tail had no way back. It is a TOGGLE now (expands to every correction, folds back to "Weniger");
+  the cap only decides what the card opens with. Pinned in `tests/correction.test.tsx`.
+- **The feedback was written for a linguist, not a learner.** "The vocabulary used is way too
+  advanced." Grading level and EXPLAINING level are two different things: a C1 text is still graded at
+  C1, but both prompts now ask for the prose in simple A2 German (short main sentences, everyday
+  words, an example from the learner's own text, and an explicit ban on "Aufgabenerfüllung",
+  "Inhaltspunkt", "Adressat", "Konnektor", "Umformulierung" and friends), plus the SAME sentence in
+  equally simple English. `PROMPT_REV` (evaluate-writing) and `PROMPT_VERSION` (transform-sentence)
+  were bumped so neither cache can serve prose written under the old wording. The templated spelling
+  verdict was rewritten by hand to the same standard, and the one jargon line under the tip
+  ("Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen") became plain German.
+- **A DE/EN switch on every AI feedback text**, `src/features/writing/FeedbackLang.tsx`: the Kurz/Lang
+  Tipp, every Verlauf row, and the Fokus Hinweis (which gave up its hold-to-peek `EnPeek` for it).
+  Deliberately STICKY, unlike `EnPeek`: a tip is a paragraph of instruction and nobody reads a
+  paragraph with a finger held down. `EnPeek` stays the pattern for LEARNING content (word cards,
+  Grammatik lessons). The chip only appears when an English version exists, so nothing renders dead.
+- **Shuffle clears the editor now** (founder, reversing the older "a mis-tap must not destroy work"
+  rule): a new Aufgabe means a new text. The rail reset and the scope-change redraw already cleared,
+  so all three paths finally agree.
+- **Migration 0014 (`writing_evaluations.insight_en`) is APPLIED** (2026-07-31, by CI, see the
+  part-4 handoff below). The read and the write still step down through the optional column, so a
+  database without it degrades rather than breaks.
+- **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
+  plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
+
+
+**Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
+`claude/ui-layout-buttons-cards-zkchha`.
+Founder, from the Fokus trainer: "when generating new umformen with AI, there's no count like
+(2 left out of 3). Even for korrigieren, there is no count. Check the documentation on what we
+agreed on and implement it neatly." The agreement was already law (s167 + the 2026-07-25 prompt):
+**Fokus 10 Korrekturen · Kurz 4 · Lang 2 per day**, one Korrektur = one unit, its Umformung free.
+It was only ever ENFORCED, never shown, so the first a learner knew of it was "komm morgen wieder".
+- **`Heute noch 7 von 10` beside the button that spends it**, in all three trainers: Fokus under the
+  Korrigieren row (desktop and mobile), Kurz/Lang under the umlaut keys sharing one line with the
+  transient "Noch N Wörter" hint (hint left, allowance right). The mobile caption slot stays the
+  Art. 50 note, per the s169 lock.
+- **The number is the server's, not a guess.** `check-sentence` and `evaluate-writing` now return
+  `dailyLimit`/`dailyRemaining` on every response (success, cache hit and limit-reached alike), so a
+  limit raised via a Supabase secret shows up in the UI by itself. Before the first call of the day
+  `src/lib/aiAllowance.ts` counts the learner's own rows over the SAME tables and the SAME UTC day
+  boundary the functions count. When neither is available it renders nothing rather than a number it
+  cannot stand behind. A cache hit in Kurz/Lang is free and correctly does NOT move the counter.
+- **"Nochmal" counts its own phrasings: `2 von 3 übrig`.** Those are the NEW AI phrasings left for
+  the current target form; cycling back to an already-generated one is cached and free, so it does
+  not count down, and a different target form starts a fresh 3.
+- **The two Edge Functions ship themselves**: `.github/workflows/supabase.yml` deploys every function
+  on merge to `main`, so this needs no founder action. Until that run finishes the UI falls back to
+  the row count, which is already correct.
+- **Gates:** typecheck · lint 0 errors · test:unit **396/396** (two new suites:
+  `tests/aiAllowance.test.ts`, `tests/fokusVariants.test.tsx`) · build · check:bundle 123.2 kB.
+
 **Handoff after session 179 (2026-07-31). Bibliothek card grids and the floating toolbar.** Branch
 `claude/ui-layout-buttons-cards-zkchha`. Founder, from a screenshot of the Wörter Karten view: the
 view-button row has a blur background and should be completely transparent so the buttons look like

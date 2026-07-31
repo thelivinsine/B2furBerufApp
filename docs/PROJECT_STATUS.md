@@ -1,6 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-31 (session 179). **Bibliothek card grids, the floating toolbar, and the AI
+_Last updated: 2026-07-31 (session 180). **The Schreiben Aufgabe filters now mean what they say.**
+Picking a Textsorte or a Niveau used to PREFER its tagged tasks and fall back to the untagged ones,
+so "Forumsbeitrag" drew a Beschwerde an eine Fluggesellschaft: 84% of that scope's pool contradicted
+the filter while the rail printed the honest count beside the option. Both axes filter hard now, one
+counting rule serves the rail and the draw, zero-yield options grey out, and a genuinely empty scope
+(Kurz + Forumsbeitrag) gets an honest empty state with a one-tap escape instead of a substitute task.
+Prior s179: **Bibliothek card grids, the floating toolbar, and the AI
 feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
 switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
 Shuffle clears the editor. **Migrations now apply themselves on merge** (the founder set
@@ -144,6 +150,46 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
+`claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
+Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and
+necessary improvements with the Aufgabe feature."
+- **Root cause: Niveau and Textsorte were never really filters.** `eligibleTasks` narrowed them
+  prefer-tagged-else-untagged, the rule that is right for Branche. 373 of the 643 tasks carry no
+  `format`, so on every theme without a tagged task the fallback swallowed the filter, and where even
+  the untagged set was empty the filter was dropped entirely. Measured on the shipped bank: under
+  "Alle Themen + Forumsbeitrag" the draw pool was 85 tasks of which **71 were not Forumsbeiträge**
+  (84%), and the rail printed the honest count, 14, right beside the option. Every Textsorte was
+  wrong between 66% and 100% of the time. **Both axes filter hard now**, and the order is
+  Unterthema → Niveau → Textsorte → Branche (the soft axis last, so it can never hide the only task
+  matching a hard one). `countExact` is gone: one hard rule means the rail count and the draw pool
+  are one number.
+- **A scope can now legitimately be empty, and the trainer says so.** Every dropdown greys its
+  zero-yield options with the count still visible; where greying cannot help (a Kurz/Lang switch
+  carrying a length-specific Textsorte, a stale deep link) the Aufgabe card is replaced by
+  "Forumsbeitrag gibt es nur bei Lang." plus the one-tap "Textsorte zurücksetzen" that `blockingAxis`
+  picks. `randomTask` returns null for an empty list instead of the first task of the first theme.
+- **Five smaller faults fixed in the same pass.** `bewerbung` was a permanently empty dropdown option
+  (0 tasks at either length, since s167), so the Textsorte list is derived from the bank now. The
+  Niveau option labelled "B2" matched the tag `B2.1` exactly, which would have made the first `B2.2`
+  task silently unreachable; it matches by BAND, and "C1.1" is labelled "C1" like everywhere else.
+  The Ziel line printed `words x 1.25` unrounded ("Ziel 150–188 Wörter") and never named the Niveau;
+  it is "B2 · Bericht · Ziel 150–190 Wörter" now. Every scope change pushed a history entry, so the
+  phone's back gesture undid filter taps one at a time. Fokus and Verlauf kept `?level`/`?format`
+  alive after a tab switch.
+- **The sign-in draft hand-off lost the text on the email/password path.** `initialText` is read once
+  on mount, and signing in from the login wall does not remount the trainer when the learner is
+  already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
+  resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
+  which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
+- **Not fixed, founder's call:** 373 of 643 tasks still carry no `level`/`format`/`points`, so the
+  DEFAULT scope draws a bare one-line legacy Aufgabe 58% of the time, and those degrade the AI to
+  language-only feedback (no Aufgabenerfüllung). Either tag the bank in waves or make the default
+  draw prefer structured tasks. `bericht` at C1 (1 task) and `bewerbung` (0) are the thinnest cells.
+- **Gates:** typecheck · lint 0 errors · test:unit **407/407** (new `tests/writingAufgabe.test.tsx`
+  renders the trainer and pins 20 consecutive draws per scope) · lint:content clean · build ·
+  check:bundle 123.2 kB.
+
 **Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
 were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
 Founder: "can you apply the migration in supabase yourself? I remember we setup something for this
@@ -171,61 +217,6 @@ and the failure was worth having.
   dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
 - **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
   wherever its number sits.
-
-**Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
-English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
-Schreiben trainers.
-- **"+6 weitere" was a dead end.** The fix tiles cap at 6 so a long text cannot wall off the card, but
-  the tail had no way back. It is a TOGGLE now (expands to every correction, folds back to "Weniger");
-  the cap only decides what the card opens with. Pinned in `tests/correction.test.tsx`.
-- **The feedback was written for a linguist, not a learner.** "The vocabulary used is way too
-  advanced." Grading level and EXPLAINING level are two different things: a C1 text is still graded at
-  C1, but both prompts now ask for the prose in simple A2 German (short main sentences, everyday
-  words, an example from the learner's own text, and an explicit ban on "Aufgabenerfüllung",
-  "Inhaltspunkt", "Adressat", "Konnektor", "Umformulierung" and friends), plus the SAME sentence in
-  equally simple English. `PROMPT_REV` (evaluate-writing) and `PROMPT_VERSION` (transform-sentence)
-  were bumped so neither cache can serve prose written under the old wording. The templated spelling
-  verdict was rewritten by hand to the same standard, and the one jargon line under the tip
-  ("Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen") became plain German.
-- **A DE/EN switch on every AI feedback text**, `src/features/writing/FeedbackLang.tsx`: the Kurz/Lang
-  Tipp, every Verlauf row, and the Fokus Hinweis (which gave up its hold-to-peek `EnPeek` for it).
-  Deliberately STICKY, unlike `EnPeek`: a tip is a paragraph of instruction and nobody reads a
-  paragraph with a finger held down. `EnPeek` stays the pattern for LEARNING content (word cards,
-  Grammatik lessons). The chip only appears when an English version exists, so nothing renders dead.
-- **Shuffle clears the editor now** (founder, reversing the older "a mis-tap must not destroy work"
-  rule): a new Aufgabe means a new text. The rail reset and the scope-change redraw already cleared,
-  so all three paths finally agree.
-- **Migration 0014 (`writing_evaluations.insight_en`) is APPLIED** (2026-07-31, by CI, see the
-  part-4 handoff below). The read and the write still step down through the optional column, so a
-  database without it degrades rather than breaks.
-- **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
-  plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
-
-**Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
-`claude/ui-layout-buttons-cards-zkchha`.
-Founder, from the Fokus trainer: "when generating new umformen with AI, there's no count like
-(2 left out of 3). Even for korrigieren, there is no count. Check the documentation on what we
-agreed on and implement it neatly." The agreement was already law (s167 + the 2026-07-25 prompt):
-**Fokus 10 Korrekturen · Kurz 4 · Lang 2 per day**, one Korrektur = one unit, its Umformung free.
-It was only ever ENFORCED, never shown, so the first a learner knew of it was "komm morgen wieder".
-- **`Heute noch 7 von 10` beside the button that spends it**, in all three trainers: Fokus under the
-  Korrigieren row (desktop and mobile), Kurz/Lang under the umlaut keys sharing one line with the
-  transient "Noch N Wörter" hint (hint left, allowance right). The mobile caption slot stays the
-  Art. 50 note, per the s169 lock.
-- **The number is the server's, not a guess.** `check-sentence` and `evaluate-writing` now return
-  `dailyLimit`/`dailyRemaining` on every response (success, cache hit and limit-reached alike), so a
-  limit raised via a Supabase secret shows up in the UI by itself. Before the first call of the day
-  `src/lib/aiAllowance.ts` counts the learner's own rows over the SAME tables and the SAME UTC day
-  boundary the functions count. When neither is available it renders nothing rather than a number it
-  cannot stand behind. A cache hit in Kurz/Lang is free and correctly does NOT move the counter.
-- **"Nochmal" counts its own phrasings: `2 von 3 übrig`.** Those are the NEW AI phrasings left for
-  the current target form; cycling back to an already-generated one is cached and free, so it does
-  not count down, and a different target form starts a fresh 3.
-- **The two Edge Functions ship themselves**: `.github/workflows/supabase.yml` deploys every function
-  on merge to `main`, so this needs no founder action. Until that run finishes the UI falls back to
-  the row count, which is already correct.
-- **Gates:** typecheck · lint 0 errors · test:unit **396/396** (two new suites:
-  `tests/aiAllowance.test.ts`, `tests/fokusVariants.test.tsx`) · build · check:bundle 123.2 kB.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
