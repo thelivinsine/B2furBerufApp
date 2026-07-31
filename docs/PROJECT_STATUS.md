@@ -108,7 +108,9 @@ in `../CLAUDE.md`).
 `pnpm lint:content` before quoting):** vocab **1,743** (**1,733 browsable**; 8 mis-filed noun+verb combos
 retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** · Redemittel **158** ·
 grammar **28 topics / 137 drills** (17 groups) · Lese-/Hörtexte **42** (126 checks) · writing tasks **643** in 20
-pools · Can-Do **57** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
+pools, of which **270 are SERVED** (s180: only a task carrying the full exam brief is drawn; the
+other 373 are retired one-liners, ids kept, and each returns when it is authored up to the shape) ·
+Can-Do **57** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
 provenance **3,308 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
 einkaufen/essen/mobilitaet/freizeit/digitales). Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
@@ -207,6 +209,13 @@ necessary improvements with the Aufgabe feature."
 - **Gates:** typecheck · lint 0 errors · test:unit **410/410** (new `tests/writingAufgabe.test.tsx`
   renders the trainer: 20 consecutive draws per scope obey the filter, and 30 default draws all carry
   an Adressat, Leitpunkte and a Niveau) · lint:content clean · build · check:bundle 123.2 kB.
+- **Shipped as two PRs, both squash-merged and deployed green** (`Validate content` + `Deploy site to
+  GitHub Pages` success on each): **#766** the filter fix, **#768** the fully-briefed-Aufgaben rule.
+- **Next session, if the founder wants the gaps closed:** the authoring list is in
+  `docs/areas/CONTENT.md` (Bewerbung has no task at any length, 15 of 46 Unterthemen have none at
+  each length, `bericht` at C1 has one). Authoring one task into the full shape makes its whole
+  Niveau x Textsorte x Unterthema cell selectable, so the greyed zeros in the rail are the progress
+  bar for that work. Load the `/content` skill first.
 
 **Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
 were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
