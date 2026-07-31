@@ -2866,3 +2866,40 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   into the branch twice mid-session as #765 and #767 landed, so nothing was written against a stale
   base.
 - **Artifacts (prompt 5):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 181 (2026-07-31) - branch `claude/latest-plan-steps-ydumbt`
+
+- **Prompt 1 (verbatim, 2026-07-31):** `what's steps are to do in the latest plan?`
+  **Response:** read the plan set and answered with the open items rather than a summary of finished
+  work. The latest plan with anything left in it is `docs/plans/SCHREIBEN-OVERHAUL.md`: P0/P1/P2 and
+  content wave 2 shipped in s167, leaving **wave 3** (Alltag formal apparatus, plus the per-genre
+  Branche decision), **wave 4** (the five Beruf Themen without Branche variants, and B1 breadth),
+  **P0 item 3** (obtain the Goethe/telc/BAMF source PDFs) and the **§12 verification items** (seven
+  exam facts that may not be hard-coded from secondary sources). On top of it sits the s180 handoff's
+  authoring backlog, which the "only fully briefed Aufgaben are served" decision made visible as the
+  greyed zeros in the Aufgabe rail: `bewerbung` at zero everywhere, 15 of 46 Unterthemen empty at each
+  length, `bericht` at C1 with one task.
+- **Artifacts (prompt 1):** none (question answered from the repo)
+- **Prompt 2 (verbatim, 2026-07-31):** `complete the full implementation of both these plans`
+  **Follow-up in the same turn (verbatim):** `ask me questions if unclear on any important points`
+  **Response:** measured the bank first (643 tasks, 270 servable, 373 bare; 30 of 92 Unterthema x
+  Länge cells empty; 13 Niveau x Textsorte cells empty; `project`/`sustainability`/`travel` with no
+  Branche variants at all), then asked three questions the plans genuinely left open and built to the
+  answers: **Niveau mix** → B1-heavy, then B2, thin C1; **where `bewerbung` lives** → under Bildung,
+  both sub-themes; **Alltag Branche** → tag every Alltag task (against the plan's own recommendation,
+  so each tag was made to earn its place: the work context is the REASON the everyday task is hard,
+  Schichtdienst gegen Behörden-Öffnungszeiten and so on, never a name-drop).
+  Delivered waves 3 and 4 and the whole rail backlog in one pass: **all 373 bare tasks authored up to
+  the exam shape in place** (same ids, same pool positions, so drafts and Verlauf still resolve),
+  **74 new tasks**, **60 existing tasks tagged**, bank **643 → 717, every task servable**. Coverage
+  now gated in `tests/writingScope.test.ts`: ≥2 tasks per Unterthema per length, all 15 Branchen on
+  all 10 Beruf Themen AND all 10 Alltag Themen at both lengths, all 16 Textsorten live (`bewerbung`
+  included). Niveau landed B1 307 / B2 302 / C1 108; the B1 share sits above the 35% target because
+  Kurz tasks are genuinely B1 and were not retagged to hit a number. One deliberate zero remains,
+  C1 + E-Mail (privat), which has no exam analogue. **Not done, and reported rather than worked
+  around:** §12 and P0.3 need primary exam documents that cannot be acquired from a session, and telc
+  material may not be copied at all under `strategy/DATA_GOVERNANCE.md`.
+  Gates: typecheck · lint:content clean · test:unit **413/413** · build · check:bundle 123.2 kB.
+- **Artifacts (prompt 2):** `src/data/writingPrompts.ts` (717 tasks) · `src/lib/writingScope.ts`
+  (docstring) · `tests/writingScope.test.ts` · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` · `docs/PROJECT_STATUS.md` · this log

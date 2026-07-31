@@ -81,8 +81,10 @@ after pulling.
   prefer-tagged-else-untagged fallback these replaced made "Forumsbeitrag" serve a Beschwerde 84% of
   the time (s180). Related founder law: **only a task carrying the full brief is served** (Adressat,
   du/Sie, 2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung
-  against it; the 373 bare legacy tasks are retired from the draw, never from the bank, and the zeros
-  they leave in the rail ARE the content backlog, not a bug to paper over.
+  against it. The 373 bare legacy tasks that law retired were all authored up to that shape in s181
+  (waves 3 and 4), in place and keeping their ids: **717 tasks, every one servable**, with ≥2 tasks
+  per Unterthema per length, all 15 Branchen on every Beruf AND Alltag theme at both lengths, and all
+  16 Textsorten live. `tests/writingScope.test.ts` gates each of those, so they are invariants now.
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments
