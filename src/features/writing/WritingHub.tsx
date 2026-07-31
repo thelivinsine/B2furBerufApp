@@ -46,11 +46,11 @@ export function WritingHub() {
     const p = new URLSearchParams(params);
     if (t === "fokus") p.delete("mode");
     else p.set("mode", t);
-    // Switching surface drops stale guided-flow scopes (theme/sub/Branche).
+    // Switching surface drops EVERY stale guided-flow scope. Niveau and
+    // Textsorte used to survive into Fokus and Verlauf, where nothing reads
+    // them, and came back the next time the learner opened Kurz or Lang.
     if (t === "fokus" || t === "verlauf") {
-      p.delete("theme");
-      p.delete("sub");
-      p.delete("sector");
+      for (const key of ["theme", "sub", "sector", "level", "format"]) p.delete(key);
     }
     setParams(p);
   };
@@ -80,6 +80,16 @@ export function WritingHub() {
   // After sign-in, restore the in-progress draft where the learner left off (the
   // learner presses the action again themselves, so no surprise auto-evaluation).
   const [resumePromptIndex, setResumePromptIndex] = useState<number | undefined>(undefined);
+  const [resumeTheme, setResumeTheme] = useState<ThemeId | undefined>(undefined);
+  /**
+   * Bumped on every consumed resume, and part of the trainer's key. The
+   * trainer reads `initialText` once, on mount, and signing in from the login
+   * wall does NOT remount it when the tab is already the draft's own tab (the
+   * email/password path: no page reload, `mode` unchanged). The draft was
+   * therefore restored only after the Google round trip and silently dropped
+   * otherwise. Remounting is also what makes the restored Aufgabe stick.
+   */
+  const [resumeKey, setResumeKey] = useState(0);
   useEffect(() => {
     if (!isSignedIn) return;
     const draft = loadWritingDraft();
@@ -90,11 +100,16 @@ export function WritingHub() {
       p.delete("theme");
     } else {
       p.set("mode", draft.mode === "lang" ? "lang" : "kurz");
-      if (draft.theme) p.set("theme", draft.theme);
     }
     setParams(p, { replace: true });
     setResumeText(draft.text);
     setResumePromptIndex(draft.promptIndex);
+    // The Aufgabe's theme travels as a PROP, not as `?theme=`: writing the
+    // param pinned a learner who had been on "Alle Themen" to the one Thema
+    // their draft happened to be drawn from, and the scope change it caused
+    // cleared the draft on the way in.
+    setResumeTheme(draft.theme);
+    setResumeKey((k) => k + 1);
     clearWritingDraft();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSignedIn]);
@@ -166,10 +181,12 @@ export function WritingHub() {
               />
             ) : (
               <GuidedWritingTrainer
+                key={`guided-${resumeKey}`}
                 length={lengthOf(tab)}
                 isSignedIn={isSignedIn}
                 onRequireAuth={requireAuthGuided}
                 initialText={resumeText}
+                initialTheme={resumeTheme}
                 initialPromptIndex={resumePromptIndex}
               />
             )}

@@ -3,8 +3,9 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { domains } from "@/data/domains";
+import { writingPrompts } from "@/data/writingPrompts";
 import { SECTOR_OPTIONS } from "@/lib/facets";
-import { countExact, countTasks } from "@/lib/writingScope";
+import { countTasks } from "@/lib/writingScope";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { cn } from "@/lib/utils";
@@ -22,17 +23,23 @@ import { cn } from "@/lib/utils";
  * folds into Alltag** in the Thema grouping (founder rule).
  */
 
-/** Niveau options: the three levels the Schreiben module targets (founder
- *  s167). `ContentCefr` is the shared content band, so B2 spans B2.1/B2.2 and
- *  the coarse label is what the learner picks. */
+/**
+ * Niveau options: the three levels the Schreiben module targets (founder s167).
+ * The VALUE is the coarse band, not one half of it: `ContentCefr` splits B1 and
+ * B2 in two, and matching a scope of "B2.1" exactly meant an option labelled
+ * "B2" quietly excluded every B2.2 task (none today, invisible breakage the day
+ * content adds one). `writingScope.levelBand` does the matching, and the C1
+ * label is "C1", not the old "C1.1", which named a band `lib/cefr.ts` does not
+ * have.
+ */
 export const WRITING_LEVELS: { value: string; label: string }[] = [
-  { value: "B1.2", label: "B1" },
-  { value: "B2.1", label: "B2" },
-  { value: "C1", label: "C1.1" },
+  { value: "B1", label: "B1" },
+  { value: "B2", label: "B2" },
+  { value: "C1", label: "C1" },
 ];
 
 /** Textsorte options, grouped by family so a 16-value list stays scannable. */
-const FORMAT_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+const ALL_FORMAT_GROUPS: { label: string; options: { value: string; label: string }[] }[] = [
   {
     label: "E-Mail & Nachricht",
     options: [
@@ -71,8 +78,28 @@ const FORMAT_GROUPS: { label: string; options: { value: string; label: string }[
   },
 ];
 
+/**
+ * Only the Textsorten the bank can actually serve. A zero-yield option greys
+ * out with an honest count where the zero depends on the scope ("Forumsbeitrag"
+ * under Kurz says: exists, just not here), but a Textsorte with no task at ANY
+ * length is dead chrome, and `bewerbung` had been sitting in the list at 0
+ * since s167. Derived, so it reappears by itself the day a Bewerbung task ships.
+ */
+const FORMATS_IN_BANK = new Set(
+  themes.flatMap((t) =>
+    (["short", "long"] as const).flatMap((len) =>
+      (writingPrompts[t.id]?.[len] ?? []).map((task) => task.format).filter(Boolean),
+    ),
+  ) as string[],
+);
+
+const FORMAT_GROUPS = ALL_FORMAT_GROUPS.map((g) => ({
+  ...g,
+  options: g.options.filter((o) => FORMATS_IN_BANK.has(o.value)),
+})).filter((g) => g.options.length > 0);
+
 const FORMAT_LABEL: Record<string, string> = Object.fromEntries(
-  FORMAT_GROUPS.flatMap((g) => g.options).map((o) => [o.value, o.label]),
+  ALL_FORMAT_GROUPS.flatMap((g) => g.options).map((o) => [o.value, o.label]),
 );
 
 /** Valid Textsorte values, for URL-param validation in the trainer. */
@@ -184,11 +211,18 @@ function ScopeSelect({
         )}
       >
         <span className="min-w-0 flex-1 truncate">{opt.label}</span>
-        {opt.count != null && !opt.disabled && (
+        {/* The count stays on a greyed option (founder rule: zero-yield options
+            grey out with HONEST counts). Hiding it made "unavailable" and
+            "nothing here for your other filters" look identical. */}
+        {opt.count != null && (
           <span
             className={cn(
               "shrink-0 text-xs tabular-nums",
-              selected ? "text-primary/70" : "text-muted-foreground",
+              selected
+                ? "text-primary/70"
+                : opt.disabled
+                  ? "text-muted-foreground/40"
+                  : "text-muted-foreground",
             )}
           >
             {opt.count}
@@ -274,6 +308,12 @@ export function WritingRail({
   // counted only sector-TAGGED tasks and greyed out at zero, which contradicted
   // the untagged-=-universal rule and made most Branchen look unavailable while
   // the engine would have served the full pool behind them.
+  //
+  // Since the Textsorte fix (2026-07-31) that really is ONE rule: Niveau and
+  // Textsorte filter hard, so their honest counts no longer need a second
+  // counting function, and the four scope-dependent axes all grey out at zero
+  // instead of only two of them. Only the generic "Alle ..." option is never
+  // disabled: it is the way back out of a scope that yields nothing.
   const countWith = (
     over: Partial<{
       theme: ThemeId | "";
@@ -283,12 +323,6 @@ export function WritingRail({
       format: string;
     }>,
   ) => countTasks({ theme: value, sub, sector, level, format, length, ...over });
-
-  // Niveau and Textsorte count WITHOUT the fallback and grey out at zero: they
-  // are not universal axes, so an option that would silently serve a different
-  // Textsorte must read as unavailable rather than as a match.
-  const countExactWith = (over: Partial<{ level: string; format: string }>) =>
-    countExact({ theme: value, sub, sector, level, format, length, ...over });
 
   const sectionLabel = "text-xs font-semibold uppercase tracking-wide text-muted-foreground";
 
@@ -312,7 +346,7 @@ export function WritingRail({
               options: [
                 { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
                 ...WRITING_LEVELS.map((l) => {
-                  const count = countExactWith({ level: l.value });
+                  const count = countWith({ level: l.value });
                   return { value: l.value, label: l.label, count, disabled: count === 0 };
                 }),
               ],
@@ -335,11 +369,13 @@ export function WritingRail({
               label: "",
               options: [
                 { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
-                ...SECTOR_OPTIONS.map((o) => ({
-                  value: o.value,
-                  label: o.label,
-                  count: countWith({ sector: o.value }),
-                })),
+                // Branche is the soft axis, so its count is zero only when the
+                // Niveau/Textsorte above already left nothing: it cannot empty
+                // a pool by itself, and it still never disables on its own.
+                ...SECTOR_OPTIONS.map((o) => {
+                  const count = countWith({ sector: o.value });
+                  return { value: o.value, label: o.label, count, disabled: count === 0 };
+                }),
               ],
             },
           ]}
@@ -363,11 +399,10 @@ export function WritingRail({
             },
             ...GROUPS.map((g) => ({
               label: g.domain.titleDe,
-              options: g.list.map((t) => ({
-                value: t.id,
-                label: t.titleDe,
-                count: countWith({ theme: t.id, sub: "" }),
-              })),
+              options: g.list.map((t) => {
+                const count = countWith({ theme: t.id, sub: "" });
+                return { value: t.id, label: t.titleDe, count, disabled: count === 0 };
+              }),
             })),
           ]}
         />
@@ -416,7 +451,7 @@ export function WritingRail({
             ...FORMAT_GROUPS.map((g) => ({
               label: g.label,
               options: g.options.map((o) => {
-                const count = countExactWith({ format: o.value });
+                const count = countWith({ format: o.value });
                 return { value: o.value, label: o.label, count, disabled: count === 0 };
               }),
             })),

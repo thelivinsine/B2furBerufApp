@@ -1,8 +1,10 @@
 import { describe, it, expect } from "vitest";
 import {
-  countExact,
+  blockingAxis,
   countTasks,
   eligibleTasks,
+  levelBand,
+  normalizeLevelScope,
   randomTask,
   sameTask,
   taskText,
@@ -11,6 +13,7 @@ import {
 import { writingPrompts } from "@/data/writingPrompts";
 import { themes } from "@/data/themes";
 import { SECTOR_OPTIONS } from "@/lib/facets";
+import { WRITING_FORMATS } from "@/features/writing/WritingRail";
 import type { ThemeId } from "@/types";
 
 const LENGTHS = ["short", "long"] as const;
@@ -140,8 +143,15 @@ describe("eligibleTasks", () => {
   });
 });
 
-describe("Niveau and Textsorte axes (s167)", () => {
-  const LEVELS = ["B1.2", "B2.1", "C1"];
+describe("Niveau and Textsorte axes (s167, hard since 2026-07-31)", () => {
+  const LEVELS = ["B1", "B2", "C1"];
+  const FORMATS = [
+    ...new Set(
+      THEME_IDS.flatMap((id) =>
+        LENGTHS.flatMap((len) => writingPrompts[id][len].map((t) => t.format)),
+      ).filter((f): f is NonNullable<typeof f> => !!f),
+    ),
+  ];
 
   it("every Niveau yields tasks under every Thema and length", () => {
     for (const length of LENGTHS) {
@@ -155,59 +165,103 @@ describe("Niveau and Textsorte axes (s167)", () => {
     }
   });
 
-  it("REGRESSION: a Niveau filter serves ONLY that level where tagged tasks exist", () => {
+  it("REGRESSION: a Niveau filter serves ONLY that level", () => {
     // Untagged-=-universal is right for Branche but wrong here: legacy tasks
-    // outnumber tagged ones ~10:1, so admitting them made a C1.1 scope serve a
-    // B1 task. Every theme now has a tagged task at every level, so the filter
-    // must be exact.
+    // outnumber tagged ones ~10:1, so admitting them made a C1 scope serve a
+    // B1 task.
     for (const length of LENGTHS) {
       for (const level of LEVELS) {
         for (const ref of eligibleTasks({ theme: "", sub: "", sector: "", level, length })) {
           const task = writingPrompts[ref.theme][length][ref.ix];
-          expect(task.level, `${ref.theme}/${length}[${ref.ix}]`).toBe(level);
+          expect(levelBand(task.level), `${ref.theme}/${length}[${ref.ix}]`).toBe(level);
         }
       }
     }
   });
 
-  it("REGRESSION: a Textsorte filter serves that format wherever it exists", () => {
-    for (const format of ["email_formell", "forumsbeitrag", "widerspruch", "bericht"]) {
+  it("REGRESSION: a Textsorte filter serves ONLY that Textsorte, at every length", () => {
+    // The founder bug (2026-07-31): "Forumsbeitrag" drew a Beschwerde an eine
+    // Fluggesellschaft. The old prefer-tagged-else-untagged fallback let every
+    // theme without a tagged task contribute its untagged legacy ones, so 66%
+    // to 100% of the draws under a Textsorte contradicted it while the rail
+    // printed the honest count next to the option. The predecessor of this test
+    // asserted `some`, which is exactly why it survived: assert EVERY.
+    for (const format of FORMATS) {
       for (const length of LENGTHS) {
-        const exists = THEME_IDS.some((id) =>
-          writingPrompts[id][length].some((t) => t.format === format),
-        );
-        const tasks = eligibleTasks({ theme: "", sub: "", sector: "", format, length });
-        expect(tasks.length).toBeGreaterThan(0);
-        if (!exists) continue; // e.g. Forumsbeitrag is a Lang-only Textsorte
-        expect(tasks.some((r) => writingPrompts[r.theme][length][r.ix].format === format)).toBe(
-          true,
-        );
+        for (const ref of eligibleTasks({ theme: "", sub: "", sector: "", format, length })) {
+          const task = writingPrompts[ref.theme][length][ref.ix];
+          expect(task.format, `${format}/${length}: ${task.id}`).toBe(format);
+        }
       }
     }
   });
 
-  it("countExact reports 0 for a Textsorte that does not exist at this length", () => {
-    // Forumsbeitrag is a Lang shape only; the Kurz dropdown must grey it out
-    // instead of quietly serving a Notiz under a Forumsbeitrag label.
-    expect(countExact({ theme: "", sub: "", sector: "", format: "forumsbeitrag", length: "long" }))
-      .toBeGreaterThan(0);
+  it("REGRESSION: every scope draws only from what the rail counted", () => {
+    // The rail count and the draw are one number (`countTasks`), across every
+    // combination of the two hard axes.
+    for (const length of LENGTHS) {
+      for (const format of FORMATS) {
+        for (const level of ["", ...LEVELS]) {
+          const scope = { theme: "" as const, sub: "", sector: "", level, format, length };
+          const tasks = eligibleTasks(scope);
+          expect(countTasks(scope)).toBe(tasks.length);
+          for (const ref of tasks) {
+            const task = writingPrompts[ref.theme][length][ref.ix];
+            expect(task.format).toBe(format);
+            if (level) expect(levelBand(task.level)).toBe(level);
+          }
+        }
+      }
+    }
+  });
+
+  it("a Textsorte that does not exist at this length yields NOTHING", () => {
+    // Forumsbeitrag is a Lang shape only; Kurz must read as unavailable instead
+    // of quietly serving a Notiz under a Forumsbeitrag label.
+    const scope = { theme: "" as const, sub: "", sector: "", format: "forumsbeitrag" };
+    expect(countTasks({ ...scope, length: "long" })).toBeGreaterThan(0);
+    expect(countTasks({ ...scope, length: "short" })).toBe(0);
+  });
+
+  it("blockingAxis names the one filter to drop, and dropping it works", () => {
+    const kurzForum = {
+      theme: "" as const,
+      sub: "",
+      sector: "",
+      format: "forumsbeitrag",
+      length: "short" as const,
+    };
+    expect(blockingAxis(kurzForum)).toBe("format");
+    expect(countTasks({ ...kurzForum, format: "" })).toBeGreaterThan(0);
+    // A scope that yields tasks has nothing to relax.
+    expect(blockingAxis({ ...kurzForum, format: "" })).toBeNull();
+    // Niveau can be the culprit too: no Forumsbeitrag is tagged B1.
     expect(
-      countExact({ theme: "", sub: "", sector: "", format: "forumsbeitrag", length: "short" }),
+      blockingAxis({ theme: "", sub: "", sector: "", level: "B1", format: "forumsbeitrag", length: "long" }),
+    ).toBe("format");
+    expect(
+      countTasks({ theme: "", sub: "", sector: "", level: "B1", format: "forumsbeitrag", length: "long" }),
     ).toBe(0);
   });
 
-  it("countExact never exceeds the fallback count", () => {
+  it("Branche never empties a pool the hard axes left standing", () => {
+    // The soft axis applies LAST and only PREFERS, so choosing a Branche can
+    // narrow a Textsorte scope but never wipe it out.
     for (const length of LENGTHS) {
-      for (const level of LEVELS) {
-        const scope = { theme: "" as const, sub: "", sector: "", level, length };
-        expect(countExact(scope)).toBeLessThanOrEqual(countTasks(scope));
+      for (const format of FORMATS) {
+        const base = countTasks({ theme: "", sub: "", sector: "", format, length });
+        for (const sector of SECTOR_OPTIONS) {
+          const n = countTasks({ theme: "", sub: "", sector: sector.value, format, length });
+          if (base > 0) expect(n, `${format}/${length}/${sector.value}`).toBeGreaterThan(0);
+          else expect(n).toBe(0);
+        }
       }
     }
   });
 
   it("REGRESSION: Niveau + Textsorte together honour BOTH tags", () => {
-    // The exact case caught on screen: C1.1 + Widerspruch under Behörden must
-    // draw the C1 Widerspruch, not an untagged legacy mail.
+    // The exact case caught on screen in s167: C1 + Widerspruch under Behörden
+    // must draw the C1 Widerspruch, not an untagged legacy mail.
     const tasks = eligibleTasks({
       theme: "behoerde",
       sub: "",
@@ -225,14 +279,16 @@ describe("Niveau and Textsorte axes (s167)", () => {
     }
   });
 
-  it("Niveau and Textsorte combine without emptying the pool", () => {
-    for (const length of LENGTHS) {
-      for (const level of LEVELS) {
-        expect(
-          countTasks({ theme: "", sub: "", sector: "", level, format: "email_formell", length }),
-        ).toBeGreaterThan(0);
-      }
-    }
+  it("levels match by BAND, so a B2.2 task answers to B2", () => {
+    expect(levelBand("B2.1")).toBe("B2");
+    expect(levelBand("B2.2")).toBe("B2");
+    expect(levelBand("B1.1")).toBe("B1");
+    expect(levelBand(undefined)).toBeUndefined();
+    // Older deep links carry the fine-grained value.
+    expect(normalizeLevelScope("B2.1")).toBe("B2");
+    expect(normalizeLevelScope("B2")).toBe("B2");
+    expect(normalizeLevelScope("")).toBe("");
+    expect(normalizeLevelScope("nonsense")).toBe("");
   });
 
   it("wave 2: the 5 universal Beruf Themen serve EVERY Branche a dedicated task", () => {
@@ -283,15 +339,41 @@ describe("Niveau and Textsorte axes (s167)", () => {
     for (const length of LENGTHS) {
       for (const id of THEME_IDS) {
         for (const level of LEVELS) {
-          const structured = writingPrompts[id][length].filter((t) => t.level === level);
+          const structured = writingPrompts[id][length].filter(
+            (t) => levelBand(t.level) === level,
+          );
           expect(structured.length, `${id}/${length}/${level}`).toBeGreaterThan(0);
         }
       }
     }
   });
+
+  it("every Textsorte the rail offers exists somewhere in the bank", () => {
+    // A zero that depends on the scope greys out with an honest count; a
+    // Textsorte with no task at ANY length is dead chrome, which is what
+    // `bewerbung` had been since s167. The rail derives its list from the bank
+    // now, so this pins the derivation, not a hand-kept list.
+    for (const format of WRITING_FORMATS) {
+      const n =
+        countTasks({ theme: "", sub: "", sector: "", format, length: "short" }) +
+        countTasks({ theme: "", sub: "", sector: "", format, length: "long" });
+      expect(n, format).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe("randomTask", () => {
+  it("returns null for an empty scope instead of an unrelated task", () => {
+    // It used to hand back the first task of the first theme, which is exactly
+    // the "this Aufgabe has nothing to do with my selection" answer.
+    expect(randomTask([])).toBeNull();
+    expect(
+      randomTask(
+        eligibleTasks({ theme: "", sub: "", sector: "", format: "forumsbeitrag", length: "short" }),
+      ),
+    ).toBeNull();
+  });
+
   it("avoids the excluded task when an alternative exists", () => {
     const list = eligibleTasks({ theme: "meetings", sub: "", sector: "", length: "short" });
     const first = list[0];
