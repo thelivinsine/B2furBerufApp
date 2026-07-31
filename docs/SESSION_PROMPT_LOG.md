@@ -2711,3 +2711,40 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `supabase/functions/evaluate-writing/index.ts` · `supabase/functions/transform-sentence/index.ts` ·
   `supabase/migrations/0014_writing_insight_en.sql` (new) · `tests/feedbackLang.test.tsx` (new) ·
   `tests/correction.test.tsx` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 8 (verbatim, 2026-07-31):** `can you apply the migration in supabase yourself? I remember
+  we setup something for this earlier`
+- **Prompt 9 (verbatim, 2026-07-31):** `I did the option b setup`
+- **Prompt 10 (verbatim, 2026-07-31, mid-turn):** `rename all the queries properly on supabase`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:** Half right: the pipeline from s167 deploys every Edge Function on merge and
+  has always had a migration step, but that step was gated on `SUPABASE_DB_PASSWORD`, which was
+  deliberately unset. Confirmed against the live run for `20df861` (functions deployed, migrations
+  skipped). Offered (A) paste the one line, or (B) add the secret once and never paste SQL again; the
+  founder chose B.
+  **The first real `db push` then failed, and the failure was the valuable part.** The remote had
+  **no migration history at all**: every migration to date was pasted into the SQL editor by hand,
+  which never writes to `supabase_migrations`, so the CLI tried to replay 0001 against a database
+  that already had everything and died on "policy profiles_select_own already exists". Because
+  migrations run before functions, the function deploy was skipped with it.
+  **Nothing was repaired on trust.** A repair marks a version applied and its SQL is then skipped
+  FOREVER, so a dispatch-only **schema probe** (Management API query endpoint) was added first: it
+  printed the live tables, the `progress`/`writing_evaluations` columns, every public function and
+  every RLS policy. That proved 0001-0004, 0006-0009 and 0011-0013 were genuinely present, **and it
+  found a hole nobody knew about: migration 0010 had never been applied.** No `gdpr_events` table, no
+  `log_gdpr_event`, no `admin_gdpr_evidence`, so the GDPR evidence counters on the Launch screen had
+  no store behind them.
+  **The bridge, once:** `repair_applied` marked the eleven verified versions; `db push --include-all`
+  then applied the three unrecorded ones (0005, idempotent and therefore a safe no-op either way;
+  0010, genuinely missing; 0014, the new one). `--include-all` is permanent now, because a repaired
+  history legitimately leaves an older file unrecorded below a newer applied one.
+  **Verified after:** `migration list` reports Local = Remote for all 14 versions, and the probe shows
+  `writing_evaluations.insight_en` and `gdpr_events` both present. From now on a merge to `main`
+  applies pending migrations and then deploys the functions; the founder pastes nothing.
+  Prompt 10 ("rename all the queries") was NOT actioned: it is ambiguous between the SQL-editor
+  snippets in the dashboard (which the public Management API cannot rename, only list) and the
+  migration files (already named), so it was put back to the founder rather than guessed at.
+- **Artifacts (prompts 8-10):** `.github/workflows/supabase.yml` (schema probe, migration-status,
+  history repair, `--include-all`) · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log ·
+  workflow runs 30656541869 (the diagnostic failure), 30657503526 (the push), 30657663298
+  (verification)

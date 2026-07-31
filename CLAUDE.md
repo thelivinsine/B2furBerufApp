@@ -161,12 +161,18 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   `.github/workflows/pages.yml` ships the site, and `.github/workflows/supabase.yml` deploys every
   Supabase Edge Function (and applies migrations first, when `SUPABASE_DB_PASSWORD` is set).
   `validate.yml` is the content-lint + test gate and never deploys.
-- **No CLI is needed for backend changes any more.** The Supabase workflow needs the
-  `SUPABASE_ACCESS_TOKEN` repo secret (set; carries an expiry, and the run fails with an explicit
-  "regenerate it" error when it lapses). `SUPABASE_DB_PASSWORD` is deliberately NOT set, so
-  migrations are skipped in CI and each new migration is pasted into the Dashboard SQL editor.
-  **Keep migrations idempotent** (`add column if not exists`), since a hand-applied one is absent
-  from `schema_migrations` and CI may re-apply it later.
+- **No CLI is needed for backend changes any more, migrations included (s179).** The Supabase
+  workflow needs `SUPABASE_ACCESS_TOKEN` (set; carries an expiry, and the run fails with an explicit
+  "regenerate it" error when it lapses) and, since 2026-07-31, `SUPABASE_DB_PASSWORD` (set), so
+  **a merge to `main` applies pending migrations and then deploys every Edge Function**. Nothing is
+  pasted into the SQL editor any more.
+  **Keep migrations idempotent** (`add column if not exists`, `create table if not exists`,
+  `drop policy if exists` before `create policy`): the push runs `--include-all`, so an unrecorded
+  file is applied wherever its number sits.
+  The workflow also carries three dispatch-only inputs for when something is off:
+  `list_only` (print local vs remote history), `probe_schema` (print the live tables, columns,
+  functions, policies and recorded migrations) and `repair_applied` (mark versions as applied
+  without running them). The s179 bridge from hand-pasted history used all three.
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.

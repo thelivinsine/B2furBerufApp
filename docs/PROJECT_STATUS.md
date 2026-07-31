@@ -3,8 +3,9 @@
 _Last updated: 2026-07-31 (session 179). **Bibliothek card grids, the floating toolbar, and the AI
 feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
 switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
-Shuffle clears the editor. **One founder action: paste `supabase/migrations/0014_writing_insight_en.sql`
-into the Supabase SQL editor** (it stores the English tip so Verlauf keeps it). Also: the AI
+Shuffle clears the editor. **Migrations now apply themselves on merge** (the founder set
+`SUPABASE_DB_PASSWORD`; the hand-pasted history was bridged and two genuinely missing migrations,
+0010 and 0014, were applied), so there is no SQL to paste any more. Also: the AI
 allowances are visible. Each writing trainer now prints "Heute noch 7 von 10" beside the button
 that spends the day's AI budget (Fokus 10 / Kurz 4 / Lang 2), and Fokus "Nochmal" says how many new
 phrasings are left ("2 von 3 übrig"); the numbers come from the Edge Functions themselves. Also: the
@@ -116,11 +117,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       the admin gate is now a user-id table, not an email claim. Live confirmation that `/admin`
       still opens is the founder's last check; the rollback to the 0008 email gate sits in a comment
       at the foot of the migration if it ever does not.
-- [ ] **Paste `supabase/migrations/0014_writing_insight_en.sql`** into the Supabase SQL editor
-      (Dashboard → SQL Editor → paste → Run). One line: it adds the column that stores the ENGLISH
-      version of a writing tip, so the DE/EN switch also works on past entries in Verlauf. Safe to run
-      twice (`add column if not exists`). Until it is run, nothing breaks: fresh tips still switch to
-      English in the moment, older Verlauf rows just show no switch.
+- [x] ~~Paste `supabase/migrations/0014_writing_insight_en.sql` into the SQL editor.~~ **APPLIED
+      2026-07-31 by CI**, along with 0010, after the founder added `SUPABASE_DB_PASSWORD`. Migrations
+      now ship themselves on merge; **there is no SQL to paste any more.**
 - [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
       is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
       `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
@@ -145,6 +144,34 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
+were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
+Founder: "can you apply the migration in supabase yourself? I remember we setup something for this
+earlier" → the pipeline existed (s167) but only ever deployed Edge Functions, because
+`SUPABASE_DB_PASSWORD` was deliberately unset. The founder set it; the first `db push` then FAILED,
+and the failure was worth having.
+- **The remote had NO migration history at all.** Every migration to date was pasted into the SQL
+  editor by hand, which never writes to `supabase_migrations`, so `db push` tried to replay 0001
+  against a database that already had everything and died on "policy profiles_select_own already
+  exists". Because migrations run before functions, the function deploy was skipped with it.
+- **Evidence before repair.** Marking a version applied skips its SQL forever, so nothing was
+  repaired on trust: a dispatch-only **schema probe** (Management API query endpoint) listed the live
+  tables, the `progress`/`writing_evaluations` columns, every public function and every RLS policy.
+  It proved 0001-0004, 0006-0009 and 0011-0013 were present.
+- **It also found a real hole: migration 0010 had never been applied.** No `gdpr_events` table, no
+  `log_gdpr_event`, no `admin_gdpr_evidence`, so the GDPR evidence counters the Launch screen reads
+  had no store behind them. Applied now, along with 0005 (idempotent, so a no-op if it was already
+  there) and 0014.
+- **The bridge, once:** `repair_applied` marked the eleven verified versions, then
+  `db push --include-all` applied the three unrecorded ones. `--include-all` is now permanent,
+  because a repaired history legitimately leaves an older file unrecorded below a newer applied one.
+- **Verified after:** `migration list` shows Local = Remote for all 14, `writing_evaluations.insight_en`
+  exists, `gdpr_events` exists.
+- **From now on a merge to `main` applies pending migrations and then deploys the functions.** Three
+  dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
+- **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
+  wherever its number sits.
+
 **Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
 English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
 Schreiben trainers.
@@ -168,11 +195,9 @@ Schreiben trainers.
 - **Shuffle clears the editor now** (founder, reversing the older "a mis-tap must not destroy work"
   rule): a new Aufgabe means a new text. The rail reset and the scope-change redraw already cleared,
   so all three paths finally agree.
-- **FOUNDER ACTION (one SQL paste):** `supabase/migrations/0014_writing_insight_en.sql` adds
-  `writing_evaluations.insight_en`, which is where the English tip is stored so Verlauf keeps it. CI
-  deploys functions but skips migrations, so paste that one `alter table ... add column if not exists`
-  into the Supabase SQL editor. Everything degrades gracefully until then: the read and the write both
-  step down through the optional column, and the chip simply does not appear.
+- **Migration 0014 (`writing_evaluations.insight_en`) is APPLIED** (2026-07-31, by CI, see the
+  part-4 handoff below). The read and the write still step down through the optional column, so a
+  database without it degrades rather than breaks.
 - **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
   plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
 
@@ -201,48 +226,6 @@ It was only ever ENFORCED, never shown, so the first a learner knew of it was "k
   the row count, which is already correct.
 - **Gates:** typecheck · lint 0 errors · test:unit **396/396** (two new suites:
   `tests/aiAllowance.test.ts`, `tests/fokusVariants.test.tsx`) · build · check:bundle 123.2 kB.
-
-**Handoff after session 179 (2026-07-31). Bibliothek card grids and the floating toolbar.** Branch
-`claude/ui-layout-buttons-cards-zkchha`. Founder, from a screenshot of the Wörter Karten view: the
-view-button row has a blur background and should be completely transparent so the buttons look like
-they float, with enough space above them; and the cards do not have the same dimensions. Follow-up in
-the same session: add a "go to top" button to the bottom right on desktop, where it was missing.
-- **The toolbar row is transparent in every state** (`browseHeaderClass`). It used to fade in a
-  `bg-background/90 backdrop-blur` mask once the page scrolled, which is the blurred band the founder
-  saw. The row now only sticks and collapses; the ViewSwitcher track and the Filter/Bookmark/Search
-  icon buttons carry `shadow-soft` so they lift off the cards moving underneath, and `pt-3` gives the
-  clearance under the app header.
-- **The level-band chip moved out of the sticky row into the content column** (all three tabs that
-  have one). Without a band behind it, a pinned chip printed straight over the card titles.
-- **Every tile in a Karten grid is now the same height, not just per row** (`auto-rows-fr` on the
-  Wörter, Kollokationen, Redemittel and Grammatik grids). `1fr` rows in an auto-height grid resolve to
-  the tallest row, so the size stays content-driven and nothing is clipped: a filtered set of short
-  cards still renders short.
-- **The verb paradigm on the Wörter card back is two label/value pairs per row.** As a single column
-  it ran four rows and made verb tiles the tallest card in the grid, which then set the height for
-  every card. Measured at 1280px: uniform tiles were 209px with the old layout, 189px with the new one,
-  and no back face overflows at either breakpoint (checked by flipping every verb card in the first
-  batch, mobile and desktop).
-- **Card content is vertically centered** on Wörter / Kollokationen / Redemittel. With one height for
-  the whole grid, top-aligned content left a hollow lower half; this was clearest on Redemittel, where
-  a short Wendung sat in a 256px card. Anchored elements stay anchored (the Wörter foot row, the
-  Grammatik pattern chip and foot).
-- **"Nach oben" now has a desktop placement** (`bottom-4 right-4`, clear of the Feedback pill); the
-  centered mobile one above the Üben bar is unchanged. Same 280px show threshold.
-- **Follow-up: the clearance moved from padding into the sticky offset.** `pt-3` applied at rest too
-  and pushed the controls away from the tabs at the top of the page. The 0.75rem now rides
-  `top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]` / `lg:top-[4.75rem]` (repeated in the four
-  trainers' own `lg:sticky` class), which does nothing until the row pins. At rest the tabs-to-buttons
-  gap is back to 24px desktop / 16px mobile; pinned, the buttons sit 12px under the app header.
-- **Follow-up in the same session: the toolbar buttons were half-transparent.** The shared `outline`
-  button variant fills with `bg-surface/50`, which was invisible behind the old blurred band and let
-  card titles print through the buttons once the band went away. Every browse-toolbar icon button now
-  wears one exported constant, `BROWSE_TOOLBAR_BUTTON` (`bg-surface` + `hover:bg-muted` +
-  `shadow-soft`); the global `outline` variant is untouched, since its translucency is wanted
-  elsewhere. Checked by reading the computed background alpha of every control in the row on all four
-  tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
-- **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
-  check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
