@@ -56,6 +56,18 @@ export function browseHeaderClass(hidden: boolean): string {
 }
 
 /**
+ * Classes every icon button in a browse toolbar row wears (Filter, Bookmark,
+ * Search). The row behind them is transparent, so they must be OPAQUE: the
+ * `outline` variant fills with `bg-surface/50` and hovers to `bg-muted/60`, and
+ * at half alpha the card titles scrolling underneath printed straight through
+ * the buttons (founder 2026-07-31, "the buttons are illegible"). `shadow-soft`
+ * is what separates them from the cards instead of a background band. Append
+ * this AFTER the variant classes so the opaque fills win the merge.
+ */
+export const BROWSE_TOOLBAR_BUTTON =
+  "shrink-0 rounded-lg bg-surface shadow-soft hover:bg-muted";
+
+/**
  * Contents for the Bibliothek "Üben" button (founder 2026-07-13): the label is
  * centered in the button and the bolt icon floats to its left without shifting
  * the label off-center. The span is what the button's `justify-center` centers;

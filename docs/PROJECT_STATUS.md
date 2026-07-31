@@ -160,6 +160,13 @@ the same session: add a "go to top" button to the bottom right on desktop, where
   Grammatik pattern chip and foot).
 - **"Nach oben" now has a desktop placement** (`bottom-4 right-4`, clear of the Feedback pill); the
   centered mobile one above the Üben bar is unchanged. Same 280px show threshold.
+- **Follow-up in the same session: the toolbar buttons were half-transparent.** The shared `outline`
+  button variant fills with `bg-surface/50`, which was invisible behind the old blurred band and let
+  card titles print through the buttons once the band went away. Every browse-toolbar icon button now
+  wears one exported constant, `BROWSE_TOOLBAR_BUTTON` (`bg-surface` + `hover:bg-muted` +
+  `shadow-soft`); the global `outline` variant is untouched, since its translucency is wanted
+  elsewhere. Checked by reading the computed background alpha of every control in the row on all four
+  tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
 - **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
   check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
 

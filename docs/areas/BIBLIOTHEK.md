@@ -144,7 +144,11 @@ The toolbar row itself is sticky under the app header and **always fully transpa
 2026-07-31, `browseHeaderClass` in `features/shared/browseScroll.tsx`): the earlier version faded a
 `bg-background/90 backdrop-blur` mask in once the page scrolled, which read as a blurred band across
 the page. The controls carry their own opaque fill plus `shadow-soft` and clear the app header by
-`pt-3`, so they float over the cards passing underneath. Nothing else may be pinned in that row: the
+`pt-3`, so they float over the cards passing underneath. **Opaque is load-bearing:** the toolbar icon
+buttons all wear `BROWSE_TOOLBAR_BUTTON` (exported from `browseScroll.tsx`), because the `outline`
+variant fills with `bg-surface/50` and hovers to `bg-muted/60`, and at half alpha the card titles
+scrolling behind printed straight through the buttons (founder 2026-07-31, "the buttons are
+illegible"). Any control added to this row needs a full-alpha fill. Nothing else may be pinned in that row: the
 level-band `ActiveFilterChip` moved into the content column, since a chip with no band behind it
 lands on top of the card titles.
 

@@ -27,7 +27,14 @@ import {
 import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
-import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
+import {
+  useScrollDirection,
+  browseHeaderClass,
+  ScrollTopButton,
+  UebenLabel,
+  BROWSE_TOOLBAR_BUTTON,
+} from "@/features/shared/browseScroll";
+import { cn } from "@/lib/utils";
 import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
@@ -410,7 +417,7 @@ export function CollocationsBrowser() {
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className="relative shrink-0 rounded-lg shadow-soft lg:hidden"
+                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
@@ -452,7 +459,7 @@ export function CollocationsBrowser() {
                   aria-expanded={searchOpen}
                   aria-label="Suche"
                   title="Suche"
-                  className="shrink-0 rounded-lg shadow-soft"
+                  className={BROWSE_TOOLBAR_BUTTON}
                   onClick={() =>
                     setSearchOpen((o) => {
                       if (o) setSearch("");
