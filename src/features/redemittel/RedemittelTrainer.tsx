@@ -151,11 +151,16 @@ export function RedemittelTrainer() {
   // German front, English on the back. The CEFR + Register badges were dropped
   // from the tile (both are filter facets, so repeating them here is redundant).
   const cardGrid = (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    // `auto-rows-fr`: one card height for the whole grid, not per row (founder
+    // 2026-07-31). Same mechanism as the Wörter card grid.
+    <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {filtered.map((p) => {
         const front = (
           <Card className="card-hover h-full">
-            <CardContent className="flex h-full flex-col gap-2 p-4">
+            {/* Content centered in the tile: every card in the grid is the same
+                height (auto-rows-fr), so a short Wendung would otherwise leave a
+                hollow half-card under it. */}
+            <CardContent className="flex h-full flex-col justify-center gap-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
                 <span onClick={(e) => e.stopPropagation()}>
@@ -170,7 +175,7 @@ export function RedemittelTrainer() {
         );
         const back = (
           <Card className="h-full border-primary/30 bg-primary/[0.03]">
-            <CardContent className="flex h-full flex-col gap-2 p-4">
+            <CardContent className="flex h-full flex-col justify-center gap-2 p-4">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
                 Englisch
               </p>
@@ -199,7 +204,7 @@ export function RedemittelTrainer() {
           SAME filter tile inline (collapsed by default; Register is a facet
           group in it now); only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
@@ -219,7 +224,7 @@ export function RedemittelTrainer() {
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className="relative shrink-0 rounded-lg lg:hidden"
+                  className="relative shrink-0 rounded-lg shadow-soft lg:hidden"
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
@@ -261,7 +266,7 @@ export function RedemittelTrainer() {
                   aria-expanded={searchOpen}
                   aria-label="Suche"
                   title="Suche"
-                  className="shrink-0 rounded-lg"
+                  className="shrink-0 rounded-lg shadow-soft"
                   onClick={() =>
                     setSearchOpen((o) => {
                       if (o) setSearch("");
@@ -287,14 +292,6 @@ export function RedemittelTrainer() {
 
           </div>
 
-          {bandActive && bandHiddenCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
         </div>
 
         {/* Mobile filter panel: normal-flow content, deliberately OUTSIDE the
@@ -320,6 +317,18 @@ export function RedemittelTrainer() {
         </AnimatePresence>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
+          {/* The level-band chip rides with the CONTENT, not the sticky toolbar
+              (2026-07-31): the toolbar row is transparent now, so a chip pinned
+              there would float on top of the cards scrolling underneath. */}
+          {bandActive && bandHiddenCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
+            </div>
+          )}
+
           {filtered.length > 0 &&
             (view === "tabelle" ? (
               <RedemittelTable items={filtered} />

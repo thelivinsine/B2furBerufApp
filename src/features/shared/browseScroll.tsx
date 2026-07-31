@@ -39,15 +39,18 @@ export function useScrollDirection() {
 /**
  * The sticky/collapsing classes for the tabs+toolbar row (both breakpoints).
  * `hidden` slides it up under the app header on mobile (desktop never collapses
- * via the `max-lg:` guard). The opaque masking background is applied ONLY once
- * the page is `scrolled`, so at rest the header is transparent (no white block
- * beside the tabs, founder 2026-07-13); when content scrolls under the sticky
- * header the backdrop fades in to mask it.
+ * via the `max-lg:` guard).
+ *
+ * The row is ALWAYS fully transparent (founder 2026-07-31): the earlier version
+ * faded in a `bg-background/90 backdrop-blur` mask once the page scrolled, which
+ * read as a blurred band strapped across the page. The controls carry their own
+ * opaque fill + `shadow-soft`, so with no band behind them they read as floating
+ * over the cards. `pt-3` is the clearance between the app header and the
+ * controls that the floating look needs.
  */
-export function browseHeaderClass(hidden: boolean, scrolled: boolean): string {
+export function browseHeaderClass(hidden: boolean): string {
   return [
-    "sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 transition-[transform,background-color] duration-200 lg:top-16",
-    scrolled ? "bg-background/90 backdrop-blur" : "",
+    "sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 pt-3 transition-transform duration-200 lg:top-16",
     hidden ? "max-lg:-translate-y-[112%]" : "",
   ].join(" ");
 }
@@ -82,8 +85,46 @@ export function UebenLabel({
   );
 }
 
-/** Small centered "go to top" button, shown above the mobile Üben action bar. */
+/**
+ * "Go to top", shown once the page is scrolled. Two placements, one per
+ * breakpoint: mobile keeps the centered button above the Üben action bar,
+ * desktop gets the same button in the bottom-right corner (founder 2026-07-31,
+ * it was mobile-only before). The desktop one clears the Feedback pill, which
+ * floats further left on its own offset.
+ */
 export function ScrollTopButton({ show }: { show: boolean }) {
+  return (
+    <>
+      <ScrollTopMobile show={show} />
+      <ScrollTopDesktop show={show} />
+    </>
+  );
+}
+
+function ScrollTopDesktop({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.button
+          key="scrolltop-desktop"
+          type="button"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 8 }}
+          transition={{ duration: 0.15 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Nach oben"
+          title="Nach oben"
+          className="fixed bottom-4 right-4 z-40 hidden rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft transition-colors hover:text-foreground lg:block"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function ScrollTopMobile({ show }: { show: boolean }) {
   return (
     <AnimatePresence>
       {show && (

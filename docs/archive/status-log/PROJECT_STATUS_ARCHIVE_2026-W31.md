@@ -420,3 +420,68 @@ bank or code change.** The verdict in one line: *structurally excellent, pedagog
   implemented: the founder decides what to spend content effort on. The three open founder rejects
   (`v_ansprechpartner`, `v_bedenken`, `v_scope_creep`) are still unresolved in the bank.
 - **Gates:** `lint:content` clean (banks untouched). No build/test run needed: docs-only.
+
+**Handoff after session 178, part 2 (2026-07-30). Audit P0 + P2 shipped; P2's display and P1 await a
+founder pick.** Branch `claude/app-content-audit-92sgh1`.
+Founder: "start one working with p0-p2 items". Three commits on top of the audit.
+- **P0, two learner-visible defects, both gated so they cannot return.**
+  (1) A quiz could show the same option twice, one of them the answer: `translationQ` and the cloze,
+  listening-cloze, collocation-fill and matching builders filtered distractors by `id` only, while 5
+  English glosses collided INSIDE one theme (`deadline` = v_frist + v_deadline, plus business trip /
+  user interface / evacuation / health insurance card). Option assembly now dedupes on the rendered
+  LABEL (`mcqOptions`, `distinctPairs` in `engine/quiz.ts`) and degrades to a shorter option list
+  rather than an ambiguous question. (2) Two words shipped twice: `der Reisepass` as v_ausweis_pass +
+  v_reisepass and `der Konferenzraum` as v_konferenz_raum + v_konferenzraum_hotel (same theme, same
+  level, same pron), each giving a learner two SRS cards for one word; the weaker of each pair is
+  retired. **Note the id `v_ausweis_pass` reads like "der Ausweis" but its headword always was "der
+  Reisepass"**; `der Personalausweis` is a separate, correct entry.
+  Fixed at the source too: the 5 glosses now carry the real nuance, a missing comma in
+  `v_monatskarte`, and `Samstag Vormittag` -> `Samstagvormittag`.
+  **CO2 is now ASCII everywhere, overruling the LanguageTool suggestion on purpose:** the bank shipped
+  both spellings and `normalizeTyped`/the fuzzy search normalizer strip the subscript, so a learner
+  typing "CO2-Ausstoß" was graded WRONG against "CO₂-Ausstoß" and could not find it by search.
+  New linter gates: duplicate headwords (erroring only when the gloss or theme matches too, so real
+  homonyms like `der Empfang` warn instead), same-theme gloss collisions, and any subscript digit in a
+  typed or searched field. `tests/quizOptions.test.ts` pins the engine with a SYNTHETIC colliding pair,
+  verified to fail against the old assembly (the bank-wide assertions alone passed either way, since
+  fixing the data removed the trigger).
+- **P2, all 234 verbs now have the forms needed to PRODUCE them.** Nouns have carried article + plural
+  since day one; verbs carried nothing. New generated `src/data/verbForms.ts` (Partizip II, auxiliary,
+  Präteritum, `separable`, zu-infinitive), built by `pnpm build:verbs-subset` (vendors an oracle from
+  `german-verbs-dict`, MIT, LanguageTool upstream, the same family as the existing noun oracle) then
+  `pnpm build:verb-forms`. Generated rather than authored because a wrong Partizip II teaches an error
+  a learner repeats for years: 225 of 234 are dictionary-attested, 9 come from the regular weak
+  paradigm and are marked `source: "rule"`.
+  **Four upstream defects had to be corrected, each with a rule, all caught by spot-checking output:**
+  empty stubs (`aufrechterhalten` is `{}`) short-circuited the particle rule; `hasPrefix` is not always
+  set, so separability is now read off the participle's internal ge- (teilgenommen splits,
+  unterschrieben does not), fixing "teilnahm" -> "nahm teil"; a corrupt strong variant of the
+  `bereiten` family gave "beritt vor", so a weak participle now forces a weak Präteritum ("bereitete
+  vor"); and pre-1996 ß spellings ("faßte zusammen" -> "fasste zusammen"), decided by the participle's
+  own spelling rather than by guessing vowel length.
+  **The auxiliary is the one hand-maintained field** (no open lexicon carries it): 14 sein-verbs are
+  listed in the generator with a reason each, defaulting to haben, which is correct for every
+  transitive and every reflexive so an omission fails safe. That surfaced a real content error:
+  `v_sich_ereignen`'s prose claimed "Perfect with 'sein'", but a reflexive always takes haben. Fixed,
+  and the linter now cross-checks prose against the structured auxiliary. Coverage is an ERROR, not a
+  warning. `tests/verbForms.test.ts` adds 7 checks (participle endings, no fused separable Präteritum,
+  paradigm consistency, post-1996 spelling, reflexive-implies-haben, 8 spot-checked forms).
+- **The card display shipped mid-session: founder picked variant C** from
+  `preview/verb-forms-card.html` (A-D were one foot pill · two pills · pill + full list on the flip
+  side · plus a separability dot). Implemented exactly: front foot shows `Perf.: hat verschoben` in the
+  SAME slot and styling as `Pl.: die Termine`, so that row is now "this word's inflection" per part of
+  speech; the back repeats it in full as a compact Präteritum · Perfekt · mit zu · trennbar grid, each
+  row only when the data has it. `FlipCard` stacks both faces in one grid cell, so the tile grows to the
+  taller face and nothing clips. New `src/lib/verbDisplay.ts` turns the stored infinitive auxiliary into
+  the citation form ("hat verschoben" / "ist entstanden" / "hat/ist gependelt").
+  **One deliberate deviation from the approved preview, flagged to the founder:** the row reads
+  **Perfekt**, not "Partizip II", because "hat verschoben" IS the Perfekt and the bare participle is
+  "verschoben"; easy to revert if they prefer the preview's wording.
+- **NOT started: P1 (C1 has no content).** It is the biggest hole (0 C1 grammar topics, 0 C1 texts,
+  0 C1 Can-Dos behind a level onboarding offers) and it is a content-authoring project, not a fix.
+  Recommended shape when it starts: 4 C1 grammar topics none of which exist yet (Konzessiv- und
+  Restriktivkonnektoren, Passiversatzformen, subjektive Modalverben, Modalpartikeln), 6 texts at
+  300-400 words (which also starts P3, since today's median text is 90 words), 5 C1 Can-Dos.
+- **Gates (all four commits):** lint:content clean (1 warning, the deliberate `der Empfang` homonym) ·
+  build · typecheck · lint 0 errors · test:unit **388/388** · check:bundle 123.2 kB of 400 kB.
+

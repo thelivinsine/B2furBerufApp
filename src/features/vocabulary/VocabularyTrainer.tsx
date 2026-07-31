@@ -318,7 +318,7 @@ export function VocabularyTrainer() {
       aria-pressed={savedActive}
       aria-label={savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter"}
       title="Gespeichert"
-      className="shrink-0 rounded-lg"
+      className="shrink-0 rounded-lg shadow-soft"
       onClick={toggleSaved}
     >
       <Bookmark className={cn("h-4 w-4", savedActive && "fill-current")} />
@@ -334,7 +334,7 @@ export function VocabularyTrainer() {
       aria-expanded={searchOpen}
       aria-label="Suche"
       title="Suche"
-      className="shrink-0 rounded-lg"
+      className="shrink-0 rounded-lg shadow-soft"
       onClick={() =>
         setSearchOpen((o) => {
           if (o) setSearch("");
@@ -362,7 +362,7 @@ export function VocabularyTrainer() {
       aria-expanded={filtersOpen}
       aria-label="Filter"
       title="Filter"
-      className="relative shrink-0 rounded-lg lg:hidden"
+      className="relative shrink-0 rounded-lg shadow-soft lg:hidden"
       onClick={() => setFiltersOpen((o) => !o)}
     >
       <SlidersHorizontal className="h-4 w-4" />
@@ -501,7 +501,7 @@ export function VocabularyTrainer() {
           the SAME filter tile inline (collapsed by default) instead of a
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
               Filter + view on the left, bookmark/search pushed right; Üben fills
               its row with the count at the far right. Desktop keeps Üben/count
@@ -566,17 +566,6 @@ export function VocabularyTrainer() {
 
           </div>
 
-          {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
-              dropdown already shows the active theme, so the chip was redundant.
-              The silent level-band cut now shows as an explicit removable chip. */}
-          {hiddenLabel && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
         </div>
 
         {/* Mobile filter panel: normal-flow content, deliberately OUTSIDE the
@@ -603,6 +592,21 @@ export function VocabularyTrainer() {
         </AnimatePresence>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
+          {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
+              dropdown already shows the active theme, so the chip was redundant.
+              The silent level-band cut shows as an explicit removable chip.
+              It rides with the CONTENT, not the sticky toolbar (2026-07-31):
+              the toolbar row is transparent now, so a chip pinned there would
+              float on top of the card titles scrolling underneath. */}
+          {hiddenLabel && (
+            <div className="flex flex-wrap items-center gap-2">
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
+            </div>
+          )}
+
           {/* One-time Artikel-Wesen legend (dismiss state in the settings
               store). Teaches the three gender creatures before they appear
               beside the words below. */}

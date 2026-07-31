@@ -2543,3 +2543,43 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Gates: test:unit **389/389** three consecutive runs · lint:content clean · typecheck ·
   lint 0 errors.
 - **Artifacts (prompt 6):** `tests/engine.test.ts` · `docs/PROJECT_STATUS.md` · this log · **PR #759**
+
+- **Prompt 1 (verbatim, 2026-07-31, screenshot of the Wörter Karten view attached):** `there are some
+  UI/layout issues:` / `1. the view buttons row has a blur background but it be completely transparent
+  making the buttons look like they are floating with enough space above them` / `2. the cards don't
+  have same dimensions - fix it`
+- **Prompt 2 (verbatim, 2026-07-31, mid-turn):** `also add a got to top button somewhere to the bottom
+  right of the page for computer view as well as it's currently missing`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:** Reproduced both defects in headless Chromium against the running dev server
+  before changing anything, and measured rather than guessed.
+  **(1) The band.** `browseHeaderClass` faded `bg-background/90 backdrop-blur` in once the page
+  scrolled past 72px, which is exactly the blurred strip in the screenshot. The row is now transparent
+  in every state; the ViewSwitcher track and the Filter/Bookmark/Search buttons carry `shadow-soft` so
+  they lift off the cards passing underneath, and `pt-3` gives the clearance above them the founder
+  asked for. One thing had to move for that to work: the level-band "Stufe: bis B2.1" chip lived in
+  the same sticky row and, with no band behind it, printed on top of the card titles. It now rides
+  with the content in all three tabs that show one.
+  **(2) The cards.** Measured at 1280px: noun tiles 140px, verb tiles 209px, because `FlipCard` sizes
+  a tile to its TALLER face and the verb back carried a four-row paradigm. Two changes: the paradigm
+  is now two label/value pairs per row (nothing dropped, back max 209 -> 189), and all four Karten
+  grids get `auto-rows-fr`, so every tile in the grid shares one height instead of only the tiles in a
+  row. Content-driven, so a filtered set of short cards stays short and nothing is ever clipped by a
+  fixed height. Verified by flipping every verb card in the first batch at 390px and 1280px: no back
+  face overflows.
+  **One thing the founder did not ask for, and why it is in anyway:** with one height for the whole
+  grid, top-aligned content leaves a hollow lower half. It was worst on Redemittel, where a short
+  Wendung sat in a 256px card. Wörter / Kollokationen / Redemittel card content is therefore centered
+  vertically; anchored elements (the Wörter foot row, the Grammatik pattern chip and foot) stay
+  anchored. Compared both versions in screenshots before keeping it.
+  **(3) Nach oben.** `ScrollTopButton` was `lg:hidden`. It now renders two placements: the centered
+  mobile one above the Üben bar, unchanged, and a desktop one at `bottom-4 right-4` that clears the
+  Feedback pill (which floats on its own content-column offset, ~92px in from the right at 1280px).
+  Same 280px show threshold, so it appears exactly when the mobile one does.
+  Gates: typecheck · lint 0 errors (75 pre-existing warnings) · test:unit **389/389** · build ·
+  check:bundle 123.2 kB of 400 kB.
+- **Artifacts (prompts 1-2):** `src/features/shared/browseScroll.tsx` · `src/features/shared/ViewSwitcher.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/features/grammar/GrammarViews.tsx` ·
+  `docs/areas/BIBLIOTHEK.md` · `docs/PROJECT_STATUS.md` · this log

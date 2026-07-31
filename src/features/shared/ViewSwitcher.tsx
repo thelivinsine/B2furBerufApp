@@ -64,7 +64,9 @@ export function ViewSwitcher({
         // (LibrarySwitcher): recessed grey track, active button on a white pill.
         // Sized so the whole control is 40px tall, matching the icon buttons in
         // the toolbar row. `relative` is the pill's positioning context.
-        "relative inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
+        // `shadow-soft`: the toolbar row behind it is transparent, so the track
+        // does its own lifting off the cards scrolling underneath.
+        "relative inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5 shadow-soft",
         className,
       )}
     >
