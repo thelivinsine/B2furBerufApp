@@ -12,7 +12,12 @@ name: Deploy Supabase functions
 #                            to regenerate it (see the "Verify access token"
 #                            step); nothing deploys half-way.
 #   SUPABASE_DB_PASSWORD   - the database password (only needed for migrations;
-#                            leave it unset and the migration step is skipped)
+#                            leave it unset and the migration step is skipped).
+#                            SET 2026-07-31. NOTE: migrations 0001-0013 were
+#                            applied by hand in the SQL editor and therefore are
+#                            NOT in supabase_migrations. Run this workflow once
+#                            with `repair_applied` listing them before the first
+#                            `db push`, or push replays 0001 and fails.
 # The project ref is not a secret and is set below.
 #
 # Until SUPABASE_ACCESS_TOKEN exists the workflow SKIPS cleanly instead of
@@ -32,6 +37,14 @@ on:
         description: "Also apply pending migrations (supabase db push)"
         type: boolean
         default: true
+      list_only:
+        description: "Diagnose only: print local vs remote migration history and stop"
+        type: boolean
+        default: false
+      repair_applied:
+        description: "Space-separated migration versions to MARK as already applied (bookkeeping only, runs no SQL)"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -97,6 +110,50 @@ jobs:
             exit 1
           fi
 
+      # Read-only diagnosis. Every migration up to 0013 was pasted into the SQL
+      # editor by hand, which does NOT write to supabase_migrations, so the
+      # remote history can be empty while the schema is fully up to date. When
+      # that is the case `db push` tries to replay 0001 and dies on an object
+      # that already exists (which is exactly what happened on 2026-07-31). This
+      # step shows the truth before anything is changed.
+      - name: Migration status
+        if: >-
+          steps.creds.outputs.configured == 'true' &&
+          steps.creds.outputs.db == 'true' &&
+          github.event_name == 'workflow_dispatch' &&
+          inputs.list_only
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase migration list
+
+      # Bookkeeping repair: tells Supabase "these versions are already in the
+      # database" WITHOUT running their SQL. This is the one-time bridge from
+      # hand-pasted migrations to an automated pipeline; after it, `db push`
+      # applies only genuinely new files. Never mark a version applied unless the
+      # schema really carries it: the SQL is skipped forever after.
+      - name: Repair migration history
+        if: >-
+          steps.creds.outputs.configured == 'true' &&
+          steps.creds.outputs.db == 'true' &&
+          github.event_name == 'workflow_dispatch' &&
+          !inputs.list_only &&
+          inputs.repair_applied != ''
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          VERSIONS: ${{ inputs.repair_applied }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          for v in $VERSIONS; do
+            echo "::group::repair $v"
+            supabase migration repair --status applied "$v"
+            echo "::endgroup::"
+          done
+          supabase migration list
+
       # Migrations run BEFORE the functions. evaluate-writing writes
       # writing_evaluations.task_id, which migration 0011 adds; deploying the
       # function first would degrade it to "no task reference" (the insert is
@@ -105,7 +162,7 @@ jobs:
         if: >-
           steps.creds.outputs.configured == 'true' &&
           steps.creds.outputs.db == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.run_migrations)
+          (github.event_name != 'workflow_dispatch' || (inputs.run_migrations && !inputs.list_only))
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
