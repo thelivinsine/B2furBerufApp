@@ -58,6 +58,14 @@ const EMPTY_TRANSFORM: TransformView = {
 /** Minimum words before a correction is allowed (mirrors the old editor floor). */
 export const MIN_WORDS = 3;
 
+/**
+ * How many AI phrasings exist per target form: the canonical one plus two
+ * alternatives. The server clamps `variant` to 0..2 as the real cost cap, so
+ * this is the same number from the client side and what the "Nochmal" counter
+ * counts down from (founder 2026-07-31).
+ */
+export const TRANSFORM_VARIANTS = 3;
+
 export function countWords(text: string): number {
   const t = text.trim();
   return t ? t.split(/\s+/).length : 0;
@@ -73,6 +81,8 @@ export interface FokusMachine {
   /** The learner's current target selection (drives the transform). */
   selection: FokusSelection;
   transform: TransformView;
+  /** New AI phrasings still available for the CURRENT target form (0..3). */
+  variantsLeft: number;
   errorMessage?: string;
   limitReached?: boolean;
   cachedCorrection?: boolean;
@@ -105,6 +115,10 @@ export function useFokusMachine(initial = ""): FokusMachine {
     mood: DEFAULT_MOOD,
   });
   const [transform, setTransform] = useState<TransformView>(EMPTY_TRANSFORM);
+  // Distinct variants already generated for the CURRENT target form, so the
+  // "Nochmal" button can say how many new phrasings are still coming (the rest
+  // of the cycle re-serves cached ones for free).
+  const [variantsUsed, setVariantsUsed] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [limitReached, setLimitReached] = useState(false);
   const [cachedCorrection, setCachedCorrection] = useState(false);
@@ -137,6 +151,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     setHasErrors(false);
     setDetected({ voice: null, tense: null, mood: null });
     setTransform(EMPTY_TRANSFORM);
+    setVariantsUsed(0);
     setErrorMessage(undefined);
     setLimitReached(false);
     setCachedCorrection(false);
@@ -160,6 +175,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     reqRef.current++;
     setStatus("submitting");
     setTransform(EMPTY_TRANSFORM);
+    setVariantsUsed(0);
     setErrorMessage(undefined);
     setLimitReached(false);
     setStale(false);
@@ -191,12 +207,24 @@ export function useFokusMachine(initial = ""): FokusMachine {
     setStatus("corrected");
   }, [input]);
 
+  // How many distinct variants of one target form are already generated (and so
+  // free to revisit). Counted off the cache, which is the thing that decides
+  // whether a "Nochmal" costs an AI call.
+  const generatedFor = useCallback((tupleKey: string) => {
+    let n = 0;
+    for (const key of cacheRef.current.keys()) {
+      if (key.startsWith(`${tupleKey}|`)) n++;
+    }
+    return n;
+  }, []);
+
   const runTransform = useCallback(async (sel: FokusSelection, variant = 0) => {
     const tupleKey = `${sel.voice}|${sel.tense}|${sel.mood}`;
     const key = `${tupleKey}|${variant}`;
     const cached = cacheRef.current.get(key);
     if (cached) {
       variantRef.current.set(tupleKey, variant);
+      setVariantsUsed(generatedFor(tupleKey));
       setTransform(cached);
       return;
     }
@@ -241,8 +269,9 @@ export function useFokusMachine(initial = ""): FokusMachine {
       cacheRef.current.set(key, view);
       variantRef.current.set(tupleKey, variant);
     }
+    setVariantsUsed(generatedFor(tupleKey));
     setTransform(view);
-  }, []);
+  }, [generatedFor]);
 
   const selectPill = useCallback(
     (axis: AxisId, value: string) => {
@@ -257,6 +286,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
       if (isBase) {
         reqRef.current++;
         setTransform(EMPTY_TRANSFORM);
+        setVariantsUsed(0);
         return;
       }
       // A fresh pill selection starts from the canonical version (variant 0);
@@ -292,6 +322,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
       mood: detected.mood ?? DEFAULT_MOOD,
     });
     setTransform(EMPTY_TRANSFORM);
+    setVariantsUsed(0);
   }, [detected]);
 
   const startOver = useCallback(() => {
@@ -307,6 +338,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     detected,
     selection,
     transform,
+    variantsLeft: Math.max(0, TRANSFORM_VARIANTS - variantsUsed),
     errorMessage,
     limitReached,
     cachedCorrection,

@@ -30,6 +30,8 @@ import { loadAutosavedDraft, saveAutosavedDraft } from "./draftAutosave";
 import type { WritingMode } from "./resumeDraft";
 import { useLiveWork } from "@/lib/liveWork";
 import { UmlautKeys } from "./UmlautKeys";
+import { AllowanceNote } from "./AllowanceNote";
+import { useDailyAllowance } from "@/lib/aiAllowance";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { useFillEditor } from "./useFillEditor";
 import {
@@ -147,6 +149,10 @@ export function GuidedWritingTrainer({
   // the Aufgabe it was written against. The sign-in hand-off wins when both
   // exist, since that one is an explicit, just-now action.
   const mode: WritingMode = length === "long" ? "lang" : "kurz";
+  // Today's allowance for THIS mode (Kurz 4 / Lang 2), counted separately so a
+  // day of Kurz cannot eat the Lang budget. Follows what `evaluate-writing`
+  // reports; a cached resubmission is free and leaves the number alone.
+  const allowance = useDailyAllowance(mode);
   const [saved] = useState(() => (initialText ? null : loadAutosavedDraft(mode)));
 
   const [drawn, setDrawn] = useState<WritingTaskRef>(() => {
@@ -600,11 +606,29 @@ export function GuidedWritingTrainer({
                   cost that slot its permanent Art. 50 note; the cluster now sits
                   2.5rem higher (matching Fokus) so a card-tail line cannot land
                   under it any more. */}
-              {tooShort && (
-                <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
-                  Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
-                </p>
-              )}
+              {/* One line, two facts: why Auswerten is not ready yet (left,
+                  transient) and what the day still holds (right, standing,
+                  founder 2026-07-31). */}
+              {tooShort || allowance.known ? (
+                <div className="flex items-start justify-between gap-2">
+                  {tooShort ? (
+                    <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
+                      Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst
+                      du auswerten.
+                    </p>
+                  ) : (
+                    <span />
+                  )}
+                  {allowance.known && (
+                    <AllowanceNote
+                      remaining={allowance.remaining}
+                      limit={allowance.limit}
+                      what="Auswertungen"
+                      className="shrink-0"
+                    />
+                  )}
+                </div>
+              ) : null}
             </>
           )}
         </CardContent>

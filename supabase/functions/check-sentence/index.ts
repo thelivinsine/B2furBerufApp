@@ -318,8 +318,12 @@ Deno.serve(async (req) => {
     .from("sentence_checks").select("id", { count: "exact", head: true })
     .eq("user_id", user.id).gte("created_at", startOfDay.toISOString());
   if ((todayCount ?? 0) >= DAILY_CHECK_LIMIT) {
-    return json({ ok: false, limitReached: true, message: `Du hast heute schon ${DAILY_CHECK_LIMIT} Sätze geprüft. Komm morgen wieder!` });
+    return json({ ok: false, limitReached: true, dailyLimit: DAILY_CHECK_LIMIT, dailyRemaining: 0, message: `Du hast heute schon ${DAILY_CHECK_LIMIT} Sätze geprüft. Komm morgen wieder!` });
   }
+  // What the client prints as "Heute noch N von M" (s179). BOTH paths below
+  // insert one `sentence_checks` row, the cached one included, so this request
+  // always spends one unit of the day's allowance.
+  const dailyRemaining = Math.max(0, DAILY_CHECK_LIMIT - (todayCount ?? 0) - 1);
 
   // Per-user monthly ceiling (paid ops).
   const startOfMonth = new Date();
@@ -350,6 +354,7 @@ Deno.serve(async (req) => {
     return json({
       ok: true, cached: true, corrected: cachedRow.corrected, hasErrors: cachedRow.has_errors,
       sentences: [{ text: cachedRow.corrected, voice: g.voice ?? "aktiv", tense: g.tense ?? "praesens", mood: g.mood ?? "indikativ" }],
+      dailyLimit: DAILY_CHECK_LIMIT, dailyRemaining,
     });
   }
 
@@ -396,5 +401,6 @@ Deno.serve(async (req) => {
   return json({
     ok: true, cached: false, checkId: inserted?.id,
     corrected: out.corrected, hasErrors: out.hasErrors, sentences: out.sentences,
+    dailyLimit: DAILY_CHECK_LIMIT, dailyRemaining,
   });
 });

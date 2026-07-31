@@ -2625,3 +2625,39 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
   `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
   `docs/areas/BIBLIOTHEK.md` · `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 5 (verbatim, 2026-07-31, three Fokus screenshots attached):** `when generating new umformen
+  with AI, there's no count like (2 left out of 3). Even for korrigieren, there is no count. Check the
+  documentation on what we agreed on and implement it neatly.`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:** The agreement was already law and only ever ENFORCED, never shown: **Fokus 10
+  Korrekturen · Kurz 4 · Lang 2 per day** (s167, sharpened by the 2026-07-25 prompt "1 correction +
+  1 umformen counts as 1"), plus the 3 phrasings per target form the "Nochmal" cycle is capped at
+  (`transform-sentence` clamps `variant` to 0..2). So the first a learner heard of any limit was
+  "komm morgen wieder". Both counts are now on screen.
+  **Daily allowance.** `Heute noch 7 von 10` sits beside the button that spends it: Fokus under the
+  Korrigieren row on both breakpoints, Kurz/Lang under the umlaut keys sharing ONE line with the
+  transient "Noch N Wörter" hint (hint left, allowance right), so the locked mobile caption slot keeps
+  its Art. 50 note. The number is the server's: `check-sentence` and `evaluate-writing` now return
+  `dailyLimit`/`dailyRemaining` on every response (success, cache hit and limit-reached alike), which
+  means a limit the founder raises via a Supabase secret shows up in the UI by itself. Before the
+  first call of the day `src/lib/aiAllowance.ts` counts the learner's own rows over the SAME tables
+  and the SAME UTC day boundary the functions count (`sentence_checks`; `writing_evaluations` filtered
+  by `length`, both select-own under RLS). Unknown (signed out, offline, query failed) renders NO
+  number rather than a guess. A Kurz/Lang cache hit is free and correctly does not move the counter,
+  while a Fokus cache hit does, because it still writes the row the limit counts.
+  **Nochmal.** `2 von 3 übrig` on the button: the NEW phrasings still available for the CURRENT target
+  form. Cycling back to an already-generated one is cached and free, so it does not count down, and a
+  different target form starts a fresh 3; at 0 the button still works and its tooltip stops promising
+  something new. Wording note: "noch 2 von 3" collided with the button's own "Nochmal", so the counter
+  reads "übrig" instead of a "2/3" that could be read as "showing 2 of 3".
+  **No founder action:** `supabase.yml` deploys both Edge Functions on merge to `main`, and until that
+  run lands the UI falls back to the row count, which is already correct.
+  Gates: typecheck · lint 0 errors · test:unit **396/396** (two new suites) · build · check:bundle
+  123.2 kB.
+- **Artifacts (prompt 5):** `src/lib/aiAllowance.ts` (new) · `src/features/writing/AllowanceNote.tsx`
+  (new) · `src/features/writing/fokus/useFokusMachine.ts` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/lib/sentenceStudio.ts` · `src/lib/writing.ts` ·
+  `supabase/functions/check-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `tests/aiAllowance.test.ts` (new) · `tests/fokusVariants.test.tsx` (new) · `docs/areas/SCHREIBEN.md` ·
+  `docs/PROJECT_STATUS.md` · this log

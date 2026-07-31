@@ -1,6 +1,9 @@
 # Project Status
 
-_Last updated: 2026-07-31 (session 179). **Bibliothek card grids and the floating toolbar.** The
+_Last updated: 2026-07-31 (session 179). **Bibliothek card grids, the floating toolbar, and the AI
+allowances made visible.** Each writing trainer now prints "Heute noch 7 von 10" beside the button
+that spends the day's AI budget (Fokus 10 / Kurz 4 / Lang 2), and Fokus "Nochmal" says how many new
+phrasings are left ("2 von 3 übrig"); the numbers come from the Edge Functions themselves. Also: the
 sticky view-button row no longer fades a blurred band in behind itself: it is transparent in every
 state and its controls float on their own shadow. Every tile in a Karten grid now shares ONE height
 (`auto-rows-fr` on all four tabs), with the card content vertically centered and the Wörter verb
@@ -132,6 +135,32 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
+`claude/ui-layout-buttons-cards-zkchha`.
+Founder, from the Fokus trainer: "when generating new umformen with AI, there's no count like
+(2 left out of 3). Even for korrigieren, there is no count. Check the documentation on what we
+agreed on and implement it neatly." The agreement was already law (s167 + the 2026-07-25 prompt):
+**Fokus 10 Korrekturen · Kurz 4 · Lang 2 per day**, one Korrektur = one unit, its Umformung free.
+It was only ever ENFORCED, never shown, so the first a learner knew of it was "komm morgen wieder".
+- **`Heute noch 7 von 10` beside the button that spends it**, in all three trainers: Fokus under the
+  Korrigieren row (desktop and mobile), Kurz/Lang under the umlaut keys sharing one line with the
+  transient "Noch N Wörter" hint (hint left, allowance right). The mobile caption slot stays the
+  Art. 50 note, per the s169 lock.
+- **The number is the server's, not a guess.** `check-sentence` and `evaluate-writing` now return
+  `dailyLimit`/`dailyRemaining` on every response (success, cache hit and limit-reached alike), so a
+  limit raised via a Supabase secret shows up in the UI by itself. Before the first call of the day
+  `src/lib/aiAllowance.ts` counts the learner's own rows over the SAME tables and the SAME UTC day
+  boundary the functions count. When neither is available it renders nothing rather than a number it
+  cannot stand behind. A cache hit in Kurz/Lang is free and correctly does NOT move the counter.
+- **"Nochmal" counts its own phrasings: `2 von 3 übrig`.** Those are the NEW AI phrasings left for
+  the current target form; cycling back to an already-generated one is cached and free, so it does
+  not count down, and a different target form starts a fresh 3.
+- **The two Edge Functions ship themselves**: `.github/workflows/supabase.yml` deploys every function
+  on merge to `main`, so this needs no founder action. Until that run finishes the UI falls back to
+  the row count, which is already correct.
+- **Gates:** typecheck · lint 0 errors · test:unit **396/396** (two new suites:
+  `tests/aiAllowance.test.ts`, `tests/fokusVariants.test.tsx`) · build · check:bundle 123.2 kB.
 
 **Handoff after session 179 (2026-07-31). Bibliothek card grids and the floating toolbar.** Branch
 `claude/ui-layout-buttons-cards-zkchha`. Founder, from a screenshot of the Wörter Karten view: the
