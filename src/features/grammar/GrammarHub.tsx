@@ -12,7 +12,14 @@ import {
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
-import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
+import {
+  useScrollDirection,
+  browseHeaderClass,
+  ScrollTopButton,
+  UebenLabel,
+  BROWSE_TOOLBAR_BUTTON,
+} from "@/features/shared/browseScroll";
+import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/useSessionStore";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -168,7 +175,7 @@ export function GrammarHub() {
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className="relative shrink-0 rounded-lg shadow-soft lg:hidden"
+                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
@@ -210,7 +217,7 @@ export function GrammarHub() {
                   aria-expanded={searchOpen}
                   aria-label="Suche"
                   title="Suche"
-                  className="shrink-0 rounded-lg shadow-soft"
+                  className={BROWSE_TOOLBAR_BUTTON}
                   onClick={() =>
                     setSearchOpen((o) => {
                       if (o) setSearch("");

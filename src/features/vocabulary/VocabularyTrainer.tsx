@@ -20,7 +20,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
-import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
+import {
+  useScrollDirection,
+  browseHeaderClass,
+  ScrollTopButton,
+  UebenLabel,
+  BROWSE_TOOLBAR_BUTTON,
+} from "@/features/shared/browseScroll";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch, foldText } from "@/lib/fuzzy";
@@ -318,7 +324,7 @@ export function VocabularyTrainer() {
       aria-pressed={savedActive}
       aria-label={savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter"}
       title="Gespeichert"
-      className="shrink-0 rounded-lg shadow-soft"
+      className={BROWSE_TOOLBAR_BUTTON}
       onClick={toggleSaved}
     >
       <Bookmark className={cn("h-4 w-4", savedActive && "fill-current")} />
@@ -334,7 +340,7 @@ export function VocabularyTrainer() {
       aria-expanded={searchOpen}
       aria-label="Suche"
       title="Suche"
-      className="shrink-0 rounded-lg shadow-soft"
+      className={BROWSE_TOOLBAR_BUTTON}
       onClick={() =>
         setSearchOpen((o) => {
           if (o) setSearch("");
@@ -362,7 +368,7 @@ export function VocabularyTrainer() {
       aria-expanded={filtersOpen}
       aria-label="Filter"
       title="Filter"
-      className="relative shrink-0 rounded-lg shadow-soft lg:hidden"
+      className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
       onClick={() => setFiltersOpen((o) => !o)}
     >
       <SlidersHorizontal className="h-4 w-4" />

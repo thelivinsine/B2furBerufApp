@@ -2583,3 +2583,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
   `src/features/grammar/GrammarHub.tsx` · `src/features/grammar/GrammarViews.tsx` ·
   `docs/areas/BIBLIOTHEK.md` · `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 3 (verbatim, 2026-07-31, crop of the toolbar over a card attached):** `the buttons are
+  illegible due to tranparency issues. fix it`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:** Regression from prompt 1, and a self-inflicted one: the toolbar icon buttons
+  use the shared `outline` variant, whose fill is `bg-surface/50` with a `hover:bg-muted/60`. At half
+  alpha they were fine over the old blurred band, but once the row went transparent the card titles
+  moving behind them printed straight through the buttons. (The `accent` variant's own comment already
+  records this trap: "outline's half-transparent fill made them disappear into the ground.")
+  Fixed by giving every browse-toolbar icon button a full-alpha fill through one exported constant,
+  `BROWSE_TOOLBAR_BUTTON` (`bg-surface` + `hover:bg-muted` + `shadow-soft`), used by the Filter,
+  Bookmark and Search buttons on all four tabs, rather than by touching the global `outline` variant,
+  which is deliberately translucent elsewhere. The ViewSwitcher track was already opaque
+  (`bg-muted`), and its segment buttons are transparent by design, sitting on that track and the white
+  sliding pill. Verified by reading the COMPUTED background of every control in the row at 390px and
+  1280px across all four tabs: alpha 1 everywhere, plus a zoomed screenshot with a card title running
+  behind the row.
+  Gates: typecheck · lint 0 errors · test:unit 389/389 · build · check:bundle 123.2 kB.
+- **Artifacts (prompt 3):** `src/features/shared/browseScroll.tsx` ·
+  `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
+  `docs/areas/BIBLIOTHEK.md` · `docs/PROJECT_STATUS.md` · this log
