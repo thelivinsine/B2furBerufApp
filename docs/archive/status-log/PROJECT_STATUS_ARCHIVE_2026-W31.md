@@ -532,3 +532,45 @@ offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the lab
   code scopes by `themeId` throughout, so nothing shipped was wrong. Lesson for future banks: a
   `tx_c1_*` id is fine, but never assert content scope through an id prefix.
 
+**Handoff after session 179 (2026-07-31). Bibliothek card grids and the floating toolbar.** Branch
+`claude/ui-layout-buttons-cards-zkchha`. Founder, from a screenshot of the Wörter Karten view: the
+view-button row has a blur background and should be completely transparent so the buttons look like
+they float, with enough space above them; and the cards do not have the same dimensions. Follow-up in
+the same session: add a "go to top" button to the bottom right on desktop, where it was missing.
+- **The toolbar row is transparent in every state** (`browseHeaderClass`). It used to fade in a
+  `bg-background/90 backdrop-blur` mask once the page scrolled, which is the blurred band the founder
+  saw. The row now only sticks and collapses; the ViewSwitcher track and the Filter/Bookmark/Search
+  icon buttons carry `shadow-soft` so they lift off the cards moving underneath, and `pt-3` gives the
+  clearance under the app header.
+- **The level-band chip moved out of the sticky row into the content column** (all three tabs that
+  have one). Without a band behind it, a pinned chip printed straight over the card titles.
+- **Every tile in a Karten grid is now the same height, not just per row** (`auto-rows-fr` on the
+  Wörter, Kollokationen, Redemittel and Grammatik grids). `1fr` rows in an auto-height grid resolve to
+  the tallest row, so the size stays content-driven and nothing is clipped: a filtered set of short
+  cards still renders short.
+- **The verb paradigm on the Wörter card back is two label/value pairs per row.** As a single column
+  it ran four rows and made verb tiles the tallest card in the grid, which then set the height for
+  every card. Measured at 1280px: uniform tiles were 209px with the old layout, 189px with the new one,
+  and no back face overflows at either breakpoint (checked by flipping every verb card in the first
+  batch, mobile and desktop).
+- **Card content is vertically centered** on Wörter / Kollokationen / Redemittel. With one height for
+  the whole grid, top-aligned content left a hollow lower half; this was clearest on Redemittel, where
+  a short Wendung sat in a 256px card. Anchored elements stay anchored (the Wörter foot row, the
+  Grammatik pattern chip and foot).
+- **"Nach oben" now has a desktop placement** (`bottom-4 right-4`, clear of the Feedback pill); the
+  centered mobile one above the Üben bar is unchanged. Same 280px show threshold.
+- **Follow-up: the clearance moved from padding into the sticky offset.** `pt-3` applied at rest too
+  and pushed the controls away from the tabs at the top of the page. The 0.75rem now rides
+  `top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]` / `lg:top-[4.75rem]` (repeated in the four
+  trainers' own `lg:sticky` class), which does nothing until the row pins. At rest the tabs-to-buttons
+  gap is back to 24px desktop / 16px mobile; pinned, the buttons sit 12px under the app header.
+- **Follow-up in the same session: the toolbar buttons were half-transparent.** The shared `outline`
+  button variant fills with `bg-surface/50`, which was invisible behind the old blurred band and let
+  card titles print through the buttons once the band went away. Every browse-toolbar icon button now
+  wears one exported constant, `BROWSE_TOOLBAR_BUTTON` (`bg-surface` + `hover:bg-muted` +
+  `shadow-soft`); the global `outline` variant is untouched, since its translucency is wanted
+  elsewhere. Checked by reading the computed background alpha of every control in the row on all four
+  tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
+- **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
+  check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
+
