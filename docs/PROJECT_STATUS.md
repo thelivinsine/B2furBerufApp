@@ -1,6 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-31 (session 179). **Bibliothek card grids, the floating toolbar, and the AI
+_Last updated: 2026-07-31 (session 180). **The Schreiben Aufgabe filters now mean what they say.**
+Picking a Textsorte or a Niveau used to PREFER its tagged tasks and fall back to the untagged ones,
+so "Forumsbeitrag" drew a Beschwerde an eine Fluggesellschaft: 84% of that scope's pool contradicted
+the filter while the rail printed the honest count beside the option. Both axes filter hard now, one
+counting rule serves the rail and the draw, zero-yield options grey out, and a genuinely empty scope
+(Kurz + Forumsbeitrag) gets an honest empty state with a one-tap escape instead of a substitute task.
+Prior s179: **Bibliothek card grids, the floating toolbar, and the AI
 feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
 switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
 Shuffle clears the editor. **One founder action: paste `supabase/migrations/0014_writing_insight_en.sql`
@@ -145,6 +151,46 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
+`claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
+Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and
+necessary improvements with the Aufgabe feature."
+- **Root cause: Niveau and Textsorte were never really filters.** `eligibleTasks` narrowed them
+  prefer-tagged-else-untagged, the rule that is right for Branche. 373 of the 643 tasks carry no
+  `format`, so on every theme without a tagged task the fallback swallowed the filter, and where even
+  the untagged set was empty the filter was dropped entirely. Measured on the shipped bank: under
+  "Alle Themen + Forumsbeitrag" the draw pool was 85 tasks of which **71 were not Forumsbeiträge**
+  (84%), and the rail printed the honest count, 14, right beside the option. Every Textsorte was
+  wrong between 66% and 100% of the time. **Both axes filter hard now**, and the order is
+  Unterthema → Niveau → Textsorte → Branche (the soft axis last, so it can never hide the only task
+  matching a hard one). `countExact` is gone: one hard rule means the rail count and the draw pool
+  are one number.
+- **A scope can now legitimately be empty, and the trainer says so.** Every dropdown greys its
+  zero-yield options with the count still visible; where greying cannot help (a Kurz/Lang switch
+  carrying a length-specific Textsorte, a stale deep link) the Aufgabe card is replaced by
+  "Forumsbeitrag gibt es nur bei Lang." plus the one-tap "Textsorte zurücksetzen" that `blockingAxis`
+  picks. `randomTask` returns null for an empty list instead of the first task of the first theme.
+- **Five smaller faults fixed in the same pass.** `bewerbung` was a permanently empty dropdown option
+  (0 tasks at either length, since s167), so the Textsorte list is derived from the bank now. The
+  Niveau option labelled "B2" matched the tag `B2.1` exactly, which would have made the first `B2.2`
+  task silently unreachable; it matches by BAND, and "C1.1" is labelled "C1" like everywhere else.
+  The Ziel line printed `words x 1.25` unrounded ("Ziel 150–188 Wörter") and never named the Niveau;
+  it is "B2 · Bericht · Ziel 150–190 Wörter" now. Every scope change pushed a history entry, so the
+  phone's back gesture undid filter taps one at a time. Fokus and Verlauf kept `?level`/`?format`
+  alive after a tab switch.
+- **The sign-in draft hand-off lost the text on the email/password path.** `initialText` is read once
+  on mount, and signing in from the login wall does not remount the trainer when the learner is
+  already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
+  resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
+  which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
+- **Not fixed, founder's call:** 373 of 643 tasks still carry no `level`/`format`/`points`, so the
+  DEFAULT scope draws a bare one-line legacy Aufgabe 58% of the time, and those degrade the AI to
+  language-only feedback (no Aufgabenerfüllung). Either tag the bank in waves or make the default
+  draw prefer structured tasks. `bericht` at C1 (1 task) and `bewerbung` (0) are the thinnest cells.
+- **Gates:** typecheck · lint 0 errors · test:unit **407/407** (new `tests/writingAufgabe.test.tsx`
+  renders the trainer and pins 20 consecutive draws per scope) · lint:content clean · build ·
+  check:bundle 123.2 kB.
+
 **Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
 English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
 Schreiben trainers.
@@ -175,74 +221,6 @@ Schreiben trainers.
   step down through the optional column, and the chip simply does not appear.
 - **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
   plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
-
-**Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
-`claude/ui-layout-buttons-cards-zkchha`.
-Founder, from the Fokus trainer: "when generating new umformen with AI, there's no count like
-(2 left out of 3). Even for korrigieren, there is no count. Check the documentation on what we
-agreed on and implement it neatly." The agreement was already law (s167 + the 2026-07-25 prompt):
-**Fokus 10 Korrekturen · Kurz 4 · Lang 2 per day**, one Korrektur = one unit, its Umformung free.
-It was only ever ENFORCED, never shown, so the first a learner knew of it was "komm morgen wieder".
-- **`Heute noch 7 von 10` beside the button that spends it**, in all three trainers: Fokus under the
-  Korrigieren row (desktop and mobile), Kurz/Lang under the umlaut keys sharing one line with the
-  transient "Noch N Wörter" hint (hint left, allowance right). The mobile caption slot stays the
-  Art. 50 note, per the s169 lock.
-- **The number is the server's, not a guess.** `check-sentence` and `evaluate-writing` now return
-  `dailyLimit`/`dailyRemaining` on every response (success, cache hit and limit-reached alike), so a
-  limit raised via a Supabase secret shows up in the UI by itself. Before the first call of the day
-  `src/lib/aiAllowance.ts` counts the learner's own rows over the SAME tables and the SAME UTC day
-  boundary the functions count. When neither is available it renders nothing rather than a number it
-  cannot stand behind. A cache hit in Kurz/Lang is free and correctly does NOT move the counter.
-- **"Nochmal" counts its own phrasings: `2 von 3 übrig`.** Those are the NEW AI phrasings left for
-  the current target form; cycling back to an already-generated one is cached and free, so it does
-  not count down, and a different target form starts a fresh 3.
-- **The two Edge Functions ship themselves**: `.github/workflows/supabase.yml` deploys every function
-  on merge to `main`, so this needs no founder action. Until that run finishes the UI falls back to
-  the row count, which is already correct.
-- **Gates:** typecheck · lint 0 errors · test:unit **396/396** (two new suites:
-  `tests/aiAllowance.test.ts`, `tests/fokusVariants.test.tsx`) · build · check:bundle 123.2 kB.
-
-**Handoff after session 179 (2026-07-31). Bibliothek card grids and the floating toolbar.** Branch
-`claude/ui-layout-buttons-cards-zkchha`. Founder, from a screenshot of the Wörter Karten view: the
-view-button row has a blur background and should be completely transparent so the buttons look like
-they float, with enough space above them; and the cards do not have the same dimensions. Follow-up in
-the same session: add a "go to top" button to the bottom right on desktop, where it was missing.
-- **The toolbar row is transparent in every state** (`browseHeaderClass`). It used to fade in a
-  `bg-background/90 backdrop-blur` mask once the page scrolled, which is the blurred band the founder
-  saw. The row now only sticks and collapses; the ViewSwitcher track and the Filter/Bookmark/Search
-  icon buttons carry `shadow-soft` so they lift off the cards moving underneath, and `pt-3` gives the
-  clearance under the app header.
-- **The level-band chip moved out of the sticky row into the content column** (all three tabs that
-  have one). Without a band behind it, a pinned chip printed straight over the card titles.
-- **Every tile in a Karten grid is now the same height, not just per row** (`auto-rows-fr` on the
-  Wörter, Kollokationen, Redemittel and Grammatik grids). `1fr` rows in an auto-height grid resolve to
-  the tallest row, so the size stays content-driven and nothing is clipped: a filtered set of short
-  cards still renders short.
-- **The verb paradigm on the Wörter card back is two label/value pairs per row.** As a single column
-  it ran four rows and made verb tiles the tallest card in the grid, which then set the height for
-  every card. Measured at 1280px: uniform tiles were 209px with the old layout, 189px with the new one,
-  and no back face overflows at either breakpoint (checked by flipping every verb card in the first
-  batch, mobile and desktop).
-- **Card content is vertically centered** on Wörter / Kollokationen / Redemittel. With one height for
-  the whole grid, top-aligned content left a hollow lower half; this was clearest on Redemittel, where
-  a short Wendung sat in a 256px card. Anchored elements stay anchored (the Wörter foot row, the
-  Grammatik pattern chip and foot).
-- **"Nach oben" now has a desktop placement** (`bottom-4 right-4`, clear of the Feedback pill); the
-  centered mobile one above the Üben bar is unchanged. Same 280px show threshold.
-- **Follow-up: the clearance moved from padding into the sticky offset.** `pt-3` applied at rest too
-  and pushed the controls away from the tabs at the top of the page. The 0.75rem now rides
-  `top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]` / `lg:top-[4.75rem]` (repeated in the four
-  trainers' own `lg:sticky` class), which does nothing until the row pins. At rest the tabs-to-buttons
-  gap is back to 24px desktop / 16px mobile; pinned, the buttons sit 12px under the app header.
-- **Follow-up in the same session: the toolbar buttons were half-transparent.** The shared `outline`
-  button variant fills with `bg-surface/50`, which was invisible behind the old blurred band and let
-  card titles print through the buttons once the band went away. Every browse-toolbar icon button now
-  wears one exported constant, `BROWSE_TOOLBAR_BUTTON` (`bg-surface` + `hover:bg-muted` +
-  `shadow-soft`); the global `outline` variant is untouched, since its translucency is wanted
-  elsewhere. Checked by reading the computed background alpha of every control in the row on all four
-  tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
-- **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
-  check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

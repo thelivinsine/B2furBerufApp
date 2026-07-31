@@ -532,3 +532,73 @@ offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the lab
   code scopes by `themeId` throughout, so nothing shipped was wrong. Lesson for future banks: a
   `tx_c1_*` id is fine, but never assert content scope through an id prefix.
 
+
+**Handoff after session 179, parts 1 and 2 (2026-07-31).** _(Archived from `PROJECT_STATUS.md` in session 180.)_
+
+**Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
+`claude/ui-layout-buttons-cards-zkchha`.
+Founder, from the Fokus trainer: "when generating new umformen with AI, there's no count like
+(2 left out of 3). Even for korrigieren, there is no count. Check the documentation on what we
+agreed on and implement it neatly." The agreement was already law (s167 + the 2026-07-25 prompt):
+**Fokus 10 Korrekturen · Kurz 4 · Lang 2 per day**, one Korrektur = one unit, its Umformung free.
+It was only ever ENFORCED, never shown, so the first a learner knew of it was "komm morgen wieder".
+- **`Heute noch 7 von 10` beside the button that spends it**, in all three trainers: Fokus under the
+  Korrigieren row (desktop and mobile), Kurz/Lang under the umlaut keys sharing one line with the
+  transient "Noch N Wörter" hint (hint left, allowance right). The mobile caption slot stays the
+  Art. 50 note, per the s169 lock.
+- **The number is the server's, not a guess.** `check-sentence` and `evaluate-writing` now return
+  `dailyLimit`/`dailyRemaining` on every response (success, cache hit and limit-reached alike), so a
+  limit raised via a Supabase secret shows up in the UI by itself. Before the first call of the day
+  `src/lib/aiAllowance.ts` counts the learner's own rows over the SAME tables and the SAME UTC day
+  boundary the functions count. When neither is available it renders nothing rather than a number it
+  cannot stand behind. A cache hit in Kurz/Lang is free and correctly does NOT move the counter.
+- **"Nochmal" counts its own phrasings: `2 von 3 übrig`.** Those are the NEW AI phrasings left for
+  the current target form; cycling back to an already-generated one is cached and free, so it does
+  not count down, and a different target form starts a fresh 3.
+- **The two Edge Functions ship themselves**: `.github/workflows/supabase.yml` deploys every function
+  on merge to `main`, so this needs no founder action. Until that run finishes the UI falls back to
+  the row count, which is already correct.
+- **Gates:** typecheck · lint 0 errors · test:unit **396/396** (two new suites:
+  `tests/aiAllowance.test.ts`, `tests/fokusVariants.test.tsx`) · build · check:bundle 123.2 kB.
+
+**Handoff after session 179 (2026-07-31). Bibliothek card grids and the floating toolbar.** Branch
+`claude/ui-layout-buttons-cards-zkchha`. Founder, from a screenshot of the Wörter Karten view: the
+view-button row has a blur background and should be completely transparent so the buttons look like
+they float, with enough space above them; and the cards do not have the same dimensions. Follow-up in
+the same session: add a "go to top" button to the bottom right on desktop, where it was missing.
+- **The toolbar row is transparent in every state** (`browseHeaderClass`). It used to fade in a
+  `bg-background/90 backdrop-blur` mask once the page scrolled, which is the blurred band the founder
+  saw. The row now only sticks and collapses; the ViewSwitcher track and the Filter/Bookmark/Search
+  icon buttons carry `shadow-soft` so they lift off the cards moving underneath, and `pt-3` gives the
+  clearance under the app header.
+- **The level-band chip moved out of the sticky row into the content column** (all three tabs that
+  have one). Without a band behind it, a pinned chip printed straight over the card titles.
+- **Every tile in a Karten grid is now the same height, not just per row** (`auto-rows-fr` on the
+  Wörter, Kollokationen, Redemittel and Grammatik grids). `1fr` rows in an auto-height grid resolve to
+  the tallest row, so the size stays content-driven and nothing is clipped: a filtered set of short
+  cards still renders short.
+- **The verb paradigm on the Wörter card back is two label/value pairs per row.** As a single column
+  it ran four rows and made verb tiles the tallest card in the grid, which then set the height for
+  every card. Measured at 1280px: uniform tiles were 209px with the old layout, 189px with the new one,
+  and no back face overflows at either breakpoint (checked by flipping every verb card in the first
+  batch, mobile and desktop).
+- **Card content is vertically centered** on Wörter / Kollokationen / Redemittel. With one height for
+  the whole grid, top-aligned content left a hollow lower half; this was clearest on Redemittel, where
+  a short Wendung sat in a 256px card. Anchored elements stay anchored (the Wörter foot row, the
+  Grammatik pattern chip and foot).
+- **"Nach oben" now has a desktop placement** (`bottom-4 right-4`, clear of the Feedback pill); the
+  centered mobile one above the Üben bar is unchanged. Same 280px show threshold.
+- **Follow-up: the clearance moved from padding into the sticky offset.** `pt-3` applied at rest too
+  and pushed the controls away from the tabs at the top of the page. The 0.75rem now rides
+  `top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]` / `lg:top-[4.75rem]` (repeated in the four
+  trainers' own `lg:sticky` class), which does nothing until the row pins. At rest the tabs-to-buttons
+  gap is back to 24px desktop / 16px mobile; pinned, the buttons sit 12px under the app header.
+- **Follow-up in the same session: the toolbar buttons were half-transparent.** The shared `outline`
+  button variant fills with `bg-surface/50`, which was invisible behind the old blurred band and let
+  card titles print through the buttons once the band went away. Every browse-toolbar icon button now
+  wears one exported constant, `BROWSE_TOOLBAR_BUTTON` (`bg-surface` + `hover:bg-muted` +
+  `shadow-soft`); the global `outline` variant is untouched, since its translucency is wanted
+  elsewhere. Checked by reading the computed background alpha of every control in the row on all four
+  tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
+- **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
+  check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.

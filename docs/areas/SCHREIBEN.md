@@ -31,20 +31,43 @@ founder-picked s171).
     and the saved draft record.
   - `sub` applies only inside a concrete theme (slugs are theme-scoped) and is ignored under Alle
     Themen; the Unterthema dropdown hides there.
-  - `sector` follows the untagged-=-universal rule **per theme**, so a Branche under Alle Themen
-    keeps the broad pool instead of collapsing to the handful of tagged tasks.
-  - **Niveau and Textsorte do NOT follow untagged-=-universal**, and this distinction is the whole
-    point: an untagged task is not "every level" and certainly not "every Textsorte". They PREFER
-    their tagged tasks, and their dropdowns count with `countExact` (no fallback) and grey out at
-    zero. Admitting untagged tasks made "C1.1 + Widerspruch" serve a B1 address-change mail, since
-    legacy tasks outnumber tagged ones roughly ten to one. A Lang-only Textsorte (Forumsbeitrag)
-    therefore reads as unavailable under Kurz rather than quietly serving a Notiz.
-  - No scope is ever empty, so **Branche never disables**. `tests/writingScope.test.ts` pins all of it.
+  - **Niveau and Textsorte are HARD filters** (2026-07-31), and the filters apply in this order:
+    Unterthema → Niveau → Textsorte → Branche. A task that is not tagged with the chosen
+    Niveau/Textsorte is not a match, full stop. They used to PREFER their tagged tasks and fall back
+    to the untagged ones, which is how "Forumsbeitrag" served a Beschwerde an eine Fluggesellschaft
+    (founder screenshot): 373 of 643 tasks carry no `format`, so every theme without a tagged task
+    contributed its legacy ones, and where even those were absent the filter was dropped entirely.
+    Measured on the shipped bank, 66% to 100% of the draws under a Textsorte contradicted it while
+    the rail printed the honest (much smaller) count beside the option: the same rail-vs-engine
+    disagreement s167 fixed for Branche, still alive on these two axes. Niveau matches by BAND
+    (`levelBand`), so a future `B2.2` task answers to "B2" and older `?level=B2.1` links normalize.
+  - `sector` follows the untagged-=-universal rule **per theme** and is applied LAST, so a Branche
+    prefers the tagged tasks among whatever the hard axes left. A soft axis must never hide the only
+    task matching a hard one, and applying it last is also what keeps **Branche unable to empty a
+    pool** (it disables only when Niveau/Textsorte already left nothing).
+  - **`countTasks` is the ONE counting function**: with hard axes the rail count and the draw pool
+    are the same number, so the separate `countExact` is gone. Every dropdown greys its zero-yield
+    options and keeps the honest count visible on them; only the generic "Alle …" option is never
+    disabled, since it is the way back out.
+  - **A scope CAN now be empty**, and the trainer says so instead of substituting: `blockingAxis`
+    names the single filter causing it and the empty state offers exactly that escape ("Forumsbeitrag
+    gibt es nur bei Lang." + "Textsorte zurücksetzen"). Greying prevents walking into an empty scope
+    inside the rail; what it cannot prevent is a Kurz/Lang switch carrying a length-specific
+    Textsorte, or a stale deep link. `randomTask` returns **null** for an empty list (it used to hand
+    back the first task of the first theme, which is the bug in miniature).
+  - The Textsorte list is **derived from the bank**: an option with no task at any length is dead
+    chrome, not a zero-yield scope (`bewerbung` had sat in the list at 0 since s167). It returns by
+    itself when content ships one. `tests/writingScope.test.ts` +
+    `tests/writingAufgabe.test.tsx` pin all of it, the latter through the rendered trainer.
 - **Every dropdown carries a generic first option** (founder s167): "Alle Niveaus", "Alle Branchen",
   "Alle Themen", "Gesamtes Thema", "Alle Textsorten".
 - **A scope change never re-rolls onto the same Aufgabe** (s167): the re-roll passes the current task
   as `exclude`, exactly like the shuffle button. Most scope changes still redraw from a pool the filter did not
   narrow, so without this a filter looked broken roughly one time in twelve.
+- **Scope changes REPLACE the history entry** (the ViewSwitcher rule, 2026-07-31). Pushing one per
+  dropdown made the phone's back gesture undo five filter taps instead of leaving Schreiben. The
+  Niveau/Textsorte params are also dropped when the tab switches to Fokus or Verlauf, like
+  theme/sub/sector: nothing there reads them and they came back on the next Kurz/Lang visit.
 - **The mobile panel stays open until the learner closes it** (founder s167). Picking a Thema used to
   close it while every other scope left it open, so the one control that auto-dismissed was also the
   one that changed the most. Only the X and the toolbar toggle close it now.
@@ -79,8 +102,11 @@ founder-picked s171).
   scope-change redraw clear too, so all three paths agree); the icon is point-symmetric, so the half-turn per roll reads as motion and
   settles back into the same shape. Scope changes (`?sub=`/`?sector=`; theme switch clears sub,
   Branche travels) reset the draft.
-- Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel
-  line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is NOT inside the
+- Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one meta line
+  **Niveau · Textsorte · Ziel** (the editor word count does NOT repeat the Ziel range). The Niveau
+  joined it on 2026-07-31: under "Alle Niveaus" nothing on screen said whether the Aufgabe in front
+  of the learner was a B1 or a C1 one. The Ziel upper bound is `words x 1.25` **rounded up to a full
+  ten**, since "Ziel 150–188 Wörter" read like a figure to hit exactly. The AI disclaimer is NOT inside the
   card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
   pill; on mobile it is a fixed line just above the nav, in every state (s160/s169, same as Fokus,
   see below).
@@ -452,7 +478,13 @@ and could not know a content point was missing, the Anredeform wrong, or the tex
 - Two different persistences, do not merge them:
   - **`resumeDraft.ts`** — the sign-in hand-off. ONE draft, stashed deliberately when a guest hits
     the login wall, consumed once, and its `resume: true` flag is what makes `AppShell` redirect
-    back to `/writing` after the OAuth round trip.
+    back to `/writing` after the OAuth round trip. Consuming it **remounts the guided trainer**
+    (`key={guided-<resumeKey>}`) and passes the Aufgabe's theme as a **prop**, never as `?theme=`
+    (2026-07-31). Both were bugs: `initialText` is read once on mount, and signing in with
+    email/password does not remount anything when the learner is already on the draft's own tab, so
+    the text came back only after the Google round trip; and writing `?theme=` pinned a learner who
+    had been on "Alle Themen" to one Thema they never picked, whose scope change then cleared the
+    draft being restored.
   - **`draftAutosave.ts`** — the quiet autosave. localStorage, one draft PER mode (Fokus / Kurz /
     Lang each keep their own, so a tab switch is not destructive), 7-day TTL. Written 500ms after
     the last keystroke and again on unmount / pagehide; restored on mount, guided modes together

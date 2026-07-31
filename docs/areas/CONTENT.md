@@ -113,12 +113,19 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   inference-level checks, the band a B2/C1 reading task actually uses. New long texts follow the C1
   six. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered side by
   side).
-- **Writing prompts** (`src/data/writingPrompts.ts`, ~316 tasks): per-theme POOLS of task objects
-  `{ text, sub?, sectors? }`; the whole pool rides ONE `wp_<themeId>` provenance row (the mission
-  pattern). `sub` = declared sub-theme slug (coverage invariant: every sub-theme of the sub-themed
-  themes has ≥2 short + ≥2 long tagged tasks); `sectors` = Branche tags with the untagged-=-
-  universal draw rule (a selected Branche prefers tagged tasks, else falls back to untagged, never
-  empty).
+- **Writing prompts** (`src/data/writingPrompts.ts`, 643 tasks): per-theme POOLS of task objects
+  `{ id, text, sub?, sectors?, level?, format?, points?, ... }`; the whole pool rides ONE
+  `wp_<themeId>` provenance row (the mission pattern). `sub` = declared sub-theme slug (coverage
+  invariant: every sub-theme of the sub-themed themes has ≥2 short + ≥2 long tagged tasks);
+  `sectors` = Branche tags with the untagged-=-universal draw rule (a selected Branche prefers
+  tagged tasks, else falls back to untagged, never empty).
+  **`level` and `format` are the opposite: HARD filters** (`lib/writingScope.ts`). An untagged task
+  is not "every Niveau" and certainly not "every Textsorte", so it is simply not a match, and a
+  Textsorte with no task at a length reads as unavailable there. Consequences for authoring: 373 of
+  the 643 tasks still carry NO `level`/`format`, so they are reachable only under "Alle Niveaus +
+  Alle Textsorten"; a Textsorte with no task at ANY length disappears from the rail entirely (the
+  option list is derived from the bank), and filling a thin cell (`bewerbung`: 0 tasks, `bericht` at
+  C1: 1) is what makes that combination selectable.
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary

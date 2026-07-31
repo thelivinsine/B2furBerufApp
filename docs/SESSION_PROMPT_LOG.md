@@ -2711,3 +2711,53 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `supabase/functions/evaluate-writing/index.ts` · `supabase/functions/transform-sentence/index.ts` ·
   `supabase/migrations/0014_writing_insight_en.sql` (new) · `tests/feedbackLang.test.tsx` (new) ·
   `tests/correction.test.tsx` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 180 — 2026-07-31 — branch `claude/aufgabe-rail-bugs-1xdep2`
+
+- **Prompt 1 (verbatim, 2026-07-31, three Schreiben Lang screenshots attached: "Alle Niveaus /
+  Textsorte Forumsbeitrag" over a Beschwerde an eine Fluggesellschaft, and twice "B2 / Forumsbeitrag"
+  over a Bericht):** `there's an issue with the aufgabe rail. I selected forumsbeitrag but the aufgabe
+  doesn't relate to it. Do a thorough analysis and find all the bugs and necessary improvements with
+  schreiben section's aufgabe feature.`
+  **Response:** the report is real and the cause is one line of policy, not a slip. `eligibleTasks`
+  narrowed Niveau and Textsorte with the Branche rule (prefer tagged, else untagged, else keep
+  everything). 373 of the 643 tasks carry no `format`, so on every theme without a tagged task the
+  fallback swallowed the filter. Measured on the shipped bank before the fix: "Alle Themen +
+  Forumsbeitrag" drew from 85 tasks of which 71 were not Forumsbeiträge (84%), which is screenshot 1;
+  adding B2 gave 50 of which 42 were wrong, which is screenshots 2 and 3. Every Textsorte was wrong
+  between 66% and 100% of the time, while the rail printed the honest count (14) beside the option,
+  because the rail counted with `countExact` and the trainer drew with the fallback. That is the same
+  rail-vs-engine disagreement s167 fixed for Branche, reintroduced on the next axis.
+  **The fix:** both axes filter HARD; filter order is Unterthema → Niveau → Textsorte → Branche (the
+  soft axis last, so a preference cannot hide the only task matching a hard filter, and Branche still
+  cannot empty a pool); `countExact` is deleted, so the rail count and the draw pool are one number;
+  every dropdown greys its zero-yield options and keeps the count visible on them.
+  **The consequence, handled rather than papered over:** a scope CAN now be empty. Inside the rail
+  greying prevents it; a Kurz/Lang switch carrying a length-specific Textsorte and a stale deep link
+  cannot be prevented, so those get an honest empty state naming the culprit ("Forumsbeitrag gibt es
+  nur bei Lang.") and the one-tap escape `blockingAxis` picks. `randomTask` returns null for an empty
+  list instead of the first task of the first theme, which was the bug in miniature.
+  **The thorough pass found seven more.** (a) `bewerbung` was a dropdown option with 0 tasks at either
+  length, dead since s167: the Textsorte list is derived from the bank now. (b) The option labelled
+  "B2" matched the tag `B2.1` exactly, so the first `B2.2` task would have been silently unreachable;
+  matching goes through `levelBand`, and old `?level=B2.1` links normalize. (c) The C1 option was
+  labelled "C1.1", a band `lib/cefr.ts` does not have. (d) "Ziel 150–188 Wörter" printed `words x 1.25`
+  raw; the upper bound rounds up to a full ten. (e) The card never named the Niveau, so under "Alle
+  Niveaus" nothing said whether the Aufgabe was B1 or C1; the meta line is "B2 · Bericht · Ziel
+  150–190 Wörter" now. (f) Every scope change pushed a history entry, so the phone back gesture undid
+  filter taps one by one; scope changes replace, like the ViewSwitcher, and Fokus/Verlauf now drop
+  `?level`/`?format` like they already dropped theme/sub/sector. (g) Signing in from the login wall
+  with email and password LOST the draft: `initialText` is read once on mount and that path does not
+  remount the trainer, so only the Google redirect restored it; and the hub wrote `?theme=` to carry
+  the Aufgabe back, which pinned an "Alle Themen" learner to one Thema and fired the scope-change
+  effect that clears the draft. The resume remounts the trainer and passes the theme as a prop.
+  **Reported, not fixed (founder's call):** 373 of 643 tasks carry no `level`/`format`/`points`, so
+  the default scope draws a bare one-line legacy Aufgabe 58% of the time and those degrade the AI to
+  language-only feedback. Either tag the bank in waves or make the default draw prefer structured
+  tasks; halving the reachable bank by default is a product decision, not a bug fix.
+  Gates: typecheck · lint 0 errors · test:unit **407/407** · lint:content clean · build ·
+  check:bundle 123.2 kB.
+- **Artifacts (prompt 1):** `src/lib/writingScope.ts` · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingHub.tsx` ·
+  `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` (new) · `docs/areas/SCHREIBEN.md` ·
+  `docs/areas/CONTENT.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
