@@ -9,8 +9,9 @@ counting rule serves the rail and the draw, zero-yield options grey out, and a g
 Prior s179: **Bibliothek card grids, the floating toolbar, and the AI
 feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
 switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
-Shuffle clears the editor. **One founder action: paste `supabase/migrations/0014_writing_insight_en.sql`
-into the Supabase SQL editor** (it stores the English tip so Verlauf keeps it). Also: the AI
+Shuffle clears the editor. **Migrations now apply themselves on merge** (the founder set
+`SUPABASE_DB_PASSWORD`; the hand-pasted history was bridged and two genuinely missing migrations,
+0010 and 0014, were applied), so there is no SQL to paste any more. Also: the AI
 allowances are visible. Each writing trainer now prints "Heute noch 7 von 10" beside the button
 that spends the day's AI budget (Fokus 10 / Kurz 4 / Lang 2), and Fokus "Nochmal" says how many new
 phrasings are left ("2 von 3 übrig"); the numbers come from the Edge Functions themselves. Also: the
@@ -122,11 +123,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       the admin gate is now a user-id table, not an email claim. Live confirmation that `/admin`
       still opens is the founder's last check; the rollback to the 0008 email gate sits in a comment
       at the foot of the migration if it ever does not.
-- [ ] **Paste `supabase/migrations/0014_writing_insight_en.sql`** into the Supabase SQL editor
-      (Dashboard → SQL Editor → paste → Run). One line: it adds the column that stores the ENGLISH
-      version of a writing tip, so the DE/EN switch also works on past entries in Verlauf. Safe to run
-      twice (`add column if not exists`). Until it is run, nothing breaks: fresh tips still switch to
-      English in the moment, older Verlauf rows just show no switch.
+- [x] ~~Paste `supabase/migrations/0014_writing_insight_en.sql` into the SQL editor.~~ **APPLIED
+      2026-07-31 by CI**, along with 0010, after the founder added `SUPABASE_DB_PASSWORD`. Migrations
+      now ship themselves on merge; **there is no SQL to paste any more.**
 - [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
       is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
       `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
@@ -191,36 +190,33 @@ necessary improvements with the Aufgabe feature."
   renders the trainer and pins 20 consecutive draws per scope) · lint:content clean · build ·
   check:bundle 123.2 kB.
 
-**Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
-English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
-Schreiben trainers.
-- **"+6 weitere" was a dead end.** The fix tiles cap at 6 so a long text cannot wall off the card, but
-  the tail had no way back. It is a TOGGLE now (expands to every correction, folds back to "Weniger");
-  the cap only decides what the card opens with. Pinned in `tests/correction.test.tsx`.
-- **The feedback was written for a linguist, not a learner.** "The vocabulary used is way too
-  advanced." Grading level and EXPLAINING level are two different things: a C1 text is still graded at
-  C1, but both prompts now ask for the prose in simple A2 German (short main sentences, everyday
-  words, an example from the learner's own text, and an explicit ban on "Aufgabenerfüllung",
-  "Inhaltspunkt", "Adressat", "Konnektor", "Umformulierung" and friends), plus the SAME sentence in
-  equally simple English. `PROMPT_REV` (evaluate-writing) and `PROMPT_VERSION` (transform-sentence)
-  were bumped so neither cache can serve prose written under the old wording. The templated spelling
-  verdict was rewritten by hand to the same standard, and the one jargon line under the tip
-  ("Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen") became plain German.
-- **A DE/EN switch on every AI feedback text**, `src/features/writing/FeedbackLang.tsx`: the Kurz/Lang
-  Tipp, every Verlauf row, and the Fokus Hinweis (which gave up its hold-to-peek `EnPeek` for it).
-  Deliberately STICKY, unlike `EnPeek`: a tip is a paragraph of instruction and nobody reads a
-  paragraph with a finger held down. `EnPeek` stays the pattern for LEARNING content (word cards,
-  Grammatik lessons). The chip only appears when an English version exists, so nothing renders dead.
-- **Shuffle clears the editor now** (founder, reversing the older "a mis-tap must not destroy work"
-  rule): a new Aufgabe means a new text. The rail reset and the scope-change redraw already cleared,
-  so all three paths finally agree.
-- **FOUNDER ACTION (one SQL paste):** `supabase/migrations/0014_writing_insight_en.sql` adds
-  `writing_evaluations.insight_en`, which is where the English tip is stored so Verlauf keeps it. CI
-  deploys functions but skips migrations, so paste that one `alter table ... add column if not exists`
-  into the Supabase SQL editor. Everything degrades gracefully until then: the read and the write both
-  step down through the optional column, and the chip simply does not appear.
-- **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
-  plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
+**Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
+were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
+Founder: "can you apply the migration in supabase yourself? I remember we setup something for this
+earlier" → the pipeline existed (s167) but only ever deployed Edge Functions, because
+`SUPABASE_DB_PASSWORD` was deliberately unset. The founder set it; the first `db push` then FAILED,
+and the failure was worth having.
+- **The remote had NO migration history at all.** Every migration to date was pasted into the SQL
+  editor by hand, which never writes to `supabase_migrations`, so `db push` tried to replay 0001
+  against a database that already had everything and died on "policy profiles_select_own already
+  exists". Because migrations run before functions, the function deploy was skipped with it.
+- **Evidence before repair.** Marking a version applied skips its SQL forever, so nothing was
+  repaired on trust: a dispatch-only **schema probe** (Management API query endpoint) listed the live
+  tables, the `progress`/`writing_evaluations` columns, every public function and every RLS policy.
+  It proved 0001-0004, 0006-0009 and 0011-0013 were present.
+- **It also found a real hole: migration 0010 had never been applied.** No `gdpr_events` table, no
+  `log_gdpr_event`, no `admin_gdpr_evidence`, so the GDPR evidence counters the Launch screen reads
+  had no store behind them. Applied now, along with 0005 (idempotent, so a no-op if it was already
+  there) and 0014.
+- **The bridge, once:** `repair_applied` marked the eleven verified versions, then
+  `db push --include-all` applied the three unrecorded ones. `--include-all` is now permanent,
+  because a repaired history legitimately leaves an older file unrecorded below a newer applied one.
+- **Verified after:** `migration list` shows Local = Remote for all 14, `writing_evaluations.insight_en`
+  exists, `gdpr_events` exists.
+- **From now on a merge to `main` applies pending migrations and then deploys the functions.** Three
+  dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
+- **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
+  wherever its number sits.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

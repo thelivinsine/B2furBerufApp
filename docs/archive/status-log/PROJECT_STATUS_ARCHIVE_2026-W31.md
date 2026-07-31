@@ -533,7 +533,37 @@ offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the lab
   `tx_c1_*` id is fine, but never assert content scope through an id prefix.
 
 
-**Handoff after session 179, parts 1 and 2 (2026-07-31).** _(Archived from `PROJECT_STATUS.md` in session 180.)_
+**Handoff after session 179, parts 1 to 3 (2026-07-31).** _(Archived from `PROJECT_STATUS.md` in session 180.)_
+
+**Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
+English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
+Schreiben trainers.
+- **"+6 weitere" was a dead end.** The fix tiles cap at 6 so a long text cannot wall off the card, but
+  the tail had no way back. It is a TOGGLE now (expands to every correction, folds back to "Weniger");
+  the cap only decides what the card opens with. Pinned in `tests/correction.test.tsx`.
+- **The feedback was written for a linguist, not a learner.** "The vocabulary used is way too
+  advanced." Grading level and EXPLAINING level are two different things: a C1 text is still graded at
+  C1, but both prompts now ask for the prose in simple A2 German (short main sentences, everyday
+  words, an example from the learner's own text, and an explicit ban on "Aufgabenerfüllung",
+  "Inhaltspunkt", "Adressat", "Konnektor", "Umformulierung" and friends), plus the SAME sentence in
+  equally simple English. `PROMPT_REV` (evaluate-writing) and `PROMPT_VERSION` (transform-sentence)
+  were bumped so neither cache can serve prose written under the old wording. The templated spelling
+  verdict was rewritten by hand to the same standard, and the one jargon line under the tip
+  ("Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen") became plain German.
+- **A DE/EN switch on every AI feedback text**, `src/features/writing/FeedbackLang.tsx`: the Kurz/Lang
+  Tipp, every Verlauf row, and the Fokus Hinweis (which gave up its hold-to-peek `EnPeek` for it).
+  Deliberately STICKY, unlike `EnPeek`: a tip is a paragraph of instruction and nobody reads a
+  paragraph with a finger held down. `EnPeek` stays the pattern for LEARNING content (word cards,
+  Grammatik lessons). The chip only appears when an English version exists, so nothing renders dead.
+- **Shuffle clears the editor now** (founder, reversing the older "a mis-tap must not destroy work"
+  rule): a new Aufgabe means a new text. The rail reset and the scope-change redraw already cleared,
+  so all three paths finally agree.
+- **Migration 0014 (`writing_evaluations.insight_en`) is APPLIED** (2026-07-31, by CI, see the
+  part-4 handoff below). The read and the write still step down through the optional column, so a
+  database without it degrades rather than breaks.
+- **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
+  plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
+
 
 **Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
 `claude/ui-layout-buttons-cards-zkchha`.
@@ -602,3 +632,4 @@ the same session: add a "go to top" button to the bottom right on desktop, where
   tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
 - **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
   check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
+
