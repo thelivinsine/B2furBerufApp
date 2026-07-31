@@ -45,6 +45,10 @@ on:
         description: "Space-separated migration versions to MARK as already applied (bookkeeping only, runs no SQL)"
         type: string
         default: ""
+      probe_schema:
+        description: "Diagnose only: print which tables/columns the live database actually has"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -109,6 +113,35 @@ jobs:
             echo "::error::SUPABASE_ACCESS_TOKEN was rejected. It has most likely EXPIRED. Generate a new one at Supabase Dashboard -> Account -> Access Tokens, then update the SUPABASE_ACCESS_TOKEN secret in GitHub -> Settings -> Secrets and variables -> Actions. Nothing was deployed."
             exit 1
           fi
+
+      # Read-only evidence about the LIVE schema, via the Management API's query
+      # endpoint (the same thing the dashboard SQL editor drives). Needed before
+      # any repair: marking a version applied skips its SQL forever, so it must
+      # only ever be done for DDL the database demonstrably already carries.
+      - name: Schema probe
+        if: >-
+          steps.creds.outputs.configured == 'true' &&
+          github.event_name == 'workflow_dispatch' &&
+          inputs.probe_schema
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          read -r -d '' SQL <<'EOSQL' || true
+          select 'table:' || table_name as item
+            from information_schema.tables
+           where table_schema = 'public'
+          union all
+          select 'column:' || table_name || '.' || column_name
+            from information_schema.columns
+           where table_schema = 'public'
+             and column_name in ('task_id', 'corrected_text', 'insight_en')
+          union all
+          select 'recorded_migration:' || version
+            from supabase_migrations.schema_migrations
+          order by 1
+          EOSQL
+          payload=$(jq -Rn --arg q "$SQL" '{query: $q}')
+          curl -sS -X POST             "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query"             -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"             -H "Content-Type: application/json"             -d "$payload" | jq -r '.[]?.item // .'
 
       # Read-only diagnosis. Every migration up to 0013 was pasted into the SQL
       # editor by hand, which does NOT write to supabase_migrations, so the
