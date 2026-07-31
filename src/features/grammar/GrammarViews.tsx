@@ -110,7 +110,9 @@ export function GrammarTopicCards({
   onOpen: (id: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    // `auto-rows-fr`: one card height for the whole grid, not per row (founder
+    // 2026-07-31). Same mechanism as the Wörter card grid.
+    <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {items.map((t, i) => (
         <TopicCard key={t.id} topic={t} index={i} onOpen={onOpen} />
       ))}

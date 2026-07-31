@@ -25,6 +25,18 @@ buttons need their own `uppercase`, Tailwind preflight resets it on buttons) wit
 + compact lists in `vocabulary/VocabViews.tsx` / `collocations/CollocationViews.tsx` /
 `redemittel/RedemittelViews.tsx`. Branche chips show on Tabelle/Karten.
 
+## Card grids (all four tabs' Karten views)
+- **Every tile in a Karten grid is the SAME height, not just the ones sharing a row** (founder
+  2026-07-31). The grids carry `auto-rows-fr`: `1fr` rows in an auto-height grid all resolve to the
+  tallest row, so the height stays content-driven (a filtered set of short cards stays compact) and
+  nothing is ever clipped by a fixed height. Applies to `vocabulary/VocabList.tsx`,
+  `collocations/CollocationsBrowser.tsx`, `redemittel/RedemittelTrainer.tsx`,
+  `grammar/GrammarViews.tsx`.
+- **Card content is vertically centered** in Wörter / Kollokationen / Redemittel
+  (`justify-center`, and on the Wörter front the example takes the slack via `flex-1 items-center`):
+  with one height for the whole grid, top-aligned content leaves a hollow lower half. Elements that
+  were already anchored stay anchored (the Wörter foot row, the Grammatik pattern chip + foot).
+
 ## Wörter card (Karten view; `vocabulary/VocabList.tsx`)
 - Both faces are stacked in ONE grid cell by `FlipCard`, so the tile sizes to the TALLER face; the
   back can grow without clipping.
@@ -36,8 +48,10 @@ buttons need their own `uppercase`, Tailwind preflight resets it on buttons) wit
   `preview/verb-forms-card.html`). Same slot, same styling; a word with neither just right-aligns the
   speak button.
 - **Back:** "Englisch" eyebrow, the gloss, then the inflection repeated in full. For nouns that is the
-  existing `Plural: …` line; for verbs a compact `dl` grid of Präteritum · Perfekt · mit zu · trennbar,
-  each row present only when the data has it. Values come from the generated `src/data/verbForms.ts`
+  existing `Plural: …` line; for verbs a compact `dl` of Präteritum · Perfekt · mit zu · trennbar,
+  each pair present only when the data has it, laid out **two label/value pairs per row** (2026-07-31:
+  as a single column the paradigm ran four rows and made verb tiles the tallest card in the grid,
+  which then set the height for every card once the grid was equalized). Values come from the generated `src/data/verbForms.ts`
   via `perfekt()` in `src/lib/verbDisplay.ts` (which turns the stored infinitive auxiliary into the
   citation form "hat"/"ist"). A verb the oracle does not cover shows nothing rather than a guess.
 - The label is **Perfekt**, not "Partizip II": "hat verschoben" is the Perfekt, the bare participle is
@@ -126,6 +140,19 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - Facet pills are `rounded-md` squircle (not `rounded-full`).
 
 ## Search (transient, outside the filter tile)
+The toolbar row itself is sticky under the app header and **always fully transparent** (founder
+2026-07-31, `browseHeaderClass` in `features/shared/browseScroll.tsx`): the earlier version faded a
+`bg-background/90 backdrop-blur` mask in once the page scrolled, which read as a blurred band across
+the page. The controls carry their own opaque fill plus `shadow-soft` and clear the app header by
+`pt-3`, so they float over the cards passing underneath. Nothing else may be pinned in that row: the
+level-band `ActiveFilterChip` moved into the content column, since a chip with no band behind it
+lands on top of the card titles.
+
+**"Nach oben"** (`ScrollTopButton`, shown once the page is past 280px) has one placement per
+breakpoint: centered above the mobile Üben bar, and the bottom-right corner on desktop (added
+2026-07-31; it was mobile-only). The desktop one sits at `bottom-4 right-4` and clears the Feedback
+pill, which floats on its own content-column offset further left.
+
 A search icon on the toolbar toggles a transient full-width `SearchField` (autofocus); opening/
 closing never touches filter state; closing clears. Desktop grows inline in the toolbar row
 (`lg:flex-1`); mobile gets its own second row. Backed by `src/lib/fuzzy.ts`

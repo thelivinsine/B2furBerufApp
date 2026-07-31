@@ -150,7 +150,7 @@ export function GrammarHub() {
           filter tile share row 2 so the tile starts level with the first card.
           Mobile renders the SAME filter tile inline as a slide-open panel. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
           <div className="flex w-full flex-col gap-2">
             {/* Items are centered while search is closed; opening search slides
@@ -168,7 +168,7 @@ export function GrammarHub() {
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className="relative shrink-0 rounded-lg lg:hidden"
+                  className="relative shrink-0 rounded-lg shadow-soft lg:hidden"
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
@@ -210,7 +210,7 @@ export function GrammarHub() {
                   aria-expanded={searchOpen}
                   aria-label="Suche"
                   title="Suche"
-                  className="shrink-0 rounded-lg"
+                  className="shrink-0 rounded-lg shadow-soft"
                   onClick={() =>
                     setSearchOpen((o) => {
                       if (o) setSearch("");

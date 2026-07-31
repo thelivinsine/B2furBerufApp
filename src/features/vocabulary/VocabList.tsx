@@ -107,9 +107,13 @@ const VocabCard = memo(function VocabCard({
             <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
           </Button>
         </div>
-        <p className="mt-2.5 text-sm italic text-muted-foreground">
-          „{v.examples[0].de}"
-        </p>
+        {/* The example takes the slack between the headline and the foot and
+            sits centered in it (2026-07-31). Every tile in the grid is the same
+            height now, so on a short card the example would otherwise cling to
+            the headline with a hollow half-card under it. */}
+        <div className="mt-2.5 flex flex-1 items-center">
+          <p className="text-sm italic text-muted-foreground">„{v.examples[0].de}"</p>
+        </div>
 
         {/* Parked: the cross-module "Verbunden" panel (SHOW_RELATED=false, see
             top of file). Never renders while parked; kept in place so
@@ -166,7 +170,9 @@ const VocabCard = memo(function VocabCard({
   const back = (
     <Card className="relative h-full overflow-hidden border-primary/30 bg-primary/[0.03]">
       {gender && <ArtikelEffect gender={gender} play={effectPlay} align="right" />}
-      <CardContent className="relative z-10 flex h-full flex-col p-4">
+      {/* Centered like the front: the back has nothing pinned to the base, so in
+          a uniform-height tile it would sit top-heavy over empty space. */}
+      <CardContent className="relative z-10 flex h-full flex-col justify-center p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
           Englisch
         </p>
@@ -178,7 +184,12 @@ const VocabCard = memo(function VocabCard({
         <p className="mt-1 text-base font-semibold sm:text-lg">{v.en}</p>
         {v.plural && <p className="mt-1 text-xs text-muted-foreground">Plural: {v.plural}</p>}
         {forms && (
-          <dl className="mt-2.5 grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5 border-t border-border pt-2 text-xs">
+          // Two label/value pairs per row (2026-07-31). As a single-pair column
+          // the paradigm ran four rows tall, which made verb tiles the tallest
+          // card in the grid and set the height for every other card once the
+          // grid was equalized. Paired up it is two rows and the uniform tile
+          // stays tight; no form was dropped.
+          <dl className="mt-2.5 grid grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)] gap-x-2.5 gap-y-0.5 border-t border-border pt-2 text-xs">
             {forms.praeteritum && (
               <>
                 <dt className="text-muted-foreground">Präteritum</dt>
@@ -229,7 +240,12 @@ export function VocabList({ items }: { items: VocabItem[] }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {/* `auto-rows-fr`: every tile in the grid gets the SAME height, not just
+          the ones sharing a row (founder 2026-07-31). Rows sized `1fr` in an
+          auto-height grid all resolve to the tallest row, so the cards stay
+          content-driven (a filtered set of short cards stays compact) without
+          any fixed height that could clip a long example. */}
+      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2">
         {visible.map((v) => (
           <VocabCard key={v.id} v={v} open={openId === v.id} onToggleOpen={onToggleOpen} />
         ))}
