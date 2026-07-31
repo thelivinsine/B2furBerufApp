@@ -23,6 +23,18 @@ import type {
  * pool. Wave 1 covers it/care/construction/transport/hospitality; further
  * Branchen follow in content waves.
  *
+ * **A task is only SERVED when it carries Inhaltspunkte** (founder decision,
+ * 2026-07-31, `lib/writingScope.isServable`). The full shape is: instruction +
+ * `addressee` + `register` + 2 to 5 `points` + `level` + `format` + `words`.
+ * That is what `evaluate-writing` needs to grade Aufgabenerfüllung, and what
+ * the Niveau/Textsorte filters read. The 373 legacy one-line tasks (of 643)
+ * stay here with their permanent ids and pool positions, so drafts and Verlauf
+ * rows still resolve, but they are retired from the draw until they are
+ * authored up to the full shape. **Upgrading them is the standing content
+ * backlog**: every zero in the Aufgabe rail is an entry on that list. Today's
+ * gaps, worst first: `bewerbung` has no task at all, 15 of 46 Unterthemen have
+ * none at each length, `bericht` at C1 has one.
+ *
  * Provenance: the whole pool rides on the theme's one `wp_<themeId>` register
  * row (the mission pattern). Coverage target per sub-theme: at least 2 short
  * + 2 long tagged tasks. No em dashes in copy.

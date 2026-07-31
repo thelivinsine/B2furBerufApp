@@ -3,6 +3,7 @@ import {
   blockingAxis,
   countTasks,
   eligibleTasks,
+  isServable,
   levelBand,
   normalizeLevelScope,
   randomTask,
@@ -19,19 +20,51 @@ import type { ThemeId } from "@/types";
 const LENGTHS = ["short", "long"] as const;
 const THEME_IDS: ThemeId[] = themes.map((t) => t.id);
 
+/** The servable slice of a pool: what the trainer may draw (2026-07-31). */
+const servable = (id: ThemeId, length: (typeof LENGTHS)[number]) =>
+  writingPrompts[id][length].filter(isServable);
+
 describe("eligibleTasks", () => {
+  it("REGRESSION: only tasks with Inhaltspunkte are ever served", () => {
+    // Founder decision (2026-07-31): a bare one-line Aufgabe leaves the AI
+    // nothing to check Aufgabenerfüllung against and carries no Niveau or
+    // Textsorte tag, so it downgrades the feedback AND is invisible to the
+    // filters. 373 of 643 tasks are retired from the DRAW (never from the
+    // bank: ids and pool positions stay, so drafts and Verlauf still resolve).
+    for (const length of LENGTHS) {
+      for (const ref of eligibleTasks({ theme: "", sub: "", sector: "", length })) {
+        const task = writingPrompts[ref.theme][length][ref.ix];
+        expect(isServable(task), `${task.id} has no Inhaltspunkte`).toBe(true);
+      }
+    }
+  });
+
+  it("a retired task is still resolvable by id and by ref (drafts, Verlauf)", () => {
+    const bare = THEME_IDS.flatMap((id) =>
+      LENGTHS.flatMap((len) =>
+        writingPrompts[id][len].map((t, ix) => ({ id, len, ix, t })).filter((r) => !isServable(r.t)),
+      ),
+    );
+    expect(bare.length).toBeGreaterThan(0);
+    for (const r of bare.slice(0, 25)) {
+      expect(writingTaskById(r.t.id)).toBe(r.t);
+      expect(taskText({ theme: r.id, ix: r.ix }, r.len)).toBe(r.t.text);
+    }
+  });
+
   it('theme "" spans every theme pool', () => {
     for (const length of LENGTHS) {
-      const total = THEME_IDS.reduce((n, id) => n + writingPrompts[id][length].length, 0);
+      const total = THEME_IDS.reduce((n, id) => n + servable(id, length).length, 0);
       expect(countTasks({ theme: "", sub: "", sector: "", length })).toBe(total);
     }
   });
 
-  it("a concrete theme yields exactly that theme's pool", () => {
+  it("a concrete theme yields exactly that theme's servable pool", () => {
     for (const length of LENGTHS) {
       for (const id of THEME_IDS) {
         const tasks = eligibleTasks({ theme: id, sub: "", sector: "", length });
-        expect(tasks.length).toBe(writingPrompts[id][length].length);
+        expect(tasks.length).toBe(servable(id, length).length);
+        expect(tasks.length, `${id}/${length} has no servable task`).toBeGreaterThan(0);
         expect(tasks.every((t) => t.theme === id)).toBe(true);
       }
     }
@@ -91,17 +124,19 @@ describe("eligibleTasks", () => {
     expect(countTasks({ theme: "", sub: "meetings.ablauf", sector: "", length: "short" })).toBe(all);
   });
 
-  it("a deep-linked Unterthema with no tasks still stays inside its theme", () => {
-    // `narrow` cannot empty the list, but the sub filter can, and a caller that
-    // gets [] would draw from a different theme entirely.
-    const tasks = eligibleTasks({
-      theme: "meetings",
+  it("an Unterthema with no task reads as empty, it does not serve the theme", () => {
+    // It used to fall back to the whole theme. That was the last silent
+    // substitution in the selector, and retiring the bare tasks empties 30 of
+    // the 96 Unterthema cells, so it would have started firing in earnest. The
+    // rail greys those options; a deep link gets the trainer's empty state.
+    const scope = {
+      theme: "meetings" as const,
       sub: "meetings.doesnotexist",
       sector: "",
-      length: "short",
-    });
-    expect(tasks.length).toBeGreaterThan(0);
-    expect(tasks.every((t) => t.theme === "meetings")).toBe(true);
+      length: "short" as const,
+    };
+    expect(eligibleTasks(scope)).toEqual([]);
+    expect(blockingAxis(scope)).toBe("sub");
   });
 
   it("every task carries a unique permanent id, resolvable by id", () => {

@@ -6,6 +6,10 @@ so "Forumsbeitrag" drew a Beschwerde an eine Fluggesellschaft: 84% of that scope
 the filter while the rail printed the honest count beside the option. Both axes filter hard now, one
 counting rule serves the rail and the draw, zero-yield options grey out, and a genuinely empty scope
 (Kurz + Forumsbeitrag) gets an honest empty state with a one-tap escape instead of a substitute task.
+**And only fully briefed Aufgaben are served** (founder decision): the 373 one-line legacy tasks, 58%
+of the default draws, left the AI nothing to grade Aufgabenerfüllung against, so the bank the trainer
+draws from is the 270 exam-shaped ones. Nothing is deleted; upgrading the rest is the content backlog
+and every zero in the rail is an entry on it.
 Prior s179: **Bibliothek card grids, the floating toolbar, and the AI
 feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
 switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
@@ -182,13 +186,27 @@ necessary improvements with the Aufgabe feature."
   already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
   resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
   which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
-- **Not fixed, founder's call:** 373 of 643 tasks still carry no `level`/`format`/`points`, so the
-  DEFAULT scope draws a bare one-line legacy Aufgabe 58% of the time, and those degrade the AI to
-  language-only feedback (no Aufgabenerfüllung). Either tag the bank in waves or make the default
-  draw prefer structured tasks. `bericht` at C1 (1 task) and `bewerbung` (0) are the thinnest cells.
-- **Gates:** typecheck · lint 0 errors · test:unit **407/407** (new `tests/writingAufgabe.test.tsx`
-  renders the trainer and pins 20 consecutive draws per scope) · lint:content clean · build ·
-  check:bundle 123.2 kB.
+- **Follow-up in the same session, founder decision: only fully briefed Aufgaben are served.** The
+  founder sent a fourth screenshot, `wt_safety_l12` ("Verfasse eine kurze Unterweisung für neue
+  Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no Niveau): "this one has too little
+  description of the task." The bank held two generations: **270 tasks carry the whole exam brief**
+  (Adressat, du/Sie, 2 to 5 Leitpunkte, Niveau, Textsorte, word target) and **373 are one-liners**.
+  Presented both options (upgrade the 373 over several content sessions, or serve only the 270 now);
+  the founder chose the smaller, better bank. Bare tasks failed three ways at once: they leave
+  `evaluate-writing` nothing to grade Aufgabenerfüllung against, so feedback silently drops to
+  grammar and vocabulary; they carry neither filter tag, so they were reachable ONLY under the
+  default scope, which is where 58% of draws landed; and they read as unfinished. At the Kurz 4 /
+  Lang 2 daily allowance, 270 tasks is about two months before anything repeats, so the number the
+  learner can feel is unchanged. **Nothing is deleted:** the 373 keep their ids AND pool positions,
+  so drafts and Verlauf rows still resolve, and each returns to the draw the moment it is authored up
+  to the full shape, with no code change. `sub` became a hard filter with it (it used to fall back to
+  the whole Thema, the last silent substitution in the selector).
+- **The zeros in the rail are now the content backlog**, deliberately visible rather than papered
+  over: `bewerbung` has no task at any length, **15 of 46 Unterthemen have none at each length**,
+  `bericht` at C1 has one. Every Thema and every Branche still yields tasks at both lengths.
+- **Gates:** typecheck · lint 0 errors · test:unit **410/410** (new `tests/writingAufgabe.test.tsx`
+  renders the trainer: 20 consecutive draws per scope obey the filter, and 30 default draws all carry
+  an Adressat, Leitpunkte and a Niveau) · lint:content clean · build · check:bundle 123.2 kB.
 
 **Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
 were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.

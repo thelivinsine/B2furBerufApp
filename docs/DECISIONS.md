@@ -955,3 +955,40 @@ selector had two kinds of axis and only one of them was honest.
    the tag `B2.1` with `===`, so the first `B2.2` task authored would have been silently unreachable
    from the UI *and* excluded from every Niveau filter. Matching goes through `levelBand`. The same
    sloppiness had the C1 option labelled "C1.1", a band `lib/cefr.ts` does not define.
+
+## s180 (cont.) · Only fully briefed Aufgaben are served
+
+Founder, on a screenshot of `wt_safety_l12` ("Verfasse eine kurze Unterweisung für neue
+Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no Niveau): **"this one has too little
+description of the task. Check for such instances and make sure they're well described."**
+
+The bank held two generations of task. 270 carry the whole exam brief (Adressat, du/Sie, 2 to 5
+Leitpunkte, Niveau, Textsorte, word target); 373 are a single sentence from before that shape
+existed. The bare ones failed in three ways at once, which is why they had to go rather than be
+tolerated until the rewrite catches up:
+
+1. **They downgrade the AI.** `evaluate-writing` is sent the Aufgabe so it can grade
+   Aufgabenerfüllung, the thing an examiner checks first. With no Leitpunkte there is nothing to
+   check against, so the learner silently gets grammar-and-vocabulary feedback instead. The learner
+   cannot tell which kind of feedback they just got, or why it changed between two sessions.
+2. **They are invisible to the filters.** Carrying neither `level` nor `format`, they can only ever
+   be reached under "Alle Niveaus + Alle Textsorten", which is the DEFAULT, so 58% of first-visit
+   draws served the one shape of task the rest of the product cannot reason about.
+3. **They made the shipped product look unfinished**, which is how the founder found them.
+
+The choice was "upgrade 373 tasks over several content sessions, serving them meanwhile" or "serve
+the 270 good ones now". **Quantity was the cheaper thing to give up:** at the Kurz 4 / Lang 2 daily
+allowance, 270 tasks is about two months of daily practice before anything repeats, so the number a
+learner can feel is unchanged, while every single session gets better feedback.
+
+**Retire from the surface, never from the bank.** The 373 stay in `writingPrompts.ts` with their
+permanent ids AND their pool positions, because a draft ref is `{theme, index}` and a Verlauf row is
+a task id: `taskAt` and `writingTaskById` index the FULL pool on purpose, so old work still resolves
+to the Aufgabe it was written against. Each task returns to the draw the moment it is authored up to
+the full shape, with no code change. That is the same id-permanence law every other bank follows.
+
+**The zeros are the backlog.** Serving only the full shape leaves honest gaps in the rail (15 of 46
+Unterthemen at each length, `bewerbung` at zero everywhere, `bericht` at C1 with one). Rather than
+hide them, they are the content to-do list, and each one closes by authoring a task. A gap that is
+visible gets filled; a gap papered over by a fallback stays forever, which is exactly how the
+Textsorte bug survived three sessions.
