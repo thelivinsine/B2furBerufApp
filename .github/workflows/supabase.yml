@@ -210,7 +210,14 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          supabase db push
+          # --include-all: apply every migration the remote has not recorded,
+          # even one numbered BELOW the newest applied version. Without it the
+          # CLI refuses an out-of-order file, which is the normal state here:
+          # the history was repaired from hand-pasted migrations, so a genuinely
+          # missing older one (0010) sits below a recorded newer one (0013).
+          # Every migration in this repo is written to be idempotent, which is
+          # what makes "apply whatever is unrecorded" the safe semantics.
+          supabase db push --include-all
 
       - name: Deploy Edge Functions
         if: steps.creds.outputs.configured == 'true'
