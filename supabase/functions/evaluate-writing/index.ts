@@ -112,7 +112,7 @@ const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
  * produced for a different Aufgabe. `taskKey` folds in the task id and the
  * level, and PROMPT_REV invalidates every entry when the rubric changes.
  */
-const PROMPT_REV = "s171.0";
+const PROMPT_REV = "s179.0";
 async function hashText(text: string, taskKey = ""): Promise<string> {
   const norm =
     `${PROMPT_REV}|${taskKey}|` + text.trim().toLowerCase().replace(/\s+/g, " ");
@@ -169,11 +169,18 @@ async function runLanguageTool(text: string): Promise<LtBuckets | null> {
   }
 }
 
-const TEMPLATED: Record<string, { weakness: Weakness; insight: string }> = {
+// Written in the same simple German the LLM tip is asked for (founder
+// 2026-07-31): short sentences, everyday words, an English version beside it.
+const TEMPLATED: Record<
+  string,
+  { weakness: Weakness; insight: string; insightEn: string }
+> = {
   spelling: {
     weakness: "spelling",
     insight:
-      "Deine größte Baustelle ist im Moment die Rechtschreibung – vor allem die Großschreibung der Nomen. Lies deinen Text vor dem Absenden noch einmal langsam durch und prüfe jedes Nomen auf den großen Anfangsbuchstaben.",
+      "Schau dir zuerst die Rechtschreibung an. Viele Nomen sind klein geschrieben. Nomen schreibt man im Deutschen immer groß, zum Beispiel \"der Termin\". Lies deinen Text am Ende noch einmal langsam und prüfe jedes Nomen.",
+    insightEn:
+      "Look at your spelling first. Many nouns start with a small letter. In German, nouns always start with a capital letter, for example \"der Termin\". Read your text again slowly at the end and check every noun.",
   },
 };
 
@@ -215,6 +222,18 @@ function buildSystemPrompt(level: string | null, hasTask: boolean): string {
   s +=
     `Nenne NUR die EINE wichtigste Schwachstelle (die mit dem größten Hebel) und gib einen kurzen, ` +
     `konkreten, ermutigenden Tipp auf Deutsch (2–3 Sätze, Du-Form). ` +
+    // The learner READS this tip, so it is written for a beginner even when the
+    // text itself is graded at C1 (founder 2026-07-31: "the vocabulary used is
+    // way too advanced"). Grading level and explaining level are different
+    // things; the whole point of the tip is that it lands.
+    `SPRACHE DES TIPPS: einfaches Deutsch auf A2-Niveau, egal auf welchem Niveau der Text bewertet ` +
+    `wird. Kurze Hauptsätze (höchstens 12 Wörter), Alltagswortschatz, keine Schachtelsätze, ` +
+    `keine Passivkonstruktionen. Benutze KEINE Fachbegriffe wie "Aufgabenerfüllung", ` +
+    `"Inhaltspunkt", "Adressat", "Anredeform", "Konnektor", "Kohärenz", "Register" oder ` +
+    `"Nebensatz"; sage stattdessen einfach, was fehlt oder was zu ändern ist, und nenne ein ` +
+    `konkretes Beispiel aus dem Text der lernenden Person. ` +
+    `Gib den GLEICHEN Tipp zusätzlich unter "insightEn" auf ebenso einfachem Englisch (A2, ` +
+    `kurze Sätze, gleiche Aussage, keine Fachbegriffe). ` +
     // The corrected text is what Verlauf renders as an Original/Korrigiert diff,
     // so it must be the learner's OWN text minimally repaired, never a rewrite:
     // a diff against a re-imagined text is unreadable and teaches nothing.
@@ -223,7 +242,7 @@ function buildSystemPrompt(level: string | null, hasTask: boolean): string {
     `sprachlichen Korrekturen (Rechtschreibung, Grammatik, Wortstellung, Wortwahl). ` +
     `Formuliere NICHT neu, kürze nicht, ergänze keine Inhalte und kommentiere nicht. ` +
     `Wenn der Text keine Fehler hat, gib das Original unverändert zurück. ` +
-    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern {"weakness","insight","corrected"}. ` +
+    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern {"weakness","insight","insightEn","corrected"}. ` +
     `"weakness" ist genau einer dieser Werte: ` + VALID_WEAKNESS.join(", ") +
     `. Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zäune und ohne weiteren Text.`;
   return s;
@@ -306,7 +325,12 @@ function salvageField(raw: string, field: string): string | null {
  */
 function parseInsight(
   raw: string,
-): { weakness: Weakness; insight: string; corrected: string | null } | null {
+): {
+  weakness: Weakness;
+  insight: string;
+  insightEn: string | null;
+  corrected: string | null;
+} | null {
   const pick = (w: unknown): Weakness =>
     VALID_WEAKNESS.includes(w as Weakness) ? (w as Weakness) : "vocabularyRange";
   try {
@@ -317,6 +341,8 @@ function parseInsight(
     return {
       weakness: pick(obj.weakness),
       insight: obj.insight.trim(),
+      insightEn:
+        typeof obj.insightEn === "string" && obj.insightEn.trim() ? obj.insightEn.trim() : null,
       corrected: typeof obj.corrected === "string" && obj.corrected.trim()
         ? obj.corrected.trim()
         : null,
@@ -325,7 +351,13 @@ function parseInsight(
     const insight = salvageField(raw, "insight");
     if (!insight?.trim()) return null;
     const weakness = salvageField(raw, "weakness");
-    return { weakness: pick(weakness), insight: insight.trim(), corrected: null };
+    const insightEn = salvageField(raw, "insightEn");
+    return {
+      weakness: pick(weakness),
+      insight: insight.trim(),
+      insightEn: insightEn?.trim() || null,
+      corrected: null,
+    };
   }
 }
 
@@ -599,10 +631,11 @@ Deno.serve(async (req) => {
 
   // (2) Cache lookup by input hash (task-aware since s167).
   const inputHash = await hashText(text, `${taskId ?? ""}|${level ?? ""}`);
-  // `corrected_text` needs migration 0012. CI deploys functions but SKIPS
-  // migrations (no SUPABASE_DB_PASSWORD), so this function can be live before
-  // the column exists and selecting it would fail the whole cache read. Try the
-  // richer select, fall back to the columns that have always been there.
+  // `corrected_text` needs migration 0012 and `insight_en` migration 0014. CI
+  // deploys functions but SKIPS migrations (no SUPABASE_DB_PASSWORD), so this
+  // function can be live before either column exists and selecting one would
+  // fail the whole cache read. Step DOWN through the optional columns, falling
+  // back to the ones that have always been there.
   const cacheQuery = (cols: string) =>
     admin
       .from("writing_evaluations")
@@ -612,7 +645,12 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-  const withCorrected = await cacheQuery("weakness, insight, practice_area, model, corrected_text");
+  const withEn = await cacheQuery(
+    "weakness, insight, insight_en, practice_area, model, corrected_text",
+  );
+  const withCorrected = withEn.error
+    ? await cacheQuery("weakness, insight, practice_area, model, corrected_text")
+    : withEn;
   const cacheRes = withCorrected.error
     ? await cacheQuery("weakness, insight, practice_area, model")
     : withCorrected;
@@ -623,6 +661,7 @@ Deno.serve(async (req) => {
       cached: true,
       weakness: cachedRow.weakness,
       insight: cachedRow.insight,
+      insightEn: cachedRow.insight_en ?? null,
       practiceArea: cachedRow.practice_area,
       model: cachedRow.model,
       corrected: cachedRow.corrected_text ?? null,
@@ -637,6 +676,7 @@ Deno.serve(async (req) => {
   // (4) Dominant spelling bucket → templated insight, no LLM.
   let weakness: Weakness | null = null;
   let insight = "";
+  let insightEn: string | null = null;
   let model: string | null = null;
   let cost = 0;
   // Stays null on the templated path: no LLM ran, so there is no correction.
@@ -644,7 +684,7 @@ Deno.serve(async (req) => {
   if (lt && lt.words > 0) {
     const spellRate = lt.spelling / lt.words;
     if (lt.spelling >= 3 && spellRate > 0.08 && lt.spelling >= lt.grammar * 2) {
-      ({ weakness, insight } = TEMPLATED.spelling);
+      ({ weakness, insight, insightEn } = TEMPLATED.spelling);
     }
   }
 
@@ -677,6 +717,7 @@ Deno.serve(async (req) => {
     }
     weakness = out.weakness;
     insight = out.insight;
+    insightEn = out.insightEn;
     model = out.model;
     cost = out.cost;
     correctedText = sanitizeCorrected(text, out.corrected);
@@ -705,11 +746,18 @@ Deno.serve(async (req) => {
   };
   const insert = (extra: Record<string, unknown>) =>
     admin.from("writing_evaluations").insert({ ...row, ...extra });
-  const full = await insert({ task_id: taskId, corrected_text: correctedText });
+  const full = await insert({
+    task_id: taskId,
+    corrected_text: correctedText,
+    insight_en: insightEn,
+  });
   if (full.error) {
     console.error("writing_evaluations insert failed", full.error.message);
-    const withTask = await insert({ task_id: taskId });
-    if (withTask.error) await insert({});
+    const withCorrected = await insert({ task_id: taskId, corrected_text: correctedText });
+    if (withCorrected.error) {
+      const withTask = await insert({ task_id: taskId });
+      if (withTask.error) await insert({});
+    }
   }
 
   await admin.rpc("bump_ai_usage", { p_month: month, p_cost: cost }).then(
@@ -728,6 +776,7 @@ Deno.serve(async (req) => {
     cached: false,
     weakness,
     insight,
+    insightEn,
     practiceArea: weakness,
     model,
     corrected: correctedText,

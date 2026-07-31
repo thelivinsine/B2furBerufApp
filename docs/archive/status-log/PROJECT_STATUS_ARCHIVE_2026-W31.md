@@ -485,3 +485,50 @@ Founder: "start one working with p0-p2 items". Three commits on top of the audit
 - **Gates (all four commits):** lint:content clean (1 warning, the deliberate `der Empfang` homonym) ·
   build · typecheck · lint 0 errors · test:unit **388/388** · check:bundle 123.2 kB of 400 kB.
 
+**Handoff after session 178, part 3 (2026-07-30). Audit P1 shipped: the C1 slice.** Branch
+`claude/app-content-audit-92sgh1`.
+Founder: "continue with the next step", after P0 and P2. P1 was the audit's biggest hole: onboarding
+offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the label sat 34 words,
+**0 grammar topics, 0 texts, 0 Can-Dos**. A self-declared C1 learner got exactly the B2 app.
+- **Four C1 grammar topics, 20 drills**, chosen so none overlapped an existing one: `g_konzessiv`
+  (obgleich / wenngleich / zwar…doch / sofern / insofern als / es sei denn), `g_passiversatz`
+  (sich lassen, sein + zu + Infinitiv, -bar/-lich, man), `g_subjektive_modalverben` (soll/will +
+  Infinitiv Perfekt for reporting a claim, muss/dürfte/könnte for grading certainty) and
+  `g_modalpartikeln` (doch, ja, mal, eben, wohl, denn).
+- **A new grammar group `particles`**, mirrored in all three places the closed-enum rule demands
+  (the `GrammarGroup` union, `GRAMMAR_GROUPS` in the linter, `groupMeta` + `groupOrder`). Modalpartikeln
+  fit none of the existing 16: they link nothing, so they are not connectors, and they are not modal
+  verbs. Placed LAST on the priority spine on purpose, since they fix no error.
+- **Six C1 texts, which also start P3.** The bank's median text was 90 words against the 300-450 a
+  B2/C1 reading task runs to, and at 90 words a learner reads every word, so skimming and inference
+  cannot be trained. The six run **305-344 words** (Widerspruchsbescheid, Risikobericht,
+  Modernisierungsmieterhöhung, Stellungnahme zur Klimabilanz, Unfalluntersuchung, Datenschutzauskunft)
+  and their 18 checks ask what the text IMPLIES, not what it states. They were written short first
+  (237-282) and extended, because German is more compact than the estimate and the length was the
+  whole point. **`de` and `en` paragraph counts must match** (both are blank-line split and rendered
+  together); noted in `areas/CONTENT.md` next to the schema.
+- **Five C1 Can-Dos** above each theme's existing top threshold (meetings, conflict, customer,
+  behoerde, project), describing what C1 adds: the unplanned, the implicit and the adversarial rather
+  than the scripted case.
+- 35 provenance rows, all `draft`. Nothing is claimed as verified, so the whole slice lands in the
+  `/admin/pruefen` queue like every other bank addition.
+- **Gates:** lint:content clean (1 known warning, the `der Empfang` homonym) · build · typecheck ·
+  lint 0 errors · test:unit 388/388 · check:bundle 123.2 kB · report:exercise-coverage 20/20 green ·
+  build:review-queue refreshed.
+- **Still open from the audit backlog:** P3 beyond these six texts (listening is still 6 TTS
+  voicemails), P4 (the Sprechen + Prüfung content is still off the nav), P5-P10. The ranked list with
+  cheapest-first-steps stays in §5 of `docs/reports/CONTENT_AUDIT_2026-07-30.md`.
+- **Shipped:** all of session 178 went to `main` as **PR #757**, squash-merged as `1c4bc83`
+  (the audit, P0, P2 and P1 in nine commits), plus **#758** (`e1820a5`, the merge-SHA backfill).
+  Post-merge housekeeping done both times: branch reset onto `main`, working tree clean.
+- **A flake the C1 slice introduced, caught on `main` and fixed (#759).** `Validate content` went RED
+  on `e1820a5`, a docs-only commit, at `tests/engine.test.ts:168`. Cause: the test asserted the
+  scoped reading block by ID PREFIX (`textId.startsWith("tx_behoerde")`), which only held while every
+  text id began with its theme. `tx_c1_behoerde_widerspruchsbescheid` is a behoerde text whose id
+  starts `tx_c1_`, so once the composer had three behoerde texts to sample from it failed roughly one
+  run in three (measured: 3 of 6 runs on the old assertion, 5 of 5 pass on the new one). The test now
+  asserts `textById(...).themeId`, which is what the composer actually scopes on, plus a 40-draw loop
+  so a single lucky sample cannot pass it again. **Only the test depended on the prefix**; production
+  code scopes by `themeId` throughout, so nothing shipped was wrong. Lesson for future banks: a
+  `tx_c1_*` id is fine, but never assert content scope through an id prefix.
+

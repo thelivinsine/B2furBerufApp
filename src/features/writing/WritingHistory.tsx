@@ -19,6 +19,7 @@ import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
 import { writingTaskById } from "@/lib/writingScope";
 import { diffWords } from "@/lib/wordDiff";
+import { FeedbackLangChip } from "./FeedbackLang";
 import {
   CorrectionToggle,
   FixTiles,
@@ -392,6 +393,7 @@ function HistoryEntry({
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [tipEnglish, setTipEnglish] = useState(false);
 
   const remove = async () => {
     setDeleting(true);
@@ -499,7 +501,19 @@ function HistoryEntry({
                   Wichtigster Tipp
                 </p>
               </div>
-              <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
+              {/* Same DE/EN chip as the fresh result (founder 2026-07-31), so a
+                  tip reads identically wherever the learner meets it. Rows from
+                  before migration 0014 carry no English and show no chip. */}
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {tipEnglish && entry.insight_en ? entry.insight_en : entry.insight}
+                {entry.insight_en && (
+                  <FeedbackLangChip
+                    showEnglish={tipEnglish}
+                    onChange={setTipEnglish}
+                    className="ml-1.5 align-middle"
+                  />
+                )}
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3">

@@ -13,7 +13,9 @@ export const practiceAreas: PracticeArea[] = [
     // Back into Kurz: the fix for a missed Inhaltspunkt is writing the task
     // again with all points covered, not a grammar lesson.
     route: "/writing?mode=kurz",
-    description: "Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen.",
+    // Plain German, same rule as the AI tip itself (founder 2026-07-31): this
+    // line sits directly under the tip, so jargon here undoes a simple tip.
+    description: "Schreib zu jedem Punkt der Aufgabe etwas. Achte auf Anrede und Länge.",
   },
   {
     id: "verbPosition",

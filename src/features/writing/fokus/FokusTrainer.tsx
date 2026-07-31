@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
-import { EnPeek } from "@/features/grammar/EnPeek";
+import { FeedbackLangChip } from "../FeedbackLang";
 import { GrammarRail } from "./GrammarRail";
 import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
@@ -68,6 +68,10 @@ export function FokusTrainer({
   // reports after every call, so the number moves the moment a unit is spent.
   const allowance = useDailyAllowance("fokus");
   const reduce = useReducedMotion();
+  // The Hinweis in English. One chip for ALL AI feedback in Schreiben (s179):
+  // this used to be the hold-to-peek EnPeek, which stays the pattern for
+  // LEARNING content (word cards, Grammatik lessons) but is the wrong fit for a
+  // sentence explaining the learner's own text.
   const [peek, setPeek] = useState(false);
   // Result view: the learner's original (coral marks), the corrected sentence
   // (green marks), or, on mobile, the transformed sentence ("Umgeformt", the
@@ -441,7 +445,7 @@ export function FokusTrainer({
               <b className="font-bold text-primary">Hinweis:</b>{" "}
               {peek && m.transform.noteEn ? m.transform.noteEn : m.transform.note}
               {m.transform.noteEn && (
-                <EnPeek active={peek} onChange={setPeek} className="ml-1.5 align-middle" />
+                <FeedbackLangChip showEnglish={peek} onChange={setPeek} className="ml-1.5 align-middle" />
               )}
             </p>
           )}
@@ -609,7 +613,7 @@ export function FokusTrainer({
                     <b className="font-bold text-primary">Hinweis:</b>{" "}
                     {peek && m.transform.noteEn ? m.transform.noteEn : m.transform.note}
                     {m.transform.noteEn && (
-                      <EnPeek active={peek} onChange={setPeek} className="ml-1.5 align-middle" />
+                      <FeedbackLangChip showEnglish={peek} onChange={setPeek} className="ml-1.5 align-middle" />
                     )}
                   </p>
                 )}

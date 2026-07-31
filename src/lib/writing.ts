@@ -16,6 +16,10 @@ export interface WritingHistoryEntry {
   /** Permanent id of the Aufgabe this entry was written against (s167); lets
    *  Verlauf resolve the task back, which pooled prompts alone could not. */
   task_id?: string | null;
+  /** English gloss of `insight` (s179, migration 0014). Null on rows written
+   *  before it, so the DE/EN chip only appears where there is something to
+   *  switch to. */
+  insight_en?: string | null;
   /** AI-corrected version of `text` (s171, migration 0012). Null for rows
    *  written before it, for the templated verdict (no model call) and for a text
    *  that needed no changes, so the Verlauf toggle only appears when there is a
@@ -41,6 +45,9 @@ export interface WritingEvalResult {
   model?: string | null;
   /** Set when the daily per-user or global monthly cap is hit. */
   limitReached?: boolean;
+  /** The same tip in simple English (s179), for the DE/EN chip. Null when the
+   *  model returned none or the row predates migration 0014. */
+  insightEn?: string | null;
   /** Today's allowance for THIS mode as the server enforces it (s179), so the
    *  trainer can print "Heute noch 3 von 4" without guessing at the env limit. */
   dailyLimit?: number;
@@ -59,11 +66,20 @@ export async function getWritingHistory(
   limit = 30,
 ): Promise<WritingHistoryEntry[] | null> {
   try {
-    // `corrected_text` arrives with migration 0012, and CI deploys code without
-    // applying migrations, so the richer select can 400 on a database that has
-    // not been migrated yet. Fall back to the always-present columns rather than
-    // show a load error for a column the UI treats as optional anyway. Both
-    // column lists stay literal, or the client's type inference collapses.
+    // `corrected_text` arrives with migration 0012 and `insight_en` with 0014,
+    // and CI deploys code without applying migrations, so a richer select can
+    // 400 on a database that has not been migrated yet. Step DOWN through the
+    // optional columns rather than show a load error for something the UI treats
+    // as optional anyway. Every column list stays literal, or the client's type
+    // inference collapses.
+    const withEn = await supabase
+      .from("writing_evaluations")
+      .select(
+        "id, created_at, theme, length, text, weakness, insight, insight_en, cached, task_id, corrected_text",
+      )
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (!withEn.error && withEn.data) return withEn.data as WritingHistoryEntry[];
     const { data, error } = await supabase
       .from("writing_evaluations")
       .select(

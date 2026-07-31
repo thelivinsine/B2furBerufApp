@@ -57,6 +57,23 @@ describe("fix tiles", () => {
     expect(screen.getByText("+3 weitere")).toBeDefined();
   });
 
+  it("expands the capped tail and folds it back (founder 2026-07-31)", () => {
+    const changes = Array.from({ length: MAX_FIX_TILES + 3 }, (_, i) => ({
+      from: `a${i}`,
+      to: `b${i}`,
+      category: "Rechtschreibung",
+    }));
+    render(<FixTiles changes={changes} max={MAX_FIX_TILES} />);
+    const toggle = screen.getByText("+3 weitere");
+    fireEvent.click(toggle);
+    // Every correction is reachable: the cap only decides what the card opens with.
+    expect(screen.getAllByText("Rechtschreibung").length).toBe(changes.length);
+    const back = screen.getByText("Weniger");
+    fireEvent.click(back);
+    expect(screen.getAllByText("Rechtschreibung").length).toBe(MAX_FIX_TILES);
+    expect(screen.getByText("+3 weitere")).toBeDefined();
+  });
+
   it("renders nothing at all when there is no edit", () => {
     const { container } = render(<FixTiles changes={[]} />);
     expect(container.firstChild).toBeNull();

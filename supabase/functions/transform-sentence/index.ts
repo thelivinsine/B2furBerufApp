@@ -76,11 +76,12 @@ const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
-// Bumped to "4" with the Zustandspassiv (Vorgang vs Zustand) clarifier +
-// example, on top of the "3" Modus/Konjunktiv-II rules. The global transform
-// cache is keyed on this, so the bump prevents serving stale transforms
-// produced by the old prompt.
-const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "4";
+// Bumped to "5" with the simple-language rule for note/note_en (founder
+// 2026-07-31). "4" added the Zustandspassiv clarifier on top of the "3"
+// Modus/Konjunktiv-II rules. The global transform cache is keyed on this, so
+// the bump prevents serving notes written under the old, far too advanced
+// wording.
+const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "5";
 
 interface Tuple { voice: string; tense: string; mood: string }
 
@@ -130,8 +131,16 @@ const SYSTEM_PROMPT =
   `(nicht_idiomatisch), der Satz mehrdeutig ist (mehrdeutig) oder ein Modalverb die Form verhindert ` +
   `(modalverb_grenze). Erfinde niemals eine Form. Bist du unsicher, setze applicable auf false. ` +
   `Eine falsche Form schadet dem Lernenden mehr als ein Hinweis. ` +
-  `note: ein kurzer deutscher Hinweis (ein Satz), was sich geaendert hat, bei false warum nicht. ` +
-  `note_en: dieselbe Erklaerung auf Englisch. achieved: die tatsaechlich gebildete Form. ` +
+  // The learner READS the note, so it is written for a beginner even though the
+  // sentence itself may be B2 (founder 2026-07-31: "the vocabulary used is way
+  // too advanced"). Grading level and explaining level are different things.
+  `note: ein kurzer deutscher Hinweis (EIN Satz, hoechstens 15 Woerter) in EINFACHEM Deutsch auf ` +
+  `A2-Niveau, der sagt, was sich geaendert hat, bei false warum nicht. Alltagswoerter, ` +
+  `keine Fachbegriffe wie "Umformulierung", "Konstruktion", "Genus Verbi", "synthetische Form" ` +
+  `oder "Nominalisierung". Nenne die konkreten Woerter aus dem Satz, ` +
+  `z. B. "Aus 'ist' wird 'war'. Das ist Praeteritum." ` +
+  `note_en: dieselbe Erklaerung auf ebenso einfachem Englisch (A2, ein Satz, gleiche Aussage). ` +
+  `achieved: die tatsaechlich gebildete Form. ` +
   `Beispiele: Quelle "Ich bin krank." (Praesens), Ziel Perfekt -> transformed ` +
   `"Ich bin krank gewesen", applicable true. Quelle "Der Bericht wird geschrieben." Ziel ` +
   `aktiv Praesens -> "Man schreibt den Bericht", applicable true. Quelle "Schicken Sie mir die ` +
