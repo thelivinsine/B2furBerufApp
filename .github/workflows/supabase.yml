@@ -134,7 +134,16 @@ jobs:
           select 'column:' || table_name || '.' || column_name
             from information_schema.columns
            where table_schema = 'public'
-             and column_name in ('task_id', 'corrected_text', 'insight_en')
+             and table_name in ('progress', 'writing_evaluations')
+          union all
+          select 'function:' || p.proname
+            from pg_proc p
+            join pg_namespace n on n.oid = p.pronamespace
+           where n.nspname = 'public'
+          union all
+          select 'policy:' || tablename || '.' || policyname
+            from pg_policies
+           where schemaname = 'public'
           union all
           select 'recorded_migration:' || version
             from supabase_migrations.schema_migrations
