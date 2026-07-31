@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { reportServerAllowance } from "@/lib/aiAllowance";
 import { TURNSTILE_ENABLED, useAuthStore } from "@/store/useAuthStore";
 import type { ThemeId, WeaknessCategory } from "@/types";
 
@@ -40,6 +41,10 @@ export interface WritingEvalResult {
   model?: string | null;
   /** Set when the daily per-user or global monthly cap is hit. */
   limitReached?: boolean;
+  /** Today's allowance for THIS mode as the server enforces it (s179), so the
+   *  trainer can print "Heute noch 3 von 4" without guessing at the env limit. */
+  dailyLimit?: number;
+  dailyRemaining?: number;
   /** Graceful, user-facing message (e.g. limit reached). */
   message?: string;
 }
@@ -151,6 +156,13 @@ export async function evaluateWriting(input: {
         message:
           "Die Bewertung ist momentan nicht verfügbar. Bitte versuche es später erneut.",
       };
+    }
+    if (data) {
+      reportServerAllowance(
+        input.length === "long" ? "lang" : "kurz",
+        data.dailyLimit,
+        data.dailyRemaining,
+      );
     }
     return data ?? { ok: false, message: "Keine Antwort erhalten." };
   } catch {

@@ -568,9 +568,16 @@ Deno.serve(async (req) => {
     return json({
       ok: false,
       limitReached: true,
+      dailyLimit,
+      dailyRemaining: 0,
       message: `Du hast heute schon ${dailyLimit} ${modeLabel} Texte ausgewertet. Komm morgen wieder!`,
     });
   }
+  // What the client prints as "Heute noch N von M" (s179). A cache hit returns
+  // before the row is written and is therefore free, so the two success paths
+  // below report DIFFERENT numbers: only a real evaluation spends a unit.
+  const remainingIfSpent = Math.max(0, dailyLimit - (todayCount ?? 0) - 1);
+  const remainingIfFree = Math.max(0, dailyLimit - (todayCount ?? 0));
 
   // (1c) Per-user monthly cap — one account can't drain the shared budget.
   const startOfMonth = new Date();
@@ -619,6 +626,8 @@ Deno.serve(async (req) => {
       practiceArea: cachedRow.practice_area,
       model: cachedRow.model,
       corrected: cachedRow.corrected_text ?? null,
+      dailyLimit,
+      dailyRemaining: remainingIfFree,
     });
   }
 
@@ -722,5 +731,7 @@ Deno.serve(async (req) => {
     practiceArea: weakness,
     model,
     corrected: correctedText,
+    dailyLimit,
+    dailyRemaining: remainingIfSpent,
   });
 });

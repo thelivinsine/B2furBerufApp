@@ -1,0 +1,61 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+/**
+ * Pins the daily-allowance readout (s179, founder: "there's no count like
+ * (2 left out of 3)"). The number a learner reads beside Korrigieren / Auswerten
+ * must be the number the Edge Function enforces, so the rules under test are:
+ *   - what the server last reported wins over the local default,
+ *   - a reported remaining is clamped into [0, limit] (never negative, never
+ *     more than the limit),
+ *   - each mode is counted on its OWN budget (Kurz cannot spend Lang's).
+ */
+
+// The module pulls in the Supabase client and the auth store only for the row
+// count / user id, neither of which this suite exercises.
+vi.mock("@/lib/supabase", () => ({ supabase: {} }));
+vi.mock("@/store/useAuthStore", () => ({ useAuthStore: () => null }));
+
+const load = async () => {
+  vi.resetModules();
+  return await import("@/lib/aiAllowance");
+};
+
+describe("daily AI allowance", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2)", async () => {
+    const { DAILY_ALLOWANCE } = await load();
+    expect(DAILY_ALLOWANCE).toEqual({ fokus: 10, kurz: 4, lang: 2 });
+  });
+
+  it("adopts the limit the server reports, not the compiled default", async () => {
+    const { reportServerAllowance, readAllowance } = await load();
+    reportServerAllowance("fokus", 25, 24);
+    expect(readAllowance("fokus")).toEqual({ limit: 25, remaining: 24 });
+  });
+
+  it("clamps a reported remaining into [0, limit]", async () => {
+    const { reportServerAllowance, readAllowance } = await load();
+    reportServerAllowance("kurz", 4, -3);
+    expect(readAllowance("kurz")).toEqual({ limit: 4, remaining: 0 });
+    reportServerAllowance("kurz", 4, 99);
+    expect(readAllowance("kurz")).toEqual({ limit: 4, remaining: 4 });
+  });
+
+  it("ignores a response that carries no numbers at all", async () => {
+    const { reportServerAllowance, readAllowance } = await load();
+    reportServerAllowance("lang", undefined, undefined);
+    expect(readAllowance("lang")).toBeUndefined();
+  });
+
+  it("counts each mode on its own budget", async () => {
+    const { reportServerAllowance, readAllowance } = await load();
+    reportServerAllowance("kurz", 4, 1);
+    expect(readAllowance("lang")).toBeUndefined();
+    reportServerAllowance("lang", 2, 2);
+    expect(readAllowance("kurz")).toEqual({ limit: 4, remaining: 1 });
+    expect(readAllowance("lang")).toEqual({ limit: 2, remaining: 2 });
+  });
+});

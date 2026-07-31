@@ -305,7 +305,8 @@ the moved-word single word).
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. Its header row carries a
   **"Nochmal" button** (RefreshCw, beside the speaker) that asks the AI for an alternative phrasing
   of the SAME target form (s163): `useFokusMachine.regenerate()` cycles variant 0→1→2→0, generating
-  each new variant once then serving cached ones for free. Cost cap is enforced server-side too
+  each new variant once then serving cached ones for free, with `m.variantsLeft` printed on the
+  button as "2 von 3 übrig". Cost cap is enforced server-side too
   (`transform-sentence` clamps `variant` to 0..2; variant 0 keeps the original global cache key,
   variants 1..2 cache under their own keys). Needs `transform-sentence` deployed with the `variant`
   param (done s163). The send-to-AI note +
@@ -387,6 +388,21 @@ Per learner, per day, all env-overridable in the Edge Functions:
   and does not consume the day's allowance.
 - The per-user monthly ceilings and the global `MONTHLY_SPEND_CAP_USD` fuse still apply
   above these.
+- **The allowance is VISIBLE, not just enforced** (founder 2026-07-31, "even for korrigieren,
+  there is no count"). Each trainer prints `Heute noch 7 von 10` beside the button that spends
+  it: Fokus under the Korrigieren row (both breakpoints), Kurz/Lang under the umlaut keys,
+  sharing one line with the transient "Noch N Wörter" hint (hint left, allowance right).
+  `src/lib/aiAllowance.ts` owns the number, `src/features/writing/AllowanceNote.tsx` renders it.
+  Two sources, in this order: (1) `dailyLimit`/`dailyRemaining`, which `check-sentence` and
+  `evaluate-writing` now return on EVERY response, so an env-raised limit shows up by itself;
+  (2) a row count on mount over the same tables and the same UTC day boundary the functions
+  count (`sentence_checks`, `writing_evaluations` filtered by `length`; both are select-own under
+  RLS). Unknown (signed out, offline, query failed) renders NO number rather than a guess.
+- **"Nochmal" carries its own counter**: `2 von 3 übrig`, the NEW AI phrasings still available for
+  the current target form (`TRANSFORM_VARIANTS`, matching the server's 0..2 clamp). Cycling back to
+  an already-generated phrasing is cached and free, so it does not count down; picking a different
+  target form starts a fresh 3. At 0 the button keeps working and its tooltip stops promising
+  something new. Pinned by `tests/fokusVariants.test.tsx`.
 
 ## The evaluator receives the Aufgabe (s167 P2)
 Before s167 `evaluate-writing` got `{theme, length, text}` and the task text NEVER reached a

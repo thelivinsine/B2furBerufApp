@@ -19,9 +19,11 @@ import { EnPeek } from "@/features/grammar/EnPeek";
 import { GrammarRail } from "./GrammarRail";
 import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
+import { AllowanceNote, LeftCount, variantTitle } from "../AllowanceNote";
 import { floatingNote, floatingSlot } from "../floatingCluster";
 import { CorrectionToggle, FixTiles, MarkedTokens } from "../correction";
-import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
+import { useFokusMachine, MIN_WORDS, TRANSFORM_VARIANTS } from "./useFokusMachine";
+import { useDailyAllowance } from "@/lib/aiAllowance";
 import { loadAutosavedDraft, saveAutosavedDraft } from "../draftAutosave";
 import { useLiveWork } from "@/lib/liveWork";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
@@ -62,6 +64,9 @@ export function FokusTrainer({
   const [boot] = useState(() => initialText || loadAutosavedDraft("fokus")?.text || "");
 
   const m = useFokusMachine(boot);
+  // Today's Korrektur allowance (Fokus 10/day). Follows what `check-sentence`
+  // reports after every call, so the number moves the moment a unit is spent.
+  const allowance = useDailyAllowance("fokus");
   const reduce = useReducedMotion();
   const [peek, setPeek] = useState(false);
   // Result view: the learner's original (coral marks), the corrected sentence
@@ -320,6 +325,17 @@ export function FokusTrainer({
               <UmlautKeys textareaRef={taRef} value={m.input} onChange={m.setInput} className="flex-1" />
               <div className="hidden lg:block">{korrigierenButton}</div>
             </div>
+            {/* What the day still holds, beside the button that spends it
+                (founder 2026-07-31). One Korrektur = one unit; the Umformung
+                that may follow is free, so this only moves on Korrigieren. */}
+            {allowance.known && (
+              <AllowanceNote
+                remaining={allowance.remaining}
+                limit={allowance.limit}
+                what="Korrekturen"
+                className="text-right"
+              />
+            )}
           </>
         )}
 
@@ -386,11 +402,12 @@ export function FokusTrainer({
             <button
               type="button"
               onClick={m.regenerate}
-              title="Andere Formulierung von der KI"
-              aria-label="Andere Formulierung von der KI"
+              title={variantTitle(m.variantsLeft, TRANSFORM_VARIANTS)}
+              aria-label={variantTitle(m.variantsLeft, TRANSFORM_VARIANTS)}
               className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
-              <RefreshCw className="h-3.5 w-3.5" /> Nochmal
+              <RefreshCw className="h-3.5 w-3.5" /> Nochmal{" "}
+              <LeftCount remaining={m.variantsLeft} total={TRANSFORM_VARIANTS} />
             </button>
             <SpeakButton text={m.transform.transformed} />
           </div>
@@ -600,10 +617,12 @@ export function FokusTrainer({
                   <button
                     type="button"
                     onClick={m.regenerate}
-                    title="Andere Formulierung von der KI"
+                    title={variantTitle(m.variantsLeft, TRANSFORM_VARIANTS)}
+                    aria-label={variantTitle(m.variantsLeft, TRANSFORM_VARIANTS)}
                     className="inline-flex h-8 items-center gap-1 rounded-lg border border-border bg-surface px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
                   >
-                    <RefreshCw className="h-3.5 w-3.5" /> Nochmal
+                    <RefreshCw className="h-3.5 w-3.5" /> Nochmal{" "}
+                    <LeftCount remaining={m.variantsLeft} total={TRANSFORM_VARIANTS} />
                   </button>
                   <SpeakButton text={m.transform.transformed} />
                 </div>
@@ -674,12 +693,28 @@ export function FokusTrainer({
                   being typed in, under the umlaut keys (founder s169), which
                   frees the bottom KI line to stay the Art. 50 note in every
                   state. Same placement as Kurz/Lang. */}
-              {tooShort && m.words > 0 && (
-                <p className="text-xs font-medium text-warning">
-                  Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du
-                  prüfen.
-                </p>
-              )}
+              {/* One line, two facts: why Korrigieren is not ready yet (left,
+                  transient) and what the day still holds (right, standing). */}
+              {(tooShort && m.words > 0) || allowance.known ? (
+                <div className="flex items-start justify-between gap-2">
+                  {tooShort && m.words > 0 ? (
+                    <p className="text-xs font-medium text-warning">
+                      Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst
+                      du prüfen.
+                    </p>
+                  ) : (
+                    <span />
+                  )}
+                  {allowance.known && (
+                    <AllowanceNote
+                      remaining={allowance.remaining}
+                      limit={allowance.limit}
+                      what="Korrekturen"
+                      className="shrink-0"
+                    />
+                  )}
+                </div>
+              ) : null}
               {m.words > 25 && (
                 <p className="text-right text-xs text-muted-foreground">
                   Tipp: In Fokus funktioniert ein Satz am besten.

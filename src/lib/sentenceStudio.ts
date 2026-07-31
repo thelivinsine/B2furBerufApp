@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { reportServerAllowance } from "@/lib/aiAllowance";
 import { TURNSTILE_ENABLED, useAuthStore } from "@/store/useAuthStore";
 import type { GrammarTuple } from "@/features/writing/fokus/grammarDimensions";
 
@@ -36,6 +37,10 @@ export interface CheckResult {
   sentences?: DetectedSentence[];
   cached?: boolean;
   limitReached?: boolean;
+  /** Today's Fokus allowance as the server enforces it (s179), so the trainer
+   *  can print "Heute noch 7 von 10" without guessing at the env-set limit. */
+  dailyLimit?: number;
+  dailyRemaining?: number;
   message?: string;
 }
 
@@ -81,6 +86,7 @@ export async function checkSentence(text: string): Promise<CheckResult> {
       body: { text: text.trim() },
     });
     if (error) return { ok: false, message: UNAVAILABLE };
+    if (data) reportServerAllowance("fokus", data.dailyLimit, data.dailyRemaining);
     return data ?? { ok: false, message: "Keine Antwort erhalten." };
   } catch {
     return { ok: false, message: UNAVAILABLE };
