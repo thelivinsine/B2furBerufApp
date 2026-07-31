@@ -136,11 +136,25 @@ jobs:
         run: |
           api="https://api.supabase.com/v1"
           auth="Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+          # api.supabase.com sits behind Cloudflare and served a 502 HTML page
+          # mid-session on 2026-07-31, which jq then choked on. Always check the
+          # status and retry, so a wobble reads as a wobble.
+          get() {
+            for attempt in 1 2 3; do
+              code=$(curl -sS -o /tmp/api.json -w '%{http_code}' -H "$auth" "$1")
+              [ "$code" = "200" ] && { cat /tmp/api.json; return 0; }
+              echo "::warning::GET $1 -> HTTP $code (attempt $attempt)" >&2
+              sleep 5
+            done
+            echo "::error::GET $1 failed after 3 attempts: HTTP $code" >&2
+            head -c 300 /tmp/api.json >&2
+            return 1
+          }
           if [ "$SNIPPETS" = "list" ]; then
-            list=$(curl -sS -H "$auth" "$api/snippets?project_ref=$SUPABASE_PROJECT_REF&limit=100")
+            list=$(get "$api/snippets?project_ref=$SUPABASE_PROJECT_REF&limit=100") || exit 1
             echo "$list" | jq -r '.data[]? | [.id, .name, .updated_at] | @tsv' || echo "$list"
             for id in $(echo "$list" | jq -r '.data[]?.id'); do
-              body=$(curl -sS -H "$auth" "$api/snippets/$id")
+              body=$(get "$api/snippets/$id") || continue
               first=$(echo "$body" | jq -r '.content.sql // ""' \
                 | grep -v '^\s*--' | grep -v '^\s*$' | head -1 | cut -c1-90)
               echo "  $id :: $(echo "$body" | jq -r '.name') :: $first"
@@ -150,7 +164,7 @@ jobs:
           # Rename map: {"<snippet id>": "<new name>", ...}
           echo "$SNIPPETS" | jq -r 'to_entries[] | [.key, .value] | @tsv' |
           while IFS=$'\t' read -r id name; do
-            cur=$(curl -sS -H "$auth" "$api/snippets/$id")
+            cur=$(get "$api/snippets/$id") || continue
             sql=$(echo "$cur" | jq -r '.content.sql // ""')
             payload=$(jq -Rn --arg n "$name" --arg s "$sql" \
               '{name: $n, content: {sql: $s}}')
