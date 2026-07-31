@@ -2748,3 +2748,24 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   history repair, `--include-all`) · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log ·
   workflow runs 30656541869 (the diagnostic failure), 30657503526 (the push), 30657663298
   (verification)
+
+- **Prompt 11 (verbatim, 2026-07-31, repeated):** `rename all the queries properly on supabase`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:** Asked once what "queries" meant (dashboard SQL-Editor snippets vs database
+  objects vs migration filenames); the founder repeated the instruction verbatim instead, so the
+  most likely reading was taken and TESTED rather than assumed: the saved queries in the dashboard
+  SQL Editor, twelve of them, most still called "Untitled query" from pasting migrations by hand.
+  **The answer is that they cannot be renamed from outside the dashboard.** The Management API
+  exposes `GET /v1/snippets` and `GET /v1/snippets/{id}` and nothing more: a PATCH against all twelve
+  returned `404 Cannot PATCH /v1/snippets/{id}`. Nothing was changed (a 404 is a no-op), and the
+  workflow now records the finding so nobody re-tests it. What it CAN do is print the inventory (id,
+  current name, first meaningful line of SQL), which is what makes renaming them by hand quick; the
+  mapping of all twelve to what each one actually did went to the founder in chat.
+  They are historical objects either way: migrations now live in `supabase/migrations` and apply
+  themselves on merge, so deleting them is as valid as renaming them.
+  **Two flakes caught in passing, both now handled:** `api.supabase.com` served a Cloudflare 502 HTML
+  page mid-session (jq reported it as a parse error, which read as a broken script) so every
+  Management API read checks its status and retries; and `esm.sh` returned 522 while bundling
+  `delete-account`, failing an entire function deploy, so each deploy retries three times.
+- **Artifacts (prompt 11):** `.github/workflows/supabase.yml` · this log · workflow runs 30658732751
+  (inventory) and 30658934894 (the PATCH attempt that proved renaming is dashboard-only)

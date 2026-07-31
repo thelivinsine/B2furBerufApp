@@ -50,9 +50,9 @@ on:
         type: boolean
         default: false
       snippets:
-        description: "SQL Editor snippets: 'list' to print them, or JSON {\"snippet-id\": \"new name\"} to rename"
-        type: string
-        default: ""
+        description: "Diagnose only: print the dashboard SQL Editor's saved queries with what each one did"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -118,27 +118,33 @@ jobs:
             exit 1
           fi
 
-      # The dashboard SQL Editor's saved snippets. They are dashboard objects, not
-      # database objects, and they accumulated as "New query" while every
-      # migration was pasted by hand (founder 2026-07-31: "rename all the queries
-      # properly on supabase"). `list` prints id, name and the first meaningful
-      # line of each so a name can be matched to what it actually did; passing a
-      # JSON map renames them. A rename re-sends the snippet's OWN content
-      # unchanged, so nothing is ever overwritten by the rename itself.
+      # The dashboard SQL Editor's saved queries. They are DASHBOARD objects, not
+      # database objects, and they accumulated as "Untitled query" while every
+      # migration was pasted by hand.
+      #
+      # They cannot be renamed from here: the Management API exposes GET
+      # /v1/snippets and GET /v1/snippets/{id} and nothing else. A PATCH against
+      # all twelve returned `404 Cannot PATCH /v1/snippets/{id}` on 2026-07-31,
+      # so renaming is a dashboard-only action (founder asked; this is the tested
+      # answer, not an assumption). What this step CAN do is print the inventory:
+      # id, current name, and the first meaningful line of SQL, which is what
+      # makes renaming them by hand a minute's work.
+      #
+      # They are historical either way: migrations live in supabase/migrations
+      # and apply themselves on merge, so deleting these is equally fine.
       - name: SQL Editor snippets
         if: >-
           steps.creds.outputs.configured == 'true' &&
           github.event_name == 'workflow_dispatch' &&
-          inputs.snippets != ''
+          inputs.snippets
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SNIPPETS: ${{ inputs.snippets }}
         run: |
           api="https://api.supabase.com/v1"
           auth="Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
           # api.supabase.com sits behind Cloudflare and served a 502 HTML page
-          # mid-session on 2026-07-31, which jq then choked on. Always check the
-          # status and retry, so a wobble reads as a wobble.
+          # mid-session on 2026-07-31, which jq then reported as a parse error.
+          # Always check the status and retry, so an outage reads as an outage.
           get() {
             for attempt in 1 2 3; do
               code=$(curl -sS -o /tmp/api.json -w '%{http_code}' -H "$auth" "$1")
@@ -150,28 +156,12 @@ jobs:
             head -c 300 /tmp/api.json >&2
             return 1
           }
-          if [ "$SNIPPETS" = "list" ]; then
-            list=$(get "$api/snippets?project_ref=$SUPABASE_PROJECT_REF&limit=100") || exit 1
-            echo "$list" | jq -r '.data[]? | [.id, .name, .updated_at] | @tsv' || echo "$list"
-            for id in $(echo "$list" | jq -r '.data[]?.id'); do
-              body=$(get "$api/snippets/$id") || continue
-              first=$(echo "$body" | jq -r '.content.sql // ""' \
-                | grep -v '^\s*--' | grep -v '^\s*$' | head -1 | cut -c1-90)
-              echo "  $id :: $(echo "$body" | jq -r '.name') :: $first"
-            done
-            exit 0
-          fi
-          # Rename map: {"<snippet id>": "<new name>", ...}
-          echo "$SNIPPETS" | jq -r 'to_entries[] | [.key, .value] | @tsv' |
-          while IFS=$'\t' read -r id name; do
-            cur=$(get "$api/snippets/$id") || continue
-            sql=$(echo "$cur" | jq -r '.content.sql // ""')
-            payload=$(jq -Rn --arg n "$name" --arg s "$sql" \
-              '{name: $n, content: {sql: $s}}')
-            code=$(curl -sS -o /tmp/rename.json -w '%{http_code}' -X PATCH \
-              -H "$auth" -H "Content-Type: application/json" \
-              -d "$payload" "$api/snippets/$id")
-            echo "PATCH $id -> \"$name\": HTTP $code $(head -c 200 /tmp/rename.json)"
+          list=$(get "$api/snippets?project_ref=$SUPABASE_PROJECT_REF&limit=100") || exit 1
+          for id in $(echo "$list" | jq -r '.data[]?.id'); do
+            body=$(get "$api/snippets/$id") || continue
+            first=$(echo "$body" | jq -r '.content.sql // ""' \
+              | grep -v '^\s*--' | grep -v '^\s*$' | head -1 | cut -c1-90)
+            echo "  $id :: $(echo "$body" | jq -r '.name') :: $first"
           done
 
       # Read-only evidence about the LIVE schema, via the Management API's query
@@ -290,7 +280,18 @@ jobs:
             # Shared, non-deployable directories would start with _ by convention.
             case "$name" in _*) continue ;; esac
             echo "::group::deploy $name"
-            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF"
+            # Bundling fetches the function's imports from esm.sh, which returned
+            # 522 mid-session on 2026-07-31 and failed the whole deploy. Retry
+            # rather than let a CDN wobble block a release.
+            for attempt in 1 2 3; do
+              supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" && break
+              if [ "$attempt" = "3" ]; then
+                echo "::error::deploy $name failed after 3 attempts"
+                exit 1
+              fi
+              echo "::warning::deploy $name failed (attempt $attempt), retrying"
+              sleep 10
+            done
             echo "::endgroup::"
           done
 
