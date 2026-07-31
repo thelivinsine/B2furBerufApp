@@ -24,32 +24,26 @@ export function domainColor(domain: string | undefined, dark: boolean): string {
 
 /**
  * Two-area life split for the graph views (founder, 2026-07-19). The graphs
- * color-code only TWO areas instead of the five content domains: Berufsleben
- * (professional) and Privatleben (personal). `beruf` is professional; every
- * other domain (alltag / gesundheit / bildung / pruefung) is personal. Only
- * the COLOR and the legend filter collapse to these two; clustering still uses
- * the finer theme grain. Professional keeps the brand indigo; personal takes a
+ * color-code only TWO areas instead of the five content domains. Only the
+ * COLOR and the legend filter collapse to these two; clustering still uses the
+ * finer theme grain. Professional keeps the brand indigo; personal takes a
  * calm teal, distinct in both light and dark.
+ *
+ * The areas themselves (ids, labels, the fold) now live in `lib/lifeAreas.ts`,
+ * which is the app-wide categorization every learner-facing surface reads,
+ * graphs included (founder, 2026-07-31). Re-exported here so graph code keeps
+ * importing colors and areas from one place.
  */
-export type LifeAreaId = "professional" | "personal";
-
-export const LIFE_AREAS: { id: LifeAreaId; titleDe: string }[] = [
-  { id: "professional", titleDe: "Berufsleben" },
-  { id: "personal", titleDe: "Privatleben" },
-];
+export { LIFE_AREAS, lifeAreaOf, type LifeAreaId } from "@/lib/lifeAreas";
+import { lifeAreaOf as areaOf, type LifeAreaId } from "@/lib/lifeAreas";
 
 export const LIFE_AREA_COLORS: Record<LifeAreaId, { light: string; dark: string }> = {
   professional: { light: "#3D74ED", dark: "#7AA5F8" },
   personal: { light: "#0d9488", dark: "#2dd4bf" },
 };
 
-/** Bucket a content domain into one of the two life areas. */
-export function lifeAreaOf(domain: string | undefined): LifeAreaId {
-  return domain === "beruf" ? "professional" : "personal";
-}
-
 /** Resolve a domain to its life-area light/dark hex (professional vs personal). */
 export function lifeAreaColor(domain: string | undefined, dark: boolean): string {
-  const c = LIFE_AREA_COLORS[lifeAreaOf(domain)];
+  const c = LIFE_AREA_COLORS[areaOf(domain)];
   return dark ? c.dark : c.light;
 }

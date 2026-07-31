@@ -1026,3 +1026,31 @@ the text, and a learner filtering by their own Branche gets Alltag tasks that so
 so it stays empty and greys out with an honest count. It is also the fixture that pins `blockingAxis`
 in `tests/writingScope.test.ts`, which needs one genuinely empty scope to test against. Filling it
 would cost the test its subject and the rail its honesty.
+
+## s181 (2026-07-31) - exactly two learner-facing categories, everywhere
+
+**Founder:** "There has to be only two overarching categories similar to the nodal graphs in
+bibliothek. This has to be consistent across the app."
+
+The content spine has five domains (`beruf`, `alltag`, `gesundheit`, `bildung`, `pruefung`) and that
+grain is real for authoring, coverage reports and the city buildings. It had also been leaking into
+the UI, differently on each surface: the Schreiben rail folded `gesundheit` into Alltag but not
+`bildung` (so "Bildung & Sprache" was a third heading), the Bibliothek Thema dropdown grouped by all
+five, and the graphs were already binary but called the second area "Privatleben".
+
+**The law now: two areas, Berufsleben and Alltag, from `src/lib/lifeAreas.ts`.** Only `beruf` is
+Berufsleben; every other domain folds into Alltag, and that default is what makes a NEW domain
+unable to introduce a third heading anywhere. `themeGroupsByArea` is the single builder both the
+Schreiben rail and the Bibliothek dropdown call, so the fold cannot drift back per surface.
+
+**Naming: Berufsleben / Alltag** (founder pick over Berufsleben / Privatleben). It matches the
+product framing (the workplace plus everyday life), CLAUDE.md's own wording, and the founder's
+report; the cost is retiring "Privatleben" from the graph legend, which was a July decision. One
+wording across the app beat keeping the older legend.
+
+**The Mode lens survives unchanged.** It filters which themes appear INSIDE the two groups, never
+which headings exist, and an actively selected theme is still never orphaned (s104).
+
+**Where the five domains still belong:** authoring, `docs/areas/CONTENT.md` coverage, the city
+buildings, graph clustering. They are a grain, not a heading. `tests/lifeAreas.test.ts` fails if a
+third group ever reaches a dropdown.

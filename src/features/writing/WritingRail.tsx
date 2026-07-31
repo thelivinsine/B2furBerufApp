@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
-import { domains } from "@/data/domains";
 import { writingPrompts } from "@/data/writingPrompts";
+import { themeGroupsByArea } from "@/lib/lifeAreas";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { countTasks } from "@/lib/writingScope";
 import type { ThemeId } from "@/types";
@@ -135,16 +135,6 @@ interface WritingRailProps {
   onClose?: () => void;
   className?: string;
 }
-
-// Domain-grouped themes, with the gesundheit domain folded into Alltag
-// (founder rule): the writing dropdown shows Berufsleben / Alltag / Bildung.
-const DOMAIN_FOLD: Record<string, string> = { gesundheit: "alltag" };
-const GROUPS = domains
-  .map((d) => ({
-    domain: d,
-    list: themes.filter((t) => (DOMAIN_FOLD[t.domain ?? ""] ?? t.domain) === d.id),
-  }))
-  .filter((g) => g.list.length > 0);
 
 interface Option {
   value: string;
@@ -397,13 +387,14 @@ export function WritingRail({
                 { value: "", label: "Alle Themen", count: countWith({ theme: "", sub: "" }) },
               ],
             },
-            ...GROUPS.map((g) => ({
-              label: g.domain.titleDe,
-              options: g.list.map((t) => {
-                const count = countWith({ theme: t.id, sub: "" });
-                return { value: t.id, label: t.titleDe, count, disabled: count === 0 };
-              }),
-            })),
+            // TWO groups, never more: Berufsleben and Alltag, from the one
+            // app-wide fold. This rail used to fold only `gesundheit`, so
+            // "Bildung & Sprache" sat here as a third heading (founder,
+            // 2026-07-31: "some topics in the themen dropdown which are
+            // non-beruf but are not part of alltag").
+            ...themeGroupsByArea((id) => countWith({ theme: id as ThemeId, sub: "" }), {
+              disableZero: true,
+            }),
           ]}
         />
       </section>

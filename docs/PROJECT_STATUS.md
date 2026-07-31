@@ -156,6 +156,27 @@ s167) and the authoring backlog s180 made visible when it retired every bare Auf
   Modellsätze (B1/B2/C1) and drop the PDFs into the repo; a session can then read them locally.
 - **Gates:** typecheck · lint:content clean · test:unit **413/413** · build · check:bundle 123.2 kB.
 
+**Same session, follow-up: the app now has exactly TWO learner-facing categories.** Founder, on the
+Schreiben Thema dropdown: "there seems to be some topics in the themen dropdown which are non-beruf
+but are not part of alltag ... There has to be only two overarching categories similar to the nodal
+graphs in bibliothek. This has to be consistent across the app."
+- **Three surfaces, three different answers.** The Schreiben rail folded `gesundheit` into Alltag but
+  not `bildung`, so "Bildung & Sprache" was a third heading; the Bibliothek Thema dropdown grouped by
+  all five content domains; only the graphs were binary, and they called the second area
+  "Privatleben".
+- **`src/lib/lifeAreas.ts` is the one fold now.** Two areas, `beruf` = Berufsleben and every other
+  domain = Alltag, with `themeGroupsByArea` as the single grouped-options builder that the Schreiben
+  rail, the Bibliothek dropdowns (Wörter + Kollokationen) and both graph legends all call.
+- **Naming: Berufsleben / Alltag** (founder pick). "Privatleben" is retired from the graph legend so
+  the whole app says the same two words.
+- **The Mode lens still narrows inside the two groups**, never adds a heading, and a deep-linked
+  theme is still never orphaned (s104). `tests/lifeAreas.test.ts` fails if a third group ever
+  appears, in any mode, or if a new domain does not fold into Alltag.
+- **Verified in the built app, not only in tests** (headless Chromium): Schreiben shows BERUFSLEBEN /
+  ALLTAG, the Bibliothek dropdown the same two, the Wörter graph legend reads "Berufsleben · Alltag".
+- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
+  check:bundle 123.2 kB.
+
 **Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
 `claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
 Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and

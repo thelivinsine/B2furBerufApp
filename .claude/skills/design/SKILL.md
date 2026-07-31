@@ -140,9 +140,11 @@ Ranked by how often the founder had to correct AI output:
 - **`FilterRail`** (desktop rail / mobile `layout="panel"` behind a toolbar toggle; sticky Üben
   footer + result count; internal scrolling with bounded max-height, `max-h-[45dvh]` mobile).
 - **Scope hierarchy: Branche → Thema → Unterthema** as dropdowns with live counts
-  (`ScopeMultiSelect` / the Schreiben single-select listboxes). Learner-facing theme groups fold
-  Gesundheit into Alltag. **Dropdowns over pill walls** for long lists; facet pills only for short
-  attribute sets (≤12 options).
+  (`ScopeMultiSelect` / the Schreiben single-select listboxes). **Learner-facing groupings have
+  exactly TWO categories, Berufsleben and Alltag** (`lib/lifeAreas.ts`; only `beruf` is
+  Berufsleben, every other domain folds into Alltag). The five content domains are an authoring
+  grain, never a heading; a third group anywhere is a bug (founder s181). **Dropdowns over pill
+  walls** for long lists; facet pills only for short attribute sets (≤12 options).
 - Sticky mobile bottom action bar for the primary action; `SearchField` transient toolbar search;
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).

@@ -63,9 +63,11 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - **Wörter Graph** (`vocabulary/WordGraph.tsx` + pure builder `wordGraph.ts`, pinned by
   `tests/wordgraph.test.ts`): Obsidian-style force canvas of the CURRENTLY FILTERED list. Node
   radius = wordfreq Zipf (no corpus evidence = min radius, never a fake claim). **Color = TWO life
-  areas** (Berufsleben = `beruf` domain, brand Nachtblau; Privatleben = every other domain, teal;
-  `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS` in `lib/graphPalette.ts`; legend + filter collapse to
-  these two). Edges ONLY from authored sources (`related` terms resolved to bank entries;
+  areas** (Berufsleben = `beruf` domain, brand Nachtblau; Alltag = every other domain, teal;
+  the areas come from `lib/lifeAreas.ts`, the app-wide fold, with the colors in
+  `lib/graphPalette.ts`; legend + filter collapse to these two). The legend said "Privatleben" until
+  s181; it says **Alltag** now, because the Thema dropdowns say Alltag and the founder asked for one
+  wording across the app. Edges ONLY from authored sources (`related` terms resolved to bank entries;
   collocations whose noun AND verb both resolve; unresolvable related terms are dropped, by
   design). Noun nodes may carry gender marks (see Artikel-Visuals in `CLAUDE.md` layout notes).
 - **Kollokationen Graph** (`collocations/CollocationGraph.tsx` + `collocationGraph.ts`, pinned by

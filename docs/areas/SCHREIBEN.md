@@ -137,7 +137,8 @@ founder-picked s171).
   (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
   Beschwerde & Antrag) (grouped listbox
   popovers, internal scroll, live counts, zero-yield greyed; Unterthema only when the theme has
-  sub-themes; Thema groups = Domain categorization with gesundheit folded into Alltag). No
+  sub-themes; Thema groups = the two life areas from `lib/lifeAreas.ts`, Berufsleben and Alltag,
+  never a third heading). No
   overflow clipping on the tile (popovers must escape); the mobile panel animates via fade/slide,
   not height collapse, for the same reason.
 - Mobile Kurz/Lang = the Bibliothek pattern: a toolbar button toggles the collapsible panel
