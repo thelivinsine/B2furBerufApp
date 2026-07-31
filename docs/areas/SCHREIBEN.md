@@ -73,8 +73,10 @@ founder-picked s171).
   capped so the page fits one viewport and can therefore cut a long Aufgabe mid-line, so there has
   to be one place that shows all of it. Same eyebrow + Ziel line as the card, so it reads as the
   same object; standard dialog recipe (soft darkening, no blur), never a bottom sheet. **Shuffle**
-  (`Shuffle`, replacing the dice, s169) re-rolls within the current scope (keeps typed text, clears
-  a stale result); the icon is point-symmetric, so the half-turn per roll reads as motion and
+  (`Shuffle`, replacing the dice, s169) re-rolls within the current scope and CLEARS the editor with
+  it (founder 2026-07-31, reversing the older "keep the typed text" rule: a new Aufgabe means a new
+  text, and the old one left standing means writing the next answer around it; the rail reset and the
+  scope-change redraw clear too, so all three paths agree); the icon is point-symmetric, so the half-turn per roll reads as motion and
   settles back into the same shape. Scope changes (`?sub=`/`?sector=`; theme switch clears sub,
   Branche travels) reset the draft.
 - Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel
@@ -178,7 +180,8 @@ Kurz. Design = variant C, "development first" (founder-picked s171):
   - Marks and tiles are computed client-side by `lib/wordDiff.ts`. Only the corrected TEXT is stored,
     so no extra AI cost per view, and `classifyChange` gained **Zeichensetzung** (a bare comma fix used
     to read as "Groß-/Kleinschreibung", which taught the wrong rule).
-  - Tiles cap at `MAX_FIX_TILES` (6) with "+N weitere", so a long text cannot wall off the card.
+  - Tiles cap at `MAX_FIX_TILES` (6) so a long text cannot wall off the card; "+N weitere" is a
+    TOGGLE that expands to every correction and folds back (founder 2026-07-31).
   - `corrected_text` is null for pre-s171 rows, for the templated spelling verdict (no model call) and
     for an error-free text, so the toggle appears only when there is a real correction. The plain
     "Dein Text" block is the fallback.
@@ -301,6 +304,19 @@ the moved-word single word).
   - **Feedback + Korrigieren float fixed** above the KI line until a correction exists (portalled,
     see §Mobile floating action cluster); the KI line is locked just above the nav in every state
     and carries the Art. 50 note only (the "Noch N Wörter" hint moved into the card, s169).
+- **All AI feedback prose is written for a beginner, and carries a DE/EN switch** (founder
+  2026-07-31: "the vocabulary used is way too advanced ... with an english toggle button even for
+  this section"). Grading level and EXPLAINING level are two different things: a C1 text is still
+  graded at C1, but the Tipp and the Hinweis are asked for in simple A2 German (short main
+  sentences, everyday words, no "Aufgabenerfüllung"/"Inhaltspunkt"/"Adressat"/"Konnektor"/
+  "Umformulierung", a concrete example from the learner's own text) plus the same sentence in
+  equally simple English. `evaluate-writing` returns `insightEn` (stored in `insight_en`,
+  migration 0014, so Verlauf keeps it) and `transform-sentence` returns `note_en`; both prompt
+  revisions were bumped (`PROMPT_REV`, `PROMPT_VERSION`) so the caches cannot serve prose written
+  under the old wording. The switch is `src/features/writing/FeedbackLang.tsx`, **sticky, NOT the
+  hold-to-peek `EnPeek`**: a tip is a paragraph of instruction and nobody reads a paragraph with a
+  finger held down. `EnPeek` remains the pattern for LEARNING content (word cards, Grammatik). The
+  chip renders only when an English version exists, so a pre-0014 Verlauf row shows no dead control.
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. Its header row carries a
   **"Nochmal" button** (RefreshCw, beside the speaker) that asks the AI for an alternative phrasing
@@ -328,7 +344,10 @@ the moved-word single word).
   (`text-accent-ink`; Rechtschreibung / Umlaut / Groß-/Kleinschreibung / Grammatik / Ergänzung /
   Streichung, from `classifyChange` in `wordDiff.ts`) + the `old → new` edit, with **Neuer Satz**
   as an outline button on that same row (`ml-auto self-end`, wraps only if needed) — NOT on the
-  mobile toolbar or the desktop rail. `wordDiff.diffWords` returns `tokens` + `originalTokens`
+  mobile toolbar or the desktop rail. With more tiles than `MAX_FIX_TILES` (6) the tail folds behind
+  a **"+N weitere" TOGGLE** that expands to every correction and folds back to "Weniger" (founder
+  2026-07-31: "there's no way to expand upon it and see all the chips"); the cap only decides what
+  the card opens with, it never hides a correction for good. `wordDiff.diffWords` returns `tokens` + `originalTokens`
   (both flagged) + `changes` (each with a `category`); `tests/wordDiff.test.ts` pins it. A word that
   was only **reordered** is collapsed by `collapseMoves` into ONE `{category:"Wortstellung",
   moved:true}` change (was a contradictory Streichung + Ergänzung pair, s163); a `moved` tile renders

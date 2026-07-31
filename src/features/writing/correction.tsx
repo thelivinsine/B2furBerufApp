@@ -1,4 +1,5 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import { diffWords, type DiffChange, type DiffToken } from "@/lib/wordDiff";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,7 @@ import { cn } from "@/lib/utils";
  * amendment): its card has a measured height, so tiles cannot grow there.
  */
 
-/** How many fix tiles a long text shows before collapsing the rest into a count. */
+/** How many fix tiles a long text shows before the rest fold behind "+N weitere". */
 export const MAX_FIX_TILES = 6;
 
 export type CorrectionViewMode = "orig" | "corr";
@@ -144,6 +145,10 @@ export function MarkedParagraphs({
  * an eyebrow plus the `old → new` pair. `action` rides the same row (Fokus puts
  * its "Neuer Satz" button there, `ml-auto self-end`), and `max` collapses the
  * tail of a long text into "+N weitere" so it cannot wall off the card.
+ *
+ * That fold is a TOGGLE, not a dead end (founder 2026-07-31: "there's no way to
+ * expand upon it and see all the chips"). Every correction the learner made is
+ * reachable; the cap only decides what the card opens with.
  */
 export function FixTiles({
   changes,
@@ -154,7 +159,9 @@ export function FixTiles({
   max?: number;
   action?: ReactNode;
 }) {
-  const shown = max ? changes.slice(0, max) : changes;
+  const [expanded, setExpanded] = useState(false);
+  const capped = !!max && changes.length > max;
+  const shown = capped && !expanded ? changes.slice(0, max) : changes;
   const hidden = changes.length - shown.length;
   if (shown.length === 0) return null;
   return (
@@ -180,10 +187,16 @@ export function FixTiles({
           )}
         </div>
       ))}
-      {hidden > 0 && (
-        <p className="self-center text-xs tabular-nums text-muted-foreground">
-          +{hidden} weitere
-        </p>
+      {capped && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className="inline-flex items-center gap-1 self-center rounded-lg px-1.5 py-1 text-xs font-medium tabular-nums text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+          {expanded ? "Weniger" : `+${hidden} weitere`}
+        </button>
       )}
       {action}
     </div>

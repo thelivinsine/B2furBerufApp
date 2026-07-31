@@ -1,7 +1,11 @@
 # Project Status
 
 _Last updated: 2026-07-31 (session 179). **Bibliothek card grids, the floating toolbar, and the AI
-allowances made visible.** Each writing trainer now prints "Heute noch 7 von 10" beside the button
+feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
+switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
+Shuffle clears the editor. **One founder action: paste `supabase/migrations/0014_writing_insight_en.sql`
+into the Supabase SQL editor** (it stores the English tip so Verlauf keeps it). Also: the AI
+allowances are visible. Each writing trainer now prints "Heute noch 7 von 10" beside the button
 that spends the day's AI budget (Fokus 10 / Kurz 4 / Lang 2), and Fokus "Nochmal" says how many new
 phrasings are left ("2 von 3 übrig"); the numbers come from the Edge Functions themselves. Also: the
 sticky view-button row no longer fades a blurred band in behind itself: it is transparent in every
@@ -112,6 +116,11 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       the admin gate is now a user-id table, not an email claim. Live confirmation that `/admin`
       still opens is the founder's last check; the rollback to the 0008 email gate sits in a comment
       at the foot of the migration if it ever does not.
+- [ ] **Paste `supabase/migrations/0014_writing_insight_en.sql`** into the Supabase SQL editor
+      (Dashboard → SQL Editor → paste → Run). One line: it adds the column that stores the ENGLISH
+      version of a writing tip, so the DE/EN switch also works on past entries in Verlauf. Safe to run
+      twice (`add column if not exists`). Until it is run, nothing breaks: fresh tips still switch to
+      English in the moment, older Verlauf rows just show no switch.
 - [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
       is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
       `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
@@ -135,6 +144,37 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 179, part 3 (2026-07-31). The AI now explains itself in plain German, with
+English beside it.** Branch `claude/ui-layout-buttons-cards-zkchha`. Three founder reports from the
+Schreiben trainers.
+- **"+6 weitere" was a dead end.** The fix tiles cap at 6 so a long text cannot wall off the card, but
+  the tail had no way back. It is a TOGGLE now (expands to every correction, folds back to "Weniger");
+  the cap only decides what the card opens with. Pinned in `tests/correction.test.tsx`.
+- **The feedback was written for a linguist, not a learner.** "The vocabulary used is way too
+  advanced." Grading level and EXPLAINING level are two different things: a C1 text is still graded at
+  C1, but both prompts now ask for the prose in simple A2 German (short main sentences, everyday
+  words, an example from the learner's own text, and an explicit ban on "Aufgabenerfüllung",
+  "Inhaltspunkt", "Adressat", "Konnektor", "Umformulierung" and friends), plus the SAME sentence in
+  equally simple English. `PROMPT_REV` (evaluate-writing) and `PROMPT_VERSION` (transform-sentence)
+  were bumped so neither cache can serve prose written under the old wording. The templated spelling
+  verdict was rewritten by hand to the same standard, and the one jargon line under the tip
+  ("Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen") became plain German.
+- **A DE/EN switch on every AI feedback text**, `src/features/writing/FeedbackLang.tsx`: the Kurz/Lang
+  Tipp, every Verlauf row, and the Fokus Hinweis (which gave up its hold-to-peek `EnPeek` for it).
+  Deliberately STICKY, unlike `EnPeek`: a tip is a paragraph of instruction and nobody reads a
+  paragraph with a finger held down. `EnPeek` stays the pattern for LEARNING content (word cards,
+  Grammatik lessons). The chip only appears when an English version exists, so nothing renders dead.
+- **Shuffle clears the editor now** (founder, reversing the older "a mis-tap must not destroy work"
+  rule): a new Aufgabe means a new text. The rail reset and the scope-change redraw already cleared,
+  so all three paths finally agree.
+- **FOUNDER ACTION (one SQL paste):** `supabase/migrations/0014_writing_insight_en.sql` adds
+  `writing_evaluations.insight_en`, which is where the English tip is stored so Verlauf keeps it. CI
+  deploys functions but skips migrations, so paste that one `alter table ... add column if not exists`
+  into the Supabase SQL editor. Everything degrades gracefully until then: the read and the write both
+  step down through the optional column, and the chip simply does not appear.
+- **Gates:** typecheck · lint 0 errors · test:unit **398/398** (new: `tests/feedbackLang.test.tsx`,
+  plus the fix-tile expansion case) · lint:content clean · build · check:bundle 123.2 kB.
 
 **Handoff after session 179, part 2 (2026-07-31). The AI allowances became visible.** Branch
 `claude/ui-layout-buttons-cards-zkchha`.
@@ -203,53 +243,6 @@ the same session: add a "go to top" button to the bottom right on desktop, where
   tabs at both breakpoints. **Rule for this row: anything added to it needs a full-alpha fill.**
 - **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
   check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
-
-**Handoff after session 178, part 3 (2026-07-30). Audit P1 shipped: the C1 slice.** Branch
-`claude/app-content-audit-92sgh1`.
-Founder: "continue with the next step", after P0 and P2. P1 was the audit's biggest hole: onboarding
-offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the label sat 34 words,
-**0 grammar topics, 0 texts, 0 Can-Dos**. A self-declared C1 learner got exactly the B2 app.
-- **Four C1 grammar topics, 20 drills**, chosen so none overlapped an existing one: `g_konzessiv`
-  (obgleich / wenngleich / zwar…doch / sofern / insofern als / es sei denn), `g_passiversatz`
-  (sich lassen, sein + zu + Infinitiv, -bar/-lich, man), `g_subjektive_modalverben` (soll/will +
-  Infinitiv Perfekt for reporting a claim, muss/dürfte/könnte for grading certainty) and
-  `g_modalpartikeln` (doch, ja, mal, eben, wohl, denn).
-- **A new grammar group `particles`**, mirrored in all three places the closed-enum rule demands
-  (the `GrammarGroup` union, `GRAMMAR_GROUPS` in the linter, `groupMeta` + `groupOrder`). Modalpartikeln
-  fit none of the existing 16: they link nothing, so they are not connectors, and they are not modal
-  verbs. Placed LAST on the priority spine on purpose, since they fix no error.
-- **Six C1 texts, which also start P3.** The bank's median text was 90 words against the 300-450 a
-  B2/C1 reading task runs to, and at 90 words a learner reads every word, so skimming and inference
-  cannot be trained. The six run **305-344 words** (Widerspruchsbescheid, Risikobericht,
-  Modernisierungsmieterhöhung, Stellungnahme zur Klimabilanz, Unfalluntersuchung, Datenschutzauskunft)
-  and their 18 checks ask what the text IMPLIES, not what it states. They were written short first
-  (237-282) and extended, because German is more compact than the estimate and the length was the
-  whole point. **`de` and `en` paragraph counts must match** (both are blank-line split and rendered
-  together); noted in `areas/CONTENT.md` next to the schema.
-- **Five C1 Can-Dos** above each theme's existing top threshold (meetings, conflict, customer,
-  behoerde, project), describing what C1 adds: the unplanned, the implicit and the adversarial rather
-  than the scripted case.
-- 35 provenance rows, all `draft`. Nothing is claimed as verified, so the whole slice lands in the
-  `/admin/pruefen` queue like every other bank addition.
-- **Gates:** lint:content clean (1 known warning, the `der Empfang` homonym) · build · typecheck ·
-  lint 0 errors · test:unit 388/388 · check:bundle 123.2 kB · report:exercise-coverage 20/20 green ·
-  build:review-queue refreshed.
-- **Still open from the audit backlog:** P3 beyond these six texts (listening is still 6 TTS
-  voicemails), P4 (the Sprechen + Prüfung content is still off the nav), P5-P10. The ranked list with
-  cheapest-first-steps stays in §5 of `docs/reports/CONTENT_AUDIT_2026-07-30.md`.
-- **Shipped:** all of session 178 went to `main` as **PR #757**, squash-merged as `1c4bc83`
-  (the audit, P0, P2 and P1 in nine commits), plus **#758** (`e1820a5`, the merge-SHA backfill).
-  Post-merge housekeeping done both times: branch reset onto `main`, working tree clean.
-- **A flake the C1 slice introduced, caught on `main` and fixed (#759).** `Validate content` went RED
-  on `e1820a5`, a docs-only commit, at `tests/engine.test.ts:168`. Cause: the test asserted the
-  scoped reading block by ID PREFIX (`textId.startsWith("tx_behoerde")`), which only held while every
-  text id began with its theme. `tx_c1_behoerde_widerspruchsbescheid` is a behoerde text whose id
-  starts `tx_c1_`, so once the composer had three behoerde texts to sample from it failed roughly one
-  run in three (measured: 3 of 6 runs on the old assertion, 5 of 5 pass on the new one). The test now
-  asserts `textById(...).themeId`, which is what the composer actually scopes on, plus a 40-draw loop
-  so a single lucky sample cannot pass it again. **Only the test depended on the prefix**; production
-  code scopes by `themeId` throughout, so nothing shipped was wrong. Lesson for future banks: a
-  `tx_c1_*` id is fine, but never assert content scope through an id prefix.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

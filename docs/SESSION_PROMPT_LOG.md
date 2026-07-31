@@ -2661,3 +2661,53 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `supabase/functions/check-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
   `tests/aiAllowance.test.ts` (new) · `tests/fokusVariants.test.tsx` (new) · `docs/areas/SCHREIBEN.md` ·
   `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 6 (verbatim, 2026-07-31, Kurz result screenshot attached):** `here, there are couple of
+  things to take note:` / `1. Not all the corrections chips are visible here. It says +6 but there's no
+  way to expand upon it and see all the chips` / `2. Take a note of how the AI gives the feedback, the
+  vocabulary used is way too advanced. It should be able to understand what is the user level and
+  respond either matching the user's german level or lower levels like A2. Because the goal is to
+  communicate clearly to german learners by keeping the instructions very very clear,and with an
+  english toggle button even for this section. This applies to all other schreiben sections.`
+- **Prompt 7 (verbatim, 2026-07-31, mid-turn, Kurz editor screenshot attached):** `when I pressed
+  shuffle or looking for a new task, the text I initially wrote is still in the field - ideally it
+  should be gone. Fix this too`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:**
+  **(1) The "+6 weitere" dead end.** The cap (`MAX_FIX_TILES` = 6) exists so a long text cannot wall
+  off the card, but the tail had no way back. It is a toggle now: press it and every correction shows,
+  press "Weniger" and it folds. The cap only decides what the card OPENS with; no correction is hidden
+  for good. New case in `tests/correction.test.tsx`.
+  **(2) The feedback was written for a linguist.** Grading level and EXPLAINING level are two
+  different things, and only the first was ever specified: the rubric graded at the task's CEFR band
+  while the tip inherited whatever register the model felt like. Both prompts now demand the prose in
+  simple A2 German (short main sentences, everyday words, a concrete example from the learner's own
+  text) with an explicit ban on the jargon the founder saw ("Aufgabenerfüllung", "Inhaltspunkt",
+  "Adressat", "Anredeform", "Konnektor", "Umformulierung", "Kohärenz", "Register"), PLUS the same
+  sentence in equally simple English. Both caches were invalidated (`PROMPT_REV` s171.0 -> s179.0,
+  `PROMPT_VERSION` 4 -> 5), or the old advanced prose would keep being served. The hand-written
+  templated spelling verdict was rewritten to the same standard, and the jargon line sitting directly
+  under the tip ("Alle Inhaltspunkte abdecken, den Adressaten und die Länge treffen") became plain
+  German, since a simple tip framed by jargon is still jargon.
+  **The English switch** is `FeedbackLang.tsx`, on the Kurz/Lang Tipp, every Verlauf row and the Fokus
+  Hinweis. Deliberately STICKY rather than the app's hold-to-peek `EnPeek`: a tip is a paragraph of
+  instruction, not a one-line gloss, and nobody reads a paragraph with a finger held down. `EnPeek`
+  stays the pattern for LEARNING content (word cards, Grammatik lessons), so the two do not merge; the
+  label flips EN/DE to say which language the press switches to. Fokus gave up its `EnPeek` for it, so
+  one behaviour covers all AI feedback in Schreiben.
+  **(3) Shuffle now clears the editor**, reversing the older "keeps typed text, a mis-tap must not
+  destroy work" rule on the founder's instruction. The rail reset and the scope-change redraw already
+  cleared, so all three paths agree now.
+  **One founder action:** migration `0014_writing_insight_en.sql` (one `add column if not exists`)
+  stores the English tip so Verlauf keeps it. CI deploys functions but skips migrations, so it is a
+  paste into the SQL editor. Everything degrades gracefully until then: the read and the write both
+  step down through the optional column and the chip simply does not render.
+  Gates: typecheck · lint 0 errors · test:unit **398/398** · lint:content clean · build ·
+  check:bundle 123.2 kB.
+- **Artifacts (prompts 6-7):** `src/features/writing/correction.tsx` ·
+  `src/features/writing/FeedbackLang.tsx` (new) · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/WritingHistory.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/lib/writing.ts` · `src/data/practiceAreas.ts` ·
+  `supabase/functions/evaluate-writing/index.ts` · `supabase/functions/transform-sentence/index.ts` ·
+  `supabase/migrations/0014_writing_insight_en.sql` (new) · `tests/feedbackLang.test.tsx` (new) ·
+  `tests/correction.test.tsx` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log

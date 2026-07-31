@@ -31,6 +31,7 @@ import type { WritingMode } from "./resumeDraft";
 import { useLiveWork } from "@/lib/liveWork";
 import { UmlautKeys } from "./UmlautKeys";
 import { AllowanceNote } from "./AllowanceNote";
+import { FeedbackLangChip } from "./FeedbackLang";
 import { useDailyAllowance } from "@/lib/aiAllowance";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { useFillEditor } from "./useFillEditor";
@@ -153,6 +154,10 @@ export function GuidedWritingTrainer({
   // day of Kurz cannot eat the Lang budget. Follows what `evaluate-writing`
   // reports; a cached resubmission is free and leaves the number alone.
   const allowance = useDailyAllowance(mode);
+  // The Tipp in English (founder 2026-07-31). Sticky, not hold-to-peek: it is a
+  // paragraph of instruction, not a one-line gloss. Resets to German with every
+  // new evaluation, so German stays the default the learner meets first.
+  const [tipEnglish, setTipEnglish] = useState(false);
   const [saved] = useState(() => (initialText ? null : loadAutosavedDraft(mode)));
 
   const [drawn, setDrawn] = useState<WritingTaskRef>(() => {
@@ -260,10 +265,15 @@ export function GuidedWritingTrainer({
     setParams(p);
   };
 
-  // The dice: another random Aufgabe within the current scope. Keeps any
-  // typed text (a mis-tap must not destroy work) but clears a stale result.
+  // The dice: another random Aufgabe within the current scope. Clears the field
+  // with it (founder 2026-07-31: "the text I initially wrote is still in the
+  // field, ideally it should be gone"), which reverses the older "keep the text,
+  // a mis-tap must not destroy work" rule: a new Aufgabe means a new text, and
+  // leaving the old one there means writing the next answer around it. The
+  // scope-change redraw above has always cleared, so the two paths now agree.
   const reroll = () => {
     setDrawn((cur) => randomTask(eligible, cur));
+    setText("");
     setResult(null);
     setRollSpin((d) => d + 180);
   };
@@ -281,6 +291,7 @@ export function GuidedWritingTrainer({
     setParams(p);
     const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", level: "", format: "", length });
     setDrawn((cur) => randomTask(fullPool, cur));
+    setText("");
     setResult(null);
     setRollSpin((d) => d + 180);
   };
@@ -290,6 +301,7 @@ export function GuidedWritingTrainer({
     setSubmitting(true);
     setResult(null);
     setSubmitted(body);
+    setTipEnglish(false);
     // Each new evaluation opens on Korrigiert, like Fokus.
     setView("corr");
     // Send the AUFGABE, not just the text (s167 P2): without it the evaluator
@@ -654,7 +666,16 @@ export function GuidedWritingTrainer({
                     {area && <Badge className="bg-primary/10 text-primary">{area.labelDe}</Badge>}
                   </div>
                 </div>
-                <p className="text-sm leading-relaxed">{result.insight}</p>
+                <p className="text-sm leading-relaxed">
+                  {tipEnglish && result.insightEn ? result.insightEn : result.insight}
+                  {result.insightEn && (
+                    <FeedbackLangChip
+                      showEnglish={tipEnglish}
+                      onChange={setTipEnglish}
+                      className="ml-1.5 align-middle"
+                    />
+                  )}
+                </p>
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Sparkles className="h-3 w-3 shrink-0" /> KI-generierte Rückmeldung
                 </p>
