@@ -74,6 +74,15 @@ after pulling.
 - **Closed-enum rule:** every union added to `src/types/index.ts` is mirrored by an array +
   validate-when-present check in `scripts/lint-content.mjs`.
 - **Every content_id has a provenance row**, added in the same edit.
+- **A filter filters; it never substitutes.** In Schreiben's Aufgabe rail, Niveau, Textsorte and
+  Unterthema are HARD (Branche stays soft, untagged-=-universal, and is applied last so it cannot
+  hide a hard match), ONE function counts what the trainer draws, zero-yield options grey out with
+  their honest count, and an empty scope gets an empty state naming the one filter to drop. The
+  prefer-tagged-else-untagged fallback these replaced made "Forumsbeitrag" serve a Beschwerde 84% of
+  the time (s180). Related founder law: **only a task carrying the full brief is served** (Adressat,
+  du/Sie, 2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung
+  against it; the 373 bare legacy tasks are retired from the draw, never from the bank, and the zeros
+  they leave in the rail ARE the content backlog, not a bug to paper over.
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments

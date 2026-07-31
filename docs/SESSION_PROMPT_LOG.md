@@ -2852,3 +2852,17 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   contract only, no content changed) · `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` ·
   `docs/areas/SCHREIBEN.md` · `docs/areas/CONTENT.md` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-31):** `document the session and merge to main`
+  **Response:** both code changes were already merged under the standing auto-ship rule (PR **#766**
+  the filter fix, PR **#768** the fully-briefed-Aufgaben rule), each squash-merged with
+  `Validate content` and `Deploy site to GitHub Pages` green on the merge commit (`3cc7d47`,
+  `20bf593`). This prompt closed the documentation pass: **`CLAUDE.md`** gained the cross-cutting
+  invariant the session established, "a filter filters, it never substitutes" (the hard/soft axis
+  split, one counting function, honest zeros, empty state over substitution) plus the founder law
+  that only a fully briefed task is served; **`docs/PROJECT_STATUS.md`** had its bank line corrected
+  (643 authored, **270 served**) and the handoff finished with the PR numbers, the deploy result and
+  the authoring list a next session would start from. Post-merge housekeeping ran after each merge
+  (`fetch` → `reset --hard origin/main` → `push --force-with-lease`), and `origin/main` was merged
+  into the branch twice mid-session as #765 and #767 landed, so nothing was written against a stale
+  base.
+- **Artifacts (prompt 5):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
