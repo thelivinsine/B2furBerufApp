@@ -633,3 +633,30 @@ the same session: add a "go to top" button to the bottom right on desktop, where
 - **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
   check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
 
+**Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
+were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
+Founder: "can you apply the migration in supabase yourself? I remember we setup something for this
+earlier" → the pipeline existed (s167) but only ever deployed Edge Functions, because
+`SUPABASE_DB_PASSWORD` was deliberately unset. The founder set it; the first `db push` then FAILED,
+and the failure was worth having.
+- **The remote had NO migration history at all.** Every migration to date was pasted into the SQL
+  editor by hand, which never writes to `supabase_migrations`, so `db push` tried to replay 0001
+  against a database that already had everything and died on "policy profiles_select_own already
+  exists". Because migrations run before functions, the function deploy was skipped with it.
+- **Evidence before repair.** Marking a version applied skips its SQL forever, so nothing was
+  repaired on trust: a dispatch-only **schema probe** (Management API query endpoint) listed the live
+  tables, the `progress`/`writing_evaluations` columns, every public function and every RLS policy.
+  It proved 0001-0004, 0006-0009 and 0011-0013 were present.
+- **It also found a real hole: migration 0010 had never been applied.** No `gdpr_events` table, no
+  `log_gdpr_event`, no `admin_gdpr_evidence`, so the GDPR evidence counters the Launch screen reads
+  had no store behind them. Applied now, along with 0005 (idempotent, so a no-op if it was already
+  there) and 0014.
+- **The bridge, once:** `repair_applied` marked the eleven verified versions, then
+  `db push --include-all` applied the three unrecorded ones. `--include-all` is now permanent,
+  because a repaired history legitimately leaves an older file unrecorded below a newer applied one.
+- **Verified after:** `migration list` shows Local = Remote for all 14, `writing_evaluations.insight_en`
+  exists, `gdpr_events` exists.
+- **From now on a merge to `main` applies pending migrations and then deploys the functions.** Three
+  dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
+- **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
+  wherever its number sits.

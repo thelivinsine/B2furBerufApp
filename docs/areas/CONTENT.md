@@ -113,26 +113,32 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   inference-level checks, the band a B2/C1 reading task actually uses. New long texts follow the C1
   six. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered side by
   side).
-- **Writing prompts** (`src/data/writingPrompts.ts`, 643 tasks): per-theme POOLS of task objects
-  `{ id, text, sub?, sectors?, level?, format?, points?, ... }`; the whole pool rides ONE
-  `wp_<themeId>` provenance row (the mission pattern). `sub` = declared sub-theme slug (coverage
-  invariant: every sub-theme of the sub-themed themes has ≥2 short + ≥2 long tagged tasks);
+- **Writing prompts** (`src/data/writingPrompts.ts`, 717 tasks, ALL servable): per-theme POOLS of
+  task objects `{ id, text, sub?, sectors?, level?, format?, points?, ... }`; the whole pool rides ONE
+  `wp_<themeId>` provenance row (the mission pattern). `sub` = declared sub-theme slug;
   `sectors` = Branche tags with the untagged-=-universal draw rule (a selected Branche prefers
-  tagged tasks, else falls back to untagged, never empty).
-  **`level` and `format` are the opposite: HARD filters** (`lib/writingScope.ts`), as is `sub`. An
-  untagged task is not "every Niveau" and certainly not "every Textsorte", so it is simply not a
-  match, and a Textsorte with no task at a length reads as unavailable there.
+  tagged tasks, else falls back to untagged, never empty), applied per theme and LAST.
+  **`level`, `format` and `sub` are HARD filters** (`lib/writingScope.ts`). An untagged task is not
+  "every Niveau" and certainly not "every Textsorte", so it is simply not a match, and a Textsorte
+  with no task at a length reads as unavailable there.
   **Only a task with Inhaltspunkte is SERVED** (founder decision, 2026-07-31): the full shape is
   instruction + `addressee` + `register` + 2-5 `points` + `level` + `format` + `words`, which is what
-  `evaluate-writing` grades Aufgabenerfüllung against. **270 of the 643 tasks have it**; the other
-  373 are one-liners that quietly downgraded the AI to language-only feedback and were invisible to
-  both filters, so they are retired from the DRAW (never from the bank: ids and pool positions stay,
-  so drafts and Verlauf still resolve) until they are authored up to the full shape.
-  **Upgrading them is the standing content backlog, and every zero in the Aufgabe rail is an entry
-  on it.** Today, worst first: `bewerbung` has no task at any length (so it does not appear in the
-  rail at all, the option list is derived from the bank), **15 of 46 Unterthemen have none at each
-  length**, `bericht` at C1 has one. Authoring one task into the full shape makes its whole
-  Niveau x Textsorte x Unterthema cell selectable.
+  `evaluate-writing` grades Aufgabenerfüllung against.
+  **The 373-task backlog is CLOSED (waves 3 and 4, s181).** Every task was authored up to that shape
+  in place: same ids, same pool positions, only text and tags changed. Gated in
+  `tests/writingScope.test.ts`, so these are invariants now, not aspirations:
+  - **Unterthema:** every declared sub-theme has ≥2 short + ≥2 long servable tasks.
+  - **Branche:** all 10 Beruf Themen x 15 Branchen x both Längen carry a dedicated task (wave 2 did
+    5 Themen, wave 4 the rest). **Alltag is tagged too** (founder decision): every Alltag task
+    carries Branchen, and each names the work context that makes the everyday situation hard
+    (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage, Spätdienst) rather than
+    name-dropping an industry. All 15 are reachable per Alltag theme x length.
+  - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` +
+    `weiterbildung`), B1/B2/C1 at both lengths. **One deliberate zero: C1 + E-Mail (privat)**, which
+    has no exam analogue; the rail greys it with an honest count.
+  - **Niveau:** B1 307 / B2 302 / C1 108. Kurz stays B1-heavy on purpose (a 40-word task with three
+    Leitpunkte is B1 work); promotion to B2 is limited to Lang tasks in demanding genres.
+  Word targets by band, keep them consistent: B1 40/80, B2 100/150, C1 120/200 (short/long).
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary

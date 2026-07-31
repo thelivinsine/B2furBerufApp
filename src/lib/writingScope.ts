@@ -58,16 +58,15 @@ import type { WritingLength } from "@/lib/writing";
  * and vocabulary. They were also invisible to the Niveau and Textsorte filters
  * (they carry neither tag), so 58% of default draws served the one shape of
  * task the rest of the product cannot reason about. The founder chose the
- * smaller, better bank: 270 tasks instead of 643, which is about two months of
- * daily practice at the Kurz 4 / Lang 2 allowance before anything repeats.
+ * smaller, better bank: 270 tasks instead of 643.
  *
- * **Nothing is deleted.** The 373 bare tasks stay in `writingPrompts.ts` with
- * their permanent ids and their pool positions, so a resumed draft or a Verlauf
- * row still resolves to the Aufgabe it was written against (`taskAt` /
- * `writingTaskById` index the FULL pool on purpose). They are retired from the
- * DRAW only, and each one returns the moment it is authored up to the exam
- * shape. That upgrade is the standing content backlog; the greyed-out zeros in
- * the rail are its to-do list.
+ * **That backlog is now closed.** Waves 3 and 4 authored all 373 up to the exam
+ * shape, so the bank is 717 tasks and every one of them is servable. The
+ * `isServable` gate stays: it is what keeps a half-built task out of the draw
+ * rather than something to remove once the count reaches zero. Ids and pool
+ * positions survived the rewrite untouched, so a resumed draft or a Verlauf row
+ * still resolves to the Aufgabe it was written against (`taskAt` /
+ * `writingTaskById` index the FULL pool on purpose).
  */
 
 /**

@@ -992,3 +992,37 @@ Unterthemen at each length, `bewerbung` at zero everywhere, `bericht` at C1 with
 hide them, they are the content to-do list, and each one closes by authoring a task. A gap that is
 visible gets filled; a gap papered over by a fallback stays forever, which is exactly how the
 Textsorte bug survived three sessions.
+
+## s181 (2026-07-31) - closing the Aufgabe backlog: three founder calls
+
+**"The zeros are the backlog" worked.** The s180 decision to serve only fully briefed Aufgaben left
+visible gaps instead of hidden substitutions, and one session later they are filled: all 373 bare
+tasks authored in place, 74 added, bank 717 with nothing retired. The gaps closed *because* they were
+visible and countable. Keep doing this: a fallback that hides a gap keeps it forever.
+
+**Niveau mix: B1-heavy, then B2, thin C1** (target 35/50/15). Shipped at B1 307 / B2 302 / C1 108.
+B1 sits above target on purpose. The excess is entirely Kurz tasks, and a 40-word task with three
+Leitpunkte is B1 work whatever tag it carries. Promotion to B2 was restricted to Lang tasks in
+demanding genres with 4+ Leitpunkte, so nothing wears a Niveau it cannot support. **Rule this sets:
+never hit a distribution target by retagging.** Moving B2 to 50% is an authoring job, not a relabel.
+
+**Bewerbung lives under Bildung**, in `bildung.anerkennung` and `bildung.weiterbildung`, at B1/B2/C1
+in both lengths. The alternatives were spreading it across Beruf Themen (nobody looking for a
+Bewerbung would search there) or a 21st Thema (a whole content system: vocab, collocations,
+dialogues, a city building). It sits next to the recognition and further-training content a job
+seeker is already using, and it needed no schema change. `bewerbung` had been dead chrome in the
+Textsorte list since s167; the list is derived from the bank, so it came back by itself.
+
+**Every Alltag task carries Branche tags** (founder, overruling this plan's own recommendation, which
+was to tag only where work genuinely changes the task). The risk the plan named is real: a
+Gastronomie-flavoured Kontokündigung is a name-drop and reads as fake. The answer was to make the tag
+do work instead of dropping it on: **the work context is the REASON the everyday task is hard.**
+Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage, Ferntour gegen
+Apotheken-Öffnungszeiten, Spätdienst gegen Filialschluss. Under that rule the tag earns its place in
+the text, and a learner filtering by their own Branche gets Alltag tasks that sound like their life.
+**If a future Alltag task cannot name such a reason, it should not carry the tag.**
+
+**One deliberate zero kept: C1 + E-Mail (privat).** A private informal mail has no C1 exam analogue,
+so it stays empty and greys out with an honest count. It is also the fixture that pins `blockingAxis`
+in `tests/writingScope.test.ts`, which needs one genuinely empty scope to test against. Filling it
+would cost the test its subject and the rail its honesty.
