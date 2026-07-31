@@ -226,8 +226,18 @@ offers C1 and `defaultVisibleBands("C1")` returns every band, but behind the lab
   voicemails), P4 (the Sprechen + Prüfung content is still off the nav), P5-P10. The ranked list with
   cheapest-first-steps stays in §5 of `docs/reports/CONTENT_AUDIT_2026-07-30.md`.
 - **Shipped:** all of session 178 went to `main` as **PR #757**, squash-merged as `1c4bc83`
-  (the audit, P0, P2 and P1 in nine commits). Post-merge housekeeping done: branch reset onto
-  `main`, working tree clean.
+  (the audit, P0, P2 and P1 in nine commits), plus **#758** (`e1820a5`, the merge-SHA backfill).
+  Post-merge housekeeping done both times: branch reset onto `main`, working tree clean.
+- **A flake the C1 slice introduced, caught on `main` and fixed (#759).** `Validate content` went RED
+  on `e1820a5`, a docs-only commit, at `tests/engine.test.ts:168`. Cause: the test asserted the
+  scoped reading block by ID PREFIX (`textId.startsWith("tx_behoerde")`), which only held while every
+  text id began with its theme. `tx_c1_behoerde_widerspruchsbescheid` is a behoerde text whose id
+  starts `tx_c1_`, so once the composer had three behoerde texts to sample from it failed roughly one
+  run in three (measured: 3 of 6 runs on the old assertion, 5 of 5 pass on the new one). The test now
+  asserts `textById(...).themeId`, which is what the composer actually scopes on, plus a 40-draw loop
+  so a single lucky sample cannot pass it again. **Only the test depended on the prefix**; production
+  code scopes by `themeId` throughout, so nothing shipped was wrong. Lesson for future banks: a
+  `tx_c1_*` id is fine, but never assert content scope through an id prefix.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

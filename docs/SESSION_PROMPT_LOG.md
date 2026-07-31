@@ -2520,3 +2520,26 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   entry (a founder decision from 2026-07-13, not mine to undo), or flip any content to `verified`.
 - **Artifacts (prompt 5):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md` · **PR #757**
   (squash-merged as `1c4bc83`), which carried all nine session-178 commits into `main`.
+
+- **Prompt 6 (verbatim, 2026-07-30):** `document the session and merge everything to live`
+- **Response summary:** Everything was already on `main` (which IS production: a push there triggers
+  both the Pages deploy and the Supabase workflow), so this pass verified the deploys rather than
+  re-merging, and that verification **caught a red build**. `Validate content` had gone RED on
+  `e1820a5`, the docs-only merge-SHA backfill, while the big content merge `1c4bc83` was green on
+  both workflows. The failure was `tests/engine.test.ts:168`, nothing that commit touched.
+  **Root cause, self-inflicted in the C1 slice:** the test asserted the scoped reading block by ID
+  PREFIX (`reading.textId.startsWith("tx_behoerde")`), an assumption that held only while every text
+  id began with its theme name. `tx_c1_behoerde_widerspruchsbescheid` is a `behoerde` text whose id
+  starts `tx_c1_`, so once the behoerde pool had three texts the random draw failed the assertion
+  roughly one run in three. Measured both ways before fixing: the old assertion failed **3 of 6**
+  runs, the new one passes **5 of 5**, and the full suite passed 3 consecutive times.
+  **Fix:** assert `textById(reading.textId)?.themeId === "behoerde"`, which is the contract the
+  composer actually implements (`engine/session.ts` scopes on `t.themeId`), plus a second test that
+  draws 40 sessions so one lucky sample cannot pass it again. Grepped for other id-prefix
+  dependencies: **only the test had one**, production code scopes by `themeId` everywhere, so no
+  shipped behaviour was wrong and no content needed renaming (ids are permanent anyway).
+  Recorded in `PROJECT_STATUS.md` as a lesson: a `tx_c1_*` id is fine, asserting scope through an id
+  prefix is not.
+  Gates: test:unit **389/389** three consecutive runs · lint:content clean · typecheck ·
+  lint 0 errors.
+- **Artifacts (prompt 6):** `tests/engine.test.ts` · `docs/PROJECT_STATUS.md` · this log · **PR #759**
