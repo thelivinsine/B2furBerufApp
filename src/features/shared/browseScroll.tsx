@@ -45,12 +45,19 @@ export function useScrollDirection() {
  * faded in a `bg-background/90 backdrop-blur` mask once the page scrolled, which
  * read as a blurred band strapped across the page. The controls carry their own
  * opaque fill + `shadow-soft`, so with no band behind them they read as floating
- * over the cards. `pt-3` is the clearance between the app header and the
- * controls that the floating look needs.
+ * over the cards.
+ *
+ * The clearance under the app header that the floating look needs (0.75rem) is
+ * baked into the STICKY OFFSET, not into padding (founder follow-up, same day:
+ * "at top it's way too much"). Padding applies in every state and pushed the
+ * controls away from the tabs at rest too; a sticky `top` does nothing until the
+ * row actually pins, so at rest the spacing is exactly what it was before this
+ * work and the gap appears only while the row floats. It also keeps the flow
+ * height constant, so nothing shifts at the moment it pins.
  */
 export function browseHeaderClass(hidden: boolean): string {
   return [
-    "sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 pt-3 transition-transform duration-200 lg:top-16",
+    "sticky top-[calc(4rem+env(safe-area-inset-top)+0.75rem)] z-20 transition-transform duration-200 lg:top-[4.75rem]",
     hidden ? "max-lg:-translate-y-[112%]" : "",
   ].join(" ");
 }

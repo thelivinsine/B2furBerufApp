@@ -2605,3 +2605,23 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
   `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
   `docs/areas/BIBLIOTHEK.md` · `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 4 (verbatim, 2026-07-31, crop of the page at the top attached):** `I like the spacing above
+  the view buttons when scrolling but when at top it's way too much. specifically when at top, revert
+  the spacing to what it was in the previous version.`
+- **Branch:** `claude/ui-layout-buttons-cards-zkchha`
+- **Response summary:** The clearance was `pt-3` on the sticky row, and padding applies in EVERY state,
+  so it also pushed the controls away from the tabs at the top of the page. Moved the same 0.75rem into
+  the sticky OFFSET instead (`top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]`, `lg:top-[4.75rem]`,
+  mirrored in the four trainers' own `lg:sticky` class): a sticky `top` does nothing until the row
+  actually pins, so at rest the spacing is byte-identical to the pre-session layout and the gap exists
+  only while the row floats. It also leaves the row's flow height unchanged, so nothing shifts at the
+  moment it pins, which a conditional padding would have caused.
+  Measured both states: at rest the tabs-to-buttons gap is back to **24px desktop / 16px mobile** (the
+  plain `space-y-6`/`space-y-4` of the page), and while pinned the buttons sit **12px** under the app
+  header, the spacing the founder liked.
+  Gates: typecheck · lint 0 errors · test:unit 389/389 · build · check:bundle 123.2 kB.
+- **Artifacts (prompt 4):** `src/features/shared/browseScroll.tsx` ·
+  `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
+  `docs/areas/BIBLIOTHEK.md` · `docs/PROJECT_STATUS.md` · this log
