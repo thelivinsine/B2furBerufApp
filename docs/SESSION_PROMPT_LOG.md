@@ -2819,3 +2819,36 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingHub.tsx` ·
   `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` (new) · `docs/areas/SCHREIBEN.md` ·
   `docs/areas/CONTENT.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 2 (verbatim, 2026-07-31):** `you need to explain to me briefly in plain language of the
+  following task:` [quoting the "not fixed, founder's call" paragraph from the prompt-1 answer]
+  **Response:** plain-language explanation of the two generations of writing task (270 exam-shaped
+  vs 373 one-liners), why a bare one matters beyond looks (the AI is sent the Aufgabe so it can grade
+  Aufgabenerfüllung; with no Leitpunkte the feedback silently drops to grammar and vocabulary), and
+  the two options: upgrade the 373 in content waves, or serve only the 270. Recommended the second
+  now with the first as the standing backlog, on the argument that at the Kurz 4 / Lang 2 allowance
+  270 tasks is about two months of daily practice before anything repeats, so the smaller pool costs
+  the learner nothing real while every session gets better feedback.
+- **Prompt 3 (verbatim, 2026-07-31):** `continue with your recommendation`
+- **Prompt 4 (verbatim, 2026-07-31, mid-turn, screenshot of `wt_safety_l12` attached: "Verfasse eine
+  kurze Unterweisung für neue Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no
+  Niveau):** `this one has too little description of the task. Check for such instances and make sure
+  they're well described`
+  **Response:** the screenshot is one of the 373, and the change already in flight retires it. Only a
+  task with Inhaltspunkte is served now (`isServable`); the full shape is instruction + Adressat +
+  du/Sie + 2 to 5 Leitpunkte + Niveau + Textsorte + word target, and all 270 served tasks carry every
+  field (checked: 0 exceptions). **Retired from the draw, never from the bank:** the 373 keep their
+  permanent ids AND their pool positions, because a draft ref is `{theme, index}` and a Verlauf row is
+  a task id, so old work still resolves; each returns the moment it is authored up to the full shape.
+  `sub` became a hard filter in the same change: retiring the bare tasks empties 15 of the 46
+  Unterthemen at each length, and the old fall-back-to-the-whole-Thema would have started firing in
+  earnest, which is the substitution bug this session exists to remove.
+  The rail's remaining zeros are deliberately visible, because they ARE the authoring to-do list:
+  `bewerbung` (no task anywhere), 15 of 46 Unterthemen per length, `bericht` at C1 (one task). Every
+  Thema and every Branche still yields tasks at both lengths (135 short + 135 long).
+  Gates: typecheck · lint 0 errors · test:unit **410/410** · lint:content clean · build ·
+  check:bundle 123.2 kB. Verified in headless Chromium: default draws on Kurz and Lang both render a
+  full brief.
+- **Artifacts (prompts 2-4):** `src/lib/writingScope.ts` · `src/data/writingPrompts.ts` (header
+  contract only, no content changed) · `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` ·
+  `docs/areas/SCHREIBEN.md` · `docs/areas/CONTENT.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log

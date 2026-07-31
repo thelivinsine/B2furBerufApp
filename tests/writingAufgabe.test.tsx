@@ -101,6 +101,27 @@ describe("Aufgabe rail: the drawn task obeys the scope", () => {
     expect(document.querySelector("textarea")).not.toBeNull();
   });
 
+  it("REGRESSION: the default scope never serves a bare one-line Aufgabe", () => {
+    // Founder screenshot (2026-07-31): "Verfasse eine kurze Unterweisung für neue
+    // Mitarbeitende ..." with no Adressat, no Leitpunkte and no Niveau. "This one
+    // has too little description of the task." Those 373 tasks are retired from
+    // the draw, so every Aufgabe on screen now carries the whole brief.
+    for (const length of ["short", "long"] as const) {
+      for (let i = 0; i < 15; i++) {
+        const { unmount } = mount("", length);
+        // Adressat line, then the Leitpunkte the examiner grades.
+        expect(screen.getByText("An:"), `draw ${i} has no Adressat`).toBeDefined();
+        const bullets = document.querySelectorAll("ul > li");
+        expect(bullets.length, `draw ${i} has no Leitpunkte`).toBeGreaterThanOrEqual(2);
+        // Niveau and Textsorte both on the meta line.
+        // No \b before the level: textContent runs the eyebrow straight into the
+        // meta line ("...ÄmterB1 · Antrag · ..."), so there is no word boundary.
+        expect(document.body.textContent).toMatch(/(B1|B2|C1) · [^·]+ · Ziel \d+–\d+ Wörter/);
+        unmount();
+      }
+    }
+  });
+
   it("the Ziel range is a round number, not words x 1.25", () => {
     // "Ziel 150–188 Wörter" read like a figure to hit exactly.
     mount("?level=B2&format=bericht", "long");

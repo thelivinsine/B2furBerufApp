@@ -119,13 +119,20 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   invariant: every sub-theme of the sub-themed themes has ≥2 short + ≥2 long tagged tasks);
   `sectors` = Branche tags with the untagged-=-universal draw rule (a selected Branche prefers
   tagged tasks, else falls back to untagged, never empty).
-  **`level` and `format` are the opposite: HARD filters** (`lib/writingScope.ts`). An untagged task
-  is not "every Niveau" and certainly not "every Textsorte", so it is simply not a match, and a
-  Textsorte with no task at a length reads as unavailable there. Consequences for authoring: 373 of
-  the 643 tasks still carry NO `level`/`format`, so they are reachable only under "Alle Niveaus +
-  Alle Textsorten"; a Textsorte with no task at ANY length disappears from the rail entirely (the
-  option list is derived from the bank), and filling a thin cell (`bewerbung`: 0 tasks, `bericht` at
-  C1: 1) is what makes that combination selectable.
+  **`level` and `format` are the opposite: HARD filters** (`lib/writingScope.ts`), as is `sub`. An
+  untagged task is not "every Niveau" and certainly not "every Textsorte", so it is simply not a
+  match, and a Textsorte with no task at a length reads as unavailable there.
+  **Only a task with Inhaltspunkte is SERVED** (founder decision, 2026-07-31): the full shape is
+  instruction + `addressee` + `register` + 2-5 `points` + `level` + `format` + `words`, which is what
+  `evaluate-writing` grades Aufgabenerfüllung against. **270 of the 643 tasks have it**; the other
+  373 are one-liners that quietly downgraded the AI to language-only feedback and were invisible to
+  both filters, so they are retired from the DRAW (never from the bank: ids and pool positions stay,
+  so drafts and Verlauf still resolve) until they are authored up to the full shape.
+  **Upgrading them is the standing content backlog, and every zero in the Aufgabe rail is an entry
+  on it.** Today, worst first: `bewerbung` has no task at any length (so it does not appear in the
+  rail at all, the option list is derived from the bank), **15 of 46 Unterthemen have none at each
+  length**, `bericht` at C1 has one. Authoring one task into the full shape makes its whole
+  Niveau x Textsorte x Unterthema cell selectable.
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary

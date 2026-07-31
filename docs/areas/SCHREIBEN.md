@@ -31,7 +31,19 @@ founder-picked s171).
     and the saved draft record.
   - `sub` applies only inside a concrete theme (slugs are theme-scoped) and is ignored under Alle
     Themen; the Unterthema dropdown hides there.
-  - **Niveau and Textsorte are HARD filters** (2026-07-31), and the filters apply in this order:
+  - **Only tasks with Inhaltspunkte are served** (founder decision, 2026-07-31). A served Aufgabe
+    always carries the whole brief: Adressat, du/Sie, 2 to 5 Leitpunkte, Niveau, Textsorte, word
+    target. The 373 bare one-liners (of 643) are retired from the DRAW because they downgrade the AI
+    to language-only feedback (there is nothing to check Aufgabenerfüllung against) and carry neither
+    filter tag, so 58% of default draws served the one shape the rest of the product cannot reason
+    about. Founder, on a screenshot of `wt_safety_l12`: "this one has too little description of the
+    task." **Nothing is deleted**: ids and pool positions stay, so a resumed draft or a Verlauf row
+    still resolves (`taskAt`/`writingTaskById` index the full pool on purpose), and each task returns
+    to the draw the moment it is authored up to the full shape. 270 tasks is about two months of
+    daily practice at the Kurz 4 / Lang 2 allowance before anything repeats. The visible cost is the
+    zeros this leaves in the rail (15 of 46 Unterthemen per length, `bewerbung` everywhere), which
+    ARE the content to-do list; see `docs/areas/CONTENT.md`.
+  - **Niveau, Textsorte and Unterthema are HARD filters** (2026-07-31), and the filters apply in this order:
     Unterthema → Niveau → Textsorte → Branche. A task that is not tagged with the chosen
     Niveau/Textsorte is not a match, full stop. They used to PREFER their tagged tasks and fall back
     to the untagged ones, which is how "Forumsbeitrag" served a Beschwerde an eine Fluggesellschaft
@@ -49,6 +61,9 @@ founder-picked s171).
     are the same number, so the separate `countExact` is gone. Every dropdown greys its zero-yield
     options and keeps the honest count visible on them; only the generic "Alle …" option is never
     disabled, since it is the way back out.
+  - **An Unterthema with no task reads as empty too.** It used to fall back to the whole Thema,
+    which was the last silent substitution in the selector; retiring the bare tasks empties 15 of the
+    46 Unterthemen at each length, so that fallback would have started firing in earnest.
   - **A scope CAN now be empty**, and the trainer says so instead of substituting: `blockingAxis`
     names the single filter causing it and the empty state offers exactly that escape ("Forumsbeitrag
     gibt es nur bei Lang." + "Textsorte zurücksetzen"). Greying prevents walking into an empty scope
