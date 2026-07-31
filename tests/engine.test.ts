@@ -12,6 +12,7 @@ import { missionContentIds } from "@/engine/mission";
 import { searchAll } from "@/lib/search";
 import { daysBetween, shuffle, todayKey } from "@/lib/utils";
 import { vocabulary } from "@/data/vocabulary";
+import { textById } from "@/data/texts";
 import { redemittel } from "@/data/redemittel";
 import { grammar } from "@/data/grammar";
 import { missions } from "@/data/missions";
@@ -161,11 +162,30 @@ describe("session composer", () => {
   });
 
   it("scopes the reading block to the requested theme when a text exists (4.4)", () => {
+    // Assert the THEME, not the id prefix. The old assertion read
+    // `textId.startsWith("tx_behoerde")`, which only held while every text id
+    // happened to begin with its theme; `tx_c1_behoerde_widerspruchsbescheid`
+    // (s178 C1 slice) is a behoerde text whose id starts `tx_c1_`, so the
+    // composer picking it at random failed the test roughly one run in three.
+    // The composer scopes on `t.themeId`, so that is the real contract.
     const plan = buildSession({ srs: {}, mode: "both", minutes: 15, scope: "behoerde" });
     const reading = plan.blocks.find((b) => b.kind === "reading") as
       | Extract<(typeof plan.blocks)[number], { kind: "reading" }>
       | undefined;
-    expect(reading?.textId.startsWith("tx_behoerde")).toBe(true);
+    expect(reading, "a behoerde session includes a reading block").toBeTruthy();
+    expect(textById(reading!.textId)?.themeId).toBe("behoerde");
+  });
+
+  it("keeps the scoped reading block on-theme across repeated draws", () => {
+    // The block is sampled at random from the theme's texts, so a single draw
+    // cannot prove scoping. behoerde has three texts at two id prefixes.
+    for (let i = 0; i < 40; i++) {
+      const plan = buildSession({ srs: {}, mode: "both", minutes: 15, scope: "behoerde" });
+      const reading = plan.blocks.find((b) => b.kind === "reading") as
+        | Extract<(typeof plan.blocks)[number], { kind: "reading" }>
+        | undefined;
+      if (reading) expect(textById(reading.textId)?.themeId).toBe("behoerde");
+    }
   });
 
   it("sessionPreview is deterministic and reports history", () => {
