@@ -2903,3 +2903,38 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 2):** `src/data/writingPrompts.ts` (717 tasks) · `src/lib/writingScope.ts`
   (docstring) · `tests/writingScope.test.ts` · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-31):** `is everything done?`
+  **Response:** confirmed done and live (PR **#770** squash-merged, `Validate content` and `Deploy
+  site to GitHub Pages` both green on `6253ee7`), and restated the two things that are NOT done and
+  why: the plan's §12 exam-verification items and P0.3 need primary exam documents no session can
+  acquire (telc material may not be copied at all), and the Niveau mix landed B1 307 / B2 302 /
+  C1 108 against a 35/50/15 target because the surplus is Kurz tasks that genuinely are B1 and were
+  not retagged to hit a number.
+- **Artifacts (prompt 3):** none (status answer)
+- **Prompt 4 (verbatim, 2026-07-31):** `In schreiben, there seems to be some topics in the themen
+  dropdown which are non-beruf but are not part of alltag - fix it. There has to be only two
+  overarching categories similar to the nodal graphs in bibliothek. This has to be consistent across
+  the app`
+  **Response:** correct report. The Schreiben rail folded `gesundheit` into Alltag but not `bildung`,
+  so "Bildung & Sprache" sat there as a third heading; the Bibliothek Thema dropdown grouped by the
+  raw five domains (up to five headings); and only the graphs were already binary, under a different
+  name ("Privatleben"). Three surfaces, three different answers.
+  Introduced **`src/lib/lifeAreas.ts` as the ONE app-wide fold**: two areas, `beruf` is Berufsleben
+  and every other domain is Alltag, with `themeGroupsByArea` as the single grouped-options builder.
+  The Schreiben rail, `themeGroupsForMode` (Bibliothek Wörter + Kollokationen) and both graph legends
+  now read from it; `graphPalette.ts` keeps only the colors and re-exports the areas. Asked the
+  founder which naming wins, since the graphs and the dropdowns disagreed: **Berufsleben / Alltag**
+  (their pick), so the graph legend's "Privatleben" is retired.
+  The Mode lens still narrows WITHIN the two groups rather than adding headings, and the s104 rule
+  that an actively selected theme never gets orphaned is kept. `tests/lifeAreas.test.ts` (6 tests)
+  pins the law: two areas, every domain except `beruf` folds to Alltag, no dropdown returns a third
+  group in any mode, and the Mode lens still filters.
+  Verified in headless Chromium against the built app, not just the unit tests: the Schreiben Thema
+  dropdown shows BERUFSLEBEN and ALLTAG, the Bibliothek dropdown the same two, and the Wörter graph
+  legend now reads "Berufsleben · Alltag".
+  Gates: typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
+  check:bundle 123.2 kB.
+- **Artifacts (prompt 4):** `src/lib/lifeAreas.ts` (new) · `src/lib/themeGroups.ts` ·
+  `src/lib/graphPalette.ts` · `src/features/writing/WritingRail.tsx` · `tests/lifeAreas.test.ts`
+  (new) · `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` · `docs/areas/SCHREIBEN.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
