@@ -143,8 +143,13 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 The toolbar row itself is sticky under the app header and **always fully transparent** (founder
 2026-07-31, `browseHeaderClass` in `features/shared/browseScroll.tsx`): the earlier version faded a
 `bg-background/90 backdrop-blur` mask in once the page scrolled, which read as a blurred band across
-the page. The controls carry their own opaque fill plus `shadow-soft` and clear the app header by
-`pt-3`, so they float over the cards passing underneath. **Opaque is load-bearing:** the toolbar icon
+the page. The controls carry their own opaque fill plus `shadow-soft`, so they float over the cards passing
+underneath. **The 0.75rem clearance under the app header lives in the sticky OFFSET
+(`top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]` / `lg:top-[4.75rem]`), never in padding**
+(founder 2026-07-31): padding applies at rest too and pushed the controls away from the tabs at the
+top of the page, while a sticky `top` does nothing until the row pins. It also keeps the flow height
+constant, so nothing shifts at the moment it pins. The four trainers repeat the same offset in their
+own `lg:sticky` class, so change both together. **Opaque is load-bearing:** the toolbar icon
 buttons all wear `BROWSE_TOOLBAR_BUTTON` (exported from `browseScroll.tsx`), because the `outline`
 variant fills with `bg-surface/50` and hovers to `bg-muted/60`, and at half alpha the card titles
 scrolling behind printed straight through the buttons (founder 2026-07-31, "the buttons are

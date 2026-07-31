@@ -160,6 +160,11 @@ the same session: add a "go to top" button to the bottom right on desktop, where
   Grammatik pattern chip and foot).
 - **"Nach oben" now has a desktop placement** (`bottom-4 right-4`, clear of the Feedback pill); the
   centered mobile one above the Üben bar is unchanged. Same 280px show threshold.
+- **Follow-up: the clearance moved from padding into the sticky offset.** `pt-3` applied at rest too
+  and pushed the controls away from the tabs at the top of the page. The 0.75rem now rides
+  `top-[calc(4rem+env(safe-area-inset-top)+0.75rem)]` / `lg:top-[4.75rem]` (repeated in the four
+  trainers' own `lg:sticky` class), which does nothing until the row pins. At rest the tabs-to-buttons
+  gap is back to 24px desktop / 16px mobile; pinned, the buttons sit 12px under the app header.
 - **Follow-up in the same session: the toolbar buttons were half-transparent.** The shared `outline`
   button variant fills with `bg-surface/50`, which was invisible behind the old blurred band and let
   card titles print through the buttons once the band went away. Every browse-toolbar icon button now
