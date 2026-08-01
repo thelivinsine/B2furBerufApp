@@ -46,6 +46,7 @@ const GRAMMAR_GROUPS = [
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
   "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
   "particles",
+  "tenses", // B1 accuracy canon (audit P5, s182)
 ];
 const WEAKNESS_CATEGORIES = [
   // "taskCompletion" (Aufgabenerfüllung) added s167 once evaluate-writing began

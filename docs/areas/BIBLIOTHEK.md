@@ -187,7 +187,11 @@ source for the CEFR scale (`CEFR_ORDER`, `cefrLabel`, `difficultyToBand`).
 Shares the same skeleton (toolbar with mobile filter toggle + Karten/Liste ViewSwitcher +
 transient fuzzy search; FilterRail with **Gruppe** as primary dropdown and **Stufe** as facet,
 `grammarFacets()`; Üben in the rail footer / sticky mobile bar; `?group=`/`?cefr=`/`?view=`/
-`?topic=` URL-persisted). Feature split: `grammar/grammarMeta.ts` (group labels/icons, B2-marker
+`?topic=` URL-persisted). Group labels changed in s182 (audit P5) as the bank grew: `attributes` is
+**"Adjektive & Attribute"** (it holds Adjektivdeklination and Komparativ now, not only
+Partizipialattribute), `prepositionalPronouns` is **"Verben mit Präpositionen"** (the da-/wo-forms
+exist because of them), and **"Zeitformen"** (`tenses`) is the new group, placed after Kasus on the
+priority spine. Feature split: `grammar/grammarMeta.ts` (group labels/icons, B2-marker
 `groupOrder`, `orderedGrammar` spine, `topicRank`), `grammar/GrammarViews.tsx` (Karten with
 emerald group tile + priority-rank chip + ONE pattern variant (`pattern.split(" · ")[0]`) in the
 Muster tint; compact Liste rows), and `grammar/GrammarTopicView.tsx`, the lesson page:

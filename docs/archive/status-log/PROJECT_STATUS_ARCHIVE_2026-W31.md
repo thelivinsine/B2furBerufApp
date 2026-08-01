@@ -721,3 +721,63 @@ necessary improvements with the Aufgabe feature."
   each length, `bericht` at C1 has one). Authoring one task into the full shape makes its whole
   Niveau x Textsorte x Unterthema cell selectable, so the greyed zeros in the rail are the progress
   bar for that work. Load the `/content` skill first.
+
+**Handoff after session 181 (2026-07-31). The Aufgabe backlog is closed: 717 tasks, every one of
+them servable.** Branch `claude/latest-plan-steps-ydumbt`.
+Founder: "what's steps are to do in the latest plan?" then "complete the full implementation of both
+these plans". The two plans were `docs/plans/SCHREIBEN-OVERHAUL.md` (waves 3 and 4 outstanding since
+s167) and the authoring backlog s180 made visible when it retired every bare Aufgabe from the draw.
+- **What the bank looked like going in:** 643 tasks, **270 servable, 373 bare**. 30 of 92 Unterthema
+  x Länge cells empty, 13 Niveau x Textsorte cells empty, `bewerbung` at zero everywhere, and
+  `project`, `sustainability` and `travel` with no Branche variants at all.
+- **Three founder decisions were needed first,** because the plans left them open: the Niveau mix,
+  where Bewerbung lives (**under Bildung**, both sub-themes), and whether Alltag tasks get Branche
+  tags (**tag every Alltag task**, against this plan's own recommendation). The third was made honest
+  rather than cosmetic: every Alltag task names the work context that makes the everyday situation
+  hard (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage), so a Branche on a
+  Kontokündigung is a reason, not a sticker.
+- **Shipped in one pass: 373 upgrades in place + 74 new tasks + 60 tagged. Bank 643 → 717, zero bare.**
+  Every id and every pool position survived, so resumed drafts and Verlauf rows still resolve; only
+  text and tags changed.
+- **Coverage is now gated, not aspirational** (`tests/writingScope.test.ts`, 413 tests):
+  **≥2 tasks per Unterthema per length**; **all 15 Branchen x both Längen on all 10 Beruf Themen**
+  (wave 2 did five, wave 4 the rest) **and on all 10 Alltag Themen**; **all 16 Textsorten live**,
+  `bewerbung` included. Seven completely empty B1 Textsorte cells closed (Bericht, Beschwerde,
+  Forumsbeitrag, Kündigung, Protokoll, Stellungnahme, Widerspruch), which is what a B1 learner
+  picking a Textsorte actually feels.
+- **Niveau: B1 307 / B2 302 / C1 108, and the founder has since SETTLED this as final.** The excess
+  over the old 35/50/15 target is entirely Kurz tasks, and a 40-word task with three Leitpunkte is B1
+  work. Promotion was limited to Lang tasks in demanding genres with 4+ Leitpunkte, so no task wears
+  a Niveau it cannot carry. Do not rebalance it in a later session.
+- **One deliberate zero left: C1 + E-Mail (privat).** A private informal mail has no C1 exam
+  analogue, so the rail greys it with an honest count instead of serving a formal letter under an
+  informal label. It is now the fixture that pins `blockingAxis` in the tests.
+- **NOT done, and it cannot be done from a session:** the plan's §12 verification items (exam point
+  values, weightings, timings, verbatim prompt wording) and P0 item 3 (obtain the Goethe/telc/BAMF
+  source documents). Both need primary documents this repo does not hold, and telc material may not
+  be copied at all under `strategy/DATA_GOVERNANCE.md`. **Nothing shipped depends on them:** no exam
+  score or timing is printed anywhere, `words` follows Genauly's own per-band convention, and `exam`
+  is a shape label on our own tasks. **Founder action if you want it closed:** buy the Goethe
+  Modellsätze (B1/B2/C1) and drop the PDFs into the repo; a session can then read them locally.
+- **Gates:** typecheck · lint:content clean · test:unit **413/413** · build · check:bundle 123.2 kB.
+
+**Same session, follow-up: the app now has exactly TWO learner-facing categories.** Founder, on the
+Schreiben Thema dropdown: "there seems to be some topics in the themen dropdown which are non-beruf
+but are not part of alltag ... There has to be only two overarching categories similar to the nodal
+graphs in bibliothek. This has to be consistent across the app."
+- **Three surfaces, three different answers.** The Schreiben rail folded `gesundheit` into Alltag but
+  not `bildung`, so "Bildung & Sprache" was a third heading; the Bibliothek Thema dropdown grouped by
+  all five content domains; only the graphs were binary, and they called the second area
+  "Privatleben".
+- **`src/lib/lifeAreas.ts` is the one fold now.** Two areas, `beruf` = Berufsleben and every other
+  domain = Alltag, with `themeGroupsByArea` as the single grouped-options builder that the Schreiben
+  rail, the Bibliothek dropdowns (Wörter + Kollokationen) and both graph legends all call.
+- **Naming: Berufsleben / Alltag** (founder pick). "Privatleben" is retired from the graph legend so
+  the whole app says the same two words.
+- **The Mode lens still narrows inside the two groups**, never adds a heading, and a deep-linked
+  theme is still never orphaned (s104). `tests/lifeAreas.test.ts` fails if a third group ever
+  appears, in any mode, or if a new domain does not fold into Alltag.
+- **Verified in the built app, not only in tests** (headless Chromium): Schreiben shows BERUFSLEBEN /
+  ALLTAG, the Bibliothek dropdown the same two, the Wörter graph legend reads "Berufsleben · Alltag".
+- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
+  check:bundle 123.2 kB.

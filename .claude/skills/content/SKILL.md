@@ -11,15 +11,16 @@ Full schema reference: `docs/areas/CONTENT.md`. Command detail: `docs/areas/COMM
 1. **Shipped content ids are permanent.** Never rename or delete one; retire from the surface
    instead. Unavoidable rename → `ID_RENAMES` in `src/lib/idRenames.ts`, kept forever.
 2. **Every new content_id gets a provenance row** in `src/data/provenance.ts` in the same edit
-   (append to `provenancePart2`; `review_status: "draft"`, non-empty `reference`).
+   (append to the LAST provenance part; `review_status: "draft"`, non-empty `reference`).
 3. **Id prefixes are law:** v_ / c_ / g_ / sc_ / ex_ / r_ / cd_ / tx_ / m_ / wp_. Ids unique
    across ALL banks.
 4. **Closed-enum rule:** a new union in `src/types/index.ts` is mirrored by a JS array +
    validate-when-present check in `scripts/lint-content.mjs`.
 5. **No em dashes** in any copy. German content sourced against Goethe B2 Beruf / telc B2+ Beruf
    word fields; CoE CEFR descriptors are cited, never reproduced.
-6. Big banks are TWO concatenated array literals (vocabulary, provenance) for the TS2590 limit;
-   append to part 2.
+6. Big banks are SPLIT into concatenated array literals for the TS2590 limit (vocabulary: 2 parts;
+   provenance: 4 since s182, ~1,300 rows each). Append to the LAST part, and split it again when
+   `tsc` starts reporting TS2590 on that literal.
 7. Nomen-Verb combos belong in Kollokationen, never as Wörter entries (the linter errors;
    retire via `RETIRED_VOCAB_IDS` if one slips through).
 8. A new theme needs: `ThemeId` union + `THEME_IDS` in the linter, icon in `lib/icons.ts`,

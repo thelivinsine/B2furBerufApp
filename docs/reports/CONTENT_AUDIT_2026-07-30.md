@@ -393,8 +393,11 @@ the progress store tracks text or dialogue completion, so nothing can guarantee 
   **P4** in s182: all 30 scenarios now have a free-speak node with a model answer (was 10 of 30),
   and Anwenden is back in `navItems` for the desktop sidebar. Open half: only 2 of 30 scenarios are
   level 3, and the mobile bottom bar's 5 slots are locked, so mobile placement needs a founder call.
-- **Open:** P3 (rest), P4 (level-3 depth + mobile entry), P5, P7, P9 (pron scheme, `uncountable`,
-  329 plural-less nouns), P10.
+  **P5** in s182: the four missing canon topics shipped with 10 drills each, and every B1 topic now
+  has ≥3 productive drills (bank 28 topics/137 drills → 32/195, productive 4% → 19%). Open half:
+  the 21 B2/C1 topics still cap at 5 MCQ-only drills.
+- **Open:** P3 (rest), P4 (level-3 depth + mobile entry), P5 (B2/C1 drill depth), P7, P9 (pron
+  scheme, `uncountable`, 329 plural-less nouns), P10.
 
 ### Two structural observations, not gaps
 

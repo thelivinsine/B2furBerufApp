@@ -134,7 +134,7 @@ Diese Bereiche haben eigene, kleinere Menüs. Kollokationen sind bewusst schlank
 | --- | --- |
 | Kollokationen (alle Themen) | Kollokations-Karte, Nomen-Verb-Paare, Nomen + Verb, Satzbau |
 | Redemittel | Redemittel-Karte, Redemittel-Lücke |
-| Grammatik | Grammatik-Übung über **28 Themen** in **17 Gruppen** (Vielfalt kommt aus den Themen, nicht aus dem Format) |
+| Grammatik | Grammatik-Übung über **32 Themen** in **18 Gruppen** (Vielfalt kommt aus den Themen, nicht aus dem Format) |
 
 ## Wann ist die Vielfalt „ausgeschöpft“?
 

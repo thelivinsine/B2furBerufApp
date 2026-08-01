@@ -90,13 +90,20 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
-- **Grammar** (`src/data/grammar.ts`, 28 topics / 137 drills, 17 groups): `GrammarTopic` with `id` (`g_`),
+- **Grammar** (`src/data/grammar.ts`, 32 topics / 195 drills, 18 groups): `GrammarTopic` with `id` (`g_`),
   `group`, `cefr` (REQUIRED, completeness-checked), `title`, `titleDe`, `purpose`, `purposeDe`,
   `explanation`, `explanationDe` (the German-FIRST lesson text; EN shows only via the hold-to-peek
   chip), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (parallel, same order/length), `drills[]`.
   Topics ordered by B2-marker priority (`grammarMeta.ts` `groupOrder`). Drills: `id`, `prompt`,
-  `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
-  the EN peek; sessions keep it visible).
+  `answer`, `options?` (MCQ) or none (PRODUCTIVE: the learner types the answer, graded by
+  `normalize()` so case and punctuation are forgiven), `explain`, `gloss` (lesson hides gloss behind
+  the EN peek; sessions keep it visible). **Every B1 topic carries ≥3 productive drills** (audit P5,
+  s182: the bank was 131 MCQ against 6 productive, so it tested recognition and called it practice);
+  `tests/grammar.test.ts` gates that, plus the group registry and drill-id uniqueness. A productive
+  answer must be unambiguous, since it is compared as one string. The B1 accuracy canon that was
+  missing entirely (Adjektivdeklination, Perfekt/Präteritum, Verben mit Präpositionen,
+  Komparativ/Superlativ) shipped in s182 with 10 drills each. Still open from P5: the 21 B2/C1 topics
+  keep their 5-drill cap and are still MCQ-only.
 - **Redemittel** (`src/data/redemittel.ts`, 220; `r_` prefix): `id`, `de`, `en`, `category`
   (closed enum, 18), `register` (neutral/formal), `example` (de + en), optional `note`, `cefr`,
   `themeId`. **`themeId` is untagged-=-universal** (audit P6, s182), like Branche and unlike
