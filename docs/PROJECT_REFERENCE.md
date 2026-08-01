@@ -49,6 +49,51 @@ evidence; human-persona (moustache-man) imagery teaches a false rule on `das Mä
 
 
 ## Backlog — founder ideas (not yet scoped, added 2026-06-07)
+
+### QUEUED (founder, s181): audit the writing-task bank for QUALITY and filter fit
+
+**Not started, deliberately.** The founder asked for it as a next task, not this session: "I want you
+to do a thorough analysis of the quality of these tasks and how they go with the filter - do the
+required research from reliable sources - this is one of the next todos for later."
+
+Context a future session needs: the bank is **717 tasks, all servable** (s181 closed the authoring
+backlog). Every task carries instruction + Adressat + du/Sie + 2-5 Leitpunkte + Niveau + Textsorte +
+word target, and coverage is gated (≥2 per Unterthema per length, all 15 Branchen on all 20 Themen at
+both lengths, all 16 Textsorten). **Coverage is proven; QUALITY is not.** Nobody has checked whether
+a task tagged B1 reads as B1, whether the Leitpunkte are answerable in the word target, or whether
+the Branche framing is convincing to someone who works in that industry.
+
+What the audit should cover, at minimum:
+- **Niveau accuracy.** Does each task's language and cognitive demand match its tag? The s181 mix is
+  B1 307 / B2 302 / C1 108 and the founder has now decided to KEEP it, so the question is whether the
+  labels are honest, not whether the distribution should move.
+- **Leitpunkte quality.** Are they answerable, non-overlapping, and covered by the word target? Do
+  they give `evaluate-writing` something concrete to grade Aufgabenerfüllung against?
+- **Filter fit.** Does a task actually deliver what its Textsorte, Niveau, Unterthema and Branche
+  tags promise? A learner filtering Beschwerde + B1 + Pflege should feel all three, not one.
+- **Branche honesty**, especially the s181 Alltag tagging rule (the work context must be the REASON
+  the everyday task is hard). Spot-check whether it reads as authentic or as a name-drop.
+- **Repetition.** With 717 tasks authored in waves, check for near-duplicate scenarios and
+  formulaic openings across Themen.
+- **Register and Adressat plausibility**, and whether du/Sie is right for each relationship.
+
+Research constraints (do not repeat s181's dead end): exam-authority documents are NOT available and
+are parked (see below). Reliable sources that ARE usable: the CEFR companion volume descriptors
+(cited, never reproduced), publicly published Goethe/telc *task-type* descriptions on their own
+sites, and open corpora. `strategy/DATA_GOVERNANCE.md` still forbids copying telc material.
+Deliverable shape: a report in `docs/reports/` with a prioritised fix list, like the s178 content
+audit.
+
+### PARKED (founder, s181): the exam-source documents and the §12 verification items
+
+`docs/plans/SCHREIBEN-OVERHAUL.md` §12 (per-band point values, Aufgabe weightings, module timings,
+verbatim prompt wording) and P0 item 3 (obtain the Goethe/telc/BAMF documents). Founder: "park the
+exam source items with official documents task for later - it's not that important."
+Why it is safe to park: nothing shipped depends on it. No exam score, weighting or timing is printed
+anywhere in the app, `words` follows Genauly's own per-band convention (B1 40/80, B2 100/150, C1
+120/200), and `exam` is a shape label on Genauly's own tasks, never a reproduction. Unparking needs a
+founder purchase (the Goethe Modellsätze), not engineering work.
+
 Raw list from the founder, for future planning sessions to scope, sequence, and break into
 phases. None of these are started; treat as candidates for the next `EXPANSION_PLAN.md` revision.
 

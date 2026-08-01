@@ -1,9 +1,14 @@
 # Schreiben overhaul: exam-realistic Aufgaben, a Niveau axis, real Branche differentiation
 
-**Status: COMPLETE except the source-material items (§12 and P0.3), which are blocked on
-documents this repo may not hold.** P0, P1, P2 and **content wave 2** shipped in s167 (PRs #711 to
-#715); **waves 3 and 4 shipped in s181**, together with the whole "every zero in the rail" backlog
-the s180 founder decision created. Extends `docs/areas/SCHREIBEN.md`.
+**Status: COMPLETE. The only open items (§12 and P0.3) are PARKED by the founder as low priority
+(s181), and nothing shipped depends on them.** P0, P1, P2 and **content wave 2** shipped in s167
+(PRs #711 to #715); **waves 3 and 4 shipped in s181** (PR #770), together with the whole "every zero
+in the rail" backlog the s180 founder decision created. Extends `docs/areas/SCHREIBEN.md`.
+
+**The follow-up this plan does NOT cover** and which the founder queued in s181: an audit of task
+QUALITY and filter fit. This plan proved coverage; nobody has yet checked whether a task tagged B1
+reads as B1 or whether the Branche framing convinces someone in that industry. Scope lives in
+`docs/PROJECT_REFERENCE.md` under "QUEUED (founder, s181)".
 
 **Shipped:** the counting fix + one shared selector · "Alle Themen" and a generic option on every
 dropdown · the Niveau and Textsorte axes · the exam-shaped `WritingTask` schema · permanent task ids
@@ -18,7 +23,7 @@ mobile panel stays open until closed · CI that deploys Supabase without a CLI.
 Alltag now tagged as well (founder decision), so all 15 Branchen are reachable in all 20 Themen at
 both lengths.
 
-**Not shipped, and not shippable from inside this repo:** the §12 verification items and P0 item 3
+**Not shipped, and PARKED by the founder in s181 as low priority:** the §12 verification items and P0 item 3
 (obtain the Goethe/telc/BAMF source documents). Both need primary sources: `strategy/
 DATA_GOVERNANCE.md` puts telc material on the do-not-use list and forbids copying a published word
 list or task sheet, and no exam numbers may be hard-coded from secondary reports. Nothing in the
@@ -406,7 +411,7 @@ gate today; it would if any row were flipped to verified first. Update `docs/are
    call it from rail and trainer. Branche stops lying. (~1 file, no content, no backend.)
 2. **Add "Alle Themen" to the Thema dropdown** and normalize the generic option across all
    dropdowns.
-3. **Obtain the source PDFs. BLOCKED, founder action.** Goethe B1/B2/C1 Modellsatz + Prüferblätter,
+3. **Obtain the source PDFs. PARKED (founder, s181), was blocked on founder action.** Goethe B1/B2/C1 Modellsatz + Prüferblätter,
    telc B2 Beruf Übungstest, BAMF DTB Prüfungshandbuch. Dropped into the repo, they can be read
    locally with no network; nobody in a session can acquire them, and telc material may not be copied
    at all (`strategy/DATA_GOVERNANCE.md`). Until then the Aufgaben are exam-*like*, not
@@ -454,8 +459,8 @@ gate today; it would if any row were flipped to verified first. Update `docs/are
 
 ## 12. Open verification items
 
-**Still open after s181, deliberately.** Nothing in this list may be hard-coded until confirmed from
-a primary source, and none of it can be resolved by authoring: item 5 is telc material, which
+**PARKED by the founder (s181): "it's not that important."** Nothing in this list may be
+hard-coded until confirmed from a primary source, and none of it can be resolved by authoring: item 5 is telc material, which
 `strategy/DATA_GOVERNANCE.md` puts on the do-not-use list, and the rest needs the official Modellsatz
 and Prüferblätter (P0 item 3), which this repo does not hold and which cannot be bought or scraped
 from the sandbox. **The app does not depend on any of them today:** no exam point value, weighting or

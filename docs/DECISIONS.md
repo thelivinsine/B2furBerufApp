@@ -1054,3 +1054,23 @@ which headings exist, and an actively selected theme is still never orphaned (s1
 **Where the five domains still belong:** authoring, `docs/areas/CONTENT.md` coverage, the city
 buildings, graph clustering. They are a grain, not a heading. `tests/lifeAreas.test.ts` fails if a
 third group ever reaches a dropdown.
+
+## s181 (2026-07-31, end of session) - the Niveau mix is settled; quality is the open question
+
+**Founder: "keep the Niveau mix as it is."** So **B1 307 / B2 302 / C1 108** is the intended
+distribution, not a deviation to be corrected later. The 35/50/15 target that produced it is
+retired; do not "fix" the mix in a future session. The reasoning that survives: promotion between
+bands must follow what a task actually demands, never a distribution target, and a 40-word Kurz task
+with three Leitpunkte is B1 work whatever number the rail would prefer.
+
+**What that makes the real open question: are the labels honest?** The founder queued a thorough
+audit of task quality and filter fit (scope in `docs/PROJECT_REFERENCE.md`). Coverage is proven and
+gated; quality is unproven. A B1 tag on a task that reads as B2 is now a content bug, not a
+distribution one.
+
+**The exam-source items are parked, not blocked-and-waiting.** Founder: "it's not that important."
+They stay in `docs/plans/SCHREIBEN-OVERHAUL.md` §12 and P0.3 with the reasoning intact, and unparking
+them needs a purchase (the Goethe Modellsätze), not engineering. Nothing in the app depends on them,
+so a future session should not treat them as a prerequisite for the quality audit: that audit uses
+CEFR descriptors (cited, never reproduced), publicly published task-type descriptions and open
+corpora instead.

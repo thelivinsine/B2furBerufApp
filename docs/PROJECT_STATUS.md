@@ -7,9 +7,9 @@ tagged, so the bank is **717 tasks and every one of them is servable**. Coverage
 than aspirational: at least 2 tasks per Unterthema per length, all 15 Branchen at both lengths on all
 20 Themen (Alltag included, by founder decision, with the work context as the reason the everyday
 task is hard), and all 16 Textsorten live including `bewerbung`. Niveau: B1 307 / B2 302 / C1 108.
-One deliberate zero remains, C1 + E-Mail (privat), which has no exam analogue. The plan's exam-source
-items (§12, P0.3) stay open: they need primary documents a session cannot acquire, and nothing
-shipped depends on them.
+One deliberate zero remains, C1 + E-Mail (privat), which has no exam analogue. **Next up (founder,
+not started): an audit of task QUALITY and filter fit** (`docs/PROJECT_REFERENCE.md`); the exam-source
+items are parked as low priority.
 Prior s180: **the Aufgabe filters now mean what they say.** Niveau, Textsorte and Unterthema became
 HARD filters, one counting rule serves both the rail and the draw, zero-yield options grey out with
 honest counts, and an empty scope gets an empty state naming the one filter to drop instead of a
@@ -18,15 +18,12 @@ Prior s179: **Bibliothek card grids, the floating toolbar and readable AI feedba
 self-applying Supabase migrations.
 Prior s178: **content audit + its P0/P1/P2 fixes** (duplicate quiz options, 234 verb paradigms
 generated into `src/data/verbForms.ts`, the empty C1 band filled).
-Prior s177 / s176: two founder word-field packs for answering written complaints, audited against the
-banks and shipped as 170 new items, all `draft`.
-Prior s175: the `/sources` chunk was ~200 content items from workbox's 2 MiB precache ceiling, which
-FAILS `pnpm build`; it is excluded from the precache now (PR #751). A telc-sourced word pack stays
-parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
+Prior s177 / s176: two founder word-field packs for answering written complaints (170 new items).
+Prior s175: the `/sources` chunk is excluded from the workbox precache (PR #751); a telc-sourced word
+pack stays parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
 Prior s174: **security audit + the sign-up flow it uncovered**, including the `onboarded` fault that
-had been discarding learner profiles on every sign-in (#745).
-Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`, draft
-and session autosave).
+discarded learner profiles on every sign-in (#745).
+Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`).
 Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
 ONE shared module (`src/features/writing/correction.tsx`) with Fokus, Kurz/Lang and Verlauf
 (PR #739). `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
@@ -116,6 +113,23 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Start with this: the queued quality audit.** The founder closed s181 by settling two open items and
+adding one task:
+- **The Niveau mix stays as shipped** (B1 307 / B2 302 / C1 108). Founder: "keep the Niveau mix as it
+  is." The old 35/50/15 target is retired; do not rebalance it.
+- **The exam-source items are PARKED**, not pending. Founder: "park the exam source items with
+  official documents task for later, it's not that important." (`SCHREIBEN-OVERHAUL.md` §12 + P0.3.)
+- **NEXT TODO, not started:** a thorough analysis of **writing-task quality and filter fit**, with
+  research from reliable sources. Founder: "I want you to do a thorough analysis of the quality of
+  these tasks and how they go with the filter, do the required research from reliable sources, this
+  is one of the next todos for later." Full scope, including which sources are usable now that the
+  exam documents are parked, is in **`docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)"**. The
+  short version: s181 proved COVERAGE (717 tasks, gated); nobody has verified that a task tagged B1
+  reads as B1, that its Leitpunkte are answerable in the word target, or that the Branche framing
+  convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
+  prioritised fix list, like the s178 content audit.
+
+
 **Handoff after session 181 (2026-07-31). The Aufgabe backlog is closed: 717 tasks, every one of
 them servable.** Branch `claude/latest-plan-steps-ydumbt`.
 Founder: "what's steps are to do in the latest plan?" then "complete the full implementation of both
@@ -124,13 +138,12 @@ s167) and the authoring backlog s180 made visible when it retired every bare Auf
 - **What the bank looked like going in:** 643 tasks, **270 servable, 373 bare**. 30 of 92 Unterthema
   x Länge cells empty, 13 Niveau x Textsorte cells empty, `bewerbung` at zero everywhere, and
   `project`, `sustainability` and `travel` with no Branche variants at all.
-- **Three founder decisions were needed first,** because the plans left them open: Niveau mix
-  (**B1-heavy, then B2, thin C1**), where Bewerbung lives (**under Bildung**, both sub-themes), and
-  whether Alltag tasks get Branche tags (**tag every Alltag task**, against this plan's own
-  recommendation). The third was made honest rather than cosmetic: every Alltag task now names the
-  work context that makes the everyday situation hard (Schichtdienst gegen Behörden-Öffnungszeiten,
-  Montage ohne Wochentage, Ferntour gegen Apotheken-Öffnungszeiten), so a Branche on a Kontokündigung
-  is a reason, not a sticker.
+- **Three founder decisions were needed first,** because the plans left them open: the Niveau mix,
+  where Bewerbung lives (**under Bildung**, both sub-themes), and whether Alltag tasks get Branche
+  tags (**tag every Alltag task**, against this plan's own recommendation). The third was made honest
+  rather than cosmetic: every Alltag task names the work context that makes the everyday situation
+  hard (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage), so a Branche on a
+  Kontokündigung is a reason, not a sticker.
 - **Shipped in one pass: 373 upgrades in place + 74 new tasks + 60 tagged. Bank 643 → 717, zero bare.**
   Every id and every pool position survived, so resumed drafts and Verlauf rows still resolve; only
   text and tags changed.
@@ -140,10 +153,10 @@ s167) and the authoring backlog s180 made visible when it retired every bare Auf
   `bewerbung` included. Seven completely empty B1 Textsorte cells closed (Bericht, Beschwerde,
   Forumsbeitrag, Kündigung, Protokoll, Stellungnahme, Widerspruch), which is what a B1 learner
   picking a Textsorte actually feels.
-- **Niveau: B1 307 / B2 302 / C1 108.** The target was 35/50/15 and B1 sits above it. That is
-  deliberate: the excess is entirely Kurz tasks, and a 40-word task with three Leitpunkte is B1 work.
-  Promotion to B2 was limited to Lang tasks in demanding genres with 4+ Leitpunkte, so no task got a
-  Niveau it cannot carry. Say the word if you want B2 pushed to 50%; it means authoring, not retagging.
+- **Niveau: B1 307 / B2 302 / C1 108, and the founder has since SETTLED this as final.** The excess
+  over the old 35/50/15 target is entirely Kurz tasks, and a 40-word task with three Leitpunkte is B1
+  work. Promotion was limited to Lang tasks in demanding genres with 4+ Leitpunkte, so no task wears
+  a Niveau it cannot carry. Do not rebalance it in a later session.
 - **One deliberate zero left: C1 + E-Mail (privat).** A private informal mail has no C1 exam
   analogue, so the rail greys it with an honest count instead of serving a formal letter under an
   informal label. It is now the fixture that pins `blockingAxis` in the tests.
