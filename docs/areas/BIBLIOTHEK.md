@@ -63,9 +63,11 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - **Wörter Graph** (`vocabulary/WordGraph.tsx` + pure builder `wordGraph.ts`, pinned by
   `tests/wordgraph.test.ts`): Obsidian-style force canvas of the CURRENTLY FILTERED list. Node
   radius = wordfreq Zipf (no corpus evidence = min radius, never a fake claim). **Color = TWO life
-  areas** (Berufsleben = `beruf` domain, brand Nachtblau; Privatleben = every other domain, teal;
-  `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS` in `lib/graphPalette.ts`; legend + filter collapse to
-  these two). Edges ONLY from authored sources (`related` terms resolved to bank entries;
+  areas** (Berufsleben = `beruf` domain, brand Nachtblau; Alltag = every other domain, teal;
+  the areas come from `lib/lifeAreas.ts`, the app-wide fold, with the colors in
+  `lib/graphPalette.ts`; legend + filter collapse to these two). The legend said "Privatleben" until
+  s181; it says **Alltag** now, because the Thema dropdowns say Alltag and the founder asked for one
+  wording across the app. Edges ONLY from authored sources (`related` terms resolved to bank entries;
   collocations whose noun AND verb both resolve; unresolvable related terms are dropped, by
   design). Noun nodes may carry gender marks (see Artikel-Visuals in `CLAUDE.md` layout notes).
 - **Kollokationen Graph** (`collocations/CollocationGraph.tsx` + `collocationGraph.ts`, pinned by
@@ -135,6 +137,11 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   facet order: Wortart right after Thema/Unterthema, Stufe (CEFR) LAST. Redemittel: Kategorie is a
   multi-select PILL facet (`CATEGORY_FACET`), Register a rail facet; `?cat=`/`?register=` ride the
   facet selection; the per-category card section headers were removed (flat card grid).
+- **Redemittel carries ONE scope dropdown, Thema** (audit P6, s182), on the same `?theme=` param as
+  the sibling tabs so a scope travels between them. Its semantics are the Branche ones, not the
+  Wörter ones: an untagged phrase is universal and shows under every Thema (`matchesThemeScope`),
+  so the count beside each Thema is its DEDICATED phrase count and a zero stays selectable. There is
+  no Branche and no Unterthema dropdown here (the bank tags neither).
 - One `filterRailProps` object feeds the two `<FilterRail>` instances (desktop rail
   default-open, mobile panel `defaultOpen={false}`).
 - Facet pills are `rounded-md` squircle (not `rounded-full`).
@@ -180,7 +187,11 @@ source for the CEFR scale (`CEFR_ORDER`, `cefrLabel`, `difficultyToBand`).
 Shares the same skeleton (toolbar with mobile filter toggle + Karten/Liste ViewSwitcher +
 transient fuzzy search; FilterRail with **Gruppe** as primary dropdown and **Stufe** as facet,
 `grammarFacets()`; Üben in the rail footer / sticky mobile bar; `?group=`/`?cefr=`/`?view=`/
-`?topic=` URL-persisted). Feature split: `grammar/grammarMeta.ts` (group labels/icons, B2-marker
+`?topic=` URL-persisted). Group labels changed in s182 (audit P5) as the bank grew: `attributes` is
+**"Adjektive & Attribute"** (it holds Adjektivdeklination and Komparativ now, not only
+Partizipialattribute), `prepositionalPronouns` is **"Verben mit Präpositionen"** (the da-/wo-forms
+exist because of them), and **"Zeitformen"** (`tenses`) is the new group, placed after Kasus on the
+priority spine. Feature split: `grammar/grammarMeta.ts` (group labels/icons, B2-marker
 `groupOrder`, `orderedGrammar` spine, `topicRank`), `grammar/GrammarViews.tsx` (Karten with
 emerald group tile + priority-rank chip + ONE pattern variant (`pattern.split(" · ")[0]`) in the
 Muster tint; compact Liste rows), and `grammar/GrammarTopicView.tsx`, the lesson page:

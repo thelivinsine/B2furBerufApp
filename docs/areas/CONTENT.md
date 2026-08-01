@@ -90,14 +90,31 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
-- **Grammar** (`src/data/grammar.ts`, 28 topics / 137 drills, 17 groups): `GrammarTopic` with `id` (`g_`),
+- **Grammar** (`src/data/grammar.ts`, 32 topics / 195 drills, 18 groups): `GrammarTopic` with `id` (`g_`),
   `group`, `cefr` (REQUIRED, completeness-checked), `title`, `titleDe`, `purpose`, `purposeDe`,
   `explanation`, `explanationDe` (the German-FIRST lesson text; EN shows only via the hold-to-peek
   chip), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (parallel, same order/length), `drills[]`.
   Topics ordered by B2-marker priority (`grammarMeta.ts` `groupOrder`). Drills: `id`, `prompt`,
-  `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
-  the EN peek; sessions keep it visible).
-- **Redemittel** (`src/data/redemittel.ts`, ~158; `r_` prefix).
+  `answer`, `options?` (MCQ) or none (PRODUCTIVE: the learner types the answer, graded by
+  `normalize()` so case and punctuation are forgiven), `explain`, `gloss` (lesson hides gloss behind
+  the EN peek; sessions keep it visible). **Every B1 topic carries ≥3 productive drills** (audit P5,
+  s182: the bank was 131 MCQ against 6 productive, so it tested recognition and called it practice);
+  `tests/grammar.test.ts` gates that, plus the group registry and drill-id uniqueness. A productive
+  answer must be unambiguous, since it is compared as one string. The B1 accuracy canon that was
+  missing entirely (Adjektivdeklination, Perfekt/Präteritum, Verben mit Präpositionen,
+  Komparativ/Superlativ) shipped in s182 with 10 drills each. Still open from P5: the 21 B2/C1 topics
+  keep their 5-drill cap and are still MCQ-only.
+- **Redemittel** (`src/data/redemittel.ts`, 220; `r_` prefix): `id`, `de`, `en`, `category`
+  (closed enum, 18), `register` (neutral/formal), `example` (de + en), optional `note`, `cefr`,
+  `themeId`. **`themeId` is untagged-=-universal** (audit P6, s182), like Branche and unlike
+  Wörter/Kollokationen where every item carries one: a phrase is tagged only when it belongs to one
+  theme's situation (Vortrag → meetings, Bewerbung → bildung, Amt/Arzt/Wohnen/Bank/Reklamation →
+  their Alltag theme), and an untagged phrase shows under EVERY Thema and in every learning mode.
+  Blanket-tagging the discussion functions would be a sticker, not information, and
+  `tests/redemittel.test.ts` fails if a pass ever does it. The 15 original categories were all
+  workplace channels or discussion functions; the three Alltag speech acts (`appointments`,
+  `formalities`, `complaints`) carry the counter language. Every category must have phrases behind
+  it (the s180 `bewerbung` lesson: a permanently empty dropdown option is a broken control).
 - **Can-Do milestones** (`src/data/canDo.ts`, 57): `id` (`cd_`), `themeId`, `cefr`, `statement`
   (German, must start with "Ich kann"), `en`, `threshold` (0..1 theme-mastery ratio). Aligned to
   the CoE CEFR self-assessment descriptors (cited in provenance, never reproduced). Keep ascending
@@ -113,21 +130,42 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   inference-level checks, the band a B2/C1 reading task actually uses. New long texts follow the C1
   six. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered side by
   side).
-- **Writing prompts** (`src/data/writingPrompts.ts`, 643 tasks): per-theme POOLS of task objects
-  `{ id, text, sub?, sectors?, level?, format?, points?, ... }`; the whole pool rides ONE
-  `wp_<themeId>` provenance row (the mission pattern). `sub` = declared sub-theme slug (coverage
-  invariant: every sub-theme of the sub-themed themes has ≥2 short + ≥2 long tagged tasks);
+- **Writing prompts** (`src/data/writingPrompts.ts`, 717 tasks, ALL servable): per-theme POOLS of
+  task objects `{ id, text, sub?, sectors?, level?, format?, points?, ... }`; the whole pool rides ONE
+  `wp_<themeId>` provenance row (the mission pattern). `sub` = declared sub-theme slug;
   `sectors` = Branche tags with the untagged-=-universal draw rule (a selected Branche prefers
-  tagged tasks, else falls back to untagged, never empty).
-  **`level` and `format` are the opposite: HARD filters** (`lib/writingScope.ts`). An untagged task
-  is not "every Niveau" and certainly not "every Textsorte", so it is simply not a match, and a
-  Textsorte with no task at a length reads as unavailable there. Consequences for authoring: 373 of
-  the 643 tasks still carry NO `level`/`format`, so they are reachable only under "Alle Niveaus +
-  Alle Textsorten"; a Textsorte with no task at ANY length disappears from the rail entirely (the
-  option list is derived from the bank), and filling a thin cell (`bewerbung`: 0 tasks, `bericht` at
-  C1: 1) is what makes that combination selectable.
+  tagged tasks, else falls back to untagged, never empty), applied per theme and LAST.
+  **`level`, `format` and `sub` are HARD filters** (`lib/writingScope.ts`). An untagged task is not
+  "every Niveau" and certainly not "every Textsorte", so it is simply not a match, and a Textsorte
+  with no task at a length reads as unavailable there.
+  **Only a task with Inhaltspunkte is SERVED** (founder decision, 2026-07-31): the full shape is
+  instruction + `addressee` + `register` + 2-5 `points` + `level` + `format` + `words`, which is what
+  `evaluate-writing` grades Aufgabenerfüllung against.
+  **The 373-task backlog is CLOSED (waves 3 and 4, s181).** Every task was authored up to that shape
+  in place: same ids, same pool positions, only text and tags changed. Gated in
+  `tests/writingScope.test.ts`, so these are invariants now, not aspirations:
+  - **Unterthema:** every declared sub-theme has ≥2 short + ≥2 long servable tasks.
+  - **Branche:** all 10 Beruf Themen x 15 Branchen x both Längen carry a dedicated task (wave 2 did
+    5 Themen, wave 4 the rest). **Alltag is tagged too** (founder decision): every Alltag task
+    carries Branchen, and each names the work context that makes the everyday situation hard
+    (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage, Spätdienst) rather than
+    name-dropping an industry. All 15 are reachable per Alltag theme x length.
+  - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` +
+    `weiterbildung`), B1/B2/C1 at both lengths. **One deliberate zero: C1 + E-Mail (privat)**, which
+    has no exam analogue; the rail greys it with an honest count.
+  - **Niveau:** B1 307 / B2 302 / C1 108. Kurz stays B1-heavy on purpose (a 40-word task with three
+    Leitpunkte is B1 work); promotion to B2 is limited to Lang tasks in demanding genres.
+  Word targets by band, keep them consistent: B1 40/80, B2 100/150, C1 120/200 (short/long).
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
+- **Sprech-Szenarien** (`dialogues.ts`, 30): `id` (`sc_`), `themeId`, `title`, `task`, `context`,
+  `level` 1-3, `minutes`, `targetRedemittel[]`, `start`, `nodes` (keyed by node id, unique WITHIN
+  the scenario only). A node is a choice node (`options[]`, each with `next`, `quality`, `feedback`,
+  optional `uses`) or a **free-speak node** (`prompt` + `model` + `next`, no options). **Every
+  scenario must carry at least one free-speak node with a model answer, on every path** (audit P4,
+  s182: 20 of 30 ended on a multiple-choice turn, so the speaking trainer never asked for produced
+  speech). `tests/scenarios.test.ts` gates it, together with node-reference integrity and
+  reachability. Level 3 is still thin (2 of 30) and is the open half of P4.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
   (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
   `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a

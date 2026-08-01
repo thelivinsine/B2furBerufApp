@@ -2770,6 +2770,42 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 11):** `.github/workflows/supabase.yml` · this log · workflow runs 30658732751
   (inventory) and 30658934894 (the PATCH attempt that proved renaming is dashboard-only)
 
+- **Prompt 12 (verbatim, 2026-07-31):** `is there any action left in this session?`
+- **Response summary:** Verified rather than recalled: working tree clean, branch identical to `main`,
+  no open PRs, seven PRs squash-merged (#760-#765, #767), and the Supabase state re-checked live (all
+  14 migrations recorded both sides, `insight_en` and `gdpr_events` present). Confirmed the docs
+  survived the collision with session 180: parts 1-3 of this session's handoff were archived into
+  `PROJECT_STATUS_ARCHIVE_2026-W31.md` by that session, not lost. Nothing left on my side; the three
+  open founder items (Resend SMTP, optional LanguageTool key, Google branding review) all predate this
+  session. Flagged two optional follow-ups: renaming/deleting the twelve dashboard SQL snippets, and
+  reverting the Redemittel card height if the uniform grid reads too airy.
+
+- **Prompt 13 (verbatim, 2026-07-31):** `document the session`
+- **Response summary:** Closing pass. The per-prompt entries above were written as each piece landed,
+  so this pass went after what the session made STALE rather than re-narrating it:
+  **`docs/DECISIONS.md` had no s179 section at all** and it was the doc most owed one, since three of
+  this session's changes REVERSE earlier rules and one is an explicit exception to a standing law.
+  Ten entries added, the load-bearing ones being: a transparent sticky row obliges every control in it
+  to carry a full-alpha fill (the "illegible buttons" round is what that rule costs when skipped);
+  clearance under a sticky header belongs in the offset, never in padding; a card grid has ONE height,
+  which makes the tallest card everyone's problem; a cap is a starting view, never a dead end; grading
+  level and EXPLAINING level are different things, and a prompt-wording change is a cache
+  invalidation; the sticky DE/EN switch is a deliberate exception to "EnPeek, never sticky" (s93),
+  scoped to feedback prose and kept visually distinct; Shuffle now clears the editor; a limit that is
+  only enforced is a trap; and never repair a migration history on trust, since the evidence pass is
+  what found 0010 missing from production.
+  **`docs/plans/PHASE2_SETUP.md` still told the founder to paste SQL by hand** in three places,
+  including the CLI section's "the supported route for a single new migration". Rewritten: the CLI is
+  not needed at all, the per-migration paste instructions are explicitly marked HISTORY (how 0001-0013
+  were applied, not what to do now), `SUPABASE_DB_PASSWORD` is recorded as set, and the hand-pasted
+  history note is replaced by what actually happened when it was bridged.
+  `docs/DECISIONS.md` §s171 item 12 also still said "CI skips migrations" as a present-tense fact;
+  corrected to the real reason the insert steps down (a deploy still lands before its migration inside
+  the same run) and extended to the new `insight_en` tier.
+  Gates: lint:content clean · typecheck (docs-only otherwise).
+- **Artifacts (prompts 12-13):** `docs/DECISIONS.md` (new §s179, §s171 item 12 corrected) ·
+  `docs/plans/PHASE2_SETUP.md` · this log
+
 ## Session 180 — 2026-07-31 — branch `claude/aufgabe-rail-bugs-1xdep2`
 
 - **Prompt 1 (verbatim, 2026-07-31, three Schreiben Lang screenshots attached: "Alle Niveaus /
@@ -2820,38 +2856,240 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` (new) · `docs/areas/SCHREIBEN.md` ·
   `docs/areas/CONTENT.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
 
-- **Prompt 12 (verbatim, 2026-07-31):** `is there any action left in this session?`
-- **Response summary:** Verified rather than recalled: working tree clean, branch identical to `main`,
-  no open PRs, seven PRs squash-merged (#760-#765, #767), and the Supabase state re-checked live (all
-  14 migrations recorded both sides, `insight_en` and `gdpr_events` present). Confirmed the docs
-  survived the collision with session 180: parts 1-3 of this session's handoff were archived into
-  `PROJECT_STATUS_ARCHIVE_2026-W31.md` by that session, not lost. Nothing left on my side; the three
-  open founder items (Resend SMTP, optional LanguageTool key, Google branding review) all predate this
-  session. Flagged two optional follow-ups: renaming/deleting the twelve dashboard SQL snippets, and
-  reverting the Redemittel card height if the uniform grid reads too airy.
+- **Prompt 2 (verbatim, 2026-07-31):** `you need to explain to me briefly in plain language of the
+  following task:` [quoting the "not fixed, founder's call" paragraph from the prompt-1 answer]
+  **Response:** plain-language explanation of the two generations of writing task (270 exam-shaped
+  vs 373 one-liners), why a bare one matters beyond looks (the AI is sent the Aufgabe so it can grade
+  Aufgabenerfüllung; with no Leitpunkte the feedback silently drops to grammar and vocabulary), and
+  the two options: upgrade the 373 in content waves, or serve only the 270. Recommended the second
+  now with the first as the standing backlog, on the argument that at the Kurz 4 / Lang 2 allowance
+  270 tasks is about two months of daily practice before anything repeats, so the smaller pool costs
+  the learner nothing real while every session gets better feedback.
+- **Prompt 3 (verbatim, 2026-07-31):** `continue with your recommendation`
+- **Prompt 4 (verbatim, 2026-07-31, mid-turn, screenshot of `wt_safety_l12` attached: "Verfasse eine
+  kurze Unterweisung für neue Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no
+  Niveau):** `this one has too little description of the task. Check for such instances and make sure
+  they're well described`
+  **Response:** the screenshot is one of the 373, and the change already in flight retires it. Only a
+  task with Inhaltspunkte is served now (`isServable`); the full shape is instruction + Adressat +
+  du/Sie + 2 to 5 Leitpunkte + Niveau + Textsorte + word target, and all 270 served tasks carry every
+  field (checked: 0 exceptions). **Retired from the draw, never from the bank:** the 373 keep their
+  permanent ids AND their pool positions, because a draft ref is `{theme, index}` and a Verlauf row is
+  a task id, so old work still resolves; each returns the moment it is authored up to the full shape.
+  `sub` became a hard filter in the same change: retiring the bare tasks empties 15 of the 46
+  Unterthemen at each length, and the old fall-back-to-the-whole-Thema would have started firing in
+  earnest, which is the substitution bug this session exists to remove.
+  The rail's remaining zeros are deliberately visible, because they ARE the authoring to-do list:
+  `bewerbung` (no task anywhere), 15 of 46 Unterthemen per length, `bericht` at C1 (one task). Every
+  Thema and every Branche still yields tasks at both lengths (135 short + 135 long).
+  Gates: typecheck · lint 0 errors · test:unit **410/410** · lint:content clean · build ·
+  check:bundle 123.2 kB. Verified in headless Chromium: default draws on Kurz and Lang both render a
+  full brief.
+- **Artifacts (prompts 2-4):** `src/lib/writingScope.ts` · `src/data/writingPrompts.ts` (header
+  contract only, no content changed) · `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` ·
+  `docs/areas/SCHREIBEN.md` · `docs/areas/CONTENT.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-31):** `document the session and merge to main`
+  **Response:** both code changes were already merged under the standing auto-ship rule (PR **#766**
+  the filter fix, PR **#768** the fully-briefed-Aufgaben rule), each squash-merged with
+  `Validate content` and `Deploy site to GitHub Pages` green on the merge commit (`3cc7d47`,
+  `20bf593`). This prompt closed the documentation pass: **`CLAUDE.md`** gained the cross-cutting
+  invariant the session established, "a filter filters, it never substitutes" (the hard/soft axis
+  split, one counting function, honest zeros, empty state over substitution) plus the founder law
+  that only a fully briefed task is served; **`docs/PROJECT_STATUS.md`** had its bank line corrected
+  (643 authored, **270 served**) and the handoff finished with the PR numbers, the deploy result and
+  the authoring list a next session would start from. Post-merge housekeeping ran after each merge
+  (`fetch` → `reset --hard origin/main` → `push --force-with-lease`), and `origin/main` was merged
+  into the branch twice mid-session as #765 and #767 landed, so nothing was written against a stale
+  base.
+- **Artifacts (prompt 5):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
 
-- **Prompt 13 (verbatim, 2026-07-31):** `document the session`
-- **Response summary:** Closing pass. The per-prompt entries above were written as each piece landed,
-  so this pass went after what the session made STALE rather than re-narrating it:
-  **`docs/DECISIONS.md` had no s179 section at all** and it was the doc most owed one, since three of
-  this session's changes REVERSE earlier rules and one is an explicit exception to a standing law.
-  Ten entries added, the load-bearing ones being: a transparent sticky row obliges every control in it
-  to carry a full-alpha fill (the "illegible buttons" round is what that rule costs when skipped);
-  clearance under a sticky header belongs in the offset, never in padding; a card grid has ONE height,
-  which makes the tallest card everyone's problem; a cap is a starting view, never a dead end; grading
-  level and EXPLAINING level are different things, and a prompt-wording change is a cache
-  invalidation; the sticky DE/EN switch is a deliberate exception to "EnPeek, never sticky" (s93),
-  scoped to feedback prose and kept visually distinct; Shuffle now clears the editor; a limit that is
-  only enforced is a trap; and never repair a migration history on trust, since the evidence pass is
-  what found 0010 missing from production.
-  **`docs/plans/PHASE2_SETUP.md` still told the founder to paste SQL by hand** in three places,
-  including the CLI section's "the supported route for a single new migration". Rewritten: the CLI is
-  not needed at all, the per-migration paste instructions are explicitly marked HISTORY (how 0001-0013
-  were applied, not what to do now), `SUPABASE_DB_PASSWORD` is recorded as set, and the hand-pasted
-  history note is replaced by what actually happened when it was bridged.
-  `docs/DECISIONS.md` §s171 item 12 also still said "CI skips migrations" as a present-tense fact;
-  corrected to the real reason the insert steps down (a deploy still lands before its migration inside
-  the same run) and extended to the new `insight_en` tier.
-  Gates: lint:content clean · typecheck (docs-only otherwise).
-- **Artifacts (prompts 12-13):** `docs/DECISIONS.md` (new §s179, §s171 item 12 corrected) ·
-  `docs/plans/PHASE2_SETUP.md` · this log
+## Session 181 (2026-07-31) - branch `claude/latest-plan-steps-ydumbt`
+
+- **Prompt 1 (verbatim, 2026-07-31):** `what's steps are to do in the latest plan?`
+  **Response:** read the plan set and answered with the open items rather than a summary of finished
+  work. The latest plan with anything left in it is `docs/plans/SCHREIBEN-OVERHAUL.md`: P0/P1/P2 and
+  content wave 2 shipped in s167, leaving **wave 3** (Alltag formal apparatus, plus the per-genre
+  Branche decision), **wave 4** (the five Beruf Themen without Branche variants, and B1 breadth),
+  **P0 item 3** (obtain the Goethe/telc/BAMF source PDFs) and the **§12 verification items** (seven
+  exam facts that may not be hard-coded from secondary sources). On top of it sits the s180 handoff's
+  authoring backlog, which the "only fully briefed Aufgaben are served" decision made visible as the
+  greyed zeros in the Aufgabe rail: `bewerbung` at zero everywhere, 15 of 46 Unterthemen empty at each
+  length, `bericht` at C1 with one task.
+- **Artifacts (prompt 1):** none (question answered from the repo)
+- **Prompt 2 (verbatim, 2026-07-31):** `complete the full implementation of both these plans`
+  **Follow-up in the same turn (verbatim):** `ask me questions if unclear on any important points`
+  **Response:** measured the bank first (643 tasks, 270 servable, 373 bare; 30 of 92 Unterthema x
+  Länge cells empty; 13 Niveau x Textsorte cells empty; `project`/`sustainability`/`travel` with no
+  Branche variants at all), then asked three questions the plans genuinely left open and built to the
+  answers: **Niveau mix** → B1-heavy, then B2, thin C1; **where `bewerbung` lives** → under Bildung,
+  both sub-themes; **Alltag Branche** → tag every Alltag task (against the plan's own recommendation,
+  so each tag was made to earn its place: the work context is the REASON the everyday task is hard,
+  Schichtdienst gegen Behörden-Öffnungszeiten and so on, never a name-drop).
+  Delivered waves 3 and 4 and the whole rail backlog in one pass: **all 373 bare tasks authored up to
+  the exam shape in place** (same ids, same pool positions, so drafts and Verlauf still resolve),
+  **74 new tasks**, **60 existing tasks tagged**, bank **643 → 717, every task servable**. Coverage
+  now gated in `tests/writingScope.test.ts`: ≥2 tasks per Unterthema per length, all 15 Branchen on
+  all 10 Beruf Themen AND all 10 Alltag Themen at both lengths, all 16 Textsorten live (`bewerbung`
+  included). Niveau landed B1 307 / B2 302 / C1 108; the B1 share sits above the 35% target because
+  Kurz tasks are genuinely B1 and were not retagged to hit a number. One deliberate zero remains,
+  C1 + E-Mail (privat), which has no exam analogue. **Not done, and reported rather than worked
+  around:** §12 and P0.3 need primary exam documents that cannot be acquired from a session, and telc
+  material may not be copied at all under `strategy/DATA_GOVERNANCE.md`.
+  Gates: typecheck · lint:content clean · test:unit **413/413** · build · check:bundle 123.2 kB.
+- **Artifacts (prompt 2):** `src/data/writingPrompts.ts` (717 tasks) · `src/lib/writingScope.ts`
+  (docstring) · `tests/writingScope.test.ts` · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-31):** `is everything done?`
+  **Response:** confirmed done and live (PR **#770** squash-merged, `Validate content` and `Deploy
+  site to GitHub Pages` both green on `6253ee7`), and restated the two things that are NOT done and
+  why: the plan's §12 exam-verification items and P0.3 need primary exam documents no session can
+  acquire (telc material may not be copied at all), and the Niveau mix landed B1 307 / B2 302 /
+  C1 108 against a 35/50/15 target because the surplus is Kurz tasks that genuinely are B1 and were
+  not retagged to hit a number.
+- **Artifacts (prompt 3):** none (status answer)
+- **Prompt 4 (verbatim, 2026-07-31):** `In schreiben, there seems to be some topics in the themen
+  dropdown which are non-beruf but are not part of alltag - fix it. There has to be only two
+  overarching categories similar to the nodal graphs in bibliothek. This has to be consistent across
+  the app`
+  **Response:** correct report. The Schreiben rail folded `gesundheit` into Alltag but not `bildung`,
+  so "Bildung & Sprache" sat there as a third heading; the Bibliothek Thema dropdown grouped by the
+  raw five domains (up to five headings); and only the graphs were already binary, under a different
+  name ("Privatleben"). Three surfaces, three different answers.
+  Introduced **`src/lib/lifeAreas.ts` as the ONE app-wide fold**: two areas, `beruf` is Berufsleben
+  and every other domain is Alltag, with `themeGroupsByArea` as the single grouped-options builder.
+  The Schreiben rail, `themeGroupsForMode` (Bibliothek Wörter + Kollokationen) and both graph legends
+  now read from it; `graphPalette.ts` keeps only the colors and re-exports the areas. Asked the
+  founder which naming wins, since the graphs and the dropdowns disagreed: **Berufsleben / Alltag**
+  (their pick), so the graph legend's "Privatleben" is retired.
+  The Mode lens still narrows WITHIN the two groups rather than adding headings, and the s104 rule
+  that an actively selected theme never gets orphaned is kept. `tests/lifeAreas.test.ts` (6 tests)
+  pins the law: two areas, every domain except `beruf` folds to Alltag, no dropdown returns a third
+  group in any mode, and the Mode lens still filters.
+  Verified in headless Chromium against the built app, not just the unit tests: the Schreiben Thema
+  dropdown shows BERUFSLEBEN and ALLTAG, the Bibliothek dropdown the same two, and the Wörter graph
+  legend now reads "Berufsleben · Alltag".
+  Gates: typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
+  check:bundle 123.2 kB.
+- **Artifacts (prompt 4):** `src/lib/lifeAreas.ts` (new) · `src/lib/themeGroups.ts` ·
+  `src/lib/graphPalette.ts` · `src/features/writing/WritingRail.tsx` · `tests/lifeAreas.test.ts`
+  (new) · `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` · `docs/areas/SCHREIBEN.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-31):** `keep the Niveau mix as it is but I want you to do a thorough
+  analysis of the quality of these tasks and how they go with the filter - do the required research
+  from reliable sources - this is one of the next todos for later so don't do it now, just document
+  the session. park the exam source items with official documents task for later - it's not that
+  important.`
+  **Response:** documentation only, no analysis and no code (the founder explicitly deferred the
+  audit). Three things recorded where a later session will actually find them:
+  **(1) The Niveau mix is now a settled decision, not a deviation.** B1 307 / B2 302 / C1 108 is
+  intended; the 35/50/15 target is retired and `docs/DECISIONS.md` says not to rebalance it. The rule
+  that survives: promotion between bands follows what a task demands, never a distribution target.
+  **(2) The quality + filter-fit audit is QUEUED with scope**, in `docs/PROJECT_REFERENCE.md`, so the
+  next session does not have to re-derive it: Niveau accuracy, Leitpunkte answerability inside the
+  word target, whether a task delivers what its Textsorte/Niveau/Unterthema/Branche tags promise,
+  Branche honesty under the s181 Alltag rule, near-duplicate scenarios across waves, and du/Sie
+  plausibility. It also names the sources that ARE usable now that the exam documents are parked
+  (CEFR descriptors cited never reproduced, publicly published task-type descriptions, open corpora)
+  and repeats the `strategy/DATA_GOVERNANCE.md` telc ban, so the next session does not walk into
+  s167's dead end. Deliverable shape: a `docs/reports/` audit with a prioritised fix list, like s178.
+  **(3) The exam-source items are marked PARKED, not blocked-and-waiting**, in the plan itself
+  (§12 + P0 item 3 + the status header) and in the reference backlog, with the note that unparking
+  needs a founder purchase rather than engineering, and that the quality audit does NOT depend on it.
+  Also recorded the framing that matters for next time: s181 proved COVERAGE and gated it in tests;
+  QUALITY is unproven, so a B1 tag on a task that reads as B2 is now a content bug, not a
+  distribution one.
+  Gates: docs-only (no code touched).
+- **Artifacts (prompt 5):** `docs/PROJECT_REFERENCE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/DECISIONS.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` · this log
+
+## Session 182 (2026-08-01) - branch `claude/next-steps-p3-analysis-7gx36m`
+
+- **Prompt 1 (verbatim, 2026-08-01):** `i remember we did an analysis recently.. and did complete
+  until p3 tasks. what are the next steps`
+  **Response:** identified the analysis as the content audit
+  (`docs/reports/CONTENT_AUDIT_2026-07-30.md`, session 178) and corrected the premise from the repo
+  rather than accepting it: P0, P1 and P2 shipped in s178, P8 was closed by the s181 Schreiben work,
+  P9 only half (the duplicates), and **P3 was started but not finished** (the six C1 texts at
+  305-344 words; the rest of the bank is still ~90 words and listening is still 6 TTS voicemails).
+  Verified the open items against the code instead of quoting the audit: `themeId` on **0 of 158**
+  Redemittel, `/anwenden` still unlinked in `nav-items.ts`, no `audio` field on any text, 13 verified
+  provenance rows. Recommended P6 first (cheapest real win, and it serves the half of the product the
+  s21 repositioning made core), then P4 with a founder decision on the nav, then P5.
+- **Artifacts (prompt 1):** none (question answered from the repo)
+- **Prompt 2 (verbatim, 2026-08-01):** `continue with p6`
+  **Response:** closed audit P6. Loaded `/content` first, then `/design` before the one UI change.
+  **The gap:** every one of the 158 phrases was a workplace discussion function or a workplace
+  channel, and `themeId` sat on zero of them, so the composer's mode filter was dead code and the
+  Alltag half of the app had no phrase bank at all.
+  **Shipped:** 62 new phrases in five packs (Amt 13, Arzt 13, Wohnen 13, Bank 11,
+  Einkauf/Reklamation 12), each with note, example pair, CEFR and themeId, Widerspruch and
+  Mängelanzeige formulas included, several carrying the s181 work-context reason. Three new
+  categories (`appointments`, `formalities`, `complaints`) mirrored in all three closed-enum places.
+  **The judgement call, reported rather than buried:** the audit said "tag the 158"; blanket tagging
+  would make a sticker of every discussion function, so **49 situational phrases were tagged** and
+  the other 109 stay **untagged = universal**, the same semantics Branche already uses. Wired the tag
+  into the two places it earns its keep: a Thema scope dropdown on the Redemittel tab (`?theme=`,
+  dedicated-content counts, zero-count Themen still selectable) and a theme-led Pool 4 in the session
+  composer. Verified in the built app with headless Chromium: Thema = Behörde & Ämter yields 122
+  Wendungen (13 dedicated + 109 universal) and the presentation openers are gone.
+  Gates: typecheck · lint 0 errors · lint:content clean (220 redemittel, 3,370 provenance rows) ·
+  test:unit **435/435** · build · check:bundle 123.2 kB · report:exercise-coverage 20/20 ·
+  build:review-queue refreshed. `verify:grammar` could not run in the sandbox (LanguageTool needs
+  `mvn` + Maven Central); it is warn-only, and this is stated rather than skipped silently.
+- **Artifacts (prompt 2):** `src/data/redemittel.ts` · `src/data/provenance.ts` (62 rows) ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `src/lib/facets.ts` (`matchesThemeScope`) ·
+  `src/lib/icons.ts` · `src/engine/session.ts` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `tests/redemittel.test.ts` (new, 16 tests) · `docs/areas/CONTENT.md` · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/areas/SESSION.md` · `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` ·
+  `src/features/admin/reviewQueue.json` · `docs/reports/exercise-coverage-report.md` · this log
+- **Prompt 3 (verbatim, 2026-08-01):** `keep the categories filter as pills and go ahead with p4 and
+  then p5`
+  **Response:** left the Kategorie facet as pills (no change) and closed the two named audit items.
+  **P4.** Measured first: 20 of 30 scenarios (every Alltag one) had NO free-speak node, so the
+  speaking trainer only ever offered multiple choice, which is recognition. Authored a free-speak
+  node with a model answer and two hints into all 20, spliced between the last choice node and the
+  closing turn so it lies on every path, each one a situation the dialogue earns (report the Amt
+  visit to your employer, call in sick after the doctor, relay the hotline's answer). Restored
+  `/anwenden` to `navItems`, which puts Sprechen and Prüfung back on the desktop sidebar; did NOT
+  touch the mobile bottom bar, whose five slots CLAUDE.md locks, and flagged that placement as the
+  open founder decision. `tests/scenarios.test.ts` (32 tests) walks every branch of every scenario.
+  **P5.** The B1 accuracy canon was absent: Adjektivdeklination, Perfekt vs. Präteritum, Verben mit
+  Präpositionen, Komparativ/Superlativ shipped with full German-first lessons and 10 drills each,
+  under a new `tenses` group ("Zeitformen") plus two group relabels that had been named after one
+  member each. Then the monoculture: 131 of 137 drills were MCQ, so 18 productive (typed-answer)
+  drills went into the six B1 topics that had none. Bank 28 topics/137 drills → **32/195**,
+  productive 4% → 19%. `tests/grammar.test.ts` (24 tests) pins the canon, the ≥3-productive rule per
+  B1 topic, the group registry and drill-id uniqueness.
+  **One infrastructure fix on the way:** the 62 new provenance rows pushed `provenancePart2` past
+  TypeScript's TS2590 union ceiling and `pnpm build` failed; provenance is four concatenated parts
+  now (~1,300 rows each) and the `/content` skill records the rule.
+  Reported honestly as NOT done: only 2 of 30 scenarios are level 3, and the 21 B2/C1 grammar topics
+  keep their 5-drill MCQ-only cap.
+  Gates: typecheck · lint 0 errors · lint:content clean · test:unit **491/491** · build ·
+  check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
+  the built app with headless Chromium: the free-speak turn renders and grades, the Grammatik hub
+  shows 32 topics under the new group labels, a typed drill is accepted.
+- **Artifacts (prompt 3):** `src/data/dialogues.ts` (20 free-speak nodes) · `src/data/grammar.ts`
+  (4 topics, 58 drills) · `src/data/provenance.ts` (62 rows + the part-3/part-4 split) ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `src/features/grammar/grammarMeta.ts` ·
+  `src/components/layout/nav-items.ts` · `tests/scenarios.test.ts` (new) · `tests/grammar.test.ts`
+  (new) · `.claude/skills/content/SKILL.md` · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
+  `docs/areas/BIBLIOTHEK.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (verbatim, 2026-08-01):** `document the session`
+  **Response:** completed the session record. The per-prompt entries above and both s182 handoffs in
+  `PROJECT_STATUS.md` were written as the work went, so what was missing was the SHIPPED half, which
+  only existed after the merges: **PR #773 → `5b30acc`** (P6) and **PR #774 → `45ba695`** (P4 + P5),
+  both squash-merged with `Validate content` and `Deploy site to GitHub Pages` green, post-merge
+  housekeeping done both times (branch reset onto `main`, force-with-lease, clean tree). Also
+  recorded the mid-session merge conflict and how it was resolved (main moved when #772 landed; both
+  sides kept in the two append-only logs), and promoted the one open design call to
+  **Open founder action items**: where Anwenden lives on MOBILE, since the bottom bar's five slots
+  are locked and no code change is pending on it.
+  Session totals for the record: three audit items closed (**P6, P4, P5**), **62 Redemittel**,
+  **20 free-speak scenario nodes**, **4 grammar topics + 58 drills**, **124 provenance rows**, three
+  new test files (`redemittel`, `scenarios`, `grammar`) taking the suite **419 → 491**, and one
+  infrastructure fix (provenance split into four parts for the TS2590 ceiling).
+  Gates: docs-only (no code touched).
+- **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · this log

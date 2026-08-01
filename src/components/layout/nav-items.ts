@@ -4,6 +4,7 @@ import {
   LineChart,
   PenLine,
   Settings,
+  Target,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -31,10 +32,13 @@ export interface NavItem {
 // tools (Sprechen/Schreiben/Prüfung) inside Anwenden, so they are no longer
 // top-level nav destinations. Their routes still resolve (redirected into the
 // hub or reachable via deep links); they are just off the nav rail.
-// The Anwenden (transfer) zone is temporarily HIDDEN from the nav (founder,
-// 2026-07-13: not needed for the demo). Its route stays mounted in router.tsx
-// so deep links (and the /welt game entry) keep working; it is just off the
-// nav rail. Re-add the entry below to restore it.
+// The Anwenden (transfer) zone was HIDDEN from the nav for the demo (founder,
+// 2026-07-13) and is BACK on the desktop sidebar since s182 (audit P4): the
+// speaking simulation and the exam run were reachable only from the dashboard
+// recommendation and ⌘K, which is not a home for the skill the product is
+// built around. The mobile bottom bar is a locked 5-slot structure, so this
+// entry shows in the sidebar (and the More surfaces that read `navItems`)
+// without touching it; mobile placement is a separate founder decision.
 //
 // Labels: "Heute" was renamed to "Praktisch" and "Bibliothek" to "Theorie"
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
@@ -47,6 +51,9 @@ export const navItems: NavItem[] = [
   // hidden Anwenden hub. Nib mark (Federspitze) in route-icons.tsx; the accent
   // moved from rose to brand blue with the s158 icon family harmonization.
   { to: "/writing",   label: "Schreiben",    icon: PenLine,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Sätze schreiben und mit KI umformen" },
+  // Anwenden (Sprechen + Prüfung). Schreiben has its own tab since 2026-07-22,
+  // so this hub is the transfer layer's speaking and exam half.
+  { to: "/anwenden",  label: "Anwenden",     icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Sprechsimulation und Prüfungsmodus" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];

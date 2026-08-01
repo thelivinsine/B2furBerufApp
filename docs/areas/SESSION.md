@@ -15,6 +15,10 @@ Bibliothek · Fortschritt + hidden Anwenden). History: `docs/DECISIONS.md`,
   via TTS when `ttsSupported()`; feeds XP + the session tally, **never vocab FSRS**).
 - The speaking block has an "Anzeigen" give-up (calls `evaluate("")`: reveals the answer, grades
   FSRS 0, unlocks Weiter), mirroring the typed block.
+- **Pool 4 (Redemittel recall) is theme-aware since s182.** The bank now carries `themeId` on the
+  situational phrases (untagged = universal), so the pool is: mode filter by the theme's context,
+  then the scoped theme's own phrases lead and the universal ones fill the remaining slot. Before
+  the tagging pass both rules were dead code, because `themeId` sat on 0 of 158 phrases.
 
 ## Bibliothek Üben sets are auto-varied
 (`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`.) `buildScopedSession` (the Bibliothek tab's Üben)

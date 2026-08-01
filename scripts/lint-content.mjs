@@ -37,6 +37,7 @@ const REDEMITTEL_CATEGORIES = [
   "suggestions", "agree", "disagree", "negotiation", "compromise",
   "clarification", "opinion", "prosCons", "reactions", "professionalIntro",
   "telephoning", "emails", "presentations", "jobInterview", "smallTalk",
+  "appointments", "formalities", "complaints", // Alltag speech acts (audit P6, s182)
 ];
 const REDEMITTEL_REGISTERS = ["neutral", "formal"]; // "diplomatic" folded into formal (audit 2026-07-09)
 const COLLOCATION_REGISTERS = ["neutral", "formal"];
@@ -45,6 +46,7 @@ const GRAMMAR_GROUPS = [
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
   "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
   "particles",
+  "tenses", // B1 accuracy canon (audit P5, s182)
 ];
 const WEAKNESS_CATEGORIES = [
   // "taskCompletion" (Aufgabenerfüllung) added s167 once evaluate-writing began

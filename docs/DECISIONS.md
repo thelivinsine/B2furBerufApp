@@ -1018,3 +1018,174 @@ selector had two kinds of axis and only one of them was honest.
    the tag `B2.1` with `===`, so the first `B2.2` task authored would have been silently unreachable
    from the UI *and* excluded from every Niveau filter. Matching goes through `levelBand`. The same
    sloppiness had the C1 option labelled "C1.1", a band `lib/cefr.ts` does not define.
+
+## s180 (cont.) · Only fully briefed Aufgaben are served
+
+Founder, on a screenshot of `wt_safety_l12` ("Verfasse eine kurze Unterweisung für neue
+Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no Niveau): **"this one has too little
+description of the task. Check for such instances and make sure they're well described."**
+
+The bank held two generations of task. 270 carry the whole exam brief (Adressat, du/Sie, 2 to 5
+Leitpunkte, Niveau, Textsorte, word target); 373 are a single sentence from before that shape
+existed. The bare ones failed in three ways at once, which is why they had to go rather than be
+tolerated until the rewrite catches up:
+
+1. **They downgrade the AI.** `evaluate-writing` is sent the Aufgabe so it can grade
+   Aufgabenerfüllung, the thing an examiner checks first. With no Leitpunkte there is nothing to
+   check against, so the learner silently gets grammar-and-vocabulary feedback instead. The learner
+   cannot tell which kind of feedback they just got, or why it changed between two sessions.
+2. **They are invisible to the filters.** Carrying neither `level` nor `format`, they can only ever
+   be reached under "Alle Niveaus + Alle Textsorten", which is the DEFAULT, so 58% of first-visit
+   draws served the one shape of task the rest of the product cannot reason about.
+3. **They made the shipped product look unfinished**, which is how the founder found them.
+
+The choice was "upgrade 373 tasks over several content sessions, serving them meanwhile" or "serve
+the 270 good ones now". **Quantity was the cheaper thing to give up:** at the Kurz 4 / Lang 2 daily
+allowance, 270 tasks is about two months of daily practice before anything repeats, so the number a
+learner can feel is unchanged, while every single session gets better feedback.
+
+**Retire from the surface, never from the bank.** The 373 stay in `writingPrompts.ts` with their
+permanent ids AND their pool positions, because a draft ref is `{theme, index}` and a Verlauf row is
+a task id: `taskAt` and `writingTaskById` index the FULL pool on purpose, so old work still resolves
+to the Aufgabe it was written against. Each task returns to the draw the moment it is authored up to
+the full shape, with no code change. That is the same id-permanence law every other bank follows.
+
+**The zeros are the backlog.** Serving only the full shape leaves honest gaps in the rail (15 of 46
+Unterthemen at each length, `bewerbung` at zero everywhere, `bericht` at C1 with one). Rather than
+hide them, they are the content to-do list, and each one closes by authoring a task. A gap that is
+visible gets filled; a gap papered over by a fallback stays forever, which is exactly how the
+Textsorte bug survived three sessions.
+
+## s181 (2026-07-31) - closing the Aufgabe backlog: three founder calls
+
+**"The zeros are the backlog" worked.** The s180 decision to serve only fully briefed Aufgaben left
+visible gaps instead of hidden substitutions, and one session later they are filled: all 373 bare
+tasks authored in place, 74 added, bank 717 with nothing retired. The gaps closed *because* they were
+visible and countable. Keep doing this: a fallback that hides a gap keeps it forever.
+
+**Niveau mix: B1-heavy, then B2, thin C1** (target 35/50/15). Shipped at B1 307 / B2 302 / C1 108.
+B1 sits above target on purpose. The excess is entirely Kurz tasks, and a 40-word task with three
+Leitpunkte is B1 work whatever tag it carries. Promotion to B2 was restricted to Lang tasks in
+demanding genres with 4+ Leitpunkte, so nothing wears a Niveau it cannot support. **Rule this sets:
+never hit a distribution target by retagging.** Moving B2 to 50% is an authoring job, not a relabel.
+
+**Bewerbung lives under Bildung**, in `bildung.anerkennung` and `bildung.weiterbildung`, at B1/B2/C1
+in both lengths. The alternatives were spreading it across Beruf Themen (nobody looking for a
+Bewerbung would search there) or a 21st Thema (a whole content system: vocab, collocations,
+dialogues, a city building). It sits next to the recognition and further-training content a job
+seeker is already using, and it needed no schema change. `bewerbung` had been dead chrome in the
+Textsorte list since s167; the list is derived from the bank, so it came back by itself.
+
+**Every Alltag task carries Branche tags** (founder, overruling this plan's own recommendation, which
+was to tag only where work genuinely changes the task). The risk the plan named is real: a
+Gastronomie-flavoured Kontokündigung is a name-drop and reads as fake. The answer was to make the tag
+do work instead of dropping it on: **the work context is the REASON the everyday task is hard.**
+Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage, Ferntour gegen
+Apotheken-Öffnungszeiten, Spätdienst gegen Filialschluss. Under that rule the tag earns its place in
+the text, and a learner filtering by their own Branche gets Alltag tasks that sound like their life.
+**If a future Alltag task cannot name such a reason, it should not carry the tag.**
+
+**One deliberate zero kept: C1 + E-Mail (privat).** A private informal mail has no C1 exam analogue,
+so it stays empty and greys out with an honest count. It is also the fixture that pins `blockingAxis`
+in `tests/writingScope.test.ts`, which needs one genuinely empty scope to test against. Filling it
+would cost the test its subject and the rail its honesty.
+
+## s181 (2026-07-31) - exactly two learner-facing categories, everywhere
+
+**Founder:** "There has to be only two overarching categories similar to the nodal graphs in
+bibliothek. This has to be consistent across the app."
+
+The content spine has five domains (`beruf`, `alltag`, `gesundheit`, `bildung`, `pruefung`) and that
+grain is real for authoring, coverage reports and the city buildings. It had also been leaking into
+the UI, differently on each surface: the Schreiben rail folded `gesundheit` into Alltag but not
+`bildung` (so "Bildung & Sprache" was a third heading), the Bibliothek Thema dropdown grouped by all
+five, and the graphs were already binary but called the second area "Privatleben".
+
+**The law now: two areas, Berufsleben and Alltag, from `src/lib/lifeAreas.ts`.** Only `beruf` is
+Berufsleben; every other domain folds into Alltag, and that default is what makes a NEW domain
+unable to introduce a third heading anywhere. `themeGroupsByArea` is the single builder both the
+Schreiben rail and the Bibliothek dropdown call, so the fold cannot drift back per surface.
+
+**Naming: Berufsleben / Alltag** (founder pick over Berufsleben / Privatleben). It matches the
+product framing (the workplace plus everyday life), CLAUDE.md's own wording, and the founder's
+report; the cost is retiring "Privatleben" from the graph legend, which was a July decision. One
+wording across the app beat keeping the older legend.
+
+**The Mode lens survives unchanged.** It filters which themes appear INSIDE the two groups, never
+which headings exist, and an actively selected theme is still never orphaned (s104).
+
+**Where the five domains still belong:** authoring, `docs/areas/CONTENT.md` coverage, the city
+buildings, graph clustering. They are a grain, not a heading. `tests/lifeAreas.test.ts` fails if a
+third group ever reaches a dropdown.
+
+## s181 (2026-07-31, end of session) - the Niveau mix is settled; quality is the open question
+
+**Founder: "keep the Niveau mix as it is."** So **B1 307 / B2 302 / C1 108** is the intended
+distribution, not a deviation to be corrected later. The 35/50/15 target that produced it is
+retired; do not "fix" the mix in a future session. The reasoning that survives: promotion between
+bands must follow what a task actually demands, never a distribution target, and a 40-word Kurz task
+with three Leitpunkte is B1 work whatever number the rail would prefer.
+
+**What that makes the real open question: are the labels honest?** The founder queued a thorough
+audit of task quality and filter fit (scope in `docs/PROJECT_REFERENCE.md`). Coverage is proven and
+gated; quality is unproven. A B1 tag on a task that reads as B2 is now a content bug, not a
+distribution one.
+
+**The exam-source items are parked, not blocked-and-waiting.** Founder: "it's not that important."
+They stay in `docs/plans/SCHREIBEN-OVERHAUL.md` §12 and P0.3 with the reasoning intact, and unparking
+them needs a purchase (the Goethe Modellsätze), not engineering. Nothing in the app depends on them,
+so a future session should not treat them as a prerequisite for the quality audit: that audit uses
+CEFR descriptors (cited, never reproduced), publicly published task-type descriptions and open
+corpora instead.
+
+## s182 (2026-08-01) - Redemittel: untagged means universal, so tagging stays selective
+
+The content audit's P6 said "tag the 158 with `themeId`". Doing that literally would have been
+wrong, and the reason is worth keeping.
+
+**Two banks, two different meanings for the same field.** Wörter and Kollokationen carry a `themeId`
+on EVERY item, so their Thema dropdown is a hard filter. A Redemittel is not that kind of object:
+"Da bin ich anderer Meinung." belongs to no situation and works in all of them. Forcing a theme onto
+it would have produced the sticker problem the founder rejected for Alltag Branche tags in s181, and
+it would have made the phrase INVISIBLE under every other Thema.
+
+**The rule as shipped:** a phrase is tagged only when it belongs to one theme's situation
+(a Vortrag → meetings, a Bewerbungsgespräch → bildung, the Amt/Arzt/Wohnen/Bank/Reklamation packs →
+their Alltag theme). Everything else stays untagged, and untagged is read as UNIVERSAL, exactly like
+an untagged Branche: it shows under every Thema and in every learning mode. 111 of 220 phrases are
+tagged. `tests/redemittel.test.ts` fails if a later pass blanket-tags the discussion functions.
+
+**Why it mattered beyond the Bibliothek:** the session composer already had the mode rule
+(`if (!r.themeId) return true`), so with zero phrases tagged it was dead code, and a personal-mode
+session happily served "Vielen Dank für Ihre Aufmerksamkeit." The tagging turned an existing rule on
+rather than adding one.
+
+## s182 (2026-08-01) - Anwenden returns to the DESKTOP nav only
+
+Audit P4 asked for the Anwenden entry back (it was pulled from `navItems` on 2026-07-13 for the
+demo), because Sprechen and Prüfung were reachable only from a dashboard recommendation and ⌘K.
+
+**It is back in `navItems`, which is the desktop sidebar. It is deliberately NOT in the mobile
+bottom bar.** That bar is a locked five-slot structure (CLAUDE.md, `docs/areas/PRAKTISCH-NAV.md`),
+and a sixth entry means moving something or growing it. That is a founder call, not an audit
+follow-through, so it is parked as an open action item instead of being decided by a session. The
+consequence is stated rather than hidden: on a phone the Sprechsimulation is still hard to find.
+
+## s182 (2026-08-01) - grammar groups are named after the group, not one member
+
+Adding the B1 accuracy canon (audit P5) exposed two group labels that had been named after their
+only member: `attributes` read "Partizipialattribute" and `prepositionalPronouns` read
+"da-/wo-Wörter". With Adjektivdeklination and Komparativ/Superlativ joining the first, and Verben mit
+Präpositionen joining the second, both labels became wrong: they are "Adjektive & Attribute" and
+"Verben mit Präpositionen" now. The da-/wo-forms sit under the latter on purpose, because they only
+exist BECAUSE a verb governs a fixed preposition.
+
+**One new group, `tenses` ("Zeitformen"),** for the Perfekt/Präteritum choice. It fits neither
+`future` (which is about Vermutung, not time) nor `verbPosition`, and it sits after `cases` on the
+priority spine, with the accuracy levers rather than the polish.
+
+**The drill law that came with it:** a topic is not practised by recognising an answer. Every B1
+topic carries at least three PRODUCTIVE drills (no `options`, the learner types the answer), gated in
+`tests/grammar.test.ts`. A productive answer must be unambiguous, since it is compared as one
+normalised string. The 21 B2/C1 topics still cap at five multiple-choice drills; that is known, open
+and written down, not an oversight.

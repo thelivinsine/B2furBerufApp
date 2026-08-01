@@ -1,7 +1,14 @@
 # Schreiben overhaul: exam-realistic Aufgaben, a Niveau axis, real Branche differentiation
 
-**Status:** P0, P1, P2 and **content wave 2** SHIPPED in s167 (PRs #711 to #715, live on `main`).
-Waves 3 and 4 remain. Founder-approved scope; extends `docs/areas/SCHREIBEN.md`.
+**Status: COMPLETE. The only open items (§12 and P0.3) are PARKED by the founder as low priority
+(s181), and nothing shipped depends on them.** P0, P1, P2 and **content wave 2** shipped in s167
+(PRs #711 to #715); **waves 3 and 4 shipped in s181** (PR #770), together with the whole "every zero
+in the rail" backlog the s180 founder decision created. Extends `docs/areas/SCHREIBEN.md`.
+
+**The follow-up this plan does NOT cover** and which the founder queued in s181: an audit of task
+QUALITY and filter fit. This plan proved coverage; nobody has yet checked whether a task tagged B1
+reads as B1 or whether the Branche framing convinces someone in that industry. Scope lives in
+`docs/PROJECT_REFERENCE.md` under "QUEUED (founder, s181)".
 
 **Shipped:** the counting fix + one shared selector · "Alle Themen" and a generic option on every
 dropdown · the Niveau and Textsorte axes · the exam-shaped `WritingTask` schema · permanent task ids
@@ -11,9 +18,17 @@ grades content first · `writing_evaluations.task_id` + Verlauf showing the task
 daily limits (Fokus 10 / Kurz 4 / Lang 2) · a scope change never re-rolls onto the same task · the
 mobile panel stays open until closed · CI that deploys Supabase without a CLI.
 
-**Bank: 373 -> 643 tasks. Branche slots filled: 71/600 (11.8%) -> 173/600 (28.8%).**
+**Bank: 373 -> 643 (s167) -> 717 tasks, ALL of them servable (s181).**
+**Branche slots filled: 71/600 (11.8%) -> 173/600 (28.8%) -> 300/300 Beruf slots (100%),** plus
+Alltag now tagged as well (founder decision), so all 15 Branchen are reachable in all 20 Themen at
+both lengths.
 
-**Not shipped:** waves 3 and 4 (§11 P3) and the §12 verification items.
+**Not shipped, and PARKED by the founder in s181 as low priority:** the §12 verification items and P0 item 3
+(obtain the Goethe/telc/BAMF source documents). Both need primary sources: `strategy/
+DATA_GOVERNANCE.md` puts telc material on the do-not-use list and forbids copying a published word
+list or task sheet, and no exam numbers may be hard-coded from secondary reports. Nothing in the
+bank depends on them: the tasks are Genauly's own, modelled on the exam SHAPES, and the `exam` tag
+is a reference label, never a reproduction.
 
 **Trigger:** founder report "why are there almost no items in the writing section?" plus the
 requirement that Aufgaben simulate real telc/Goethe exam tasks and that every filter option yield
@@ -396,9 +411,11 @@ gate today; it would if any row were flipped to verified first. Update `docs/are
    call it from rail and trainer. Branche stops lying. (~1 file, no content, no backend.)
 2. **Add "Alle Themen" to the Thema dropdown** and normalize the generic option across all
    dropdowns.
-3. **Obtain the source PDFs.** Goethe B1/B2/C1 Modellsatz + Prüferblätter, telc B2 Beruf Übungstest,
-   BAMF DTB Prüfungshandbuch. Dropped into the repo, they can be read locally with no network. This
-   is the gate on faithful content: without them the Aufgaben are exam-*like*, not exam-simulating.
+3. **Obtain the source PDFs. PARKED (founder, s181), was blocked on founder action.** Goethe B1/B2/C1 Modellsatz + Prüferblätter,
+   telc B2 Beruf Übungstest, BAMF DTB Prüfungshandbuch. Dropped into the repo, they can be read
+   locally with no network; nobody in a session can acquire them, and telc material may not be copied
+   at all (`strategy/DATA_GOVERNANCE.md`). Until then the Aufgaben are exam-*like*, not
+   exam-simulating, which is the honest description of the 717-task bank as it stands.
 
 **P1 — the structural change**
 4. Extend the `WritingTask` schema (§7), add the two enums, mirror them in the linter.
@@ -423,19 +440,34 @@ gate today; it would if any row were flipped to verified first. Update `docs/are
   tasks. 150 tasks, each satisfying the §8 four-way-difference test. C1.1 Branche variants and the
   remaining Beruf Themen (`logistics`, `project`, `technology`, `sustainability`, `travel`) move to
   wave 4.
-- **Wave 3 — Alltag formal apparatus.** Rewrite the legacy Alltag tasks with Betreff, Aktenzeichen,
-  Frist and Grußformel as Inhaltspunkte (the 30 new wave-1 Alltag tasks already have them). Legal
-  claims verified against primary sources. Decide per genre whether Branche is meaningful at all:
-  Branche means where you WORK, so a Wohnen or Bank task is personal life and a Gastronomie-flavoured
-  Kontokündigung would be artificial, but Krankmeldung (Schichtdienst vs Büro) and Urlaubsantrag
-  (Baustelle) genuinely do vary.
-- **Wave 4 — remaining Branchen and B1 breadth.**
+- **Wave 3 — Alltag formal apparatus. DONE (s181).** All 177 legacy Alltag tasks rewritten, with
+  Betreff, Aktenzeichen, Frist and Grußformel as Inhaltspunkte where the genre calls for them.
+  **The Branche question was decided by the founder against this plan's reading: tag every Alltag
+  task.** It stays honest because each task names the work context that makes the everyday situation
+  hard, rather than flavouring it: Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne
+  Wochentage, Ferntour gegen Apotheken-Öffnungszeiten, Spätdienst gegen Filialschluss. A Branche on a
+  Kontokündigung is therefore the reason the learner cannot simply go during opening hours, not a
+  Gastronomie sticker on a bank letter.
+- **Wave 4 — remaining Branchen and B1 breadth. DONE (s181).** The five Beruf Themen wave 2 skipped
+  (`logistics`, `project`, `technology`, `sustainability`, `travel`) now carry a dedicated task for
+  each of the 15 Branchen at both lengths: 74 newly authored, the rest upgraded from the legacy pool.
+  B1 breadth came with it. The band went from ~40 servable tasks to 307 and seven completely empty B1
+  Textsorte cells closed (Bericht, Beschwerde, Forumsbeitrag, Kündigung, Protokoll, Stellungnahme,
+  Widerspruch), which is what a B1 learner picking a Textsorte actually feels.
 
 ---
 
 ## 12. Open verification items
 
-Nothing in this list may be hard-coded until confirmed from a primary source:
+**PARKED by the founder (s181): "it's not that important."** Nothing in this list may be
+hard-coded until confirmed from a primary source, and none of it can be resolved by authoring: item 5 is telc material, which
+`strategy/DATA_GOVERNANCE.md` puts on the do-not-use list, and the rest needs the official Modellsatz
+and Prüferblätter (P0 item 3), which this repo does not hold and which cannot be bought or scraped
+from the sandbox. **The app does not depend on any of them today:** no exam point value, weighting or
+timing is printed anywhere, `words` comes from Genauly's own per-band convention (B1 40/80, B2
+100/150, C1 120/200), and `exam` is a shape label on our own tasks. Resolving the list would let the
+app show real scoring, not fix anything currently shown. Founder action if that is wanted: buy the
+Goethe Modellsätze (B1/B2/C1) and drop the PDFs in, then a session can read them locally.
 
 1. Per-band (A to E) point values for Schreiben at B1, B2, C1.
 2. B1 Aufgabe weighting 40/40/20 (widely reported, unconfirmed).

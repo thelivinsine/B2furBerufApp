@@ -633,3 +633,151 @@ the same session: add a "go to top" button to the bottom right on desktop, where
 - **Gates:** typecheck · lint 0 errors (75 pre-existing warnings) · test:unit 389/389 · build ·
   check:bundle 123.2 kB of 400 kB. Verified in headless Chromium at 390px and 1280px on all four tabs.
 
+**Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
+were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
+Founder: "can you apply the migration in supabase yourself? I remember we setup something for this
+earlier" → the pipeline existed (s167) but only ever deployed Edge Functions, because
+`SUPABASE_DB_PASSWORD` was deliberately unset. The founder set it; the first `db push` then FAILED,
+and the failure was worth having.
+- **The remote had NO migration history at all.** Every migration to date was pasted into the SQL
+  editor by hand, which never writes to `supabase_migrations`, so `db push` tried to replay 0001
+  against a database that already had everything and died on "policy profiles_select_own already
+  exists". Because migrations run before functions, the function deploy was skipped with it.
+- **Evidence before repair.** Marking a version applied skips its SQL forever, so nothing was
+  repaired on trust: a dispatch-only **schema probe** (Management API query endpoint) listed the live
+  tables, the `progress`/`writing_evaluations` columns, every public function and every RLS policy.
+  It proved 0001-0004, 0006-0009 and 0011-0013 were present.
+- **It also found a real hole: migration 0010 had never been applied.** No `gdpr_events` table, no
+  `log_gdpr_event`, no `admin_gdpr_evidence`, so the GDPR evidence counters the Launch screen reads
+  had no store behind them. Applied now, along with 0005 (idempotent, so a no-op if it was already
+  there) and 0014.
+- **The bridge, once:** `repair_applied` marked the eleven verified versions, then
+  `db push --include-all` applied the three unrecorded ones. `--include-all` is now permanent,
+  because a repaired history legitimately leaves an older file unrecorded below a newer applied one.
+- **Verified after:** `migration list` shows Local = Remote for all 14, `writing_evaluations.insight_en`
+  exists, `gdpr_events` exists.
+- **From now on a merge to `main` applies pending migrations and then deploys the functions.** Three
+  dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
+- **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
+  wherever its number sits.
+
+**Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
+`claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
+Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and
+necessary improvements with the Aufgabe feature."
+- **Root cause: Niveau and Textsorte were never really filters.** `eligibleTasks` narrowed them
+  prefer-tagged-else-untagged, the rule that is right for Branche. 373 of the 643 tasks carry no
+  `format`, so on every theme without a tagged task the fallback swallowed the filter, and where even
+  the untagged set was empty the filter was dropped entirely. Measured on the shipped bank: under
+  "Alle Themen + Forumsbeitrag" the draw pool was 85 tasks of which **71 were not Forumsbeiträge**
+  (84%), and the rail printed the honest count, 14, right beside the option. Every Textsorte was
+  wrong between 66% and 100% of the time. **Both axes filter hard now**, and the order is
+  Unterthema → Niveau → Textsorte → Branche (the soft axis last, so it can never hide the only task
+  matching a hard one). `countExact` is gone: one hard rule means the rail count and the draw pool
+  are one number.
+- **A scope can now legitimately be empty, and the trainer says so.** Every dropdown greys its
+  zero-yield options with the count still visible; where greying cannot help (a Kurz/Lang switch
+  carrying a length-specific Textsorte, a stale deep link) the Aufgabe card is replaced by
+  "Forumsbeitrag gibt es nur bei Lang." plus the one-tap "Textsorte zurücksetzen" that `blockingAxis`
+  picks. `randomTask` returns null for an empty list instead of the first task of the first theme.
+- **Five smaller faults fixed in the same pass.** `bewerbung` was a permanently empty dropdown option
+  (0 tasks at either length, since s167), so the Textsorte list is derived from the bank now. The
+  Niveau option labelled "B2" matched the tag `B2.1` exactly, which would have made the first `B2.2`
+  task silently unreachable; it matches by BAND, and "C1.1" is labelled "C1" like everywhere else.
+  The Ziel line printed `words x 1.25` unrounded ("Ziel 150–188 Wörter") and never named the Niveau;
+  it is "B2 · Bericht · Ziel 150–190 Wörter" now. Every scope change pushed a history entry, so the
+  phone's back gesture undid filter taps one at a time. Fokus and Verlauf kept `?level`/`?format`
+  alive after a tab switch.
+- **The sign-in draft hand-off lost the text on the email/password path.** `initialText` is read once
+  on mount, and signing in from the login wall does not remount the trainer when the learner is
+  already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
+  resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
+  which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
+- **Follow-up in the same session, founder decision: only fully briefed Aufgaben are served.** The
+  founder sent a fourth screenshot, `wt_safety_l12` ("Verfasse eine kurze Unterweisung für neue
+  Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no Niveau): "this one has too little
+  description of the task." The bank held two generations: **270 tasks carry the whole exam brief**
+  (Adressat, du/Sie, 2 to 5 Leitpunkte, Niveau, Textsorte, word target) and **373 are one-liners**.
+  Presented both options (upgrade the 373 over several content sessions, or serve only the 270 now);
+  the founder chose the smaller, better bank. Bare tasks failed three ways at once: they leave
+  `evaluate-writing` nothing to grade Aufgabenerfüllung against, so feedback silently drops to
+  grammar and vocabulary; they carry neither filter tag, so they were reachable ONLY under the
+  default scope, which is where 58% of draws landed; and they read as unfinished. At the Kurz 4 /
+  Lang 2 daily allowance, 270 tasks is about two months before anything repeats, so the number the
+  learner can feel is unchanged. **Nothing is deleted:** the 373 keep their ids AND pool positions,
+  so drafts and Verlauf rows still resolve, and each returns to the draw the moment it is authored up
+  to the full shape, with no code change. `sub` became a hard filter with it (it used to fall back to
+  the whole Thema, the last silent substitution in the selector).
+- **The zeros in the rail are now the content backlog**, deliberately visible rather than papered
+  over: `bewerbung` has no task at any length, **15 of 46 Unterthemen have none at each length**,
+  `bericht` at C1 has one. Every Thema and every Branche still yields tasks at both lengths.
+- **Gates:** typecheck · lint 0 errors · test:unit **410/410** (new `tests/writingAufgabe.test.tsx`
+  renders the trainer: 20 consecutive draws per scope obey the filter, and 30 default draws all carry
+  an Adressat, Leitpunkte and a Niveau) · lint:content clean · build · check:bundle 123.2 kB.
+- **Shipped as two PRs, both squash-merged and deployed green** (`Validate content` + `Deploy site to
+  GitHub Pages` success on each): **#766** the filter fix, **#768** the fully-briefed-Aufgaben rule.
+- **Next session, if the founder wants the gaps closed:** the authoring list is in
+  `docs/areas/CONTENT.md` (Bewerbung has no task at any length, 15 of 46 Unterthemen have none at
+  each length, `bericht` at C1 has one). Authoring one task into the full shape makes its whole
+  Niveau x Textsorte x Unterthema cell selectable, so the greyed zeros in the rail are the progress
+  bar for that work. Load the `/content` skill first.
+
+**Handoff after session 181 (2026-07-31). The Aufgabe backlog is closed: 717 tasks, every one of
+them servable.** Branch `claude/latest-plan-steps-ydumbt`.
+Founder: "what's steps are to do in the latest plan?" then "complete the full implementation of both
+these plans". The two plans were `docs/plans/SCHREIBEN-OVERHAUL.md` (waves 3 and 4 outstanding since
+s167) and the authoring backlog s180 made visible when it retired every bare Aufgabe from the draw.
+- **What the bank looked like going in:** 643 tasks, **270 servable, 373 bare**. 30 of 92 Unterthema
+  x Länge cells empty, 13 Niveau x Textsorte cells empty, `bewerbung` at zero everywhere, and
+  `project`, `sustainability` and `travel` with no Branche variants at all.
+- **Three founder decisions were needed first,** because the plans left them open: the Niveau mix,
+  where Bewerbung lives (**under Bildung**, both sub-themes), and whether Alltag tasks get Branche
+  tags (**tag every Alltag task**, against this plan's own recommendation). The third was made honest
+  rather than cosmetic: every Alltag task names the work context that makes the everyday situation
+  hard (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage), so a Branche on a
+  Kontokündigung is a reason, not a sticker.
+- **Shipped in one pass: 373 upgrades in place + 74 new tasks + 60 tagged. Bank 643 → 717, zero bare.**
+  Every id and every pool position survived, so resumed drafts and Verlauf rows still resolve; only
+  text and tags changed.
+- **Coverage is now gated, not aspirational** (`tests/writingScope.test.ts`, 413 tests):
+  **≥2 tasks per Unterthema per length**; **all 15 Branchen x both Längen on all 10 Beruf Themen**
+  (wave 2 did five, wave 4 the rest) **and on all 10 Alltag Themen**; **all 16 Textsorten live**,
+  `bewerbung` included. Seven completely empty B1 Textsorte cells closed (Bericht, Beschwerde,
+  Forumsbeitrag, Kündigung, Protokoll, Stellungnahme, Widerspruch), which is what a B1 learner
+  picking a Textsorte actually feels.
+- **Niveau: B1 307 / B2 302 / C1 108, and the founder has since SETTLED this as final.** The excess
+  over the old 35/50/15 target is entirely Kurz tasks, and a 40-word task with three Leitpunkte is B1
+  work. Promotion was limited to Lang tasks in demanding genres with 4+ Leitpunkte, so no task wears
+  a Niveau it cannot carry. Do not rebalance it in a later session.
+- **One deliberate zero left: C1 + E-Mail (privat).** A private informal mail has no C1 exam
+  analogue, so the rail greys it with an honest count instead of serving a formal letter under an
+  informal label. It is now the fixture that pins `blockingAxis` in the tests.
+- **NOT done, and it cannot be done from a session:** the plan's §12 verification items (exam point
+  values, weightings, timings, verbatim prompt wording) and P0 item 3 (obtain the Goethe/telc/BAMF
+  source documents). Both need primary documents this repo does not hold, and telc material may not
+  be copied at all under `strategy/DATA_GOVERNANCE.md`. **Nothing shipped depends on them:** no exam
+  score or timing is printed anywhere, `words` follows Genauly's own per-band convention, and `exam`
+  is a shape label on our own tasks. **Founder action if you want it closed:** buy the Goethe
+  Modellsätze (B1/B2/C1) and drop the PDFs into the repo; a session can then read them locally.
+- **Gates:** typecheck · lint:content clean · test:unit **413/413** · build · check:bundle 123.2 kB.
+
+**Same session, follow-up: the app now has exactly TWO learner-facing categories.** Founder, on the
+Schreiben Thema dropdown: "there seems to be some topics in the themen dropdown which are non-beruf
+but are not part of alltag ... There has to be only two overarching categories similar to the nodal
+graphs in bibliothek. This has to be consistent across the app."
+- **Three surfaces, three different answers.** The Schreiben rail folded `gesundheit` into Alltag but
+  not `bildung`, so "Bildung & Sprache" was a third heading; the Bibliothek Thema dropdown grouped by
+  all five content domains; only the graphs were binary, and they called the second area
+  "Privatleben".
+- **`src/lib/lifeAreas.ts` is the one fold now.** Two areas, `beruf` = Berufsleben and every other
+  domain = Alltag, with `themeGroupsByArea` as the single grouped-options builder that the Schreiben
+  rail, the Bibliothek dropdowns (Wörter + Kollokationen) and both graph legends all call.
+- **Naming: Berufsleben / Alltag** (founder pick). "Privatleben" is retired from the graph legend so
+  the whole app says the same two words.
+- **The Mode lens still narrows inside the two groups**, never adds a heading, and a deep-linked
+  theme is still never orphaned (s104). `tests/lifeAreas.test.ts` fails if a third group ever
+  appears, in any mode, or if a new domain does not fold into Alltag.
+- **Verified in the built app, not only in tests** (headless Chromium): Schreiben shows BERUFSLEBEN /
+  ALLTAG, the Bibliothek dropdown the same two, the Wörter graph legend reads "Berufsleben · Alltag".
+- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
+  check:bundle 123.2 kB.

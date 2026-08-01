@@ -9,7 +9,9 @@ import { grammar } from "@/data/grammar";
 export const groupMeta: Record<GrammarGroup, { labelDe: string; icon: string }> = {
   connectors: { labelDe: "Konnektoren", icon: "Link2" },
   relativeClauses: { labelDe: "Relativsätze", icon: "GitBranch" },
-  prepositionalPronouns: { labelDe: "da-/wo-Wörter", icon: "CornerDownRight" },
+  // Also relabelled in s182: the da-/wo-forms only exist BECAUSE a verb has a
+  // fixed preposition, and that topic now sits in the same group.
+  prepositionalPronouns: { labelDe: "Verben mit Präpositionen", icon: "CornerDownRight" },
   collocations: { labelDe: "Nomen-Verb-Verbindungen", icon: "Combine" },
   verbPosition: { labelDe: "Verbstellung", icon: "MoveHorizontal" },
   subordinate: { labelDe: "Nebensätze", icon: "CornerDownRight" },
@@ -19,13 +21,18 @@ export const groupMeta: Record<GrammarGroup, { labelDe: string; icon: string }> 
   passive: { labelDe: "Passiv", icon: "Boxes" },
   // Scale-up Wave 4 (2026-07-12): the missing B1-B2 canon groups.
   nouns: { labelDe: "Nomen & Deklination", icon: "Tag" },
-  attributes: { labelDe: "Partizipialattribute", icon: "AlignLeft" },
+  // Relabelled in s182 (audit P5): the group now holds Adjektivdeklination and
+  // Komparativ/Superlativ next to the Partizipialattribute, so the old label
+  // named one member instead of the group.
+  attributes: { labelDe: "Adjektive & Attribute", icon: "AlignLeft" },
   reportedSpeech: { labelDe: "Indirekte Rede", icon: "Quote" },
   wordFormation: { labelDe: "Nominalstil", icon: "Shuffle" },
   infinitives: { labelDe: "Infinitivsätze", icon: "ArrowRight" },
   future: { labelDe: "Futur & Vermutung", icon: "Clock" },
   // C1 slice (s178 audit P1).
   particles: { labelDe: "Modalpartikeln", icon: "Sparkles" },
+  // B1 accuracy canon (audit P5, s182).
+  tenses: { labelDe: "Zeitformen", icon: "Clock" },
 };
 
 // Ordered by B2-marker priority (categorization audit 2026-07-09): the
@@ -41,6 +48,9 @@ export const groupOrder: GrammarGroup[] = [
   "relativeClauses",
   "attributes",
   "cases",
+  // B1 accuracy canon (audit P5, s182): the Perfekt/Präteritum choice sits with
+  // the other accuracy levers, not at the polish end of the spine.
+  "tenses",
   "nouns",
   "wordFormation",
   "verbPosition",

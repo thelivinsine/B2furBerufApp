@@ -3,6 +3,7 @@ import {
   blockingAxis,
   countTasks,
   eligibleTasks,
+  isServable,
   levelBand,
   normalizeLevelScope,
   randomTask,
@@ -19,19 +20,63 @@ import type { ThemeId } from "@/types";
 const LENGTHS = ["short", "long"] as const;
 const THEME_IDS: ThemeId[] = themes.map((t) => t.id);
 
+/** The servable slice of a pool: what the trainer may draw (2026-07-31). */
+const servable = (id: ThemeId, length: (typeof LENGTHS)[number]) =>
+  writingPrompts[id][length].filter(isServable);
+
 describe("eligibleTasks", () => {
+  it("REGRESSION: only tasks with Inhaltspunkte are ever served", () => {
+    // Founder decision (2026-07-31): a bare one-line Aufgabe leaves the AI
+    // nothing to check Aufgabenerfüllung against and carries no Niveau or
+    // Textsorte tag, so it downgrades the feedback AND is invisible to the
+    // filters. 373 of 643 tasks are retired from the DRAW (never from the
+    // bank: ids and pool positions stay, so drafts and Verlauf still resolve).
+    for (const length of LENGTHS) {
+      for (const ref of eligibleTasks({ theme: "", sub: "", sector: "", length })) {
+        const task = writingPrompts[ref.theme][length][ref.ix];
+        expect(isServable(task), `${task.id} has no Inhaltspunkte`).toBe(true);
+      }
+    }
+  });
+
+  it("the authoring backlog is closed: every task in the bank is servable", () => {
+    // The 373 bare one-liners retired from the draw on 2026-07-31 have all been
+    // authored up to the exam shape (waves 3 and 4). A new bare task is not a
+    // bug, it is simply invisible to the trainer until it carries Inhaltspunkte,
+    // and the resolution test below keeps working either way.
+    const bare = THEME_IDS.flatMap((id) =>
+      LENGTHS.flatMap((len) => writingPrompts[id][len].filter((t) => !isServable(t)).map((t) => t.id)),
+    );
+    expect(bare).toEqual([]);
+  });
+
+  it("every task resolves by id and by ref, servable or not (drafts, Verlauf)", () => {
+    // `taskAt` / `writingTaskById` index the FULL pool on purpose, so a resumed
+    // draft or a Verlauf row still resolves to the Aufgabe it was written
+    // against even for a task the draw currently skips.
+    for (const id of THEME_IDS) {
+      for (const len of LENGTHS) {
+        writingPrompts[id][len].forEach((t, ix) => {
+          expect(writingTaskById(t.id)).toBe(t);
+          expect(taskText({ theme: id, ix }, len)).toBe(t.text);
+        });
+      }
+    }
+  });
+
   it('theme "" spans every theme pool', () => {
     for (const length of LENGTHS) {
-      const total = THEME_IDS.reduce((n, id) => n + writingPrompts[id][length].length, 0);
+      const total = THEME_IDS.reduce((n, id) => n + servable(id, length).length, 0);
       expect(countTasks({ theme: "", sub: "", sector: "", length })).toBe(total);
     }
   });
 
-  it("a concrete theme yields exactly that theme's pool", () => {
+  it("a concrete theme yields exactly that theme's servable pool", () => {
     for (const length of LENGTHS) {
       for (const id of THEME_IDS) {
         const tasks = eligibleTasks({ theme: id, sub: "", sector: "", length });
-        expect(tasks.length).toBe(writingPrompts[id][length].length);
+        expect(tasks.length).toBe(servable(id, length).length);
+        expect(tasks.length, `${id}/${length} has no servable task`).toBeGreaterThan(0);
         expect(tasks.every((t) => t.theme === id)).toBe(true);
       }
     }
@@ -68,14 +113,27 @@ describe("eligibleTasks", () => {
   });
 
   it("the sector fallback is applied per theme, not globally", () => {
-    // Under "Alle Themen" a Branche must still reach the untagged Themen (which
-    // have no sector tags at all), not collapse to the handful of tagged tasks.
-    const scoped = countTasks({ theme: "", sub: "", sector: "it", length: "long" });
-    const tagged = THEME_IDS.reduce(
-      (n, id) => n + writingPrompts[id].long.filter((t) => t.sectors?.includes("it")).length,
-      0,
-    );
-    expect(scoped).toBeGreaterThan(tagged);
+    // Under "Alle Themen" the soft axis resolves INSIDE each theme: a theme with
+    // tagged tasks contributes exactly those, a theme without contributes its
+    // universal ones. Collapsing globally (prefer tagged across the whole bank)
+    // would drop every untagged theme from the pool. Asserted as an identity so
+    // it keeps holding as Branche coverage grows, rather than as a "> tagged"
+    // count, which only held while some Themen carried no tags at all.
+    for (const length of LENGTHS) {
+      for (const sector of SECTOR_OPTIONS) {
+        const perTheme = THEME_IDS.reduce((n, id) => {
+          const pool = writingPrompts[id][length].filter(isServable);
+          const tagged = pool.filter((t) => t.sectors?.includes(sector.value as never));
+          if (tagged.length) return n + tagged.length;
+          const universal = pool.filter((t) => !t.sectors?.length);
+          return n + (universal.length || pool.length);
+        }, 0);
+        expect(
+          countTasks({ theme: "", sub: "", sector: sector.value, length }),
+          `${sector.value}/${length}`,
+        ).toBe(perTheme);
+      }
+    }
   });
 
   it("an Unterthema narrows to its tagged tasks", () => {
@@ -91,17 +149,19 @@ describe("eligibleTasks", () => {
     expect(countTasks({ theme: "", sub: "meetings.ablauf", sector: "", length: "short" })).toBe(all);
   });
 
-  it("a deep-linked Unterthema with no tasks still stays inside its theme", () => {
-    // `narrow` cannot empty the list, but the sub filter can, and a caller that
-    // gets [] would draw from a different theme entirely.
-    const tasks = eligibleTasks({
-      theme: "meetings",
+  it("an Unterthema with no task reads as empty, it does not serve the theme", () => {
+    // It used to fall back to the whole theme. That was the last silent
+    // substitution in the selector, and retiring the bare tasks empties 30 of
+    // the 96 Unterthema cells, so it would have started firing in earnest. The
+    // rail greys those options; a deep link gets the trainer's empty state.
+    const scope = {
+      theme: "meetings" as const,
       sub: "meetings.doesnotexist",
       sector: "",
-      length: "short",
-    });
-    expect(tasks.length).toBeGreaterThan(0);
-    expect(tasks.every((t) => t.theme === "meetings")).toBe(true);
+      length: "short" as const,
+    };
+    expect(eligibleTasks(scope)).toEqual([]);
+    expect(blockingAxis(scope)).toBe("sub");
   });
 
   it("every task carries a unique permanent id, resolvable by id", () => {
@@ -235,13 +295,20 @@ describe("Niveau and Textsorte axes (s167, hard since 2026-07-31)", () => {
     expect(countTasks({ ...kurzForum, format: "" })).toBeGreaterThan(0);
     // A scope that yields tasks has nothing to relax.
     expect(blockingAxis({ ...kurzForum, format: "" })).toBeNull();
-    // Niveau can be the culprit too: no Forumsbeitrag is tagged B1.
+    // Niveau can be the culprit too. B1 Forumsbeitrag used to be the example;
+    // it is real content now (Goethe B1 Schreiben has exactly that shape), so
+    // the standing zero is C1 + E-Mail (privat): a private informal mail has no
+    // C1 exam analogue, and the rail greys it with an honest count rather than
+    // serving a formal letter under an informal label.
     expect(
-      blockingAxis({ theme: "", sub: "", sector: "", level: "B1", format: "forumsbeitrag", length: "long" }),
+      blockingAxis({ theme: "", sub: "", sector: "", level: "C1", format: "email_informell", length: "long" }),
     ).toBe("format");
     expect(
-      countTasks({ theme: "", sub: "", sector: "", level: "B1", format: "forumsbeitrag", length: "long" }),
+      countTasks({ theme: "", sub: "", sector: "", level: "C1", format: "email_informell", length: "long" }),
     ).toBe(0);
+    expect(
+      countTasks({ theme: "", sub: "", sector: "", level: "B1", format: "forumsbeitrag", length: "long" }),
+    ).toBeGreaterThan(0);
   });
 
   it("Branche never empties a pool the hard axes left standing", () => {
@@ -291,12 +358,15 @@ describe("Niveau and Textsorte axes (s167, hard since 2026-07-31)", () => {
     expect(normalizeLevelScope("nonsense")).toBe("");
   });
 
-  it("wave 2: the 5 universal Beruf Themen serve EVERY Branche a dedicated task", () => {
+  it("waves 2 and 4: EVERY Beruf Thema serves EVERY Branche a dedicated task", () => {
     // The founder report behind wave 2: picking a Branche redrew a task that had
     // nothing to do with that Branche, because only 11.8% of theme x Länge x
-    // Branche slots carried a tagged task. These five Themen apply to every
-    // industry, so they are now filled for all 15 Branchen in both lengths.
-    for (const id of ["meetings", "scheduling", "conflict", "safety", "customer"] as const) {
+    // Branche slots carried a tagged task. Wave 2 filled the five universal
+    // Themen; wave 4 filled the remaining five (logistics, project, technology,
+    // sustainability, travel), so all 10 x 15 x 2 slots now carry one.
+    const BERUF = themes.filter((t) => t.domain === "beruf").map((t) => t.id);
+    expect(BERUF.length).toBe(10);
+    for (const id of BERUF) {
       for (const length of LENGTHS) {
         for (const sector of SECTOR_OPTIONS) {
           const tagged = writingPrompts[id][length].filter((t) =>
@@ -307,6 +377,43 @@ describe("Niveau and Textsorte axes (s167, hard since 2026-07-31)", () => {
           for (const ref of eligibleTasks({ theme: id, sub: "", sector: sector.value, length })) {
             expect(writingPrompts[ref.theme][length][ref.ix].sectors).toContain(sector.value);
           }
+        }
+      }
+    }
+  });
+
+  it("wave 3: every Alltag task carries Branche tags, and every Branche is reachable", () => {
+    // Founder decision (wave 3): Alltag is tagged too, not left universal. Each
+    // task names the work context that makes the everyday situation hard
+    // (Schichtdienst gegen Öffnungszeiten, Montage ohne Wochentage), so the tag
+    // does work instead of name-dropping an industry.
+    const ALLTAG = themes.filter((t) => t.domain !== "beruf").map((t) => t.id);
+    for (const id of ALLTAG) {
+      for (const length of LENGTHS) {
+        for (const t of writingPrompts[id][length]) {
+          expect(t.sectors?.length, `${t.id} untagged`).toBeTruthy();
+        }
+        for (const sector of SECTOR_OPTIONS) {
+          const tagged = writingPrompts[id][length].filter((t) =>
+            t.sectors?.includes(sector.value as never),
+          );
+          expect(tagged.length, `${id}/${length}/${sector.value}`).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it("every declared Unterthema has at least 2 tasks at each length", () => {
+    // The coverage invariant from docs/areas/CONTENT.md. It was aspirational
+    // while 30 of the Unterthema cells sat empty; waves 3 and 4 closed them, so
+    // it is a gate now: a new sub-theme ships with its tasks or not at all.
+    for (const theme of themes) {
+      for (const s of theme.subThemes ?? []) {
+        for (const length of LENGTHS) {
+          const n = writingPrompts[theme.id][length].filter(
+            (t) => t.sub === s.id && isServable(t),
+          ).length;
+          expect(n, `${s.id}/${length}`).toBeGreaterThanOrEqual(2);
         }
       }
     }

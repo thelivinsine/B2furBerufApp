@@ -382,6 +382,23 @@ the progress store tracks text or dialogue completion, so nothing can guarantee 
 | **P9** | **Content hygiene**: 2 duplicate word pairs, 12 duplicate collocations, 5 same-theme gloss collisions feeding a two-correct-answer MCQ, non-standard `pron` scheme, 329 nouns with no plural and no way to say "uncountable" | Small, visible, cheap; the MCQ one is a live bug | Retire one of each duplicate via `RETIRED_VOCAB_IDS`; de-dup by `en` in `translationQ`; document one pron scheme and lint it; add an `uncountable` flag |
 | **P10** | **0.4% human-verified** (13 of 3,273) | Machine checks cannot see sense, register or naturalness | Prioritise the review queue by frequency: verify the 162 core items and the 158 Redemittel first (320 items ≈ the whole high-traffic surface) |
 
+### Backlog status (updated as items ship)
+
+- **Closed:** P0 hygiene bug + **P1** (the C1 slice) + **P2** (verb morphology) in s178;
+  **P8** by the Schreiben work in s181 (717 tasks, every one carrying the full brief);
+  **P6** in s182 (5 Alltag packs, 62 phrases, 3 new speech-act categories, `themeId` tagging with
+  untagged-=-universal semantics, Thema scope on the Redemittel tab).
+- **Started:** **P3** (six C1 texts at 305-344 words in s178). The rest of the bank is still ~90
+  words and listening is still 6 TTS voicemails with no note-taking task type.
+  **P4** in s182: all 30 scenarios now have a free-speak node with a model answer (was 10 of 30),
+  and Anwenden is back in `navItems` for the desktop sidebar. Open half: only 2 of 30 scenarios are
+  level 3, and the mobile bottom bar's 5 slots are locked, so mobile placement needs a founder call.
+  **P5** in s182: the four missing canon topics shipped with 10 drills each, and every B1 topic now
+  has ≥3 productive drills (bank 28 topics/137 drills → 32/195, productive 4% → 19%). Open half:
+  the 21 B2/C1 topics still cap at 5 MCQ-only drills.
+- **Open:** P3 (rest), P4 (level-3 depth + mobile entry), P5 (B2/C1 drill depth), P7, P9 (pron
+  scheme, `uncountable`, 329 plural-less nouns), P10.
+
 ### Two structural observations, not gaps
 
 - **The daily-life half is starter-sized but better built.** The 5 newest `alltag` packs are 49

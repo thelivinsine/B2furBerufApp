@@ -1,69 +1,39 @@
 # Project Status
 
-_Last updated: 2026-07-31 (session 180). **The Schreiben Aufgabe filters now mean what they say.**
-Picking a Textsorte or a Niveau used to PREFER its tagged tasks and fall back to the untagged ones,
-so "Forumsbeitrag" drew a Beschwerde an eine Fluggesellschaft: 84% of that scope's pool contradicted
-the filter while the rail printed the honest count beside the option. Both axes filter hard now, one
-counting rule serves the rail and the draw, zero-yield options grey out, and a genuinely empty scope
-(Kurz + Forumsbeitrag) gets an honest empty state with a one-tap escape instead of a substitute task.
-Prior s179: **Bibliothek card grids, the floating toolbar, and the AI
-feedback made usable.** The writing feedback is now written in simple A2 German with a sticky DE/EN
-switch on every AI text (Kurz/Lang Tipp, Verlauf, Fokus Hinweis), the capped fix tiles expand, and
-Shuffle clears the editor. **Migrations now apply themselves on merge** (the founder set
-`SUPABASE_DB_PASSWORD`; the hand-pasted history was bridged and two genuinely missing migrations,
-0010 and 0014, were applied), so there is no SQL to paste any more. Also: the AI
-allowances are visible. Each writing trainer now prints "Heute noch 7 von 10" beside the button
-that spends the day's AI budget (Fokus 10 / Kurz 4 / Lang 2), and Fokus "Nochmal" says how many new
-phrasings are left ("2 von 3 übrig"); the numbers come from the Edge Functions themselves. Also: the
-sticky view-button row no longer fades a blurred band in behind itself: it is transparent in every
-state and its controls float on their own shadow. Every tile in a Karten grid now shares ONE height
-(`auto-rows-fr` on all four tabs), with the card content vertically centered and the Wörter verb
-paradigm paired two-per-row so the uniform tile stays tight. "Nach oben" gained a desktop placement.
-Prior s178: **Content audit, then its P0-P2 fixes and the C1 slice.**
-`docs/reports/CONTENT_AUDIT_2026-07-30.md` measures coverage, quality, real-world usage frequency and
-fitness for B1-C1 across all 3,896 content items. Verdict: **structurally excellent, pedagogically
-lopsided.** Then P0 and P2 of its backlog shipped. **P0:** a quiz could render the same option twice
-(one of them the answer), because distractors were filtered by id and 5 English glosses collided
-inside a theme; two words shipped twice (`der Reisepass`, `der Konferenzraum`); CO2 was spelled two
-ways, one of them unreachable for a learner who types it. All fixed and gated. **P2:** all 234 verbs
-now have Partizip II, auxiliary, Präteritum and separability in the generated
-`src/data/verbForms.ts`, derived from a vendored dictionary oracle rather than typed by hand.
-They now show on the Wörter card (founder picked variant C from `preview/verb-forms-card.html`).
-**P1:** the C1 band had 0 grammar topics, 0 texts and 0 Can-Dos behind a level onboarding offers; it
-now has 4 topics (20 drills), 6 texts of 305-344 words and 5 Can-Dos.
-Prior s177: **Complaint response pack 2, cleaning-service focus.** A
-second founder-supplied word field for answering a written complaint, framed around a
-Reinigungsservice customer relationship, was audited against the live banks (including the s176 pack
-it overlaps with): about 90 of ~150 requested items were already shipped, **60 are now in** (38
-Wörter, 18 Kollokationen, 4 Redemittel), all `draft`. Prior s176: **formal complaint response pack (B2/C1 business German).** A
-founder-supplied word field for answering a written complaint was audited against the banks: 41 of
-151 items were already shipped, the other 110 are now in, split by the bank rules (82 Wörter, 19
-Nomen-Verb chunks into Kollokationen, 5 Redemittel sentence frames, 4 already covered by existing
-phrases). 106 new provenance rows, all `draft`. Prior s175: **a latent build-breaker is defused, and a
-238-item word-field pack is parked.** The `/sources` workbench chunk bundles the whole provenance
-register, so it grows with the content banks; at ~1.96 MB it was roughly **200 content items** from
-workbox's 2 MiB precache ceiling, which **fails `pnpm build`** rather than warning. `vite.config.ts`
-now keeps that founder-only chunk out of the precache (PR #751). The pack that surfaced it stays
-parked on `claude/word-list-validation-br3u2g`: the word list came from photographed pages of a
-commercial telc B2 Beruf coursebook, and `strategy/DATA_GOVERNANCE.md` puts telc materials on the
-do-not-use list and forbids copying a published word list wholesale. **PR #749 was withdrawn.**
-Also s175: **Fokus mobile tiles breathe.** The two mobile Fokus tiles
-filled the room down to the fixed bottom chrome to the last pixel and read as cramped; they now keep
-90% of it (`FILL_RATIO` in `FokusTrainer.tsx`), anchored at the same top, and sit `gap-5` apart, so
-the freed strip sits under the lower tile. Prior s174: **Security audit + the sign-up flow it uncovered.**
-`docs/reports/security-audit-2026-07-27.md` covers the bundle, the five Edge Functions, all twelve
-migrations, CI and the dependency tree; the architecture held, and three findings were fixed in the
-same pass. Acting on finding F1 the founder turned **"Confirm email" ON**, which exposed that
-**email sign-up had never actually worked end to end**, and pulling that thread reached a latent
-fault that had been quietly discarding learner profiles: `onboarded` was written to the cloud and
-never read back, so every sign-in on a device restarted onboarding and lost the learner's level and
-goal (#745). Sign-up, log-in, the confirmation link and the profile restore all work now; the auth
-dialog was reworked along the way. Still open for the founder: Resend SMTP so mail comes from
-Genauly (migration 0013 is applied). Prior s173: **a deploy can no longer refresh a learner's work away.**
-The PWA's auto-update reload now waits while any surface holds unsaved work (`src/lib/liveWork.ts`),
-and both kinds of work persist so even an unavoidable reload is recoverable: writing drafts autosave
-per mode (`draftAutosave.ts`), and a running Üben session snapshots its plan + position
-(`sessionResume.ts`). **Merged (PR #740).** Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
+_Last updated: 2026-08-01 (session 182). **Three audit items closed in one session: P6, P4 and P5.**
+P6: Redemittel 158 → **220** with five Alltag packs and selective `themeId` tagging (untagged =
+universal), plus a Thema scope on the Redemittel tab.
+P4: **all 30 speaking scenarios now end in a free-speak turn with a model answer** (was 10 of 30),
+and Anwenden is back on the desktop sidebar.
+P5: the missing B1 accuracy canon shipped (Adjektivdeklination, Perfekt/Präteritum, Verben mit
+Präpositionen, Komparativ/Superlativ, 10 drills each) and **every B1 topic now has ≥3 productive
+drills**, so the bank stopped testing recognition and calling it practice (grammar 28 topics/137
+drills → **32/195**, productive 4% → 19%).
+Prior s181: **The Schreiben Aufgabe backlog is closed.** Waves 3 and 4
+of `docs/plans/SCHREIBEN-OVERHAUL.md` shipped together with the authoring to-do list s180 exposed:
+all 373 bare one-liners were authored up to the full exam brief in place, 74 tasks were added and 60
+tagged, so the bank is **717 tasks and every one of them is servable**. Coverage is gated now rather
+than aspirational: at least 2 tasks per Unterthema per length, all 15 Branchen at both lengths on all
+20 Themen (Alltag included, by founder decision, with the work context as the reason the everyday
+task is hard), and all 16 Textsorten live including `bewerbung`. Niveau: B1 307 / B2 302 / C1 108.
+One deliberate zero remains, C1 + E-Mail (privat), which has no exam analogue. **Next up (founder,
+not started): an audit of task QUALITY and filter fit** (`docs/PROJECT_REFERENCE.md`); the exam-source
+items are parked as low priority.
+Prior s180: **the Aufgabe filters now mean what they say.** Niveau, Textsorte and Unterthema became
+HARD filters, one counting rule serves both the rail and the draw, zero-yield options grey out with
+honest counts, and an empty scope gets an empty state naming the one filter to drop instead of a
+substituted task.
+Prior s179: **Bibliothek card grids, the floating toolbar and readable AI feedback**, plus
+self-applying Supabase migrations.
+Prior s178: **content audit + its P0/P1/P2 fixes** (duplicate quiz options, 234 verb paradigms
+generated into `src/data/verbForms.ts`, the empty C1 band filled).
+Prior s177 / s176: two founder word-field packs for answering written complaints (170 new items).
+Prior s175: the `/sources` chunk is excluded from the workbox precache (PR #751); a telc-sourced word
+pack stays parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
+Prior s174: **security audit + the sign-up flow it uncovered**, including the `onboarded` fault that
+discarded learner profiles on every sign-in (#745).
+Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`).
+Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
 ONE shared module (`src/features/writing/correction.tsx`) with Fokus, Kurz/Lang and Verlauf
 (PR #739). `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
@@ -100,16 +70,18 @@ read that for the "what's built and how." The living detail of every feature are
 session engine, Bibliothek views, the game layer, content conventions) is in `docs/areas/` (index
 in `../CLAUDE.md`).
 
-**Content banks (as of 2026-07-30, session 178, measured against the live banks — re-verify with
+**Content banks (as of 2026-08-01, session 182, measured against the live banks — re-verify with
 `pnpm lint:content` before quoting):** vocab **1,743** (**1,733 browsable**; 8 mis-filed noun+verb combos
-retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** · Redemittel **158** ·
-grammar **28 topics / 137 drills** (17 groups) · Lese-/Hörtexte **42** (126 checks) · writing tasks **643** in 20
-pools · Can-Do **57** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
-provenance **3,308 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
+retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** ·
+Redemittel **220** (s182: +62 Alltag phrases in 5 packs; 111 carry a `themeId`, 109 are universal;
+18 categories) · grammar **32 topics / 195 drills** (18 groups; 37 productive, s182) · Lese-/Hörtexte **42** (126 checks) ·
+writing tasks **717**, every one servable (s181) in 20 pools ·
+Can-Do **57** · dialogues **30** (178 nodes, 335 options; every scenario ends in a free-speak turn since s182) · exam sets **15** · missions **6** ·
+provenance **3,432 rows** (four concatenated parts since s182, TS2590) · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
 einkaufen/essen/mobilitaet/freizeit/digitales). Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
-Standing governance debt: **3,295 of 3,308 provenance rows are AI-drafted `draft`**; only **13** are
+Standing governance debt: **3,419 of 3,432 provenance rows are AI-drafted `draft`**; only **13** are
 human-verified (13 vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset to restart the
 review pass; see `strategy/DATA_GOVERNANCE.md`). The full picture of what the banks do and do not
 cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178).
@@ -135,6 +107,10 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 - [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
+- [ ] **Decide where Anwenden lives on MOBILE (s182, audit P4).** Sprechen + Prüfung are back on the
+      desktop sidebar, but the mobile bottom bar has five locked slots, so a sixth entry means moving
+      something or growing the bar. Until this is answered, a phone reaches the Sprechsimulation only
+      through the dashboard recommendation and ⌘K. No code change is pending; this is a design call.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
       **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
@@ -150,73 +126,109 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
-`claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
-Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and
-necessary improvements with the Aufgabe feature."
-- **Root cause: Niveau and Textsorte were never really filters.** `eligibleTasks` narrowed them
-  prefer-tagged-else-untagged, the rule that is right for Branche. 373 of the 643 tasks carry no
-  `format`, so on every theme without a tagged task the fallback swallowed the filter, and where even
-  the untagged set was empty the filter was dropped entirely. Measured on the shipped bank: under
-  "Alle Themen + Forumsbeitrag" the draw pool was 85 tasks of which **71 were not Forumsbeiträge**
-  (84%), and the rail printed the honest count, 14, right beside the option. Every Textsorte was
-  wrong between 66% and 100% of the time. **Both axes filter hard now**, and the order is
-  Unterthema → Niveau → Textsorte → Branche (the soft axis last, so it can never hide the only task
-  matching a hard one). `countExact` is gone: one hard rule means the rail count and the draw pool
-  are one number.
-- **A scope can now legitimately be empty, and the trainer says so.** Every dropdown greys its
-  zero-yield options with the count still visible; where greying cannot help (a Kurz/Lang switch
-  carrying a length-specific Textsorte, a stale deep link) the Aufgabe card is replaced by
-  "Forumsbeitrag gibt es nur bei Lang." plus the one-tap "Textsorte zurücksetzen" that `blockingAxis`
-  picks. `randomTask` returns null for an empty list instead of the first task of the first theme.
-- **Five smaller faults fixed in the same pass.** `bewerbung` was a permanently empty dropdown option
-  (0 tasks at either length, since s167), so the Textsorte list is derived from the bank now. The
-  Niveau option labelled "B2" matched the tag `B2.1` exactly, which would have made the first `B2.2`
-  task silently unreachable; it matches by BAND, and "C1.1" is labelled "C1" like everywhere else.
-  The Ziel line printed `words x 1.25` unrounded ("Ziel 150–188 Wörter") and never named the Niveau;
-  it is "B2 · Bericht · Ziel 150–190 Wörter" now. Every scope change pushed a history entry, so the
-  phone's back gesture undid filter taps one at a time. Fokus and Verlauf kept `?level`/`?format`
-  alive after a tab switch.
-- **The sign-in draft hand-off lost the text on the email/password path.** `initialText` is read once
-  on mount, and signing in from the login wall does not remount the trainer when the learner is
-  already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
-  resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
-  which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
-- **Not fixed, founder's call:** 373 of 643 tasks still carry no `level`/`format`/`points`, so the
-  DEFAULT scope draws a bare one-line legacy Aufgabe 58% of the time, and those degrade the AI to
-  language-only feedback (no Aufgabenerfüllung). Either tag the bank in waves or make the default
-  draw prefer structured tasks. `bericht` at C1 (1 task) and `bewerbung` (0) are the thinnest cells.
-- **Gates:** typecheck · lint 0 errors · test:unit **407/407** (new `tests/writingAufgabe.test.tsx`
-  renders the trainer and pins 20 consecutive draws per scope) · lint:content clean · build ·
-  check:bundle 123.2 kB.
+**Start with this: the queued quality audit.** The founder closed s181 by settling two open items and
+adding one task:
+- **The Niveau mix stays as shipped** (B1 307 / B2 302 / C1 108). Founder: "keep the Niveau mix as it
+  is." The old 35/50/15 target is retired; do not rebalance it.
+- **The exam-source items are PARKED**, not pending. Founder: "park the exam source items with
+  official documents task for later, it's not that important." (`SCHREIBEN-OVERHAUL.md` §12 + P0.3.)
+- **NEXT TODO, not started:** a thorough analysis of **writing-task quality and filter fit**, with
+  research from reliable sources. Founder: "I want you to do a thorough analysis of the quality of
+  these tasks and how they go with the filter, do the required research from reliable sources, this
+  is one of the next todos for later." Full scope, including which sources are usable now that the
+  exam documents are parked, is in **`docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)"**. The
+  short version: s181 proved COVERAGE (717 tasks, gated); nobody has verified that a task tagged B1
+  reads as B1, that its Leitpunkte are answerable in the word target, or that the Branche framing
+  convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
+  prioritised fix list, like the s178 content audit.
 
-**Handoff after session 179, part 4 (2026-07-31). Migrations apply themselves now, and two of them
-were missing from production.** Branch `claude/ui-layout-buttons-cards-zkchha`.
-Founder: "can you apply the migration in supabase yourself? I remember we setup something for this
-earlier" → the pipeline existed (s167) but only ever deployed Edge Functions, because
-`SUPABASE_DB_PASSWORD` was deliberately unset. The founder set it; the first `db push` then FAILED,
-and the failure was worth having.
-- **The remote had NO migration history at all.** Every migration to date was pasted into the SQL
-  editor by hand, which never writes to `supabase_migrations`, so `db push` tried to replay 0001
-  against a database that already had everything and died on "policy profiles_select_own already
-  exists". Because migrations run before functions, the function deploy was skipped with it.
-- **Evidence before repair.** Marking a version applied skips its SQL forever, so nothing was
-  repaired on trust: a dispatch-only **schema probe** (Management API query endpoint) listed the live
-  tables, the `progress`/`writing_evaluations` columns, every public function and every RLS policy.
-  It proved 0001-0004, 0006-0009 and 0011-0013 were present.
-- **It also found a real hole: migration 0010 had never been applied.** No `gdpr_events` table, no
-  `log_gdpr_event`, no `admin_gdpr_evidence`, so the GDPR evidence counters the Launch screen reads
-  had no store behind them. Applied now, along with 0005 (idempotent, so a no-op if it was already
-  there) and 0014.
-- **The bridge, once:** `repair_applied` marked the eleven verified versions, then
-  `db push --include-all` applied the three unrecorded ones. `--include-all` is now permanent,
-  because a repaired history legitimately leaves an older file unrecorded below a newer applied one.
-- **Verified after:** `migration list` shows Local = Remote for all 14, `writing_evaluations.insight_en`
-  exists, `gdpr_events` exists.
-- **From now on a merge to `main` applies pending migrations and then deploys the functions.** Three
-  dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
-- **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
-  wherever its number sits.
+**Same session, follow-up (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
+pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall by that decision.
+- **P4, the half that matters: 20 of 30 speaking scenarios never asked the learner to speak.** Every
+  Alltag scenario ended on a multiple-choice turn, which is recognition, not production. All 20 now
+  carry a free-speak node with a model answer and two hints, spliced between the last choice and the
+  closing turn so it sits on EVERY path. Each asks for 20-30 seconds in a situation the dialogue
+  earns: report the Amt visit to your employer, call work sick after the doctor, pass the hotline's
+  answer to your flatmate. `tests/scenarios.test.ts` walks every branch and fails if any terminal
+  path skips it.
+- **P4, the nav half: Anwenden is back in `navItems`**, so Sprechen and Prüfung have a home on the
+  desktop sidebar instead of only the dashboard recommendation and ⌘K. **It is NOT in the mobile
+  bottom bar**, whose five slots are locked: putting it there is a founder decision, and it is the
+  open question from this pass. Remote config can still hide the entry (`hiddenTabs`).
+- **P5: the B1 accuracy canon existed nowhere.** Adjektivdeklination, Perfekt vs. Präteritum, Verben
+  mit Präpositionen and Komparativ/Superlativ shipped with the full German-first lesson and 10
+  drills each. New group `tenses` ("Zeitformen", after Kasus on the priority spine); `attributes` is
+  relabelled "Adjektive & Attribute" and `prepositionalPronouns` "Verben mit Präpositionen", because
+  both groups were named after one member.
+- **P5: the bank tested recognition and called it practice.** 131 of 137 drills were multiple
+  choice. Every B1 topic now has ≥3 productive (typed-answer) drills, 18 of them authored into the
+  six existing B1 topics that had none. Bank: 28 topics/137 drills → **32/195**, productive 4% → 19%.
+- **`provenance.ts` needed a third and fourth part**: the 62 new rows pushed part 2 past TypeScript's
+  union-complexity ceiling and `pnpm build` failed with TS2590. Four parts of ~1,300 rows now, and
+  the `/content` skill says to append to the LAST one and split again when tsc complains.
+- **Still open in both items, deliberately:** only 2 of 30 scenarios are level 3, and the 21 B2/C1
+  grammar topics keep their 5-drill MCQ-only cap. Both are authoring depth, not structure.
+- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **491/491** · build ·
+  check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
+  the built app: the free-speak turn renders and accepts an answer, the Grammatik hub shows 32
+  topics with the new group labels, and a typed drill grades correctly.
+- **Shipped:** PR **#774**, squash-merged as `45ba695`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Branch reset onto `main` afterwards, working tree clean.
+- **The one founder decision this pass left open:** should Anwenden (Sprechen + Prüfung) also sit in
+  the MOBILE bottom bar? Its five slots are locked, so a sixth entry means moving something or
+  growing the bar. Until that is answered, mobile reaches Sprechen only through the dashboard
+  recommendation and ⌘K.
+
+**Handoff after session 182 (2026-08-01). Audit P6 is closed: the daily-life half has a phrase
+bank.** Branch `claude/next-steps-p3-analysis-7gx36m`.
+Founder: "i remember we did an analysis recently.. and did complete until p3 tasks. what are the
+next steps", then "continue with p6".
+- **Where the audit backlog actually stood** (`docs/reports/CONTENT_AUDIT_2026-07-30.md` §5, now
+  carrying a status block): P0/P1/P2 shipped in s178, P8 closed by the s181 Schreiben work, P3 only
+  *started* (the six C1 texts at 305-344 words). P6 was the cheapest real win left, so it was
+  recommended first and picked.
+- **The gap, measured before touching anything:** all 158 phrases were workplace discussion
+  functions or workplace channels (email, phone, presentation, interview, small talk), and
+  **`themeId` sat on 0 of 158**. So a learner at the Bürgeramt, the Arztpraxis, the Vermieter or the
+  Servicetheke had nothing, and the session composer's mode filter (`if (!r.themeId) return true`)
+  was dead code.
+- **62 new phrases in five Alltag packs**, each with `note`, example pair, CEFR and `themeId`:
+  Amt 13, Arzt 13, Wohnen 13, Bank 11, Einkauf/Reklamation 12. They cover the counter language the
+  audit named, Widerspruch included ("Hiermit lege ich Widerspruch gegen den Bescheid vom … ein.",
+  "Ich bitte Sie, den Mangel bis zum … zu beheben.", "Ich setze Ihnen eine Frist bis zum …"), and
+  several carry the s181 work-context reason ("Ich arbeite bis 15 Uhr, wäre auch ein Termin am
+  späten Nachmittag möglich?").
+- **Three new categories, because the existing 15 could not hold them honestly:** `appointments`
+  (Termine), `formalities` (Anliegen & Anträge), `complaints` (Problem & Reklamation). Closed-enum
+  rule followed in all three places (union, linter array, category metadata). Pill count on the
+  Kategorie facet is now 18; say the word if that should become a dropdown.
+- **Tagging is deliberately NOT blanket, and this is the decision to know about.** The audit said
+  "tag the 158". Tagging a discussion function ("Da bin ich anderer Meinung.") with a theme would be
+  a sticker: it belongs to no situation and works in all of them. So **49 situational phrases were
+  tagged** (presentations → meetings, jobInterview + professionalIntro → bildung, the company-voice
+  phone and email lines → customer) and the 109 function/channel phrases stay **untagged =
+  universal**, exactly like an untagged Branche. `tests/redemittel.test.ts` (16 tests) fails if a
+  later pass blanket-tags the bank, empties a pack, or leaves a category with no phrases.
+- **Two places the tag now does work.** (1) The Redemittel tab carries the sibling tabs' **Thema
+  scope dropdown** on the same `?theme=` param, with dedicated-content counts and zero-count Themen
+  still selectable (Branche semantics, not Wörter semantics). Verified in the built app: Thema =
+  Behörde & Ämter yields **122 Wendungen** (13 Amt + 109 universal) and the presentation openers are
+  gone. (2) A scoped session leads Pool 4 with that theme's phrases, and a personal-mode session no
+  longer serves "Vielen Dank für Ihre Aufmerksamkeit."
+- **Gates:** typecheck · lint 0 errors · lint:content clean (220 redemittel, 3,370 provenance rows,
+  1 known `der Empfang` warning) · test:unit **435/435** · build · check:bundle 123.2 kB ·
+  report:exercise-coverage 20/20 green · build:review-queue refreshed. `verify:grammar` could not
+  run in this sandbox (the LanguageTool toolchain needs `mvn` + Maven Central); it is warn-only.
+- **Shipped:** PR **#773**, squash-merged as `5b30acc`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Main had moved under the branch while the work ran (#772 landed), so the
+  PR conflicted in the two logs; both sides were kept (the founder's queued quality-audit directive
+  leads "Resume here", session 181's prompt 5 stays above the session 182 block in the append-only
+  prompt log). Post-merge housekeeping done: branch reset onto `main`, working tree clean.
+- **Next, if you want the audit list continued:** P4 (Sprechen + Prüfung off the nav) needs a
+  founder decision on whether the Anwenden entry returns to the four-zone nav; P5 (Adjektivdeklination,
+  Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure
+  content win; P3's remaining half needs an audio strategy, since TTS voicemails cannot train
+  note-taking.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

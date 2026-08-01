@@ -62,7 +62,8 @@ after pulling.
   `artikel/` + `city/` (see `docs/areas/COMPONENTS.md`), `ui/` primitives, `shared/Logo.tsx`
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
-  Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` (mounted, off the nav) ·
+  Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` (desktop sidebar only,
+  s182: the mobile bar's 5 slots are locked) ·
   `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
   `/auth/confirm` (email-confirmation landing, ungated on purpose) · `/hilfe`,
   `/privacy`,
@@ -74,6 +75,17 @@ after pulling.
 - **Closed-enum rule:** every union added to `src/types/index.ts` is mirrored by an array +
   validate-when-present check in `scripts/lint-content.mjs`.
 - **Every content_id has a provenance row**, added in the same edit.
+- **A filter filters; it never substitutes.** In Schreiben's Aufgabe rail, Niveau, Textsorte and
+  Unterthema are HARD (Branche stays soft, untagged-=-universal, and is applied last so it cannot
+  hide a hard match), ONE function counts what the trainer draws, zero-yield options grey out with
+  their honest count, and an empty scope gets an empty state naming the one filter to drop. The
+  prefer-tagged-else-untagged fallback these replaced made "Forumsbeitrag" serve a Beschwerde 84% of
+  the time (s180). Related founder law: **only a task carrying the full brief is served** (Adressat,
+  du/Sie, 2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung
+  against it. The 373 bare legacy tasks that law retired were all authored up to that shape in s181
+  (waves 3 and 4), in place and keeping their ids: **717 tasks, every one servable**, with ≥2 tasks
+  per Unterthema per length, all 15 Branchen on every Beruf AND Alltag theme at both lengths, and all
+  16 Textsorten live. `tests/writingScope.test.ts` gates each of those, so they are invariants now.
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments
@@ -115,7 +127,10 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
   building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
   dropdowns, facet pills, sticky mobile action bars) and the one categorization hierarchy
-  (Branche → Thema → Unterthema; learner-facing groupings fold Gesundheit into Alltag).
+  (Branche → Thema → Unterthema). **Exactly TWO learner-facing categories, everywhere: Berufsleben
+  and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is Berufsleben, every other
+  domain is Alltag). The five content domains stay the authoring grain, never a heading a learner
+  sees; a third group in any dropdown or legend is a bug (founder, s181).
 - **Previews first for design work:** founder-reviewable `preview/*.html` mockups from the real
   tokens, iterate on the feedback list, then implement.
 - **No redundancy:** each fact appears once, no explanatory filler lines, compact chrome

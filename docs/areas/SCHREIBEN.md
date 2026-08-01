@@ -31,7 +31,17 @@ founder-picked s171).
     and the saved draft record.
   - `sub` applies only inside a concrete theme (slugs are theme-scoped) and is ignored under Alle
     Themen; the Unterthema dropdown hides there.
-  - **Niveau and Textsorte are HARD filters** (2026-07-31), and the filters apply in this order:
+  - **Only tasks with Inhaltspunkte are served** (founder decision, 2026-07-31). A served Aufgabe
+    always carries the whole brief: Adressat, du/Sie, 2 to 5 Leitpunkte, Niveau, Textsorte, word
+    target. A bare one-liner downgrades the AI to language-only feedback (there is nothing to check
+    Aufgabenerfüllung against) and carries neither filter tag. Founder, on a screenshot of
+    `wt_safety_l12`: "this one has too little description of the task."
+    **The 373 that were retired from the draw are all authored now (waves 3 and 4, s181): 717 tasks,
+    every one servable.** They were rewritten in place, same ids and same pool positions, so resumed
+    drafts and Verlauf rows still resolve (`taskAt`/`writingTaskById` index the full pool on purpose).
+    The rail has no zero-yield Unterthema or Branche left; see `docs/areas/CONTENT.md` for the
+    coverage invariants that now gate it.
+  - **Niveau, Textsorte and Unterthema are HARD filters** (2026-07-31), and the filters apply in this order:
     Unterthema → Niveau → Textsorte → Branche. A task that is not tagged with the chosen
     Niveau/Textsorte is not a match, full stop. They used to PREFER their tagged tasks and fall back
     to the untagged ones, which is how "Forumsbeitrag" served a Beschwerde an eine Fluggesellschaft
@@ -49,6 +59,11 @@ founder-picked s171).
     are the same number, so the separate `countExact` is gone. Every dropdown greys its zero-yield
     options and keeps the honest count visible on them; only the generic "Alle …" option is never
     disabled, since it is the way back out.
+  - **An Unterthema with no task reads as empty too.** It used to fall back to the whole Thema,
+    which was the last silent substitution in the selector. Retiring the bare tasks emptied 15 of the
+    46 Unterthemen at each length, so that fallback would have started firing in earnest; wave 3
+    refilled them (≥2 short + ≥2 long each, gated), but the hard rule stays: a new sub-theme without
+    tasks reads as unavailable rather than quietly serving its Thema.
   - **A scope CAN now be empty**, and the trainer says so instead of substituting: `blockingAxis`
     names the single filter causing it and the empty state offers exactly that escape ("Forumsbeitrag
     gibt es nur bei Lang." + "Textsorte zurücksetzen"). Greying prevents walking into an empty scope
@@ -56,7 +71,8 @@ founder-picked s171).
     Textsorte, or a stale deep link. `randomTask` returns **null** for an empty list (it used to hand
     back the first task of the first theme, which is the bug in miniature).
   - The Textsorte list is **derived from the bank**: an option with no task at any length is dead
-    chrome, not a zero-yield scope (`bewerbung` had sat in the list at 0 since s167). It returns by
+    chrome, not a zero-yield scope (`bewerbung` had sat in the list at 0 since s167; it ships under
+    Bildung since s181, so all 16 Textsorten are live). It returns by
     itself when content ships one. `tests/writingScope.test.ts` +
     `tests/writingAufgabe.test.tsx` pin all of it, the latter through the rendered trainer.
 - **Every dropdown carries a generic first option** (founder s167): "Alle Niveaus", "Alle Branchen",
@@ -121,7 +137,8 @@ founder-picked s171).
   (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
   Beschwerde & Antrag) (grouped listbox
   popovers, internal scroll, live counts, zero-yield greyed; Unterthema only when the theme has
-  sub-themes; Thema groups = Domain categorization with gesundheit folded into Alltag). No
+  sub-themes; Thema groups = the two life areas from `lib/lifeAreas.ts`, Berufsleben and Alltag,
+  never a third heading). No
   overflow clipping on the tile (popovers must escape); the mobile panel animates via fade/slide,
   not height collapse, for the same reason.
 - Mobile Kurz/Lang = the Bibliothek pattern: a toolbar button toggles the collapsible panel

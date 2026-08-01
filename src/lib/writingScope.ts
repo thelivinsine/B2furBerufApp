@@ -49,6 +49,24 @@ import type { WritingLength } from "@/lib/writing";
  * that greying cannot prevent (a length switch, a deep link) with an honest
  * empty state plus the one-tap escape `blockingAxis` names, never by drawing
  * something that contradicts the selection.
+ *
+ * **Only STRUCTURED tasks are ever served** (founder decision, 2026-07-31).
+ * A task with Inhaltspunkte carries the whole exam brief: Adressat, du/Sie,
+ * 2 to 5 Leitpunkte, Niveau, Textsorte, word target. A bare one is a single
+ * sentence, and `evaluate-writing` is sent the Aufgabe so it can grade
+ * Aufgabenerfüllung, so a bare task quietly downgrades the feedback to grammar
+ * and vocabulary. They were also invisible to the Niveau and Textsorte filters
+ * (they carry neither tag), so 58% of default draws served the one shape of
+ * task the rest of the product cannot reason about. The founder chose the
+ * smaller, better bank: 270 tasks instead of 643.
+ *
+ * **That backlog is now closed.** Waves 3 and 4 authored all 373 up to the exam
+ * shape, so the bank is 717 tasks and every one of them is servable. The
+ * `isServable` gate stays: it is what keeps a half-built task out of the draw
+ * rather than something to remove once the count reaches zero. Ids and pool
+ * positions survived the rewrite untouched, so a resumed draft or a Verlauf row
+ * still resolves to the Aufgabe it was written against (`taskAt` /
+ * `writingTaskById` index the FULL pool on purpose).
  */
 
 /**
@@ -81,6 +99,17 @@ export function normalizeLevelScope(value: string): string {
   const band = LEVEL_BAND[value as ContentCefr];
   if (band) return band;
   return Object.values(LEVEL_BAND).includes(value) ? value : "";
+}
+
+/**
+ * A task the trainer may serve: one that carries the full exam brief. The
+ * Inhaltspunkte are the marker because they are what makes Aufgabenerfüllung
+ * checkable; on today's bank they coincide exactly with the Niveau/Textsorte
+ * tags (270 tasks carry all of it, 373 carry none of it), and the shape check
+ * in `tests/writingScope.test.ts` keeps them coinciding.
+ */
+export function isServable(task: WritingTask): boolean {
+  return !!task.points?.length;
 }
 
 /** A task identity that survives the "Alle Themen" scope. */
@@ -123,14 +152,15 @@ export function eligibleTasks({
   for (const id of theme ? [theme] : ALL_THEME_IDS) {
     const pool = writingPrompts[id]?.[length] ?? [];
     if (!pool.length) continue;
-    let ix = pool.map((_, i) => i);
-    if (theme && sub) {
-      const tagged = ix.filter((i) => pool[i].sub === sub);
-      // A deep link may name a sub-theme with no tasks at this length. A theme
-      // in scope must never contribute nothing on ITS account, or the caller
-      // draws a task from an entirely different theme.
-      if (tagged.length) ix = tagged;
-    }
+    // Bare tasks are retired from the draw, not from the bank (module docstring).
+    let ix = pool.map((_, i) => i).filter((i) => isServable(pool[i]));
+    if (!ix.length) continue;
+    // HARD, like Niveau and Textsorte: an Unterthema that has no task at this
+    // length reads as unavailable. It used to fall back to the whole theme,
+    // which was the last silent substitution left in here, and retiring the
+    // bare tasks empties 30 of the 96 Unterthema cells, so the fallback would
+    // have started firing in earnest.
+    if (theme && sub) ix = ix.filter((i) => pool[i].sub === sub);
     // HARD: Niveau and Textsorte mean what they say. See the module docstring
     // for the fallback that used to sit here and the bug it caused.
     if (level) ix = ix.filter((i) => levelBand(pool[i].level) === level);
