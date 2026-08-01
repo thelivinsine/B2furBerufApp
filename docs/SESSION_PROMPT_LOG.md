@@ -3006,3 +3006,37 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `tests/redemittel.test.ts` (new, 16 tests) · `docs/areas/CONTENT.md` · `docs/areas/BIBLIOTHEK.md` ·
   `docs/areas/SESSION.md` · `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` ·
   `src/features/admin/reviewQueue.json` · `docs/reports/exercise-coverage-report.md` · this log
+- **Prompt 3 (verbatim, 2026-08-01):** `keep the categories filter as pills and go ahead with p4 and
+  then p5`
+  **Response:** left the Kategorie facet as pills (no change) and closed the two named audit items.
+  **P4.** Measured first: 20 of 30 scenarios (every Alltag one) had NO free-speak node, so the
+  speaking trainer only ever offered multiple choice, which is recognition. Authored a free-speak
+  node with a model answer and two hints into all 20, spliced between the last choice node and the
+  closing turn so it lies on every path, each one a situation the dialogue earns (report the Amt
+  visit to your employer, call in sick after the doctor, relay the hotline's answer). Restored
+  `/anwenden` to `navItems`, which puts Sprechen and Prüfung back on the desktop sidebar; did NOT
+  touch the mobile bottom bar, whose five slots CLAUDE.md locks, and flagged that placement as the
+  open founder decision. `tests/scenarios.test.ts` (32 tests) walks every branch of every scenario.
+  **P5.** The B1 accuracy canon was absent: Adjektivdeklination, Perfekt vs. Präteritum, Verben mit
+  Präpositionen, Komparativ/Superlativ shipped with full German-first lessons and 10 drills each,
+  under a new `tenses` group ("Zeitformen") plus two group relabels that had been named after one
+  member each. Then the monoculture: 131 of 137 drills were MCQ, so 18 productive (typed-answer)
+  drills went into the six B1 topics that had none. Bank 28 topics/137 drills → **32/195**,
+  productive 4% → 19%. `tests/grammar.test.ts` (24 tests) pins the canon, the ≥3-productive rule per
+  B1 topic, the group registry and drill-id uniqueness.
+  **One infrastructure fix on the way:** the 62 new provenance rows pushed `provenancePart2` past
+  TypeScript's TS2590 union ceiling and `pnpm build` failed; provenance is four concatenated parts
+  now (~1,300 rows each) and the `/content` skill records the rule.
+  Reported honestly as NOT done: only 2 of 30 scenarios are level 3, and the 21 B2/C1 grammar topics
+  keep their 5-drill MCQ-only cap.
+  Gates: typecheck · lint 0 errors · lint:content clean · test:unit **491/491** · build ·
+  check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
+  the built app with headless Chromium: the free-speak turn renders and grades, the Grammatik hub
+  shows 32 topics under the new group labels, a typed drill is accepted.
+- **Artifacts (prompt 3):** `src/data/dialogues.ts` (20 free-speak nodes) · `src/data/grammar.ts`
+  (4 topics, 58 drills) · `src/data/provenance.ts` (62 rows + the part-3/part-4 split) ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `src/features/grammar/grammarMeta.ts` ·
+  `src/components/layout/nav-items.ts` · `tests/scenarios.test.ts` (new) · `tests/grammar.test.ts`
+  (new) · `.claude/skills/content/SKILL.md` · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
+  `docs/areas/BIBLIOTHEK.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` · this log

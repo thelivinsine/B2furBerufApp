@@ -90,13 +90,20 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
-- **Grammar** (`src/data/grammar.ts`, 28 topics / 137 drills, 17 groups): `GrammarTopic` with `id` (`g_`),
+- **Grammar** (`src/data/grammar.ts`, 32 topics / 195 drills, 18 groups): `GrammarTopic` with `id` (`g_`),
   `group`, `cefr` (REQUIRED, completeness-checked), `title`, `titleDe`, `purpose`, `purposeDe`,
   `explanation`, `explanationDe` (the German-FIRST lesson text; EN shows only via the hold-to-peek
   chip), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (parallel, same order/length), `drills[]`.
   Topics ordered by B2-marker priority (`grammarMeta.ts` `groupOrder`). Drills: `id`, `prompt`,
-  `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
-  the EN peek; sessions keep it visible).
+  `answer`, `options?` (MCQ) or none (PRODUCTIVE: the learner types the answer, graded by
+  `normalize()` so case and punctuation are forgiven), `explain`, `gloss` (lesson hides gloss behind
+  the EN peek; sessions keep it visible). **Every B1 topic carries ≥3 productive drills** (audit P5,
+  s182: the bank was 131 MCQ against 6 productive, so it tested recognition and called it practice);
+  `tests/grammar.test.ts` gates that, plus the group registry and drill-id uniqueness. A productive
+  answer must be unambiguous, since it is compared as one string. The B1 accuracy canon that was
+  missing entirely (Adjektivdeklination, Perfekt/Präteritum, Verben mit Präpositionen,
+  Komparativ/Superlativ) shipped in s182 with 10 drills each. Still open from P5: the 21 B2/C1 topics
+  keep their 5-drill cap and are still MCQ-only.
 - **Redemittel** (`src/data/redemittel.ts`, 220; `r_` prefix): `id`, `de`, `en`, `category`
   (closed enum, 18), `register` (neutral/formal), `example` (de + en), optional `note`, `cefr`,
   `themeId`. **`themeId` is untagged-=-universal** (audit P6, s182), like Branche and unlike
@@ -151,6 +158,14 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   Word targets by band, keep them consistent: B1 40/80, B2 100/150, C1 120/200 (short/long).
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
+- **Sprech-Szenarien** (`dialogues.ts`, 30): `id` (`sc_`), `themeId`, `title`, `task`, `context`,
+  `level` 1-3, `minutes`, `targetRedemittel[]`, `start`, `nodes` (keyed by node id, unique WITHIN
+  the scenario only). A node is a choice node (`options[]`, each with `next`, `quality`, `feedback`,
+  optional `uses`) or a **free-speak node** (`prompt` + `model` + `next`, no options). **Every
+  scenario must carry at least one free-speak node with a model answer, on every path** (audit P4,
+  s182: 20 of 30 ended on a multiple-choice turn, so the speaking trainer never asked for produced
+  speech). `tests/scenarios.test.ts` gates it, together with node-reference integrity and
+  reachability. Level 3 is still thin (2 of 30) and is the open half of P4.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
   (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
   `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a

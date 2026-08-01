@@ -356,7 +356,11 @@ export type GrammarGroup =
   // C1 slice (s178 audit P1): Modalpartikeln fit none of the groups above.
   // They are not connectors (they link nothing) and not modal verbs; they are
   // the tone layer of spoken German, which is exactly why they read as C1.
-  | "particles";
+  | "particles"
+  // B1 accuracy canon (audit P5, s182): the Perfekt/Präteritum choice is a
+  // TENSE question, so it belongs to neither `future` (which is about
+  // Vermutung) nor `verbPosition`.
+  | "tenses";
 
 export interface GrammarExample {
   de: string;

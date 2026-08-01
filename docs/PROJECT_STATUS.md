@@ -1,12 +1,14 @@
 # Project Status
 
-_Last updated: 2026-08-01 (session 182). **The daily-life half has a phrase bank.** Audit item P6
-is closed: Redemittel went 158 → **220** with five Alltag packs (Amt, Arzt, Wohnen, Bank,
-Einkauf/Reklamation), three new speech-act categories (`appointments`, `formalities`, `complaints`),
-and `themeId` tagging on the 49 situational workplace phrases, where **untagged = universal**. The
-tag was dead weight before: it sat on 0 of 158, so the session composer's mode filter never fired
-and every scope showed the same phrases. The Redemittel tab now carries the sibling tabs' Thema
-scope dropdown, and a scoped session leads with that situation's phrases.
+_Last updated: 2026-08-01 (session 182). **Three audit items closed in one session: P6, P4 and P5.**
+P6: Redemittel 158 → **220** with five Alltag packs and selective `themeId` tagging (untagged =
+universal), plus a Thema scope on the Redemittel tab.
+P4: **all 30 speaking scenarios now end in a free-speak turn with a model answer** (was 10 of 30),
+and Anwenden is back on the desktop sidebar.
+P5: the missing B1 accuracy canon shipped (Adjektivdeklination, Perfekt/Präteritum, Verben mit
+Präpositionen, Komparativ/Superlativ, 10 drills each) and **every B1 topic now has ≥3 productive
+drills**, so the bank stopped testing recognition and calling it practice (grammar 28 topics/137
+drills → **32/195**, productive 4% → 19%).
 Prior s181: **The Schreiben Aufgabe backlog is closed.** Waves 3 and 4
 of `docs/plans/SCHREIBEN-OVERHAUL.md` shipped together with the authoring to-do list s180 exposed:
 all 373 bare one-liners were authored up to the full exam brief in place, 74 tasks were added and 60
@@ -72,14 +74,14 @@ in `../CLAUDE.md`).
 `pnpm lint:content` before quoting):** vocab **1,743** (**1,733 browsable**; 8 mis-filed noun+verb combos
 retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** ·
 Redemittel **220** (s182: +62 Alltag phrases in 5 packs; 111 carry a `themeId`, 109 are universal;
-18 categories) · grammar **28 topics / 137 drills** (17 groups) · Lese-/Hörtexte **42** (126 checks) ·
+18 categories) · grammar **32 topics / 195 drills** (18 groups; 37 productive, s182) · Lese-/Hörtexte **42** (126 checks) ·
 writing tasks **717**, every one servable (s181) in 20 pools ·
-Can-Do **57** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
-provenance **3,370 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
+Can-Do **57** · dialogues **30** (178 nodes, 335 options; every scenario ends in a free-speak turn since s182) · exam sets **15** · missions **6** ·
+provenance **3,432 rows** (four concatenated parts since s182, TS2590) · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
 einkaufen/essen/mobilitaet/freizeit/digitales). Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
-Standing governance debt: **3,357 of 3,370 provenance rows are AI-drafted `draft`**; only **13** are
+Standing governance debt: **3,419 of 3,432 provenance rows are AI-drafted `draft`**; only **13** are
 human-verified (13 vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset to restart the
 review pass; see `strategy/DATA_GOVERNANCE.md`). The full picture of what the banks do and do not
 cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178).
@@ -136,6 +138,37 @@ adding one task:
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
 
+**Same session, follow-up (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
+pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall by that decision.
+- **P4, the half that matters: 20 of 30 speaking scenarios never asked the learner to speak.** Every
+  Alltag scenario ended on a multiple-choice turn, which is recognition, not production. All 20 now
+  carry a free-speak node with a model answer and two hints, spliced between the last choice and the
+  closing turn so it sits on EVERY path. Each asks for 20-30 seconds in a situation the dialogue
+  earns: report the Amt visit to your employer, call work sick after the doctor, pass the hotline's
+  answer to your flatmate. `tests/scenarios.test.ts` walks every branch and fails if any terminal
+  path skips it.
+- **P4, the nav half: Anwenden is back in `navItems`**, so Sprechen and Prüfung have a home on the
+  desktop sidebar instead of only the dashboard recommendation and ⌘K. **It is NOT in the mobile
+  bottom bar**, whose five slots are locked: putting it there is a founder decision, and it is the
+  open question from this pass. Remote config can still hide the entry (`hiddenTabs`).
+- **P5: the B1 accuracy canon existed nowhere.** Adjektivdeklination, Perfekt vs. Präteritum, Verben
+  mit Präpositionen and Komparativ/Superlativ shipped with the full German-first lesson and 10
+  drills each. New group `tenses` ("Zeitformen", after Kasus on the priority spine); `attributes` is
+  relabelled "Adjektive & Attribute" and `prepositionalPronouns` "Verben mit Präpositionen", because
+  both groups were named after one member.
+- **P5: the bank tested recognition and called it practice.** 131 of 137 drills were multiple
+  choice. Every B1 topic now has ≥3 productive (typed-answer) drills, 18 of them authored into the
+  six existing B1 topics that had none. Bank: 28 topics/137 drills → **32/195**, productive 4% → 19%.
+- **`provenance.ts` needed a third and fourth part**: the 62 new rows pushed part 2 past TypeScript's
+  union-complexity ceiling and `pnpm build` failed with TS2590. Four parts of ~1,300 rows now, and
+  the `/content` skill says to append to the LAST one and split again when tsc complains.
+- **Still open in both items, deliberately:** only 2 of 30 scenarios are level 3, and the 21 B2/C1
+  grammar topics keep their 5-drill MCQ-only cap. Both are authoring depth, not structure.
+- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **491/491** · build ·
+  check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
+  the built app: the free-speak turn renders and accepts an answer, the Grammatik hub shows 32
+  topics with the new group labels, and a typed drill grades correctly.
+
 **Handoff after session 182 (2026-08-01). Audit P6 is closed: the daily-life half has a phrase
 bank.** Branch `claude/next-steps-p3-analysis-7gx36m`.
 Founder: "i remember we did an analysis recently.. and did complete until p3 tasks. what are the
@@ -181,66 +214,6 @@ next steps", then "continue with p6".
   Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure
   content win; P3's remaining half needs an audio strategy, since TTS voicemails cannot train
   note-taking.
-
-**Handoff after session 181 (2026-07-31). The Aufgabe backlog is closed: 717 tasks, every one of
-them servable.** Branch `claude/latest-plan-steps-ydumbt`.
-Founder: "what's steps are to do in the latest plan?" then "complete the full implementation of both
-these plans". The two plans were `docs/plans/SCHREIBEN-OVERHAUL.md` (waves 3 and 4 outstanding since
-s167) and the authoring backlog s180 made visible when it retired every bare Aufgabe from the draw.
-- **What the bank looked like going in:** 643 tasks, **270 servable, 373 bare**. 30 of 92 Unterthema
-  x Länge cells empty, 13 Niveau x Textsorte cells empty, `bewerbung` at zero everywhere, and
-  `project`, `sustainability` and `travel` with no Branche variants at all.
-- **Three founder decisions were needed first,** because the plans left them open: the Niveau mix,
-  where Bewerbung lives (**under Bildung**, both sub-themes), and whether Alltag tasks get Branche
-  tags (**tag every Alltag task**, against this plan's own recommendation). The third was made honest
-  rather than cosmetic: every Alltag task names the work context that makes the everyday situation
-  hard (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage), so a Branche on a
-  Kontokündigung is a reason, not a sticker.
-- **Shipped in one pass: 373 upgrades in place + 74 new tasks + 60 tagged. Bank 643 → 717, zero bare.**
-  Every id and every pool position survived, so resumed drafts and Verlauf rows still resolve; only
-  text and tags changed.
-- **Coverage is now gated, not aspirational** (`tests/writingScope.test.ts`, 413 tests):
-  **≥2 tasks per Unterthema per length**; **all 15 Branchen x both Längen on all 10 Beruf Themen**
-  (wave 2 did five, wave 4 the rest) **and on all 10 Alltag Themen**; **all 16 Textsorten live**,
-  `bewerbung` included. Seven completely empty B1 Textsorte cells closed (Bericht, Beschwerde,
-  Forumsbeitrag, Kündigung, Protokoll, Stellungnahme, Widerspruch), which is what a B1 learner
-  picking a Textsorte actually feels.
-- **Niveau: B1 307 / B2 302 / C1 108, and the founder has since SETTLED this as final.** The excess
-  over the old 35/50/15 target is entirely Kurz tasks, and a 40-word task with three Leitpunkte is B1
-  work. Promotion was limited to Lang tasks in demanding genres with 4+ Leitpunkte, so no task wears
-  a Niveau it cannot carry. Do not rebalance it in a later session.
-- **One deliberate zero left: C1 + E-Mail (privat).** A private informal mail has no C1 exam
-  analogue, so the rail greys it with an honest count instead of serving a formal letter under an
-  informal label. It is now the fixture that pins `blockingAxis` in the tests.
-- **NOT done, and it cannot be done from a session:** the plan's §12 verification items (exam point
-  values, weightings, timings, verbatim prompt wording) and P0 item 3 (obtain the Goethe/telc/BAMF
-  source documents). Both need primary documents this repo does not hold, and telc material may not
-  be copied at all under `strategy/DATA_GOVERNANCE.md`. **Nothing shipped depends on them:** no exam
-  score or timing is printed anywhere, `words` follows Genauly's own per-band convention, and `exam`
-  is a shape label on our own tasks. **Founder action if you want it closed:** buy the Goethe
-  Modellsätze (B1/B2/C1) and drop the PDFs into the repo; a session can then read them locally.
-- **Gates:** typecheck · lint:content clean · test:unit **413/413** · build · check:bundle 123.2 kB.
-
-**Same session, follow-up: the app now has exactly TWO learner-facing categories.** Founder, on the
-Schreiben Thema dropdown: "there seems to be some topics in the themen dropdown which are non-beruf
-but are not part of alltag ... There has to be only two overarching categories similar to the nodal
-graphs in bibliothek. This has to be consistent across the app."
-- **Three surfaces, three different answers.** The Schreiben rail folded `gesundheit` into Alltag but
-  not `bildung`, so "Bildung & Sprache" was a third heading; the Bibliothek Thema dropdown grouped by
-  all five content domains; only the graphs were binary, and they called the second area
-  "Privatleben".
-- **`src/lib/lifeAreas.ts` is the one fold now.** Two areas, `beruf` = Berufsleben and every other
-  domain = Alltag, with `themeGroupsByArea` as the single grouped-options builder that the Schreiben
-  rail, the Bibliothek dropdowns (Wörter + Kollokationen) and both graph legends all call.
-- **Naming: Berufsleben / Alltag** (founder pick). "Privatleben" is retired from the graph legend so
-  the whole app says the same two words.
-- **The Mode lens still narrows inside the two groups**, never adds a heading, and a deep-linked
-  theme is still never orphaned (s104). `tests/lifeAreas.test.ts` fails if a third group ever
-  appears, in any mode, or if a new domain does not fold into Alltag.
-- **Verified in the built app, not only in tests** (headless Chromium): Schreiben shows BERUFSLEBEN /
-  ALLTAG, the Bibliothek dropdown the same two, the Wörter graph legend reads "Berufsleben · Alltag".
-- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
-  check:bundle 123.2 kB.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

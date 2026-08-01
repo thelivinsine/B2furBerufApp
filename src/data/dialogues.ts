@@ -1520,10 +1520,21 @@ const anmeldung: Scenario = {
       gloss: "Wonderful, the form is complete. The registration is free and you receive the registration certificate immediately. Do you have any questions?",
       hints: ["Bedanke dich.", "Du kannst eine sinnvolle Nachfrage stellen (z. B. zur Steuer-ID)."],
       options: [
-        { id: "a4a", text: "Vielen Dank. Brauche ich die Meldebescheinigung auch für die Steuer-ID?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende, relevante Nachfrage.", next: "a_end" },
-        { id: "a4b", text: "Nein, danke. Das war sehr hilfreich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "a_end" },
-        { id: "a4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "a_end" },
+        { id: "a4a", text: "Vielen Dank. Brauche ich die Meldebescheinigung auch für die Steuer-ID?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende, relevante Nachfrage.", next: "a_free" },
+        { id: "a4b", text: "Nein, danke. Das war sehr hilfreich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "a_free" },
+        { id: "a4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "a_free" },
       ],
+    },
+    a_free: {
+      id: "a_free",
+      speaker: "examiner",
+      line: "Ihr Arbeitgeber fragt am nächsten Tag nach der Meldebescheinigung. Was sagen Sie?",
+      gloss: "Your employer asks about the registration certificate the next day. What do you say?",
+      prompt: "Erzähle 20–30 Sekunden am Stück, was du beim Bürgeramt erledigt hast und was dein Arbeitgeber jetzt bekommt.",
+      model:
+        "Ich war heute früh beim Bürgeramt und habe mich angemeldet. Ich hatte einen Termin, meinen Pass und die Wohnungsgeberbestätigung dabei. Das Formular habe ich vor Ort ausgefüllt, das ging schnell. Die Meldebescheinigung habe ich direkt mitbekommen, sie war kostenlos. Ich bringe Ihnen morgen eine Kopie für die Personalakte mit.",
+      hints: ["Sag zuerst, was erledigt ist, dann was noch kommt.", "Nenne die Unterlagen beim Namen."],
+      next: "a_end",
     },
     a_end: {
       id: "a_end",
@@ -1589,10 +1600,21 @@ const auslaenderbehoerde: Scenario = {
       gloss: "Good. I will issue you a temporary certificate. As soon as the proof arrives, I will process the extension. The fee is 100 euros.",
       hints: ["Bedanke dich und bestätige.", "Du kannst nach der Zahlungsart fragen."],
       options: [
-        { id: "m4a", text: "Vielen Dank für Ihre Hilfe. Wie kann ich die Gebühr bezahlen?", uses: "clarification", quality: 1, feedback: "Top: höflich bedankt und den nächsten Schritt geklärt.", next: "m_end" },
-        { id: "m4b", text: "In Ordnung, einverstanden. Ich überweise die Gebühr noch heute.", uses: "agree", quality: 1, feedback: "Sehr gut: klar zugestimmt und proaktiv.", next: "m_end" },
-        { id: "m4c", text: "Okay, gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank würde den Abschluss runden.", next: "m_end" },
+        { id: "m4a", text: "Vielen Dank für Ihre Hilfe. Wie kann ich die Gebühr bezahlen?", uses: "clarification", quality: 1, feedback: "Top: höflich bedankt und den nächsten Schritt geklärt.", next: "m_free" },
+        { id: "m4b", text: "In Ordnung, einverstanden. Ich überweise die Gebühr noch heute.", uses: "agree", quality: 1, feedback: "Sehr gut: klar zugestimmt und proaktiv.", next: "m_free" },
+        { id: "m4c", text: "Okay, gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank würde den Abschluss runden.", next: "m_free" },
       ],
+    },
+    m_free: {
+      id: "m_free",
+      speaker: "examiner",
+      line: "Ihre Vorgesetzte fragt, ob mit Ihrem Aufenthaltstitel alles in Ordnung ist. Was antworten Sie?",
+      gloss: "Your manager asks whether everything is fine with your residence permit. What do you answer?",
+      prompt: "Erkläre 20–30 Sekunden, wie der Stand ist und was die Fiktionsbescheinigung für deine Arbeit bedeutet.",
+      model:
+        "Mein Aufenthaltstitel läuft Ende des Monats ab. Ich war bei der Ausländerbehörde und habe den Antrag gestellt, aber ein Nachweis fehlt noch. Deshalb habe ich eine Fiktionsbescheinigung bekommen. Damit darf ich weiterarbeiten, bis über die Verlängerung entschieden ist. Den fehlenden Nachweis reiche ich nächste Woche nach und sage Ihnen sofort Bescheid.",
+      hints: ["Beruhige zuerst: du darfst weiterarbeiten.", "Nenne den nächsten Schritt mit einem Zeitpunkt."],
+      next: "m_end",
     },
     m_end: {
       id: "m_end",
@@ -1658,10 +1680,21 @@ const arztbesuch: Scenario = {
       gloss: "Three times a day after meals, for seven days. I'll give you a sick note for three days. Please redeem the prescription at the pharmacy. Do you have any other questions?",
       hints: ["Bedanke dich.", "Du kannst fragen, was du bei einer Verschlechterung tun sollst."],
       options: [
-        { id: "d4a", text: "Vielen Dank. Was soll ich tun, wenn es nach drei Tagen nicht besser wird?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende und wichtige Nachfrage.", next: "d_end" },
-        { id: "d4b", text: "Nein, danke. Das war sehr verständlich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "d_end" },
-        { id: "d4c", text: "Alles klar.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_end" },
+        { id: "d4a", text: "Vielen Dank. Was soll ich tun, wenn es nach drei Tagen nicht besser wird?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende und wichtige Nachfrage.", next: "d_free" },
+        { id: "d4b", text: "Nein, danke. Das war sehr verständlich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "d_free" },
+        { id: "d4c", text: "Alles klar.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_free" },
       ],
+    },
+    d_free: {
+      id: "d_free",
+      speaker: "examiner",
+      line: "Sie rufen in der Arbeit an und melden sich krank. Was sagen Sie Ihrer Teamleitung?",
+      gloss: "You call work to report sick. What do you tell your team lead?",
+      prompt: "Sprich 20–30 Sekunden: Grund, Dauer, Krankmeldung und was mit deinen Aufgaben passiert.",
+      model:
+        "Guten Morgen, Frau Kaiser, hier ist Sina Weber. Ich war heute beim Hausarzt. Ich habe eine Racheninfektion und bin bis Donnerstag krankgeschrieben. Die Krankmeldung schicke ich Ihnen heute noch. Die Übergabe für den Kunden Berger liegt bei Herrn Prem, er ist informiert. Sobald ich wieder fit bin, melde ich mich bei Ihnen.",
+      hints: ["Sag die Dauer konkret, nicht nur \"ein paar Tage\".", "Sag auch, wer deine Aufgaben übernimmt."],
+      next: "d_end",
     },
     d_end: {
       id: "d_end",
@@ -1727,10 +1760,21 @@ const wohnungsbesichtigung: Scenario = {
       gloss: "Gladly. I need proof of income, a copy of your ID and a tenant self-disclosure form. Do you have any more questions?",
       hints: ["Bedanke dich.", "Du kannst nach dem weiteren Ablauf fragen."],
       options: [
-        { id: "w4a", text: "Vielen Dank. Bis wann sollte ich die Unterlagen einreichen?", uses: "clarification", quality: 1, feedback: "Top: nach der Frist gefragt, so bleibst du im Rennen.", next: "w_end" },
-        { id: "w4b", text: "Danke für die Besichtigung. Ich schicke Ihnen die Unterlagen bis morgen.", uses: "agree", quality: 0.9, feedback: "Sehr verbindlich und freundlich abgeschlossen.", next: "w_end" },
-        { id: "w4c", text: "Okay, danke.", uses: "reactions", quality: 0.5, feedback: "Freundlich, aber eine konkrete Nachfrage wäre stärker.", next: "w_end" },
+        { id: "w4a", text: "Vielen Dank. Bis wann sollte ich die Unterlagen einreichen?", uses: "clarification", quality: 1, feedback: "Top: nach der Frist gefragt, so bleibst du im Rennen.", next: "w_free" },
+        { id: "w4b", text: "Danke für die Besichtigung. Ich schicke Ihnen die Unterlagen bis morgen.", uses: "agree", quality: 0.9, feedback: "Sehr verbindlich und freundlich abgeschlossen.", next: "w_free" },
+        { id: "w4c", text: "Okay, danke.", uses: "reactions", quality: 0.5, feedback: "Freundlich, aber eine konkrete Nachfrage wäre stärker.", next: "w_free" },
       ],
+    },
+    w_free: {
+      id: "w_free",
+      speaker: "examiner",
+      line: "Eine Freundin ruft an und fragt, wie die Besichtigung war. Was erzählen Sie?",
+      gloss: "A friend calls and asks how the viewing went. What do you tell her?",
+      prompt: "Beschreibe 20–30 Sekunden die Wohnung, die Kosten und ob du sie nehmen willst.",
+      model:
+        "Ich war gerade in der Wohnung. Sie hat zwei Zimmer, ist hell und die Küche ist schon eingebaut. Die Kaltmiete liegt bei 720 Euro, dazu kommen 180 Euro Nebenkosten. Die Kaution sind zwei Kaltmieten, das ist viel auf einmal. Frei wäre sie ab dem Ersten. Mir gefällt sie wirklich gut, deshalb schicke ich heute Abend meine Unterlagen.",
+      hints: ["Nenne Zahlen: Miete, Nebenkosten, Kaution.", "Sag am Ende klar, wie du dich entscheidest."],
+      next: "w_end",
     },
     w_end: {
       id: "w_end",
@@ -1796,10 +1840,21 @@ const kontoeroeffnung: Scenario = {
       gloss: "Yes, a debit card is included. It and the PIN will arrive separately by post in the next few days. Do you have any more questions?",
       hints: ["Bedanke dich.", "Du kannst nach dem Dispo oder den Gebühren fragen."],
       options: [
-        { id: "k4a", text: "Vielen Dank. Gibt es zum Konto einen Dispokredit und welche Zinsen fallen dafür an?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende Frage zu Kosten und Dispo.", next: "k_end" },
-        { id: "k4b", text: "Nein, danke. Das war sehr verständlich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "k_end" },
-        { id: "k4c", text: "Alles klar.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "k_end" },
+        { id: "k4a", text: "Vielen Dank. Gibt es zum Konto einen Dispokredit und welche Zinsen fallen dafür an?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende Frage zu Kosten und Dispo.", next: "k_free" },
+        { id: "k4b", text: "Nein, danke. Das war sehr verständlich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "k_free" },
+        { id: "k4c", text: "Alles klar.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "k_free" },
       ],
+    },
+    k_free: {
+      id: "k_free",
+      speaker: "examiner",
+      line: "Ihre Personalabteilung fragt nach Ihrer Kontoverbindung für die Gehaltszahlung. Was sagen Sie?",
+      gloss: "HR asks for your bank details for your salary payment. What do you say?",
+      prompt: "Erkläre 20–30 Sekunden, dass das Konto eröffnet ist, was noch fehlt und ab wann alles läuft.",
+      model:
+        "Ich habe heute ein Girokonto eröffnet. Ich hatte meinen Ausweis und die Meldebescheinigung dabei, das hat gereicht. Die IBAN habe ich schon bekommen, ich schicke sie Ihnen gleich per E-Mail. Die Karte und die PIN kommen in den nächsten Tagen getrennt per Post. Das Konto ist kostenlos, sobald das Gehalt darauf eingeht.",
+      hints: ["Sag zuerst das Ergebnis, dann die Details.", "Nenne, was du wann schickst."],
+      next: "k_end",
     },
     k_end: {
       id: "k_end",
@@ -1865,10 +1920,21 @@ const sprachkursberatung: Scenario = {
       gloss: "With an education voucher the fee is waived. The course starts in two weeks. Shall I enrol you? Do you have any more questions?",
       hints: ["Bedanke dich.", "Du kannst nach dem Zertifikat am Ende fragen."],
       options: [
-        { id: "b4a", text: "Ja, bitte melden Sie mich an. Bekomme ich am Ende ein Zertifikat?", uses: "clarification", quality: 1, feedback: "Top: klar zugesagt und an den Abschluss gedacht.", next: "b_end" },
-        { id: "b4b", text: "Vielen Dank. Ich bringe den Bildungsgutschein zum ersten Termin mit.", uses: "agree", quality: 0.9, feedback: "Sehr gut: konkret und verbindlich abgeschlossen.", next: "b_end" },
-        { id: "b4c", text: "Mal sehen.", uses: "reactions", quality: 0.4, feedback: "Wenn du interessiert bist, tritt ruhig etwas entschlossener auf.", next: "b_end" },
+        { id: "b4a", text: "Ja, bitte melden Sie mich an. Bekomme ich am Ende ein Zertifikat?", uses: "clarification", quality: 1, feedback: "Top: klar zugesagt und an den Abschluss gedacht.", next: "b_free" },
+        { id: "b4b", text: "Vielen Dank. Ich bringe den Bildungsgutschein zum ersten Termin mit.", uses: "agree", quality: 0.9, feedback: "Sehr gut: konkret und verbindlich abgeschlossen.", next: "b_free" },
+        { id: "b4c", text: "Mal sehen.", uses: "reactions", quality: 0.4, feedback: "Wenn du interessiert bist, tritt ruhig etwas entschlossener auf.", next: "b_free" },
       ],
+    },
+    b_free: {
+      id: "b_free",
+      speaker: "examiner",
+      line: "Ihr Kollege überlegt auch, einen Kurs zu machen, und fragt Sie nach der Beratung. Was erzählen Sie?",
+      gloss: "A colleague is also considering a course and asks about the advice you got. What do you tell him?",
+      prompt: "Fasse 20–30 Sekunden zusammen: Niveau, Kurszeiten, Kosten und wann es losgeht.",
+      model:
+        "Ich war heute in der Beratung an der Volkshochschule. Für mein Niveau haben sie mir einen B2-Abendkurs empfohlen, zweimal pro Woche von 18 bis 20 Uhr. Die Gebühr beträgt 240 Euro, mit einem Bildungsgutschein entfällt sie sogar. Vorher mache ich noch einen Einstufungstest. Der Kurs beginnt in zwei Wochen, angemeldet bin ich schon.",
+      hints: ["Ordne die Infos: erst Niveau, dann Zeiten, dann Kosten.", "Sag, was du selbst entschieden hast."],
+      next: "b_end",
     },
     b_end: {
       id: "b_end",
@@ -1934,10 +2000,21 @@ const apotheke: Scenario = {
       gloss: "In rare cases you may feel nauseous. The co-payment is five euros. Would you like to take the medication like this?",
       hints: ["Bedanke dich und schließe das Gespräch ab."],
       options: [
-        { id: "d4a", text: "Ja, gern. Vielen Dank für die ausführliche Beratung.", uses: "agree", quality: 1, feedback: "Freundlich und höflich abgeschlossen.", next: "d_end" },
-        { id: "d4b", text: "Ja, bitte. Wo kann ich bezahlen?", uses: "clarification", quality: 0.9, feedback: "Gut, du klärst den nächsten Schritt.", next: "d_end" },
-        { id: "d4c", text: "Ja.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_end" },
+        { id: "d4a", text: "Ja, gern. Vielen Dank für die ausführliche Beratung.", uses: "agree", quality: 1, feedback: "Freundlich und höflich abgeschlossen.", next: "d_free" },
+        { id: "d4b", text: "Ja, bitte. Wo kann ich bezahlen?", uses: "clarification", quality: 0.9, feedback: "Gut, du klärst den nächsten Schritt.", next: "d_free" },
+        { id: "d4c", text: "Ja.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_free" },
       ],
+    },
+    d_free: {
+      id: "d_free",
+      speaker: "examiner",
+      line: "Zu Hause fragt Ihre Mitbewohnerin, was der Apotheker gesagt hat. Was antworten Sie?",
+      gloss: "At home your flatmate asks what the pharmacist said. What do you answer?",
+      prompt: "Gib 20–30 Sekunden die Einnahme, die Nebenwirkungen und die Kosten wieder.",
+      model:
+        "Ich habe das Medikament bekommen. Ich soll es dreimal täglich nach dem Essen mit etwas Wasser einnehmen, sieben Tage lang. Alkohol soll ich in der Zeit weglassen. Selten kann einem davon übel werden, aber das geht meistens schnell vorbei. Die Zuzahlung waren fünf Euro. Wenn es bis Freitag nicht besser wird, gehe ich noch einmal zum Arzt.",
+      hints: ["Wie oft, wie lange, womit: in dieser Reihenfolge.", "Nenne die Nebenwirkung, ohne Panik zu machen."],
+      next: "d_end",
     },
     d_end: {
       id: "d_end",
@@ -2003,10 +2080,21 @@ const wohnungsmangel: Scenario = {
       gloss: "Good, then the technician will come at 3 p.m. tomorrow. If it gets very cold, I'll provide you a fan heater. Is that okay?",
       hints: ["Bedanke dich und bestätige den Termin."],
       options: [
-        { id: "d4a", text: "Das ist sehr freundlich, vielen Dank. Dann sehen wir uns morgen um 15 Uhr.", uses: "agree", quality: 1, feedback: "Freundlich und klar bestätigt.", next: "d_end" },
-        { id: "d4b", text: "Danke. Soll ich Ihnen den Mangel noch schriftlich per E-Mail bestätigen?", uses: "suggestions", quality: 0.95, feedback: "Stark: an die schriftliche Dokumentation gedacht.", next: "d_end" },
-        { id: "d4c", text: "Okay, tschüss.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank rundet das Gespräch ab.", next: "d_end" },
+        { id: "d4a", text: "Das ist sehr freundlich, vielen Dank. Dann sehen wir uns morgen um 15 Uhr.", uses: "agree", quality: 1, feedback: "Freundlich und klar bestätigt.", next: "d_free" },
+        { id: "d4b", text: "Danke. Soll ich Ihnen den Mangel noch schriftlich per E-Mail bestätigen?", uses: "suggestions", quality: 0.95, feedback: "Stark: an die schriftliche Dokumentation gedacht.", next: "d_free" },
+        { id: "d4c", text: "Okay, tschüss.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank rundet das Gespräch ab.", next: "d_free" },
       ],
+    },
+    d_free: {
+      id: "d_free",
+      speaker: "examiner",
+      line: "Sie schreiben der Hausverwaltung anschließend eine kurze Sprachnachricht, damit alles festgehalten ist. Was sagen Sie?",
+      gloss: "Afterwards you send the property manager a short voice message to put it on record. What do you say?",
+      prompt: "Halte 20–30 Sekunden fest: der Mangel, seit wann, was vereinbart wurde und wann der Techniker kommt.",
+      model:
+        "Guten Tag, hier spricht Familie Osei aus der Lindenstraße 14. Wie eben besprochen: Die Heizung funktioniert seit Montag nicht, in der Wohnung sind es nur 16 Grad. Sie schicken morgen um 15 Uhr einen Techniker, das passt uns gut. Bis dahin stellen Sie uns einen Heizlüfter. Bitte bestätigen Sie mir den Termin noch kurz schriftlich. Vielen Dank.",
+      hints: ["Nenne den Mangel mit Datum, das ist rechtlich wichtig.", "Bitte am Ende um eine schriftliche Bestätigung."],
+      next: "d_end",
     },
     d_end: {
       id: "d_end",
@@ -2072,10 +2160,21 @@ const kartesperren: Scenario = {
       gloss: "The new card is free. You can withdraw cash at the branch with your ID. Is there anything else I can do for you?",
       hints: ["Bedanke dich und beende das Gespräch höflich."],
       options: [
-        { id: "d4a", text: "Nein danke, das war sehr hilfreich. Vielen Dank für die schnelle Hilfe.", uses: "agree", quality: 1, feedback: "Freundlich abgeschlossen.", next: "d_end" },
-        { id: "d4b", text: "Eine Frage noch: Sollte ich die verlorene Karte auch der Polizei melden?", uses: "clarification", quality: 0.9, feedback: "Gute vorausschauende Frage.", next: "d_end" },
-        { id: "d4c", text: "Nein.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_end" },
+        { id: "d4a", text: "Nein danke, das war sehr hilfreich. Vielen Dank für die schnelle Hilfe.", uses: "agree", quality: 1, feedback: "Freundlich abgeschlossen.", next: "d_free" },
+        { id: "d4b", text: "Eine Frage noch: Sollte ich die verlorene Karte auch der Polizei melden?", uses: "clarification", quality: 0.9, feedback: "Gute vorausschauende Frage.", next: "d_free" },
+        { id: "d4c", text: "Nein.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_free" },
       ],
+    },
+    d_free: {
+      id: "d_free",
+      speaker: "examiner",
+      line: "Ihr Partner fragt, ob die Sache mit der Karte erledigt ist. Was sagen Sie?",
+      gloss: "Your partner asks whether the card matter is sorted. What do you say?",
+      prompt: "Erkläre 20–30 Sekunden, was gesperrt wurde, wie ihr an Bargeld kommt und wann die neue Karte da ist.",
+      model:
+        "Ich habe eben mit der Bank telefoniert. Die Karte ist gesperrt, das ging sofort, ich musste mich nur mit Namen und Geburtsdatum ausweisen. Eine neue Karte ist unterwegs, sie kommt in etwa einer Woche und kostet nichts. Bis dahin können wir Bargeld in der Filiale mit dem Ausweis abheben. Die letzten Buchungen schaue ich mir heute Abend noch an.",
+      hints: ["Sag zuerst, dass die Gefahr gebannt ist.", "Nenne die Übergangslösung bis zur neuen Karte."],
+      next: "d_end",
     },
     d_end: {
       id: "d_end",
@@ -2141,10 +2240,21 @@ const pruefungsanmeldung: Scenario = {
       gloss: "I just need your ID and the completed form. You can pay the fee today or by bank transfer. Does that work for you?",
       hints: ["Bedanke dich und bestätige die Anmeldung."],
       options: [
-        { id: "d4a", text: "Das passt. Ich fülle das Formular gleich aus und überweise die Gebühr diese Woche.", uses: "agree", quality: 1, feedback: "Klar und verbindlich bestätigt.", next: "d_end" },
-        { id: "d4b", text: "Sehr gut. Bekomme ich vorher noch eine Bestätigung mit dem genauen Ablauf?", uses: "clarification", quality: 0.95, feedback: "Stark: an die schriftliche Bestätigung gedacht.", next: "d_end" },
-        { id: "d4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank rundet das Gespräch ab.", next: "d_end" },
+        { id: "d4a", text: "Das passt. Ich fülle das Formular gleich aus und überweise die Gebühr diese Woche.", uses: "agree", quality: 1, feedback: "Klar und verbindlich bestätigt.", next: "d_free" },
+        { id: "d4b", text: "Sehr gut. Bekomme ich vorher noch eine Bestätigung mit dem genauen Ablauf?", uses: "clarification", quality: 0.95, feedback: "Stark: an die schriftliche Bestätigung gedacht.", next: "d_free" },
+        { id: "d4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank rundet das Gespräch ab.", next: "d_free" },
       ],
+    },
+    d_free: {
+      id: "d_free",
+      speaker: "examiner",
+      line: "Ihre Lernpartnerin fragt, wie die Anmeldung gelaufen ist. Was erzählen Sie?",
+      gloss: "Your study partner asks how the registration went. What do you tell her?",
+      prompt: "Fasse 20–30 Sekunden zusammen: Termin, Prüfungsteile, Gebühr und was du noch mitbringen musst.",
+      model:
+        "Ich habe mich heute im Sprachzentrum für die telc-Prüfung angemeldet. Der Termin ist am 8. März. Die Prüfung hat einen schriftlichen und einen mündlichen Teil, den mündlichen macht man zu zweit. Die Gebühr beträgt 180 Euro, ich zahle sie bis Ende der Woche. Mitbringen muss ich nur meinen Ausweis und das ausgefüllte Formular. Melde dich schnell, falls du auch noch willst.",
+      hints: ["Erst der Termin, dann der Ablauf, dann das Geld.", "Sag, was du selbst noch zu erledigen hast."],
+      next: "d_end",
     },
     d_end: {
       id: "d_end",
@@ -2210,10 +2320,21 @@ const supermarkteinkauf: Scenario = {
       gloss: "That comes to 8.50 euros. Would you like the receipt?",
       hints: ["Antworte höflich.", "Ein Kassenzettel ist bei einem Umtausch nützlich."],
       options: [
-        { id: "s4a", text: "Ja, gern. Den Kassenzettel hebe ich lieber auf.", uses: "agree", quality: 1, feedback: "Top: sinnvoll, falls du etwas umtauschen musst.", next: "s_end" },
-        { id: "s4b", text: "Nein, danke, das ist nicht nötig. Schönen Tag noch!", uses: "smallTalk", quality: 0.9, feedback: "Freundlich abgeschlossen.", next: "s_end" },
-        { id: "s4c", text: "Nein.", uses: "reactions", quality: 0.4, feedback: "Etwas kurz. Ein freundlicher Abschluss wirkt besser.", next: "s_end" },
+        { id: "s4a", text: "Ja, gern. Den Kassenzettel hebe ich lieber auf.", uses: "agree", quality: 1, feedback: "Top: sinnvoll, falls du etwas umtauschen musst.", next: "s_free" },
+        { id: "s4b", text: "Nein, danke, das ist nicht nötig. Schönen Tag noch!", uses: "smallTalk", quality: 0.9, feedback: "Freundlich abgeschlossen.", next: "s_free" },
+        { id: "s4c", text: "Nein.", uses: "reactions", quality: 0.4, feedback: "Etwas kurz. Ein freundlicher Abschluss wirkt besser.", next: "s_free" },
       ],
+    },
+    s_free: {
+      id: "s_free",
+      speaker: "examiner",
+      line: "Zu Hause fragt Ihre Mitbewohnerin, ob Sie alles bekommen haben. Was sagen Sie?",
+      gloss: "At home your flatmate asks whether you got everything. What do you say?",
+      prompt: "Erzähle 20–30 Sekunden, was du gesucht, wo du es gefunden und was du bezahlt hast.",
+      model:
+        "Ich habe fast alles bekommen. Die Sojasoße stand nicht bei den Gewürzen, deshalb habe ich eine Mitarbeiterin gefragt. Sie war im Regal mit den asiatischen Lebensmitteln, ganz hinten. Der Reis war im Angebot, zwei Packungen zum Preis von einer, die habe ich gleich mitgenommen. Insgesamt waren es 8,50 Euro. Den Kassenzettel habe ich mitgenommen, er liegt auf dem Tisch.",
+      hints: ["Erzähle in der Reihenfolge, in der es passiert ist.", "Nenne den Preis und wo etwas stand."],
+      next: "s_end",
     },
     s_end: {
       id: "s_end",
@@ -2279,10 +2400,21 @@ const umtauschreklamation: Scenario = {
       gloss: "The same model is in stock. I will exchange the device right away. Is that all right for you?",
       hints: ["Stimme freundlich zu.", "Bedanke dich für die Lösung."],
       options: [
-        { id: "r4a", text: "Ja, das ist super. Vielen Dank für die schnelle Lösung!", uses: "agree", quality: 1, feedback: "Top: freundlich und wertschätzend abgeschlossen.", next: "r_end" },
-        { id: "r4b", text: "Das passt gut, danke. Dann nehme ich den Ersatz.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "r_end" },
-        { id: "r4c", text: "Na gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre freundlicher.", next: "r_end" },
+        { id: "r4a", text: "Ja, das ist super. Vielen Dank für die schnelle Lösung!", uses: "agree", quality: 1, feedback: "Top: freundlich und wertschätzend abgeschlossen.", next: "r_free" },
+        { id: "r4b", text: "Das passt gut, danke. Dann nehme ich den Ersatz.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "r_free" },
+        { id: "r4c", text: "Na gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre freundlicher.", next: "r_free" },
       ],
+    },
+    r_free: {
+      id: "r_free",
+      speaker: "examiner",
+      line: "Ein Freund hat dasselbe Gerät und fragt, wie Sie den Umtausch geschafft haben. Was raten Sie ihm?",
+      gloss: "A friend has the same device and asks how you managed the exchange. What do you advise?",
+      prompt: "Erkläre 20–30 Sekunden, wie du vorgegangen bist und was er mitnehmen soll.",
+      model:
+        "Geh einfach mit dem Gerät und dem Kassenbon in die Filiale. Sag ruhig und klar, seit wann es kaputt ist und was genau passiert. Bei mir hat es nach zwei Wochen den Dienst eingestellt, das ist noch in der Gewährleistung. Erst wollten sie es einschicken, aber ich habe gesagt, dass mir das zu lange dauert. Am Ende haben sie das gleiche Modell sofort umgetauscht. Bleib freundlich, aber bleib bei deiner Forderung.",
+      hints: ["Beschreibe den Fehler mit Datum, nicht nur \"es geht nicht\".", "Sag, welche Lösung du willst."],
+      next: "r_end",
     },
     r_end: {
       id: "r_end",
@@ -2348,10 +2480,21 @@ const tischreservieren: Scenario = {
       gloss: "Wonderful, the reservation is set. Under what name may I enter it?",
       hints: ["Nenne deinen Namen.", "Bedanke dich zum Abschluss."],
       options: [
-        { id: "t4a", text: "Auf den Namen Keller, vielen Dank für Ihre Hilfe!", uses: "smallTalk", quality: 1, feedback: "Sehr gut: klar und freundlich abgeschlossen.", next: "t_end" },
-        { id: "t4b", text: "Keller. Bis Samstag dann.", uses: "agree", quality: 0.9, feedback: "Gut: kurz und höflich.", next: "t_end" },
-        { id: "t4c", text: "Keller.", uses: "reactions", quality: 0.5, feedback: "Ein kurzer Dank wäre noch netter.", next: "t_end" },
+        { id: "t4a", text: "Auf den Namen Keller, vielen Dank für Ihre Hilfe!", uses: "smallTalk", quality: 1, feedback: "Sehr gut: klar und freundlich abgeschlossen.", next: "t_free" },
+        { id: "t4b", text: "Keller. Bis Samstag dann.", uses: "agree", quality: 0.9, feedback: "Gut: kurz und höflich.", next: "t_free" },
+        { id: "t4c", text: "Keller.", uses: "reactions", quality: 0.5, feedback: "Ein kurzer Dank wäre noch netter.", next: "t_free" },
       ],
+    },
+    t_free: {
+      id: "t_free",
+      speaker: "examiner",
+      line: "Sie schreiben der Gruppe anschließend in den Chat. Was sagen Sie als Sprachnachricht?",
+      gloss: "Afterwards you message the group. What do you say as a voice message?",
+      prompt: "Sag 20–30 Sekunden alles Wichtige: Restaurant, Datum, Uhrzeit, Personenzahl und Besonderheiten.",
+      model:
+        "Hallo zusammen, der Tisch ist reserviert. Wir sind am Samstag um 19 Uhr im Ristorante Cortina, für vier Personen. Ich habe um einen Tisch am Fenster gebeten, sie schauen, ob das klappt. Reserviert ist auf meinen Namen. Wenn jemand später kommt, sagt mir bitte kurz Bescheid, sie halten den Tisch nur eine Viertelstunde.",
+      hints: ["Datum, Uhrzeit, Personenzahl gehören in jeden Satzanfang.", "Nenne den Namen, auf den reserviert ist."],
+      next: "t_end",
     },
     t_end: {
       id: "t_end",
@@ -2417,10 +2560,21 @@ const restaurantbestellen: Scenario = {
       gloss: "With pleasure. Did you enjoy it? Would you like a dessert or to pay right away?",
       hints: ["Antworte höflich.", "Sag, ob du zahlen möchtest, und wie."],
       options: [
-        { id: "b4a", text: "Es hat sehr gut geschmeckt, danke. Wir möchten bitte zahlen, getrennt.", uses: "clarification", quality: 1, feedback: "Top: freundliches Lob und klar gesagt, wie ihr zahlen wollt.", next: "b_end" },
-        { id: "b4b", text: "Danke, es war lecker. Die Rechnung, bitte.", uses: "agree", quality: 0.9, feedback: "Gut: höflich und klar.", next: "b_end" },
-        { id: "b4c", text: "Zahlen.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Höflichkeit wirkt besser.", next: "b_end" },
+        { id: "b4a", text: "Es hat sehr gut geschmeckt, danke. Wir möchten bitte zahlen, getrennt.", uses: "clarification", quality: 1, feedback: "Top: freundliches Lob und klar gesagt, wie ihr zahlen wollt.", next: "b_free" },
+        { id: "b4b", text: "Danke, es war lecker. Die Rechnung, bitte.", uses: "agree", quality: 0.9, feedback: "Gut: höflich und klar.", next: "b_free" },
+        { id: "b4c", text: "Zahlen.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Höflichkeit wirkt besser.", next: "b_free" },
       ],
+    },
+    b_free: {
+      id: "b_free",
+      speaker: "examiner",
+      line: "Später fragt eine Freundin, wie das Essen war. Was erzählen Sie?",
+      gloss: "Later a friend asks how the meal was. What do you tell her?",
+      prompt: "Erzähle 20–30 Sekunden, was du bestellt hast, warum du nachgefragt hast und wie du bezahlt hast.",
+      model:
+        "Es war richtig gut. Ich habe die Gemüselasagne genommen, vorher habe ich aber gefragt, ob Nüsse drin sind, wegen meiner Allergie. Der Kellner hat extra in der Küche nachgefragt, das fand ich sehr aufmerksam. Nachtisch habe ich mir gespart, ich war satt. Bezahlt habe ich mit Karte, getrennt, das war kein Problem. Da gehe ich bestimmt wieder hin.",
+      hints: ["Sag, warum du nachgefragt hast.", "Beende mit einem Urteil: würdest du wiederkommen?"],
+      next: "b_end",
     },
     b_end: {
       id: "b_end",
@@ -2486,10 +2640,21 @@ const fahrkartekaufen: Scenario = {
       gloss: "The S1 leaves from track 2. The next train comes in five minutes. Have a good journey!",
       hints: ["Bedanke dich.", "Du kannst den Weg zum Gleis bestätigen."],
       options: [
-        { id: "f4a", text: "Vielen Dank für Ihre Hilfe! Dann gehe ich schnell zu Gleis 2.", uses: "agree", quality: 1, feedback: "Top: freundlich bedankt und den nächsten Schritt genannt.", next: "f_end" },
-        { id: "f4b", text: "Danke schön, das war sehr hilfreich.", uses: "agree", quality: 0.9, feedback: "Gut: höflich abgeschlossen.", next: "f_end" },
-        { id: "f4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre netter.", next: "f_end" },
+        { id: "f4a", text: "Vielen Dank für Ihre Hilfe! Dann gehe ich schnell zu Gleis 2.", uses: "agree", quality: 1, feedback: "Top: freundlich bedankt und den nächsten Schritt genannt.", next: "f_free" },
+        { id: "f4b", text: "Danke schön, das war sehr hilfreich.", uses: "agree", quality: 0.9, feedback: "Gut: höflich abgeschlossen.", next: "f_free" },
+        { id: "f4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre netter.", next: "f_free" },
       ],
+    },
+    f_free: {
+      id: "f_free",
+      speaker: "examiner",
+      line: "Am Gleis fragt Sie ein anderer Reisender, wie er zum Flughafen kommt. Was erklären Sie?",
+      gloss: "On the platform another traveller asks how to get to the airport. What do you explain?",
+      prompt: "Erkläre 20–30 Sekunden die Fahrkarte, den Preis und die Verbindung.",
+      model:
+        "Zum Flughafen brauchen Sie ein Ticket für die Zone C, das kostet 4,20 Euro. Am Automaten wählen Sie einfach Einzelfahrt und die Zone, Karte funktioniert dort auch. Sie nehmen die S1 von Gleis 2, sie fährt alle zehn Minuten. Die Fahrt dauert etwa 25 Minuten, umsteigen müssen Sie nicht. Vergessen Sie nicht, das Ticket vor dem Einsteigen zu entwerten.",
+      hints: ["Erst das Ticket, dann das Gleis, dann die Dauer.", "Nenne die eine Sache, die man leicht vergisst."],
+      next: "f_end",
     },
     f_end: {
       id: "f_end",
@@ -2555,10 +2720,21 @@ const nachdemwegfragen: Scenario = {
       gloss: "You are welcome. Have a nice day!",
       hints: ["Erwidere den Gruß.", "Ein freundlicher Abschluss rundet das Gespräch ab."],
       options: [
-        { id: "w4a", text: "Danke, Ihnen auch einen schönen Tag!", uses: "smallTalk", quality: 1, feedback: "Perfekt: freundlich und natürlich abgeschlossen.", next: "w_end" },
-        { id: "w4b", text: "Vielen Dank, tschüss!", uses: "agree", quality: 0.9, feedback: "Gut: höflich verabschiedet.", next: "w_end" },
-        { id: "w4c", text: "Tschüss.", uses: "reactions", quality: 0.5, feedback: "Ein kurzer Dank dazu wäre noch netter.", next: "w_end" },
+        { id: "w4a", text: "Danke, Ihnen auch einen schönen Tag!", uses: "smallTalk", quality: 1, feedback: "Perfekt: freundlich und natürlich abgeschlossen.", next: "w_free" },
+        { id: "w4b", text: "Vielen Dank, tschüss!", uses: "agree", quality: 0.9, feedback: "Gut: höflich verabschiedet.", next: "w_free" },
+        { id: "w4c", text: "Tschüss.", uses: "reactions", quality: 0.5, feedback: "Ein kurzer Dank dazu wäre noch netter.", next: "w_free" },
       ],
+    },
+    w_free: {
+      id: "w_free",
+      speaker: "examiner",
+      line: "Ihre Begleitung hat die Wegbeschreibung nicht verstanden. Wiederholen Sie sie.",
+      gloss: "The person with you did not understand the directions. Repeat them.",
+      prompt: "Gib 20–30 Sekunden den Weg in eigenen Worten wieder, Schritt für Schritt.",
+      model:
+        "Also, wir gehen hier geradeaus bis zur zweiten Kreuzung. Dort biegen wir links in die Bahnhofstraße ein. Wir laufen an der Apotheke vorbei, danach kommt ein kleiner Park. Direkt hinter dem Park liegt das Museum auf der rechten Seite. Zu Fuß sind das ungefähr zehn Minuten. Wenn wir am Rathaus vorbeikommen, sind wir zu weit gegangen.",
+      hints: ["Benutze Reihenfolge-Wörter: zuerst, dann, danach.", "Nenne einen Punkt, an dem man merkt, dass man falsch ist."],
+      next: "w_end",
     },
     w_end: {
       id: "w_end",
@@ -2624,10 +2800,21 @@ const freundeverabreden: Scenario = {
       gloss: "Agreed, Saturday at 10 at the station. I am looking forward to it!",
       hints: ["Bestätige die Verabredung.", "Ein freundlicher Abschluss ist schön."],
       options: [
-        { id: "v4a", text: "Ich freue mich auch! Bis Samstag dann, meld dich, falls etwas dazwischenkommt.", uses: "smallTalk", quality: 1, feedback: "Perfekt: bestätigt und freundlich abgeschlossen.", next: "v_end" },
-        { id: "v4b", text: "Super, bis Samstag!", uses: "agree", quality: 0.9, feedback: "Gut: kurz und herzlich.", next: "v_end" },
-        { id: "v4c", text: "Ok, tschüss.", uses: "reactions", quality: 0.5, feedback: "Ein bisschen wärmer wäre noch netter.", next: "v_end" },
+        { id: "v4a", text: "Ich freue mich auch! Bis Samstag dann, meld dich, falls etwas dazwischenkommt.", uses: "smallTalk", quality: 1, feedback: "Perfekt: bestätigt und freundlich abgeschlossen.", next: "v_free" },
+        { id: "v4b", text: "Super, bis Samstag!", uses: "agree", quality: 0.9, feedback: "Gut: kurz und herzlich.", next: "v_free" },
+        { id: "v4c", text: "Ok, tschüss.", uses: "reactions", quality: 0.5, feedback: "Ein bisschen wärmer wäre noch netter.", next: "v_free" },
       ],
+    },
+    v_free: {
+      id: "v_free",
+      speaker: "examiner",
+      line: "Eine dritte Freundin fragt, was ihr am Wochenende vorhabt. Was sagen Sie?",
+      gloss: "A third friend asks what you are doing at the weekend. What do you say?",
+      prompt: "Erzähle 20–30 Sekunden, was ihr macht, wann ihr euch trefft und lade sie ein.",
+      model:
+        "Wir wollen am Samstag wandern gehen. Treffpunkt ist um 10 Uhr am Bahnhof, von dort nehmen wir die Regionalbahn. Die Strecke ist nicht schwer, ungefähr drei Stunden, und unterwegs gibt es ein Gasthaus. Zurück sind wir am späten Nachmittag. Komm doch mit, es wäre schön, wenn wir zu dritt sind. Sag mir einfach bis Freitagabend Bescheid.",
+      hints: ["Aktivität, Zeit, Treffpunkt: alle drei nennen.", "Lade am Ende konkret ein, mit einer Frist."],
+      next: "v_end",
     },
     v_end: {
       id: "v_end",
@@ -2693,10 +2880,21 @@ const smalltalkparty: Scenario = {
       gloss: "We're playing in a small club next month. Come along, it'll surely be fun!",
       hints: ["Reagiere auf die Einladung.", "Bedanke dich freundlich."],
       options: [
-        { id: "p4a", text: "Sehr gern, das mache ich! Gib mir einfach kurz die Daten.", uses: "agree", quality: 1, feedback: "Perfekt: die Einladung angenommen und praktisch weitergedacht.", next: "p_end" },
-        { id: "p4b", text: "Das klingt toll, danke für die Einladung! Ich versuche zu kommen.", uses: "agree", quality: 0.9, feedback: "Gut: freundlich und offen reagiert.", next: "p_end" },
-        { id: "p4c", text: "Mal schauen.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Begeisterung wirkt netter.", next: "p_end" },
+        { id: "p4a", text: "Sehr gern, das mache ich! Gib mir einfach kurz die Daten.", uses: "agree", quality: 1, feedback: "Perfekt: die Einladung angenommen und praktisch weitergedacht.", next: "p_free" },
+        { id: "p4b", text: "Das klingt toll, danke für die Einladung! Ich versuche zu kommen.", uses: "agree", quality: 0.9, feedback: "Gut: freundlich und offen reagiert.", next: "p_free" },
+        { id: "p4c", text: "Mal schauen.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Begeisterung wirkt netter.", next: "p_free" },
       ],
+    },
+    p_free: {
+      id: "p_free",
+      speaker: "examiner",
+      line: "Sie stellen die neue Bekanntschaft einer Freundin vor. Was sagen Sie über sie?",
+      gloss: "You introduce your new acquaintance to a friend. What do you say about her?",
+      prompt: "Stelle die Person 20–30 Sekunden vor: Name, woher ihr euch kennt, was sie macht, was ihr gemeinsam habt.",
+      model:
+        "Das ist Lena, wir haben uns gerade hier am Buffet kennengelernt. Sie kommt ursprünglich aus Dresden und wohnt seit zwei Jahren hier. Beruflich macht sie etwas mit Design, und nebenbei spielt sie Bass in einer Band. Wir haben festgestellt, dass wir beide gern klettern gehen. Nächsten Monat spielt ihre Band in einem kleinen Club, da wollten wir hin. Komm doch mit.",
+      hints: ["Nenne die Gemeinsamkeit, die ihr gefunden habt.", "Schließe mit einem gemeinsamen Plan."],
+      next: "p_end",
     },
     p_end: {
       id: "p_end",
@@ -2762,10 +2960,21 @@ const handyvertragabschliessen: Scenario = {
       gloss: "Number portability is free. I just need your ID, then we can conclude the contract.",
       hints: ["Bestätige und gib die nötigen Angaben.", "Bedanke dich."],
       options: [
-        { id: "h4a", text: "Sehr gern, hier ist mein Ausweis. Vielen Dank für die gute Beratung!", uses: "agree", quality: 1, feedback: "Perfekt: kooperativ und freundlich abgeschlossen.", next: "h_end" },
-        { id: "h4b", text: "Alles klar, hier bitte. Wann ist die SIM-Karte freigeschaltet?", uses: "clarification", quality: 0.9, feedback: "Gut: mitgedacht und praktisch nachgefragt.", next: "h_end" },
-        { id: "h4c", text: "Hier.", uses: "reactions", quality: 0.4, feedback: "Ein freundliches Wort dazu wäre netter.", next: "h_end" },
+        { id: "h4a", text: "Sehr gern, hier ist mein Ausweis. Vielen Dank für die gute Beratung!", uses: "agree", quality: 1, feedback: "Perfekt: kooperativ und freundlich abgeschlossen.", next: "h_free" },
+        { id: "h4b", text: "Alles klar, hier bitte. Wann ist die SIM-Karte freigeschaltet?", uses: "clarification", quality: 0.9, feedback: "Gut: mitgedacht und praktisch nachgefragt.", next: "h_free" },
+        { id: "h4c", text: "Hier.", uses: "reactions", quality: 0.4, feedback: "Ein freundliches Wort dazu wäre netter.", next: "h_free" },
       ],
+    },
+    h_free: {
+      id: "h_free",
+      speaker: "examiner",
+      line: "Ihr Mitbewohner fragt, welchen Tarif Sie genommen haben und ob er sich lohnt. Was antworten Sie?",
+      gloss: "Your flatmate asks which tariff you took and whether it is worth it. What do you answer?",
+      prompt: "Erkläre 20–30 Sekunden Datenvolumen, Preis, Laufzeit und warum du dich so entschieden hast.",
+      model:
+        "Ich habe den mittleren Tarif genommen: 15 Gigabyte für 19,99 Euro im Monat. Die Laufzeit sind 24 Monate, monatlich kündbar wäre teurer gewesen. Der große Tarif hätte sich für mich nicht gelohnt, ich bin fast immer im WLAN. Meine alte Nummer konnte ich kostenlos mitnehmen. Wenn du viel unterwegs streamst, würde ich dir aber eher zum großen Tarif raten.",
+      hints: ["Nenne Preis und Laufzeit in einem Satz.", "Begründe deine Wahl mit deinem eigenen Verhalten."],
+      next: "h_end",
     },
     h_end: {
       id: "h_end",
@@ -2831,10 +3040,21 @@ const internetstoerung: Scenario = {
       gloss: "For the outage I will credit you one day. I will get in touch as soon as the fault is fixed. Is that all right?",
       hints: ["Stimme zu.", "Bedanke dich freundlich."],
       options: [
-        { id: "i4a", text: "Ja, das ist fair. Vielen Dank für Ihre Hilfe!", uses: "agree", quality: 1, feedback: "Perfekt: die Lösung angenommen und freundlich bedankt.", next: "i_end" },
-        { id: "i4b", text: "Das passt, danke. Dann warte ich auf Ihre Nachricht.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "i_end" },
-        { id: "i4c", text: "Na gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre freundlicher.", next: "i_end" },
+        { id: "i4a", text: "Ja, das ist fair. Vielen Dank für Ihre Hilfe!", uses: "agree", quality: 1, feedback: "Perfekt: die Lösung angenommen und freundlich bedankt.", next: "i_free" },
+        { id: "i4b", text: "Das passt, danke. Dann warte ich auf Ihre Nachricht.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "i_free" },
+        { id: "i4c", text: "Na gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre freundlicher.", next: "i_free" },
       ],
+    },
+    i_free: {
+      id: "i_free",
+      speaker: "examiner",
+      line: "Ihre Mitbewohnerin arbeitet im Homeoffice und fragt, wann das Internet wieder läuft. Was sagen Sie?",
+      gloss: "Your flatmate works from home and asks when the internet will be back. What do you say?",
+      prompt: "Gib 20–30 Sekunden weiter, was die Hotline gesagt hat und was das für morgen bedeutet.",
+      model:
+        "Ich habe eben mit der Hotline gesprochen. Es ist eine Störung im ganzen Viertel, nicht bei uns im Router. Sie arbeiten daran und rechnen damit, dass es heute Abend wieder läuft. Für den Ausfall schreiben sie uns einen Tag gut. Sie melden sich, sobald es behoben ist. Falls du morgen früh eine Videokonferenz hast, würde ich sicherheitshalber deinen Hotspot vorbereiten.",
+      hints: ["Sag zuerst, woran es NICHT liegt.", "Nenne einen Notfallplan für den Fall, dass es länger dauert."],
+      next: "i_end",
     },
     i_end: {
       id: "i_end",
