@@ -63,7 +63,8 @@ lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
 ## Where things stand
 
 The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the four-zone nav
-(Praktisch · Bibliothek · Schreiben · Fortschritt), the Neuland game layer (`/welt`, Kapitel 1
+(Praktisch · Bibliothek · **Prüfung** · Fortschritt, s182: Schreiben moved into the Prüfung hub),
+the Neuland game layer (`/welt`, Kapitel 1
 complete), Supabase auth + cloud sync, and the AI writing coach. **The shipped architecture, locked
 architectural decisions, and backend/infra setup are documented in `docs/PROJECT_FOUNDATION.md`** —
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
@@ -107,10 +108,10 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 - [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
-- [ ] **Decide where Anwenden lives on MOBILE (s182, audit P4).** Sprechen + Prüfung are back on the
-      desktop sidebar, but the mobile bottom bar has five locked slots, so a sixth entry means moving
-      something or growing the bar. Until this is answered, a phone reaches the Sprechsimulation only
-      through the dashboard recommendation and ⌘K. No code change is pending; this is a design call.
+- [x] ~~Decide where Anwenden lives on MOBILE (s182, audit P4).~~ **DECIDED 2026-08-01 by the
+      founder:** "just move schreiben to anwenden and rename anwenden as prufung." Shipped in s182,
+      so the bar stays at five slots and now reads Praktisch · Bibliothek · **Prüfung** ·
+      Fortschritt · Einstellungen, with Sprechen, Schreiben and Prüfungssimulation inside the hub.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
       **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
@@ -141,6 +142,28 @@ adding one task:
   reads as B1, that its Leitpunkte are answerable in the word target, or that the Branche framing
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
+
+**Same session, third follow-up (2026-08-01): the nav zone question is answered.** Founder, first
+"yes keep it in the bottom bar", then, seeing the six-slot direction: "just move schreiben to
+anwenden and rename anwenden as prufung."
+- **The bar stays FIVE slots**, which is why this answer is better than the one it replaced. The
+  six-slot version was built and measured first: at 320px it overflowed, because the longest label
+  ("Einstellungen") set a 73px width floor and pushed the gear off screen. That is fixed either way
+  now (`min-w-0` on every slot, so the name truncates instead of setting a floor), but the founder's
+  reshape means the bar never had to grow.
+- **Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen.** `/writing` lost the tab it had
+  held since 2026-07-22 and is a card in the hub again; the hub is labelled **Prüfung** and holds
+  the three exam skills. The exam card inside it is "Prüfungssimulation", because a card cannot
+  carry the name of the page it sits on.
+- **Nothing about Schreiben itself changed**: same route, same pencil mark, same deep links, same
+  draft-resume redirect in `AppShell`. A learner who had pinned `/writing` gets remapped through
+  `ROUTE_SUCCESSOR`, so no one lands on an empty slot.
+- `tests/nav.test.tsx` (5 tests) pins the five slots and their order, the remap of a stale `/writing`
+  pin, and that Schreiben is no longer a top-level entry while Prüfung is.
+- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.3 kB.
+  Verified in the built app at 320px and 390px (five even slots, "Prüfung" active) and on desktop
+  (sidebar reads Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, and the Schreiben
+  card still opens the trainer at `/writing`).
 
 **Same session, follow-up (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
 pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall by that decision.

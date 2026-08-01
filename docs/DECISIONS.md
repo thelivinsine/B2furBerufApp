@@ -1097,7 +1097,7 @@ tagged. `tests/redemittel.test.ts` fails if a later pass blanket-tags the discus
 session happily served "Vielen Dank für Ihre Aufmerksamkeit." The tagging turned an existing rule on
 rather than adding one.
 
-## s182 (2026-08-01) - Anwenden returns to the DESKTOP nav only
+## s182 (2026-08-01) - Anwenden returns to the DESKTOP nav only (SUPERSEDED same day, see below)
 
 Audit P4 asked for the Anwenden entry back (it was pulled from `navItems` on 2026-07-13 for the
 demo), because Sprechen and Prüfung were reachable only from a dashboard recommendation and ⌘K.
@@ -1126,3 +1126,31 @@ topic carries at least three PRODUCTIVE drills (no `options`, the learner types 
 `tests/grammar.test.ts`. A productive answer must be unambiguous, since it is compared as one
 normalised string. The 21 B2/C1 topics still cap at five multiple-choice drills; that is known, open
 and written down, not an oversight.
+
+
+## s182 (2026-08-01, founder) - the fifth zone is Prüfung, and Schreiben lives inside it
+
+The open question from the P4 pass was whether the transfer hub belongs in the mobile bottom bar.
+The founder first said yes ("yes keep it in the bottom bar"), which meant six slots. That version
+was built and measured before anything was shown: at 320px it **overflowed**, because the longest
+label ("Einstellungen") set a 73px floor on its slot and pushed the gear off screen. The floor was a
+real bug (a flex item without `min-w-0` cannot shrink below its content, so the `truncate` on the
+label never fired) and is fixed independently. But six slots on a 320px phone leaves 53px each, and
+several labels truncate.
+
+**The founder's answer, and why it is better:** "just move schreiben to anwenden and rename anwenden
+as prufung." The bar keeps FIVE slots and gains a zone instead of a tab:
+**Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen.**
+
+- The zone is now named for what it prepares you for, and it holds the three exam skills:
+  **Sprechen · Schreiben · Prüfungssimulation**. The exam card is deliberately NOT called "Prüfung":
+  a card may not carry the name of the page it sits on.
+- **Schreiben lost its tab, not its route.** `/writing` keeps its path, its pencil mark, its deep
+  links and the `AppShell` draft-resume redirect. It had been a top-level tab from 2026-07-22 to
+  s182, so `ROUTE_SUCCESSOR["/writing"] = "/anwenden"` remaps a pin saved in that window and nobody
+  lands on an empty slot.
+- **What this costs, stated plainly:** the writing coach is one tap deeper than it was. That is the
+  founder's trade for a bar that stays at five slots and a zone name that says what it is for.
+- `tests/nav.test.tsx` pins the five slots and their order, the remap, and the two registry facts
+  (Schreiben is not top-level; the `/anwenden` label is "Prüfung"). The bar remains a locked
+  structure: change it only on an explicit founder request.

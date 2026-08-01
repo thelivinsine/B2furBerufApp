@@ -13,7 +13,9 @@ founder-picked s171).
   eyebrow/H1; Verlauf rides `?mode=verlauf`), capped `lg:max-w-xl` + centered (four short labels
   at full column width read oversized), over the standard `[minmax(0,1fr)_16rem]` content+rail
   grid.
-- Schreiben is a top-level nav item (rose accent, pencil mark).
+- Schreiben is a CARD in the Prüfung hub (`/anwenden`) since s182, not a top-level nav item
+  (it had a tab from 2026-07-22 to s182; founder: "just move schreiben to anwenden"). The route
+  `/writing`, the pencil mark and every deep link are unchanged, so a resumed draft still lands here.
 - Guest submits: `WritingHub` stashes the draft and opens `AuthDialog`; drafts carry
   `promptIndex` so the OAuth resume restores the exact task.
 

@@ -2,7 +2,6 @@ import {
   Compass,
   Library,
   LineChart,
-  PenLine,
   Settings,
   Target,
 } from "lucide-react";
@@ -32,13 +31,13 @@ export interface NavItem {
 // tools (Sprechen/Schreiben/Prüfung) inside Anwenden, so they are no longer
 // top-level nav destinations. Their routes still resolve (redirected into the
 // hub or reachable via deep links); they are just off the nav rail.
-// The Anwenden (transfer) zone was HIDDEN from the nav for the demo (founder,
-// 2026-07-13) and is BACK on the desktop sidebar since s182 (audit P4): the
-// speaking simulation and the exam run were reachable only from the dashboard
-// recommendation and ⌘K, which is not a home for the skill the product is
-// built around. The mobile bottom bar is a locked 5-slot structure, so this
-// entry shows in the sidebar (and the More surfaces that read `navItems`)
-// without touching it; mobile placement is a separate founder decision.
+// The transfer zone was HIDDEN from the nav for the demo (founder,
+// 2026-07-13) and came back in s182 (audit P4): the speaking simulation and the
+// exam run were reachable only from the dashboard recommendation and ⌘K, which
+// is not a home for the skill the product is built around. The founder then
+// reshaped it rather than growing the bar: **Schreiben moved into the hub and
+// the hub is called Prüfung**, so the zone holds the three exam skills and the
+// bar still has five slots.
 //
 // Labels: "Heute" was renamed to "Praktisch" and "Bibliothek" to "Theorie"
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
@@ -46,19 +45,23 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { to: "/",          label: "Praktisch",    icon: Compass,         end: true, color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag" },
   { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
-  // Schreibtraining promoted to a dedicated nav item (founder, 2026-07-22): the
-  // Fokus "Satzlabor" now has its own entry instead of only living under the
-  // hidden Anwenden hub. Nib mark (Federspitze) in route-icons.tsx; the accent
-  // moved from rose to brand blue with the s158 icon family harmonization.
-  { to: "/writing",   label: "Schreiben",    icon: PenLine,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Sätze schreiben und mit KI umformen" },
-  // Anwenden (Sprechen + Prüfung). Schreiben has its own tab since 2026-07-22,
-  // so this hub is the transfer layer's speaking and exam half.
-  { to: "/anwenden",  label: "Anwenden",     icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Sprechsimulation und Prüfungsmodus" },
+  // Schreiben had its own tab from 2026-07-22 until s182, when the founder
+  // moved it INTO the transfer hub and renamed that hub **Prüfung**: the three
+  // exam skills (Sprechen, Schreiben, Prüfungssimulation) now live in one zone,
+  // which keeps the bar at five slots. `/writing` keeps its route, its icon and
+  // every deep link; it is simply not a top-level nav entry any more, so it is
+  // absent from this list on purpose (see ROUTE_SUCCESSOR below).
+  { to: "/anwenden",  label: "Prüfung",      icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Sprechen, Schreiben und Prüfungssimulation" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];
 
-export const DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"];
+// Five slots, unchanged in count since s182 reshaped what fills them (founder:
+// move Schreiben into the transfer hub and call that hub Prüfung): Home,
+// Bibliothek, Prüfung, Fortschritt, Einstellungen. An existing learner's
+// persisted order still works: BottomTabBar completes the reorderable group
+// with whatever is missing, and a pinned "/writing" remaps via ROUTE_SUCCESSOR.
+export const DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"];
 
 // Removed top-level routes → their successor zone. Used by the settings-store
 // migration so an existing learner's custom pins / More-sheet order remap onto
@@ -70,8 +73,9 @@ export const ROUTE_SUCCESSOR: Record<string, string> = {
   "/redemittel": "/library",
   "/grammar": "/library",
   "/quiz": "/library",
-  // "/writing" is a top-level nav item again (2026-07-22), so it no longer
-  // remaps into the hidden Anwenden hub.
+  // Schreiben went back under the transfer hub in s182 (founder), so a pin
+  // saved while it was a top-level tab (2026-07-22 to s182) remaps again.
+  "/writing": "/anwenden",
   "/simulation": "/anwenden",
   "/exam": "/anwenden",
   "/revision": "/",

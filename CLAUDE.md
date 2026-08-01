@@ -62,8 +62,9 @@ after pulling.
   `artikel/` + `city/` (see `docs/areas/COMPONENTS.md`), `ui/` primitives, `shared/Logo.tsx`
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
-  Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` (desktop sidebar only,
-  s182: the mobile bar's 5 slots are locked) ·
+  Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone
+  that holds Sprechen + Schreiben + Prüfungssimulation since s182; `/writing` keeps its route but
+  is a card in that hub, not a tab) ·
   `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
   `/auth/confirm` (email-confirmation landing, ungated on purpose) · `/hilfe`,
   `/privacy`,

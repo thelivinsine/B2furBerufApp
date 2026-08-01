@@ -6,9 +6,13 @@ import { HubHero } from "@/components/shared/HubHero";
 import { cn } from "@/lib/utils";
 
 // The transfer layer: where the learner puts the reference material to use.
-// Sprechsimulation, Schreibtraining and Prüfungsmodus were three separate nav
-// destinations before Phase 5; grouping them under one hub gives them equal
-// visual rank as "Anwenden" (apply), distinct from the Bibliothek (reference).
+// Renamed from "Anwenden" to **Prüfung** in s182 (founder), when Schreiben
+// moved back in from its own tab: the zone is the three exam skills, so the
+// name says what it prepares for. The third card is "Prüfungssimulation", not
+// "Prüfung", because a card cannot carry the same name as the page it sits on.
+// Sprechen · Schreiben · Prüfungssimulation share one visual rank here, which
+// is the whole point of the hub: they are the productive half of the app,
+// distinct from the Bibliothek (reference).
 const CARDS: {
   to: string;
   icon: LucideIcon;
@@ -27,7 +31,7 @@ const CARDS: {
   {
     to: "/writing",
     icon: PenLine,
-    gradient: "from-rose-500 to-red-500",
+    gradient: "from-blue-500 to-sky-500",
     title: "Schreiben",
     desc: "Schreibe zu einer Aufgabe und erhalte gezieltes Feedback zu deiner größten Schwachstelle.",
   },
@@ -35,7 +39,7 @@ const CARDS: {
     to: "/exam",
     icon: GraduationCap,
     gradient: "from-amber-500 to-orange-500",
-    title: "Prüfung",
+    title: "Prüfungssimulation",
     desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
   },
 ];
@@ -46,8 +50,8 @@ export function AnwendenHub() {
       <HubHero
         icon={Target}
         gradient="from-orange-500 to-amber-500"
-        eyebrow="Anwenden"
-        title="Wissen anwenden"
+        eyebrow="Prüfung"
+        title="Prüfung vorbereiten"
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
