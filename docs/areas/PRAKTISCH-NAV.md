@@ -4,30 +4,38 @@ Structure here is **locked**: do not change bar structure, edit-mode behavior, o
 without an explicit founder request. Mechanism history + mockups: `docs/DECISIONS.md`.
 
 ## Nav zones
-Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Schreiben** (`/writing`, brand-blue
-accent, pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
-**Anwenden is back in `navItems` since s182** (audit P4), so it shows in the DESKTOP sidebar
-(orange target mark). It is deliberately NOT in the mobile bottom bar: that is the locked 5-slot
-structure, and adding a sixth would break it, so mobile placement stays a founder decision. Before
-s182 the hub was off `navItems` entirely (founder, 2026-07-13, demo), which left the speaking
-simulation reachable only from the dashboard recommendation and ⌘K. Remote config can still hide
-it (`hiddenTabs`, admin Steuerung). `BottomTabBar` `REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT =
-"/analytics"` (Fortschritt is pinned directly left of Einstellungen for every user since s158,
-founder request; older persisted orders are normalised at read time);
-`DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed
-Einstellungen = the 5 locked slots). Route marks (founder picks, s158; Bibliothek, Fortschritt +
-Schreiben swapped s170): Praktisch = Wegweiser signpost, Bibliothek = stack of three books,
-Schreiben = pencil on the diagonal (accent stays brand blue), Fortschritt = Pokal (trophy/cup).
-The Anwenden hub
-itself (`/anwenden`) is 3 cards → Sprechen/Schreiben/Prüfung. Remote-config overrides (admin
-Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults match the above.
+Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Prüfung** (`/anwenden`, orange target
+mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
+**The transfer zone came back and absorbed Schreiben in s182.** Audit P4 found the Sprechsimulation
+reachable only from the dashboard recommendation and ⌘K (the hub had been off `navItems` since
+2026-07-13, founder, for the demo). It returned to the desktop sidebar first; the founder then
+settled the mobile question by RESHAPING rather than growing the bar: **"just move schreiben to
+anwenden and rename anwenden as prufung"**. So `/writing` lost its tab (it had one from 2026-07-22),
+the hub is labelled **Prüfung**, and it holds the three exam skills: Sprechen, Schreiben,
+Prüfungssimulation. The bar is still FIVE slots. `/writing` keeps its route, its pencil mark and
+every deep link, and a pin saved while it was a tab remaps through `ROUTE_SUCCESSOR`.
+`BottomTabBar` `REORDERABLE = ["/library", "/anwenden"]` + `FIXED_LAST_CONTENT = "/analytics"`
+(Fortschritt is pinned directly left of Einstellungen for every user since s158, founder request;
+older persisted orders are normalised at read time);
+`DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]` (Home + 2 middle + Fortschritt
++ fixed Einstellungen = the 5 locked slots). Every slot carries `min-w-0` so the name under the
+active tab truncates instead of setting a width floor (s182: "Einstellungen" was forcing a 73px
+slot). Remote config can still hide a middle tab (`hiddenTabs`, admin Steuerung). Route marks
+(founder picks, s158; Bibliothek, Fortschritt + Schreiben swapped s170): Praktisch = Wegweiser
+signpost, Bibliothek = stack of three books, Prüfung = target rings, Fortschritt = Pokal
+(trophy/cup); the pencil-on-the-diagonal Schreiben mark lives on inside the hub card.
+The Prüfung hub itself (`/anwenden`) is 3 cards → Sprechen / Schreiben / Prüfungssimulation (the
+exam card is NOT called "Prüfung": a card may not carry the name of the page it sits on).
+Remote-config overrides (admin Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults
+match the above.
 
 ## Bottom tab bar (mobile)
 - Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots: Home (fixed slot 1) + 3
-  middle + Einstellungen (fixed last, plain NavLink to `/settings`). The More sheet is retired
-  (`MoreSheet.tsx` deleted); no add/remove — the middle sections are always visible and only
-  Bibliothek + Schreiben REORDER via a hidden long-press easter egg (600ms, haptic; jiggle +
-  drag; transparent full-screen layer = "tap anywhere to finish"; navigating also ends it).
+  middle (Bibliothek · Prüfung · Fortschritt) + Einstellungen (fixed last, plain NavLink to
+  `/settings`). The More sheet is retired (`MoreSheet.tsx` deleted); no add/remove — the middle
+  sections are always visible and only Bibliothek + Prüfung REORDER via a hidden long-press easter
+  egg (600ms, haptic; jiggle + drag; transparent full-screen layer = "tap anywhere to finish";
+  navigating also ends it).
   Home, Fortschritt and Einstellungen never move (Fortschritt pinned s158).
 - **Active-tab labels:** each tab shows its section name under the icon, visible ONLY on the
   selected tab. The label slot is a reserved fixed-height row on every tab (selection never

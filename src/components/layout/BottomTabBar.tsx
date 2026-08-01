@@ -13,13 +13,17 @@ const IZ = 29; // icon size
 
 // The middle content sections. Home is the fixed first slot and Einstellungen
 // the fixed last slot (they replaced the retired "Mehr" sheet in s-polish).
-// Anwenden stays hidden from the nav (founder, 2026-07-13, demo); Schreiben was
-// promoted to its own tab (2026-07-22), so the middle is Bibliothek · Schreiben
-// · Fortschritt. Since s158 (founder request) Fortschritt is pinned to the END
-// of the middle, always directly left of Einstellungen for every user: only
-// Bibliothek and Schreiben reorder, and any older persisted order that moved
-// Fortschritt elsewhere is normalised at read time.
-const REORDERABLE = ["/library", "/writing"];
+// The transfer zone is back on the bar in s182 (founder, after audit P4 found
+// the Sprechsimulation reachable only from the dashboard recommendation and
+// ⌘K), but the bar stays at FIVE slots: the founder moved Schreiben INTO that
+// zone and renamed it **Prüfung**, so the middle is Bibliothek · Prüfung.
+// `/writing` keeps its route and every deep link; it is a card in the Prüfung
+// hub now instead of a tab, and `ROUTE_SUCCESSOR` remaps a persisted pin.
+// Since s158 (founder request) Fortschritt is pinned to the END of the middle,
+// always directly left of Einstellungen for every user: only Bibliothek and
+// Prüfung reorder, and any older persisted order that moved Fortschritt
+// elsewhere is normalised at read time.
+const REORDERABLE = ["/library", "/anwenden"];
 const FIXED_LAST_CONTENT = "/analytics";
 
 // Every surface (bottom bar, sidebar) draws the SAME custom branded SVG for a
@@ -42,13 +46,17 @@ function BarTab({ path, moreHidden }: { path: string; moreHidden?: boolean }) {
       to={to}
       end={end}
       aria-label={label}
-      className="flex flex-1 p-1"
+      // `min-w-0` is what lets a slot shrink below its label width, so the
+      // truncate on the name actually fires. Without it the longest label
+      // ("Einstellungen") set a 73px floor, and at six slots that pushed the
+      // last tab off a 320px screen (s182, when Anwenden joined the bar).
+      className="flex min-w-0 flex-1 p-1"
       onContextMenu={e => e.preventDefault()}
     >
       {({ isActive }) => {
         const showActive = isActive && !moreHidden;
         return (
-          <div className="relative flex flex-1 flex-col items-center justify-center gap-0.5">
+          <div className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5">
             {/* Compact squircle "cloud" hugs the icon instead of filling the whole
                 slot. Flat, even grey (no raised dome). */}
             <div

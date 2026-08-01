@@ -2808,6 +2808,19 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompts 12-13):** `docs/DECISIONS.md` (new §s179, §s171 item 12 corrected) ·
   `docs/plans/PHASE2_SETUP.md` · this log
 
+- **Prompt 14 (verbatim, 2026-07-31):** `as long as nothing is missing from this session and
+  everything is updated, we're done here.`
+- **Response summary:** Final audit rather than a sign-off, since three sessions (180, 181, 182) had
+  edited the same docs after this one. It found ONE genuine defect, in the file whose whole purpose is
+  the paper trail: **there was no `## Session 179` heading**, so all 13 prompts of this session were
+  filed under session 178's branch. Heading added; the 13 entries now sit under
+  `claude/ui-layout-buttons-cards-zkchha` where they belong. Everything else verified present on
+  `main` after the later sessions: `docs/DECISIONS.md` §s179 (10 entries, between s174 and s180), the
+  `auto-rows-fr` + full-alpha-toolbar rules in `areas/BIBLIOTHEK.md`, the allowance/DE-EN/Nochmal
+  rules in `areas/SCHREIBEN.md`, the migrations-are-automatic law in `CLAUDE.md`, and this session's
+  part-4 handoff archived into `PROJECT_STATUS_ARCHIVE_2026-W31.md` by session 182 (not lost).
+- **Artifacts (prompt 14):** this log
+
 ## Session 180 — 2026-07-31 — branch `claude/aufgabe-rail-bugs-1xdep2`
 
 - **Prompt 1 (verbatim, 2026-07-31, three Schreiben Lang screenshots attached: "Alle Niveaus /
@@ -3095,16 +3108,27 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   infrastructure fix (provenance split into four parts for the TS2590 ceiling).
   Gates: docs-only (no code touched).
 - **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · this log
-
-- **Prompt 14 (verbatim, 2026-07-31):** `as long as nothing is missing from this session and
-  everything is updated, we're done here.`
-- **Response summary:** Final audit rather than a sign-off, since three sessions (180, 181, 182) had
-  edited the same docs after this one. It found ONE genuine defect, in the file whose whole purpose is
-  the paper trail: **there was no `## Session 179` heading**, so all 13 prompts of this session were
-  filed under session 178's branch. Heading added; the 13 entries now sit under
-  `claude/ui-layout-buttons-cards-zkchha` where they belong. Everything else verified present on
-  `main` after the later sessions: `docs/DECISIONS.md` §s179 (10 entries, between s174 and s180), the
-  `auto-rows-fr` + full-alpha-toolbar rules in `areas/BIBLIOTHEK.md`, the allowance/DE-EN/Nochmal
-  rules in `areas/SCHREIBEN.md`, the migrations-are-automatic law in `CLAUDE.md`, and this session's
-  part-4 handoff archived into `PROJECT_STATUS_ARCHIVE_2026-W31.md` by session 182 (not lost).
-- **Artifacts (prompt 14):** this log
+- **Prompt 5 (verbatim, 2026-08-01):** `yes keep it in the bottom bar`
+  **Follow-up mid-implementation (verbatim):** `actually.. just move schreiben to anwenden and
+  rename anwenden as prufung`
+  **Response:** built the six-slot version first and measured it in the real app before showing
+  anything: at 320px the bar **overflowed**, because a flex slot without `min-w-0` cannot shrink
+  below its longest label, so "Einstellungen" set a 73px floor and pushed the gear off screen. Fixed
+  that properly (`min-w-0` on every slot, so the active label truncates instead of setting a width
+  floor) and kept the fix, since it makes the five slots even too.
+  Then took the founder's correction and shipped that instead: `/writing` lost the tab it had held
+  since 2026-07-22 and is a card in the hub again; the hub label went from "Anwenden" to **Prüfung**,
+  its hero from "Wissen anwenden" to "Prüfung vorbereiten", and the exam card from "Prüfung" to
+  **Prüfungssimulation**, because a card cannot carry the name of the page it sits on. The bar reads
+  Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, still five slots.
+  Nothing about the writing trainer itself changed: same route, same mark, same deep links, same
+  draft-resume redirect, and a pin saved while it was a tab remaps via `ROUTE_SUCCESSOR`. Flagged
+  the one real cost: the writing coach is a tap deeper than before.
+  `tests/nav.test.tsx` (5 tests) pins the slot order, the remap and the two registry facts.
+  Gates: typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.3 kB. Verified
+  in the built app at 320px and 390px and on desktop, including that the Schreiben card still opens
+  the trainer.
+- **Artifacts (prompt 5):** `src/components/layout/nav-items.ts` ·
+  `src/components/layout/BottomTabBar.tsx` · `src/features/anwenden/AnwendenHub.tsx` ·
+  `tests/nav.test.tsx` (new) · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
