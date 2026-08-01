@@ -1074,3 +1074,55 @@ them needs a purchase (the Goethe Modellsätze), not engineering. Nothing in the
 so a future session should not treat them as a prerequisite for the quality audit: that audit uses
 CEFR descriptors (cited, never reproduced), publicly published task-type descriptions and open
 corpora instead.
+
+## s182 (2026-08-01) - Redemittel: untagged means universal, so tagging stays selective
+
+The content audit's P6 said "tag the 158 with `themeId`". Doing that literally would have been
+wrong, and the reason is worth keeping.
+
+**Two banks, two different meanings for the same field.** Wörter and Kollokationen carry a `themeId`
+on EVERY item, so their Thema dropdown is a hard filter. A Redemittel is not that kind of object:
+"Da bin ich anderer Meinung." belongs to no situation and works in all of them. Forcing a theme onto
+it would have produced the sticker problem the founder rejected for Alltag Branche tags in s181, and
+it would have made the phrase INVISIBLE under every other Thema.
+
+**The rule as shipped:** a phrase is tagged only when it belongs to one theme's situation
+(a Vortrag → meetings, a Bewerbungsgespräch → bildung, the Amt/Arzt/Wohnen/Bank/Reklamation packs →
+their Alltag theme). Everything else stays untagged, and untagged is read as UNIVERSAL, exactly like
+an untagged Branche: it shows under every Thema and in every learning mode. 111 of 220 phrases are
+tagged. `tests/redemittel.test.ts` fails if a later pass blanket-tags the discussion functions.
+
+**Why it mattered beyond the Bibliothek:** the session composer already had the mode rule
+(`if (!r.themeId) return true`), so with zero phrases tagged it was dead code, and a personal-mode
+session happily served "Vielen Dank für Ihre Aufmerksamkeit." The tagging turned an existing rule on
+rather than adding one.
+
+## s182 (2026-08-01) - Anwenden returns to the DESKTOP nav only
+
+Audit P4 asked for the Anwenden entry back (it was pulled from `navItems` on 2026-07-13 for the
+demo), because Sprechen and Prüfung were reachable only from a dashboard recommendation and ⌘K.
+
+**It is back in `navItems`, which is the desktop sidebar. It is deliberately NOT in the mobile
+bottom bar.** That bar is a locked five-slot structure (CLAUDE.md, `docs/areas/PRAKTISCH-NAV.md`),
+and a sixth entry means moving something or growing it. That is a founder call, not an audit
+follow-through, so it is parked as an open action item instead of being decided by a session. The
+consequence is stated rather than hidden: on a phone the Sprechsimulation is still hard to find.
+
+## s182 (2026-08-01) - grammar groups are named after the group, not one member
+
+Adding the B1 accuracy canon (audit P5) exposed two group labels that had been named after their
+only member: `attributes` read "Partizipialattribute" and `prepositionalPronouns` read
+"da-/wo-Wörter". With Adjektivdeklination and Komparativ/Superlativ joining the first, and Verben mit
+Präpositionen joining the second, both labels became wrong: they are "Adjektive & Attribute" and
+"Verben mit Präpositionen" now. The da-/wo-forms sit under the latter on purpose, because they only
+exist BECAUSE a verb governs a fixed preposition.
+
+**One new group, `tenses` ("Zeitformen"),** for the Perfekt/Präteritum choice. It fits neither
+`future` (which is about Vermutung, not time) nor `verbPosition`, and it sits after `cases` on the
+priority spine, with the accuracy levers rather than the polish.
+
+**The drill law that came with it:** a topic is not practised by recognising an answer. Every B1
+topic carries at least three PRODUCTIVE drills (no `options`, the learner types the answer), gated in
+`tests/grammar.test.ts`. A productive answer must be unambiguous, since it is compared as one
+normalised string. The 21 B2/C1 topics still cap at five multiple-choice drills; that is known, open
+and written down, not an oversight.
