@@ -19,15 +19,12 @@ schema, set the secret API keys, and deploy the Edge Function.
 
 ## 1. Install the Supabase CLI (one time)
 
-> **The CLI is OPTIONAL.** Its only advantage is that `supabase db push`
-> (section 3) applies your entire `supabase/migrations/` folder in one command,
-> which was handy for the initial two-migration Phase 2 setup. Every migration
-> added since (0003, 0004, 0006, 0007, 0008, ...) ships with a
-> **"paste it into the Supabase dashboard SQL editor"** instruction that needs
-> nothing installed, and that is the supported route for a single new
-> migration. If the CLI install is giving you trouble (e.g. `scoop` isn't set
-> up on Windows), **skip this whole section** and use the SQL-editor paste
-> steps in the per-migration sections below. You do NOT need to re-run
+> **The CLI is not needed at all any more (s179).** `.github/workflows/supabase.yml`
+> applies pending migrations and deploys every Edge Function on each merge to
+> `main`, so neither the CLI nor the SQL editor is part of the normal flow. The
+> per-migration "paste it into the dashboard SQL editor" instructions below are
+> HISTORY: they describe how 0001-0013 were applied, not what to do now. Install
+> the CLI only if you want a local Supabase to develop against. You do NOT need to re-run
 > `supabase db push`; your earlier migrations are already applied.
 
 macOS: `brew install supabase/tap/supabase`
@@ -105,9 +102,9 @@ a fallback, not the normal path. **One-time setup, all in the browser:**
 1. Supabase Dashboard → Account → **Access Tokens** → generate one.
 2. GitHub → repo **Settings → Secrets and variables → Actions → New repository
    secret**: `SUPABASE_ACCESS_TOKEN` = that token.
-3. Optional, only if CI should also apply migrations: add `SUPABASE_DB_PASSWORD`
-   (the database password). Without it the migration step is skipped and
-   migrations must be pasted into the Dashboard SQL editor instead.
+3. `SUPABASE_DB_PASSWORD` (the database password), so CI also applies migrations.
+   **Set 2026-07-31.** Without it the migration step is skipped and migrations
+   would have to be pasted into the Dashboard SQL editor instead.
 
 **Known deviation:** `supabase/setup-cli` is pinned to the `v1` TAG, not a
 commit SHA like every other action in this repo. The sandbox that authored the
@@ -122,14 +119,18 @@ step with an explicit "regenerate it" error and deploys nothing, rather than
 failing half-way; fix it by generating a new token and updating the same GitHub
 secret. Nothing else changes.
 
-**Migrations applied by hand.** Migrations **0011** (s167) and **0012** (s171,
-`writing_evaluations.corrected_text`) were run directly in the Dashboard SQL
-editor, not through `supabase db push`, so neither is recorded in
-`supabase_migrations.schema_migrations`. That is safe: every statement in it is
-idempotent (`add column if not exists`, `create index if not exists`), so if
-`SUPABASE_DB_PASSWORD` is added later and CI re-applies it, the re-run is a
-no-op. Keep new migrations idempotent for the same reason. Without that secret,
-each future migration needs one paste into the SQL editor. Function ENV values
+**Migrations are automatic since s179, and the hand-pasted history was bridged.**
+Every migration up to 0013 was run in the Dashboard SQL editor, which never
+writes to `supabase_migrations.schema_migrations`, so when the DB password was
+added the first `db push` tried to replay 0001 and failed on an object that
+already existed. The bridge, done once: a schema probe proved which versions the
+database really carried, `supabase migration repair --status applied` recorded
+those eleven, and `db push --include-all` applied the rest. **That probe found
+0010 had never been applied at all** (no `gdpr_events`, no `log_gdpr_event`), so
+the GDPR evidence counters had no store behind them; it is in now.
+`--include-all` is permanent, because a repaired history legitimately leaves an
+older file unrecorded below a newer applied one. **Keep new migrations
+idempotent** for exactly that reason. Function ENV values
 (model ids, the daily limits, spend caps) are Supabase **secrets** and are set in
 the Dashboard under Edge Functions → Secrets; changing one needs no redeploy and
 no code change.
