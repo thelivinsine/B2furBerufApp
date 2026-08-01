@@ -2938,3 +2938,30 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/lib/graphPalette.ts` · `src/features/writing/WritingRail.tsx` · `tests/lifeAreas.test.ts`
   (new) · `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` · `docs/areas/SCHREIBEN.md` ·
   `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-31):** `keep the Niveau mix as it is but I want you to do a thorough
+  analysis of the quality of these tasks and how they go with the filter - do the required research
+  from reliable sources - this is one of the next todos for later so don't do it now, just document
+  the session. park the exam source items with official documents task for later - it's not that
+  important.`
+  **Response:** documentation only, no analysis and no code (the founder explicitly deferred the
+  audit). Three things recorded where a later session will actually find them:
+  **(1) The Niveau mix is now a settled decision, not a deviation.** B1 307 / B2 302 / C1 108 is
+  intended; the 35/50/15 target is retired and `docs/DECISIONS.md` says not to rebalance it. The rule
+  that survives: promotion between bands follows what a task demands, never a distribution target.
+  **(2) The quality + filter-fit audit is QUEUED with scope**, in `docs/PROJECT_REFERENCE.md`, so the
+  next session does not have to re-derive it: Niveau accuracy, Leitpunkte answerability inside the
+  word target, whether a task delivers what its Textsorte/Niveau/Unterthema/Branche tags promise,
+  Branche honesty under the s181 Alltag rule, near-duplicate scenarios across waves, and du/Sie
+  plausibility. It also names the sources that ARE usable now that the exam documents are parked
+  (CEFR descriptors cited never reproduced, publicly published task-type descriptions, open corpora)
+  and repeats the `strategy/DATA_GOVERNANCE.md` telc ban, so the next session does not walk into
+  s167's dead end. Deliverable shape: a `docs/reports/` audit with a prioritised fix list, like s178.
+  **(3) The exam-source items are marked PARKED, not blocked-and-waiting**, in the plan itself
+  (§12 + P0 item 3 + the status header) and in the reference backlog, with the note that unparking
+  needs a founder purchase rather than engineering, and that the quality audit does NOT depend on it.
+  Also recorded the framing that matters for next time: s181 proved COVERAGE and gated it in tests;
+  QUALITY is unproven, so a B1 tag on a task that reads as B2 is now a content bug, not a
+  distribution one.
+  Gates: docs-only (no code touched).
+- **Artifacts (prompt 5):** `docs/PROJECT_REFERENCE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/DECISIONS.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` · this log
