@@ -29,7 +29,8 @@ import { cn } from "@/lib/utils";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
-import { redemittelFacets } from "@/lib/facets";
+import { matchesThemeScope, redemittelFacets } from "@/lib/facets";
+import { themeGroupsForMode } from "@/lib/themeGroups";
 import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { defaultVisibleBands } from "@/lib/cefr";
@@ -65,6 +66,9 @@ export function RedemittelTrainer() {
   const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [search, setSearch] = useState("");
   const level = useSettingsStore((s) => s.level);
+  // Mode pre-selects which DOMAINS the grouped Thema dropdown offers, as on
+  // Wörter and Kollokationen (founder 2026-07-09, "Mode on top").
+  const learningMode = useSettingsStore((s) => s.mode);
   const [showAllLevels, setShowAllLevels] = useState(false);
   const [view, setView] = useViewParam(REDEMITTEL_VIEWS);
   // Mobile filter panel open state: the toggle is an icon on the view line.
@@ -73,6 +77,22 @@ export function RedemittelTrainer() {
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
   const { hidden: headerHidden, scrolled } = useScrollDirection();
+
+  // Thema is a SCOPE dropdown here (audit P6, s182), the same control the
+  // sibling tabs carry, riding the same `?theme=` param so a scope travels
+  // between tabs. Semantics differ on purpose: a Redemittel without a themeId
+  // is universal and shows under every Thema (`matchesThemeScope`).
+  const themes = useMemo(() => {
+    const raw = params.get("theme");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
+
+  const setThemes = (next: string[]) => {
+    const p = new URLSearchParams(params);
+    if (next.length) p.set("theme", next.join(","));
+    else p.delete("theme");
+    setParams(p, { replace: true });
+  };
 
   // Facet selection (Kategorie + Register) rides the URL, exactly like the
   // sibling tabs. `?cat=` is now a facet param, not a scope.
@@ -99,18 +119,23 @@ export function RedemittelTrainer() {
   // learner's CEFR band + one step up, over the full bank (facets apply
   // last, like Wörter/Kollokationen). Never activates if it would leave
   // nothing to show.
+  const themeScoped = useMemo(
+    () => redemittel.filter((p) => matchesThemeScope(p, themes)),
+    [themes],
+  );
+
   const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
   const bandNonEmpty = useMemo(
-    () => redemittel.some((p) => !p.cefr || visibleBands.includes(p.cefr)),
-    [visibleBands],
+    () => themeScoped.some((p) => !p.cefr || visibleBands.includes(p.cefr)),
+    [themeScoped, visibleBands],
   );
   const bandActive = !showAllLevels && !search.trim() && bandNonEmpty;
   const bandLimited = useMemo(
     () =>
-      bandActive ? redemittel.filter((p) => !p.cefr || visibleBands.includes(p.cefr)) : redemittel,
-    [bandActive, visibleBands],
+      bandActive ? themeScoped.filter((p) => !p.cefr || visibleBands.includes(p.cefr)) : themeScoped,
+    [bandActive, themeScoped, visibleBands],
   );
-  const bandHiddenCount = bandActive ? redemittel.length - bandLimited.length : 0;
+  const bandHiddenCount = bandActive ? themeScoped.length - bandLimited.length : 0;
 
   // ONE filter pipeline: level band -> search -> facets (Kategorie + Register).
   // `searched` (pre-facet) feeds the FilterRail so its pill counts reflect
@@ -123,6 +148,17 @@ export function RedemittelTrainer() {
   const filtered = useMemo(
     () => applyFacets(searched, REDEMITTEL_FACETS, railSelection),
     [searched, railSelection],
+  );
+
+  // The badge on the Filter toggle counts the scope too, like the sibling tabs.
+  const activeFilterCount = activeFacetCount(railSelection) + themes.length;
+
+  const primaryGroups = useMemo(
+    () =>
+      themeGroupsForMode(learningMode, themes, (id) =>
+        redemittel.reduce((n, p) => n + (p.themeId === id ? 1 : 0), 0),
+      ),
+    [learningMode, themes],
   );
 
   // Üben practises EXACTLY the filtered Redemittel (founder 2026-07-13): hand the
@@ -142,6 +178,19 @@ export function RedemittelTrainer() {
     selection: railSelection,
     onChange: setRailSelection,
     pinScope: "redemittel",
+    // ONE scope dropdown: Thema. The count beside each Thema is its DEDICATED
+    // phrase count, so a zero stays selectable (the universal phrases still
+    // show), exactly like the Branche dropdown on the sibling tabs.
+    scopes: [
+      {
+        pinId: "primary",
+        label: "Thema",
+        values: themes,
+        onChange: setThemes,
+        all: { value: "all", label: "Alle Themen", count: redemittel.length },
+        groups: primaryGroups,
+      },
+    ],
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
         <UebenLabel
@@ -235,9 +284,9 @@ export function RedemittelTrainer() {
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
-                  {activeFacetCount(railSelection) > 0 && (
+                  {activeFilterCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                      {activeFacetCount(railSelection)}
+                      {activeFilterCount}
                     </span>
                   )}
                 </Button>

@@ -1,6 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-31 (session 181). **The Schreiben Aufgabe backlog is closed.** Waves 3 and 4
+_Last updated: 2026-08-01 (session 182). **The daily-life half has a phrase bank.** Audit item P6
+is closed: Redemittel went 158 → **220** with five Alltag packs (Amt, Arzt, Wohnen, Bank,
+Einkauf/Reklamation), three new speech-act categories (`appointments`, `formalities`, `complaints`),
+and `themeId` tagging on the 49 situational workplace phrases, where **untagged = universal**. The
+tag was dead weight before: it sat on 0 of 158, so the session composer's mode filter never fired
+and every scope showed the same phrases. The Redemittel tab now carries the sibling tabs' Thema
+scope dropdown, and a scoped session leads with that situation's phrases.
+Prior s181: **The Schreiben Aufgabe backlog is closed.** Waves 3 and 4
 of `docs/plans/SCHREIBEN-OVERHAUL.md` shipped together with the authoring to-do list s180 exposed:
 all 373 bare one-liners were authored up to the full exam brief in place, 74 tasks were added and 60
 tagged, so the bank is **717 tasks and every one of them is servable**. Coverage is gated now rather
@@ -64,18 +71,18 @@ read that for the "what's built and how." The living detail of every feature are
 session engine, Bibliothek views, the game layer, content conventions) is in `docs/areas/` (index
 in `../CLAUDE.md`).
 
-**Content banks (as of 2026-07-30, session 178, measured against the live banks — re-verify with
+**Content banks (as of 2026-08-01, session 182, measured against the live banks — re-verify with
 `pnpm lint:content` before quoting):** vocab **1,743** (**1,733 browsable**; 8 mis-filed noun+verb combos
-retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** · Redemittel **158** ·
-grammar **28 topics / 137 drills** (17 groups) · Lese-/Hörtexte **42** (126 checks) · writing tasks **717** (all servable) in 20
-pools, of which **270 are SERVED** (s180: only a task carrying the full exam brief is drawn; the
-other 373 are retired one-liners, ids kept, and each returns when it is authored up to the shape) ·
+retired in s142 + 2 true duplicates retired in s178, ids kept) · collocations **1,072** ·
+Redemittel **220** (s182: +62 Alltag phrases in 5 packs; 111 carry a `themeId`, 109 are universal;
+18 categories) · grammar **28 topics / 137 drills** (17 groups) · Lese-/Hörtexte **42** (126 checks) ·
+writing tasks **717**, every one servable (s181) in 20 pools ·
 Can-Do **57** · dialogues **30** (158 nodes, 335 options) · exam sets **15** · missions **6** ·
-provenance **3,308 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
+provenance **3,370 rows** · themes **20** / sub-themes **46** (five new `alltag` themes in s126:
 einkaufen/essen/mobilitaet/freizeit/digitales). Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
-Standing governance debt: **3,295 of 3,308 provenance rows are AI-drafted `draft`**; only **13** are
+Standing governance debt: **3,357 of 3,370 provenance rows are AI-drafted `draft`**; only **13** are
 human-verified (13 vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset to restart the
 review pass; see `strategy/DATA_GOVERNANCE.md`). The full picture of what the banks do and do not
 cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178).
@@ -115,6 +122,52 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 182 (2026-08-01). Audit P6 is closed: the daily-life half has a phrase
+bank.** Branch `claude/next-steps-p3-analysis-7gx36m`.
+Founder: "i remember we did an analysis recently.. and did complete until p3 tasks. what are the
+next steps", then "continue with p6".
+- **Where the audit backlog actually stood** (`docs/reports/CONTENT_AUDIT_2026-07-30.md` §5, now
+  carrying a status block): P0/P1/P2 shipped in s178, P8 closed by the s181 Schreiben work, P3 only
+  *started* (the six C1 texts at 305-344 words). P6 was the cheapest real win left, so it was
+  recommended first and picked.
+- **The gap, measured before touching anything:** all 158 phrases were workplace discussion
+  functions or workplace channels (email, phone, presentation, interview, small talk), and
+  **`themeId` sat on 0 of 158**. So a learner at the Bürgeramt, the Arztpraxis, the Vermieter or the
+  Servicetheke had nothing, and the session composer's mode filter (`if (!r.themeId) return true`)
+  was dead code.
+- **62 new phrases in five Alltag packs**, each with `note`, example pair, CEFR and `themeId`:
+  Amt 13, Arzt 13, Wohnen 13, Bank 11, Einkauf/Reklamation 12. They cover the counter language the
+  audit named, Widerspruch included ("Hiermit lege ich Widerspruch gegen den Bescheid vom … ein.",
+  "Ich bitte Sie, den Mangel bis zum … zu beheben.", "Ich setze Ihnen eine Frist bis zum …"), and
+  several carry the s181 work-context reason ("Ich arbeite bis 15 Uhr, wäre auch ein Termin am
+  späten Nachmittag möglich?").
+- **Three new categories, because the existing 15 could not hold them honestly:** `appointments`
+  (Termine), `formalities` (Anliegen & Anträge), `complaints` (Problem & Reklamation). Closed-enum
+  rule followed in all three places (union, linter array, category metadata). Pill count on the
+  Kategorie facet is now 18; say the word if that should become a dropdown.
+- **Tagging is deliberately NOT blanket, and this is the decision to know about.** The audit said
+  "tag the 158". Tagging a discussion function ("Da bin ich anderer Meinung.") with a theme would be
+  a sticker: it belongs to no situation and works in all of them. So **49 situational phrases were
+  tagged** (presentations → meetings, jobInterview + professionalIntro → bildung, the company-voice
+  phone and email lines → customer) and the 109 function/channel phrases stay **untagged =
+  universal**, exactly like an untagged Branche. `tests/redemittel.test.ts` (16 tests) fails if a
+  later pass blanket-tags the bank, empties a pack, or leaves a category with no phrases.
+- **Two places the tag now does work.** (1) The Redemittel tab carries the sibling tabs' **Thema
+  scope dropdown** on the same `?theme=` param, with dedicated-content counts and zero-count Themen
+  still selectable (Branche semantics, not Wörter semantics). Verified in the built app: Thema =
+  Behörde & Ämter yields **122 Wendungen** (13 Amt + 109 universal) and the presentation openers are
+  gone. (2) A scoped session leads Pool 4 with that theme's phrases, and a personal-mode session no
+  longer serves "Vielen Dank für Ihre Aufmerksamkeit."
+- **Gates:** typecheck · lint 0 errors · lint:content clean (220 redemittel, 3,370 provenance rows,
+  1 known `der Empfang` warning) · test:unit **435/435** · build · check:bundle 123.2 kB ·
+  report:exercise-coverage 20/20 green · build:review-queue refreshed. `verify:grammar` could not
+  run in this sandbox (the LanguageTool toolchain needs `mvn` + Maven Central); it is warn-only.
+- **Next, if you want the audit list continued:** P4 (Sprechen + Prüfung off the nav) needs a
+  founder decision on whether the Anwenden entry returns to the four-zone nav; P5 (Adjektivdeklination,
+  Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure
+  content win; P3's remaining half needs an audio strategy, since TTS voicemails cannot train
+  note-taking.
 
 **Handoff after session 181 (2026-07-31). The Aufgabe backlog is closed: 717 tasks, every one of
 them servable.** Branch `claude/latest-plan-steps-ydumbt`.
@@ -176,67 +229,6 @@ graphs in bibliothek. This has to be consistent across the app."
   ALLTAG, the Bibliothek dropdown the same two, the Wörter graph legend reads "Berufsleben · Alltag".
 - **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
   check:bundle 123.2 kB.
-
-**Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
-`claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
-Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and
-necessary improvements with the Aufgabe feature."
-- **Root cause: Niveau and Textsorte were never really filters.** `eligibleTasks` narrowed them
-  prefer-tagged-else-untagged, the rule that is right for Branche. 373 of the 643 tasks carry no
-  `format`, so on every theme without a tagged task the fallback swallowed the filter, and where even
-  the untagged set was empty the filter was dropped entirely. Measured on the shipped bank: under
-  "Alle Themen + Forumsbeitrag" the draw pool was 85 tasks of which **71 were not Forumsbeiträge**
-  (84%), and the rail printed the honest count, 14, right beside the option. Every Textsorte was
-  wrong between 66% and 100% of the time. **Both axes filter hard now**, and the order is
-  Unterthema → Niveau → Textsorte → Branche (the soft axis last, so it can never hide the only task
-  matching a hard one). `countExact` is gone: one hard rule means the rail count and the draw pool
-  are one number.
-- **A scope can now legitimately be empty, and the trainer says so.** Every dropdown greys its
-  zero-yield options with the count still visible; where greying cannot help (a Kurz/Lang switch
-  carrying a length-specific Textsorte, a stale deep link) the Aufgabe card is replaced by
-  "Forumsbeitrag gibt es nur bei Lang." plus the one-tap "Textsorte zurücksetzen" that `blockingAxis`
-  picks. `randomTask` returns null for an empty list instead of the first task of the first theme.
-- **Five smaller faults fixed in the same pass.** `bewerbung` was a permanently empty dropdown option
-  (0 tasks at either length, since s167), so the Textsorte list is derived from the bank now. The
-  Niveau option labelled "B2" matched the tag `B2.1` exactly, which would have made the first `B2.2`
-  task silently unreachable; it matches by BAND, and "C1.1" is labelled "C1" like everywhere else.
-  The Ziel line printed `words x 1.25` unrounded ("Ziel 150–188 Wörter") and never named the Niveau;
-  it is "B2 · Bericht · Ziel 150–190 Wörter" now. Every scope change pushed a history entry, so the
-  phone's back gesture undid filter taps one at a time. Fokus and Verlauf kept `?level`/`?format`
-  alive after a tab switch.
-- **The sign-in draft hand-off lost the text on the email/password path.** `initialText` is read once
-  on mount, and signing in from the login wall does not remount the trainer when the learner is
-  already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
-  resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
-  which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
-- **Follow-up in the same session, founder decision: only fully briefed Aufgaben are served.** The
-  founder sent a fourth screenshot, `wt_safety_l12` ("Verfasse eine kurze Unterweisung für neue
-  Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no Niveau): "this one has too little
-  description of the task." The bank held two generations: **270 tasks carry the whole exam brief**
-  (Adressat, du/Sie, 2 to 5 Leitpunkte, Niveau, Textsorte, word target) and **373 are one-liners**.
-  Presented both options (upgrade the 373 over several content sessions, or serve only the 270 now);
-  the founder chose the smaller, better bank. Bare tasks failed three ways at once: they leave
-  `evaluate-writing` nothing to grade Aufgabenerfüllung against, so feedback silently drops to
-  grammar and vocabulary; they carry neither filter tag, so they were reachable ONLY under the
-  default scope, which is where 58% of draws landed; and they read as unfinished. At the Kurz 4 /
-  Lang 2 daily allowance, 270 tasks is about two months before anything repeats, so the number the
-  learner can feel is unchanged. **Nothing is deleted:** the 373 keep their ids AND pool positions,
-  so drafts and Verlauf rows still resolve, and each returns to the draw the moment it is authored up
-  to the full shape, with no code change. `sub` became a hard filter with it (it used to fall back to
-  the whole Thema, the last silent substitution in the selector).
-- **The zeros in the rail are now the content backlog**, deliberately visible rather than papered
-  over: `bewerbung` has no task at any length, **15 of 46 Unterthemen have none at each length**,
-  `bericht` at C1 has one. Every Thema and every Branche still yields tasks at both lengths.
-- **Gates:** typecheck · lint 0 errors · test:unit **410/410** (new `tests/writingAufgabe.test.tsx`
-  renders the trainer: 20 consecutive draws per scope obey the filter, and 30 default draws all carry
-  an Adressat, Leitpunkte and a Niveau) · lint:content clean · build · check:bundle 123.2 kB.
-- **Shipped as two PRs, both squash-merged and deployed green** (`Validate content` + `Deploy site to
-  GitHub Pages` success on each): **#766** the filter fix, **#768** the fully-briefed-Aufgaben rule.
-- **Next session, if the founder wants the gaps closed:** the authoring list is in
-  `docs/areas/CONTENT.md` (Bewerbung has no task at any length, 15 of 46 Unterthemen have none at
-  each length, `bericht` at C1 has one). Authoring one task into the full shape makes its whole
-  Niveau x Textsorte x Unterthema cell selectable, so the greyed zeros in the rail are the progress
-  bar for that work. Load the `/content` skill first.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

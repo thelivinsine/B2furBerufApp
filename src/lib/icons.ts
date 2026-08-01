@@ -48,6 +48,8 @@ import {
   Bus,
   PartyPopper,
   Smartphone,
+  FileText,
+  AlertTriangle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -101,6 +103,8 @@ const map: Record<string, LucideIcon> = {
   Bus,
   PartyPopper,
   Smartphone,
+  FileText,
+  AlertTriangle,
 };
 
 export function iconByName(name: string): LucideIcon {

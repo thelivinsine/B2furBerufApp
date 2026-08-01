@@ -555,7 +555,16 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
     const ctx = themeById(r.themeId)?.context ?? "both";
     return ctx === mode || ctx === "both";
   });
-  const redeBlocks: SessionBlock[] = sample(redePool.length ? redePool : redemittel, 2).map(
+  // Since the P6 pass (s182) the situational phrases carry a themeId, so a
+  // session scoped to a theme leads with the phrases for THAT situation and
+  // falls back to the universal ones when the theme has none of its own.
+  const scopedRede = redePool.filter((r) => r.themeId === scopeTheme);
+  const otherRede = redePool.filter((r) => r.themeId !== scopeTheme);
+  const redeSource = [
+    ...sample(scopedRede, 2),
+    ...sample(otherRede.length ? otherRede : redemittel, 2),
+  ].slice(0, 2);
+  const redeBlocks: SessionBlock[] = redeSource.map(
     (r): SessionBlock => ({
       kind: "flashcard",
       key: `fc_rede_${r.id}`,

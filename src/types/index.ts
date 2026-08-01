@@ -230,7 +230,14 @@ export type RedemittelCategory =
   | "emails"
   | "presentations"
   | "jobInterview"
-  | "smallTalk";
+  | "smallTalk"
+  // Alltag speech acts (audit P6, s182). The first fifteen categories were all
+  // workplace channels or discussion functions, so the daily-life half of the
+  // product had no phrase bank at all. These three are the acts a learner
+  // performs at a counter: booking, filing, and reporting what went wrong.
+  | "appointments"
+  | "formalities"
+  | "complaints";
 
 export interface RedemittelPhrase {
   id: string;
