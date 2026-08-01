@@ -2819,3 +2819,39 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingHub.tsx` ·
   `tests/writingScope.test.ts` · `tests/writingAufgabe.test.tsx` (new) · `docs/areas/SCHREIBEN.md` ·
   `docs/areas/CONTENT.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 12 (verbatim, 2026-07-31):** `is there any action left in this session?`
+- **Response summary:** Verified rather than recalled: working tree clean, branch identical to `main`,
+  no open PRs, seven PRs squash-merged (#760-#765, #767), and the Supabase state re-checked live (all
+  14 migrations recorded both sides, `insight_en` and `gdpr_events` present). Confirmed the docs
+  survived the collision with session 180: parts 1-3 of this session's handoff were archived into
+  `PROJECT_STATUS_ARCHIVE_2026-W31.md` by that session, not lost. Nothing left on my side; the three
+  open founder items (Resend SMTP, optional LanguageTool key, Google branding review) all predate this
+  session. Flagged two optional follow-ups: renaming/deleting the twelve dashboard SQL snippets, and
+  reverting the Redemittel card height if the uniform grid reads too airy.
+
+- **Prompt 13 (verbatim, 2026-07-31):** `document the session`
+- **Response summary:** Closing pass. The per-prompt entries above were written as each piece landed,
+  so this pass went after what the session made STALE rather than re-narrating it:
+  **`docs/DECISIONS.md` had no s179 section at all** and it was the doc most owed one, since three of
+  this session's changes REVERSE earlier rules and one is an explicit exception to a standing law.
+  Ten entries added, the load-bearing ones being: a transparent sticky row obliges every control in it
+  to carry a full-alpha fill (the "illegible buttons" round is what that rule costs when skipped);
+  clearance under a sticky header belongs in the offset, never in padding; a card grid has ONE height,
+  which makes the tallest card everyone's problem; a cap is a starting view, never a dead end; grading
+  level and EXPLAINING level are different things, and a prompt-wording change is a cache
+  invalidation; the sticky DE/EN switch is a deliberate exception to "EnPeek, never sticky" (s93),
+  scoped to feedback prose and kept visually distinct; Shuffle now clears the editor; a limit that is
+  only enforced is a trap; and never repair a migration history on trust, since the evidence pass is
+  what found 0010 missing from production.
+  **`docs/plans/PHASE2_SETUP.md` still told the founder to paste SQL by hand** in three places,
+  including the CLI section's "the supported route for a single new migration". Rewritten: the CLI is
+  not needed at all, the per-migration paste instructions are explicitly marked HISTORY (how 0001-0013
+  were applied, not what to do now), `SUPABASE_DB_PASSWORD` is recorded as set, and the hand-pasted
+  history note is replaced by what actually happened when it was bridged.
+  `docs/DECISIONS.md` §s171 item 12 also still said "CI skips migrations" as a present-tense fact;
+  corrected to the real reason the insert steps down (a deploy still lands before its migration inside
+  the same run) and extended to the new `insight_en` tier.
+  Gates: lint:content clean · typecheck (docs-only otherwise).
+- **Artifacts (prompts 12-13):** `docs/DECISIONS.md` (new §s179, §s171 item 12 corrected) ·
+  `docs/plans/PHASE2_SETUP.md` · this log

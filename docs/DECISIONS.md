@@ -789,9 +789,10 @@ app, not only in the preview.
     tokens, so `parseInsight` now falls back to salvaging `weakness` + `insight` out of a payload too
     broken to parse, and simply drops the correction. The learner never loses their tip because the
     optional extra did not fit.
-12. **The insert steps DOWN through optional columns.** CI deploys Edge Functions but skips migrations
-    (`SUPABASE_DB_PASSWORD` unset), so the function is expected to run before its column exists: full
-    row -> without `corrected_text` -> base row. A lost row would also stop the daily limit counting,
+12. **The insert steps DOWN through optional columns.** The function can be live before its column
+    exists (CI deployed functions but skipped migrations until s179, and a deploy still lands before
+    the migration in the same run): full row -> without `insight_en` -> without `corrected_text` ->
+    base row. A lost row would also stop the daily limit counting,
     since that limit counts rows, so this protects a cost guardrail, not just a feature.
 13. **`Zeichensetzung` became its own edit category.** A bare added comma normalised to the same word
     and therefore read as "Groß-/Kleinschreibung", which taught the wrong rule. Longer Verlauf texts are
@@ -914,6 +915,68 @@ the shape of the mistake is repeatable.
    ("with a secondary account, it redirects me to landing page") was a profile-restore symptom, not
    an authentication one. Ask what is on screen and where the learner ends up BEFORE re-reading the
    file you just edited.
+
+## s179 · The Bibliothek grid, the AI's own voice, and a migration history that was never real
+
+Four founder reports on the UI, one on the AI's language, and one ops question that turned into a
+production finding.
+
+1. **A sticky row either masks what passes under it or it does not exist.** The browse toolbar faded
+   a `bg-background/90 backdrop-blur` band in on scroll, which the founder read as "a blurred band
+   strapped across the page". It is transparent in every state now, and that decision has a cost
+   that must be paid deliberately: **every control in that row needs a FULL-ALPHA fill**. The shared
+   `outline` variant is `bg-surface/50`, so the first version shipped buttons the card titles printed
+   straight through ("the buttons are illegible"). `BROWSE_TOOLBAR_BUTTON` exists to make that
+   non-optional. A half-transparent control is invisible as a bug until the thing behind it moves.
+2. **Clearance under a sticky header belongs in the sticky OFFSET, never in padding.** Padding applies
+   in every state, so it also pushed the controls away from the tabs at the top of the page ("when at
+   top it's way too much"). `top-[calc(4rem+…+0.75rem)]` does nothing until the row pins, and it
+   leaves the flow height unchanged, so nothing shifts at the moment it pins. A conditional padding
+   would have twitched the page.
+3. **A card grid has ONE card height, not one per row.** CSS grid equalises rows, which reads as
+   raggedness down the page. `auto-rows-fr` equalises the whole grid and stays content-driven, so a
+   filtered set of short cards stays short and no fixed height can ever clip. The height is then set
+   by the tallest card, which makes tall cards everyone's problem: the Wörter verb paradigm went to
+   two label/value pairs per row for exactly that reason (209px → 189px). **With one height for the
+   whole grid, top-aligned content leaves a hollow lower half**, so card content is centered on the
+   three text-card tabs; anchored elements (the Wörter foot row, the Grammatik pattern chip) stay
+   anchored.
+4. **A cap is a starting view, never a dead end.** "+6 weitere" under the fix tiles hid corrections
+   with no way back. The cap now decides only what the card opens with. Any future truncation that
+   cannot be expanded is a bug, not a layout choice.
+5. **Grading level and EXPLAINING level are different things, and only the first was ever specified.**
+   The rubric graded at the task's CEFR band while the tip inherited whatever register the model
+   chose, so a B2 learner was told about "Aufgabenerfüllung" and "Anredeform". Both prompts now demand
+   simple A2 German with the jargon banned by name, plus the same sentence in equally simple English.
+   **A prompt-wording change is a cache invalidation**: `PROMPT_REV` and `PROMPT_VERSION` were bumped,
+   or the old prose would have kept being served from the hash cache forever.
+6. **The DE/EN switch on AI feedback is a deliberate exception to "EnPeek, never sticky" (s93).** That
+   law protects LEARNING content: a one-line gloss should be a peek, because a sticky English would
+   let a learner dodge the German. A Kurz/Lang tip is a paragraph of INSTRUCTION about the learner's
+   own text, and nobody reads a paragraph with a finger held down. The two are kept apart by their
+   labels: the peek chip always reads "EN", the switch flips "EN"/"DE". Do not merge them.
+7. **Shuffle clears the editor** (reverses the older "keeps typed text, a mis-tap must not destroy
+   work" rule, founder-instructed). A new Aufgabe means a new text; leaving the old one there means
+   writing the next answer around it. The rail reset and the scope-change redraw already cleared, so
+   all three paths agree now.
+8. **A limit that is only enforced is a trap; the number belongs on screen.** Fokus 10 / Kurz 4 /
+   Lang 2 were invisible until a learner hit one and got "komm morgen wieder". Each trainer prints
+   "Heute noch 7 von 10" beside the button that spends it, and **the number is the server's**:
+   `check-sentence` and `evaluate-writing` return `dailyLimit`/`dailyRemaining` on every response, so
+   an env-raised limit surfaces without a code change. Unknown renders NOTHING rather than a guess.
+9. **Never repair a migration history on trust.** `supabase migration repair --status applied` skips
+   that version's SQL forever. The remote had no history at all (everything to date was pasted by
+   hand, which never writes to `supabase_migrations`), so the first `db push` tried to replay 0001.
+   The bridge was done only after a schema probe printed what the database actually carried, **and
+   that probe found migration 0010 had never been applied**: no `gdpr_events`, no `log_gdpr_event`,
+   so the GDPR evidence counters had no store behind them. A blanket "mark everything applied" would
+   have buried that permanently. `--include-all` is permanent for the same reason a repaired history
+   exists: an older file can legitimately sit unrecorded below a newer applied one. **Keep every
+   migration idempotent.**
+10. **What an API cannot do is worth writing down.** The dashboard's saved SQL queries cannot be
+    renamed from outside the dashboard: the Management API exposes `GET /v1/snippets` and
+    `GET /v1/snippets/{id}` and nothing else, and a PATCH against all twelve returned 404. Tested,
+    not assumed, and recorded in the workflow so nobody re-tests it.
 
 ## s180 · A filter that "prefers" is not a filter
 
