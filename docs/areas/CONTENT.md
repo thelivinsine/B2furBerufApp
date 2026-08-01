@@ -97,7 +97,17 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   Topics ordered by B2-marker priority (`grammarMeta.ts` `groupOrder`). Drills: `id`, `prompt`,
   `answer`, `options?` (MCQ) or none (word-order), `explain`, `gloss` (lesson hides gloss behind
   the EN peek; sessions keep it visible).
-- **Redemittel** (`src/data/redemittel.ts`, ~158; `r_` prefix).
+- **Redemittel** (`src/data/redemittel.ts`, 220; `r_` prefix): `id`, `de`, `en`, `category`
+  (closed enum, 18), `register` (neutral/formal), `example` (de + en), optional `note`, `cefr`,
+  `themeId`. **`themeId` is untagged-=-universal** (audit P6, s182), like Branche and unlike
+  Wörter/Kollokationen where every item carries one: a phrase is tagged only when it belongs to one
+  theme's situation (Vortrag → meetings, Bewerbung → bildung, Amt/Arzt/Wohnen/Bank/Reklamation →
+  their Alltag theme), and an untagged phrase shows under EVERY Thema and in every learning mode.
+  Blanket-tagging the discussion functions would be a sticker, not information, and
+  `tests/redemittel.test.ts` fails if a pass ever does it. The 15 original categories were all
+  workplace channels or discussion functions; the three Alltag speech acts (`appointments`,
+  `formalities`, `complaints`) carry the counter language. Every category must have phrases behind
+  it (the s180 `bewerbung` lesson: a permanently empty dropdown option is a broken control).
 - **Can-Do milestones** (`src/data/canDo.ts`, 57): `id` (`cd_`), `themeId`, `cefr`, `statement`
   (German, must start with "Ich kann"), `en`, `threshold` (0..1 theme-mastery ratio). Aligned to
   the CoE CEFR self-assessment descriptors (cited in provenance, never reproduced). Keep ascending

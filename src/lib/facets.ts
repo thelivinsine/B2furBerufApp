@@ -149,6 +149,21 @@ export function matchesSector(
   );
 }
 
+/** The same untagged-=-universal semantics for the Thema scope on Redemittel
+ *  (audit P6, s182). Wörter and Kollokationen carry a themeId on EVERY item, so
+ *  their Thema dropdown is a hard filter. A Redemittel is different: "Da bin ich
+ *  anderer Meinung." belongs to no situation and works in all of them, so the
+ *  bank tags only the phrases that belong to one theme's situation (the counter,
+ *  the practice, the presentation) and leaves the rest universal. An untagged
+ *  phrase therefore shows under EVERY Thema, exactly like an untagged Branche,
+ *  and a Thema count is the dedicated-content signal, not the yield. */
+export function matchesThemeScope(
+  item: { themeId?: string },
+  themes: readonly string[] | undefined | null,
+): boolean {
+  return !themes?.length || !item.themeId || themes.includes(item.themeId);
+}
+
 /** With one or more Branchen selected, the learner's Fachwörter lead the list
  *  and the general (untagged) words follow. Stable within each group. */
 export function sectorFirst<T extends { sectors?: readonly string[] }>(

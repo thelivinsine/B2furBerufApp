@@ -2965,3 +2965,44 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Gates: docs-only (no code touched).
 - **Artifacts (prompt 5):** `docs/PROJECT_REFERENCE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/DECISIONS.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` · this log
+
+## Session 182 (2026-08-01) - branch `claude/next-steps-p3-analysis-7gx36m`
+
+- **Prompt 1 (verbatim, 2026-08-01):** `i remember we did an analysis recently.. and did complete
+  until p3 tasks. what are the next steps`
+  **Response:** identified the analysis as the content audit
+  (`docs/reports/CONTENT_AUDIT_2026-07-30.md`, session 178) and corrected the premise from the repo
+  rather than accepting it: P0, P1 and P2 shipped in s178, P8 was closed by the s181 Schreiben work,
+  P9 only half (the duplicates), and **P3 was started but not finished** (the six C1 texts at
+  305-344 words; the rest of the bank is still ~90 words and listening is still 6 TTS voicemails).
+  Verified the open items against the code instead of quoting the audit: `themeId` on **0 of 158**
+  Redemittel, `/anwenden` still unlinked in `nav-items.ts`, no `audio` field on any text, 13 verified
+  provenance rows. Recommended P6 first (cheapest real win, and it serves the half of the product the
+  s21 repositioning made core), then P4 with a founder decision on the nav, then P5.
+- **Artifacts (prompt 1):** none (question answered from the repo)
+- **Prompt 2 (verbatim, 2026-08-01):** `continue with p6`
+  **Response:** closed audit P6. Loaded `/content` first, then `/design` before the one UI change.
+  **The gap:** every one of the 158 phrases was a workplace discussion function or a workplace
+  channel, and `themeId` sat on zero of them, so the composer's mode filter was dead code and the
+  Alltag half of the app had no phrase bank at all.
+  **Shipped:** 62 new phrases in five packs (Amt 13, Arzt 13, Wohnen 13, Bank 11,
+  Einkauf/Reklamation 12), each with note, example pair, CEFR and themeId, Widerspruch and
+  Mängelanzeige formulas included, several carrying the s181 work-context reason. Three new
+  categories (`appointments`, `formalities`, `complaints`) mirrored in all three closed-enum places.
+  **The judgement call, reported rather than buried:** the audit said "tag the 158"; blanket tagging
+  would make a sticker of every discussion function, so **49 situational phrases were tagged** and
+  the other 109 stay **untagged = universal**, the same semantics Branche already uses. Wired the tag
+  into the two places it earns its keep: a Thema scope dropdown on the Redemittel tab (`?theme=`,
+  dedicated-content counts, zero-count Themen still selectable) and a theme-led Pool 4 in the session
+  composer. Verified in the built app with headless Chromium: Thema = Behörde & Ämter yields 122
+  Wendungen (13 dedicated + 109 universal) and the presentation openers are gone.
+  Gates: typecheck · lint 0 errors · lint:content clean (220 redemittel, 3,370 provenance rows) ·
+  test:unit **435/435** · build · check:bundle 123.2 kB · report:exercise-coverage 20/20 ·
+  build:review-queue refreshed. `verify:grammar` could not run in the sandbox (LanguageTool needs
+  `mvn` + Maven Central); it is warn-only, and this is stated rather than skipped silently.
+- **Artifacts (prompt 2):** `src/data/redemittel.ts` · `src/data/provenance.ts` (62 rows) ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `src/lib/facets.ts` (`matchesThemeScope`) ·
+  `src/lib/icons.ts` · `src/engine/session.ts` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `tests/redemittel.test.ts` (new, 16 tests) · `docs/areas/CONTENT.md` · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/areas/SESSION.md` · `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` ·
+  `src/features/admin/reviewQueue.json` · `docs/reports/exercise-coverage-report.md` · this log

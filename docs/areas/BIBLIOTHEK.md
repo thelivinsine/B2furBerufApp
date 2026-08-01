@@ -137,6 +137,11 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   facet order: Wortart right after Thema/Unterthema, Stufe (CEFR) LAST. Redemittel: Kategorie is a
   multi-select PILL facet (`CATEGORY_FACET`), Register a rail facet; `?cat=`/`?register=` ride the
   facet selection; the per-category card section headers were removed (flat card grid).
+- **Redemittel carries ONE scope dropdown, Thema** (audit P6, s182), on the same `?theme=` param as
+  the sibling tabs so a scope travels between them. Its semantics are the Branche ones, not the
+  Wörter ones: an untagged phrase is universal and shows under every Thema (`matchesThemeScope`),
+  so the count beside each Thema is its DEDICATED phrase count and a zero stays selectable. There is
+  no Branche and no Unterthema dropdown here (the bank tags neither).
 - One `filterRailProps` object feeds the two `<FilterRail>` instances (desktop rail
   default-open, mobile panel `defaultOpen={false}`).
 - Facet pills are `rounded-md` squircle (not `rounded-full`).

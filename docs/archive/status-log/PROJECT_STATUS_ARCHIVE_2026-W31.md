@@ -660,3 +660,64 @@ and the failure was worth having.
   dispatch-only inputs stay for diagnosis: `list_only`, `probe_schema`, `repair_applied`.
 - **Still true:** keep every migration idempotent. With `--include-all` an unrecorded file is applied
   wherever its number sits.
+
+**Handoff after session 180 (2026-07-31). The Aufgabe filters now mean what they say.** Branch
+`claude/aufgabe-rail-bugs-1xdep2`. Founder, with three screenshots of Schreiben Lang: "I selected
+Forumsbeitrag but the Aufgabe doesn't relate to it. Do a thorough analysis and find all the bugs and
+necessary improvements with the Aufgabe feature."
+- **Root cause: Niveau and Textsorte were never really filters.** `eligibleTasks` narrowed them
+  prefer-tagged-else-untagged, the rule that is right for Branche. 373 of the 643 tasks carry no
+  `format`, so on every theme without a tagged task the fallback swallowed the filter, and where even
+  the untagged set was empty the filter was dropped entirely. Measured on the shipped bank: under
+  "Alle Themen + Forumsbeitrag" the draw pool was 85 tasks of which **71 were not Forumsbeiträge**
+  (84%), and the rail printed the honest count, 14, right beside the option. Every Textsorte was
+  wrong between 66% and 100% of the time. **Both axes filter hard now**, and the order is
+  Unterthema → Niveau → Textsorte → Branche (the soft axis last, so it can never hide the only task
+  matching a hard one). `countExact` is gone: one hard rule means the rail count and the draw pool
+  are one number.
+- **A scope can now legitimately be empty, and the trainer says so.** Every dropdown greys its
+  zero-yield options with the count still visible; where greying cannot help (a Kurz/Lang switch
+  carrying a length-specific Textsorte, a stale deep link) the Aufgabe card is replaced by
+  "Forumsbeitrag gibt es nur bei Lang." plus the one-tap "Textsorte zurücksetzen" that `blockingAxis`
+  picks. `randomTask` returns null for an empty list instead of the first task of the first theme.
+- **Five smaller faults fixed in the same pass.** `bewerbung` was a permanently empty dropdown option
+  (0 tasks at either length, since s167), so the Textsorte list is derived from the bank now. The
+  Niveau option labelled "B2" matched the tag `B2.1` exactly, which would have made the first `B2.2`
+  task silently unreachable; it matches by BAND, and "C1.1" is labelled "C1" like everywhere else.
+  The Ziel line printed `words x 1.25` unrounded ("Ziel 150–188 Wörter") and never named the Niveau;
+  it is "B2 · Bericht · Ziel 150–190 Wörter" now. Every scope change pushed a history entry, so the
+  phone's back gesture undid filter taps one at a time. Fokus and Verlauf kept `?level`/`?format`
+  alive after a tab switch.
+- **The sign-in draft hand-off lost the text on the email/password path.** `initialText` is read once
+  on mount, and signing in from the login wall does not remount the trainer when the learner is
+  already on the draft's own tab, so the draft came back only after the Google redirect. Consuming a
+  resume now remounts the trainer, and the Aufgabe's theme travels as a prop instead of `?theme=`,
+  which used to pin an "Alle Themen" learner to one Thema and clear the draft on the way in.
+- **Follow-up in the same session, founder decision: only fully briefed Aufgaben are served.** The
+  founder sent a fourth screenshot, `wt_safety_l12` ("Verfasse eine kurze Unterweisung für neue
+  Mitarbeitende ...", one sentence, no Adressat, no Leitpunkte, no Niveau): "this one has too little
+  description of the task." The bank held two generations: **270 tasks carry the whole exam brief**
+  (Adressat, du/Sie, 2 to 5 Leitpunkte, Niveau, Textsorte, word target) and **373 are one-liners**.
+  Presented both options (upgrade the 373 over several content sessions, or serve only the 270 now);
+  the founder chose the smaller, better bank. Bare tasks failed three ways at once: they leave
+  `evaluate-writing` nothing to grade Aufgabenerfüllung against, so feedback silently drops to
+  grammar and vocabulary; they carry neither filter tag, so they were reachable ONLY under the
+  default scope, which is where 58% of draws landed; and they read as unfinished. At the Kurz 4 /
+  Lang 2 daily allowance, 270 tasks is about two months before anything repeats, so the number the
+  learner can feel is unchanged. **Nothing is deleted:** the 373 keep their ids AND pool positions,
+  so drafts and Verlauf rows still resolve, and each returns to the draw the moment it is authored up
+  to the full shape, with no code change. `sub` became a hard filter with it (it used to fall back to
+  the whole Thema, the last silent substitution in the selector).
+- **The zeros in the rail are now the content backlog**, deliberately visible rather than papered
+  over: `bewerbung` has no task at any length, **15 of 46 Unterthemen have none at each length**,
+  `bericht` at C1 has one. Every Thema and every Branche still yields tasks at both lengths.
+- **Gates:** typecheck · lint 0 errors · test:unit **410/410** (new `tests/writingAufgabe.test.tsx`
+  renders the trainer: 20 consecutive draws per scope obey the filter, and 30 default draws all carry
+  an Adressat, Leitpunkte and a Niveau) · lint:content clean · build · check:bundle 123.2 kB.
+- **Shipped as two PRs, both squash-merged and deployed green** (`Validate content` + `Deploy site to
+  GitHub Pages` success on each): **#766** the filter fix, **#768** the fully-briefed-Aufgaben rule.
+- **Next session, if the founder wants the gaps closed:** the authoring list is in
+  `docs/areas/CONTENT.md` (Bewerbung has no task at any length, 15 of 46 Unterthemen have none at
+  each length, `bericht` at C1 has one). Authoring one task into the full shape makes its whole
+  Niveau x Textsorte x Unterthema cell selectable, so the greyed zeros in the rail are the progress
+  bar for that work. Load the `/content` skill first.
