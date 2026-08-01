@@ -2544,6 +2544,8 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   lint 0 errors.
 - **Artifacts (prompt 6):** `tests/engine.test.ts` · `docs/PROJECT_STATUS.md` · this log · **PR #759**
 
+## Session 179 — 2026-07-31 — branch `claude/ui-layout-buttons-cards-zkchha`
+
 - **Prompt 1 (verbatim, 2026-07-31, screenshot of the Wörter Karten view attached):** `there are some
   UI/layout issues:` / `1. the view buttons row has a blur background but it be completely transparent
   making the buttons look like they are floating with enough space above them` / `2. the cards don't
@@ -3093,3 +3095,16 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   infrastructure fix (provenance split into four parts for the TS2590 ceiling).
   Gates: docs-only (no code touched).
 - **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 14 (verbatim, 2026-07-31):** `as long as nothing is missing from this session and
+  everything is updated, we're done here.`
+- **Response summary:** Final audit rather than a sign-off, since three sessions (180, 181, 182) had
+  edited the same docs after this one. It found ONE genuine defect, in the file whose whole purpose is
+  the paper trail: **there was no `## Session 179` heading**, so all 13 prompts of this session were
+  filed under session 178's branch. Heading added; the 13 entries now sit under
+  `claude/ui-layout-buttons-cards-zkchha` where they belong. Everything else verified present on
+  `main` after the later sessions: `docs/DECISIONS.md` §s179 (10 entries, between s174 and s180), the
+  `auto-rows-fr` + full-alpha-toolbar rules in `areas/BIBLIOTHEK.md`, the allowance/DE-EN/Nochmal
+  rules in `areas/SCHREIBEN.md`, the migrations-are-automatic law in `CLAUDE.md`, and this session's
+  part-4 handoff archived into `PROJECT_STATUS_ARCHIVE_2026-W31.md` by session 182 (not lost).
+- **Artifacts (prompt 14):** this log
