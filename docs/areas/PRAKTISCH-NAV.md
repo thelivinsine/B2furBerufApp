@@ -6,9 +6,12 @@ without an explicit founder request. Mechanism history + mockups: `docs/DECISION
 ## Nav zones
 Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Schreiben** (`/writing`, brand-blue
 accent, pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
-**Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, but `/anwenden`
-stays mounted in `router.tsx` so `/welt` + deep links resolve — re-add the `navItems` row to
-restore it. `BottomTabBar` `REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT =
+**Anwenden is back in `navItems` since s182** (audit P4), so it shows in the DESKTOP sidebar
+(orange target mark). It is deliberately NOT in the mobile bottom bar: that is the locked 5-slot
+structure, and adding a sixth would break it, so mobile placement stays a founder decision. Before
+s182 the hub was off `navItems` entirely (founder, 2026-07-13, demo), which left the speaking
+simulation reachable only from the dashboard recommendation and ⌘K. Remote config can still hide
+it (`hiddenTabs`, admin Steuerung). `BottomTabBar` `REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT =
 "/analytics"` (Fortschritt is pinned directly left of Einstellungen for every user since s158,
 founder request; older persisted orders are normalised at read time);
 `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed

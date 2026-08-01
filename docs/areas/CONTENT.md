@@ -151,6 +151,14 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   Word targets by band, keep them consistent: B1 40/80, B2 100/150, C1 120/200 (short/long).
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
+- **Sprech-Szenarien** (`dialogues.ts`, 30): `id` (`sc_`), `themeId`, `title`, `task`, `context`,
+  `level` 1-3, `minutes`, `targetRedemittel[]`, `start`, `nodes` (keyed by node id, unique WITHIN
+  the scenario only). A node is a choice node (`options[]`, each with `next`, `quality`, `feedback`,
+  optional `uses`) or a **free-speak node** (`prompt` + `model` + `next`, no options). **Every
+  scenario must carry at least one free-speak node with a model answer, on every path** (audit P4,
+  s182: 20 of 30 ended on a multiple-choice turn, so the speaking trainer never asked for produced
+  speech). `tests/scenarios.test.ts` gates it, together with node-reference integrity and
+  reachability. Level 3 is still thin (2 of 30) and is the open half of P4.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
   (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
   `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a
