@@ -107,6 +107,10 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 - [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
+- [ ] **Decide where Anwenden lives on MOBILE (s182, audit P4).** Sprechen + Prüfung are back on the
+      desktop sidebar, but the mobile bottom bar has five locked slots, so a sixth entry means moving
+      something or growing the bar. Until this is answered, a phone reaches the Sprechsimulation only
+      through the dashboard recommendation and ⌘K. No code change is pending; this is a design call.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
       **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
@@ -168,6 +172,12 @@ pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall b
   check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
   the built app: the free-speak turn renders and accepts an answer, the Grammatik hub shows 32
   topics with the new group labels, and a typed drill grades correctly.
+- **Shipped:** PR **#774**, squash-merged as `45ba695`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Branch reset onto `main` afterwards, working tree clean.
+- **The one founder decision this pass left open:** should Anwenden (Sprechen + Prüfung) also sit in
+  the MOBILE bottom bar? Its five slots are locked, so a sixth entry means moving something or
+  growing the bar. Until that is answered, mobile reaches Sprechen only through the dashboard
+  recommendation and ⌘K.
 
 **Handoff after session 182 (2026-08-01). Audit P6 is closed: the daily-life half has a phrase
 bank.** Branch `claude/next-steps-p3-analysis-7gx36m`.
@@ -209,6 +219,11 @@ next steps", then "continue with p6".
   1 known `der Empfang` warning) · test:unit **435/435** · build · check:bundle 123.2 kB ·
   report:exercise-coverage 20/20 green · build:review-queue refreshed. `verify:grammar` could not
   run in this sandbox (the LanguageTool toolchain needs `mvn` + Maven Central); it is warn-only.
+- **Shipped:** PR **#773**, squash-merged as `5b30acc`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Main had moved under the branch while the work ran (#772 landed), so the
+  PR conflicted in the two logs; both sides were kept (the founder's queued quality-audit directive
+  leads "Resume here", session 181's prompt 5 stays above the session 182 block in the append-only
+  prompt log). Post-merge housekeeping done: branch reset onto `main`, working tree clean.
 - **Next, if you want the audit list continued:** P4 (Sprechen + Prüfung off the nav) needs a
   founder decision on whether the Anwenden entry returns to the four-zone nav; P5 (Adjektivdeklination,
   Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure

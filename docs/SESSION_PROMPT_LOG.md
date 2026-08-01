@@ -3040,3 +3040,19 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   (new) · `.claude/skills/content/SKILL.md` · `CLAUDE.md` · `docs/areas/CONTENT.md` ·
   `docs/areas/BIBLIOTHEK.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (verbatim, 2026-08-01):** `document the session`
+  **Response:** completed the session record. The per-prompt entries above and both s182 handoffs in
+  `PROJECT_STATUS.md` were written as the work went, so what was missing was the SHIPPED half, which
+  only existed after the merges: **PR #773 → `5b30acc`** (P6) and **PR #774 → `45ba695`** (P4 + P5),
+  both squash-merged with `Validate content` and `Deploy site to GitHub Pages` green, post-merge
+  housekeeping done both times (branch reset onto `main`, force-with-lease, clean tree). Also
+  recorded the mid-session merge conflict and how it was resolved (main moved when #772 landed; both
+  sides kept in the two append-only logs), and promoted the one open design call to
+  **Open founder action items**: where Anwenden lives on MOBILE, since the bottom bar's five slots
+  are locked and no code change is pending on it.
+  Session totals for the record: three audit items closed (**P6, P4, P5**), **62 Redemittel**,
+  **20 free-speak scenario nodes**, **4 grammar topics + 58 drills**, **124 provenance rows**, three
+  new test files (`redemittel`, `scenarios`, `grammar`) taking the suite **419 → 491**, and one
+  infrastructure fix (provenance split into four parts for the TS2590 ceiling).
+  Gates: docs-only (no code touched).
+- **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · this log
