@@ -4,8 +4,8 @@ Structure here is **locked**: do not change bar structure, edit-mode behavior, o
 without an explicit founder request. Mechanism history + mockups: `docs/DECISIONS.md`.
 
 ## Nav zones
-Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Prüfung** (`/anwenden`, orange target
-mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
+Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Prüfung** (`/anwenden`, orange
+Absolventenhut), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
 **The transfer zone came back and absorbed Schreiben in s182.** Audit P4 found the Sprechsimulation
 reachable only from the dashboard recommendation and ⌘K (the hub had been off `navItems` since
 2026-07-13, founder, for the demo). It returned to the desktop sidebar first; the founder then
@@ -22,10 +22,22 @@ older persisted orders are normalised at read time);
 active tab truncates instead of setting a width floor (s182: "Einstellungen" was forcing a 73px
 slot). Remote config can still hide a middle tab (`hiddenTabs`, admin Steuerung). Route marks
 (founder picks, s158; Bibliothek, Fortschritt + Schreiben swapped s170): Praktisch = Wegweiser
-signpost, Bibliothek = stack of three books, Prüfung = target rings, Fortschritt = Pokal
+signpost, Bibliothek = stack of three books, Prüfung = Absolventenhut (orange cap + amber base,
+founder pick D s183; it replaced the target rings, the bar's ONLY outline mark among filled
+two-tone shapes, which is why it read thinner than its neighbours), Fortschritt = Pokal
 (trophy/cup); the pencil-on-the-diagonal Schreiben mark lives on inside the hub card.
 The Prüfung hub itself (`/anwenden`) is 3 cards → Sprechen / Schreiben / Prüfungssimulation (the
 exam card is NOT called "Prüfung": a card may not carry the name of the page it sits on).
+**Those cards wear the branded route marks, not lucide icons** (founder pick 2, s183): each card
+renders `RouteIcon` for its own route on a 48px `rounded-xl` tile tinted in that mark's colour
+(cyan / brand blue / orange at 10%, 15% in dark). So the Schreiben card carries the exact pencil
+the nav does. `rounded-xl`, never `rounded-2xl`: `--radius + 10` is 24px, which on a 48px tile is a
+full circle, and icon tiles are squircles. Routes that are not `navItems` entries take their accent
+from `OFF_NAV_COLOR` in `route-icons.tsx` (`/writing` brand blue, `/simulation` cyan, `/exam`
+orange), otherwise all three fall back to brand blue and stop telling each other apart.
+**`/anwenden` and `/exam` deliberately share ONE mark** (`graduationCap`): the tab and the hub card
+are the same thing at two depths. The page's `HubHero` still shows the lucide `Target`, which is
+the one spot where the zone is not yet a cap.
 Remote-config overrides (admin Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults
 match the above.
 

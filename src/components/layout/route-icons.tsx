@@ -15,6 +15,30 @@ const BRAND = "#3D74ED";
 
 type Render = (c: string) => React.ReactNode;
 
+// Accent colour for routes that are NOT top-level nav entries, so they have no
+// `navItems` row to take a colour from. Their marks are still drawn from this
+// registry (the Prüfung hub cards render them), and without this they would all
+// fall back to brand blue and stop telling each other apart.
+const OFF_NAV_COLOR: Record<string, string> = {
+  "/writing": BRAND,
+  "/simulation": "#06b6d4",
+  "/exam": "#f97316",
+};
+
+// Graduation cap, shared by the Prüfung ZONE (/anwenden, the bottom-tab mark)
+// and the exam run inside it (/exam, the hub card). One mark on purpose: the
+// tab and the card are the same thing at two depths, the way the Bibliothek
+// stack repeats. Founder pick D, session 183: it replaced a stroked target
+// ring, the only outline icon in a bar of filled two-tone marks, which is why
+// it read thinner than its neighbours.
+const graduationCap: Render = c => (
+  <>
+    <path d="M10 2.8 1.8 6.4 10 10l8.2-3.6L10 2.8Z" fill={c} />
+    <path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill="#fbbf24" />
+    <line x1="17.4" y1="6.6" x2="17.4" y2="11.2" stroke={c} strokeWidth="1.2" strokeLinecap="round" />
+  </>
+);
+
 const RENDERERS: Record<string, Render> = {
   // Praktisch (using German in real life) — a signpost (Wegweiser): two
   // direction boards on a post, blue + neon cyan. Keeps the old compass's
@@ -51,13 +75,8 @@ const RENDERERS: Record<string, Render> = {
       <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill={c} opacity=".82" />
     </>
   ),
-  // Anwenden — a target / bullseye (aim, then apply) in orange + neon-amber
-  "/anwenden": c => (
-    <>
-      <circle cx="10" cy="10" r="7.6" stroke={c} strokeWidth="2.2" fill="none" />
-      <circle cx="10" cy="10" r="3.4" fill="#fbbf24" />
-    </>
-  ),
+  // Prüfung — the graduation cap (see `graduationCap` above).
+  "/anwenden": graduationCap,
   // Redemittel — speech bubble with neon-magenta reply dots
   "/redemittel": c => (
     <>
@@ -98,23 +117,20 @@ const RENDERERS: Record<string, Render> = {
       <path d="M7.8 13.2h4.4L10 17.4Z" fill="#22d3ee" />
     </g>
   ),
-  // Sprechsimulation — microphone (cyan capsule + neon-teal stand)
+  // Sprechsimulation — microphone (cyan capsule + neon-teal stand). The teal
+  // was lightened from #5eead4 in s183, when this mark left the nav-only world
+  // and started rendering on the Prüfung hub's tinted tile, where the paler
+  // shade washed out.
   "/simulation": c => (
     <>
       <rect x="7.5" y="2.4" width="5" height="9.2" rx="2.5" fill={c} />
-      <path d="M5 9.4a5 5 0 0 0 10 0" stroke="#5eead4" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-      <line x1="10" y1="14.4" x2="10" y2="17" stroke="#5eead4" strokeWidth="1.6" strokeLinecap="round" />
-      <line x1="7.2" y1="17" x2="12.8" y2="17" stroke="#5eead4" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M5 9.4a5 5 0 0 0 10 0" stroke="#2dd4bf" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+      <line x1="10" y1="14.4" x2="10" y2="17" stroke="#2dd4bf" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="7.2" y1="17" x2="12.8" y2="17" stroke="#2dd4bf" strokeWidth="1.6" strokeLinecap="round" />
     </>
   ),
-  // Prüfungsmodus — graduation cap (fuchsia top + neon-pink base)
-  "/exam": c => (
-    <>
-      <path d="M10 2.8 1.8 6.4 10 10l8.2-3.6L10 2.8Z" fill={c} />
-      <path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill="#f0abfc" />
-      <line x1="17.4" y1="6.6" x2="17.4" y2="11.2" stroke={c} strokeWidth="1.2" strokeLinecap="round" />
-    </>
-  ),
+  // Prüfungssimulation — the same graduation cap as the zone that holds it.
+  "/exam": graduationCap,
   // Schnellwiederholung — lightning bolt (amber-yellow top, neon-yellow lower)
   "/revision": c => (
     <>
@@ -161,7 +177,7 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
   "/":             { box: [3.2, 3.6, 13.6, 13.8],   weight: 1.05 },
   "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
-  "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
+  "/anwenden":     { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.08 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
   "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.05 },
   "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.08 },
@@ -195,7 +211,7 @@ export function RouteIcon({
   active?: boolean;
 }) {
   const item = navItems.find(i => i.to === path);
-  const color = item?.color ?? BRAND;
+  const color = item?.color ?? OFF_NAV_COLOR[path] ?? BRAND;
   const render = RENDERERS[path];
 
   if (!render) {

@@ -1,8 +1,9 @@
 # Project Status
 
-_Last updated: 2026-08-02 (session 183). **Prüfung icon mockup round is OPEN, founder picks
-pending** (bar mark A-D, hub tiles 1-3, and the keep-or-merge verdict on Sprechen vs.
-Prüfungssimulation); see the newest handoff below.
+_Last updated: 2026-08-02 (session 183). **The Prüfung zone has a new icon language: the orange
+Absolventenhut in the bar (founder pick D), and the branded route marks on tinted tiles in the hub
+(pick 2).** The founder also settled the merge question: **Sprechen and Prüfungssimulation stay
+separate.**
 Prior s182: **Three audit items closed in one session: P6, P4 and P5.**
 P6: Redemittel 158 → **220** with five Alltag packs and selective `themeId` tagging (untagged =
 universal), plus a Thema scope on the Redemittel tab.
@@ -148,6 +149,64 @@ adding one task:
   reads as B1, that its Leitpunkte are answerable in the word target, or that the Branche framing
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
+
+**Handoff after session 182, part 4 (2026-08-01): the nav zone question is answered.** Founder, first
+"yes keep it in the bottom bar", then, seeing the six-slot direction: "just move schreiben to
+anwenden and rename anwenden as prufung."
+- **The bar stays FIVE slots**, which is why this answer is better than the one it replaced. The
+  six-slot version was built and measured first: at 320px it overflowed, because the longest label
+  ("Einstellungen") set a 73px width floor and pushed the gear off screen. That is fixed either way
+  now (`min-w-0` on every slot, so the name truncates instead of setting a floor), but the founder's
+  reshape means the bar never had to grow.
+- **Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen.** `/writing` lost the tab it had
+  held since 2026-07-22 and is a card in the hub again; the hub is labelled **Prüfung** and holds
+  the three exam skills. The exam card inside it is "Prüfungssimulation", because a card cannot
+  carry the name of the page it sits on.
+- **Nothing about Schreiben itself changed**: same route, same pencil mark, same deep links, same
+  draft-resume redirect in `AppShell`. A learner who had pinned `/writing` gets remapped through
+  `ROUTE_SUCCESSOR`, so no one lands on an empty slot.
+- `tests/nav.test.tsx` (5 tests) pins the five slots and their order, the remap of a stale `/writing`
+  pin, and that Schreiben is no longer a top-level entry while Prüfung is.
+- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.3 kB.
+  Verified in the built app at 320px and 390px (five even slots, "Prüfung" active) and on desktop
+  (sidebar reads Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, and the Schreiben
+  card still opens the trainer at `/writing`).
+- **Shipped:** PR **#778**, squash-merged as `3863c49`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Main had moved again (#776 and #777 landed while the work ran), so the
+  prompt log conflicted; resolved by keeping session 182's entry at the tail and filing session
+  179's late prompt 14 under its own heading, where #777 had just moved the rest of that session.
+  Post-merge housekeeping done: branch reset onto `main`, working tree clean.
+- **Worth the founder's eye on the live site:** whether "Prüfung vorbereiten" reads right as the
+  page title, and whether Schreiben sitting one tap deeper is felt in daily use. Both are one-line
+  changes.
+
+**Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
+Founder: "D and 2", then "keep them separate".
+- **Bar mark: the orange Absolventenhut** (`graduationCap` in `route-icons.tsx`). The target rings
+  it replaced were the bar's only OUTLINE mark among filled two-tone shapes, which is the whole
+  reason it read thinner than its neighbours. `/anwenden` and `/exam` now share that one mark on
+  purpose: the tab and the hub card are the same thing at two depths.
+- **Hub tiles: the branded route marks on tinted squircles** (`AnwendenHub.tsx`). Each card renders
+  `RouteIcon` for its own route, so the Schreiben card carries the exact pencil the nav does, the
+  microphone matches it in style, and the cap ties the exam card to the zone. The white-on-gradient
+  tiles this replaced turned every mark into the same white silhouette.
+- **Two fixes the implementation forced.** (1) Routes that are not `navItems` entries had no accent
+  colour, so all three marks would have drawn brand blue: `OFF_NAV_COLOR` now supplies cyan for
+  `/simulation` and orange for `/exam`. (2) The tiles were `rounded-2xl`, and `--radius + 10` is
+  24px, exactly half of a 48px tile, so they were rendering as full CIRCLES (already true of the old
+  gradient tiles). Now `rounded-xl`, matching the approved preview and the squircle law.
+  The `/simulation` teal also went from `#5eead4` to `#2dd4bf`, which washed out on the tinted tile.
+- **Sprechen vs. Prüfungssimulation: KEEP BOTH, founder decision.** Same dialogue engine and
+  scenario bank; Sprechen is untimed practice with hints across all 30 scenarios, Prüfungssimulation
+  wraps one scenario in exam conditions (Aufgabenblatt, 6-minute countdown, rubric self-check,
+  score). Nothing was merged and nothing changed in either runner.
+- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.2 kB.
+  Verified in the BUILT app at 320px, 390px (light + dark) and desktop: five even bar slots with the
+  cap active, the three tiles read apart at a glance, and all three cards still open their trainer.
+- **Approved mockups:** `preview/pruefung-icons.html` (variants A-D and 1-3 as shown to the founder).
+- **One open one-liner for the founder:** the page's `HubHero` still shows the lucide target, so the
+  zone is a cap in the bar and the sidebar but a target at the top of its own page. Swapping it
+  would put two caps on that page (hero + Prüfungssimulation card), which is why it was left alone.
 
 **Handoff after session 182, part 4 (2026-08-01): the nav zone question is answered.** Founder, first
 "yes keep it in the bottom bar", then, seeing the six-slot direction: "just move schreiben to

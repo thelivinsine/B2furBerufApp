@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Target, Mic, PenLine, GraduationCap, ChevronRight, type LucideIcon } from "lucide-react";
+import { Target, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { HubHero } from "@/components/shared/HubHero";
+import { RouteIcon } from "@/components/layout/route-icons";
 import { cn } from "@/lib/utils";
 
 // The transfer layer: where the learner puts the reference material to use.
@@ -13,32 +14,33 @@ import { cn } from "@/lib/utils";
 // Sprechen · Schreiben · Prüfungssimulation share one visual rank here, which
 // is the whole point of the hub: they are the productive half of the app,
 // distinct from the Bibliothek (reference).
+// Each card wears its route's own branded mark from `route-icons.tsx` on a tile
+// tinted in that mark's colour (founder pick 2, session 183), so the Schreiben
+// card carries the same pencil the nav does and the three cards stay apart at a
+// glance. The white-on-gradient tiles this replaced turned every mark into the
+// same white silhouette.
 const CARDS: {
   to: string;
-  icon: LucideIcon;
-  gradient: string;
+  tint: string;
   title: string;
   desc: string;
   badge?: string;
 }[] = [
   {
     to: "/simulation",
-    icon: Mic,
-    gradient: "from-cyan-500 to-sky-500",
+    tint: "bg-cyan-500/10 dark:bg-cyan-400/15",
     title: "Sprechen",
     desc: "Simuliere ein Gespräch mit verzweigten Dialogen, Hinweisen und Coaching-Feedback.",
   },
   {
     to: "/writing",
-    icon: PenLine,
-    gradient: "from-blue-500 to-sky-500",
+    tint: "bg-primary/10 dark:bg-primary/15",
     title: "Schreiben",
     desc: "Schreibe zu einer Aufgabe und erhalte gezieltes Feedback zu deiner größten Schwachstelle.",
   },
   {
     to: "/exam",
-    icon: GraduationCap,
-    gradient: "from-amber-500 to-orange-500",
+    tint: "bg-orange-500/10 dark:bg-orange-400/15",
     title: "Prüfungssimulation",
     desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
   },
@@ -67,11 +69,15 @@ export function AnwendenHub() {
                 <CardContent className="flex h-full flex-col gap-3 p-5">
                   <div
                     className={cn(
-                      "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-soft",
-                      card.gradient,
+                      // rounded-xl, not 2xl: `--radius + 10` is 24px, exactly
+                      // half of a 48px tile, so the old gradient tiles were
+                      // full circles. Squircle is the house shape for icon
+                      // tiles (Sprechen and Prüfungssimulation use it too).
+                      "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
+                      card.tint,
                     )}
                   >
-                    <card.icon className="h-6 w-6" />
+                    <RouteIcon path={card.to} size={27} />
                   </div>
                   <div className="flex-1">
                     <p className="text-lg font-semibold leading-snug">
