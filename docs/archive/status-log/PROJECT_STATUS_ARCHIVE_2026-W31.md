@@ -832,3 +832,40 @@ next steps", then "continue with p6".
   Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure
   content win; P3's remaining half needs an audio strategy, since TTS voicemails cannot train
   note-taking.
+
+**Handoff after session 182, parts 2 and 3 (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
+pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall by that decision.
+- **P4, the half that matters: 20 of 30 speaking scenarios never asked the learner to speak.** Every
+  Alltag scenario ended on a multiple-choice turn, which is recognition, not production. All 20 now
+  carry a free-speak node with a model answer and two hints, spliced between the last choice and the
+  closing turn so it sits on EVERY path. Each asks for 20-30 seconds in a situation the dialogue
+  earns: report the Amt visit to your employer, call work sick after the doctor, pass the hotline's
+  answer to your flatmate. `tests/scenarios.test.ts` walks every branch and fails if any terminal
+  path skips it.
+- **P4, the nav half: Anwenden is back in `navItems`**, so Sprechen and Prüfung have a home on the
+  desktop sidebar instead of only the dashboard recommendation and ⌘K. **It is NOT in the mobile
+  bottom bar**, whose five slots are locked: putting it there is a founder decision, and it is the
+  open question from this pass. Remote config can still hide the entry (`hiddenTabs`).
+- **P5: the B1 accuracy canon existed nowhere.** Adjektivdeklination, Perfekt vs. Präteritum, Verben
+  mit Präpositionen and Komparativ/Superlativ shipped with the full German-first lesson and 10
+  drills each. New group `tenses` ("Zeitformen", after Kasus on the priority spine); `attributes` is
+  relabelled "Adjektive & Attribute" and `prepositionalPronouns` "Verben mit Präpositionen", because
+  both groups were named after one member.
+- **P5: the bank tested recognition and called it practice.** 131 of 137 drills were multiple
+  choice. Every B1 topic now has ≥3 productive (typed-answer) drills, 18 of them authored into the
+  six existing B1 topics that had none. Bank: 28 topics/137 drills → **32/195**, productive 4% → 19%.
+- **`provenance.ts` needed a third and fourth part**: the 62 new rows pushed part 2 past TypeScript's
+  union-complexity ceiling and `pnpm build` failed with TS2590. Four parts of ~1,300 rows now, and
+  the `/content` skill says to append to the LAST one and split again when tsc complains.
+- **Still open in both items, deliberately:** only 2 of 30 scenarios are level 3, and the 21 B2/C1
+  grammar topics keep their 5-drill MCQ-only cap. Both are authoring depth, not structure.
+- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **491/491** · build ·
+  check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
+  the built app: the free-speak turn renders and accepts an answer, the Grammatik hub shows 32
+  topics with the new group labels, and a typed drill grades correctly.
+- **Shipped:** PR **#774**, squash-merged as `45ba695`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Branch reset onto `main` afterwards, working tree clean.
+- **The one founder decision this pass left open:** should Anwenden (Sprechen + Prüfung) also sit in
+  the MOBILE bottom bar? Its five slots are locked, so a sixth entry means moving something or
+  growing the bar. Until that is answered, mobile reaches Sprechen only through the dashboard
+  recommendation and ⌘K.

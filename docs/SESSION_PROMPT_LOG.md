@@ -3150,3 +3150,50 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Gates: docs-only (no code touched).
 - **Artifacts (prompt 6):** `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log
+
+## Session 183 (2026-08-02) - branch `claude/pruefung-icon-design-n9n3z8`
+
+- **Prompt 1 (verbatim, 2026-08-02):** `reg. the latest changes made in the app, I have some
+  comments: 1. I want the prufung icon in the bottom bar to match the aesthetics of other icons
+  there. create mockups 2. what's the difference between sprechen and prufung simulation in the
+  prufung section same? what's the difference? should we merge both? 3. I want to use the schreiben
+  icon from menu bar in the prufung section schreiben tile, and a similar icon for sprechen.
+  generate mockups`
+  **Response:** mockup round only, no app code touched (previews-first rule). Diagnosis for 1: the
+  bar's Prüfung mark is the only stroke-drawn icon (hollow target ring); every neighbour is a
+  filled two-tone shape, which is why it reads thinner. Built `preview/pruefung-icons.html` with
+  the real tokens and the exact route-icon SVGs: Teil 1 offers four filled orange+amber bar marks
+  (A volle Zielscheibe, B Klemmbrett mit Haken, C Stoppuhr, D Absolventenhut) each rendered in a
+  five-slot bar replica, light + dark, plus a 64px detail row; Teil 2 offers three tile treatments
+  for the Prüfung hub (1 white marks on the existing gradients, 2 own-colour marks on tinted
+  squircles, 3 own-colour marks on the grey bar squircle), each using the menu-bar pencil for
+  Schreiben, the same-style microphone for Sprechen and the cap recoloured amber for the
+  Prüfungssimulation. Screenshot-verified in headless Chromium and published as an artifact.
+  For 2, reported in chat (no changes): Sprechen and Prüfungssimulation run on the SAME dialogue
+  engine and scenario bank; Sprechen is untimed practice with hints across all 30 scenarios,
+  Prüfungssimulation wraps one scenario in exam conditions (Aufgabenblatt briefing, countdown,
+  rubric self-check, score). Recommendation: keep both cards, do not merge; the practice/exam split
+  is the point of the zone, and merging would bury the timed run as a toggle.
+  Gates: preview + docs only.
+- **Artifacts (prompt 1):** `preview/pruefung-icons.html` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log
+- **Prompt 2 (verbatim, 2026-08-02):** `D and 2` · **Prompt 3 (verbatim, same turn, 2026-08-02):**
+  `keep them separate`
+  **Response:** implemented exactly the picked variants. **D:** `route-icons.tsx` gained a shared
+  `graduationCap` render used by BOTH `/anwenden` (the bar tab) and `/exam` (the hub card), orange
+  `#f97316` cap over an amber `#fbbf24` base; `/anwenden`'s `NORM` box moved from the target circle
+  to the cap's `[1.8, 2.8, 16.4, 11.9] @ 1.08`. **2:** `AnwendenHub.tsx` dropped its lucide icons and
+  gradient tiles for `RouteIcon` on 48px tinted squircles, so the Schreiben card carries the nav's
+  own pencil. Two things the implementation forced: `OFF_NAV_COLOR` (routes outside `navItems` had no
+  accent, so all three marks would have drawn brand blue), and `rounded-xl` instead of `rounded-2xl`
+  (`--radius + 10` = 24px = exactly half of a 48px tile, so the tiles, old gradient ones included,
+  were rendering as full circles rather than the squircles the approved preview showed). Also
+  lightened the `/simulation` teal `#5eead4` → `#2dd4bf`, which washed out on the tinted tile.
+  Per "keep them separate", nothing was merged: Sprechen and Prüfungssimulation keep their own cards
+  and runners, and that decision is now recorded as founder law.
+  Verified in the BUILT app at 320 / 390 (light + dark) / desktop, including that all three cards
+  still open their trainer.
+  Gates: typecheck · lint 0 errors · test:unit 496/496 · build · check:bundle 123.2 kB.
+- **Artifacts (prompts 2-3):** `src/components/layout/route-icons.tsx` ·
+  `src/features/anwenden/AnwendenHub.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/PROJECT_STATUS.md` · this log
