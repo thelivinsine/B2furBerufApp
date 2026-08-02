@@ -3150,3 +3150,31 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Gates: docs-only (no code touched).
 - **Artifacts (prompt 6):** `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log
+
+## Session 183 (2026-08-02) - branch `claude/pruefung-icon-design-n9n3z8`
+
+- **Prompt 1 (verbatim, 2026-08-02):** `reg. the latest changes made in the app, I have some
+  comments: 1. I want the prufung icon in the bottom bar to match the aesthetics of other icons
+  there. create mockups 2. what's the difference between sprechen and prufung simulation in the
+  prufung section same? what's the difference? should we merge both? 3. I want to use the schreiben
+  icon from menu bar in the prufung section schreiben tile, and a similar icon for sprechen.
+  generate mockups`
+  **Response:** mockup round only, no app code touched (previews-first rule). Diagnosis for 1: the
+  bar's Prüfung mark is the only stroke-drawn icon (hollow target ring); every neighbour is a
+  filled two-tone shape, which is why it reads thinner. Built `preview/pruefung-icons.html` with
+  the real tokens and the exact route-icon SVGs: Teil 1 offers four filled orange+amber bar marks
+  (A volle Zielscheibe, B Klemmbrett mit Haken, C Stoppuhr, D Absolventenhut) each rendered in a
+  five-slot bar replica, light + dark, plus a 64px detail row; Teil 2 offers three tile treatments
+  for the Prüfung hub (1 white marks on the existing gradients, 2 own-colour marks on tinted
+  squircles, 3 own-colour marks on the grey bar squircle), each using the menu-bar pencil for
+  Schreiben, the same-style microphone for Sprechen and the cap recoloured amber for the
+  Prüfungssimulation. Screenshot-verified in headless Chromium and published as an artifact.
+  For 2, reported in chat (no changes): Sprechen and Prüfungssimulation run on the SAME dialogue
+  engine and scenario bank; Sprechen is untimed practice with hints across all 30 scenarios,
+  Prüfungssimulation wraps one scenario in exam conditions (Aufgabenblatt briefing, countdown,
+  rubric self-check, score). Recommendation: keep both cards, do not merge; the practice/exam split
+  is the point of the zone, and merging would bury the timed run as a toggle.
+  Awaiting founder picks (A-D and 1-3) before implementing.
+  Gates: preview + docs only.
+- **Artifacts (prompt 1):** `preview/pruefung-icons.html` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log

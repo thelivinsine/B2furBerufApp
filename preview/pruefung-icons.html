@@ -1,0 +1,341 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prüfung Icons</title>
+<style>
+  :root {
+    --page-from: hsl(144 45% 98%);
+    --page-mid: hsl(150 50% 98%);
+    --page-to: hsl(198 83% 98%);
+    --surface: hsl(0 0% 100%);
+    --border: hsl(218 13% 84%);
+    --muted: hsl(220 13% 88%);
+    --muted-fg: hsl(220 8% 36%);
+    --fg: hsl(252 16% 12%);
+    --primary: hsl(221 83% 54%);
+    --label: #475569;
+    --shadow-soft: 0 1px 2px hsl(222 30% 22% / 0.06), 0 6px 16px -3px hsl(222 30% 22% / 0.12);
+    --d-surface: hsl(224 26% 18%);
+    --d-border: hsl(216 28% 36%);
+    --d-label: #cbd5e1;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: linear-gradient(160deg, var(--page-from), var(--page-mid) 45%, var(--page-to));
+    color: var(--fg);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--primary); margin-bottom: 4px;
+  }
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .note { margin-top: 8px; font-size: 14px; color: var(--muted-fg); }
+  h2 { font-size: 19px; font-weight: 700; margin: 44px 0 4px; letter-spacing: -0.01em; }
+  .sub { font-size: 13.5px; color: var(--muted-fg); margin-bottom: 16px; }
+
+  .variant { margin-bottom: 26px; }
+  .vname { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .vname .tag {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 22px; height: 22px; padding: 0 6px; margin-right: 8px;
+    border-radius: 8px; background: var(--primary); color: #fff;
+    font-size: 12px; font-weight: 800;
+  }
+  .vwhy { font-size: 12.5px; color: var(--muted-fg); margin-bottom: 10px; }
+
+  /* Phone-width tab bar replica */
+  .barwrap { display: flex; gap: 18px; flex-wrap: wrap; }
+  .bar {
+    width: 390px; max-width: 100%; height: 63px;
+    background: rgb(255 255 255 / 0.95);
+    border: 1px solid var(--border); border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    display: flex; align-items: stretch;
+    box-shadow: var(--shadow-soft);
+  }
+  .bar.dark { background: hsl(224 26% 18% / 0.95); border-color: var(--d-border); }
+  .slot { flex: 1; padding: 4px; display: flex; min-width: 0; }
+  .slotin {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px; min-width: 0;
+  }
+  .pill {
+    width: 40px; height: 40px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .active .pill { background: var(--muted); }
+  .bar.dark .active .pill { background: var(--d-border); }
+  .tlabel {
+    height: 12px; font-size: 10px; font-weight: 600; line-height: 1;
+    color: var(--label); opacity: 0; max-width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .bar.dark .tlabel { color: var(--d-label); }
+  .active .tlabel { opacity: 1; }
+
+  /* Detail row */
+  .bigrow { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+  .bigcard {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: var(--shadow-soft);
+    padding: 18px 22px 14px; text-align: center; width: 150px;
+  }
+  .bigcard .cap { margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--muted-fg); }
+
+  /* Hub cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: var(--shadow-soft);
+    padding: 20px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .tile {
+    width: 48px; height: 48px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-soft);
+  }
+  .g-cyan  { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+  .g-blue  { background: linear-gradient(135deg, #3b82f6, #0ea5e9); }
+  .g-amber { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .t-cyan  { background: rgb(6 182 212 / 0.12); box-shadow: none; }
+  .t-blue  { background: rgb(61 116 237 / 0.10); box-shadow: none; }
+  .t-amber { background: rgb(249 115 22 / 0.10); box-shadow: none; }
+  .t-grey  { background: var(--muted); box-shadow: none; }
+  .card h3 { font-size: 17px; font-weight: 600; line-height: 1.3; }
+  .card p { font-size: 13.5px; color: var(--muted-fg); line-height: 1.45; flex: 1; }
+  .card .go { font-size: 13.5px; font-weight: 500; color: var(--primary); }
+  .divider { height: 1px; background: var(--border); margin: 40px 0 0; }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Vorschau</p>
+  <h1>Prüfung Icons</h1>
+  <p class="note">Bitte per Name wählen: Teil 1 mit A bis D, Teil 2 mit 1 bis 3.</p>
+
+  <h2>Teil 1 · Prüfung in der Tab-Bar</h2>
+  <p class="sub">Alle anderen Marken sind gefüllte Formen mit einer Neon-Zweitfarbe. Die aktuelle Zielscheibe ist nur eine Linie und wirkt dadurch dünner.</p>
+
+  <div class="variant">
+    <p class="vname"><span class="tag" style="background:#94a3b8">–</span>Aktuell (zum Vergleich)</p>
+    <div class="barwrap" id="bar-current"></div>
+  </div>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">A</span>Volle Zielscheibe</p>
+    <p class="vwhy">Gleiche Idee wie heute, aber als gefüllte Scheibe mit weißem Ring und Amber-Mitte. Kleinste Änderung.</p>
+    <div class="barwrap" id="bar-a"></div>
+  </div>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">B</span>Klemmbrett mit Haken</p>
+    <p class="vwhy">Das Aufgabenblatt der Prüfung: oranges Brett, Amber-Klammer, abgehakte Aufgabe.</p>
+    <div class="barwrap" id="bar-b"></div>
+  </div>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">C</span>Stoppuhr</p>
+    <p class="vwhy">Prüfung heißt Zeitdruck: orange Uhr mit Amber-Knopf und weißen Zeigern.</p>
+    <div class="barwrap" id="bar-c"></div>
+  </div>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">D</span>Absolventenhut</p>
+    <p class="vwhy">Das klarste Prüfungssymbol, in Orange und Amber statt Pink.</p>
+    <div class="barwrap" id="bar-d"></div>
+  </div>
+
+  <p class="sub" style="margin-top:22px">Dunkelmodus, alle vier nebeneinander:</p>
+  <div class="barwrap"><div class="bar dark" id="bar-dark"></div></div>
+
+  <div class="bigrow" id="bigrow"></div>
+
+  <div class="divider"></div>
+
+  <h2>Teil 2 · Kacheln im Prüfung-Bereich</h2>
+  <p class="sub">Der Schreiben-Stift aus der Tab-Bar, dazu das Mikrofon im gleichen Stil für Sprechen und der Hut für die Prüfungssimulation.</p>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">1</span>Weiße Marke auf Farbverlauf</p>
+    <p class="vwhy">Die Kacheln bleiben wie heute, nur die Form der Marke wechselt auf die Tab-Bar-Formen.</p>
+    <div class="cards" id="hub-1"></div>
+  </div>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">2</span>Farbige Marke auf Tonfläche</p>
+    <p class="vwhy">Die Marken behalten ihre eigenen Farben wie in der Tab-Bar, auf einer leicht getönten Fläche.</p>
+    <div class="cards" id="hub-2"></div>
+  </div>
+
+  <div class="variant">
+    <p class="vname"><span class="tag">3</span>Farbige Marke auf Grau</p>
+    <p class="vwhy">Gleiche farbige Marken auf dem grauen Squircle, das auch der aktive Tab in der Bar nutzt.</p>
+    <div class="cards" id="hub-3"></div>
+  </div>
+</div>
+
+<script>
+  // ── Marks (20×20 grid, copied 1:1 from src/components/layout/route-icons.tsx
+  //    including the optical normalisation transforms) ─────────────────────────
+  const MARKS = {
+    praktisch: `<g transform="translate(10 10) scale(1.2174) translate(-10 -10.5)">
+      <path d="M4.6 3.6h9l3.2 1.85-3.2 1.85h-9Z" fill="#3D74ED"/>
+      <path d="M15.4 8.9h-9l-3.2 1.85 3.2 1.85h9Z" fill="#22d3ee"/>
+      <rect x="9.05" y="12.6" width="1.9" height="4.8" rx="0.95" fill="#3D74ED"/></g>`,
+    bibliothek: `<g transform="translate(10 10) scale(1.1053) translate(-10.4 -10)">
+      <rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="#3D74ED"/>
+      <rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/>
+      <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="#3D74ED" opacity=".82"/></g>`,
+    fortschritt: `<g transform="translate(10 10) scale(1.2118) translate(-10 -9.7)">
+      <path d="M5.6 4.4 H3.7 c-.2 2.6 1 4.1 2.9 4.5" stroke="#0ea5e9" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      <path d="M14.4 4.4 h1.9 c.2 2.6-1 4.1-2.9 4.5" stroke="#0ea5e9" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      <path d="M5.8 3h8.4v4a4.2 4.2 0 0 1-8.4 0Z" fill="#0ea5e9"/>
+      <rect x="9.1" y="11" width="1.8" height="3" fill="#0ea5e9"/>
+      <rect x="6.4" y="14.4" width="7.2" height="2" rx="0.9" fill="#22d3ee"/></g>`,
+    settings: `<g transform="translate(10 10) scale(1.0507) translate(-10 -10)">
+      <g transform="translate(10 10) scale(0.83) translate(-12 -12)">
+        <path fill="#64748b" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/>
+      </g>
+      <circle cx="10" cy="10" r="2.6" fill="#38bdf8"/></g>`,
+    // Current Prüfung mark (stroked target) with its shipped normalisation.
+    current: `<g transform="translate(10 10) scale(0.8644) translate(-10 -10)">
+      <circle cx="10" cy="10" r="7.6" stroke="#f97316" stroke-width="2.2" fill="none"/>
+      <circle cx="10" cy="10" r="3.4" fill="#fbbf24"/></g>`,
+
+    // ── Proposals A–D (drawn pre-centred at the shared optical size) ─────────
+    a: `<circle cx="10" cy="10" r="7.35" fill="#f97316"/>
+        <circle cx="10" cy="10" r="4.55" stroke="#fff" stroke-width="1.8" fill="none" opacity=".9"/>
+        <circle cx="10" cy="10" r="2.05" fill="#fbbf24"/>`,
+    b: `<rect x="5" y="3.2" width="10" height="14" rx="1.6" fill="#f97316"/>
+        <rect x="7.4" y="1.9" width="5.2" height="2.8" rx="1.3" fill="#fbbf24"/>
+        <line x1="7" y1="7.8" x2="13" y2="7.8" stroke="#fff" stroke-width="1.1" stroke-linecap="round" opacity=".7"/>
+        <line x1="7" y1="10.1" x2="13" y2="10.1" stroke="#fff" stroke-width="1.1" stroke-linecap="round" opacity=".5"/>
+        <polyline points="7.3,13.5 9.1,15.2 12.9,11.2" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+    c: `<rect x="8.7" y="1.4" width="2.6" height="1.6" rx="0.8" fill="#fbbf24"/>
+        <rect x="9.35" y="2.8" width="1.3" height="1.7" fill="#f97316"/>
+        <circle cx="10" cy="11" r="6.7" fill="#f97316"/>
+        <line x1="10" y1="11" x2="10" y2="7.3" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+        <line x1="10" y1="11" x2="12.7" y2="11" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+        <circle cx="10" cy="11" r="1" fill="#fbbf24"/>`,
+    d: `<g transform="translate(10 10) scale(1.0537) translate(-10 -8.75)">
+        <path d="M10 2.8 1.8 6.4 10 10l8.2-3.6L10 2.8Z" fill="#f97316"/>
+        <path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill="#fbbf24"/>
+        <line x1="17.4" y1="6.6" x2="17.4" y2="11.2" stroke="#f97316" stroke-width="1.2" stroke-linecap="round"/></g>`,
+  };
+
+  // Hub marks: the pencil is the exact menu-bar Schreiben mark; the mic reuses
+  // the Sprechsimulation mark; the cap is the exam mark recoloured to the
+  // card's amber/orange family.
+  function pencil(c1, c2) {
+    return `<g transform="translate(10 10) scale(1.1546) translate(-10 -10)"><g transform="rotate(45 10 10)">
+      <path d="M8.9 2.6h2.2c.66 0 1.1.54 1.1 1.2v9.4H7.8V3.8c0-.66.44-1.2 1.1-1.2Z" fill="${c1}"/>
+      <path d="M7.8 13.2h4.4L10 17.4Z" fill="${c2}"/></g></g>`;
+  }
+  function mic(c1, c2) {
+    return `<g transform="translate(10 10) scale(1.037) translate(-10 -9.7)">
+      <rect x="7.5" y="2.4" width="5" height="9.2" rx="2.5" fill="${c1}"/>
+      <path d="M5 9.4a5 5 0 0 0 10 0" stroke="${c2}" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <line x1="10" y1="14.4" x2="10" y2="17" stroke="${c2}" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="7.2" y1="17" x2="12.8" y2="17" stroke="${c2}" stroke-width="1.6" stroke-linecap="round"/></g>`;
+  }
+  function cap(c1, c2) {
+    return `<g transform="translate(10 10) scale(1.0537) translate(-10 -8.75)">
+      <path d="M10 2.8 1.8 6.4 10 10l8.2-3.6L10 2.8Z" fill="${c1}"/>
+      <path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill="${c2}"/>
+      <line x1="17.4" y1="6.6" x2="17.4" y2="11.2" stroke="${c1}" stroke-width="1.2" stroke-linecap="round"/></g>`;
+  }
+
+  function svg(inner, size) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none" aria-hidden="true">${inner}</svg>`;
+  }
+
+  // ── Tab bar replica ────────────────────────────────────────────────────────
+  function bar(pruefungMark, { dark = false, activePruefung = true } = {}) {
+    const slots = [
+      { mark: MARKS.praktisch, label: "Praktisch" },
+      { mark: MARKS.bibliothek, label: "Bibliothek" },
+      { mark: pruefungMark, label: "Prüfung", active: activePruefung },
+      { mark: MARKS.fortschritt, label: "Fortschritt" },
+      { mark: MARKS.settings, label: "Einstellungen" },
+    ];
+    return `<div class="bar${dark ? " dark" : ""}">${slots
+      .map(
+        s => `<div class="slot"><div class="slotin${s.active ? " active" : ""}">
+          <div class="pill">${svg(s.mark, 29)}</div>
+          <span class="tlabel">${s.label}</span>
+        </div></div>`,
+      )
+      .join("")}</div>`;
+  }
+
+  document.getElementById("bar-current").innerHTML = bar(MARKS.current);
+  document.getElementById("bar-a").innerHTML = bar(MARKS.a);
+  document.getElementById("bar-b").innerHTML = bar(MARKS.b);
+  document.getElementById("bar-c").innerHTML = bar(MARKS.c);
+  document.getElementById("bar-d").innerHTML = bar(MARKS.d);
+
+  // Dark strip: the four proposals side by side on the dark bar surface.
+  document.getElementById("bar-dark").innerHTML = ["a", "b", "c", "d"]
+    .map(
+      k => `<div class="slot"><div class="slotin active">
+        <div class="pill">${svg(MARKS[k], 29)}</div>
+        <span class="tlabel">${k.toUpperCase()}</span>
+      </div></div>`,
+    )
+    .join("") + `<div class="slot"><div class="slotin">
+        <div class="pill">${svg(MARKS.fortschritt, 29)}</div>
+        <span class="tlabel"></span>
+      </div></div>`;
+
+  // Detail row at 64px.
+  document.getElementById("bigrow").innerHTML = [
+    ["A", "Volle Zielscheibe", MARKS.a],
+    ["B", "Klemmbrett", MARKS.b],
+    ["C", "Stoppuhr", MARKS.c],
+    ["D", "Absolventenhut", MARKS.d],
+  ]
+    .map(([tag, name, mark]) => `<div class="bigcard">${svg(mark, 64)}<p class="cap">${tag} · ${name}</p></div>`)
+    .join("");
+
+  // ── Hub cards ──────────────────────────────────────────────────────────────
+  const HUB = [
+    {
+      title: "Sprechen",
+      desc: "Simuliere ein Gespräch mit verzweigten Dialogen, Hinweisen und Coaching-Feedback.",
+      grad: "g-cyan", tint: "t-cyan",
+      white: mic("#fff", "rgb(255 255 255 / 0.65)"),
+      color: mic("#06b6d4", "#2dd4bf"),
+    },
+    {
+      title: "Schreiben",
+      desc: "Schreibe zu einer Aufgabe und erhalte gezieltes Feedback zu deiner größten Schwachstelle.",
+      grad: "g-blue", tint: "t-blue",
+      white: pencil("#fff", "rgb(255 255 255 / 0.6)"),
+      color: pencil("#3D74ED", "#22d3ee"),
+    },
+    {
+      title: "Prüfungssimulation",
+      desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
+      grad: "g-amber", tint: "t-amber",
+      white: cap("#fff", "rgb(255 255 255 / 0.6)"),
+      color: cap("#f97316", "#fbbf24"),
+    },
+  ];
+
+  function hubGrid(getTileClass, getMark) {
+    return HUB.map(
+      c => `<div class="card">
+        <div class="tile ${getTileClass(c)}">${svg(getMark(c), 27)}</div>
+        <h3>${c.title}</h3>
+        <p>${c.desc}</p>
+        <span class="go">Starten ›</span>
+      </div>`,
+    ).join("");
+  }
+
+  document.getElementById("hub-1").innerHTML = hubGrid(c => c.grad, c => c.white);
+  document.getElementById("hub-2").innerHTML = hubGrid(c => c.tint, c => c.color);
+  document.getElementById("hub-3").innerHTML = hubGrid(() => "t-grey", c => c.color);
+</script>

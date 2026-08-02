@@ -1,6 +1,9 @@
 # Project Status
 
-_Last updated: 2026-08-01 (session 182). **Three audit items closed in one session: P6, P4 and P5.**
+_Last updated: 2026-08-02 (session 183). **Prüfung icon mockup round is OPEN, founder picks
+pending** (bar mark A-D, hub tiles 1-3, and the keep-or-merge verdict on Sprechen vs.
+Prüfungssimulation); see the newest handoff below.
+Prior s182: **Three audit items closed in one session: P6, P4 and P5.**
 P6: Redemittel 158 → **220** with five Alltag packs and selective `themeId` tagging (untagged =
 universal), plus a Thema scope on the Redemittel tab.
 P4: **all 30 speaking scenarios now end in a free-speak turn with a model answer** (was 10 of 30),
@@ -176,42 +179,23 @@ anwenden and rename anwenden as prufung."
   page title, and whether Schreiben sitting one tap deeper is felt in daily use. Both are one-line
   changes.
 
-**Handoff after session 182, parts 2 and 3 (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
-pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall by that decision.
-- **P4, the half that matters: 20 of 30 speaking scenarios never asked the learner to speak.** Every
-  Alltag scenario ended on a multiple-choice turn, which is recognition, not production. All 20 now
-  carry a free-speak node with a model answer and two hints, spliced between the last choice and the
-  closing turn so it sits on EVERY path. Each asks for 20-30 seconds in a situation the dialogue
-  earns: report the Amt visit to your employer, call work sick after the doctor, pass the hotline's
-  answer to your flatmate. `tests/scenarios.test.ts` walks every branch and fails if any terminal
-  path skips it.
-- **P4, the nav half: Anwenden is back in `navItems`**, so Sprechen and Prüfung have a home on the
-  desktop sidebar instead of only the dashboard recommendation and ⌘K. **It is NOT in the mobile
-  bottom bar**, whose five slots are locked: putting it there is a founder decision, and it is the
-  open question from this pass. Remote config can still hide the entry (`hiddenTabs`).
-- **P5: the B1 accuracy canon existed nowhere.** Adjektivdeklination, Perfekt vs. Präteritum, Verben
-  mit Präpositionen and Komparativ/Superlativ shipped with the full German-first lesson and 10
-  drills each. New group `tenses` ("Zeitformen", after Kasus on the priority spine); `attributes` is
-  relabelled "Adjektive & Attribute" and `prepositionalPronouns` "Verben mit Präpositionen", because
-  both groups were named after one member.
-- **P5: the bank tested recognition and called it practice.** 131 of 137 drills were multiple
-  choice. Every B1 topic now has ≥3 productive (typed-answer) drills, 18 of them authored into the
-  six existing B1 topics that had none. Bank: 28 topics/137 drills → **32/195**, productive 4% → 19%.
-- **`provenance.ts` needed a third and fourth part**: the 62 new rows pushed part 2 past TypeScript's
-  union-complexity ceiling and `pnpm build` failed with TS2590. Four parts of ~1,300 rows now, and
-  the `/content` skill says to append to the LAST one and split again when tsc complains.
-- **Still open in both items, deliberately:** only 2 of 30 scenarios are level 3, and the 21 B2/C1
-  grammar topics keep their 5-drill MCQ-only cap. Both are authoring depth, not structure.
-- **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **491/491** · build ·
-  check:bundle 123.3 kB · report:exercise-coverage 20/20 · build:review-queue refreshed. Verified in
-  the built app: the free-speak turn renders and accepts an answer, the Grammatik hub shows 32
-  topics with the new group labels, and a typed drill grades correctly.
-- **Shipped:** PR **#774**, squash-merged as `45ba695`, `Validate content` and `Deploy site to
-  GitHub Pages` both green. Branch reset onto `main` afterwards, working tree clean.
-- **The one founder decision this pass left open:** should Anwenden (Sprechen + Prüfung) also sit in
-  the MOBILE bottom bar? Its five slots are locked, so a sixth entry means moving something or
-  growing the bar. Until that is answered, mobile reaches Sprechen only through the dashboard
-  recommendation and ⌘K.
+**Handoff after session 183 (2026-08-02): Prüfung icon mockup round, picks pending.** Founder had
+three comments on the s182 nav change; nothing shipped yet, this was a previews-first round.
+- **1, bar icon:** the Prüfung mark is the bar's only stroke-drawn icon (hollow target ring); every
+  neighbour is a filled two-tone shape. `preview/pruefung-icons.html` offers four filled
+  orange+amber replacements: **A** volle Zielscheibe, **B** Klemmbrett mit Haken, **C** Stoppuhr,
+  **D** Absolventenhut, each in a five-slot bar replica (light + dark) plus a 64px detail row.
+- **3, hub tiles:** same preview, Teil 2: the menu-bar pencil on the Schreiben tile, the same-style
+  microphone on Sprechen, the cap recoloured amber on Prüfungssimulation, in three treatments:
+  **1** white marks on the existing gradients, **2** own-colour marks on tinted squircles,
+  **3** own-colour marks on the grey bar squircle.
+- **2, Sprechen vs. Prüfungssimulation:** answered in chat, recommendation KEEP BOTH. Same dialogue
+  engine and scenario bank; Sprechen is untimed practice with hints (30 scenarios),
+  Prüfungssimulation wraps one scenario in exam conditions (Aufgabenblatt, countdown, rubric
+  self-check, score). Awaiting the founder's verdict alongside the icon picks.
+- **Next step:** implement exactly the picked variants (bar mark in `route-icons.tsx` incl. its
+  `NORM` box, hub tiles in `AnwendenHub.tsx`), then verify live against the preview.
+- **Gates:** preview + docs only; no app code touched.
 
 **Session 182's first part (audit P6, the Redemittel phrase bank) is archived** in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`; its law lives on in
