@@ -3132,3 +3132,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/components/layout/BottomTabBar.tsx` · `src/features/anwenden/AnwendenHub.tsx` ·
   `tests/nav.test.tsx` (new) · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 6 (verbatim, 2026-08-01):** `document the session`
+  **Response:** second documentation pass, covering the nav work that landed after the first one.
+  Added the shipped record for **PR #778 → `3863c49`** (`Validate content` + `Deploy site to GitHub
+  Pages` green, post-merge housekeeping done) and the second mid-session merge conflict with how it
+  was resolved: #776 and #777 landed while the branch was open, so session 182's entry stayed at the
+  tail of this log and session 179's late prompt 14 was filed under its own heading, where #777 had
+  just moved the rest of that session. Put the nav outcome into the `_Last updated_` summary, since
+  the fifth zone is a structural change a future session must not rediscover by surprise.
+  Doc hygiene: the file had grown to 268 lines against a ~250 ceiling, so session 182's FIRST part
+  (audit P6) was archived into `PROJECT_STATUS_ARCHIVE_2026-W31.md` with a pointer left behind; its
+  law already lives in `docs/DECISIONS.md` §s182 and `docs/areas/CONTENT.md`, so nothing was lost.
+  The two remaining blocks were renamed from "Same session" to explicit part-numbered handoffs, now
+  that the block they used to follow sits in the archive.
+  Session 182 final tally: **four PRs** (#773 P6, #774 P4+P5, #775 the record, #778 the nav), all
+  squash-merged and deployed green; **three audit items closed**; test suite **419 → 496**.
+  Gates: docs-only (no code touched).
+- **Artifacts (prompt 6):** `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` · this log

@@ -9,6 +9,9 @@ P5: the missing B1 accuracy canon shipped (Adjektivdeklination, Perfekt/Präteri
 Präpositionen, Komparativ/Superlativ, 10 drills each) and **every B1 topic now has ≥3 productive
 drills**, so the bank stopped testing recognition and calling it practice (grammar 28 topics/137
 drills → **32/195**, productive 4% → 19%).
+Then the founder answered the nav question P4 had left open: **the bar's fifth zone is Prüfung and
+Schreiben lives inside it** (Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, still
+five slots; `/writing` keeps its route and is a card in the hub).
 Prior s181: **The Schreiben Aufgabe backlog is closed.** Waves 3 and 4
 of `docs/plans/SCHREIBEN-OVERHAUL.md` shipped together with the authoring to-do list s180 exposed:
 all 373 bare one-liners were authored up to the full exam brief in place, 74 tasks were added and 60
@@ -143,7 +146,7 @@ adding one task:
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
 
-**Same session, third follow-up (2026-08-01): the nav zone question is answered.** Founder, first
+**Handoff after session 182, part 4 (2026-08-01): the nav zone question is answered.** Founder, first
 "yes keep it in the bottom bar", then, seeing the six-slot direction: "just move schreiben to
 anwenden and rename anwenden as prufung."
 - **The bar stays FIVE slots**, which is why this answer is better than the one it replaced. The
@@ -164,8 +167,16 @@ anwenden and rename anwenden as prufung."
   Verified in the built app at 320px and 390px (five even slots, "Prüfung" active) and on desktop
   (sidebar reads Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, and the Schreiben
   card still opens the trainer at `/writing`).
+- **Shipped:** PR **#778**, squash-merged as `3863c49`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Main had moved again (#776 and #777 landed while the work ran), so the
+  prompt log conflicted; resolved by keeping session 182's entry at the tail and filing session
+  179's late prompt 14 under its own heading, where #777 had just moved the rest of that session.
+  Post-merge housekeeping done: branch reset onto `main`, working tree clean.
+- **Worth the founder's eye on the live site:** whether "Prüfung vorbereiten" reads right as the
+  page title, and whether Schreiben sitting one tap deeper is felt in daily use. Both are one-line
+  changes.
 
-**Same session, follow-up (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
+**Handoff after session 182, parts 2 and 3 (2026-08-01): audit P4 and P5.** Founder: "keep the categories filter as
 pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall by that decision.
 - **P4, the half that matters: 20 of 30 speaking scenarios never asked the learner to speak.** Every
   Alltag scenario ended on a multiple-choice turn, which is recognition, not production. All 20 now
@@ -202,56 +213,9 @@ pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall b
   growing the bar. Until that is answered, mobile reaches Sprechen only through the dashboard
   recommendation and ⌘K.
 
-**Handoff after session 182 (2026-08-01). Audit P6 is closed: the daily-life half has a phrase
-bank.** Branch `claude/next-steps-p3-analysis-7gx36m`.
-Founder: "i remember we did an analysis recently.. and did complete until p3 tasks. what are the
-next steps", then "continue with p6".
-- **Where the audit backlog actually stood** (`docs/reports/CONTENT_AUDIT_2026-07-30.md` §5, now
-  carrying a status block): P0/P1/P2 shipped in s178, P8 closed by the s181 Schreiben work, P3 only
-  *started* (the six C1 texts at 305-344 words). P6 was the cheapest real win left, so it was
-  recommended first and picked.
-- **The gap, measured before touching anything:** all 158 phrases were workplace discussion
-  functions or workplace channels (email, phone, presentation, interview, small talk), and
-  **`themeId` sat on 0 of 158**. So a learner at the Bürgeramt, the Arztpraxis, the Vermieter or the
-  Servicetheke had nothing, and the session composer's mode filter (`if (!r.themeId) return true`)
-  was dead code.
-- **62 new phrases in five Alltag packs**, each with `note`, example pair, CEFR and `themeId`:
-  Amt 13, Arzt 13, Wohnen 13, Bank 11, Einkauf/Reklamation 12. They cover the counter language the
-  audit named, Widerspruch included ("Hiermit lege ich Widerspruch gegen den Bescheid vom … ein.",
-  "Ich bitte Sie, den Mangel bis zum … zu beheben.", "Ich setze Ihnen eine Frist bis zum …"), and
-  several carry the s181 work-context reason ("Ich arbeite bis 15 Uhr, wäre auch ein Termin am
-  späten Nachmittag möglich?").
-- **Three new categories, because the existing 15 could not hold them honestly:** `appointments`
-  (Termine), `formalities` (Anliegen & Anträge), `complaints` (Problem & Reklamation). Closed-enum
-  rule followed in all three places (union, linter array, category metadata). Pill count on the
-  Kategorie facet is now 18; say the word if that should become a dropdown.
-- **Tagging is deliberately NOT blanket, and this is the decision to know about.** The audit said
-  "tag the 158". Tagging a discussion function ("Da bin ich anderer Meinung.") with a theme would be
-  a sticker: it belongs to no situation and works in all of them. So **49 situational phrases were
-  tagged** (presentations → meetings, jobInterview + professionalIntro → bildung, the company-voice
-  phone and email lines → customer) and the 109 function/channel phrases stay **untagged =
-  universal**, exactly like an untagged Branche. `tests/redemittel.test.ts` (16 tests) fails if a
-  later pass blanket-tags the bank, empties a pack, or leaves a category with no phrases.
-- **Two places the tag now does work.** (1) The Redemittel tab carries the sibling tabs' **Thema
-  scope dropdown** on the same `?theme=` param, with dedicated-content counts and zero-count Themen
-  still selectable (Branche semantics, not Wörter semantics). Verified in the built app: Thema =
-  Behörde & Ämter yields **122 Wendungen** (13 Amt + 109 universal) and the presentation openers are
-  gone. (2) A scoped session leads Pool 4 with that theme's phrases, and a personal-mode session no
-  longer serves "Vielen Dank für Ihre Aufmerksamkeit."
-- **Gates:** typecheck · lint 0 errors · lint:content clean (220 redemittel, 3,370 provenance rows,
-  1 known `der Empfang` warning) · test:unit **435/435** · build · check:bundle 123.2 kB ·
-  report:exercise-coverage 20/20 green · build:review-queue refreshed. `verify:grammar` could not
-  run in this sandbox (the LanguageTool toolchain needs `mvn` + Maven Central); it is warn-only.
-- **Shipped:** PR **#773**, squash-merged as `5b30acc`, `Validate content` and `Deploy site to
-  GitHub Pages` both green. Main had moved under the branch while the work ran (#772 landed), so the
-  PR conflicted in the two logs; both sides were kept (the founder's queued quality-audit directive
-  leads "Resume here", session 181's prompt 5 stays above the session 182 block in the append-only
-  prompt log). Post-merge housekeeping done: branch reset onto `main`, working tree clean.
-- **Next, if you want the audit list continued:** P4 (Sprechen + Prüfung off the nav) needs a
-  founder decision on whether the Anwenden entry returns to the four-zone nav; P5 (Adjektivdeklination,
-  Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure
-  content win; P3's remaining half needs an audio strategy, since TTS voicemails cannot train
-  note-taking.
+**Session 182's first part (audit P6, the Redemittel phrase bank) is archived** in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`; its law lives on in
+`docs/DECISIONS.md` §s182 and `docs/areas/CONTENT.md`.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
