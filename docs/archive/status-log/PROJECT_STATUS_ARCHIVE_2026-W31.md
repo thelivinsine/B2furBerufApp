@@ -781,3 +781,54 @@ graphs in bibliothek. This has to be consistent across the app."
   ALLTAG, the Bibliothek dropdown the same two, the Wörter graph legend reads "Berufsleben · Alltag".
 - **Gates:** typecheck · lint 0 errors · lint:content clean · test:unit **419/419** · build ·
   check:bundle 123.2 kB.
+
+**Handoff after session 182 (2026-08-01). Audit P6 is closed: the daily-life half has a phrase
+bank.** Branch `claude/next-steps-p3-analysis-7gx36m`.
+Founder: "i remember we did an analysis recently.. and did complete until p3 tasks. what are the
+next steps", then "continue with p6".
+- **Where the audit backlog actually stood** (`docs/reports/CONTENT_AUDIT_2026-07-30.md` §5, now
+  carrying a status block): P0/P1/P2 shipped in s178, P8 closed by the s181 Schreiben work, P3 only
+  *started* (the six C1 texts at 305-344 words). P6 was the cheapest real win left, so it was
+  recommended first and picked.
+- **The gap, measured before touching anything:** all 158 phrases were workplace discussion
+  functions or workplace channels (email, phone, presentation, interview, small talk), and
+  **`themeId` sat on 0 of 158**. So a learner at the Bürgeramt, the Arztpraxis, the Vermieter or the
+  Servicetheke had nothing, and the session composer's mode filter (`if (!r.themeId) return true`)
+  was dead code.
+- **62 new phrases in five Alltag packs**, each with `note`, example pair, CEFR and `themeId`:
+  Amt 13, Arzt 13, Wohnen 13, Bank 11, Einkauf/Reklamation 12. They cover the counter language the
+  audit named, Widerspruch included ("Hiermit lege ich Widerspruch gegen den Bescheid vom … ein.",
+  "Ich bitte Sie, den Mangel bis zum … zu beheben.", "Ich setze Ihnen eine Frist bis zum …"), and
+  several carry the s181 work-context reason ("Ich arbeite bis 15 Uhr, wäre auch ein Termin am
+  späten Nachmittag möglich?").
+- **Three new categories, because the existing 15 could not hold them honestly:** `appointments`
+  (Termine), `formalities` (Anliegen & Anträge), `complaints` (Problem & Reklamation). Closed-enum
+  rule followed in all three places (union, linter array, category metadata). Pill count on the
+  Kategorie facet is now 18; say the word if that should become a dropdown.
+- **Tagging is deliberately NOT blanket, and this is the decision to know about.** The audit said
+  "tag the 158". Tagging a discussion function ("Da bin ich anderer Meinung.") with a theme would be
+  a sticker: it belongs to no situation and works in all of them. So **49 situational phrases were
+  tagged** (presentations → meetings, jobInterview + professionalIntro → bildung, the company-voice
+  phone and email lines → customer) and the 109 function/channel phrases stay **untagged =
+  universal**, exactly like an untagged Branche. `tests/redemittel.test.ts` (16 tests) fails if a
+  later pass blanket-tags the bank, empties a pack, or leaves a category with no phrases.
+- **Two places the tag now does work.** (1) The Redemittel tab carries the sibling tabs' **Thema
+  scope dropdown** on the same `?theme=` param, with dedicated-content counts and zero-count Themen
+  still selectable (Branche semantics, not Wörter semantics). Verified in the built app: Thema =
+  Behörde & Ämter yields **122 Wendungen** (13 Amt + 109 universal) and the presentation openers are
+  gone. (2) A scoped session leads Pool 4 with that theme's phrases, and a personal-mode session no
+  longer serves "Vielen Dank für Ihre Aufmerksamkeit."
+- **Gates:** typecheck · lint 0 errors · lint:content clean (220 redemittel, 3,370 provenance rows,
+  1 known `der Empfang` warning) · test:unit **435/435** · build · check:bundle 123.2 kB ·
+  report:exercise-coverage 20/20 green · build:review-queue refreshed. `verify:grammar` could not
+  run in this sandbox (the LanguageTool toolchain needs `mvn` + Maven Central); it is warn-only.
+- **Shipped:** PR **#773**, squash-merged as `5b30acc`, `Validate content` and `Deploy site to
+  GitHub Pages` both green. Main had moved under the branch while the work ran (#772 landed), so the
+  PR conflicted in the two logs; both sides were kept (the founder's queued quality-audit directive
+  leads "Resume here", session 181's prompt 5 stays above the session 182 block in the append-only
+  prompt log). Post-merge housekeeping done: branch reset onto `main`, working tree clean.
+- **Next, if you want the audit list continued:** P4 (Sprechen + Prüfung off the nav) needs a
+  founder decision on whether the Anwenden entry returns to the four-zone nav; P5 (Adjektivdeklination,
+  Perfekt vs. Präteritum, Verben mit Präpositionen, plus the 95% MCQ monoculture) is the next pure
+  content win; P3's remaining half needs an audio strategy, since TTS voicemails cannot train
+  note-taking.
