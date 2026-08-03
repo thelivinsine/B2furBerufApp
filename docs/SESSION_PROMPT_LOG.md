@@ -3268,3 +3268,24 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `tests/writingScope.test.ts` · `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 2 (verbatim, 2026-08-03):** `document the session`
+  **Response:** the bulk of the session record had already gone out INSIDE PR #782 (the doc rule is
+  to update `CLAUDE.md` and the matching `docs/areas/*` in the same PR as the change), so this pass
+  closed what only existed after the merge, plus one gap the first pass left.
+  (1) **The s184 handoff had no shipped line**, because it was written before the PR existed. It now
+  records PR **#782**, squash-merge `c612a5d`, both workflows green on the merge commit
+  (`Validate content` and `Deploy site to GitHub Pages` run 788), and the completed post-merge
+  housekeeping.
+  (2) **The handoff now states what was deliberately NOT touched**, so the next session does not
+  read those as misses: Grammatik (topics carry no `themeId`), Sammlung (a Lv 1-5 chip row, not a
+  scope rail), the Fokus grammar dials (form controls, not a content scope), and `libraryFocus`.
+  (3) **`docs/areas/SESSION.md` was the one stale doc the first pass missed.** It lists the params
+  `libraryFocus` maps onto a session focus, so a reader would reasonably expect `?area=` to have
+  joined them. It has not, and the file now says why: Bibliothek Üben hands the session its
+  already-filtered ids (`?src=lib`), which outranks every tailoring path, so the Lebensbereich
+  narrowing rides along by construction; `libraryFocus` only serves hand-built `/session?…` links,
+  which no surface in the app writes.
+  Also confirmed the Supabase workflow did not run on this merge (it is scoped to `supabase/**`, and
+  nothing in that tree changed), so there is no backend deploy to report.
+  Gates: docs-only (no app code touched).
+- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · `docs/areas/SESSION.md` · this log

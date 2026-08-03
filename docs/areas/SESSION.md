@@ -41,6 +41,11 @@ uses 4 drills of that topic), `?cat=` (Redemittel category), and the Bibliothek 
 `?sub=`/`?cefr=`/`?sector=` (the pure `libraryFocus` helper maps them onto the mission-style
 `focus`, so the session leads with that narrowed slice; `undefined` when nothing narrows past the
 theme). Priority: mission > grammar > libraryFocus; GrammarHub + bare theme stay generic.
+**The Lebensbereich pills need no entry here** (s184): the Bibliothek Üben button hands over the
+tab's already-filtered ids (`?src=lib` + `setLibrarySession`), which takes priority over every
+tailoring path, so the area narrowing rides along by construction. `libraryFocus` deliberately does
+NOT read `?area=`: it only serves hand-built `/session?…` deep links, which nothing in the app
+generates, and adding a param there that no surface writes would be dead contract.
 Mission-focused sessions (`/session?mission=<id>`) lead with the mission's own vocab + Redemittel
 (`missionContentIds` in `engine/mission.ts` → `buildSession`'s `focus`), then fill from the
 mission's theme and drop the untethered grammar drill, so Üben mission N mirrors Spielen
