@@ -1263,3 +1263,45 @@ hub tiles).
   had been rendering as full circles for this reason and nobody had noticed. Rule: a corner radius at
   or above half the box side is round, whatever the class is called. Check the number against the box,
   not the name of the token.
+
+## s184 (2026-08-03, founder) - the Lebensbereich pills, in every rail
+
+Founder: *"I want a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail
+through out the app right below the Branchen filter."*
+
+**Naming: Berufsleben, not Berufswelt.** Asked before building, because the word appears in the
+graph legend, every Thema dropdown heading and the Schreiben rail, and one surface saying something
+different is exactly the drift `lib/lifeAreas.ts` exists to prevent. Founder kept **Berufsleben**
+(the s181 pick), so nothing was renamed.
+
+**What shipped:** one shared `LifeAreaPills` control (`features/shared/LifeAreaPills.tsx`) in Wörter,
+Kollokationen, Redemittel and the Schreiben Kurz/Lang Aufgabe rail, on both breakpoints.
+
+- **The rail owns the slot, not the caller.** In `FilterRail` it is an `area` prop, not another
+  `RailPrimary` entry, and the rail inserts it directly after the `sector` scope (or first, when a
+  tab has no Branche dropdown, which is the same place in the hierarchy: coarser than Thema). A
+  caller cannot put it somewhere else, so "right below the Branchen filter" cannot drift per surface.
+- **Single-select that toggles off, no "Alle" pill.** With exactly two options, "both selected" and
+  "none selected" mean the same thing, so multi-select semantics would ship a meaningless state. The
+  resting state is beides; tapping the active pill returns to it. A third "Alle" chip would also put
+  three pills where the app's categorization law says two.
+- **The pill wins over the Thema below it.** Picking an area narrows the Thema dropdown to that area
+  AND drops a selected Thema from the other one, so pill, dropdown and list can never contradict each
+  other. Consequence: with a pill active the dropdown shows ONE heading (the area the learner just
+  chose), which is not a violation of the two-category law but the law applied.
+- **Counts ignore what they supersede.** Area counts are computed before Thema/Unterthema, search and
+  facets, within the current Branche scope only, the same convention the Branche dropdown counts by.
+  Counting them post-Thema would grey out the other area the moment a Thema was picked, i.e. a dead
+  control at exactly the moment you want to switch.
+- **In Schreiben, `area` is a HARD axis and the coarsest one** (`lib/writingScope.ts`), so the two
+  areas partition the task pool exactly. `blockingAxis` gained `area` last, for the one reachable
+  empty case: a stale deep link pairing an area with a Thema from the other one.
+- **Redemittel passes `disableZero: false`.** Untagged phrases are universal there, so an area's
+  count is a dedicated-content signal, not the yield, exactly like the Branche dropdown that stays
+  selectable at zero.
+- **Grammatik deliberately has NO pills.** Grammar topics carry no `themeId`, so there is no honest
+  area to filter by; a pill pair there would be dead chrome, which is the rule that bans it.
+- **Layout: content-sized wrapping pills, not an equal-width 2-column grid.** The grid was built
+  first and looked deliberate, but "Berufsleben" truncated against a four-digit count in the 16rem
+  desktop rail. The facet pill rows two sections below it in the same tile are content-sized and
+  wrap, so matching them is both the fix and the more consistent answer.

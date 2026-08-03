@@ -1,6 +1,11 @@
 # Project Status
 
-_Last updated: 2026-08-02 (session 183). **The Prüfung zone has a new icon language: the orange
+_Last updated: 2026-08-03 (session 184). **Every filter and Aufgabe rail now carries the
+Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
+Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
+shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
+drops a Thema from the other area so the three controls can never disagree.
+Prior s183: **The Prüfung zone has a new icon language: the orange
 Absolventenhut in the bar (founder pick D), and the branded route marks on tinted tiles in the hub
 (pick 2).** The founder also settled the merge question: **Sprechen and Prüfungssimulation stay
 separate.**
@@ -150,35 +155,36 @@ adding one task:
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
 
-**Handoff after session 182, part 4 (2026-08-01): the nav zone question is answered.** Founder, first
-"yes keep it in the bottom bar", then, seeing the six-slot direction: "just move schreiben to
-anwenden and rename anwenden as prufung."
-- **The bar stays FIVE slots**, which is why this answer is better than the one it replaced. The
-  six-slot version was built and measured first: at 320px it overflowed, because the longest label
-  ("Einstellungen") set a 73px width floor and pushed the gear off screen. That is fixed either way
-  now (`min-w-0` on every slot, so the name truncates instead of setting a floor), but the founder's
-  reshape means the bar never had to grow.
-- **Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen.** `/writing` lost the tab it had
-  held since 2026-07-22 and is a card in the hub again; the hub is labelled **Prüfung** and holds
-  the three exam skills. The exam card inside it is "Prüfungssimulation", because a card cannot
-  carry the name of the page it sits on.
-- **Nothing about Schreiben itself changed**: same route, same pencil mark, same deep links, same
-  draft-resume redirect in `AppShell`. A learner who had pinned `/writing` gets remapped through
-  `ROUTE_SUCCESSOR`, so no one lands on an empty slot.
-- `tests/nav.test.tsx` (5 tests) pins the five slots and their order, the remap of a stale `/writing`
-  pin, and that Schreiben is no longer a top-level entry while Prüfung is.
-- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.3 kB.
-  Verified in the built app at 320px and 390px (five even slots, "Prüfung" active) and on desktop
-  (sidebar reads Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, and the Schreiben
-  card still opens the trainer at `/writing`).
-- **Shipped:** PR **#778**, squash-merged as `3863c49`, `Validate content` and `Deploy site to
-  GitHub Pages` both green. Main had moved again (#776 and #777 landed while the work ran), so the
-  prompt log conflicted; resolved by keeping session 182's entry at the tail and filing session
-  179's late prompt 14 under its own heading, where #777 had just moved the rest of that session.
-  Post-merge housekeeping done: branch reset onto `main`, working tree clean.
-- **Worth the founder's eye on the live site:** whether "Prüfung vorbereiten" reads right as the
-  page title, and whether Schreiben sitting one tap deeper is felt in daily use. Both are one-line
-  changes.
+**Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
+a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app
+right below the Branchen filter."
+- **Naming was asked BEFORE building**, because it was the only part that changed the scope: the
+  prompt said "Berufswelt", the app's locked word is **Berufsleben** (s181), and one surface saying
+  something different is the exact drift `lib/lifeAreas.ts` exists to stop. Founder kept
+  **Berufsleben**, so nothing was renamed and the change stayed additive.
+- **One shared control, `src/features/shared/LifeAreaPills.tsx`**, now in Wörter, Kollokationen,
+  Redemittel and the Schreiben Kurz/Lang Aufgabe rail, on desktop rails and mobile panels alike.
+  **Grammatik is the one deliberate exception:** grammar topics carry no `themeId`, so a life-area
+  filter there would be dead chrome, not a filter.
+- **The rail owns the slot, not the caller** (`area` prop on `FilterRail`, inserted after the
+  `sector` scope, or first on a tab with no Branche dropdown), so "right below the Branchen filter"
+  cannot drift per surface. Single-select that toggles off, `?area=`, pinnable, counted by the badge,
+  cleared by both rails' reset.
+- **Coherence is enforced, not hoped for:** picking an area narrows the Thema dropdown to that area
+  AND drops a Thema from the other one, so pill, dropdown and list can never contradict each other.
+  Pill counts are computed before Thema/search/facets, so the other pill never goes dead at exactly
+  the moment you want to switch. In Schreiben `area` became a HARD, coarsest axis, so the two areas
+  partition the 717-task pool exactly, with `blockingAxis` gaining `area` for the stale-deep-link case.
+- **One visual correction during the round:** an equal-width 2-column pill grid truncated
+  "Berufsleben" against a four-digit count in the 16rem desktop rail, so the pills use the
+  content-sized wrapping facet-pill layout the same tile already uses two sections below.
+- **Gates:** typecheck · lint 0 errors · lint:content · test:unit **506/506** (10 new) · build ·
+  check:bundle 123.1 kB. Verified in a headless browser on both rails: `theme=arzt` + tap Berufsleben
+  → `?area=professional` with Thema back to "Alle Themen", the Thema dropdown then listing exactly
+  one heading; toggle-off, pin+collapse and reset all behave.
+- **Worth the founder's eye on the live site:** whether "Lebensbereich" is the right section label
+  (one word, matches the two pills under it), and whether Grammatik should carry the pills anyway.
+  Both are small changes.
 
 **Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
 Founder: "D and 2", then "keep them separate".
@@ -213,39 +219,11 @@ Founder: "D and 2", then "keep them separate".
   zone is a cap in the bar and the sidebar but a target at the top of its own page. Swapping it
   would put two caps on that page (hero + Prüfungssimulation card), which is why it was left alone.
 
-**Handoff after session 182, part 4 (2026-08-01): the nav zone question is answered.** Founder, first
-"yes keep it in the bottom bar", then, seeing the six-slot direction: "just move schreiben to
-anwenden and rename anwenden as prufung."
-- **The bar stays FIVE slots**, which is why this answer is better than the one it replaced. The
-  six-slot version was built and measured first: at 320px it overflowed, because the longest label
-  ("Einstellungen") set a 73px width floor and pushed the gear off screen. That is fixed either way
-  now (`min-w-0` on every slot, so the name truncates instead of setting a floor), but the founder's
-  reshape means the bar never had to grow.
-- **Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen.** `/writing` lost the tab it had
-  held since 2026-07-22 and is a card in the hub again; the hub is labelled **Prüfung** and holds
-  the three exam skills. The exam card inside it is "Prüfungssimulation", because a card cannot
-  carry the name of the page it sits on.
-- **Nothing about Schreiben itself changed**: same route, same pencil mark, same deep links, same
-  draft-resume redirect in `AppShell`. A learner who had pinned `/writing` gets remapped through
-  `ROUTE_SUCCESSOR`, so no one lands on an empty slot.
-- `tests/nav.test.tsx` (5 tests) pins the five slots and their order, the remap of a stale `/writing`
-  pin, and that Schreiben is no longer a top-level entry while Prüfung is.
-- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.3 kB.
-  Verified in the built app at 320px and 390px (five even slots, "Prüfung" active) and on desktop
-  (sidebar reads Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, and the Schreiben
-  card still opens the trainer at `/writing`).
-- **Shipped:** PR **#778**, squash-merged as `3863c49`, `Validate content` and `Deploy site to
-  GitHub Pages` both green. Main had moved again (#776 and #777 landed while the work ran), so the
-  prompt log conflicted; resolved by keeping session 182's entry at the tail and filing session
-  179's late prompt 14 under its own heading, where #777 had just moved the rest of that session.
-  Post-merge housekeeping done: branch reset onto `main`, working tree clean.
-- **Worth the founder's eye on the live site:** whether "Prüfung vorbereiten" reads right as the
-  page title, and whether Schreiben sitting one tap deeper is felt in daily use. Both are one-line
-  changes.
-
-**Session 182's first part (audit P6, the Redemittel phrase bank) is archived** in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`; its law lives on in
-`docs/DECISIONS.md` §s182 and `docs/areas/CONTENT.md`.
+**Session 182 is fully archived** in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`:
+part 1 (audit P6, the Redemittel phrase bank) and, aged out by this session, part 4 (the five-slot
+Prüfung nav zone, PR #778). Their law lives on in `docs/DECISIONS.md` §s182,
+`docs/areas/CONTENT.md` and `docs/areas/PRAKTISCH-NAV.md`. (Part 4 had been sitting in this file
+TWICE, once above the s183 handoff and once below it; the duplicate went with the archive move.)
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

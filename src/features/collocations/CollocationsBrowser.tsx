@@ -39,6 +39,13 @@ import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
 import { themeGroupsForMode } from "@/lib/themeGroups";
+import {
+  lifeAreaOfTheme,
+  matchesLifeArea,
+  normalizeLifeArea,
+  type LifeAreaId,
+} from "@/lib/lifeAreas";
+import { countLifeAreas } from "@/features/shared/LifeAreaPills";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { usePagedList } from "@/lib/usePagedList";
 import { fuzzyMatch } from "@/lib/fuzzy";
@@ -134,6 +141,8 @@ export function CollocationsBrowser() {
     const raw = params.get("sector");
     return raw ? raw.split(",").filter(Boolean) : [];
   }, [params]);
+  // Lebensbereich pills (s184): single-select, "" = beides.
+  const lifeArea = useMemo(() => normalizeLifeArea(params.get("area")), [params]);
   const search = params.get("q") ?? "";
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
@@ -210,6 +219,23 @@ export function CollocationsBrowser() {
     setParams(p, { replace: true });
   };
 
+  // Picking a Lebensbereich drops any Thema outside it (same rule as Wörter), so
+  // the pill, the Thema dropdown and the list always agree.
+  const setLifeArea = (next: LifeAreaId | "") => {
+    const p = new URLSearchParams(params);
+    if (next) p.set("area", next);
+    else p.delete("area");
+    if (next) {
+      const kept = themes.filter((id) => matchesLifeArea(id, next));
+      if (kept.length !== themes.length) {
+        if (kept.length) p.set("theme", kept.join(","));
+        else p.delete("theme");
+        p.delete("sub");
+      }
+    }
+    setParams(p, { replace: true });
+  };
+
   // Sub-theme drill-down (parity with Wörter, audit 2026-07-09): only rendered
   // with exactly ONE active Thema (a multi-theme selection has no single
   // sub-theme spine, s104).
@@ -219,15 +245,35 @@ export function CollocationsBrowser() {
   const subFilter = hasSubThemes && subs.length ? subs : undefined;
   const activeSub = subThemes.find((s) => subs.includes(s.id));
 
+  // Lebensbereich cut, applied FIRST (s184): the coarsest topic scope, so every
+  // count below it means "within the chosen area". A pair with no Thema at all
+  // cannot be placed in an area, so it drops out of a chosen area rather than
+  // counting as universal.
+  const areaScoped = useMemo(
+    () => (lifeArea ? collocations.filter((c) => matchesLifeArea(c.themeId, lifeArea)) : collocations),
+    [lifeArea],
+  );
+
   // Theme-scoped list BEFORE the Branche cut, for the dropdown's per-sector
   // dedicated-content counts.
   const themeScoped = useMemo(() => {
     let list = themes.length
-      ? collocations.filter((c) => !!c.themeId && themes.includes(c.themeId))
-      : collocations;
+      ? areaScoped.filter((c) => !!c.themeId && themes.includes(c.themeId))
+      : areaScoped;
     if (subFilter) list = list.filter((c) => !!c.subThemeId && subFilter.includes(c.subThemeId));
     return list;
-  }, [themes, subFilter]);
+  }, [areaScoped, themes, subFilter]);
+
+  // Pill counts: pairs per area within the current Branche scope, before search
+  // and facets, mirroring how the Branche dropdown counts (see Wörter).
+  const areaCounts = useMemo(
+    () =>
+      countLifeAreas(
+        sectors.length ? collocations.filter((c) => matchesSector(c, sectors)) : collocations,
+        (c) => lifeAreaOfTheme(c.themeId),
+      ),
+    [sectors],
+  );
 
   const scoped = useMemo(() => {
     // Branche scope cut (root-cause fix, s102; multi-select s104): untagged
@@ -271,12 +317,13 @@ export function CollocationsBrowser() {
   // badge, so selecting a dropdown value updates the button count too (founder
   // bug report).
   const scopeActiveCount =
-    sectors.length + themes.length + (hasSubThemes ? subs.length : 0);
+    sectors.length + (lifeArea ? 1 : 0) + themes.length + (hasSubThemes ? subs.length : 0);
   const filterCount = activeFacetCount(selection) + scopeActiveCount;
 
   const primaryGroups = useMemo(
-    () => themeGroupsForMode(learningMode, themes, (id) => collocationsByTheme(id).length),
-    [learningMode, themes],
+    () =>
+      themeGroupsForMode(learningMode, themes, (id) => collocationsByTheme(id).length, lifeArea),
+    [learningMode, themes, lifeArea],
   );
 
   // Carry the active scope into the session. Collocations have no session block
@@ -344,6 +391,8 @@ export function CollocationsBrowser() {
           ]
         : []),
     ],
+    // Lebensbereich pills, rendered by the rail directly under Branche (s184).
+    area: { value: lifeArea, onChange: setLifeArea, counts: areaCounts },
     items: scoped,
     facets: COLLOCATION_FACETS,
     selection,

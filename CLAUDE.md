@@ -128,10 +128,16 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
   building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
   dropdowns, facet pills, sticky mobile action bars) and the one categorization hierarchy
-  (Branche → Thema → Unterthema). **Exactly TWO learner-facing categories, everywhere: Berufsleben
-  and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is Berufsleben, every other
-  domain is Alltag). The five content domains stay the authoring grain, never a heading a learner
-  sees; a third group in any dropdown or legend is a bug (founder, s181).
+  (Branche → **Lebensbereich** → Thema → Unterthema). **Exactly TWO learner-facing categories,
+  everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
+  Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,
+  never a heading a learner sees; a third group in any dropdown or legend is a bug (founder, s181).
+- **Every filter and Aufgabe rail carries the Lebensbereich pills** (founder, s184): one shared
+  `LifeAreaPills` control in a fixed slot, directly BELOW the Branche dropdown (top of the scope
+  stack on a rail without one), single-select that toggles off, `?area=` in the URL, honest counts.
+  Picking one narrows the Thema dropdown to that area and drops a Thema from the other one, so pill,
+  dropdown and list can never disagree. The one exception is Grammatik, whose topics carry no Thema:
+  a life-area filter there would be dead chrome, not a filter.
 - **Previews first for design work:** founder-reviewable `preview/*.html` mockups from the real
   tokens, iterate on the feedback list, then implement.
 - **No redundancy:** each fact appears once, no explanatory filler lines, compact chrome

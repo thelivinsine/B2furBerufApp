@@ -53,6 +53,12 @@ founder-picked s171).
     the rail printed the honest (much smaller) count beside the option: the same rail-vs-engine
     disagreement s167 fixed for Branche, still alive on these two axes. Niveau matches by BAND
     (`levelBand`), so a future `B2.2` task answers to "B2" and older `?level=B2.1` links normalize.
+  - **Lebensbereich is HARD too, and coarsest** (founder s184): `area` filters the theme loop before
+    anything else, so the two areas partition the pool exactly (pinned in
+    `tests/writingScope.test.ts`). The rail clears a cross-area Thema when the pill changes, so the
+    only way to an empty area scope is a stale deep link; `blockingAxis` then names `area` and the
+    empty state offers "Lebensbereich zurücksetzen". The pills' own counts ignore Thema/Unterthema
+    (they supersede those), so switching area is never blocked by the Thema you are leaving.
   - `sector` follows the untagged-=-universal rule **per theme** and is applied LAST, so a Branche
     prefers the tagged tasks among whatever the hard axes left. A soft axis must never hide the only
     task matching a hard one, and applying it last is also what keeps **Branche unable to empty a
@@ -135,12 +141,13 @@ founder-picked s171).
   `border-border` edge) is retired: a grey rule around a blue wash read as dirty. Inner dividers are
   tinted to match (`border-accent-ink/10`), so no hard grey line survives on the tile. Header reset
   icon and the
-  scope hierarchy Niveau → Branche → Thema → Unterthema → Textsorte as single-select dropdowns
+  scope hierarchy Niveau → Branche → **Lebensbereich** → Thema → Unterthema → Textsorte, all
+  single-select dropdowns except Lebensbereich, which is the shared `LifeAreaPills` pill pair
   (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
   Beschwerde & Antrag) (grouped listbox
   popovers, internal scroll, live counts, zero-yield greyed; Unterthema only when the theme has
   sub-themes; Thema groups = the two life areas from `lib/lifeAreas.ts`, Berufsleben and Alltag,
-  never a third heading). No
+  never a third heading, and an active Lebensbereich pill leaves exactly the one group it names). No
   overflow clipping on the tile (popovers must escape); the mobile panel animates via fade/slide,
   not height collapse, for the same reason.
 - Mobile Kurz/Lang = the Bibliothek pattern: a toolbar button toggles the collapsible panel

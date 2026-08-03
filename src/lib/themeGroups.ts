@@ -1,6 +1,6 @@
 import { themeById } from "@/data/themes";
 import { domainById } from "@/data/domains";
-import { themeGroupsByArea } from "@/lib/lifeAreas";
+import { matchesLifeArea, themeGroupsByArea, type LifeAreaId } from "@/lib/lifeAreas";
 import type { DomainId, LearningMode } from "@/types";
 
 /**
@@ -28,6 +28,14 @@ export function themeGroupsForMode(
   mode: LearningMode,
   activeThemeIds: string[],
   countFor: (themeId: string) => number,
+  /**
+   * Active Lebensbereich pill (s184). The pills sit ABOVE Thema in the rail, so
+   * picking one narrows this dropdown to that area's Themen: the remaining
+   * heading is then the pill the learner already chose, never a second group
+   * whose every option reads 0. An active theme still survives (same escape
+   * hatch the Mode lens uses) so a deep link cannot orphan its own selection.
+   */
+  area: LifeAreaId | "" = "",
 ): ThemeGroup[] {
   // A deep-linked theme outside the mode's domains must stay selectable, so
   // every active theme's domain is kept visible rather than orphaning the
@@ -40,7 +48,9 @@ export function themeGroupsForMode(
     if (!d) return mode === "both";
     return mode === "both" || d.context === "both" || d.context === mode || activeDomains.has(d.id);
   };
+  const active = new Set(activeThemeIds);
   return themeGroupsByArea(countFor, {
-    include: (id) => inMode(themeById(id)?.domain),
+    include: (id) =>
+      inMode(themeById(id)?.domain) && (matchesLifeArea(id, area) || active.has(id)),
   });
 }

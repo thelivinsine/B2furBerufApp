@@ -1,8 +1,20 @@
 import { describe, it, expect } from "vitest";
-import { LIFE_AREAS, lifeAreaOf, domainsInArea } from "@/lib/lifeAreas";
+import {
+  LIFE_AREAS,
+  lifeAreaOf,
+  lifeAreaOfTheme,
+  domainsInArea,
+  matchesLifeArea,
+  normalizeLifeArea,
+  type LifeAreaId,
+} from "@/lib/lifeAreas";
 import { themeGroupsForMode } from "@/lib/themeGroups";
+import { countLifeAreas } from "@/features/shared/LifeAreaPills";
 import { themes } from "@/data/themes";
 import { domains } from "@/data/domains";
+import { browsableVocabulary } from "@/data/vocabulary";
+import { collocations } from "@/data/collocations";
+import { redemittel } from "@/data/redemittel";
 import type { LearningMode } from "@/types";
 
 /**
@@ -79,6 +91,83 @@ describe("life areas: exactly two learner-facing categories", () => {
     const groups = themeGroupsForMode("personal", ["meetings"], () => 1);
     const all = groups.flatMap((g) => g.options.map((o) => o.value));
     expect(all).toContain("meetings");
+    expect(groups.length).toBeLessThanOrEqual(2);
+  });
+});
+
+/**
+ * The Lebensbereich pills (founder, s184): "a clear Berufsleben and Alltag pill
+ * in each and every filter or aufgabe rail, right below the Branchen filter."
+ *
+ * One control, one fold, one behavior. These pin the parts a future rail could
+ * get wrong: the matcher, the URL contract, the fact that neither pill may ship
+ * dead on any tab, and that an active pill collapses the Thema dropdown to ONE
+ * heading (its own) instead of leaving a second group reading all-zero.
+ */
+describe("Lebensbereich pills", () => {
+  const AREAS: LifeAreaId[] = ["professional", "personal"];
+
+  it("an empty area matches everything; a chosen one matches only its themes", () => {
+    for (const t of themes) {
+      expect(matchesLifeArea(t.id, ""), t.id).toBe(true);
+      const own = lifeAreaOf(t.domain);
+      for (const area of AREAS) {
+        expect(matchesLifeArea(t.id, area), `${t.id} in ${area}`).toBe(area === own);
+      }
+    }
+    // Untagged is NOT universal here (unlike Branche): an item with no Thema
+    // has no area, so a chosen area excludes it.
+    expect(matchesLifeArea(undefined, "")).toBe(true);
+    expect(matchesLifeArea(undefined, "professional")).toBe(false);
+    expect(matchesLifeArea("not-a-theme", "personal")).toBe(false);
+    expect(lifeAreaOfTheme("not-a-theme")).toBeUndefined();
+    expect(lifeAreaOfTheme(undefined)).toBeUndefined();
+  });
+
+  it("the ?area= param accepts only the two ids, never crashes a deep link", () => {
+    for (const area of AREAS) expect(normalizeLifeArea(area)).toBe(area);
+    for (const junk of ["", "beruf", "Berufsleben", "work", null, undefined]) {
+      expect(normalizeLifeArea(junk)).toBe("");
+    }
+  });
+
+  it("neither pill is dead on any tab that carries them", () => {
+    // A pill greys out at zero, so a bank with nothing in one area would ship a
+    // permanently disabled control. Wörter and Kollokationen count by theme;
+    // Redemittel counts DEDICATED phrases (untagged ones are universal there).
+    const banks: [string, Record<LifeAreaId, number>][] = [
+      ["woerter", countLifeAreas(browsableVocabulary, (v) => lifeAreaOfTheme(v.themeId))],
+      ["kollokationen", countLifeAreas(collocations, (c) => lifeAreaOfTheme(c.themeId))],
+      ["redemittel", countLifeAreas(redemittel, (p) => lifeAreaOfTheme(p.themeId))],
+    ];
+    for (const [tab, counts] of banks) {
+      for (const area of AREAS) {
+        expect(counts[area], `${tab}/${area}`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("an active pill leaves the Thema dropdown with exactly ONE heading: its own", () => {
+    for (const area of AREAS) {
+      const groups = themeGroupsForMode("both", [], () => 1, area);
+      expect(groups.map((g) => g.label)).toEqual([
+        LIFE_AREAS.find((a) => a.id === area)!.titleDe,
+      ]);
+      for (const opt of groups[0].options) {
+        expect(matchesLifeArea(opt.value, area), opt.value).toBe(true);
+      }
+    }
+    // Resting state keeps both, exactly as before the pills existed.
+    expect(themeGroupsForMode("both", [], () => 1, "").length).toBe(2);
+  });
+
+  it("a deep-linked Thema from the other area is never orphaned in the dropdown", () => {
+    // The rails clear a cross-area Thema when the pill changes, so this only
+    // happens via a stale URL. It must stay selectable rather than vanish while
+    // still being the active scope.
+    const beruf = themes.find((t) => lifeAreaOf(t.domain) === "professional")!;
+    const groups = themeGroupsForMode("both", [beruf.id], () => 1, "personal");
+    expect(groups.flatMap((g) => g.options.map((o) => o.value))).toContain(beruf.id);
     expect(groups.length).toBeLessThanOrEqual(2);
   });
 });

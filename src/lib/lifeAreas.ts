@@ -44,6 +44,31 @@ export function lifeAreaLabel(area: LifeAreaId): string {
   return LIFE_AREAS.find((a) => a.id === area)!.titleDe;
 }
 
+/** The life area a Thema belongs to, or undefined for an unknown theme id. */
+export function lifeAreaOfTheme(themeId: string | undefined): LifeAreaId | undefined {
+  if (!themeId) return undefined;
+  const theme = themes.find((t) => t.id === themeId);
+  return theme ? lifeAreaOf(theme.domain) : undefined;
+}
+
+/**
+ * Does an item sitting in `themeId` belong to the selected life area?
+ * `area === ""` means "both", the resting state of the Lebensbereich pills.
+ *
+ * Untagged is NOT universal here (unlike Branche): every content item carries a
+ * Thema, and a Thema always folds into exactly one area, so an item that cannot
+ * be placed is genuinely outside a chosen area rather than general to it.
+ */
+export function matchesLifeArea(themeId: string | undefined, area: LifeAreaId | ""): boolean {
+  if (!area) return true;
+  return lifeAreaOfTheme(themeId) === area;
+}
+
+/** URL-param validation: anything that is not one of the two ids is "both". */
+export function normalizeLifeArea(value: string | null | undefined): LifeAreaId | "" {
+  return LIFE_AREAS.some((a) => a.id === value) ? (value as LifeAreaId) : "";
+}
+
 /** The domains that make up a life area, in the taxonomy's own order. */
 export function domainsInArea(area: LifeAreaId): DomainId[] {
   return domains.filter((d) => lifeAreaOf(d.id) === area).map((d) => d.id);

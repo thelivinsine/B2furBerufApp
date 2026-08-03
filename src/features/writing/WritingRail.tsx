@@ -3,7 +3,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
-import { themeGroupsByArea } from "@/lib/lifeAreas";
+import { matchesLifeArea, themeGroupsByArea, type LifeAreaId } from "@/lib/lifeAreas";
+import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { countTasks } from "@/lib/writingScope";
 import type { ThemeId } from "@/types";
@@ -14,8 +15,10 @@ import { cn } from "@/lib/utils";
  * "Aufgabe wählen" rail for the guided Kurz/Lang writing tasks (Bibliothek-
  * extension redesign, s148/s149). The FilterRail scope language on a light
  * HIMMELBLAU tile: uppercase eyebrow section labels over Bibliothek-style
- * scope DROPDOWNS in the Bibliothek hierarchy order **Branche → Thema →
- * Unterthema** (s149 harmonization round). Prompts carry optional `sub` +
+ * scope DROPDOWNS in the Bibliothek hierarchy order **Branche → Lebensbereich →
+ * Thema → Unterthema** (s149 harmonization round; the Lebensbereich pills are
+ * the s184 addition, the one control shared with the Bibliothek rails). Prompts
+ * carry optional `sub` +
  * `sectors` tags: the Unterthema dropdown appears only for themes with
  * sub-themes, options grey out at zero yield (live counts per current
  * length), and Branche follows the untagged-=-universal rule (choosing a
@@ -126,6 +129,9 @@ interface WritingRailProps {
   /** Selected Branche ("" = all). */
   sector: string;
   onSectorChange: (sector: string) => void;
+  /** Selected Lebensbereich ("" = beides). Sits directly below Branche (s184). */
+  lifeArea: LifeAreaId | "";
+  onLifeAreaChange: (area: LifeAreaId | "") => void;
   /** Current mode's length, for live option counts. */
   length: WritingLength;
   /** Full reset (always active): clears every scope AND draws a fresh task. */
@@ -282,6 +288,8 @@ export function WritingRail({
   onSubChange,
   sector,
   onSectorChange,
+  lifeArea,
+  onLifeAreaChange,
   length,
   onReset,
   layout = "rail",
@@ -306,21 +314,23 @@ export function WritingRail({
   // disabled: it is the way back out of a scope that yields nothing.
   const countWith = (
     over: Partial<{
+      area: LifeAreaId | "";
       theme: ThemeId | "";
       sub: string;
       sector: string;
       level: string;
       format: string;
     }>,
-  ) => countTasks({ theme: value, sub, sector, level, format, length, ...over });
+  ) => countTasks({ area: lifeArea, theme: value, sub, sector, level, format, length, ...over });
 
   const sectionLabel = "text-xs font-semibold uppercase tracking-wide text-muted-foreground";
 
   const body = (
     <div className="space-y-4">
-      {/* Niveau -> Branche -> Thema -> Unterthema -> Textsorte (s167): the
-          Bibliothek hierarchy with the level axis in front (it is the coarsest
-          scope) and Textsorte last (it narrows within everything else). */}
+      {/* Niveau -> Branche -> Lebensbereich -> Thema -> Unterthema -> Textsorte
+          (s167, Lebensbereich added s184): the Bibliothek hierarchy with the
+          level axis in front (it is the coarsest scope) and Textsorte last (it
+          narrows within everything else). */}
       <section>
         <p className={cn("mb-2", sectionLabel)}>Niveau</p>
         <ScopeSelect
@@ -372,6 +382,23 @@ export function WritingRail({
         />
       </section>
 
+      {/* Lebensbereich, directly below Branche and above Thema (founder s184).
+          The same `LifeAreaPills` the Bibliothek rails render, so the control
+          the learner meets here is the one they already know from there. The
+          counts ignore the Thema/Unterthema below (the pills supersede those),
+          so switching areas is never blocked by a Thema from the other one. */}
+      <section>
+        <p className={cn("mb-2", sectionLabel)}>Lebensbereich</p>
+        <LifeAreaPills
+          value={lifeArea}
+          onChange={onLifeAreaChange}
+          counts={{
+            professional: countWith({ area: "professional", theme: "", sub: "" }),
+            personal: countWith({ area: "personal", theme: "", sub: "" }),
+          }}
+        />
+      </section>
+
       <section>
         <p className={cn("mb-2", sectionLabel)}>Thema</p>
         <ScopeSelect
@@ -392,7 +419,11 @@ export function WritingRail({
             // "Bildung & Sprache" sat here as a third heading (founder,
             // 2026-07-31: "some topics in the themen dropdown which are
             // non-beruf but are not part of alltag").
+            // With a Lebensbereich pill active the dropdown narrows to that
+            // area's Themen: the one heading left is the pill the learner just
+            // chose, never a second group whose every option reads 0.
             ...themeGroupsByArea((id) => countWith({ theme: id as ThemeId, sub: "" }), {
+              include: (id) => matchesLifeArea(id, lifeArea) || id === value,
               disableZero: true,
             }),
           ]}

@@ -28,6 +28,12 @@ import {
   type WritingTaskRef,
 } from "@/lib/writingScope";
 import { SECTOR_OPTIONS } from "@/lib/facets";
+import {
+  lifeAreaLabel,
+  matchesLifeArea,
+  normalizeLifeArea,
+  type LifeAreaId,
+} from "@/lib/lifeAreas";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingRail, WRITING_FORMATS, WRITING_LEVELS, writingFormatLabel } from "./WritingRail";
@@ -127,6 +133,7 @@ function emptyReason({
   blocking,
   format,
   level,
+  lifeArea,
   themeScope,
   sub,
   sector,
@@ -135,6 +142,7 @@ function emptyReason({
   blocking: ScopeAxis | null;
   format: string;
   level: string;
+  lifeArea: LifeAreaId | "";
   themeScope: ThemeId | "";
   sub: string;
   sector: string;
@@ -142,6 +150,7 @@ function emptyReason({
 }): string {
   if (blocking === "format") {
     const elsewhere = countTasks({
+      area: lifeArea,
       theme: themeScope,
       sub,
       sector,
@@ -155,6 +164,10 @@ function emptyReason({
   }
   if (blocking === "level") return `Auf Niveau ${level} gibt es hier keine Aufgabe.`;
   if (blocking === "sub") return "Zu diesem Unterthema gibt es hier keine Aufgabe.";
+  // Only reachable from a deep link that pairs an area with a Thema from the
+  // other one; the rail itself clears the Thema when the pill changes.
+  if (blocking === "area")
+    return `Dieses Thema gehört nicht zu ${lifeAreaLabel(lifeArea || "professional")}.`;
   return "Diese Filter passen zu keiner Aufgabe.";
 }
 
@@ -205,11 +218,13 @@ export function GuidedWritingTrainer({
   const level = WRITING_LEVELS.some((l) => l.value === levelParam) ? levelParam : "";
   const formatParam = params.get("format") ?? "";
   const format = WRITING_FORMATS.includes(formatParam) ? formatParam : "";
+  // Lebensbereich pills (s184), same `?area=` param the Bibliothek rails use.
+  const lifeArea = normalizeLifeArea(params.get("area"));
 
   // ONE selection rule, shared with the rail's option counts (`lib/writingScope`).
   const eligible = useMemo(
-    () => eligibleTasks({ theme: themeScope, sub, sector, level, format, length }),
-    [themeScope, length, sub, sector, level, format],
+    () => eligibleTasks({ area: lifeArea, theme: themeScope, sub, sector, level, format, length }),
+    [lifeArea, themeScope, length, sub, sector, level, format],
   );
 
   // Autosave restore (s172): a draft left behind by ANY reload (a deploy, a
@@ -286,9 +301,9 @@ export function GuidedWritingTrainer({
   // Reset draft + result and draw a fresh random Aufgabe when the task scope
   // (theme, length, Unterthema or Branche) changes, but NOT on mount (so a
   // resumed draft survives). keyRef is seeded with the initial scope.
-  const keyRef = useRef(`${themeScope}|${length}|${sub}|${sector}|${level}|${format}`);
+  const keyRef = useRef(`${lifeArea}|${themeScope}|${length}|${sub}|${sector}|${level}|${format}`);
   useEffect(() => {
-    const key = `${themeScope}|${length}|${sub}|${sector}|${level}|${format}`;
+    const key = `${lifeArea}|${themeScope}|${length}|${sub}|${sector}|${level}|${format}`;
     if (keyRef.current !== key) {
       keyRef.current = key;
       setText("");
@@ -302,7 +317,7 @@ export function GuidedWritingTrainer({
       setDrawn((cur) => randomTask(eligible, cur));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themeScope, length, sub, sector, level, format]);
+  }, [lifeArea, themeScope, length, sub, sector, level, format]);
 
   /**
    * Scope changes REPLACE the history entry (the ViewSwitcher rule). Pushing
@@ -330,6 +345,18 @@ export function GuidedWritingTrainer({
     setScope((p) => (l ? p.set("level", l) : p.delete("level")));
   const setFormat = (f: string) =>
     setScope((p) => (f ? p.set("format", f) : p.delete("format")));
+  // Picking a Lebensbereich drops a Thema from the other area (and its
+  // Unterthema), the same rule the Bibliothek rails follow, so the pill and the
+  // Aufgabe can never contradict each other.
+  const setLifeArea = (next: LifeAreaId | "") =>
+    setScope((p) => {
+      if (next) p.set("area", next);
+      else p.delete("area");
+      if (next && themeScope && !matchesLifeArea(themeScope, next)) {
+        p.delete("theme");
+        p.delete("sub");
+      }
+    });
 
   // The dice: another random Aufgabe within the current scope. Clears the field
   // with it (founder 2026-07-31: "the text I initially wrote is still in the
@@ -354,8 +381,17 @@ export function GuidedWritingTrainer({
       p.delete("sector");
       p.delete("level");
       p.delete("format");
+      p.delete("area");
     });
-    const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", level: "", format: "", length });
+    const fullPool = eligibleTasks({
+      area: "",
+      theme: "",
+      sub: "",
+      sector: "",
+      level: "",
+      format: "",
+      length,
+    });
     setDrawn((cur) => randomTask(fullPool, cur));
     setText("");
     setResult(null);
@@ -367,7 +403,9 @@ export function GuidedWritingTrainer({
    * stale deep link). `blockingAxis` names the single filter that is causing it,
    * so the escape drops THAT one and keeps everything else the learner chose.
    */
-  const blocking = drawn ? null : blockingAxis({ theme: themeScope, sub, sector, level, format, length });
+  const blocking = drawn
+    ? null
+    : blockingAxis({ area: lifeArea, theme: themeScope, sub, sector, level, format, length });
   const relax = () => {
     if (!blocking) {
       resetScope();
@@ -569,7 +607,7 @@ export function GuidedWritingTrainer({
     <EmptyState
       icon={Target}
       title="Keine Aufgabe für diese Auswahl"
-      description={emptyReason({ blocking, format, level, themeScope, sub, sector, length })}
+      description={emptyReason({ blocking, format, level, lifeArea, themeScope, sub, sector, length })}
       action={
         <Button onClick={relax} variant="gradient">
           <RotateCcw className="h-4 w-4" />
@@ -579,7 +617,9 @@ export function GuidedWritingTrainer({
               ? "Niveau zurücksetzen"
               : blocking === "sub"
                 ? "Unterthema zurücksetzen"
-                : "Auswahl zurücksetzen"}
+                : blocking === "area"
+                  ? "Lebensbereich zurücksetzen"
+                  : "Auswahl zurücksetzen"}
         </Button>
       }
     />
@@ -874,6 +914,8 @@ export function GuidedWritingTrainer({
                 onSubChange={setSub}
                 sector={sector}
                 onSectorChange={setSector}
+                lifeArea={lifeArea}
+                onLifeAreaChange={setLifeArea}
                 length={length}
                 onReset={resetScope}
                 onClose={() => setPickerOpen(false)}
@@ -897,6 +939,8 @@ export function GuidedWritingTrainer({
           onSubChange={setSub}
           sector={sector}
           onSectorChange={setSector}
+          lifeArea={lifeArea}
+          onLifeAreaChange={setLifeArea}
           length={length}
           onReset={resetScope}
           className="hidden lg:block lg:sticky lg:top-24"

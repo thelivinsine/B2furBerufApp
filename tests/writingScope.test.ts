@@ -13,6 +13,7 @@ import {
 } from "@/lib/writingScope";
 import { writingPrompts } from "@/data/writingPrompts";
 import { themes } from "@/data/themes";
+import { lifeAreaOf } from "@/lib/lifeAreas";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { WRITING_FORMATS } from "@/features/writing/WritingRail";
 import type { ThemeId } from "@/types";
@@ -495,5 +496,71 @@ describe("randomTask", () => {
       1,
     );
     expect(sameTask(randomTask(list, list[0]), list[0])).toBe(true);
+  });
+});
+
+/**
+ * Lebensbereich axis (s184): the Berufsleben/Alltag pills the Aufgabe rail now
+ * carries directly below Branche. HARD, like Niveau and Textsorte, and the
+ * coarsest topic cut of all, so it partitions the pool exactly.
+ */
+describe("Lebensbereich axis", () => {
+  it("partitions the pool: the two areas sum to the whole, at every length", () => {
+    for (const length of LENGTHS) {
+      const all = countTasks({ theme: "", sub: "", sector: "", length });
+      const beruf = countTasks({ area: "professional", theme: "", sub: "", sector: "", length });
+      const alltag = countTasks({ area: "personal", theme: "", sub: "", sector: "", length });
+      expect(beruf, `Berufsleben/${length}`).toBeGreaterThan(0);
+      expect(alltag, `Alltag/${length}`).toBeGreaterThan(0);
+      expect(beruf + alltag, length).toBe(all);
+    }
+  });
+
+  it("serves ONLY that area's Themen, never a task from the other one", () => {
+    for (const length of LENGTHS) {
+      for (const area of ["professional", "personal"] as const) {
+        const refs = eligibleTasks({ area, theme: "", sub: "", sector: "", length });
+        for (const ref of refs) {
+          expect(lifeAreaOf(themes.find((t) => t.id === ref.theme)!.domain), ref.theme).toBe(area);
+        }
+      }
+    }
+  });
+
+  it("stays honest under the other axes: no Niveau or Textsorte leaks across", () => {
+    // The pills narrow the pool, they never relax what is already chosen.
+    for (const length of LENGTHS) {
+      for (const area of ["professional", "personal"] as const) {
+        for (const level of ["B1", "B2", "C1"]) {
+          const withArea = countTasks({ area, theme: "", sub: "", sector: "", level, length });
+          const without = countTasks({ theme: "", sub: "", sector: "", level, length });
+          expect(withArea, `${area}/${level}/${length}`).toBeLessThanOrEqual(without);
+        }
+      }
+    }
+  });
+
+  it("an area paired with a Thema from the other one is empty, and blockingAxis says so", () => {
+    // Only a stale deep link produces this (the rail clears a cross-area Thema
+    // when the pill changes), so the empty state must name `area` as the escape.
+    const beruf = themes.find((t) => lifeAreaOf(t.domain) === "professional")!;
+    const scope = {
+      area: "personal" as const,
+      theme: beruf.id,
+      sub: "",
+      sector: "",
+      length: "short" as const,
+    };
+    expect(countTasks(scope)).toBe(0);
+    expect(blockingAxis(scope)).toBe("area");
+    expect(countTasks({ ...scope, area: "" as const })).toBeGreaterThan(0);
+  });
+
+  it("no area is set by default, so the resting pool is unchanged", () => {
+    for (const length of LENGTHS) {
+      expect(countTasks({ area: "", theme: "", sub: "", sector: "", length })).toBe(
+        countTasks({ theme: "", sub: "", sector: "", length }),
+      );
+    }
   });
 });

@@ -45,6 +45,13 @@ import {
   sectorFirst,
 } from "@/lib/facets";
 import { themeGroupsForMode } from "@/lib/themeGroups";
+import {
+  lifeAreaOfTheme,
+  matchesLifeArea,
+  normalizeLifeArea,
+  type LifeAreaId,
+} from "@/lib/lifeAreas";
+import { countLifeAreas } from "@/features/shared/LifeAreaPills";
 import type { WorkSector } from "@/types";
 import { mastery, masteryLabel } from "@/engine/srs";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
@@ -100,6 +107,9 @@ export function VocabularyTrainer() {
     const raw = params.get("sector");
     return raw ? raw.split(",").filter(Boolean) : [];
   }, [params]);
+  // Lebensbereich pills (s184): single-select, "" = beides. Sits between Branche
+  // and Thema in the rail and in this pipeline.
+  const lifeArea = useMemo(() => normalizeLifeArea(params.get("area")), [params]);
   const savedActive = params.get("saved") === "1";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
@@ -188,15 +198,40 @@ export function VocabularyTrainer() {
     return s;
   }, [params]);
 
+  // Lebensbereich cut, applied FIRST: it is the coarsest topic scope (a Thema
+  // always sits in exactly one area), so everything below it counts within the
+  // chosen area. A word carries its area through its Thema; there is no
+  // untagged-=-universal escape here the way there is for Branche.
+  const areaScoped = useMemo(
+    () =>
+      lifeArea
+        ? browsableVocabulary.filter((v) => matchesLifeArea(v.themeId, lifeArea))
+        : browsableVocabulary,
+    [lifeArea],
+  );
+
   // Theme-scoped list BEFORE the Branche cut, so the Branche dropdown can show
   // per-sector dedicated-content counts within the current Thema scope.
   const themeScoped = useMemo(() => {
-    let list = themes.length
-      ? browsableVocabulary.filter((v) => themes.includes(v.themeId))
-      : browsableVocabulary;
+    let list = themes.length ? areaScoped.filter((v) => themes.includes(v.themeId)) : areaScoped;
     if (subFilter) list = list.filter((v) => !!v.subThemeId && subFilter.includes(v.subThemeId));
     return list;
-  }, [themes, subFilter]);
+  }, [areaScoped, themes, subFilter]);
+
+  // Pill counts: words per area within the current BRANCHE scope, ignoring the
+  // Thema/Unterthema below (the pills supersede those) and the attribute facets.
+  // Same shape as the Branche dropdown's own counts, which are likewise computed
+  // before search and facets, so the two rows of numbers mean the same thing.
+  const areaCounts = useMemo(
+    () =>
+      countLifeAreas(
+        sectors.length
+          ? browsableVocabulary.filter((v) => matchesSector(v, sectors))
+          : browsableVocabulary,
+        (v) => lifeAreaOfTheme(v.themeId),
+      ),
+    [sectors],
+  );
   // The Branche scope cut (root-cause fix, s102; multi-select s104): untagged
   // words are general vocabulary and stay visible under EVERY selected
   // Branche; tagged words hide only under Branchen NOT in the selection.
@@ -273,6 +308,24 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
+  // Picking a Lebensbereich drops any Thema outside it (and the Unterthema that
+  // hangs off it), so the pill, the Thema dropdown and the list can never
+  // disagree. Clearing the pill leaves the rest of the scope alone.
+  const setLifeArea = (next: LifeAreaId | "") => {
+    const p = new URLSearchParams(params);
+    if (next) p.set("area", next);
+    else p.delete("area");
+    if (next) {
+      const kept = themes.filter((id) => matchesLifeArea(id, next));
+      if (kept.length !== themes.length) {
+        if (kept.length) p.set("theme", kept.join(","));
+        else p.delete("theme");
+        p.delete("sub");
+      }
+    }
+    setParams(p, { replace: true });
+  };
+
   const setSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
     for (const id of ALL_FACET_IDS) {
@@ -298,8 +351,8 @@ export function VocabularyTrainer() {
   };
 
   const primaryGroups = useMemo(
-    () => themeGroupsForMode(learningMode, themes, (id) => vocabByTheme(id).length),
-    [learningMode, themes],
+    () => themeGroupsForMode(learningMode, themes, (id) => vocabByTheme(id).length, lifeArea),
+    [learningMode, themes, lifeArea],
   );
 
   // Carry the learner's active learning scope into the session, so Üben
@@ -358,7 +411,7 @@ export function VocabularyTrainer() {
   // (Branche/Thema/Unterthema), matching the FilterRail's own header badge, so
   // picking a dropdown value updates the button count too (founder bug report).
   const scopeActiveCount =
-    sectors.length + themes.length + (hasSubThemes ? subs.length : 0);
+    sectors.length + (lifeArea ? 1 : 0) + themes.length + (hasSubThemes ? subs.length : 0);
   const facetCount = activeFacetCount(selection) + scopeActiveCount;
   const filterButton = (
     <Button
@@ -434,6 +487,8 @@ export function VocabularyTrainer() {
           ]
         : []),
     ],
+    // Lebensbereich pills, rendered by the rail directly under Branche (s184).
+    area: { value: lifeArea, onChange: setLifeArea, counts: areaCounts },
     items: searched,
     facets,
     selection,
