@@ -1217,3 +1217,49 @@ as prufung." The bar keeps FIVE slots and gains a zone instead of a tab:
 - `tests/nav.test.tsx` pins the five slots and their order, the remap, and the two registry facts
   (Schreiben is not top-level; the `/anwenden` label is "Prüfung"). The bar remains a locked
   structure: change it only on an explicit founder request.
+
+## s183 (2026-08-02, founder) - Sprechen and Prüfungssimulation stay SEPARATE
+
+The founder asked whether the two speaking cards in the Prüfung hub are the same thing and should be
+merged. They are not, and they are not merged. Founder verdict: "keep them separate."
+
+They do share their machinery, which is what makes the question fair: both run `engine/dialogue.ts`
+over the SAME 30 scenarios in `src/data/dialogues.ts`. The split is the framing, and the framing is
+the product:
+
+- **Sprechen** (`/simulation`) is practice. Any of the 30 scenarios, no clock, hints and coaching
+  feedback in the run, repeat as often as you like.
+- **Prüfungssimulation** (`/exam`) is the rehearsal. One scenario wrapped in exam conditions: the
+  Aufgabenblatt briefing with its aspects, a 6-minute countdown, then a self-check against the real
+  telc rubric (Aufgabenerfüllung · Interaktion · Redemittel · Flüssigkeit · Korrektheit) and a score.
+
+**Why merging is the wrong move:** the practice-then-under-pressure split is how learners actually
+prepare, and it is the reason the zone carries the name Prüfung. A merge would demote the timed run
+to a toggle inside Sprechen, burying the one feature the zone is named after. The honest weakness is
+DEPTH (few exam sets, speaking only), and the fix for that is growing the exam run toward a fuller
+timed pass, which makes the two MORE distinct, not less. If the two cards ever read as samey, sharpen
+the card copy; do not merge the runners.
+
+## s183 (2026-08-02, founder) - the Prüfung icon language, and two traps it exposed
+
+Founder picks D and 2 from `preview/pruefung-icons.html` (variants A-D for the bar mark, 1-3 for the
+hub tiles).
+
+- **The bar mark is the orange Absolventenhut.** The target rings it replaced were the bottom bar's
+  ONLY outline mark surrounded by filled two-tone shapes, which is the entire reason the founder saw
+  it as not matching. Diagnosis rule worth keeping: in that bar, a mark is off when it is drawn in a
+  different WAY, not when it is drawn in a different colour.
+- **`/anwenden` and `/exam` deliberately share one `graduationCap` render.** The tab and the hub card
+  are the same destination at two depths; two different marks for it would be the bug.
+- **Hub tiles carry the branded route marks on tinted squircles**, so the Schreiben card shows the
+  exact pencil the nav shows. The white-on-gradient tiles they replaced flattened every mark into the
+  same white silhouette, which is why the founder could not reuse the nav's pencil there.
+- **Trap 1, colour: `RouteIcon` had no colour for routes outside `navItems`.** Since s182 only
+  `/anwenden` is a nav entry, so `/writing`, `/simulation` and `/exam` all fell back to brand blue and
+  the three tiles would have been identical. `OFF_NAV_COLOR` supplies their accents. Any future
+  surface that draws `RouteIcon` for a non-nav route must add its colour there.
+- **Trap 2, geometry: `rounded-2xl` on a 48px tile is a CIRCLE, not a squircle.** `--radius + 10` is
+  24px, exactly half the tile, so the corner radius consumed the whole side. The old gradient tiles
+  had been rendering as full circles for this reason and nobody had noticed. Rule: a corner radius at
+  or above half the box side is round, whatever the class is called. Check the number against the box,
+  not the name of the token.

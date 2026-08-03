@@ -204,6 +204,11 @@ Founder: "D and 2", then "keep them separate".
   Verified in the BUILT app at 320px, 390px (light + dark) and desktop: five even bar slots with the
   cap active, the three tiles read apart at a glance, and all three cards still open their trainer.
 - **Approved mockups:** `preview/pruefung-icons.html` (variants A-D and 1-3 as shown to the founder).
+- **Shipped:** PR **#780**, squash-merged as `797f65d`. `Validate content` and `Deploy site to
+  GitHub Pages` both green on the merge commit, so this is live on genauly.de. Post-merge
+  housekeeping done: branch reset onto `main`, working tree clean. (The mockup round and the
+  implementation went out as ONE PR: the preview commit was still unmerged when the founder picked,
+  so the picks were added to the same branch.)
 - **One open one-liner for the founder:** the page's `HubHero` still shows the lucide target, so the
   zone is a cap in the bar and the sidebar but a target at the top of its own page. Swapping it
   would put two caps on that page (hero + Prüfungssimulation card), which is why it was left alone.
@@ -237,24 +242,6 @@ anwenden and rename anwenden as prufung."
 - **Worth the founder's eye on the live site:** whether "Prüfung vorbereiten" reads right as the
   page title, and whether Schreiben sitting one tap deeper is felt in daily use. Both are one-line
   changes.
-
-**Handoff after session 183 (2026-08-02): Prüfung icon mockup round, picks pending.** Founder had
-three comments on the s182 nav change; nothing shipped yet, this was a previews-first round.
-- **1, bar icon:** the Prüfung mark is the bar's only stroke-drawn icon (hollow target ring); every
-  neighbour is a filled two-tone shape. `preview/pruefung-icons.html` offers four filled
-  orange+amber replacements: **A** volle Zielscheibe, **B** Klemmbrett mit Haken, **C** Stoppuhr,
-  **D** Absolventenhut, each in a five-slot bar replica (light + dark) plus a 64px detail row.
-- **3, hub tiles:** same preview, Teil 2: the menu-bar pencil on the Schreiben tile, the same-style
-  microphone on Sprechen, the cap recoloured amber on Prüfungssimulation, in three treatments:
-  **1** white marks on the existing gradients, **2** own-colour marks on tinted squircles,
-  **3** own-colour marks on the grey bar squircle.
-- **2, Sprechen vs. Prüfungssimulation:** answered in chat, recommendation KEEP BOTH. Same dialogue
-  engine and scenario bank; Sprechen is untimed practice with hints (30 scenarios),
-  Prüfungssimulation wraps one scenario in exam conditions (Aufgabenblatt, countdown, rubric
-  self-check, score). Awaiting the founder's verdict alongside the icon picks.
-- **Next step:** implement exactly the picked variants (bar mark in `route-icons.tsx` incl. its
-  `NORM` box, hub tiles in `AnwendenHub.tsx`), then verify live against the preview.
-- **Gates:** preview + docs only; no app code touched.
 
 **Session 182's first part (audit P6, the Redemittel phrase bank) is archived** in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`; its law lives on in

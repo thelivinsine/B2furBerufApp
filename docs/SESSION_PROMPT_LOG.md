@@ -3197,3 +3197,31 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompts 2-3):** `src/components/layout/route-icons.tsx` ·
   `src/features/anwenden/AnwendenHub.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Shipped (prompts 1-3, recorded after the merge):** PR **#780**, squash-merged as `797f65d`.
+  The mockup round and the implementation went out as ONE PR: the preview commit was still unmerged
+  when the founder picked, so D and 2 were added to the same branch. `Validate content` and `Deploy
+  site to GitHub Pages` both green on the merge commit; post-merge housekeeping done (branch reset
+  onto `main`, working tree clean).
+- **Prompt 4 (verbatim, 2026-08-02):** `document the session`
+  **Response:** documentation pass over what prompts 1-3 shipped, plus three gaps they left.
+  (1) **`docs/DECISIONS.md` had no s183 section at all**, although the prompt-3 entry above claims
+  the keep-them-separate call "is now recorded as founder law". It is now, in two sections: the
+  Sprechen vs. Prüfungssimulation verdict (same engine and scenario bank, different framing; why a
+  merge would bury the timed run, and that the real weakness is exam-set DEPTH, not duplication), and
+  the Prüfung icon language with the two traps it exposed (`OFF_NAV_COLOR` for non-nav routes, and a
+  radius at or above half the box side being a circle whatever the token is called).
+  (2) **The `/design` skill gained that geometry rule** in its pre-flight Corners item, since it is
+  reusable and cost a shipped-then-unnoticed bug: the hub tiles had been full circles.
+  (3) **`docs/PROJECT_STATUS.md` carried three handoffs and sat at 264 lines** against a ~250
+  ceiling. The superseded s183 "picks pending" mockup-round handoff was archived into
+  `PROJECT_STATUS_ARCHIVE_2026-W31.md` (the final s183 handoff covers the same work end to end), and
+  the shipped record for #780 was added to the surviving one. Back to 251 lines with the two most
+  recent handoffs, per the doc-hygiene rule.
+  `docs/areas/PRAKTISCH-NAV.md` needed nothing: prompt 2-3 already updated it in the same PR.
+  The one founder question still open is unchanged and recorded in both files: the Prüfung page's
+  `HubHero` still shows the lucide target, so the zone is a cap in the bar and the sidebar but a
+  target at the top of its own page.
+  Gates: docs-only (no code touched).
+- **Artifacts (prompt 4):** `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` ·
+  `.claude/skills/design/SKILL.md` · this log
