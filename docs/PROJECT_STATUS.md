@@ -183,8 +183,9 @@ right below the Branchen filter."
   → `?area=professional` with Thema back to "Alle Themen", the Thema dropdown then listing exactly
   one heading; toggle-off, pin+collapse and reset all behave.
 - **Shipped:** PR **#782**, squash-merged as `c612a5d`; `Validate content` and `Deploy site to
-  GitHub Pages` both green on the merge commit, so this is live on genauly.de. Post-merge
-  housekeeping done: branch reset onto `main`, working tree clean.
+  GitHub Pages` both green on the merge commit, so this is live on genauly.de. The session record
+  followed in PR **#783** (`f3b4395`) and the layout-index gaps it exposed in PR **#784**. Post-merge
+  housekeeping done after each: branch reset onto `main`, working tree clean.
 - **Not touched, on purpose:** Grammatik (no `themeId` on its topics), Sammlung (a Lv 1-5 chip row,
   not a scope rail), the Fokus grammar dials (form controls, not a content scope), and
   `libraryFocus` in `engine/session.ts` (Bibliothek Üben hands over already-filtered ids, so the

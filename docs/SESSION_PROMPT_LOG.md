@@ -3288,4 +3288,23 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Also confirmed the Supabase workflow did not run on this merge (it is scoped to `supabase/**`, and
   nothing in that tree changed), so there is no backend deploy to report.
   Gates: docs-only (no app code touched).
-- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · `docs/areas/SESSION.md` · this log
+- **Artifacts (prompt 2):** `docs/PROJECT_STATUS.md` · `docs/areas/SESSION.md` · this log. Shipped as PR **#783**, squash-merged `f3b4395`.
+- **Prompt 3 (verbatim, 2026-08-03):** `document the session`
+  **Response:** the same instruction a second time, so this pass looked for what the prompt-2 pass
+  could not have covered rather than restating it. Two things, one of them a gap s184's own code
+  created.
+  (1) **`CLAUDE.md`'s layout index had gone stale in two places.** The `shared/` list did not name
+  `LifeAreaPills`, although s184 had just made it a control on four surfaces, and the `lib/` list has
+  never named `lifeAreas.ts` (added in s181 without being indexed) or `themeGroups.ts`. Both are
+  listed now. The index is how a fresh session finds the module that owns a rule, so a law-bearing
+  module missing from it is the kind of omission that gets the rule re-implemented somewhere else.
+  (2) **The shipped lines for the documentation PRs themselves.** Prompt 2's entry was written before
+  its PR existed, so it recorded no PR number; it now carries **#783** (`f3b4395`), and the s184
+  handoff in `PROJECT_STATUS.md` names #783 and #784 alongside #782, so the session's three merges
+  are traceable from the handoff alone.
+  Re-audited the rest and found nothing further stale: `docs/PROJECT_FOUNDATION.md` describes
+  architecture and infra, neither of which moved; `docs/areas/COMMANDS.md` gained no script;
+  `docs/areas/CONTENT.md` saw no bank change (s184 shipped zero content edits); `PROJECT_REFERENCE.md`
+  backlog is untouched, with the queued writing-task quality audit still the next TODO.
+  Gates: docs-only (no app code touched).
+- **Artifacts (prompt 3):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
