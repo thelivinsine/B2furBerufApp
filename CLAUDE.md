@@ -51,13 +51,15 @@ after pulling.
 - `store/` — `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`,
   `useLibraryScope`
 - `lib/` — `facets.ts` (single facet registry, ≤12-option rule + coverage floor), `cefr.ts`
-  (single CEFR source), `search.ts`, `fuzzy.ts`, `graphPalette.ts`, `phase.ts`, `idRenames.ts`,
+  (single CEFR source), `lifeAreas.ts` (the ONE Berufsleben/Alltag fold + the `?area=` matcher) with
+  `themeGroups.ts` (the grouped Thema options every dropdown reads), `search.ts`, `fuzzy.ts`,
+  `graphPalette.ts`, `phase.ts`, `idRenames.ts`,
   `admin.ts` (FOUNDER_EMAILS), `appConfig.ts` (remote config; empty config == default behavior),
   hooks/icons/utils
 - `features/` — `session/` (SessionPlayer + ReadingBlock), `library/`, `vocabulary/`,
   `collocations/`, `redemittel/`, `grammar/`, `writing/`, `dashboard/`, `welt/` (game),
-  `collection/` (Sammlung), `help/`, `legal/`, `admin/`, `shared/` (FilterRail, ViewSwitcher,
-  DataTable, SearchField, useSlidingPill)
+  `collection/` (Sammlung), `help/`, `legal/`, `admin/`, `shared/` (FilterRail, LifeAreaPills,
+  ViewSwitcher, DataTable, SearchField, useSlidingPill)
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
   `artikel/` + `city/` (see `docs/areas/COMPONENTS.md`), `ui/` primitives, `shared/Logo.tsx`
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
