@@ -142,12 +142,19 @@ Ranked by how often the founder had to correct AI output:
 - **`ViewSwitcher`** (icon-only 36px squares, white sliding pill).
 - **`FilterRail`** (desktop rail / mobile `layout="panel"` behind a toolbar toggle; sticky Üben
   footer + result count; internal scrolling with bounded max-height, `max-h-[45dvh]` mobile).
-- **Scope hierarchy: Branche → Thema → Unterthema** as dropdowns with live counts
+- **Scope hierarchy: Branche → Lebensbereich → Thema → Unterthema** as dropdowns with live counts
   (`ScopeMultiSelect` / the Schreiben single-select listboxes). **Learner-facing groupings have
   exactly TWO categories, Berufsleben and Alltag** (`lib/lifeAreas.ts`; only `beruf` is
   Berufsleben, every other domain folds into Alltag). The five content domains are an authoring
   grain, never a heading; a third group anywhere is a bug (founder s181). **Dropdowns over pill
   walls** for long lists; facet pills only for short attribute sets (≤12 options).
+- **`LifeAreaPills`** (founder s184): the Lebensbereich pair, in EVERY filter and Aufgabe rail, in
+  one fixed slot directly below Branche (or leading, on a rail with no Branche dropdown). Single
+  select that toggles off, so the resting state is "beides" and there is no third "Alle" pill; the
+  visual recipe is the FilterRail facet pill verbatim, content-sized and wrapping, because the pill
+  rows two sections below it in the same tile are exactly that. An equal-width 2-column grid was
+  tried and truncated "Berufsleben" against a four-digit count in the 16rem rail. Never add it to a
+  surface whose content carries no Thema (Grammatik): that is dead chrome, not a filter.
 - Sticky mobile bottom action bar for the primary action; `SearchField` transient toolbar search;
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).

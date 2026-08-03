@@ -1,5 +1,6 @@
 import { themes } from "@/data/themes";
 import { writingPrompts, type WritingTask } from "@/data/writingPrompts";
+import { matchesLifeArea, type LifeAreaId } from "@/lib/lifeAreas";
 import type { ContentCefr, ThemeId, WorkSector } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 
@@ -120,6 +121,14 @@ export interface WritingTaskRef {
 }
 
 export interface WritingScope {
+  /**
+   * Lebensbereich pills (s184). "" = beides. HARD, like Niveau and Textsorte,
+   * and coarser than Thema: a Thema sits in exactly one area, so picking
+   * Berufsleben restricts the pool to Berufsleben Themen, full stop. The rail
+   * clears a cross-area Thema when the pill changes; a deep link that still
+   * carries one yields nothing and `blockingAxis` names `area` as the way out.
+   */
+  area?: LifeAreaId | "";
   /** "" = all Themen. */
   theme: ThemeId | "";
   /** "" = whole theme. Ignored when `theme` is "". */
@@ -141,6 +150,7 @@ const ALL_THEME_IDS: ThemeId[] = themes.map((t) => t.id);
  * say so rather than draw something else.
  */
 export function eligibleTasks({
+  area,
   theme,
   sub,
   sector,
@@ -150,6 +160,10 @@ export function eligibleTasks({
 }: WritingScope): WritingTaskRef[] {
   const out: WritingTaskRef[] = [];
   for (const id of theme ? [theme] : ALL_THEME_IDS) {
+    // Lebensbereich first: it is the coarsest topic cut, and it is HARD, so a
+    // Thema outside the chosen area contributes nothing rather than being
+    // quietly served (the substitution law).
+    if (!matchesLifeArea(id, area ?? "")) continue;
     const pool = writingPrompts[id]?.[length] ?? [];
     if (!pool.length) continue;
     // Bare tasks are retired from the draw, not from the bank (module docstring).
@@ -192,7 +206,7 @@ export function countTasks(scope: WritingScope): number {
 }
 
 /** The scope axes a learner can relax, hardest first. */
-export type ScopeAxis = "format" | "level" | "sub";
+export type ScopeAxis = "format" | "level" | "sub" | "area";
 
 /**
  * Which single axis to drop to get out of an empty scope, for the trainer's
@@ -202,7 +216,10 @@ export type ScopeAxis = "format" | "level" | "sub";
  */
 export function blockingAxis(scope: WritingScope): ScopeAxis | null {
   if (eligibleTasks(scope).length) return null;
-  for (const axis of ["format", "level", "sub"] as const) {
+  // `area` sits last: it can only block in combination with an out-of-area
+  // Thema, which the rail prevents and only a stale deep link produces, so the
+  // three authored axes are the likelier culprits and get named first.
+  for (const axis of ["format", "level", "sub", "area"] as const) {
     if (scope[axis] && eligibleTasks({ ...scope, [axis]: "" }).length) return axis;
   }
   return null;

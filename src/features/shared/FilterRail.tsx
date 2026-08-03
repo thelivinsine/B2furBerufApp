@@ -8,6 +8,8 @@ import {
   activeFacetCount,
 } from "@/features/shared/FacetSheet";
 import { Button } from "@/components/ui/button";
+import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
+import type { LifeAreaId } from "@/lib/lifeAreas";
 import type { PrimaryGroup, PrimaryOption } from "@/features/shared/BrowseToolbar";
 
 /**
@@ -47,6 +49,23 @@ export interface RailPrimary {
   /** Grouped rows with group headings (the Domain-grouped themes). */
   groups?: PrimaryGroup[];
 }
+
+/**
+ * The Lebensbereich pill pair (s184). Its own prop rather than a `RailPrimary`
+ * entry because it is a pill row, not a dropdown, and because its position is
+ * fixed by law: directly BELOW Branche and above Thema, on every rail.
+ */
+export interface RailArea {
+  /** Active area, "" = beides. */
+  value: LifeAreaId | "";
+  onChange: (next: LifeAreaId | "") => void;
+  counts: Record<LifeAreaId, number>;
+  /** See `LifeAreaPills`: false on tabs where untagged content is universal. */
+  disableZero?: boolean;
+}
+
+/** Stable pin id for the Lebensbereich section (pins persist per tab). */
+const AREA_PIN_ID = "area";
 
 /** Find a selected value's label across the flat + grouped option lists (for
  *  the trigger button, which shows the single chosen label). */
@@ -271,6 +290,7 @@ function SectionHeader({
 
 export function FilterRail<T>({
   scopes,
+  area,
   items,
   facets,
   selection,
@@ -290,6 +310,10 @@ export function FilterRail<T>({
    *  Wörter/Kollokationen pass [Branche, Thema, Unterthema?], Redemittel
    *  [Kategorie], Grammatik [Gruppe]. Each carries a stable `pinId`. */
   scopes?: RailPrimary[];
+  /** Lebensbereich pills. Rendered directly below the `sector` scope (or first,
+   *  on a rail that has no Branche dropdown), never anywhere else. Omit on a
+   *  tab whose content carries no Thema, e.g. Grammatik. */
+  area?: RailArea;
   /** Items in the current scope, for live option counts (same list the sheet gets). */
   items: T[];
   facets: FacetDef<T>[];
@@ -336,7 +360,9 @@ export function FilterRail<T>({
   // (s104 follow-up: the badge undercounted, and the reset button couldn't
   // clear a selected Branche/Thema/etc. because it only looked at `selection`).
   const scopeActiveCount = (scopes ?? []).reduce((sum, s) => sum + s.values.length, 0);
-  const activeCount = activeFacetCount(selection) + scopeActiveCount;
+  // The Lebensbereich pills count as one active filter, like any scope value:
+  // the badge and the reset must see them (s184).
+  const activeCount = activeFacetCount(selection) + scopeActiveCount + (area?.value ? 1 : 0);
 
   // The Filter toggle for the headerless (mobile) tile. It moves between two
   // spots by state: the top-left of the panel (beside the count) when expanded,
@@ -384,6 +410,7 @@ export function FilterRail<T>({
       onClick={() => {
         onChange({});
         scopes?.forEach((s) => s.values.length && s.onChange([]));
+        if (area?.value) area.onChange("");
       }}
       disabled={activeCount === 0}
       aria-label="Filter zurücksetzen"
@@ -465,10 +492,40 @@ export function FilterRail<T>({
     </section>
   );
 
-  // Ordered scope sections (Branche → Thema → Unterthema on Wörter/
-  // Kollokationen); the sub-theme entry only exists when the active theme has
-  // sub-themes, so drilling in is part of the filter, not a separate page.
-  const scopeSections = (scopes ?? []).map(scopeSelect);
+  // The Lebensbereich pills (s184). One fixed slot: directly under Branche.
+  const areaSection = area ? (
+    <section key="area">
+      <SectionHeader
+        label="Lebensbereich"
+        eyebrow
+        pinned={pins.includes(AREA_PIN_ID)}
+        onTogglePin={() => togglePin(AREA_PIN_ID)}
+        pinnable={!panel}
+      />
+      <LifeAreaPills
+        value={area.value}
+        onChange={area.onChange}
+        counts={area.counts}
+        disableZero={area.disableZero}
+      />
+    </section>
+  ) : null;
+
+  // Ordered scope sections (Branche → Lebensbereich → Thema → Unterthema on
+  // Wörter/Kollokationen); the sub-theme entry only exists when the active theme
+  // has sub-themes, so drilling in is part of the filter, not a separate page.
+  //
+  // The Lebensbereich slot is placed HERE rather than by the caller so it cannot
+  // drift per surface: it always follows the Branche dropdown, and on a rail
+  // without one (Redemittel) it leads, which is the same spot in the hierarchy
+  // (coarser than Thema, finer than nothing).
+  const scopeSections = (() => {
+    const out = (scopes ?? []).map(scopeSelect);
+    if (!areaSection) return out;
+    const afterSector = (scopes ?? []).findIndex((s) => s.pinId === "sector");
+    const at = afterSector === -1 ? 0 : afterSector + 1;
+    return [...out.slice(0, at), areaSection, ...out.slice(at)];
+  })();
 
   const facetSection = (facet: FacetDef<T>) => (
     <section key={facet.id}>
@@ -540,7 +597,18 @@ export function FilterRail<T>({
 
   const pinnedFacets = facets.filter((f) => pins.includes(f.id));
   const pinnedScopes = (scopes ?? []).filter((p) => pins.includes(p.pinId));
-  const showPinnedBody = !open && (pinnedScopes.length > 0 || pinnedFacets.length > 0);
+  const areaPinned = !!areaSection && pins.includes(AREA_PIN_ID);
+  // Same slot rule as the open body: pinned Lebensbereich follows a pinned
+  // Branche and otherwise leads, so collapsing never reshuffles the tile.
+  const pinnedSections = (() => {
+    const out = pinnedScopes.map(scopeSelect);
+    if (!areaPinned) return out;
+    const afterSector = pinnedScopes.findIndex((s) => s.pinId === "sector");
+    const at = afterSector === -1 ? 0 : afterSector + 1;
+    return [...out.slice(0, at), areaSection, ...out.slice(at)];
+  })();
+  const showPinnedBody =
+    !open && (pinnedSections.length > 0 || pinnedFacets.length > 0);
 
   // The filter controls proper (scopes + facet pills + reset), shared by the
   // desktop rail's open body and the mobile panel.
@@ -652,7 +720,7 @@ export function FilterRail<T>({
           {/* Collapsed: pinned sections stay visible. */}
           {!open && showPinnedBody && (
             <div className="space-y-5 p-3">
-              {pinnedScopes.map(scopeSelect)}
+              {pinnedSections}
               {pinnedFacets.map(facetSection)}
             </div>
           )}

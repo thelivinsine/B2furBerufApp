@@ -3225,3 +3225,46 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 4):** `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` ·
   `.claude/skills/design/SKILL.md` · this log
+
+## Session 184 (2026-08-03) - branch `claude/berufswelt-alltag-filter-pills-bpguv0`
+
+- **Prompt 1 (verbatim, 2026-08-03):** `I want a clear Berufswelt and Alltag pills in each and every
+  filter or aufgabe rail through out the app right below the Branchen filter. Implement it cleanly
+  and make sure everything works coherently with this.`
+  **Response:** asked ONE question first, because it was the founder's to make and it changed the
+  scope: the app's locked word for the work side is **Berufsleben** (s181 pick, used by the graph
+  legend, every Thema dropdown heading and the Schreiben rail), and the prompt said "Berufswelt".
+  Keeping Berufsleben meant a purely additive change; renaming meant an app-wide rename in the same
+  PR. Founder chose **keep "Berufsleben"**, so nothing was renamed.
+  Then shipped the pills as ONE shared control, `src/features/shared/LifeAreaPills.tsx`, in four
+  rails on both breakpoints: Wörter, Kollokationen, Redemittel (Bibliothek `FilterRail`, desktop rail
+  + mobile panel) and the Schreiben Kurz/Lang "Aufgabe wählen" rail. **Grammatik is the one
+  deliberate exception** and is flagged as such: grammar topics carry no `themeId`, so a life-area
+  filter there would be dead chrome rather than a filter.
+  Key decisions (full record in `docs/DECISIONS.md` §s184): the RAIL owns the slot (an `area` prop on
+  `FilterRail`, inserted after the `sector` scope, or first on a tab with no Branche dropdown), so
+  "right below the Branchen filter" cannot drift per surface; single-select that toggles off with no
+  third "Alle" pill; picking an area narrows the Thema dropdown AND drops a Thema from the other
+  area, so pill/dropdown/list can never disagree; counts are computed before Thema/search/facets so
+  the other pill never goes dead the moment a Thema is picked; `area` became a HARD, coarsest axis in
+  `lib/writingScope.ts` (the two areas partition the task pool exactly) with `blockingAxis` gaining
+  `area` for the stale-deep-link case; Redemittel passes `disableZero: false` because untagged is
+  universal there. The one visual correction during the round: an equal-width 2-column pill grid
+  truncated "Berufsleben" against a four-digit count in the 16rem desktop rail, so the pills use the
+  content-sized wrapping facet-pill layout the same tile already uses two sections below.
+  Verified in a headless browser on both rails: picking Berufsleben over a selected `theme=arzt`
+  rewrites the URL to `?area=professional` with the Thema back to "Alle Themen", the Thema dropdown
+  then lists exactly one heading (BERUFSLEBEN), toggling the same pill returns to beides, the pin +
+  collapse path keeps the pills visible, and both rails' reset icons clear `?area=`.
+  Gates: `pnpm typecheck` · `pnpm lint` (0 errors) · `pnpm lint:content` · `pnpm test:unit`
+  **506 passed** (10 new, in `tests/lifeAreas.test.ts` and `tests/writingScope.test.ts`) ·
+  `pnpm build` · `pnpm check:bundle` (123.1 kB / 400 kB) all green.
+- **Artifacts (prompt 1):** `src/features/shared/LifeAreaPills.tsx` (new) ·
+  `src/features/shared/FilterRail.tsx` · `src/lib/lifeAreas.ts` · `src/lib/themeGroups.ts` ·
+  `src/lib/writingScope.ts` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `tests/lifeAreas.test.ts` ·
+  `tests/writingScope.test.ts` · `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/PROJECT_STATUS.md` · this log

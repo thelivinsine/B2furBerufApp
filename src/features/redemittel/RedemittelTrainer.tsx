@@ -31,6 +31,13 @@ import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
 import { matchesThemeScope, redemittelFacets } from "@/lib/facets";
 import { themeGroupsForMode } from "@/lib/themeGroups";
+import {
+  lifeAreaOfTheme,
+  matchesLifeArea,
+  normalizeLifeArea,
+  type LifeAreaId,
+} from "@/lib/lifeAreas";
+import { countLifeAreas } from "@/features/shared/LifeAreaPills";
 import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { defaultVisibleBands } from "@/lib/cefr";
@@ -94,6 +101,24 @@ export function RedemittelTrainer() {
     setParams(p, { replace: true });
   };
 
+  // Lebensbereich pills (s184). This tab has no Branche dropdown, so the rail
+  // renders them first, which is the same place in the hierarchy: above Thema.
+  const lifeArea = useMemo(() => normalizeLifeArea(params.get("area")), [params]);
+
+  const setLifeArea = (next: LifeAreaId | "") => {
+    const p = new URLSearchParams(params);
+    if (next) p.set("area", next);
+    else p.delete("area");
+    if (next) {
+      const kept = themes.filter((id) => matchesLifeArea(id, next));
+      if (kept.length !== themes.length) {
+        if (kept.length) p.set("theme", kept.join(","));
+        else p.delete("theme");
+      }
+    }
+    setParams(p, { replace: true });
+  };
+
   // Facet selection (Kategorie + Register) rides the URL, exactly like the
   // sibling tabs. `?cat=` is now a facet param, not a scope.
   const railSelection = useMemo(() => {
@@ -119,9 +144,29 @@ export function RedemittelTrainer() {
   // learner's CEFR band + one step up, over the full bank (facets apply
   // last, like Wörter/Kollokationen). Never activates if it would leave
   // nothing to show.
+  // Lebensbereich cut, applied before the Thema scope. Untagged-=-universal
+  // here too (`matchesThemeScope`'s rule): a Wendung with no Thema has no area
+  // either, and a phrase that works everywhere works in both areas, so it stays
+  // visible under whichever pill is active.
+  const areaScoped = useMemo(
+    () =>
+      lifeArea
+        ? redemittel.filter((p) => !p.themeId || matchesLifeArea(p.themeId, lifeArea))
+        : redemittel,
+    [lifeArea],
+  );
+
   const themeScoped = useMemo(
-    () => redemittel.filter((p) => matchesThemeScope(p, themes)),
-    [themes],
+    () => areaScoped.filter((p) => matchesThemeScope(p, themes)),
+    [areaScoped, themes],
+  );
+
+  // Dedicated-content counts, like the Thema dropdown right below: a zero means
+  // "no Wendung authored FOR this area", not "nothing to show", so the pills
+  // stay selectable (`disableZero: false`).
+  const areaCounts = useMemo(
+    () => countLifeAreas(redemittel, (p) => lifeAreaOfTheme(p.themeId)),
+    [],
   );
 
   const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
@@ -151,14 +196,18 @@ export function RedemittelTrainer() {
   );
 
   // The badge on the Filter toggle counts the scope too, like the sibling tabs.
-  const activeFilterCount = activeFacetCount(railSelection) + themes.length;
+  const activeFilterCount =
+    activeFacetCount(railSelection) + themes.length + (lifeArea ? 1 : 0);
 
   const primaryGroups = useMemo(
     () =>
-      themeGroupsForMode(learningMode, themes, (id) =>
-        redemittel.reduce((n, p) => n + (p.themeId === id ? 1 : 0), 0),
+      themeGroupsForMode(
+        learningMode,
+        themes,
+        (id) => redemittel.reduce((n, p) => n + (p.themeId === id ? 1 : 0), 0),
+        lifeArea,
       ),
-    [learningMode, themes],
+    [learningMode, themes, lifeArea],
   );
 
   // Üben practises EXACTLY the filtered Redemittel (founder 2026-07-13): hand the
@@ -191,6 +240,14 @@ export function RedemittelTrainer() {
         groups: primaryGroups,
       },
     ],
+    // Lebensbereich pills (s184). No Branche dropdown on this tab, so the rail
+    // puts them at the top of the scope stack, still directly above Thema.
+    area: {
+      value: lifeArea,
+      onChange: setLifeArea,
+      counts: areaCounts,
+      disableZero: false,
+    },
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
         <UebenLabel

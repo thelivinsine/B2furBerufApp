@@ -122,8 +122,8 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - **Header:** "Filter" label (brand accent) + active-count badge + chevron toggle, plus a
   permanent reset icon (RotateCcw) and a close X (mobile panel only). Reset clears facets AND
   scope dropdowns; the badge counts both. The result count sits beside Üben in EVERY state.
-- **Scopes:** primary dropdowns in the hierarchy Branche → Thema → Unterthema (Kategorie on
-  Grammatik = Gruppe). **Scope dropdowns are MULTI-select** via the hand-built checkbox popover
+- **Scopes:** primary dropdowns in the hierarchy Branche → **Lebensbereich** → Thema → Unterthema
+  (Kategorie on Grammatik = Gruppe). **Scope dropdowns are MULTI-select** via the hand-built checkbox popover
   `ScopeMultiSelect` (Radix Select is single-value only); each rides a comma-list URL param
   (empty = everything), OR-within. "Alle X" shows the OPTION count in the muted pill-number
   format. Sub-theme drill-down + the travelling `useLibraryScope` apply only when EXACTLY ONE
@@ -137,6 +137,16 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   facet order: Wortart right after Thema/Unterthema, Stufe (CEFR) LAST. Redemittel: Kategorie is a
   multi-select PILL facet (`CATEGORY_FACET`), Register a rail facet; `?cat=`/`?register=` ride the
   facet selection; the per-category card section headers were removed (flat card grid).
+- **Lebensbereich pills (founder s184; `features/shared/LifeAreaPills.tsx`):** Berufsleben · Alltag
+  as a `RailArea` prop, NOT a `RailPrimary` entry, because the rail owns their position: directly
+  after the `sector` scope, or first when a tab has none (Redemittel). Single-select that toggles
+  off, `?area=professional|personal` (anything else = beides), pinnable like any section, counted by
+  the badge, cleared by reset. **They narrow the Thema dropdown to that area** (`themeGroupsForMode`
+  takes the area) and the setter drops a Thema from the other one, so the three controls can never
+  disagree. Counts are per-area content within the current Branche scope, before search and facets,
+  the same convention the Branche dropdown counts by. Zero greys out, EXCEPT on Redemittel
+  (`disableZero: false`), where untagged is universal so a zero is a dedicated-content signal.
+  Grammatik has no pills at all: its topics carry no Thema, so there is no honest area to filter by.
 - **Redemittel carries ONE scope dropdown, Thema** (audit P6, s182), on the same `?theme=` param as
   the sibling tabs so a scope travels between them. Its semantics are the Branche ones, not the
   Wörter ones: an untagged phrase is universal and shows under every Thema (`matchesThemeScope`),
