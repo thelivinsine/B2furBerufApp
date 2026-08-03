@@ -869,3 +869,21 @@ pills and go ahead with p4 and then p5." The Kategorie facet stays a pill wall b
   the MOBILE bottom bar? Its five slots are locked, so a sixth entry means moving something or
   growing the bar. Until that is answered, mobile reaches Sprechen only through the dashboard
   recommendation and ⌘K.
+
+**Handoff after session 183 (2026-08-02): Prüfung icon mockup round, picks pending.** Founder had
+three comments on the s182 nav change; nothing shipped yet, this was a previews-first round.
+- **1, bar icon:** the Prüfung mark is the bar's only stroke-drawn icon (hollow target ring); every
+  neighbour is a filled two-tone shape. `preview/pruefung-icons.html` offers four filled
+  orange+amber replacements: **A** volle Zielscheibe, **B** Klemmbrett mit Haken, **C** Stoppuhr,
+  **D** Absolventenhut, each in a five-slot bar replica (light + dark) plus a 64px detail row.
+- **3, hub tiles:** same preview, Teil 2: the menu-bar pencil on the Schreiben tile, the same-style
+  microphone on Sprechen, the cap recoloured amber on Prüfungssimulation, in three treatments:
+  **1** white marks on the existing gradients, **2** own-colour marks on tinted squircles,
+  **3** own-colour marks on the grey bar squircle.
+- **2, Sprechen vs. Prüfungssimulation:** answered in chat, recommendation KEEP BOTH. Same dialogue
+  engine and scenario bank; Sprechen is untimed practice with hints (30 scenarios),
+  Prüfungssimulation wraps one scenario in exam conditions (Aufgabenblatt, countdown, rubric
+  self-check, score). Awaiting the founder's verdict alongside the icon picks.
+- **Next step:** implement exactly the picked variants (bar mark in `route-icons.tsx` incl. its
+  `NORM` box, hub tiles in `AnwendenHub.tsx`), then verify live against the preview.
+- **Gates:** preview + docs only; no app code touched.

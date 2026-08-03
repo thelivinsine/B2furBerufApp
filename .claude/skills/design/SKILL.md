@@ -61,7 +61,10 @@ Ranked by how often the founder had to correct AI output:
    dead-end.
 5. **Corners.** Squircle, not fully round: `rounded-lg` tracks / `rounded-md` pills for toggles,
    switchers, filter pills (s154). Fully round stays ONLY for dots, meters, count badges, avatars,
-   circular icon buttons.
+   circular icon buttons. **Check the radius against the BOX, not the token name** (s183): a radius
+   at or above half the side is a circle whatever it is called, so `rounded-2xl` (`--radius + 10` =
+   24px) on a 48px tile renders a full circle. The Prüfung hub tiles had been doing exactly that
+   unnoticed; 48px tiles take `rounded-xl`.
 6. **Placement.** AI/legal disclaimers are standalone muted lines BELOW cards, never inside them,
    horizontally centered in normal flow (not bottom-pinned) — EXCEPT the two Schreiben trainers
    (Fokus + Kurz/Lang), where the founder moved the Art. 50 note to a fixed bottom line level with
