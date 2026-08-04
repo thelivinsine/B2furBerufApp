@@ -145,10 +145,11 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**One small thing is owed from s185b:** confirm `/admin → Launch` shows `retention_scheduled: true`.
-A green Supabase deploy proves migration 0015 applied but not that pg_cron was available to schedule
-the three purge jobs. If it reads false: enable pg_cron under Database → Extensions, then re-run the
-Supabase workflow (0015 re-applies idempotently).
+**Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
+shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
+weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
+merely installed. The same screenshot confirms the Consent-Version card green and **im Gleichschritt
+at 2026-08-04**, so the legal-date fix is live too.
 
 **The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
 is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:

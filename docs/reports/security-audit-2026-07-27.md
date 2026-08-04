@@ -322,9 +322,11 @@ the policy was rewritten in the same change, and `PRIVACY_LAST_UPDATED_ISO` + `C
 bumped to `2026-08-04` together (the §G2 drift check only catches bumping one of the two, never
 forgetting both, which is exactly the mistake this change made and then corrected).
 Two neighbouring purges shipped with it: abandoned anonymous accounts (90 days) and never-reused
-transform-cache rows (60 days). **Verify once in `/admin → Launch`:** a green Supabase deploy proves
-the migration applied but NOT that `pg_cron` was available to schedule the jobs, since the block
-warns rather than failing so it cannot block the Edge Function deploys behind it.
+transform-cache rows (60 days). **Verified in `/admin → Launch` on 2026-08-04** (green
+"Aufbewahrungs-Job (pg_cron) ist geplant"), which was a necessary check rather than a formality: a
+green Supabase deploy proves the migration applied but NOT that `pg_cron` was available to schedule
+the jobs, since the block warns rather than failing so it cannot block the Edge Function deploys
+behind it.
 
 ---
 
@@ -404,6 +406,6 @@ Worth recording, so the next audit knows what has already been ruled out.
 4. Optional, cheap, do-anytime: set `ALLOWED_ORIGINS` to the real domains (F7); revoke
    `log_gdpr_event` from `anon` (F9); enable the leaked-password check (above).
 5. Before a paid launch: close the limit race (F6). ~~Schedule the retention job (F11).~~
-   **DONE 2026-08-04** (s185, migration 0015, 2-year window, policy rewritten to match). One
-   10-second confirmation is still owed: `/admin → Launch` must show `retention_scheduled: true`;
-   if it reads false, enable pg_cron under Database → Extensions and re-run the Supabase workflow.
+   **DONE 2026-08-04** (s185, migration 0015, 2-year window, policy rewritten to match) and
+   **founder-verified the same day**: `/admin → Launch` renders the green "Aufbewahrungs-Job
+   (pg_cron) ist geplant", so the three weekly purges are scheduled, not merely installed.

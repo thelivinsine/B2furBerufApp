@@ -202,13 +202,22 @@ unavailable the migration still succeeds with a warning and the purge functions 
 by hand, rather than failing the migration step and blocking the Edge Function deploys behind
 it.
 
-**Verification note.** That safety net has a cost worth stating plainly: `supabase db push`
-does not surface Postgres NOTICE/WARNING output, so a green deploy proves the migration
-applied but NOT that the three jobs were scheduled. The two states are distinguishable in one
-place, `/admin → Launch`, where `retention_scheduled` reads the live `cron.job` table. If it
-reads false, pg_cron is not enabled on the project: turn it on under Database → Extensions and
-re-run the Supabase workflow, which re-applies migration 0015 idempotently and schedules the
-jobs. Until that is checked, treat the purges as installed but unproven.
+**Verification note, now CLOSED.** That safety net has a cost worth stating plainly:
+`supabase db push` does not surface Postgres NOTICE/WARNING output, so a green deploy proves
+the migration applied but NOT that the three jobs were scheduled. The two states are
+distinguishable in one place, `/admin → Launch`, where `retention_scheduled` reads the live
+`cron.job` table. **Founder-verified 2026-08-04: it renders the green "Aufbewahrungs-Job
+(pg_cron) ist geplant", so pg_cron was available and all three purges are scheduled.** Keep the
+recovery path on record in case a future project move loses the extension: enable pg_cron under
+Database → Extensions and re-run the Supabase workflow, which re-applies migration 0015
+idempotently.
+
+**One interaction to watch.** The Launch checklist item *"Supabase-Plan geprüft (Free-Tier
+pausiert nach 7 Tagen Inaktivität)"* is still unticked, and it bears directly on this: a paused
+project runs no scheduled jobs. That is harmless while the app is in daily use, and these are
+weekly hygiene tasks with no deadline, so a delayed purge is not a correctness problem. It only
+matters if the project is ever left idle for a long stretch while the privacy policy promises a
+2-year deletion, so it belongs on the pre-launch plan decision, not on this audit.
 
 ### R5 — Admin analytics recompute from the blobs, O(users × account-age) per dashboard view
 
