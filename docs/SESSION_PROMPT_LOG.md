@@ -3308,3 +3308,27 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   backlog is untouched, with the queued writing-task quality audit still the next TODO.
   Gates: docs-only (no app code touched).
 - **Artifacts (prompt 3):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 185 (2026-08-04) - branch `claude/database-architecture-audit-x4cdmu`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `the database architecture is concerningly linear.. can you
+  do a thorough audit and provide your analysis with risks and recommendations?`
+  **Response:** full audit of the Supabase layer (all 14 migrations, 5 Edge Functions, the
+  cloudSync protocol, admin RPCs), written up as
+  `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the "linear" shape (few relations,
+  everything hanging off `auth.users`) is deliberate and correct, because the ~5,000-id content
+  catalog lives in the repo, not the database; the DB only holds per-learner state, ops tables and
+  one global cache. The real risks are growth-shaped, not shape-shaped: (R1) the `progress` row is
+  one ever-growing JSONB blob re-uploaded whole on a 1.5 s debounce, with `daily_xp`/`active_days`
+  growing forever; (R2) between logins sync is whole-row last-write-wins across devices; (R3)
+  `pushProgress`/`pushSettings` never read the supabase-js `{ error }` result, so a permanently
+  failing sync is invisible to the learner; (R4) nothing is ever deleted (stale anonymous
+  accounts, indefinite learner text retention = open audit F11, stranded transform-cache rows) and
+  the pg_cron retention job the 0010 evidence probe expects was never scheduled; (R5) admin RPCs
+  recompute analytics from the blobs, O(users x account-age); (R6) migration idempotency is an
+  unchecked convention that can block the whole backend deploy chain. Recommended order: sync-error
+  indicator, retention jobs, day-map caps, idempotency lint (all small, independent), then the one
+  real schema evolution (split `srs` into a per-card table) before serious growth. Analysis only,
+  no code changed, per the prompt.
+- **Artifacts (prompt 1):** `docs/reports/db-architecture-audit-2026-08-04.md` ·
+  `docs/PROJECT_STATUS.md` · this log

@@ -1,10 +1,14 @@
 # Project Status
 
-_Last updated: 2026-08-03 (session 184). **Every filter and Aufgabe rail now carries the
-Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
-Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
-shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
-drops a Thema from the other area so the three controls can never disagree.
+_Last updated: 2026-08-04 (session 185). **Database architecture audit**, prompted by the founder's
+"concerningly linear" concern: full report in `docs/reports/db-architecture-audit-2026-08-04.md`.
+Verdict: the linear shape is deliberate (content lives in the repo; the DB holds only per-learner
+state + ops), but six growth/sync risks were found and ranked, with a small-fix list (sync-error
+indicator, retention jobs, day-map caps, migration idempotency lint) ahead of the one real schema
+evolution (split `srs` out of the progress blob into a per-card table). Analysis only, no code.
+Prior s184: **every filter and Aufgabe rail carries the Lebensbereich pills, Berufsleben · Alltag,
+directly below Branche** (one shared `LifeAreaPills` control, `?area=`, Grammatik excluded on
+purpose).
 Prior s183: **The Prüfung zone has a new icon language: the orange
 Absolventenhut in the bar (founder pick D), and the branded route marks on tinted tiles in the hub
 (pick 2).** The founder also settled the merge question: **Sprechen and Prüfungssimulation stay
@@ -45,9 +49,7 @@ pack stays parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
 Prior s174: **security audit + the sign-up flow it uncovered**, including the `onboarded` fault that
 discarded learner profiles on every sign-in (#745).
 Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`).
-Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
-ONE shared module (`src/features/writing/correction.tsx`) with Fokus, Kurz/Lang and Verlauf
-(PR #739). `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
+`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
 a CLI. Product name: **Genauly** (`genauly.de`)._
 
@@ -155,6 +157,29 @@ adding one task:
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
 
+**Handoff after session 185 (2026-08-04): the database architecture audit.** Founder: "the database
+architecture is concerningly linear.. can you do a thorough audit and provide your analysis with
+risks and recommendations?"
+- **Deliverable:** `docs/reports/db-architecture-audit-2026-08-04.md`, covering all 14 migrations,
+  the 5 Edge Functions, `src/lib/cloudSync.ts` and the admin RPCs. Analysis only, no code changed,
+  because the prompt asked for an assessment.
+- **Verdict in one line:** the "linear" schema (11 small tables around `auth.users`, few relations)
+  is the correct consequence of keeping the ~5,000-id content catalog in the repo; the real risks
+  are growth-shaped, not shape-shaped.
+- **Findings, ranked R1-R8.** The three that matter most: the `progress` row is one ever-growing
+  JSONB blob re-uploaded whole every 1.5 s of activity (R1); `pushProgress`/`pushSettings` never
+  read the supabase-js `{ error }` result, so a permanently failing sync is invisible while the
+  learner believes the cloud backup works (R3); nothing is ever deleted, and the pg_cron retention
+  job that migration 0010's evidence probe expects was never scheduled, which also keeps audit F11
+  (indefinite learner-text retention) open (R4).
+- **Recommended order (all still TODO, founder to green-light):** 1) read the push result + quiet
+  "sync failing" indicator, 2) retention jobs (stale anonymous accounts, old learner text, dead
+  transform-cache rows), 3) cap `daily_xp`/`active_days` at ~400 days, 4) migration idempotency
+  lint in `validate.yml`, 5) the one real schema evolution, `srs` into a per-card `srs_cards`
+  table (also fixes cross-device last-write-wins, R2), 6) later, a nightly rollup for the admin
+  analytics RPCs (R5).
+- **Gates:** docs-only (report + status + prompt log); no app code, no build needed.
+
 **Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
 a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app
 right below the Branchen filter."
@@ -194,44 +219,11 @@ right below the Branchen filter."
   (one word, matches the two pills under it), and whether Grammatik should carry the pills anyway.
   Both are small changes.
 
-**Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
-Founder: "D and 2", then "keep them separate".
-- **Bar mark: the orange Absolventenhut** (`graduationCap` in `route-icons.tsx`). The target rings
-  it replaced were the bar's only OUTLINE mark among filled two-tone shapes, which is the whole
-  reason it read thinner than its neighbours. `/anwenden` and `/exam` now share that one mark on
-  purpose: the tab and the hub card are the same thing at two depths.
-- **Hub tiles: the branded route marks on tinted squircles** (`AnwendenHub.tsx`). Each card renders
-  `RouteIcon` for its own route, so the Schreiben card carries the exact pencil the nav does, the
-  microphone matches it in style, and the cap ties the exam card to the zone. The white-on-gradient
-  tiles this replaced turned every mark into the same white silhouette.
-- **Two fixes the implementation forced.** (1) Routes that are not `navItems` entries had no accent
-  colour, so all three marks would have drawn brand blue: `OFF_NAV_COLOR` now supplies cyan for
-  `/simulation` and orange for `/exam`. (2) The tiles were `rounded-2xl`, and `--radius + 10` is
-  24px, exactly half of a 48px tile, so they were rendering as full CIRCLES (already true of the old
-  gradient tiles). Now `rounded-xl`, matching the approved preview and the squircle law.
-  The `/simulation` teal also went from `#5eead4` to `#2dd4bf`, which washed out on the tinted tile.
-- **Sprechen vs. Prüfungssimulation: KEEP BOTH, founder decision.** Same dialogue engine and
-  scenario bank; Sprechen is untimed practice with hints across all 30 scenarios, Prüfungssimulation
-  wraps one scenario in exam conditions (Aufgabenblatt, 6-minute countdown, rubric self-check,
-  score). Nothing was merged and nothing changed in either runner.
-- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.2 kB.
-  Verified in the BUILT app at 320px, 390px (light + dark) and desktop: five even bar slots with the
-  cap active, the three tiles read apart at a glance, and all three cards still open their trainer.
-- **Approved mockups:** `preview/pruefung-icons.html` (variants A-D and 1-3 as shown to the founder).
-- **Shipped:** PR **#780**, squash-merged as `797f65d`. `Validate content` and `Deploy site to
-  GitHub Pages` both green on the merge commit, so this is live on genauly.de. Post-merge
-  housekeeping done: branch reset onto `main`, working tree clean. (The mockup round and the
-  implementation went out as ONE PR: the preview commit was still unmerged when the founder picked,
-  so the picks were added to the same branch.)
-- **One open one-liner for the founder:** the page's `HubHero` still shows the lucide target, so the
-  zone is a cap in the bar and the sidebar but a target at the top of its own page. Swapping it
-  would put two caps on that page (hero + Prüfungssimulation card), which is why it was left alone.
-
-**Session 182 is fully archived** in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`:
-part 1 (audit P6, the Redemittel phrase bank) and, aged out by this session, part 4 (the five-slot
-Prüfung nav zone, PR #778). Their law lives on in `docs/DECISIONS.md` §s182,
-`docs/areas/CONTENT.md` and `docs/areas/PRAKTISCH-NAV.md`. (Part 4 had been sitting in this file
-TWICE, once above the s183 handoff and once below it; the duplicate went with the archive move.)
+**Sessions 182 and 183 are fully archived** in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`: s182 parts 1 and 4, and, aged out by
+this session, the full s183 handoff (the Prüfung icon language, PR #780). Their law lives on in
+`docs/DECISIONS.md` §s182/§s183, `docs/areas/CONTENT.md`, `docs/areas/PRAKTISCH-NAV.md` and
+`docs/areas/BRAND.md`.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
