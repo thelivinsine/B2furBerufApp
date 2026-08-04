@@ -42746,6 +42746,78 @@ const provenancePart4: ProvenanceEntry[] = [
     review_status: "draft",
     notes: "parent topic=g_temporalsaetze. Productive (typed-answer) drill authored in s185 (audit P5, bringing the last B1 topics to 10 drills); verify answer against the parent topic reference."
   },
+  {
+    content_id: "sc_eskalationsgespraech",
+    content_type: "dialogue",
+    label: "Ein Eskalationsgespräch führen",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=customer; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
+  },
+  {
+    content_id: "sc_scopeverhandlung",
+    content_type: "dialogue",
+    label: "Umfang und Termin neu verhandeln",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=project; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
+  },
+  {
+    content_id: "sc_beinaheunfall",
+    content_type: "dialogue",
+    label: "Einen Beinaheunfall melden",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=safety; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
+  },
+  {
+    content_id: "sc_widerspruch",
+    content_type: "dialogue",
+    label: "Widerspruch gegen einen Bescheid",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
+  },
+  {
+    content_id: "sc_mietminderung",
+    content_type: "dialogue",
+    label: "Schimmel: Mängel und Miete",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=wohnen; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
+  },
+  {
+    content_id: "sc_kostenuebernahme",
+    content_type: "dialogue",
+    label: "Die Kasse lehnt die Behandlung ab",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
+  },
 ];
 
 export const provenance: ProvenanceEntry[] = provenancePart1

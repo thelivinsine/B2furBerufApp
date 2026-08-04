@@ -142,6 +142,21 @@ deliberately not in the lint:** the ich-Laut/ach-Laut split (`ch` vs `kh`) is st
 across the bank, and `au` is written `au` in some entries and `ow` in others. Both are a bigger
 re-derivation than P9 covered; do not "fix" one item in passing, fix the class or leave it.
 
+- **Dialogues** (`src/data/dialogues.ts`, 36 scenarios; `sc_` prefix): `Scenario` with `themeId`,
+  `task`, `context`, `level` 1-3, `minutes`, `start` and a `nodes` record. Every option carries
+  `feedback`, a `quality` score and a `uses` Redemittel tag; every scenario ends in a free-speak
+  node (`prompt` + `model`, audit P4 in s182) and a narrator end node. Option ids are
+  scenario-scoped, not global (`d1a` recurs across scenarios); only the `sc_` id is a content_id.
+  **Level 3 means the partner pushes back** (audit P4, s185): the ladder was 13/15/**2** and both
+  level-3 scenarios were workplace, so the hardest speaking practice in the app was two items and
+  the daily-life half had none. Six were added (customer, project, safety · behoerde, wohnen, arzt)
+  to make it 13/15/**8**, three of them Alltag. What distinguishes the level from level 2: the
+  partner counters after a good answer, the weak options are plausible professional judgements
+  rather than obvious mistakes (conceding a discount you have no authority for, agreeing not to
+  report a near-miss), and the free-speak turn asks the learner to hold a position under pressure
+  rather than summarise agreement. `SimulationHub` groups by level automatically, so a new scenario
+  needs no UI change; keep new entries at the END of the `scenarios` array, because "Empfohlen" is
+  the first not-yet-completed item in array order.
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
