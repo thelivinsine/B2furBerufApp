@@ -3599,3 +3599,25 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompt 7):** `docs/PROJECT_STATUS.md` ·
   `docs/reports/db-architecture-audit-2026-08-04.md` ·
   `docs/reports/security-audit-2026-07-27.md` · this log
+
+## Session 186 (2026-08-04) - branch `claude/prufung-simulation-rework-av72gq`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `prufung simulation should actually feel like an exam with
+  all the lesen, hören, schreiben and sprechen modules with a timer and clear instructions. I want
+  you to do a complete rework of this section.`
+  **Response:** design round FIRST, per the locked preview-first process; no app code touched yet.
+  The concept replaces the speaking-only "Prüfungssimulation" with a real four-part mock exam
+  (telc B2 Beruf / Goethe B2 shape): Teil 1 Lesen (3 Texte, 9 MC-Aufgaben, 15 Min), Teil 2 Hören
+  (2 Ansagen via TTS, max. 2x, Notizen + Aufgaben, 10 Min), Teil 3 Schreiben (1 voll gebriefte
+  Aufgabe, KI-bewertet, 20 Min), Teil 4 Sprechen (bestehender Dialog-Runner, 7 Min); Anleitungs-
+  Seite vor jedem Teil, Timer je Teil (amber unter 2 Min), Ergebnis mit Punkten pro Teil und
+  Bestanden-Grenze 60 %. Every module draws from existing banks (texts.ts incl. the eight
+  exam-length B2 texts and the six voicemails with `notes`, the 717 writing tasks, the 30 speaking
+  scenarios), so the rework is engine + UI work, no new content wave. Three named variants in
+  `preview/pruefungssimulation-rework.html` (screenshot-verified, published as a Claude artifact):
+  **A "Prüfungstag"** (timeline hub, one start CTA, single parts below; runner with white top bar,
+  Teil-Punkte, Timer-Pill; recommended), **B "Vier Module"** (four equal module cards, timer in the
+  bottom action bar), **C "Antwortbogen"** (numbered answer-strip navigation, A's hub). Awaiting
+  the founder's pick before implementation.
+- **Artifacts (prompt 1):** `preview/pruefungssimulation-rework.html` · `docs/PROJECT_STATUS.md` ·
+  this log

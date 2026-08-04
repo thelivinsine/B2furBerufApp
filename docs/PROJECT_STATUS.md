@@ -145,6 +145,20 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**In flight (s186): the Prüfungssimulation rework, waiting on the founder's variant pick.** The
+founder asked for a complete rework: the simulation should feel like a real exam with Lesen, Hören,
+Schreiben and Sprechen, a timer and clear instructions. The design round shipped as
+`preview/pruefungssimulation-rework.html` (three variants: A "Prüfungstag" timeline hub +
+top-bar runner, recommended; B "Vier Module" card hub + bottom-bar timer; C "Antwortbogen"
+numbered answer-strip navigation), published as a Claude artifact. The proposed structure: four
+Teile at 15/10/20/7 Min (52 Min total), Anleitung before each Teil, per-Teil timer, Ergebnis with
+per-Teil Punkte and a 60 % Bestanden line. All content comes from existing banks (exam-length B2
+texts + voicemail `notes` from s185, the 717 writing tasks, the 30 speaking scenarios), so the
+implementation is engine + UI only. **Do not implement until the founder picks a variant**; then:
+new exam composer in `engine/`, ExamHub/ExamRunner rework in `features/exam/`, per-Teil timer with
+`useLiveWork` + persistence (never lose a running exam to a reload), and `examsDone` grows a
+per-module breakdown (ids stay permanent).
+
 **Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
 shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
 weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
