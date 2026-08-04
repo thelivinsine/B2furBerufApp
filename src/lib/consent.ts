@@ -10,7 +10,7 @@ import { PRIVACY_LAST_UPDATED_ISO } from "@/lib/legalMeta";
  * `consentInSync()` (admin Launch §G2) and `tests/consent.test.ts` guard the
  * lockstep.
  */
-export const CONSENT_VERSION = "2026-06-08";
+export const CONSENT_VERSION = "2026-08-04";
 
 /**
  * G2 consent-drift check: true when the consent version matches the legal

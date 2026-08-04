@@ -298,7 +298,7 @@ a normal change, not a security patch.
 
 ---
 
-### F11 — Learner text is kept indefinitely
+### F11 — Learner text is kept indefinitely ✅ fixed (s185, 2026-08-04)
 **Low (compliance). `writing_evaluations.text`, `sentence_checks.source_text`.**
 
 Already noted in `SECURITY.md` as accepted. Restating it because the surface grew since: it is now
@@ -311,6 +311,20 @@ this is a data-minimisation question (Art. 5(1)(e)), not a confidentiality one. 
 **Recommendation:** when you're ready, a `pg_cron` job deleting rows older than N months (12 is a
 defensible choice for a learning history) closes it and turns that admin indicator green. Worth
 pairing with a line in the Datenschutzerklärung stating the retention period.
+
+**FIXED (s185, 2026-08-04, migration `0015_retention.sql`).** Closed by the database architecture
+audit (`docs/reports/db-architecture-audit-2026-08-04.md` §R4). The founder chose **2 years**;
+`purge_old_learner_text(730)` runs weekly and NULLS the text columns on both tables rather than
+deleting rows, so the AI limits, cache bookkeeping and admin aggregates keep working and Verlauf
+keeps the evaluation itself. The recommendation's second sentence was the load-bearing one: the
+Datenschutzerklärung had promised the OPPOSITE ("Schreibeinreichungen … bleiben gespeichert"), so
+the policy was rewritten in the same change, and `PRIVACY_LAST_UPDATED_ISO` + `CONSENT_VERSION`
+bumped to `2026-08-04` together (the §G2 drift check only catches bumping one of the two, never
+forgetting both, which is exactly the mistake this change made and then corrected).
+Two neighbouring purges shipped with it: abandoned anonymous accounts (90 days) and never-reused
+transform-cache rows (60 days). **Verify once in `/admin → Launch`:** a green Supabase deploy proves
+the migration applied but NOT that `pg_cron` was available to schedule the jobs, since the block
+warns rather than failing so it cannot block the Edge Function deploys behind it.
 
 ---
 
@@ -389,4 +403,7 @@ Worth recording, so the next audit knows what has already been ruled out.
 3. Decide on the react-router 6 → 7 migration; the safe toolchain updates can ship meanwhile. (F2)
 4. Optional, cheap, do-anytime: set `ALLOWED_ORIGINS` to the real domains (F7); revoke
    `log_gdpr_event` from `anon` (F9); enable the leaked-password check (above).
-5. Before a paid launch: close the limit race (F6) and schedule the retention job (F11).
+5. Before a paid launch: close the limit race (F6). ~~Schedule the retention job (F11).~~
+   **DONE 2026-08-04** (s185, migration 0015, 2-year window, policy rewritten to match). One
+   10-second confirmation is still owed: `/admin → Launch` must show `retention_scheduled: true`;
+   if it reads false, enable pg_cron under Database → Extensions and re-run the Supabase workflow.

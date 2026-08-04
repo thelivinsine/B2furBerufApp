@@ -52,6 +52,25 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   live only in Supabase Edge Function secrets (never in the repo or browser).
 - **2A schema:** `profiles`, `progress`, `writing_evaluations`, `ai_usage`, owner-only RLS,
   auto-provision trigger on auth.users, `bump_ai_usage` atomic RPC. `profiles.tier` flag present.
+- **Full schema as of s185 (15 migrations).** Per-learner, owner-only RLS: `profiles`, `progress`,
+  `writing_evaluations`, `sentence_checks`, `sentence_ai_ops`. Service-role only (no client
+  policies at all): `ai_usage`, `feedback`, `admins`, `gdpr_events`, `sentence_transforms` (the one
+  GLOBAL cross-user cache, the main AI cost lever). Founder-gated: `provenance_reviews`,
+  `launch_checklist`, and `app_config` (world-readable, founder-writable). The admin gate is
+  `is_founder()` against the service-role-only `admins` table (0013; never an email claim), and
+  every admin RPC is SECURITY DEFINER returning AGGREGATES only, `feedback` rows being the single
+  deliberate exception. **The shape is intentionally "linear":** the ~5,000-id content catalog lives
+  in the repo, not the database, so almost nothing relates to anything but `auth.users`
+  (`docs/reports/db-architecture-audit-2026-08-04.md` explains why that is the right trade and what
+  it would cost to undo).
+- **Bounded growth + sync health (s185, DB audit).** `dailyXp`/`activeDays` keep 400 days with the
+  lifetime figure folded into `progress.active_days_folded`; three weekly `pg_cron` purges retire
+  learner text (2 years), abandoned guests (90 days) and dead cache rows (60 days). Every cloud
+  write reads its `{ error }` and surfaces a persistent failure as "Sync pausiert" in Settings.
+  **Known and accepted:** between logins the sync is whole-row last-write-wins, and the admin
+  analytics RPCs recompute from the JSONB blobs. Both are fixed by the one schema evolution still
+  outstanding, splitting `srs` into a per-card `srs_cards` table, which should happen before serious
+  growth rather than after it.
 - **2B auth + sync:** `useAuthStore` (guest anon + email/password + Google); `cloudSync.ts`
   (offline-first: localStorage stays cache, pull+MERGE on login, debounced write-through).
   `AccountPanel` in Settings. Guest sign-in is the primary path.
@@ -79,7 +98,11 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
 - **Deployment:** since s167, `.github/workflows/supabase.yml` deploys every Edge Function on merge
   to `main`, so neither the CLI nor the dashboard editor is needed. If you ever do paste into the
   dashboard editor by hand, note it pre-fills a "Hello [name]!" boilerplate: select-all-delete
-  first. Migrations are still applied by hand in the SQL editor (no `SUPABASE_DB_PASSWORD` in CI).
+  first. **Migrations self-apply since s179** (`SUPABASE_DB_PASSWORD` is set), running BEFORE the
+  function deploys in the same workflow, so nothing is pasted into the SQL editor any more and a
+  broken migration blocks the whole backend deploy. That is what `pnpm lint:migrations` guards
+  (s185): `db push --include-all` re-applies any file the remote history does not record, so every
+  migration must survive running twice.
 - **Anthropic key:** rotated by the founder; the live secret lives only in Supabase Edge Functions →
   Secrets → `ANTHROPIC_API_KEY`.
 - Bundle carries supabase-js; the writing path is code-split.
