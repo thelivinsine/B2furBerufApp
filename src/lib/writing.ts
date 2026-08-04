@@ -39,6 +39,12 @@ export interface WritingEvalResult {
   practiceArea?: WeaknessCategory;
   /** True when served from the input-hash cache (no AI cost). */
   cached?: boolean;
+  /**
+   * Mock-exam mode only (s186): the evaluator's 0-100 exam score. Null/absent
+   * when the model returned none or the row predates migration 0016; the
+   * exam result then renormalises over the scored parts.
+   */
+  score?: number | null;
   /** The corrected text (s171). Persisted for Verlauf; null when the model
    *  returned none, the text needed no changes, or the verdict was templated. */
   corrected?: string | null;
@@ -146,6 +152,8 @@ export async function evaluateWriting(input: {
   register?: string;
   /** Word target of the task, so underlength is detectable. */
   words?: number;
+  /** Mock-exam mode (s186): also request the 0-100 exam score. */
+  exam?: boolean;
 }): Promise<WritingEvalResult> {
   const auth = useAuthStore.getState();
   if (auth.status === "signedOut" || !auth.session) {

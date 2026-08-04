@@ -56,12 +56,22 @@ export function ExamRunner({
   examSet,
   scenario,
   onBack,
+  embedded = false,
+  onFinish,
 }: {
   examSet: ExamSet;
   scenario: Scenario;
   onBack: () => void;
+  /**
+   * Mock-exam mode (s186): the runner sits inside the four-part simulation,
+   * which provides its own Anleitung page and chrome. Skips the briefing,
+   * hides the back buttons, keeps the CTAs quiet (dark blue is reserved for
+   * the submission moment), and reports the self-scored result via onFinish.
+   */
+  embedded?: boolean;
+  onFinish?: (pct: number) => void;
 }) {
-  const [phase, setPhase] = useState<Phase>("briefing");
+  const [phase, setPhase] = useState<Phase>(embedded ? "running" : "briefing");
   const [state, dispatch] = useReducer(reducer, scenario, startDialogue);
   const [freeText, setFreeText] = useState("");
   const [elapsed, setElapsed] = useState(0);
@@ -125,6 +135,11 @@ export function ExamRunner({
     completeExam(examSet.id, pct);
     addXp(XP.examComplete);
     registerSession();
+    if (embedded) {
+      // The simulation's result screen takes over; no toast on top of it.
+      onFinish?.(pct);
+      return;
+    }
     showToast(`Prüfung abgeschlossen: ${pct}%`, "success");
   };
 
@@ -171,9 +186,11 @@ export function ExamRunner({
   if (phase === "debrief") {
     return (
       <div className="mx-auto max-w-2xl space-y-5">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Zurück
-        </button>
+        {!embedded && (
+          <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> Zurück
+          </button>
+        )}
         <Card className="border-primary/30 shadow-glow">
           <CardContent className="space-y-4 p-6">
             <div className="flex items-center gap-2">
@@ -312,10 +329,16 @@ export function ExamRunner({
                   placeholder="Tippe deine Antwort …"
                   className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
-                <Button variant="gradient" className="w-full" onClick={() => {
-                  dispatch({ type: "advance_free", spoken: freeText || undefined });
-                  setFreeText("");
-                }}>
+                <Button
+                  // Quiet in the simulation (founder s186): dark blue is
+                  // reserved for the moment that submits the whole part.
+                  variant={embedded ? "outline" : "gradient"}
+                  className="w-full"
+                  onClick={() => {
+                    dispatch({ type: "advance_free", spoken: freeText || undefined });
+                    setFreeText("");
+                  }}
+                >
                   Weiter <ChevronRight className="h-4 w-4" />
                 </Button>
               </CardContent>

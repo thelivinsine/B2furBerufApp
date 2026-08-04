@@ -3599,3 +3599,68 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompt 7):** `docs/PROJECT_STATUS.md` ·
   `docs/reports/db-architecture-audit-2026-08-04.md` ·
   `docs/reports/security-audit-2026-07-27.md` · this log
+
+## Session 186 (2026-08-04) - branch `claude/prufung-simulation-rework-av72gq`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `prufung simulation should actually feel like an exam with
+  all the lesen, hören, schreiben and sprechen modules with a timer and clear instructions. I want
+  you to do a complete rework of this section.`
+  **Response:** design round FIRST, per the locked preview-first process; no app code touched yet.
+  The concept replaces the speaking-only "Prüfungssimulation" with a real four-part mock exam
+  (telc B2 Beruf / Goethe B2 shape): Teil 1 Lesen (3 Texte, 9 MC-Aufgaben, 15 Min), Teil 2 Hören
+  (2 Ansagen via TTS, max. 2x, Notizen + Aufgaben, 10 Min), Teil 3 Schreiben (1 voll gebriefte
+  Aufgabe, KI-bewertet, 20 Min), Teil 4 Sprechen (bestehender Dialog-Runner, 7 Min); Anleitungs-
+  Seite vor jedem Teil, Timer je Teil (amber unter 2 Min), Ergebnis mit Punkten pro Teil und
+  Bestanden-Grenze 60 %. Every module draws from existing banks (texts.ts incl. the eight
+  exam-length B2 texts and the six voicemails with `notes`, the 717 writing tasks, the 30 speaking
+  scenarios), so the rework is engine + UI work, no new content wave. Three named variants in
+  `preview/pruefungssimulation-rework.html` (screenshot-verified, published as a Claude artifact):
+  **A "Prüfungstag"** (timeline hub, one start CTA, single parts below; runner with white top bar,
+  Teil-Punkte, Timer-Pill; recommended), **B "Vier Module"** (four equal module cards, timer in the
+  bottom action bar), **C "Antwortbogen"** (numbered answer-strip navigation, A's hub). Awaiting
+  the founder's pick before implementation.
+- **Artifacts (prompt 1):** `preview/pruefungssimulation-rework.html` · `docs/PROJECT_STATUS.md` ·
+  this log
+- **Prompt 2 (verbatim, 2026-08-04):** `I don't understand how to interpret the preview artifact.
+  The explanation isn't clear and is in German. Fix it. keep it in English. only the app renders
+  should be in German`
+  **Response:** rewrote every explanatory layer of the preview page in plain English (intro, the
+  "how to read this page" guidance, the structure table, all option notes, frame captions, page
+  title) and made each note say explicitly what the left/right phone shows. The phone mockups
+  themselves stay German, since they render the app as the learner sees it. Republished to the
+  same artifact URL. Standing rule for future previews: review-page chrome in English, app
+  renders in German.
+- **Artifacts (prompt 2):** `preview/pruefungssimulation-rework.html` · this log
+- **Prompt 3 (verbatim, 2026-08-04):** `I like option B for start page - add Niveau in the first
+  row so that the user can select if they want to take B1 or b2 exam for example by pushing the
+  current tiles downward. offer a2 until c1 levels.
+
+  take option C for during the exam layout and keep the zuruck and weiter buttons from option a.
+  However, the weiter button should also have same design as zuruck. The dark blue button should
+  not take away focus from the task for the test taker. The dark blue button should only be there
+  for submission of the module or something important to grab the attention of the test taker.
+
+  wherever necessary add the expand to full screen button for better accessibility - for this
+  refer to the button already implemented in the schreiben section earlier.`
+  **Response:** implemented the full rework to those picks. New `engine/exam.ts` composer
+  (level-aware draws from the existing banks, telc-style scoring, 60 % pass line) and persisted
+  `useExamStore` run state (reload-safe mid-part; Sprechen restarts its dialogue). ExamHub: Option
+  B with the Niveau row A2-C1 first (A2 honestly empty, zero content bank-wide; gap logged in
+  PROJECT_REFERENCE with the C1-Hören single-audio-text gap), slim full-exam card, four module
+  cards startable alone with per-level last scores. Runner: Option C numbered answer strip,
+  Anleitung page per Teil, timer pill amber under 2 minutes, Zurück/Weiter both quiet outline,
+  gradient reserved for "Teil abschließen"/"Abgeben"/starts; expand-to-fullscreen buttons
+  (Schreiben pattern) on the Lesen text card and the Schreiben Aufgabe card. Hören: TTS max 2x +
+  the s185 Notizen anatomy. Schreiben: scored by `evaluate-writing`'s new exam mode (0-100,
+  telc-weighted, `exam_score` column, migration 0016), renormalised honestly when unscored.
+  `progress.mock_exams` syncs runs (bounded 100, unknown-column retry). Ergebnis: per-Teil bars,
+  weakest-part Üben, answer review. Embedded ExamRunner keeps the self-score rubric as the
+  Sprechen grade. Gates green: typecheck · lint 0 errors · 551 unit tests (9 new in
+  `tests/exam.test.ts`) · lint:migrations · build · bundle 125 kB. Live flow screenshot-verified
+  against the approved preview (hub, Anleitung, Lesen with strip + timer, answered state).
+- **Artifacts (prompt 3):** `src/engine/exam.ts` · `src/store/useExamStore.ts` ·
+  `src/features/exam/*` (ExamHub, MockExamRunner, McParts, SchreibenPart, SprechenPart, partMeta,
+  ExamRunner embedded mode) · `src/store/useProgressStore.ts` · `src/lib/cloudSync.ts` ·
+  `src/lib/writing.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `supabase/migrations/0016_mock_exams.sql` · `tests/exam.test.ts` · `docs/PROJECT_STATUS.md` ·
+  `docs/PROJECT_REFERENCE.md` · this log

@@ -203,7 +203,7 @@ function levelLabel(level: string | null): string {
  * "Erfüllung" fails, and telc grades "Berücksichtigung der Leitpunkte" by
  * counting covered points.
  */
-function buildSystemPrompt(level: string | null, hasTask: boolean): string {
+function buildSystemPrompt(level: string | null, hasTask: boolean, exam = false): string {
   const lv = levelLabel(level);
   let s =
     `Du bist Prüfer:in für Deutsch als Fremdsprache und bewertest einen Text auf Niveau ${lv}. ` +
@@ -241,8 +241,22 @@ function buildSystemPrompt(level: string | null, hasTask: boolean): string {
     `dieselben Sätze und derselbe Inhalt wie im Original, nur mit den nötigen ` +
     `sprachlichen Korrekturen (Rechtschreibung, Grammatik, Wortstellung, Wortwahl). ` +
     `Formuliere NICHT neu, kürze nicht, ergänze keine Inhalte und kommentiere nicht. ` +
-    `Wenn der Text keine Fehler hat, gib das Original unverändert zurück. ` +
-    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern {"weakness","insight","insightEn","corrected"}. ` +
+    `Wenn der Text keine Fehler hat, gib das Original unverändert zurück. `;
+  if (exam) {
+    // Mock-exam mode (s186): the simulation's result screen needs a number
+    // like the real exam produces one. Weighted like the telc Schreiben
+    // rubric: content first, then communicative design, then correctness.
+    s +=
+      `Gib zusätzlich unter "score" eine GANZE Zahl von 0 bis 100: deine Prüfungsbewertung des ` +
+      `Textes auf ${levelLabel(level)}-Niveau, gewichtet wie in der Prüfung ` +
+      `(Aufgabenerfüllung 40 %, kommunikative Gestaltung 30 %, sprachliche Korrektheit 30 %). ` +
+      `Ein Text, der die Aufgabe verfehlt oder das Thema wechselt, bleibt unter 40. `;
+  }
+  s +=
+    `Antworte AUSSCHLIESSLICH als JSON mit den Feldern ` +
+    (exam
+      ? `{"weakness","insight","insightEn","corrected","score"}. `
+      : `{"weakness","insight","insightEn","corrected"}. `) +
     `"weakness" ist genau einer dieser Werte: ` + VALID_WEAKNESS.join(", ") +
     `. Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zäune und ohne weiteren Text.`;
   return s;
@@ -330,9 +344,16 @@ function parseInsight(
   insight: string;
   insightEn: string | null;
   corrected: string | null;
+  score: number | null;
 } | null {
   const pick = (w: unknown): Weakness =>
     VALID_WEAKNESS.includes(w as Weakness) ? (w as Weakness) : "vocabularyRange";
+  // Exam-mode score (s186): a number 0-100 or nothing. Never invented: a
+  // missing/broken field stays null and the client renormalises without it.
+  const pickScore = (v: unknown): number | null =>
+    typeof v === "number" && Number.isFinite(v)
+      ? Math.max(0, Math.min(100, Math.round(v)))
+      : null;
   try {
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("no object");
@@ -346,6 +367,7 @@ function parseInsight(
       corrected: typeof obj.corrected === "string" && obj.corrected.trim()
         ? obj.corrected.trim()
         : null,
+      score: pickScore(obj.score),
     };
   } catch {
     const insight = salvageField(raw, "insight");
@@ -357,6 +379,7 @@ function parseInsight(
       insight: insight.trim(),
       insightEn: insightEn?.trim() || null,
       corrected: null,
+      score: null,
     };
   }
 }
@@ -387,6 +410,7 @@ interface LlmOut {
   weakness: Weakness;
   insight: string;
   corrected: string | null;
+  score: number | null;
   model: string;
   cost: number;
 }
@@ -571,6 +595,8 @@ Deno.serve(async (req) => {
     typeof body.words === "number" && body.words >= 30 && body.words <= 300
       ? Math.round(body.words)
       : null;
+  // Mock-exam mode (s186): the prompt additionally asks for a 0-100 score.
+  const exam = body.exam === true;
 
   const month = monthKey();
 
@@ -630,7 +656,10 @@ Deno.serve(async (req) => {
   }
 
   // (2) Cache lookup by input hash (task-aware since s167).
-  const inputHash = await hashText(text, `${taskId ?? ""}|${level ?? ""}`);
+  // Exam evaluations hash separately: their prompt differs (score request),
+  // so a practice verdict must never be served back to an exam run or vice
+  // versa. PROMPT_REV stays put: the practice prompt is byte-identical.
+  const inputHash = await hashText(text, `${taskId ?? ""}|${level ?? ""}${exam ? "|exam" : ""}`);
   // `corrected_text` needs migration 0012 and `insight_en` migration 0014. CI
   // deploys functions but SKIPS migrations (no SUPABASE_DB_PASSWORD), so this
   // function can be live before either column exists and selecting one would
@@ -645,9 +674,12 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-  const withEn = await cacheQuery(
-    "weakness, insight, insight_en, practice_area, model, corrected_text",
+  const withScore = await cacheQuery(
+    "weakness, insight, insight_en, practice_area, model, corrected_text, exam_score",
   );
+  const withEn = withScore.error
+    ? await cacheQuery("weakness, insight, insight_en, practice_area, model, corrected_text")
+    : withScore;
   const withCorrected = withEn.error
     ? await cacheQuery("weakness, insight, practice_area, model, corrected_text")
     : withEn;
@@ -665,6 +697,7 @@ Deno.serve(async (req) => {
       practiceArea: cachedRow.practice_area,
       model: cachedRow.model,
       corrected: cachedRow.corrected_text ?? null,
+      score: exam ? ((cachedRow.exam_score as number | null) ?? null) : null,
       dailyLimit,
       dailyRemaining: remainingIfFree,
     });
@@ -681,6 +714,8 @@ Deno.serve(async (req) => {
   let cost = 0;
   // Stays null on the templated path: no LLM ran, so there is no correction.
   let correctedText: string | null = null;
+  // Null unless exam mode got a usable number back; the client renormalises.
+  let examScore: number | null = null;
   if (lt && lt.words > 0) {
     const spellRate = lt.spelling / lt.words;
     if (lt.spelling >= 3 && spellRate > 0.08 && lt.spelling >= lt.grammar * 2) {
@@ -696,7 +731,7 @@ Deno.serve(async (req) => {
     // The Aufgabe travels with every provider call (s167 P2), so the cascade
     // cannot silently downgrade to language-only grading on a fallback.
     const brief: TaskBrief = { task, points, addressee, register, format, words };
-    const sys = buildSystemPrompt(level, !!task);
+    const sys = buildSystemPrompt(level, !!task, exam);
     let out = await callGemini(text, lt, sys, brief);
     if (!out) {
       const [opsRows, writRows] = await Promise.all([
@@ -721,6 +756,7 @@ Deno.serve(async (req) => {
     model = out.model;
     cost = out.cost;
     correctedText = sanitizeCorrected(text, out.corrected);
+    if (exam) examScore = out.score;
   }
 
   // (6) Persist + bump global usage.
@@ -750,6 +786,7 @@ Deno.serve(async (req) => {
     task_id: taskId,
     corrected_text: correctedText,
     insight_en: insightEn,
+    exam_score: examScore,
   });
   if (full.error) {
     console.error("writing_evaluations insert failed", full.error.message);
@@ -780,6 +817,7 @@ Deno.serve(async (req) => {
     practiceArea: weakness,
     model,
     corrected: correctedText,
+    score: examScore,
     dailyLimit,
     dailyRemaining: remainingIfSpent,
   });

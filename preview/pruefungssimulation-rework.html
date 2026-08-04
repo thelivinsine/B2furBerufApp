@@ -1,0 +1,603 @@
+<title>Exam Simulation Rework: Options A / B / C</title>
+<style>
+  /* Real tokens from src/index.css + tailwind.config.ts (light theme) */
+  :root {
+    --background: hsl(180 45% 98%);
+    --page-from: hsl(144 45% 98%);
+    --page-mid: hsl(150 50% 98%);
+    --page-to: hsl(198 83% 98%);
+    --foreground: hsl(252 16% 12%);
+    --surface: hsl(0 0% 100%);
+    --muted: hsl(220 13% 88%);
+    --muted-fg: hsl(220 8% 36%);
+    --border: hsl(218 13% 84%);
+    --primary: hsl(221 83% 54%);
+    --accent: hsl(197 93% 77%);
+    --accent-ink: hsl(198 90% 32%);
+    --success: hsl(153 55% 40%);
+    --warning: hsl(38 92% 46%);
+    --danger: hsl(4 73% 56%);
+    --reward: hsl(11 82% 54%);
+    --shadow: 221 40% 22%;
+    --radius: 14px;
+    --shadow-soft: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+    --shadow-elevated: 0 2px 4px hsl(var(--shadow) / 0.05), 0 12px 32px hsl(var(--shadow) / 0.12);
+    --grad: linear-gradient(135deg, hsl(226 83% 47%), hsl(221 83% 54%) 45%, hsl(196 93% 38%));
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: "Inter Variable", "Inter var", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: linear-gradient(120deg, var(--page-from), var(--page-mid) 50%, var(--page-to));
+    color: var(--foreground);
+    padding: 40px 24px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1340px; margin: 0 auto; }
+
+  /* ---- review-page chrome (not part of the mockups) ---- */
+  .intro h1 { font-weight: 800; letter-spacing: -0.02em; font-size: 28px; }
+  .intro .kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--primary); margin-bottom: 6px; }
+  .intro p { color: var(--muted-fg); font-size: 14px; max-width: 760px; margin-top: 10px; line-height: 1.55; }
+  .structure { margin-top: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-soft); padding: 18px 20px; max-width: 760px; }
+  .structure table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .structure th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-fg); padding: 4px 8px 8px; }
+  .structure td { padding: 7px 8px; border-top: 1px solid var(--border); }
+  .structure td.num { font-variant-numeric: tabular-nums; }
+  section.variant { margin-top: 56px; }
+  .vhead { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .vbadge { width: 34px; height: 34px; border-radius: 10px; background: var(--primary); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .vhead h2 { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; }
+  .vnotes { color: var(--muted-fg); font-size: 13.5px; max-width: 760px; line-height: 1.5; margin: 6px 0 20px; }
+  .vnotes b { color: var(--foreground); }
+  .frames { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  .frame { width: 392px; }
+  .frame .flabel { font-size: 12px; font-weight: 600; color: var(--muted-fg); margin: 0 0 8px 4px; }
+  .phone {
+    border: 1px solid var(--border); border-radius: 26px; overflow: hidden;
+    background: linear-gradient(120deg, var(--page-from), var(--page-mid) 50%, var(--page-to));
+    box-shadow: var(--shadow-elevated);
+  }
+  .screen { padding: 18px 16px 20px; min-height: 640px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ---- shared mockup atoms ---- */
+  .eyebrow { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--primary); }
+  .display { font-weight: 800; letter-spacing: -0.02em; font-size: 23px; text-wrap: balance; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-soft); }
+  .hero { display: flex; align-items: flex-start; gap: 12px; }
+  .hero .tile { width: 46px; height: 46px; border-radius: 16px; background: linear-gradient(135deg, hsl(24 95% 53%), hsl(38 92% 50%)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-soft); }
+  .hero .tile svg { width: 24px; height: 24px; stroke: #fff; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 12px; font-weight: 600; font-size: 14.5px; padding: 11px 18px; border: none; cursor: pointer; }
+  .btn.grad { background: var(--grad); color: #fff; box-shadow: var(--shadow-soft); width: 100%; }
+  .btn.outline { background: var(--surface); border: 1px solid var(--border); color: var(--foreground); }
+  .btn.sm { padding: 7px 12px; font-size: 13px; border-radius: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 8px; }
+  .chip.green { background: hsl(153 55% 40% / 0.12); color: var(--success); }
+  .chip.muted { background: var(--muted); color: var(--muted-fg); }
+  .mtile { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .mtile svg { width: 21px; height: 21px; }
+  .t-lesen { background: hsl(173 80% 40% / 0.12); } .t-lesen svg { stroke: hsl(175 84% 28%); }
+  .t-hoeren { background: hsl(38 92% 50% / 0.14); } .t-hoeren svg { stroke: hsl(32 95% 38%); }
+  .t-schreiben { background: hsl(221 83% 54% / 0.10); } .t-schreiben svg { stroke: var(--primary); }
+  .t-sprechen { background: hsl(189 94% 43% / 0.12); } .t-sprechen svg { stroke: hsl(192 91% 32%); }
+  .meta { font-size: 12.5px; color: var(--muted-fg); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* timer pill */
+  .timer { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 5px 10px; font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: var(--shadow-soft); }
+  .timer svg { width: 14px; height: 14px; stroke: var(--muted-fg); }
+  .timer.low { color: var(--warning); border-color: hsl(38 92% 46% / 0.35); }
+  .timer.low svg { stroke: var(--warning); }
+
+  /* runner top bar */
+  .runbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-soft); padding: 8px 12px; }
+  .runbar .part { font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .runbar .part span { color: var(--muted-fg); font-weight: 600; }
+  .dots { display: flex; gap: 5px; align-items: center; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .dots i.done { background: var(--success); }
+  .dots i.act { background: var(--primary); width: 18px; border-radius: 4px; }
+
+  /* options */
+  .opt { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 11px 12px; font-size: 13.5px; line-height: 1.4; }
+  .opt .radio { width: 17px; height: 17px; border-radius: 50%; border: 2px solid var(--border); flex: none; margin-top: 1px; }
+  .opt.sel { background: hsl(197 93% 77% / 0.20); border-color: hsl(197 93% 77% / 0.20); box-shadow: var(--shadow-soft); }
+  .opt.sel .radio { border-color: var(--accent-ink); background: radial-gradient(circle at center, var(--accent-ink) 40%, transparent 45%); }
+
+  /* answer strip (variant C) */
+  .strip { display: flex; gap: 6px; flex-wrap: wrap; }
+  .strip b { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; background: var(--surface); border: 1px solid var(--border); color: var(--muted-fg); }
+  .strip b.done { background: hsl(197 93% 77% / 0.25); border-color: hsl(197 93% 77% / 0.25); color: var(--accent-ink); }
+  .strip b.act { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  /* notizen ruled lines */
+  .note-row { display: flex; align-items: baseline; gap: 10px; padding: 12px 0 2px; }
+  .note-row .nlabel { font-size: 12.5px; font-weight: 600; color: var(--muted-fg); flex: none; width: 120px; }
+  .note-row .nline { flex: 1; border-bottom: 1.5px solid var(--border); font-size: 15px; padding: 0 2px 3px; min-height: 24px; }
+  .play { width: 40px; height: 40px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; flex: none; box-shadow: var(--shadow-soft); }
+  .play svg { width: 16px; height: 16px; fill: #fff; stroke: none; margin-left: 2px; }
+
+  /* result bars */
+  .bar { height: 8px; border-radius: 4px; background: var(--muted); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 4px; background: var(--primary); }
+  .ai-note { text-align: center; font-size: 11.5px; color: var(--muted-fg); }
+
+  svg.ic { width: 18px; height: 18px; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <div class="kicker">Preview · Prüfungssimulation</div>
+    <h1>Exam simulation: full rework</h1>
+    <p>
+      Today the "Prüfungssimulation" is only a speaking dialogue. The rework turns it into a
+      <b>complete mock exam with four parts</b>, like the real telc B2 Beruf and Goethe B2 exams:
+      Reading, Listening, Writing, Speaking. Each part gets a clear instruction page before it
+      starts, its own countdown timer, and real exam rules (no translation help, audio playable
+      only twice). All questions and tasks come from content the app already has, so nothing new
+      needs to be written.
+    </p>
+    <p style="margin-top:8px;">
+      <b>How to read this page:</b> every phone frame below is one screen of the app, shown with
+      real app colors and in German (as the learner sees it). There are <b>three design options,
+      labeled A, B and C</b>. They all contain the same exam; they differ only in how the start
+      page looks and where the timer and navigation sit. Pick one by letter (mixing is fine, for
+      example "A but with C's numbered strip"). The last section shows screens that are the same
+      in all three options.
+    </p>
+    <div class="structure">
+      <table>
+        <tr><th>Part</th><th>Module</th><th>Content</th><th>Time</th><th>Graded by</th></tr>
+        <tr><td class="num">1</td><td><b>Lesen</b> (Reading)</td><td>3 texts, 9 multiple-choice questions</td><td class="num">15 min</td><td>app</td></tr>
+        <tr><td class="num">2</td><td><b>Hören</b> (Listening)</td><td>2 audio messages (max. 2 plays), note-taking + questions</td><td class="num">10 min</td><td>app</td></tr>
+        <tr><td class="num">3</td><td><b>Schreiben</b> (Writing)</td><td>1 task with a full exam briefing</td><td class="num">20 min</td><td>AI</td></tr>
+        <tr><td class="num">4</td><td><b>Sprechen</b> (Speaking)</td><td>1 conversation (the existing dialogue runner)</td><td class="num">7 min</td><td>app + AI</td></tr>
+        <tr><td></td><td colspan="2"><b>Total</b> · pass mark 60 %</td><td class="num"><b>52 min</b></td><td></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================ VARIANTE A ============================ -->
+  <section class="variant">
+    <div class="vhead"><div class="vbadge">A</div><h2>Option A · "Exam day" (recommended)</h2></div>
+    <p class="vnotes">
+      <b>Left phone:</b> the start page. It reads like the schedule of a real exam day: one card
+      listing the four parts in order with their times, and one start button. Below it, each part
+      can also be practiced on its own. <b>Right phone:</b> what a part looks like while running.
+      A white bar at the top shows which part you are in, four progress dots (one per part), and
+      the countdown timer. The timer turns amber when less than 2 minutes remain.
+    </p>
+    <div class="frames">
+
+      <!-- A: hub -->
+      <div class="frame">
+        <p class="flabel">Start page</p>
+        <div class="phone"><div class="screen">
+          <div class="hero">
+            <div class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
+            <div>
+              <div class="eyebrow">Prüfung</div>
+              <div class="display">Prüfungssimulation</div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-weight:700; font-size:15px;">Komplette Prüfung</span>
+              <span class="chip muted num">52 Min</span>
+            </div>
+            <div style="margin-top:12px; display:flex; flex-direction:column;">
+              <!-- timeline rows -->
+              <div style="display:flex; align-items:center; gap:11px; padding:8px 0;">
+                <div class="mtile t-lesen"><svg class="ic" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></svg></div>
+                <div style="flex:1;"><b style="font-size:14px;">Lesen</b><div class="meta">3 Texte · 9 Aufgaben</div></div>
+                <span class="meta num">15 Min</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:11px; padding:8px 0; border-top:1px solid var(--border);">
+                <div class="mtile t-hoeren"><svg class="ic" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+                <div style="flex:1;"><b style="font-size:14px;">Hören</b><div class="meta">2 Ansagen · Notizen</div></div>
+                <span class="meta num">10 Min</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:11px; padding:8px 0; border-top:1px solid var(--border);">
+                <div class="mtile t-schreiben"><svg class="ic" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+                <div style="flex:1;"><b style="font-size:14px;">Schreiben</b><div class="meta">1 Aufgabe · ca. 120 Wörter</div></div>
+                <span class="meta num">20 Min</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:11px; padding:8px 0; border-top:1px solid var(--border);">
+                <div class="mtile t-sprechen"><svg class="ic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/></svg></div>
+                <div style="flex:1;"><b style="font-size:14px;">Sprechen</b><div class="meta">1 Gespräch mit Partner</div></div>
+                <span class="meta num">7 Min</span>
+              </div>
+            </div>
+            <div style="margin-top:8px; display:flex; align-items:center; gap:8px;">
+              <span class="meta" style="flex:1;">Zuletzt: <b class="num" style="color:var(--foreground);">68 %</b> · 28. Juli</span>
+              <span class="chip green">Bestanden</span>
+            </div>
+            <button class="btn grad" style="margin-top:12px;">Prüfung starten</button>
+          </div>
+
+          <div>
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted-fg); margin:2px 0 8px 4px;">Einzelne Teile üben</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="card" style="padding:11px 12px; display:flex; align-items:center; gap:9px;">
+                <div class="mtile t-lesen" style="width:34px;height:34px;border-radius:10px;"><svg class="ic" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></svg></div>
+                <div><b style="font-size:13.5px;">Lesen</b><div class="meta num">15 Min</div></div>
+              </div>
+              <div class="card" style="padding:11px 12px; display:flex; align-items:center; gap:9px;">
+                <div class="mtile t-hoeren" style="width:34px;height:34px;border-radius:10px;"><svg class="ic" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+                <div><b style="font-size:13.5px;">Hören</b><div class="meta num">10 Min</div></div>
+              </div>
+              <div class="card" style="padding:11px 12px; display:flex; align-items:center; gap:9px;">
+                <div class="mtile t-schreiben" style="width:34px;height:34px;border-radius:10px;"><svg class="ic" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+                <div><b style="font-size:13.5px;">Schreiben</b><div class="meta num">20 Min</div></div>
+              </div>
+              <div class="card" style="padding:11px 12px; display:flex; align-items:center; gap:9px;">
+                <div class="mtile t-sprechen" style="width:34px;height:34px;border-radius:10px;"><svg class="ic" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/></svg></div>
+                <div><b style="font-size:13.5px;">Sprechen</b><div class="meta num">7 Min</div></div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- A: runner Lesen -->
+      <div class="frame">
+        <p class="flabel">During the exam · Part 1 Reading</p>
+        <div class="phone"><div class="screen">
+          <div class="runbar">
+            <span class="part">Lesen <span>· Teil 1 von 4</span></span>
+            <div class="dots"><i class="act"></i><i></i><i></i><i></i></div>
+            <span class="timer"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>12:41</span>
+          </div>
+
+          <div class="card" style="padding:16px; overflow:hidden;">
+            <div class="meta" style="margin-bottom:6px;">Text 1 von 3 · Brief</div>
+            <b style="font-size:15px; line-height:1.35; display:block;">Ihr Termin zur Anmeldung im Bürgeramt</b>
+            <p style="font-size:13.5px; line-height:1.55; margin-top:9px; color:var(--foreground);">
+              Sehr geehrte Frau Yilmaz,<br><br>
+              vielen Dank für Ihre Terminanfrage. Ihr Termin zur Anmeldung Ihrer neuen Wohnung
+              findet am Dienstag, dem 14. Juli, um 9:30 Uhr im Bürgeramt Mitte statt (Zimmer 204).<br><br>
+              Bitte bringen Sie folgende Unterlagen mit: Ihren Reisepass oder Personalausweis, die
+              Wohnungsgeberbestätigung Ihres Vermieters und das ausgefüllte Anmeldeformular …
+            </p>
+          </div>
+
+          <div class="card" style="padding:14px 16px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between;">
+              <span style="font-weight:700; font-size:12.5px; color:var(--primary); text-transform:uppercase; letter-spacing:0.06em;">Aufgabe 2 von 9</span>
+            </div>
+            <p style="font-size:14px; font-weight:600; margin-top:7px;">Welche Unterlage kommt vom Vermieter?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <div class="opt sel"><span class="radio"></span>Die Wohnungsgeberbestätigung</div>
+              <div class="opt"><span class="radio"></span>Das Anmeldeformular</div>
+              <div class="opt"><span class="radio"></span>Der Personalausweis</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:auto;">
+            <button class="btn outline" style="flex:1;">Zurück</button>
+            <button class="btn grad" style="flex:2;">Weiter</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ VARIANTE B ============================ -->
+  <section class="variant">
+    <div class="vhead"><div class="vbadge">B</div><h2>Option B · "Four modules"</h2></div>
+    <p class="vnotes">
+      <b>Left phone:</b> the start page leads with <b>four equal module cards</b>, each showing
+      its content, length and your last score. The full exam is the slim card at the top. This
+      puts practicing single skills first and the complete run second. <b>Right phone:</b> the
+      running view carries the timer in the <b>bottom bar next to the buttons</b>, close to the
+      thumb; the top keeps only a slim line naming the part.
+    </p>
+    <div class="frames">
+
+      <!-- B: hub -->
+      <div class="frame">
+        <p class="flabel">Start page</p>
+        <div class="phone"><div class="screen">
+          <div class="hero">
+            <div class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
+            <div>
+              <div class="eyebrow">Prüfung</div>
+              <div class="display">Prüfungssimulation</div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:13px 16px; display:flex; align-items:center; gap:10px;">
+            <div style="flex:1;">
+              <b style="font-size:14.5px;">Komplette Prüfung</b>
+              <div class="meta num">4 Teile · 52 Min · zuletzt 68 %</div>
+            </div>
+            <button class="btn grad sm" style="width:auto;">Starten</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="card" style="padding:14px;">
+              <div class="mtile t-lesen"><svg class="ic" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></svg></div>
+              <b style="font-size:15px; display:block; margin-top:9px;">Lesen</b>
+              <div class="meta" style="margin-top:2px;">3 Texte · 9 Aufgaben<br><span class="num">15 Min</span></div>
+              <div style="margin-top:9px;"><span class="chip green num">78 %</span></div>
+            </div>
+            <div class="card" style="padding:14px;">
+              <div class="mtile t-hoeren"><svg class="ic" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+              <b style="font-size:15px; display:block; margin-top:9px;">Hören</b>
+              <div class="meta" style="margin-top:2px;">2 Ansagen · Notizen<br><span class="num">10 Min</span></div>
+              <div style="margin-top:9px;"><span class="chip muted num">65 %</span></div>
+            </div>
+            <div class="card" style="padding:14px;">
+              <div class="mtile t-schreiben"><svg class="ic" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+              <b style="font-size:15px; display:block; margin-top:9px;">Schreiben</b>
+              <div class="meta" style="margin-top:2px;">1 Aufgabe · voller Brief<br><span class="num">20 Min</span></div>
+              <div style="margin-top:9px;"><span class="chip muted">Noch offen</span></div>
+            </div>
+            <div class="card" style="padding:14px;">
+              <div class="mtile t-sprechen"><svg class="ic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/></svg></div>
+              <b style="font-size:15px; display:block; margin-top:9px;">Sprechen</b>
+              <div class="meta" style="margin-top:2px;">1 Gespräch · Partner<br><span class="num">7 Min</span></div>
+              <div style="margin-top:9px;"><span class="chip green num">75 %</span></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- B: runner -->
+      <div class="frame">
+        <p class="flabel">During the exam · timer at the bottom</p>
+        <div class="phone"><div class="screen">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:0 4px;">
+            <span style="font-size:13px; font-weight:700;">Lesen <span style="color:var(--muted-fg); font-weight:600;">· Teil 1 von 4</span></span>
+            <div class="dots"><i class="act"></i><i></i><i></i><i></i></div>
+          </div>
+
+          <div class="card" style="padding:16px;">
+            <div class="meta" style="margin-bottom:6px;">Text 1 von 3 · Brief</div>
+            <b style="font-size:15px; line-height:1.35; display:block;">Ihr Termin zur Anmeldung im Bürgeramt</b>
+            <p style="font-size:13.5px; line-height:1.55; margin-top:9px;">
+              Sehr geehrte Frau Yilmaz,<br><br>
+              vielen Dank für Ihre Terminanfrage. Ihr Termin zur Anmeldung Ihrer neuen Wohnung
+              findet am Dienstag, dem 14. Juli, um 9:30 Uhr im Bürgeramt Mitte statt (Zimmer 204) …
+            </p>
+          </div>
+
+          <div class="card" style="padding:14px 16px;">
+            <span style="font-weight:700; font-size:12.5px; color:var(--primary); text-transform:uppercase; letter-spacing:0.06em;">Aufgabe 2 von 9</span>
+            <p style="font-size:14px; font-weight:600; margin-top:7px;">Welche Unterlage kommt vom Vermieter?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <div class="opt sel"><span class="radio"></span>Die Wohnungsgeberbestätigung</div>
+              <div class="opt"><span class="radio"></span>Das Anmeldeformular</div>
+              <div class="opt"><span class="radio"></span>Der Personalausweis</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:auto; padding:10px 12px; display:flex; align-items:center; gap:10px;">
+            <span class="timer low"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>1:52</span>
+            <button class="btn outline sm" style="margin-left:auto;">Zurück</button>
+            <button class="btn grad sm" style="width:auto;">Weiter</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ VARIANTE C ============================ -->
+  <section class="variant">
+    <div class="vhead"><div class="vbadge">C</div><h2>Option C · "Answer sheet"</h2></div>
+    <p class="vnotes">
+      Closest to the paper exam: while a part runs, a <b>numbered strip like a paper answer
+      sheet</b> sits under the top bar. Answered questions turn light blue, the current one dark
+      blue, and tapping a number jumps straight to that question, so you can skip and come back
+      like in the real exam. The start page is the same as option A; only this in-exam navigation
+      is different.
+    </p>
+    <div class="frames">
+      <div class="frame">
+        <p class="flabel">During the exam · answer-sheet navigation</p>
+        <div class="phone"><div class="screen">
+          <div class="runbar">
+            <span class="part">Lesen <span>· Teil 1 von 4</span></span>
+            <span class="timer"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>12:41</span>
+          </div>
+
+          <div class="strip">
+            <b class="done">1</b><b class="act">2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b>
+          </div>
+
+          <div class="card" style="padding:16px;">
+            <div class="meta" style="margin-bottom:6px;">Text 1 von 3 · Brief</div>
+            <b style="font-size:15px; line-height:1.35; display:block;">Ihr Termin zur Anmeldung im Bürgeramt</b>
+            <p style="font-size:13.5px; line-height:1.55; margin-top:9px;">
+              Sehr geehrte Frau Yilmaz,<br><br>
+              vielen Dank für Ihre Terminanfrage. Ihr Termin zur Anmeldung Ihrer neuen Wohnung
+              findet am Dienstag, dem 14. Juli, um 9:30 Uhr im Bürgeramt Mitte statt (Zimmer 204) …
+            </p>
+          </div>
+
+          <div class="card" style="padding:14px 16px;">
+            <span style="font-weight:700; font-size:12.5px; color:var(--primary); text-transform:uppercase; letter-spacing:0.06em;">Aufgabe 2 von 9</span>
+            <p style="font-size:14px; font-weight:600; margin-top:7px;">Welche Unterlage kommt vom Vermieter?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <div class="opt sel"><span class="radio"></span>Die Wohnungsgeberbestätigung</div>
+              <div class="opt"><span class="radio"></span>Das Anmeldeformular</div>
+              <div class="opt"><span class="radio"></span>Der Personalausweis</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:auto;">
+            <button class="btn grad" style="flex:1;">Teil abschließen</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ SHARED FLOW ============================ -->
+  <section class="variant">
+    <div class="vhead"><div class="vbadge" style="background:var(--muted-fg);">·</div><h2>Shared screens (same in A, B and C)</h2></div>
+    <p class="vnotes">
+      These four screens are part of the exam flow whichever option you pick.
+      <b>1st phone:</b> before each part, an instruction page in exam style tells the learner
+      exactly what comes and how much time they have; the timer only starts when they tap start.
+      <b>2nd phone:</b> the Listening part, with a play button (each recording plays max. twice)
+      and the note-taking sheet you already approved for practice sessions.
+      <b>3rd phone:</b> the Writing part: the task briefing on top, the text field below, timer
+      running. <b>4th phone:</b> the final result: overall score, pass mark at 60 %, a score per
+      part, and a shortcut to practice the weakest part.
+    </p>
+    <div class="frames">
+
+      <!-- Anleitung -->
+      <div class="frame">
+        <p class="flabel">1 · Instruction page before a part</p>
+        <div class="phone"><div class="screen" style="justify-content:center; gap:16px;">
+          <div style="text-align:center;">
+            <div class="mtile t-hoeren" style="margin:0 auto; width:52px; height:52px; border-radius:14px;"><svg class="ic" viewBox="0 0 24 24" style="width:26px;height:26px;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+            <div class="eyebrow" style="margin-top:12px;">Teil 2 von 4</div>
+            <div class="display" style="font-size:26px;">Hören</div>
+          </div>
+          <div class="card" style="padding:16px;">
+            <p style="font-size:14px; line-height:1.6;">
+              Sie hören zwei Ansagen. Notieren Sie beim Hören die wichtigen Angaben und lösen Sie
+              danach die Aufgaben. Sie können jede Ansage <b>maximal zweimal</b> hören.
+            </p>
+            <div style="display:flex; gap:14px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+              <span class="meta num" style="display:inline-flex; align-items:center; gap:5px;"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>10 Minuten</span>
+              <span class="meta num">2 Ansagen</span>
+              <span class="meta num">6 Aufgaben</span>
+            </div>
+          </div>
+          <button class="btn grad">Teil 2 starten</button>
+          <p class="ai-note">Der Timer startet mit dem ersten Abspielen.</p>
+        </div></div>
+      </div>
+
+      <!-- Hören -->
+      <div class="frame">
+        <p class="flabel">2 · Listening with note-taking</p>
+        <div class="phone"><div class="screen">
+          <div class="runbar">
+            <span class="part">Hören <span>· Teil 2 von 4</span></span>
+            <div class="dots"><i class="done"></i><i class="act"></i><i></i><i></i></div>
+            <span class="timer"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>7:18</span>
+          </div>
+
+          <div class="card" style="padding:14px 16px; display:flex; align-items:center; gap:12px;">
+            <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+            <div style="flex:1;">
+              <b style="font-size:14.5px;">Ansage 1 von 2</b>
+              <div class="meta">Mailbox · noch 2x abspielbar</div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:14px 16px;">
+            <span style="font-weight:700; font-size:12.5px; color:var(--primary); text-transform:uppercase; letter-spacing:0.06em;">Ihre Notizen</span>
+            <div class="note-row"><span class="nlabel">Rückruf unter</span><span class="nline num">0721 44…</span></div>
+            <div class="note-row"><span class="nlabel">Termin am</span><span class="nline"></span></div>
+            <div class="note-row"><span class="nlabel">Mitbringen</span><span class="nline"></span></div>
+          </div>
+
+          <div class="card" style="padding:14px 16px;">
+            <span style="font-weight:700; font-size:12.5px; color:var(--primary); text-transform:uppercase; letter-spacing:0.06em;">Aufgabe 1 von 6</span>
+            <p style="font-size:14px; font-weight:600; margin-top:7px;">Warum ruft Herr Becker an?</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <div class="opt"><span class="radio"></span>Er verschiebt den Liefertermin</div>
+              <div class="opt"><span class="radio"></span>Er bestätigt die Bestellung</div>
+              <div class="opt"><span class="radio"></span>Er reklamiert eine Rechnung</div>
+            </div>
+          </div>
+
+          <button class="btn grad" style="margin-top:auto;">Weiter</button>
+        </div></div>
+      </div>
+
+      <!-- Schreiben -->
+      <div class="frame">
+        <p class="flabel">3 · Writing with timer</p>
+        <div class="phone"><div class="screen">
+          <div class="runbar">
+            <span class="part">Schreiben <span>· Teil 3 von 4</span></span>
+            <div class="dots"><i class="done"></i><i class="done"></i><i class="act"></i><i></i></div>
+            <span class="timer"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>16:05</span>
+          </div>
+
+          <div class="card" style="padding:14px 16px;">
+            <span style="font-weight:700; font-size:13px; color:var(--primary);">Aufgabe: Terminverschiebung</span>
+            <p style="font-size:13.5px; line-height:1.55; margin-top:7px;">
+              Schreiben Sie eine formelle E-Mail an Ihre Kundin Frau Sommer: Sie müssen den
+              vereinbarten Termin verschieben.
+            </p>
+            <ul style="font-size:13px; line-height:1.6; margin:8px 0 0 18px; color:var(--muted-fg);">
+              <li>Grund der Verschiebung nennen</li>
+              <li>Zwei Ersatztermine vorschlagen</li>
+              <li>Sich für die Umstände entschuldigen</li>
+            </ul>
+            <div class="meta num" style="margin-top:9px;">E-Mail (formell) · Sie · ca. 120 Wörter</div>
+          </div>
+
+          <div class="card" style="padding:14px 16px; flex:1; display:flex; flex-direction:column;">
+            <p style="font-size:14px; line-height:1.6; color:var(--foreground);">
+              Sehr geehrte Frau Sommer,<br><br>
+              leider muss ich unseren Termin am Donnerstag verschieben, da …
+            </p>
+            <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center; padding-top:10px;">
+              <span class="meta num">87 Wörter</span>
+              <span class="meta">ä ö ü ß</span>
+            </div>
+          </div>
+
+          <button class="btn grad">Abgeben</button>
+          <p class="ai-note">Dein Text wird zur Auswertung an eine KI gesendet.</p>
+        </div></div>
+      </div>
+
+      <!-- Ergebnis -->
+      <div class="frame">
+        <p class="flabel">4 · Result page</p>
+        <div class="phone"><div class="screen">
+          <div style="text-align:center; padding-top:8px;">
+            <div class="eyebrow">Ergebnis</div>
+            <div class="display num" style="font-size:40px; margin-top:4px;">72 %</div>
+            <div style="margin-top:8px;"><span class="chip green">Bestanden · Grenze 60 %</span></div>
+          </div>
+
+          <div class="card" style="padding:16px;">
+            <div style="display:flex; flex-direction:column; gap:13px;">
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px;"><b>Lesen</b><span class="num" style="color:var(--muted-fg);">78 %</span></div>
+                <div class="bar"><i style="width:78%;"></i></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px;"><b>Hören</b><span class="num" style="color:var(--muted-fg);">58 %</span></div>
+                <div class="bar"><i style="width:58%; background:var(--warning);"></i></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px;"><b>Schreiben</b><span class="num" style="color:var(--muted-fg);">70 %</span></div>
+                <div class="bar"><i style="width:70%;"></i></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:5px;"><b>Sprechen</b><span class="num" style="color:var(--muted-fg);">75 %</span></div>
+                <div class="bar"><i style="width:75%;"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:13px 16px; display:flex; align-items:center; gap:10px;">
+            <div style="flex:1;">
+              <b style="font-size:14px;">Schwächster Teil: Hören</b>
+              <div class="meta">Mailbox-Ansagen gezielt üben</div>
+            </div>
+            <button class="btn outline sm">Üben</button>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:auto;">
+            <button class="btn outline" style="flex:1;">Antworten ansehen</button>
+            <button class="btn grad" style="flex:1;">Fertig</button>
+          </div>
+          <p class="ai-note">Schreiben und Sprechen bewertet eine KI, ohne Gewähr.</p>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</div>
