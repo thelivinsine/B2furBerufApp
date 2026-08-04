@@ -43,14 +43,21 @@ describe("grammar: the B1 accuracy canon exists", () => {
 });
 
 describe("grammar: practice means producing, not recognising", () => {
-  const b1 = grammar.filter((t) => t.cefr?.startsWith("B1"));
-
-  it("there are B1 topics to check", () => {
-    expect(b1.length).toBeGreaterThanOrEqual(10);
+  it("there are topics to check", () => {
+    expect(grammar.length).toBeGreaterThanOrEqual(30);
   });
 
-  it.each(b1.map((t) => [t.id] as const))("%s has at least 3 productive drills", (id) => {
-    expect(productive(id).length).toBeGreaterThanOrEqual(3);
+  /**
+   * The rule reached the B2/C1 half in s185. Before that pass the 21 B2/C1
+   * topics sat at 4-5 drills with ZERO productive between them, so the hardest
+   * grammar in the app was also the only grammar a learner could never be asked
+   * to produce, and a topic was exhausted in one sitting. Every topic, every
+   * band: 10 drills, at least 3 of them typed.
+   */
+  it.each(grammar.map((t) => [t.id] as const))("%s has 10 drills, at least 3 productive", (id) => {
+    const topic = grammar.find((t) => t.id === id)!;
+    expect(topic.drills.length, `${id} drill count`).toBeGreaterThanOrEqual(10);
+    expect(productive(id).length, `${id} productive count`).toBeGreaterThanOrEqual(3);
   });
 
   it("a productive drill has no options and a single unambiguous answer", () => {

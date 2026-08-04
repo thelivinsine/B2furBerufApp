@@ -72,7 +72,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 
 ## Banks
 - **Vocabulary** (`src/data/vocabulary.ts`, ~1,743 words): each entry has `id` (`v_`), article
-  (nouns), plural (countable nouns), pronunciation hint, two example sentences, related terms; all
+  (nouns), plural **or** `numerus` (see below), pronunciation hint, two example sentences, related terms; all
   tagged `cefr`, split themes carry `subThemeId`, sector-specific items a `sectors[]` multi-tag
   (1-4 typical; general words stay untagged). **The bank is two concatenated array literals**
   (`vocabularyPart1/2`, split for the TS2590 union-complexity limit); append new packs to part 2.
@@ -87,23 +87,119 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `vocabulary` stay the FULL bank so ids still resolve. `lintVocabCollocationOverlap` **errors** if
   a vocab `de` equals a collocation `full` unless the id is retired: add the combo to Kollokationen
   + the id to `RETIRED_VOCAB_IDS`.
+
+### Texts: exam length and the Notizen task (audit P3, s185)
+The bank's median was **90 words**, which can be read in full every time, so nothing exercised the
+two B2 reading skills (skim for gist, scan for detail) and all 108 checks were literal retrieval.
+s178 added 6 C1 texts at 305-344 words; s185 added **8 at B2**, chosen so every domain has at least
+two exam-length texts: gesundheit and bildung had **none** (arzt ×2, bildung ×2), plus customer,
+logistics · bank, mobilitaet. Range 288-333 words, three checks each, and a check must need an
+inference ACROSS paragraphs (which of three changes helps you and why; what follows from a
+condition stated two paragraphs earlier), never a lookup.
+**`notes?: TextNoteField[]`** marks a listening text that carries a **Notizen task**: the facts a
+voicemail exists to deliver (callback number, new time, deadline, what to bring). All 6 voicemails
+carry 5 fields each. `label` is what to catch, `value` is what the message said, so the learner
+self-corrects. The linter requires both halves and warns if a non-voicemail carries the field.
+**Keep a `value` under ~32 characters:** it is a note, not a sentence ("Rückflug Do. gestrichen",
+not "Der Rückflug am Donnerstag wurde gestrichen"), and a one-line value is what keeps the sheet the
+same height before and after the reveal.
+**The step ships as founder-picked variant A** (`preview/notizen-a-r2.html`), in `ReadingBlock`
+between the audio and the comprehension checks, and only while the text is actually being listened
+to: with the text on screen, noting it is copying. Its shape is founder-settled, so treat it as
+locked: the message tile carries the Himmelblau fill and the Notizen sheet is the white one (the
+colours were swapped on request); fields are ruled LINES, never boxes; the play control is a 40px
+button on the title row, never a tile of its own; and both states are one 44px row so the button
+underneath does not move when the answers appear.
+
+### Noun number: every noun says `plural` or `numerus` (audit P9, s185)
+329 nouns simply had no `plural`, so "nobody authored this" and "there is nothing to author" looked
+identical, and the Wörter card showed a blank where a fact belongs. Each of those now carries
+`numerus` instead: **`uncountable`** (Singularetantum, no plural in ordinary use: `der Stress`,
+`das Gepäck`, `die Nachhaltigkeit`) or **`pluralOnly`** (the headword IS the plural: `die Spesen`,
+`die Nebenkosten`, `die Stakeholder`). The linter requires exactly one of the two on every noun.
+**Do not backfill a plural from the oracle without reading it.** Both lexicons attest `Stresse`,
+`Supporte`, `Benzine` and `Konsense`; all four are wrong to teach a B1-B2 learner, which is why
+this classification was made by hand and not generated. `pluralLabel()`
+(`src/features/vocabulary/pluralLabel.ts`) renders the three cases as the plural, `kein Plural` or
+`nur Plural`, and `verify:facts` reads `pluralOnly` instead of inferring it from a `die` + masc/neut
+oracle disagreement.
+
+### CEFR band: what "advanced" means (audit P7, s185)
+A band is a claim about how demanding a word is, not about how rare it is. Two drifts were fixed:
+**the connectors were over-levelled** (`somit` B2.2, `angesichts`/`vielmehr`/`ferner` C1, when these
+are exactly what a B1 learner needs to sound coherent) and **B2.2 had become a Fachsprache bucket**
+(82% specialized-or-rarer, so `die Lieferkettentransparenz` held the same SRS slot as `trotzdem`).
+108 items were re-levelled: the 10 FLAG connectors to B2.1 (register is real, C1 was not), and 98 of
+the 105 WATCH items to B1.1/B1.2. Bands went A2 13 · B1.1 131→**147** · B1.2 396→**482** ·
+B2.1 774→**690** · B2.2 387→**382** · C1 34→**29**, so the B1 half is 36% of the bank, not 30%.
+Seven WATCH items stayed B2.1 on purpose because their register really is B2: `darüber hinaus`,
+`zudem`, `ebenso`, `zur Sprache bringen`, `einerseits … andererseits`, `die Anerkennung`,
+`die Ich-Botschaft`.
+
+**The rare-compound ratchet** (`lintAdvancedRareRatchet`) freezes the count of B2.2/C1 items that
+are specialized-or-rarer at its current 334. Existing ones are grandfathered; adding one fails the
+lint. When a new item trips it, the fix is nearly always to pitch it at the band a learner actually
+meets it in. **Standing rule from the same audit item:** new vocabulary slots go to core verbs,
+adjectives and connectors before they go to another closed compound. Only 9% of the bank is core
+(Zipf ≥ 4.5) and 54% sits below "häufig"; the collocation bank, at 71% häufig-or-above, is the
+model. Raising the ceiling is a deliberate edit with a reason, never a way to land a pack.
+
+### Pronunciation: ONE respelling scheme (audit P9, s185)
+`pron` is an anglicised respelling for an English-reading learner. It used to be **two** schemes
+split by authoring wave (the workplace half wrote /aɪ/ `y` and /x/ `kh`; the daily-life half wrote
+them `ai` and `x`, and `der Reisepass` shipped both spellings side by side), which makes the field
+useless: a symbol has to mean one sound. The scheme, enforced by `checkPron` in the linter:
+
+| Sound | Write | Example | Never |
+|---|---|---|---|
+| /aɪ/ (ei, ai) after a consonant | `y` | `TSYT-plahn`, `ZI-cher-hyt` | `ai` (reads like "rain") |
+| /aɪ/ starting a syllable, closed by n | `INE` | `INE-kowfs-vaa-gen` | `AIN`, `AYN`, `EYN` |
+| /aɪ/ starting an open syllable | `EYE` | `EYE-mer` | a bare `Y` (reads /j/) |
+| /ɔʏ/ (eu, äu) | `oy` | `ROY-moong` | `oi` |
+| /x/ (ach-Laut) | `kh` | `NAAKH-for-de-roong` | `x` (reads /ks/) |
+| /eː/ (long e) | `ay` | `be-LAYK` | (this is why `AYN` is wrong for "ein") |
+| /yː/, /øː/ (ü, ö) | `UE`, `OE` | `UE-boong` | `Uu`, `Ou`, a bare `Ü` |
+
+The stressed syllable is CAPITALISED; a monosyllable has none to mark and is exempt. **Known gap,
+deliberately not in the lint:** the ich-Laut/ach-Laut split (`ch` vs `kh`) is still inconsistent
+across the bank, and `au` is written `au` in some entries and `ow` in others. Both are a bigger
+re-derivation than P9 covered; do not "fix" one item in passing, fix the class or leave it.
+
+- **Dialogues** (`src/data/dialogues.ts`, 36 scenarios; `sc_` prefix): `Scenario` with `themeId`,
+  `task`, `context`, `level` 1-3, `minutes`, `start` and a `nodes` record. Every option carries
+  `feedback`, a `quality` score and a `uses` Redemittel tag; every scenario ends in a free-speak
+  node (`prompt` + `model`, audit P4 in s182) and a narrator end node. Option ids are
+  scenario-scoped, not global (`d1a` recurs across scenarios); only the `sc_` id is a content_id.
+  **Level 3 means the partner pushes back** (audit P4, s185): the ladder was 13/15/**2** and both
+  level-3 scenarios were workplace, so the hardest speaking practice in the app was two items and
+  the daily-life half had none. Six were added (customer, project, safety · behoerde, wohnen, arzt)
+  to make it 13/15/**8**, three of them Alltag. What distinguishes the level from level 2: the
+  partner counters after a good answer, the weak options are plausible professional judgements
+  rather than obvious mistakes (conceding a discount you have no authority for, agreeing not to
+  report a near-miss), and the free-speak turn asks the learner to hold a position under pressure
+  rather than summarise agreement. `SimulationHub` groups by level automatically, so a new scenario
+  needs no UI change; keep new entries at the END of the `scenarios` array, because "Empfohlen" is
+  the first not-yet-completed item in array order.
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
-- **Grammar** (`src/data/grammar.ts`, 32 topics / 195 drills, 18 groups): `GrammarTopic` with `id` (`g_`),
+- **Grammar** (`src/data/grammar.ts`, 32 topics / 320 drills, 18 groups): `GrammarTopic` with `id` (`g_`),
   `group`, `cefr` (REQUIRED, completeness-checked), `title`, `titleDe`, `purpose`, `purposeDe`,
   `explanation`, `explanationDe` (the German-FIRST lesson text; EN shows only via the hold-to-peek
   chip), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (parallel, same order/length), `drills[]`.
   Topics ordered by B2-marker priority (`grammarMeta.ts` `groupOrder`). Drills: `id`, `prompt`,
   `answer`, `options?` (MCQ) or none (PRODUCTIVE: the learner types the answer, graded by
   `normalize()` so case and punctuation are forgiven), `explain`, `gloss` (lesson hides gloss behind
-  the EN peek; sessions keep it visible). **Every B1 topic carries ≥3 productive drills** (audit P5,
-  s182: the bank was 131 MCQ against 6 productive, so it tested recognition and called it practice);
-  `tests/grammar.test.ts` gates that, plus the group registry and drill-id uniqueness. A productive
-  answer must be unambiguous, since it is compared as one string. The B1 accuracy canon that was
-  missing entirely (Adjektivdeklination, Perfekt/Präteritum, Verben mit Präpositionen,
-  Komparativ/Superlativ) shipped in s182 with 10 drills each. Still open from P5: the 21 B2/C1 topics
-  keep their 5-drill cap and are still MCQ-only.
+  the EN peek; sessions keep it visible). **EVERY topic carries 10 drills with ≥3 productive**
+  (audit P5: the bank was 131 MCQ against 6 productive, so it tested recognition and called it
+  practice); `tests/grammar.test.ts` gates that per topic, plus the group registry and drill-id
+  uniqueness. A productive answer must be unambiguous, since it is compared as one string. The B1
+  accuracy canon that was missing entirely (Adjektivdeklination, Perfekt/Präteritum, Verben mit
+  Präpositionen, Komparativ/Superlativ) shipped in s182. **s185 closed the B2/C1 half**: those 21
+  topics sat at 4-5 drills with zero productive between them, so the hardest grammar in the app was
+  also the only grammar a learner was never asked to produce, and a topic was exhausted in one
+  sitting. 125 drills added (107 across the 21 B2/C1 topics, 18 bringing the last 7 B1 topics to
+  10), so the bank is 195 → **320 drills, 33% productive**.
 - **Redemittel** (`src/data/redemittel.ts`, 220; `r_` prefix): `id`, `de`, `en`, `category`
   (closed enum, 18), `register` (neutral/formal), `example` (de + en), optional `note`, `cefr`,
   `themeId`. **`themeId` is untagged-=-universal** (audit P6, s182), like Branche and unlike
@@ -205,7 +301,11 @@ battle graphs resolve and reach a win, content-bank ids exist, required key item
 acyclic dependencies; `GAME_SPRITES` errors on a `GameNpc.sprite` with no registered art); global
 content-id uniqueness ACROSS banks + per-bank id prefixes (v_/c_/g_/sc_/ex_/r_/cd_/tx_/m_/wp_);
 the verified-content fingerprint gate (`stamp:verified`); the `ID_RENAMES` registry; writing-task
-text/sub/sectors validity. Plural is intentionally NOT required on nouns (uncountable/plural-only).
+text/sub/sectors validity; **every noun carries `plural` XOR `numerus`**, and **`pron` follows the
+one respelling scheme** (both above). Those two report as a WARNING rather than an error on a
+human-verified row: fixing one would change the content its `verified` stamp is fingerprinted
+against, and only a human may re-verify, so the 12 affected rows are surfaced for the next review
+pass instead of being edited through the gate.
 It also writes `docs/reports/related-terms-report.md` (unresolvable `related` terms = dropped
 word-graph edges, by design; visible, not a gate).
 

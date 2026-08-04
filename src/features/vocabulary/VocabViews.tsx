@@ -15,6 +15,7 @@ import { SectorChips } from "@/features/shared/SectorChips";
 import { genderOf } from "@/components/artikel/gender";
 import { Wesen } from "@/components/artikel/Wesen";
 import { cn } from "@/lib/utils";
+import { pluralLabel } from "./pluralLabel";
 
 /**
  * The Tabelle + Liste presentations of the Wörter tab (Bibliothek views,
@@ -92,7 +93,7 @@ const VOCAB_COLUMNS: DataColumn<VocabItem>[] = [
   {
     id: "plural",
     label: "Plural",
-    cell: (v) => <span className="text-muted-foreground">{v.plural ?? ""}</span>,
+    cell: (v) => <span className="text-muted-foreground">{pluralLabel(v) ?? ""}</span>,
     className: "min-w-[9rem]",
   },
   {

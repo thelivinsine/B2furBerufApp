@@ -1,7 +1,24 @@
 # Project Status
 
-_Last updated: 2026-08-04 (session 185). **Database architecture audit, and the four fixes it
-recommended.** Report: `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the linear
+_Last updated: 2026-08-04 (session 185). **The content-audit backlog is down to one open item.**
+The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
+are closed outright, and so is P3 now that the founder picked and refined the Notizen step.
+P9: every noun declares `plural` or `numerus` (329 had neither), and the `pron` respelling is ONE
+documented scheme with a linter gate instead of two schemes split by authoring wave.
+P7: 108 items re-levelled off the advanced bands, so the B1 half is **36%** of the bank (was 30%)
+and verify:cefr FLAG went 10 → **0**; a linter ratchet freezes the rare-compound count at 334.
+P5: **every** grammar topic now has 10 drills with ≥3 productive (bank 195 → **320**, productive
+19% → **33%**); the 21 B2/C1 topics had zero productive drills between them.
+P4: six level-3 scenarios, three of them Alltag, so the ladder is **13/15/8** not 13/15/2.
+P3: eight exam-length B2 texts (288-333 words), chosen so every domain has ≥2; gesundheit and
+bildung had none. All 6 voicemails carry `notes` for a Notizen task, and the founder picked
+**variante A** for the learner-facing step, which shipped after three rounds of feedback (bigger
+write lines, a 40px play button instead of a tall tile, ruled lines instead of boxes, tile colours
+swapped, row heights locked so the button never jumps). **The whole audit backlog is closed except
+P10**, which the founder deferred.
+**The same session also ran a database architecture audit and shipped four of its fixes**, on a
+parallel branch (#786, #787).
+That work: Report: `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the linear
 shape is deliberate (content lives in the repo; the DB holds only per-learner state + ops), but six
 growth/sync risks were found. Four shipped the same session: a **failed cloud write is no longer
 silent** (Settings shows "Sync pausiert" with a retry), **retention jobs** purge abandoned guest
@@ -10,9 +27,11 @@ with the lifetime figure preserved, and **`pnpm lint:migrations`** gates migrati
 Learner writing now expires after **2 years** (founder decision, asked because the privacy policy
 promised the opposite), which closes security-audit finding F11. Still open by design: the `srs`
 per-card table and the admin analytics rollups.
-Prior s184: **every filter and Aufgabe rail carries the Lebensbereich pills, Berufsleben · Alltag,
-directly below Branche** (one shared `LifeAreaPills` control, `?area=`, Grammatik excluded on
-purpose).
+Prior s184: **Every filter and Aufgabe rail now carries the
+Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
+Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
+shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
+drops a Thema from the other area so the three controls can never disagree.
 Prior s183: **The Prüfung zone has a new icon language: the orange
 Absolventenhut in the bar (founder pick D), and the branded route marks on tinted tiles in the hub
 (pick 2).** The founder also settled the merge question: **Sprechen and Prüfungssimulation stay
@@ -145,9 +164,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**One small thing is owed from s185:** confirm `/admin → Launch` shows `retention_scheduled: true`.
+**One small thing is owed from s185b:** confirm `/admin → Launch` shows `retention_scheduled: true`.
 A green Supabase deploy proves migration 0015 applied but not that pg_cron was available to schedule
-the three purge jobs. If it reads false: enable pg_cron under Database → Extensions, re-run the
+the three purge jobs. If it reads false: enable pg_cron under Database → Extensions, then re-run the
 Supabase workflow (0015 re-applies idempotently).
 
 **Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
@@ -158,9 +177,35 @@ industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, 
 audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
 C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
 
-**Handoff after session 185 (2026-08-04): the database architecture audit.** Founder: "the database
-architecture is concerningly linear.. can you do a thorough audit and provide your analysis with
-risks and recommendations?"
+**Handoff after session 185a (2026-08-04): the content-audit backlog, minus P10.** Founder, after
+being shown what was left: "go ahead with all the items except for the p10."
+- **Closed outright: P9, P7, P5, P4.** P9 gave every noun a `plural` or a `numerus` and folded the
+  two `pron` schemes into one documented, linted scheme. P7 re-levelled 108 items off the advanced
+  bands and froze the rare-compound count with a linter ratchet. P5 took EVERY grammar topic to 10
+  drills with ≥3 productive (the 21 B2/C1 topics had zero productive between them). P4 added six
+  level-3 scenarios, three of them Alltag.
+- **P3 is done.** Eight exam-length B2 texts shipped, all six voicemails carry `notes` fields, and
+  the Notizen step itself shipped as **variante A**, which the founder picked from
+  `preview/notizen-varianten.html` and then refined over three rounds. The settled shape is in
+  `docs/areas/CONTENT.md` and should be treated as locked: Himmelblau message tile above a WHITE
+  Notizen sheet (colours swapped on request), ruled lines rather than boxed inputs, a 40px play
+  button on the title row, and identical row heights before and after "Notizen vergleichen" so the
+  button underneath never moves. Final render: `preview/notizen-a-r2.html`.
+- **Three things were deliberately left alone, and each is a rule, not a shortcut.** (1) The 12
+  human-verified rows that P9's new checks touch: editing one breaks the content fingerprint its
+  `verified` stamp is tied to, so the linter warns and they queue for the next human review. (2)
+  P7's "spend the next 200 items on core verbs, adjectives and connectors" is a standing authoring
+  rule in `docs/areas/CONTENT.md`, not a shippable change. (3) P10 itself, per the founder.
+- **Two rules are gates now, so they cannot rot:** `tests/grammar.test.ts` asserts 10 drills + 3
+  productive per topic, and `lint-content.mjs` gates noun numerus, the pron scheme and the
+  rare-compound ceiling. A future pack cannot quietly re-open any of them.
+- **One test fixture was rewritten, not patched.** The composer's listening test scoped to logistics
+  because that theme's only text WAS a voicemail; the new logistics text falsified that. It now
+  derives the theme from the bank, so adding a text anywhere cannot make it stale again.
+
+**Handoff after session 185b (2026-08-04, parallel branch): the database architecture audit.**
+Founder: "the database architecture is concerningly linear.. can you do a thorough audit and provide
+your analysis with risks and recommendations?"
 - **The report is `docs/reports/db-architecture-audit-2026-08-04.md`** (all 15 migrations, the 5 Edge
   Functions, `cloudSync.ts`, the admin RPCs; findings R1-R8 with per-finding status). **Verdict:**
   the "linear" schema is the correct consequence of keeping the ~5,000-id content catalog in the
@@ -197,51 +242,3 @@ risks and recommendations?"
   (9 new) · build · check:bundle 124.7 kB. **Shipped:** PR **#786** (`7fe00dd`) and **#787**
   (`f738544`), both squash-merged, all three workflows green, migration 0015 applied to the live
   database.
-
-**Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
-a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app
-right below the Branchen filter."
-- **Naming was asked BEFORE building**, because it was the only part that changed the scope: the
-  prompt said "Berufswelt", the app's locked word is **Berufsleben** (s181), and one surface saying
-  something different is the exact drift `lib/lifeAreas.ts` exists to stop. Founder kept
-  **Berufsleben**, so nothing was renamed and the change stayed additive.
-- **One shared control, `src/features/shared/LifeAreaPills.tsx`**, now in Wörter, Kollokationen,
-  Redemittel and the Schreiben Kurz/Lang Aufgabe rail, on desktop rails and mobile panels alike.
-  **Grammatik is the one deliberate exception:** grammar topics carry no `themeId`, so a life-area
-  filter there would be dead chrome, not a filter.
-- **The rail owns the slot, not the caller** (`area` prop on `FilterRail`, inserted after the
-  `sector` scope, or first on a tab with no Branche dropdown), so "right below the Branchen filter"
-  cannot drift per surface. Single-select that toggles off, `?area=`, pinnable, counted by the badge,
-  cleared by both rails' reset.
-- **Coherence is enforced, not hoped for:** picking an area narrows the Thema dropdown to that area
-  AND drops a Thema from the other one, so pill, dropdown and list can never contradict each other.
-  Pill counts are computed before Thema/search/facets, so the other pill never goes dead at exactly
-  the moment you want to switch. In Schreiben `area` became a HARD, coarsest axis, so the two areas
-  partition the 717-task pool exactly, with `blockingAxis` gaining `area` for the stale-deep-link case.
-- **One visual correction during the round:** an equal-width 2-column pill grid truncated
-  "Berufsleben" against a four-digit count in the 16rem desktop rail, so the pills use the
-  content-sized wrapping facet-pill layout the same tile already uses two sections below.
-- **Gates:** typecheck · lint 0 errors · lint:content · test:unit **506/506** (10 new) · build ·
-  check:bundle 123.1 kB. Verified in a headless browser on both rails: `theme=arzt` + tap Berufsleben
-  → `?area=professional` with Thema back to "Alle Themen", the Thema dropdown then listing exactly
-  one heading; toggle-off, pin+collapse and reset all behave.
-- **Shipped:** PR **#782**, squash-merged as `c612a5d`; `Validate content` and `Deploy site to
-  GitHub Pages` both green on the merge commit, so this is live on genauly.de. The session record
-  followed in PR **#783** (`f3b4395`) and the layout-index gaps it exposed in PR **#784**. Post-merge
-  housekeeping done after each: branch reset onto `main`, working tree clean.
-- **Not touched, on purpose:** Grammatik (no `themeId` on its topics), Sammlung (a Lv 1-5 chip row,
-  not a scope rail), the Fokus grammar dials (form controls, not a content scope), and
-  `libraryFocus` in `engine/session.ts` (Bibliothek Üben hands over already-filtered ids, so the
-  area rides along; only hand-built `/session?…` links would need the param, and nothing writes them).
-- **Worth the founder's eye on the live site:** whether "Lebensbereich" is the right section label
-  (one word, matches the two pills under it), and whether Grammatik should carry the pills anyway.
-  Both are small changes.
-
-**Sessions 182 and 183 are fully archived** in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`: s182 parts 1 and 4, and, aged out by
-this session, the full s183 handoff (the Prüfung icon language, PR #780). Their law lives on in
-`docs/DECISIONS.md` §s182/§s183, `docs/areas/CONTENT.md`, `docs/areas/PRAKTISCH-NAV.md` and
-`docs/areas/BRAND.md`.
-
-_(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
-mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
