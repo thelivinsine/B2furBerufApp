@@ -1,0 +1,783 @@
+<meta charset="utf-8">
+<title>Prüfungssimulation redesign — three options</title>
+<style>
+  /* ---------------------------------------------------------------
+     REVIEW CHROME (deliberately not the app palette: a cool graphite
+     shell with a deep teal accent, so the mocked app screens below
+     read as separate objects and never borrow the chrome's colour).
+     --------------------------------------------------------------- */
+  :root {
+    --c-ground: #eceef1;
+    --c-panel: #ffffff;
+    --c-ink: #191d24;
+    --c-muted: #5c6672;
+    --c-line: #d3d8de;
+    --c-accent: #1f6f68;
+    --c-chip: #e2e6ea;
+  }
+  [data-appearance="dark"] {
+    --c-ground: #0e1013;
+    --c-panel: #16191d;
+    --c-ink: #e6e9ec;
+    --c-muted: #98a1ab;
+    --c-line: #292e35;
+    --c-accent: #58bdb2;
+    --c-chip: #212630;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--c-ground);
+    color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    padding: 32px 24px 96px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p { margin: 0; }
+  .lede { color: var(--c-muted); max-width: 68ch; }
+  .kicker {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--c-accent);
+  }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .rule { height: 1px; background: var(--c-line); border: 0; margin: 0; }
+
+  /* Sticky control bar */
+  .controls {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: var(--c-panel);
+    border: 1px solid var(--c-line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 22px 0 30px;
+    box-shadow: 0 6px 18px -12px rgba(0,0,0,.4);
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl > span {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--c-muted);
+  }
+  .seg { display: inline-flex; background: var(--c-chip); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; font-weight: 600;
+    border: 0; background: transparent; color: var(--c-muted);
+    padding: 5px 12px; border-radius: 7px; cursor: pointer;
+    transition: background .14s ease, color .14s ease;
+  }
+  .seg button:hover { color: var(--c-ink); }
+  .seg button[aria-pressed="true"] { background: var(--c-panel); color: var(--c-ink); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+  .seg button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+  /* Findings + comparison table */
+  .panel {
+    background: var(--c-panel); border: 1px solid var(--c-line);
+    border-radius: 12px; padding: 20px 22px;
+  }
+  .findings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .finding { display: flex; gap: 11px; align-items: flex-start; }
+  .finding b { display: block; font-size: 14px; }
+  .finding p { font-size: 13.5px; color: var(--c-muted); }
+  .num {
+    flex: none; width: 22px; height: 22px; border-radius: 7px;
+    background: var(--c-chip); color: var(--c-accent);
+    font-size: 12px; font-weight: 700; display: grid; place-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-muted); font-weight: 700; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+
+  /* Option sections */
+  .option { margin-top: 46px; }
+  .opthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .optname {
+    font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-panel); background: var(--c-accent);
+    padding: 3px 9px; border-radius: 6px;
+  }
+  .framerow { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 20px; align-items: flex-start; }
+  .framebox.phone { flex: 0 0 auto; }
+  .notecol { flex: 1 1 420px; min-width: 0; }
+  .framelabel {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--c-muted); margin: 18px 0 7px;
+  }
+  .frame {
+    border: 1px solid var(--c-line); border-radius: 14px; overflow: hidden;
+  }
+  .frame.desk .screen { padding: 28px 24px 34px; }
+  .frame.desk .inner { max-width: 1152px; margin: 0 auto; }
+  .frame.mob { width: 390px; }
+  .frame.mob .screen { padding: 18px 16px 22px; height: 690px; overflow-y: auto; }
+  .note { font-size: 13.5px; color: var(--c-muted); max-width: 70ch; }
+  .note + .note { margin-top: 10px; }
+  .note b { color: var(--c-ink); font-weight: 650; }
+
+  /* ---------------------------------------------------------------
+     APP TOKENS — copied verbatim from src/index.css (light + s187
+     "N3 Slate" dark) and tailwind.config.ts. Everything inside a
+     .screen is drawn from these, never from the chrome palette.
+     --------------------------------------------------------------- */
+  .screen {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%; --elevated: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --warning: 38 92% 46%;
+    --shadow: 221 40% 22%;
+    --radius: 0.5rem;
+    --wash-a: 0.10; --wash-b: 0.09;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+    --tile-lesen: rgba(20,184,166,.10);  --ink-lesen: #0f766e;
+    --tile-hoeren: rgba(245,158,11,.10); --ink-hoeren: #b45309;
+    --tile-schr: hsl(var(--primary) / .10); --ink-schr: hsl(var(--primary));
+    --tile-spr: rgba(6,182,212,.10);     --ink-spr: #0e7490;
+
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    color: hsl(var(--foreground));
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  [data-appearance="dark"] .screen {
+    --background: 220 15% 4%;
+    --page-from: 220 15% 4%; --page-mid: 220 15% 4%; --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%;
+    --surface: 220 10% 17%; --elevated: 220 9% 22%;
+    --muted: 220 9% 25%; --muted-foreground: 220 8% 72%;
+    --border: 220 10% 38%;
+    --primary: 219 90% 74%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-ink: 198 72% 72%;
+    --success: 153 50% 52%;
+    --warning: 43 90% 62%;
+    --shadow: 220 30% 2%;
+    --wash-a: 0; --wash-b: 0;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+    --tile-lesen: rgba(45,212,191,.15);  --ink-lesen: #5eead4;
+    --tile-hoeren: rgba(251,191,36,.15); --ink-hoeren: #fbbf24;
+    --tile-schr: hsl(var(--primary) / .15); --ink-schr: hsl(var(--primary));
+    --tile-spr: rgba(34,211,238,.15);    --ink-spr: #67e8f9;
+  }
+
+  .screen .col { display: flex; flex-direction: column; gap: 18px; }
+  .frame.mob .screen .col { gap: 14px; }
+
+  /* App primitives */
+  .card {
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em;
+  }
+  .eyebrow.pri { color: hsl(var(--primary)); }
+  .eyebrow.mut { color: hsl(var(--muted-foreground)); }
+  .h1 { font-size: 30px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+  .frame.mob .h1 { font-size: 24px; }
+  .sub { color: hsl(var(--muted-foreground)); font-size: 14px; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .semi { font-weight: 600; }
+
+  .hubrow { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .hero { display: flex; align-items: flex-start; gap: 14px; }
+  .heroicon {
+    flex: none; width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.mob .heroicon { width: 42px; height: 42px; border-radius: 12px; }
+
+  /* Niveau switcher — LibrarySwitcher mechanism (grey track, lifted pill) */
+  .lvl {
+    position: relative; display: inline-flex; gap: 2px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .lvl .pill {
+    position: absolute; top: 4px; bottom: 4px; border-radius: 6px;
+    background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .18s cubic-bezier(.2,.7,.2,1), width .18s cubic-bezier(.2,.7,.2,1);
+    left: 0;
+  }
+  .lvl button {
+    position: relative; font: inherit; font-size: 14px; font-weight: 600;
+    border: 0; background: transparent; cursor: pointer;
+    color: hsl(var(--muted-foreground)); padding: 6px 14px; border-radius: 6px;
+    transition: color .14s ease;
+  }
+  .lvl button[aria-pressed="true"] { color: hsl(var(--foreground)); }
+  .lvl button:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
+  .frame.mob .lvl { width: 100%; }
+  .frame.mob .lvl button { flex: 1; padding: 6px 0; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font: inherit; font-weight: 500; border: 0; border-radius: 6px; cursor: pointer;
+    height: 40px; padding: 0 16px; font-size: 14px; white-space: nowrap;
+  }
+  .btn.sm { height: 32px; padding: 0 12px; font-size: 12px; }
+  .btn.grad {
+    background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .btn.ghostlink {
+    background: transparent; color: hsl(var(--primary)); height: auto; padding: 0;
+    font-size: 13px; font-weight: 500;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; border-radius: 999px;
+    padding: 2px 10px; font-size: 12px; font-weight: 500; white-space: nowrap;
+  }
+  .badge.ok { background: hsl(var(--success) / .15); color: hsl(var(--success)); }
+  .badge.mutedb { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+
+  .tile {
+    flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px;
+  }
+  .tile.lg { width: 44px; height: 44px; }
+  .tile.lesen { background: var(--tile-lesen); color: var(--ink-lesen); }
+  .tile.hoeren { background: var(--tile-hoeren); color: var(--ink-hoeren); }
+  .tile.schreiben { background: var(--tile-schr); color: var(--ink-schr); }
+  .tile.sprechen { background: var(--tile-spr); color: var(--ink-spr); }
+
+  .bar { height: 6px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .bar > i { display: block; height: 100%; border-radius: 999px; }
+
+  .rowlist { display: flex; flex-direction: column; }
+  .rowlist > .row + .row { border-top: 1px solid hsl(var(--border)); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .rname { font-weight: 600; font-size: 15px; }
+  .rsub { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .chev { color: hsl(var(--muted-foreground)); flex: none; }
+  .start {
+    display: inline-flex; align-items: center; gap: 2px; color: hsl(var(--primary));
+    font-size: 12.5px; font-weight: 500; white-space: nowrap;
+  }
+
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .frame.mob .grid4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  /* Option A readiness ring */
+  .ring { position: relative; width: 96px; height: 96px; border-radius: 999px; flex: none; }
+  .ring > i {
+    position: absolute; inset: 9px; border-radius: 999px; background: hsl(var(--surface));
+    display: grid; place-items: center; font-size: 21px; font-weight: 700; font-style: normal;
+    font-variant-numeric: tabular-nums;
+  }
+  .frame.mob .ring { width: 84px; height: 84px; }
+
+  /* Option B timeline strip */
+  .track { position: relative; display: flex; justify-content: space-between; padding: 4px 0 0; }
+  .track::before {
+    content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 26px; height: 2px;
+    background: hsl(var(--border));
+  }
+  .tnode { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+  .tnode .dot {
+    width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center;
+    border: 3px solid hsl(var(--surface));
+  }
+  .tnode .lab { font-size: 13px; font-weight: 600; }
+  .tnode .min { font-size: 11.5px; color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+  .frame.mob .tnode .dot { width: 38px; height: 38px; border-radius: 10px; }
+  .frame.mob .tnode .lab { font-size: 12px; }
+
+  /* history mini bar */
+  .mini { display: flex; gap: 4px; flex: 1; min-width: 60px; max-width: 320px; }
+  .mini > span { flex: 1; height: 5px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .mini > span > i { display: block; height: 100%; }
+
+  .emptyline { text-align: center; font-size: 14px; color: hsl(var(--muted-foreground)); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .001ms !important; }
+  }
+</style>
+
+<div class="page">
+  <div class="wrap">
+
+    <p class="kicker">Genauly · design review</p>
+    <h1>Prüfungssimulation: three ways to re-do the page</h1>
+    <p class="lede" style="margin-top:8px">
+      Every screen below is drawn from the real app tokens (the s187 “N3 Slate” dark palette, the
+      tighter 8&nbsp;px corner scale, the shipped card, badge and button recipes). German inside a
+      frame is the app copy under review; everything outside a frame is review text. Pick one option
+      by name, or mix (“B, but with A’s status card”).
+    </p>
+
+    <div class="controls" role="group" aria-label="Preview controls">
+      <div class="ctl">
+        <span>Theme</span>
+        <div class="seg" id="seg-theme">
+          <button type="button" data-v="dark">Dark</button>
+          <button type="button" data-v="light">Light</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span>Learner</span>
+        <div class="seg" id="seg-data">
+          <button type="button" data-v="history">Has practised</button>
+          <button type="button" data-v="fresh">First visit</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span>Niveau</span>
+        <div class="seg" id="seg-level">
+          <button type="button" data-v="B2">B2</button>
+          <button type="button" data-v="A2">A2 (no content)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>What the current page gets wrong</h2>
+      <div class="findings" style="margin-top:16px">
+        <div class="finding"><span class="num">1</span><div>
+          <b>It answers nothing</b>
+          <p>Five “Starten” buttons and no statement of where the learner stands, so the page has no
+          reason to be visited twice.</p>
+        </div></div>
+        <div class="finding"><span class="num">2</span><div>
+          <b>It stops half way down</b>
+          <p>Content ends at ~45&nbsp;% of the screen and the rest is empty ground. Results already
+          exist in the data and are shown nowhere.</p>
+        </div></div>
+        <div class="finding"><span class="num">3</span><div>
+          <b>The same fact twice</b>
+          <p>“4 Teile · 52 Min” on top and four cards each printing their own minutes below it.</p>
+        </div></div>
+        <div class="finding"><span class="num">4</span><div>
+          <b>Loose chrome on top</b>
+          <p>A “NIVEAU” label plus four floating grey buttons, above a big hero, before anything the
+          learner came for.</p>
+        </div></div>
+      </div>
+      <hr class="rule" style="margin:18px 0">
+      <h3>Shared in all three options</h3>
+      <p class="note" style="margin-top:6px">
+        The Niveau row becomes the <b>sliding-pill switcher</b> already used by Bibliothek and
+        Schreiben, parked beside the title instead of stacked under it (one line saved, one less
+        style in the app). The <b>exam countdown</b> from Settings appears on the page it belongs to,
+        not only in Fortschritt. And a <b>Verlauf</b> block shows the last runs, which is the data
+        that fills the empty half. Flip “First visit” or “A2” above to see the honest empty states.
+      </p>
+    </div>
+
+    <section class="option" id="opt-a">
+      <div class="opthead">
+        <span class="optname">Option A</span>
+        <h2>Stand zuerst</h2>
+        <p class="sub" style="color:var(--c-muted)">The page leads with how ready you are.</p>
+      </div>
+      <p class="framelabel">Desktop</p>
+      <div class="frame desk"><div class="screen" data-render="a" data-form="desk"></div></div>
+      <div class="framerow">
+        <div class="framebox phone">
+          <p class="framelabel" style="margin-top:0">Phone · 390 px · scrolls inside the frame</p>
+          <div class="frame mob"><div class="screen" data-render="a" data-form="mob"></div></div>
+        </div>
+        <div class="notecol">
+          <p class="note">
+            One status card carries the last total as a ring, the four skills as bars, and the single
+            primary action. The four parts drop to a quiet list underneath, because starting one part
+            is the secondary move.
+          </p>
+          <p class="note"><b>Cost:</b> the most new surface of the three, and on day one the ring
+            reads “–”. The layout stays the same shape when it is empty, the way Verlauf in Schreiben
+            does, so the page never changes skeleton once results arrive.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="option" id="opt-b">
+      <div class="opthead">
+        <span class="optname">Option B</span>
+        <h2>Prüfungstag</h2>
+        <p class="sub" style="color:var(--c-muted)">The page leads with the run itself.</p>
+      </div>
+      <p class="framelabel">Desktop</p>
+      <div class="frame desk"><div class="screen" data-render="b" data-form="desk"></div></div>
+      <div class="framerow">
+        <div class="framebox phone">
+          <p class="framelabel" style="margin-top:0">Phone · 390 px · scrolls inside the frame</p>
+          <div class="frame mob"><div class="screen" data-render="b" data-form="mob"></div></div>
+        </div>
+        <div class="notecol">
+          <p class="note">
+            The full exam becomes one band that visibly <b>contains</b> the four parts as a timeline,
+            so the duplicated minutes disappear and the exam-day shape is the thing you look at.
+            Practising a single part sits below it as “Einzeln üben”.
+          </p>
+          <p class="note"><b>Cost:</b> the four parts lose their card presence and become rows, and
+            the band is the only place a result is shown as a number rather than a bar.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="option" id="opt-c">
+      <div class="opthead">
+        <span class="optname">Option C</span>
+        <h2>Vier Karten</h2>
+        <p class="sub" style="color:var(--c-muted)">Today’s skeleton, given weight.</p>
+      </div>
+      <p class="framelabel">Desktop</p>
+      <div class="frame desk"><div class="screen" data-render="c" data-form="desk"></div></div>
+      <div class="framerow">
+        <div class="framebox phone">
+          <p class="framelabel" style="margin-top:0">Phone · 390 px · scrolls inside the frame</p>
+          <div class="frame mob"><div class="screen" data-render="c" data-form="mob"></div></div>
+        </div>
+        <div class="notecol">
+          <p class="note">
+            Same three blocks as today, but each part card carries its last result as a bar, the full
+            run states the countdown, and Verlauf closes the page.
+          </p>
+          <p class="note"><b>Cost:</b> the smallest change and the smallest gain. The page still
+            opens with four equal choices instead of one, and the four cards stay text-tight at two
+            columns on a phone.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <h2>Side by side</h2>
+      <div class="panel tablewrap" style="margin-top:14px">
+        <table>
+          <thead>
+            <tr><th>&nbsp;</th><th>A · Stand zuerst</th><th>B · Prüfungstag</th><th>C · Vier Karten</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Page opens with</td><td>Your standing</td><td>The full run</td><td>Four choices</td></tr>
+            <tr><td>Primary action</td><td>One, inside the status card</td><td>One, inside the run band</td><td>One, plus four equals</td></tr>
+            <tr><td>Where results live</td><td>Bars in the status card</td><td>Badges on the part rows</td><td>Bars on the part cards</td></tr>
+            <tr><td>Duplicate minutes</td><td>Gone</td><td>Gone</td><td>Still there (total + per part)</td></tr>
+            <tr><td>Fills the screen</td><td>Yes</td><td>Yes</td><td>Mostly</td></tr>
+            <tr><td>Build effort</td><td>Largest</td><td>Medium</td><td>Smallest</td></tr>
+            <tr><td>Risk</td><td>Empty ring on day one</td><td>Parts feel demoted</td><td>Page still reads flat</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(() => {
+  const ICON = {
+    lesen: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+    hoeren: '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+    schreiben: '<path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/>',
+    sprechen: '<rect x="9" y="2" width="6" height="13" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+    cap: '<path d="M21.4 10.9a1 1 0 0 0 0-1.8L12.8 5.2a2 2 0 0 0-1.6 0L2.6 9.1a1 1 0 0 0 0 1.8l8.6 3.9a2 2 0 0 0 1.6 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+    play: '<path d="m6 3 14 9-14 9Z" fill="currentColor" stroke="none"/>',
+    chev: '<path d="m9 18 6-6-6-6"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+  };
+  const svg = (k, size) =>
+    `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+
+  const PARTS = [
+    { id: 'lesen',     label: 'Lesen',     desc: '3 Texte mit Aufgaben',    min: 15, last: 72 },
+    { id: 'hoeren',    label: 'Hören',     desc: '2 Ansagen · Notizen',     min: 10, last: 54 },
+    { id: 'schreiben', label: 'Schreiben', desc: '1 Aufgabe · voller Brief', min: 20, last: 81 },
+    { id: 'sprechen',  label: 'Sprechen',  desc: '1 Gespräch mit Partner',  min: 7,  last: 66 }
+  ];
+  const INK = { lesen: 'var(--ink-lesen)', hoeren: 'var(--ink-hoeren)', schreiben: 'var(--ink-schr)', sprechen: 'var(--ink-spr)' };
+  const TOTAL_MIN = PARTS.reduce((s, p) => s + p.min, 0);
+  const LAST_TOTAL = 68, PASS = 60, LAST_DATE = '12. Juli', EXAM_DATE = '12. September', DAYS = 34;
+  const HISTORY = [
+    { date: '12. Juli',  total: 68, parts: [72, 54, 81, 66] },
+    { date: '28. Juni',  total: 61, parts: [65, 48, 74, 58] },
+    { date: '9. Juni',   total: 52, parts: [58, 40, 66, 47] }
+  ];
+
+  const state = { appearance: 'dark', data: 'history', level: 'B2' };
+
+  /* ---------- shared blocks ---------- */
+  const header = () => `
+    <div class="hubrow">
+      <div class="hero">
+        <div class="heroicon">${svg('cap', 24)}</div>
+        <div>
+          <p class="eyebrow pri">Prüfung</p>
+          <p class="h1">Prüfungssimulation</p>
+        </div>
+      </div>
+      <div class="lvl" role="group" aria-label="Niveau">
+        <span class="pill" aria-hidden="true"></span>
+        ${['A2', 'B1', 'B2', 'C1'].map(l =>
+          `<button type="button" data-lvl="${l}" aria-pressed="${state.level === l}">${l}</button>`).join('')}
+      </div>
+    </div>`;
+
+  const countdown = (short) => state.level === 'A2' ? '' :
+    `<span class="sub tnum" style="display:inline-flex;align-items:center;gap:6px">${svg('clock', 14)} Noch ${DAYS} Tage${short ? '' : ` bis zum ${EXAM_DATE}`}</span>`;
+
+  const servable = () => state.level !== 'A2';
+  const scored = () => servable() && state.data === 'history';
+
+  const verlauf = () => !scored() ? '' : `
+    <div>
+      <p class="eyebrow mut" style="margin:0 0 8px 2px">Verlauf</p>
+      <div class="card rowlist">
+        ${HISTORY.map(h => `
+          <div class="row" style="gap:14px">
+            <span class="semi tnum" style="font-size:14px;min-width:66px">${h.date}</span>
+            <span class="mini">${h.parts.map((v, i) =>
+              `<span><i style="width:${v}%;background:${INK[PARTS[i].id]}"></i></span>`).join('')}</span>
+            <span style="display:flex;align-items:center;gap:10px;margin-left:auto">
+              <span class="badge ${h.total >= PASS ? 'ok' : 'mutedb'} tnum">${h.total} %</span>
+              <span class="chev">${svg('chev', 16)}</span>
+            </span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  /* ---------- Option A ---------- */
+  function optionA(form) {
+    const ringPct = scored() ? LAST_TOTAL : 0;
+    const ring = `
+      <div class="ring" style="background:conic-gradient(hsl(var(--primary)) ${ringPct * 3.6}deg, hsl(var(--border)) 0deg)">
+        <i>${scored() ? LAST_TOTAL + ' %' : '–'}</i>
+      </div>`;
+    const bars = PARTS.map(p => `
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="semi" style="font-size:13.5px;min-width:74px">${p.label}</span>
+        <span class="bar" style="flex:1">${scored() ? `<i style="width:${p.last}%;background:${INK[p.id]}"></i>` : ''}</span>
+        <span class="sub tnum" style="min-width:34px;text-align:right">${scored() ? p.last + ' %' : '–'}</span>
+      </div>`).join('');
+
+    const statusCard = `
+      <div class="card" style="padding:${form === 'mob' ? '16px' : '20px 22px'}">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <p class="eyebrow mut">Dein Stand</p>
+          ${countdown()}
+        </div>
+        <div style="display:flex;align-items:center;gap:${form === 'mob' ? '16px' : '24px'};margin-top:14px;flex-wrap:${form === 'mob' ? 'wrap' : 'nowrap'}">
+          <div style="display:flex;align-items:center;gap:14px">
+            ${ring}
+            <div>
+              ${scored()
+                ? `<span class="badge ok">Bestanden</span><p class="sub tnum" style="margin-top:6px">Simulation vom ${LAST_DATE}</p>`
+                : servable()
+                  ? `<p class="semi">Noch keine Simulation</p><p class="sub" style="margin-top:2px">Starte die erste Prüfung</p>`
+                  : `<p class="semi">Noch keine Inhalte</p><p class="sub" style="margin-top:2px">Wähle B1, B2 oder C1</p>`}
+            </div>
+          </div>
+          <div style="flex:1;min-width:${form === 'mob' ? '100%' : '240px'};display:flex;flex-direction:column;gap:9px">${bars}</div>
+        </div>
+        ${servable() ? `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid hsl(var(--border));flex-wrap:wrap">
+          <div>
+            <p class="semi">Komplette Prüfung</p>
+            <p class="sub tnum">4 Teile · ${TOTAL_MIN} Min</p>
+          </div>
+          <button class="btn grad" type="button">${svg('play', 16)} Starten</button>
+        </div>` : ''}
+      </div>`;
+
+    const list = `
+      <div>
+        <p class="eyebrow mut" style="margin:0 0 8px 2px">Einzelne Teile</p>
+        <div class="card rowlist">
+          ${PARTS.map(p => `
+            <div class="row">
+              <span class="tile ${p.id}">${svg(p.id, 20)}</span>
+              <div style="flex:1;min-width:0">
+                <p class="rname">${p.label}</p>
+                <p class="rsub tnum">${servable() ? `${p.desc} · ${p.min} Min` : 'Noch keine Inhalte'}</p>
+              </div>
+              ${servable() ? `<span class="start">Starten ${svg('chev', 14)}</span>` : ''}
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    return `<div class="col">${header()}${statusCard}${list}${verlauf()}</div>`;
+  }
+
+  /* ---------- Option B ---------- */
+  function optionB(form) {
+    const band = `
+      <div class="card" style="padding:${form === 'mob' ? '16px' : '20px 22px'}">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <p class="eyebrow mut">Komplette Prüfung</p>
+          ${countdown()}
+        </div>
+        <div class="track" style="margin-top:14px">
+          ${PARTS.map(p => `
+            <div class="tnode">
+              <span class="dot tile ${p.id}">${svg(p.id, 20)}</span>
+              <span class="lab">${p.label}</span>
+              <span class="min">${p.min} Min</span>
+            </div>`).join('')}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid hsl(var(--border));flex-wrap:wrap">
+          ${scored()
+            ? `<div style="display:flex;align-items:center;gap:8px"><span class="badge ok tnum">${LAST_TOTAL} %</span><span class="sub">zuletzt am ${LAST_DATE}</span></div>`
+            : `<span class="sub">${servable() ? 'Noch keine Simulation' : 'Noch keine Inhalte'}</span>`}
+          ${servable()
+            ? `<button class="btn grad" type="button">${svg('play', 16)} Prüfung starten</button>`
+            : ''}
+        </div>
+      </div>`;
+
+    const list = `
+      <div>
+        <p class="eyebrow mut" style="margin:0 0 8px 2px">Einzeln üben</p>
+        <div class="card rowlist">
+          ${PARTS.map(p => `
+            <div class="row">
+              <span class="tile ${p.id}">${svg(p.id, 20)}</span>
+              <div style="flex:1;min-width:0">
+                <p class="rname">${p.label}</p>
+                <p class="rsub tnum">${servable() ? `${p.desc} · ${p.min} Min` : 'Noch keine Inhalte'}</p>
+              </div>
+              ${scored() ? `<span class="badge ${p.last >= PASS ? 'ok' : 'mutedb'} tnum">${p.last} %</span>` : ''}
+              ${servable() ? `<span class="start">Starten ${svg('chev', 14)}</span>` : ''}
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    return `<div class="col">${header()}${band}${list}${verlauf()}</div>`;
+  }
+
+  /* ---------- Option C ---------- */
+  function optionC(form) {
+    const slim = form === 'mob'
+      ? `
+      <div class="card" style="padding:14px 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1;min-width:0">
+            <p class="semi">Komplette Prüfung</p>
+            <p class="sub tnum">4 Teile · ${TOTAL_MIN} Min${scored() ? ` · zuletzt ${LAST_TOTAL} %` : ''}</p>
+          </div>
+          ${scored() ? `<span class="badge ok">Bestanden</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px">
+          ${countdown(true) || '<span></span>'}
+          ${servable()
+            ? `<button class="btn grad sm" type="button">${svg('play', 14)} Starten</button>`
+            : `<span class="sub">Noch keine Inhalte</span>`}
+        </div>
+      </div>`
+      : `
+      <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px 20px">
+        <div style="flex:1;min-width:0">
+          <p class="semi">Komplette Prüfung</p>
+          <p class="sub tnum">4 Teile · ${TOTAL_MIN} Min${scored() ? ` · zuletzt ${LAST_TOTAL} %` : ''}</p>
+        </div>
+        ${countdown()}
+        ${scored() ? `<span class="badge ok">Bestanden</span>` : ''}
+        ${servable()
+          ? `<button class="btn grad" type="button">${svg('play', 16)} Starten</button>`
+          : `<span class="sub">Noch keine Inhalte</span>`}
+      </div>`;
+
+    const cards = `
+      <div class="grid4">
+        ${PARTS.map(p => `
+          <div class="card" style="display:flex;flex-direction:column;gap:10px;padding:16px">
+            <span class="tile lg ${p.id}"${servable() ? '' : ' style="opacity:.5"'}>${svg(p.id, 22)}</span>
+            <div style="flex:1">
+              <p class="rname" style="font-size:16px">${p.label}</p>
+              <p class="rsub tnum" style="margin-top:2px">${servable() ? `${p.desc} · ${p.min} Min` : 'Noch keine Inhalte'}</p>
+            </div>
+            ${scored() ? `
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="bar" style="flex:1"><i style="width:${p.last}%;background:${INK[p.id]}"></i></span>
+                <span class="sub tnum">${p.last} %</span>
+              </div>` : ''}
+            ${servable() ? `<span class="start" style="align-self:flex-start">Starten ${svg('chev', 14)}</span>` : ''}
+          </div>`).join('')}
+      </div>`;
+
+    return `<div class="col">${header()}${slim}${cards}${verlauf()}</div>`;
+  }
+
+  const RENDER = { a: optionA, b: optionB, c: optionC };
+
+  function placePill(root) {
+    root.querySelectorAll('.lvl').forEach(track => {
+      const active = track.querySelector('button[aria-pressed="true"]');
+      const pill = track.querySelector('.pill');
+      if (!active || !pill) return;
+      pill.style.width = active.offsetWidth + 'px';
+      pill.style.transform = `translateX(${active.offsetLeft - 4}px)`;
+    });
+  }
+
+  function render() {
+    document.querySelectorAll('.screen[data-render]').forEach(el => {
+      const html = RENDER[el.dataset.render](el.dataset.form);
+      el.innerHTML = el.dataset.form === 'desk' ? `<div class="inner">${html}</div>` : html;
+    });
+    requestAnimationFrame(() => placePill(document));
+  }
+
+  function syncSegs() {
+    const map = { 'seg-theme': state.appearance, 'seg-data': state.data, 'seg-level': state.level };
+    Object.entries(map).forEach(([id, val]) => {
+      document.querySelectorAll(`#${id} button`).forEach(b =>
+        b.setAttribute('aria-pressed', String(b.dataset.v === val)));
+    });
+    document.documentElement.setAttribute('data-appearance', state.appearance);
+  }
+
+  document.getElementById('seg-theme').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.appearance = b.dataset.v; syncSegs();
+  });
+  document.getElementById('seg-data').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.data = b.dataset.v; syncSegs(); render();
+  });
+  document.getElementById('seg-level').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.level = b.dataset.v; syncSegs(); render();
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.lvl button'); if (!b) return;
+    state.level = b.dataset.lvl; syncSegs(); render();
+  });
+
+  // Start from the viewer's theme when it is light; the founder's screenshot is dark.
+  const rootTheme = document.documentElement.getAttribute('data-theme');
+  if (rootTheme === 'light') state.appearance = 'light';
+  else if (!rootTheme && window.matchMedia('(prefers-color-scheme: light)').matches) state.appearance = 'light';
+
+  syncSegs();
+  render();
+  window.addEventListener('resize', () => placePill(document));
+  new MutationObserver(() => {
+    const t = document.documentElement.getAttribute('data-theme');
+    if (t === 'light' || t === 'dark') { state.appearance = t; syncSegs(); }
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>

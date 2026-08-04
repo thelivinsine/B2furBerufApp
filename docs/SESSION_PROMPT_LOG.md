@@ -3904,3 +3904,34 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/areas/BRAND.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+
+## Session 188 — 2026-08-04 · branch `claude/page-redesign-7md2zi`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `re-do this page` (attached: a dark-mode screenshot of
+  `/exam`, the Prüfungssimulation hub as it shipped in s186: HubHero, a "NIVEAU" label above four
+  grey level buttons, the slim "Komplette Prüfung" card, and the four part cards, with the lower
+  half of the screen empty).
+  **Response:** design-skill process, so previews before code. ONE interactive preview,
+  `preview/exam-hub-redesign.html`, published as an artifact
+  (https://claude.ai/code/artifact/49f4ec01-73b4-42a3-85a4-47b339ca9d06), with **three named
+  options** and three review switches (Theme dark/light · Learner has-practised/first-visit ·
+  Niveau B2/A2), each option rendered at desktop width (1152 px content column) and at 390 px.
+  Every screen is drawn from the real tokens (`src/index.css` s187 "N3 Slate" dark + light, the
+  0.5rem corner scale, card/badge/button/switcher recipes) and the real data the hub already has
+  (`MockExamRecord.parts`, `mockExamAvailability`, `settings.examDate`, `PASS_PCT`).
+  **Findings put to the founder:** the page answers nothing (five identical "Starten" and no
+  statement of where the learner stands), it stops at ~45 % of the screen while results already
+  exist in the data and are shown nowhere, "4 Teile · 52 Min" repeats the four cards' own minutes,
+  and the Niveau label + four floating buttons are loose chrome above the hero.
+  **Shared across all three options:** Niveau becomes the shipped sliding-pill switcher
+  (`useSlidingPill`) beside the title, the exam countdown appears on the page it belongs to, and a
+  Verlauf block shows the last runs.
+  **A "Stand zuerst"** leads with a status card (ring + four skill bars + the one CTA), parts drop
+  to a quiet list. **B "Prüfungstag"** leads with a run band that visibly contains the four parts as
+  a timeline (which is what removes the duplicated minutes), parts below as "Einzeln üben".
+  **C "Vier Karten"** keeps today's skeleton and gives the four cards their last result as a bar.
+  **Verification:** rendered in headless Chromium across dark, light, first-visit and A2 states;
+  three defects found and fixed before showing (the desktop frames were rendering at tablet width,
+  `.rname`/`.rsub` were scoped under `.row` so Option C's cards lost their type hierarchy, and the
+  A2 state stated "no content" three times over). No app code touched: the founder picks first.
+- **Artifacts (prompt 1):** `preview/exam-hub-redesign.html` · this log
