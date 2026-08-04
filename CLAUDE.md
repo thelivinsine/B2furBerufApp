@@ -138,7 +138,11 @@ after pulling.
   discarding the tab) is recoverable rather than lost work.
 - **A freshly opened page never scrolls.** Every trainer sizes its elastic element (the writing
   field, the tile column) to the room actually left, and gives up its preferred floor rather than
-  push the resting page past one viewport (`useFillEditor`, `measureMobile`).
+  push the resting page past one viewport (`useFillEditor`, `measureMobile`). The **exam** answers
+  this with a stage instead of measurement (s186): a running Teil is `h-exam-stage` tall, pins its
+  RunBar/strip/actions and scrolls ONE inner region, so all ten in-exam screens rest at exactly 0
+  page scroll down to 360x640. Height only, never `overflow:hidden`, or the mobile keyboard cannot
+  scroll the field into view.
 - **Design landmines:** the `/design` skill §7 lists everything shipped-then-reverted; never
   reintroduce an item on that list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior

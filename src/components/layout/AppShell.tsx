@@ -197,10 +197,12 @@ export function AppShell() {
           className={cn(
             focus
               ? "mx-auto flex min-h-screen w-full max-w-2xl flex-col px-4 pt-safe pb-safe sm:px-6"
-              : "mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8 lg:pb-safe-8",
-            // `pb-nav` reserves the bottom bar's height; without the bar that
-            // gap is dead space under the last control.
-            !focus && (exam ? "pb-safe-8" : "pb-nav"),
+              : exam
+                ? // One viewport, no page scroll: the running Teil pins its own
+                  // chrome and scrolls internally. `pb-nav` is gone with the
+                  // bottom bar it was reserving room for.
+                  "mx-auto flex h-exam-stage w-full max-w-3xl flex-col px-4 pt-4 pb-safe-2 sm:px-6"
+                : "mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8",
           )}
         >
           {/* Desktop shows this nudge at the bottom of the sidebar instead; keep
@@ -211,7 +213,12 @@ export function AppShell() {
             </div>
           )}
           <AnimatePresence mode="wait">
-            <motion.div key={location.pathname}>
+            <motion.div
+              key={location.pathname}
+              // The exam stage's height has to reach the part component, which
+              // sits under this wrapper.
+              className={cn(exam && "flex min-h-0 flex-1 flex-col")}
+            >
               <Suspense
                 fallback={
                   <div className="flex h-64 items-center justify-center">

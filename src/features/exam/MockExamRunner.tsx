@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ChevronRight, Clock, X } from "lucide-react";
 import {
@@ -58,7 +58,10 @@ export function MockExamRunner() {
   // on every tick and every answer, which would re-register the handler (and
   // re-render the header) once a second.
   const running = !!run;
-  useEffect(() => {
+  // Layout effect, not effect: registering also switches the shell to the
+  // one-viewport exam stage, and doing that after paint would show one frame of
+  // the normal (bottom-bar, page-scrolling) layout first.
+  useLayoutEffect(() => {
     if (!running) return;
     setExamExit(() => (onResult ? finish() : setExitOpen(true)));
     return () => setExamExit(null);
@@ -238,7 +241,11 @@ function PartIntro({ run }: { run: MockExamRun }) {
     facts.push(`${run.plan.hoeren.length} Ansagen`, `${mcCount(run.plan.hoeren)} Aufgaben`);
 
   return (
-    <div className="mx-auto flex min-h-[60dvh] max-w-md flex-col justify-center gap-4">
+    // Scrolls INSIDE the stage when a long Sprechen briefing outgrows it; the
+    // inner wrapper keeps the short parts optically centred without clipping
+    // the top of a tall one (the justify-center + overflow trap).
+    <div className="slim-scrollbar mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto">
+      <div className="flex min-h-full flex-col justify-center gap-4 py-1">
       <div className="text-center">
         <div
           className={cn(
@@ -289,6 +296,7 @@ function PartIntro({ run }: { run: MockExamRun }) {
       <p className="text-center text-xs text-muted-foreground">
         Der Timer läuft, sobald du startest.
       </p>
+      </div>
     </div>
   );
 }
@@ -335,7 +343,9 @@ function Ergebnis({ run }: { run: MockExamRun }) {
   const schreibenUnscored = hasSchreiben && run.results.schreiben?.pct == null;
 
   return (
-    <div className="mx-auto max-w-md space-y-4">
+    // The result can outgrow the stage (four bars plus an expanded answer
+    // review), so it scrolls internally like every other part.
+    <div className="slim-scrollbar mx-auto min-h-0 w-full max-w-md flex-1 space-y-4 overflow-y-auto pb-1">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}

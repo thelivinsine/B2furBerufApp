@@ -42,6 +42,16 @@ exam card is NOT called "Prüfung": a card may not carry the name of the page it
   page deliberately carry no abort control, so the learner is never offered two ways out. The
   confirm dialog belongs to the runner (`danger` button, matching Settings' Konto löschen); on the
   result screen the run is already recorded, so the X just closes without a confirm.
+  Exam chrome also switches `main` to the **exam stage**: `h-exam-stage` (`100dvh - 4rem - 1px -
+  safe-top`, the 1px being the header's bottom border, which is exactly the overflow leaving it out
+  caused) as a flex column. Every part then pins its RunBar, answer strip and action buttons and
+  gives ONE region `flex-1 min-h-0 overflow-y-auto`: Lesen/Hören scroll text + question together,
+  Schreiben caps the Aufgabe at 34 % with its own scroll and lets the field take the rest
+  (`resize-none`, since a dragged textarea re-breaks the viewport), Sprechen scrolls the dialogue,
+  and the Anleitung/Ergebnis screens scroll themselves. Measured at 393x852, 375x667 and 360x640:
+  all ten in-exam screens rest at **0 px** page overflow. The hub is a menu, not a Teil, and scrolls
+  like every other hub (95-151 px on a 667 px phone, against 237 px for `/anwenden` and 253 px for
+  Praktisch); it is deliberately NOT on the stage.
 **Those cards wear the branded route marks, not lucide icons** (founder pick 2, s183): each card
 renders `RouteIcon` for its own route on a 48px `rounded-xl` tile tinted in that mark's colour
 (cyan / brand blue / orange at 10%, 15% in dark). So the Schreiben card carries the exact pencil
