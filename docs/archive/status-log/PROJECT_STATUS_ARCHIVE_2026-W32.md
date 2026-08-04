@@ -160,3 +160,61 @@ your analysis with risks and recommendations?"
   (9 new) · build · check:bundle 124.7 kB. **Shipped:** PR **#786** (`7fe00dd`) and **#787**
   (`f738544`), both squash-merged, all three workflows green, migration 0015 applied to the live
   database.
+
+**Handoff after session 186 (2026-08-04): the Prüfungssimulation rework, in four merged PRs.**
+Founder: the simulation "should actually feel like an exam with all the lesen, hören, schreiben and
+sprechen modules with a timer and clear instructions"; picks after a preview round
+(`preview/pruefungssimulation-rework.html`): **Option B start page + a Niveau row (A2 to C1),
+Option C answer-sheet runner, quiet outline Zurück/Weiter (dark blue only on submission moments),
+and the Schreiben expand button where useful.**
+**PRs: #791** (the exam) · **#792** (exam chrome) · **#793** (the stage, no page scroll) ·
+**#794** (question always visible, desktop side by side). All squash-merged; deploys green (one
+Supabase run needed a re-run after an `esm.sh` 522 outage, unrelated to the code).
+- **What shipped:** `engine/exam.ts` (level-aware composer + scoring; 3 Texte, 2 Ansagen max 2x,
+  1 voll gebriefte Schreibaufgabe, 1 Sprechen-Szenario über die 1-3-Leiter; Bestanden ab 60 %),
+  `useExamStore` (persisted run: plan ids, answers, Notizen, essay, remaining seconds; a reload
+  resumes mid-part; Sprechen restarts its dialogue with full time, documented), the reworked
+  `ExamHub` (Niveau row, slim full-exam card, four module cards, each startable alone, honest
+  zero states), `MockExamRunner` + parts (Anleitung pages, runbar with amber-under-2-min timer,
+  numbered answer strip, Hören with TTS + Notizen lines, Schreiben with fullscreen dialog +
+  UmlautKeys, embedded Sprechen), and the Ergebnis screen (per-Teil bars, weakest-part Üben CTA,
+  answer review). Writing is scored by `evaluate-writing`'s new **exam mode** (0-100, telc-weighted;
+  `exam_score` persisted, migration 0016) and the result renormalises honestly when no score came
+  back. `progress.mock_exams` syncs the runs (bounded at 100, unknown-column retry covers the
+  deploy window). Tests: `tests/exam.test.ts` (9) + the full suite green; bundle 125 kB.
+- **Exam chrome (founder follow-up, same session):** while a run is on screen the mobile bottom
+  bar is hidden and the header's streak pill + account menu become ONE quiet muted X. It is the
+  only exit (the RunBar X and the Anleitung abort link were removed with it), it confirms through
+  a `danger` dialog mid-exam and closes without one on the result screen. The flag is
+  `useSessionStore.examExit`, a callback rather than a boolean so eager `AppShell` never imports
+  the exam store (bundle held at 125.7 kB). Not the same thing as focus mode, which hides the
+  header too; both are documented in `docs/areas/PRAKTISCH-NAV.md`.
+- **No page scroll inside the exam (founder follow-up):** a running Teil is a STAGE, not a
+  document. `main` becomes `h-exam-stage` tall and every part pins its RunBar, answer strip and
+  actions around one internally scrolling region. Audited by driving the real build at 393x852,
+  375x667 and 360x640: all ten in-exam screens (hub-to-Ergebnis) rest at **0 px** page overflow.
+  The hub itself still scrolls ~150 px on a 667 px phone and is meant to: it is a menu, and the
+  least-scrolling hub in the app (`/anwenden` 237 px, Praktisch 253 px at the same size).
+- **The question tile is never what shrinks (founder follow-up, #794).** Sharing one scroll region
+  buried it under a long text. Now the text (Lesen) and the Notizen sheet (Hören) are the elastic
+  tiles and the question keeps its natural height, verified fully visible for **every** question
+  (9 Lesen + 6 Hören) at all three phone sizes. Three rules make it fit and are load-bearing: no
+  "Aufgabe N von M" eyebrow on the question card (the centred number strip says it), "Teil
+  abschließen" only on the LAST question once everything is answered (it replaces Weiter; the
+  permanent submit row cost every screen ~52 px), and a `gap-1` strip so nine numbers hold one row
+  at 360 px. **Desktop lays the two tiles side by side** (3/5 + 2/5, Schreiben mirrored) and exam
+  chrome additionally hides the sidebar and the Feedback pill there, which overlapped the Weiter
+  button; the header mark becomes a non-clickable `Logo`, since navigating away would end the run.
+  Known limit, accepted: on 375/360-wide phones the reading pane can fall to ~2 lines for the
+  tallest questions (it scrolls; the expand button reads full-screen). Giving it more would mean
+  shrinking the question tile, which is the thing this guarantees.
+- **Content gaps this exposed (PROJECT_REFERENCE backlog):** A2 has NO exam content anywhere (the
+  A2 Niveau pill shows an honest empty state), and C1 Hören has a single audio text, so it tops up
+  from B2.2. Both need an authoring wave before those levels feel native.
+- **Verify live after merge:** run one full B2 exam end to end (Hören audio is device TTS; the
+  Schreiben score needs the deployed function + migration).
+- **Next, if the founder does not redirect:** the **queued writing-task quality audit** below is
+  still the oldest open item. The exam's own next steps, in the order they would pay off: the A2
+  and C1-Hören content waves (`PROJECT_REFERENCE` → CONTENT GAPS), then a Fortschritt tile reading
+  `progress.mock_exams` (the data is synced but nothing plots it yet), then per-Teil exam history.
+  Nothing is half-built: every part of the exam ships complete.

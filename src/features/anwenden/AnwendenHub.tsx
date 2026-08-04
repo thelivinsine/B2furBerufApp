@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 // The transfer layer: where the learner puts the reference material to use.
 // Renamed from "Anwenden" to **Prüfung** in s182 (founder), when Schreiben
 // moved back in from its own tab: the zone is the three exam skills, so the
-// name says what it prepares for. The third card is "Prüfungssimulation", not
-// "Prüfung", because a card cannot carry the same name as the page it sits on.
-// Sprechen · Schreiben · Prüfungssimulation share one visual rank here, which
+// name says what it prepares for. The third card is "Modelltest" (renamed with
+// the page itself, founder s188), not "Prüfung", because a card cannot carry the
+// same name as the page it sits on.
+// Sprechen · Schreiben · Modelltest share one visual rank here, which
 // is the whole point of the hub: they are the productive half of the app,
 // distinct from the Bibliothek (reference).
 // Each card wears its route's own branded mark from `route-icons.tsx` on a tile
@@ -41,7 +42,7 @@ const CARDS: {
   {
     to: "/exam",
     tint: "bg-orange-500/10 dark:bg-orange-400/15",
-    title: "Prüfungssimulation",
+    title: "Modelltest",
     desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
   },
 ];

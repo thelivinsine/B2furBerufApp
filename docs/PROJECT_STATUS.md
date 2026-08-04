@@ -1,22 +1,22 @@
 # Project Status
 
-_Last updated: 2026-08-04 (session 187). **Dark mode is no longer blue, the corners are tighter,
-and the running Prüfungsteil got its polish round.** All four founder picks came off ONE interactive
-preview (`preview/exam-question-tile-polish.html`, artifact link in `docs/DECISIONS.md` §s187).
-**Palette "N3 Slate", app-wide:** the dark greys were a blue at 44 % saturation with two coloured
-radials laid over every screen; they are near-neutral now (10-15 %, ground `220 15% 4%`, cards
-`220 10% 17%`) with the washes off in dark, and blue survives only where it acts. The contrast
-relationship is the founder-confirmed one: card/ground 1.38:1, edge/ground 3.03:1, plus a third step
-for anything nested inside a card, because the exam's answer rows carried the very fill of the card
-they sat in (1.00:1). **Corners:** `--radius` 0.875rem → 0.5rem (card 10px, row 8px, pill 6px).
-**Exam:** the question carries NO tile any more (it floats on the ground beside the ONE card on
-screen), each block is content-tall with the pair centred, the number strip moved down beside
-Zurück/Weiter with real space around them, both blocks are drag-resizable (with arrow-key support)
-and reset on every question change, and the exit is red: the bare door mark on a phone, mark plus
-"Verlassen" from `sm` up. The answered number is no longer blue-on-blue. Verified by driving the
-real build: **225 in-exam screens** across five viewports and three fresh draws each of Lesen and
-Hören, all at 0 px page overflow with the question fully visible; gates green (typecheck, lint 0
-errors, 551 tests, check:contrast, bundle 126.0 kB).
+_Last updated: 2026-08-04 (session 188). **The Prüfungssimulation hub was re-done and renamed
+Modelltest.** Founder prompt: "re-do this page". Three options were previewed
+(`preview/exam-hub-redesign.html`) and the founder picked **B "Prüfungstag"** with two amendments,
+which is what shipped: the page **leads with the run** (one band containing the four Teile as a
+timeline, which is what removed the minutes being printed twice), then "Einzeln üben" as rows, then
+**Verlauf**, which is now the ONLY place a past result is shown (founder: not on the band, not on
+the rows). The HubHero went with it, so the page is the `h1` **"Modelltest"** plus the Niveau
+sliding-pill switcher on one line, and the `/anwenden` card that leads here was renamed to match.
+The exam countdown from Settings moved onto this page, a Verlauf row opens to the four per-Teil
+percentages, and the A2 zero state states itself once per control instead of three times per
+screen. Verified by driving the real build (desktop 1280, phone 390, narrow 360, light + dark, A2,
+Verlauf open): 0 px horizontal overflow, no console errors. Gates green: typecheck · lint 0 errors ·
+551 tests · build · check:bundle 126.0 kB · check:contrast.
+Prior s187: dark mode became near-neutral ("N3 Slate", ground `220 15% 4%`, cards `220 10% 17%`,
+page radials off in dark), the corner scale tightened (`--radius` 0.5rem → card 10px, row 8px,
+pill 6px), and the running Prüfungsteil got its polish round (no tile on the question, drag-resizable
+blocks, the number strip beside Zurück/Weiter, a red exit), verified over 225 in-exam screens.
 Prior s186: the Prüfungssimulation became a real four-part mock exam (Lesen, Hören, Schreiben,
 Sprechen) in four PRs (#791-#794), with per-Teil timers, an answer-sheet strip, the one-viewport
 exam stage and a result screen with a 60 % pass line.
@@ -128,6 +128,34 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 188 (2026-08-04): the Modelltest hub (branch `claude/page-redesign-7md2zi`).**
+Founder: "re-do this page" (a dark screenshot of `/exam`), then "go with B" plus two amendments.
+**What shipped** (`src/features/exam/ExamHub.tsx`, rewritten; `partMeta.ts` gained a solid `bar`
+colour per Teil):
+- **The run leads.** One band: eyebrow + countdown, the four Teile as a connected timeline (one
+  absolutely-positioned line inset to the first and last tile centre, masked by a `border-surface`
+  ring), then the CTA on its own divided row. This is what removes the s186 duplication of
+  "4 Teile · 52 Min" above four cards each printing their own minutes.
+- **Results live only in Verlauf** (founder amendment): the last 5 runs for the selected Niveau, a
+  row being date · four result segments in exam order · total badge · chevron, whose disclosure
+  holds the four per-Teil percentages. A single-part run leaves three tracks empty and prints "–".
+- **"Modelltest"** replaces "Prüfungssimulation" as the page name (founder amendment), one word,
+  and the `/anwenden` entry card + the nav zone description were renamed with it. Content ids and
+  provenance labels are untouched.
+- **No HubHero** (founder amendment): `h1` + the Niveau sliding-pill switcher (`useSlidingPill`) on
+  one line, full width on a phone.
+- **The countdown** (`settings.examDate`) moved onto this page and retires itself once the date has
+  passed. The A2 zero state states itself once per control; the page-level sentence was dropped.
+**Verification:** the real build driven over a CDP script (no Playwright in this repo) at 1280x900,
+390x844 and 360x640, light + dark, A2 and B2, Verlauf open and closed: 0 px horizontal overflow, no
+console errors, the hub scrolls ~220 px on a phone, which is what a menu does.
+**Docs updated in the same PR:** CLAUDE.md (route name + the one-place-per-result law),
+`docs/areas/PRAKTISCH-NAV.md` (the hub anatomy), `docs/DECISIONS.md` §s188, this file and the prompt
+log. The preview stays in `preview/exam-hub-redesign.html` as the record of the round.
+**Next, if the founder does not redirect:** unchanged from s187 (the queued writing-quality audit,
+then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`). One item
+this session made cheaper: per-Teil exam history now has a real surface to grow into.
+
 **Handoff after session 187 (2026-08-04): the exam polish round + the app-wide dark palette.**
 Founder feedback on the shipped Prüfungsteil (7 numbered points across the session), answered with
 ONE interactive preview and then implemented from their picks. **What shipped:**
@@ -154,64 +182,6 @@ mark a recommendation, the new palette + corners).
 **Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
 open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
 (synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.
-
-**Handoff after session 186 (2026-08-04): the Prüfungssimulation rework, in four merged PRs.**
-Founder: the simulation "should actually feel like an exam with all the lesen, hören, schreiben and
-sprechen modules with a timer and clear instructions"; picks after a preview round
-(`preview/pruefungssimulation-rework.html`): **Option B start page + a Niveau row (A2 to C1),
-Option C answer-sheet runner, quiet outline Zurück/Weiter (dark blue only on submission moments),
-and the Schreiben expand button where useful.**
-**PRs: #791** (the exam) · **#792** (exam chrome) · **#793** (the stage, no page scroll) ·
-**#794** (question always visible, desktop side by side). All squash-merged; deploys green (one
-Supabase run needed a re-run after an `esm.sh` 522 outage, unrelated to the code).
-- **What shipped:** `engine/exam.ts` (level-aware composer + scoring; 3 Texte, 2 Ansagen max 2x,
-  1 voll gebriefte Schreibaufgabe, 1 Sprechen-Szenario über die 1-3-Leiter; Bestanden ab 60 %),
-  `useExamStore` (persisted run: plan ids, answers, Notizen, essay, remaining seconds; a reload
-  resumes mid-part; Sprechen restarts its dialogue with full time, documented), the reworked
-  `ExamHub` (Niveau row, slim full-exam card, four module cards, each startable alone, honest
-  zero states), `MockExamRunner` + parts (Anleitung pages, runbar with amber-under-2-min timer,
-  numbered answer strip, Hören with TTS + Notizen lines, Schreiben with fullscreen dialog +
-  UmlautKeys, embedded Sprechen), and the Ergebnis screen (per-Teil bars, weakest-part Üben CTA,
-  answer review). Writing is scored by `evaluate-writing`'s new **exam mode** (0-100, telc-weighted;
-  `exam_score` persisted, migration 0016) and the result renormalises honestly when no score came
-  back. `progress.mock_exams` syncs the runs (bounded at 100, unknown-column retry covers the
-  deploy window). Tests: `tests/exam.test.ts` (9) + the full suite green; bundle 125 kB.
-- **Exam chrome (founder follow-up, same session):** while a run is on screen the mobile bottom
-  bar is hidden and the header's streak pill + account menu become ONE quiet muted X. It is the
-  only exit (the RunBar X and the Anleitung abort link were removed with it), it confirms through
-  a `danger` dialog mid-exam and closes without one on the result screen. The flag is
-  `useSessionStore.examExit`, a callback rather than a boolean so eager `AppShell` never imports
-  the exam store (bundle held at 125.7 kB). Not the same thing as focus mode, which hides the
-  header too; both are documented in `docs/areas/PRAKTISCH-NAV.md`.
-- **No page scroll inside the exam (founder follow-up):** a running Teil is a STAGE, not a
-  document. `main` becomes `h-exam-stage` tall and every part pins its RunBar, answer strip and
-  actions around one internally scrolling region. Audited by driving the real build at 393x852,
-  375x667 and 360x640: all ten in-exam screens (hub-to-Ergebnis) rest at **0 px** page overflow.
-  The hub itself still scrolls ~150 px on a 667 px phone and is meant to: it is a menu, and the
-  least-scrolling hub in the app (`/anwenden` 237 px, Praktisch 253 px at the same size).
-- **The question tile is never what shrinks (founder follow-up, #794).** Sharing one scroll region
-  buried it under a long text. Now the text (Lesen) and the Notizen sheet (Hören) are the elastic
-  tiles and the question keeps its natural height, verified fully visible for **every** question
-  (9 Lesen + 6 Hören) at all three phone sizes. Three rules make it fit and are load-bearing: no
-  "Aufgabe N von M" eyebrow on the question card (the centred number strip says it), "Teil
-  abschließen" only on the LAST question once everything is answered (it replaces Weiter; the
-  permanent submit row cost every screen ~52 px), and a `gap-1` strip so nine numbers hold one row
-  at 360 px. **Desktop lays the two tiles side by side** (3/5 + 2/5, Schreiben mirrored) and exam
-  chrome additionally hides the sidebar and the Feedback pill there, which overlapped the Weiter
-  button; the header mark becomes a non-clickable `Logo`, since navigating away would end the run.
-  Known limit, accepted: on 375/360-wide phones the reading pane can fall to ~2 lines for the
-  tallest questions (it scrolls; the expand button reads full-screen). Giving it more would mean
-  shrinking the question tile, which is the thing this guarantees.
-- **Content gaps this exposed (PROJECT_REFERENCE backlog):** A2 has NO exam content anywhere (the
-  A2 Niveau pill shows an honest empty state), and C1 Hören has a single audio text, so it tops up
-  from B2.2. Both need an authoring wave before those levels feel native.
-- **Verify live after merge:** run one full B2 exam end to end (Hören audio is device TTS; the
-  Schreiben score needs the deployed function + migration).
-- **Next, if the founder does not redirect:** the **queued writing-task quality audit** below is
-  still the oldest open item. The exam's own next steps, in the order they would pay off: the A2
-  and C1-Hören content waves (`PROJECT_REFERENCE` → CONTENT GAPS), then a Fortschritt tile reading
-  `progress.mock_exams` (the data is synced but nothing plots it yet), then per-Teil exam history.
-  Nothing is half-built: every part of the exam ships complete.
 
 **Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
 shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three

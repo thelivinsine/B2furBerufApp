@@ -3935,3 +3935,38 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `.rname`/`.rsub` were scoped under `.row` so Option C's cards lost their type hierarchy, and the
   A2 state stated "no content" three times over). No app code touched: the founder picks first.
 - **Artifacts (prompt 1):** `preview/exam-hub-redesign.html` · this log
+- **Prompt 2 (verbatim, 2026-08-04):** `go with B but the previous test results should not show up
+  in the first two tiles, they should only be in the verlauf section. Also, get rid of the icon and
+  the shorter header "Prufung", just keep the main header as "Modell Test" in place of
+  "Prufungssimulation".`
+  **Response:** Option B implemented with both amendments (`src/features/exam/ExamHub.tsx`,
+  rewritten). The run band carries no result any more and the "Einzeln üben" rows carry no per-Teil
+  badge, so a past score exists in exactly one place: Verlauf. The HubHero (gradient icon tile +
+  "Prüfung" eyebrow) is gone, leaving the `h1` and the Niveau sliding-pill switcher on one line.
+  **Naming:** shipped as **"Modelltest"**, one word, since German writes the compound closed and a
+  space would be a writing error inside a German-learning product; flagged to the founder as a
+  one-line change if they want the two-word form. The `/anwenden` entry card and the nav zone
+  description were renamed with it, so the page and its entry point carry ONE name; content ids and
+  provenance labels were not touched.
+  **Also in this change:** the exam countdown (`settings.examDate`) moved onto this page and
+  retires itself once the date has passed; Verlauf shows the last 5 runs for the selected Niveau
+  (date · four result segments · total badge) with a disclosure holding the four per-Teil
+  percentages, and a single-part run honestly leaves three tracks empty; the A2 zero state states
+  itself once per control instead of three times per screen; `partMeta.ts` gained a solid `bar`
+  colour per Teil for the Verlauf segments.
+  **Verification:** the real build driven through a CDP script (no Playwright in this repo) at
+  1280x900, 390x844 and 360x640, light + dark, B2 and A2, Verlauf open and closed: 0 px horizontal
+  overflow, no console errors, `h1` reads "Modelltest" on every screen. One defect caught and fixed
+  mid-round: a JSX comment placed between `{expanded && (` and its element broke the build, and the
+  disclosure's label-left/value-right rows were restacked as label-over-value because a wide column
+  pulled the pair apart.
+  **Gates:** typecheck · lint 0 errors (77 pre-existing warnings) · 551 tests · build ·
+  check:bundle 126.0 kB · check:contrast.
+  **Documentation:** `CLAUDE.md` (route name + the one-result-one-place law),
+  `docs/areas/PRAKTISCH-NAV.md` (the hub anatomy), `docs/DECISIONS.md` §s188,
+  `docs/PROJECT_STATUS.md` (`_Last updated_` rewritten to s188, new handoff, s186 handoff archived
+  to `docs/archive/status-log/…W32.md`), and this log.
+- **Artifacts (prompt 2):** `src/features/exam/ExamHub.tsx` · `src/features/exam/partMeta.ts` ·
+  `src/features/anwenden/AnwendenHub.tsx` · `src/components/layout/nav-items.ts` · `CLAUDE.md` ·
+  `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log

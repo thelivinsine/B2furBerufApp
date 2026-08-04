@@ -1428,3 +1428,36 @@ Founder feedback on the shipped Prüfungsteil, then four picks off
 - **Everything the founder reads is English** (they had asked before): previews, artifacts, chat,
   PRs, docs. Only the copy that IS app copy inside a mockup stays German. Written into CLAUDE.md
   and the design skill so it stops being a per-session reminder.
+
+## s188 (2026-08-04, founder) - the Modelltest hub: the run leads, results live in one place
+
+Founder prompt: "re-do this page", on a dark screenshot of `/exam` as s186 shipped it. Three
+options were previewed (`preview/exam-hub-redesign.html`, artifact
+https://claude.ai/code/artifact/49f4ec01-73b4-42a3-85a4-47b339ca9d06): A "Stand zuerst" (a
+readiness card leads), B "Prüfungstag" (the run leads), C "Vier Karten" (today's skeleton, given
+weight). The founder picked **B**, with two amendments.
+
+- **The run leads the page.** One band that visibly CONTAINS the four Teile as a timeline, then
+  "Einzeln üben", then Verlauf. This is what removed the duplicated minutes: s186 printed
+  "4 Teile · 52 Min" above four cards that each stated their own length, which is the same fact
+  twice on one screen.
+- **A result is shown in ONE place: Verlauf** (founder amendment). Not on the run band, not on the
+  part rows. The consequence is that a first visit shows a page with no numbers at all, which is
+  correct: there is nothing to report yet.
+- **The page is named "Modelltest"** (founder amendment, replacing "Prüfungssimulation"), and the
+  `/anwenden` card that leads to it was renamed with it, because an entry point and its page may
+  not carry two names for one thing. Written as ONE word, the way German compounds: "Modell Test"
+  would be a spacing error inside a German-learning product. The five-slot nav zone is still
+  "Prüfung", so no nav mark changed.
+- **No HubHero here** (founder amendment): the gradient icon tile and the "Prüfung" eyebrow are
+  gone, leaving the `h1` and the Niveau switcher on one line. The eyebrow named the nav zone the
+  page already sits in, and the hero cost a screen band before anything the learner came for.
+- **Niveau is a switcher, not a button row.** The shipped sliding-pill mechanism
+  (`useSlidingPill`), which is one less style in the app than the four floating buttons under a
+  "NIVEAU" label that it replaces.
+- **The countdown moved onto the page it belongs to.** It existed only in Fortschritt; the hub is
+  where a learner decides whether to sit a full run, so the days-to-exam line sits in the band, and
+  retires itself once the date has passed.
+- **The A2 zero state states itself once per control.** The band in its CTA slot, each row in its
+  content line, and no page-level sentence: "Wähle B1, B2 oder C1" was pointing at a switcher
+  sitting directly above it.

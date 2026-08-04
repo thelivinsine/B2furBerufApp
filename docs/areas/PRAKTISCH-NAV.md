@@ -26,8 +26,35 @@ signpost, Bibliothek = stack of three books, Prüfung = Absolventenhut (orange c
 founder pick D s183; it replaced the target rings, the bar's ONLY outline mark among filled
 two-tone shapes, which is why it read thinner than its neighbours), Fortschritt = Pokal
 (trophy/cup); the pencil-on-the-diagonal Schreiben mark lives on inside the hub card.
-The Prüfung hub itself (`/anwenden`) is 3 cards → Sprechen / Schreiben / Prüfungssimulation (the
-exam card is NOT called "Prüfung": a card may not carry the name of the page it sits on).
+The Prüfung hub itself (`/anwenden`) is 3 cards → Sprechen / Schreiben / **Modelltest** (the
+exam card is NOT called "Prüfung": a card may not carry the name of the page it sits on). The exam
+card was renamed with its page in s188, so the entry point and the page carry ONE name.
+
+### The Modelltest hub (`/exam` at rest, redesign s188)
+
+Founder pick "Prüfungstag" from `preview/exam-hub-redesign.html`, plus two amendments they made
+when picking. Anatomy, top to bottom:
+- **Header:** the `h1` "Modelltest" and the Niveau switcher on ONE line. No HubHero: the icon tile
+  and the "Prüfung" eyebrow went with the redesign (the eyebrow repeated the nav zone the page
+  already sits in). Niveau is the shipped sliding-pill switcher (`useSlidingPill`, one always
+  mounted pill), full width on a phone, content-sized from `sm` up.
+- **The run band:** eyebrow + countdown, then the four Teile as a connected timeline (tinted tile,
+  label, minutes), then the CTA on its own divided row. The timeline is what removed the duplicated
+  minutes the s186 layout printed twice ("4 Teile · 52 Min" above four cards each stating their
+  own). The connector is ONE absolutely-positioned line inset to the first and last tile centre
+  (`left-[12.5%] right-[12.5%]`), masked by a `border-surface` ring on each tile; per-node borders
+  would stop mid-row at the outer nodes.
+- **"Einzeln üben":** the four Teile as rows, each starting that part alone.
+- **Verlauf:** the last 5 runs for the selected Niveau. A row is date · four result segments in
+  exam order · total badge · chevron, and its disclosure holds the four per-Teil percentages as
+  stacked label-over-value cells. A single-part run leaves the other three tracks empty and prints
+  "–" in the disclosure, which is the honest picture of what was actually sat.
+- **Results appear ONLY in Verlauf** (founder s188): not on the band, not on the part rows.
+- **Zero states:** an unservable Niveau (A2) states "Noch keine Inhalte" once per control (the band
+  in its CTA slot, each row in its content line) and Verlauf simply isn't rendered. The page-level
+  "Wähle B1, B2 oder C1" sentence was dropped: the switcher that fixes it sits directly above.
+- The countdown comes from `settings.examDate` and retires itself once the date has passed, so it
+  can never sit at "0 Tage" forever.
 
 **Two states hide the bar, and they are NOT the same** (do not merge them):
 - **Focus mode** (`useSessionStore.focusMode`, route-gated to `/session`, `/revision`, `/welt`):

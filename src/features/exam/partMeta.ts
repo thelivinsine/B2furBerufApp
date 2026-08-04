@@ -2,18 +2,21 @@ import { BookOpen, Headphones, Mic, PenLine, type LucideIcon } from "lucide-reac
 import type { MockPartId } from "@/engine/exam";
 
 /**
- * Shared look + copy for the four exam parts (hub cards, Anleitung pages,
+ * Shared look + copy for the four exam parts (hub rows, Anleitung pages,
  * runner chrome). Tints come from the sanctioned gradient families
  * (teal/amber/blue/cyan); Schreiben and Sprechen echo their route colours.
+ * `bar` is the solid version of the same hue, for the Verlauf result segments:
+ * a 6 px bar needs the full colour, not the 10 % tile wash.
  */
 export const PART_META: Record<
   MockPartId,
-  { icon: LucideIcon; tile: string; ink: string; desc: string; instructions: string }
+  { icon: LucideIcon; tile: string; ink: string; bar: string; desc: string; instructions: string }
 > = {
   lesen: {
     icon: BookOpen,
     tile: "bg-teal-500/10 dark:bg-teal-400/15",
     ink: "text-teal-700 dark:text-teal-300",
+    bar: "bg-teal-500 dark:bg-teal-400",
     desc: "3 Texte mit Aufgaben",
     instructions:
       "Sie lesen drei Texte. Wählen Sie zu jeder Aufgabe die richtige Antwort. Über die Nummernleiste können Sie Aufgaben überspringen und später zurückkommen.",
@@ -22,6 +25,7 @@ export const PART_META: Record<
     icon: Headphones,
     tile: "bg-amber-500/10 dark:bg-amber-400/15",
     ink: "text-amber-700 dark:text-amber-400",
+    bar: "bg-amber-500 dark:bg-amber-400",
     desc: "2 Ansagen · Notizen",
     instructions:
       "Sie hören zwei Ansagen. Notieren Sie beim Hören die wichtigen Angaben und lösen Sie danach die Aufgaben. Sie können jede Ansage maximal zweimal hören.",
@@ -30,6 +34,7 @@ export const PART_META: Record<
     icon: PenLine,
     tile: "bg-primary/10 dark:bg-primary/15",
     ink: "text-primary",
+    bar: "bg-primary",
     desc: "1 Aufgabe · voller Brief",
     instructions:
       "Sie schreiben einen Text zu der Aufgabe. Bearbeiten Sie alle Inhaltspunkte und achten Sie auf Anrede und Länge. Am Ende bewertet eine KI Ihren Text.",
@@ -38,6 +43,7 @@ export const PART_META: Record<
     icon: Mic,
     tile: "bg-cyan-500/10 dark:bg-cyan-400/15",
     ink: "text-cyan-700 dark:text-cyan-300",
+    bar: "bg-cyan-500 dark:bg-cyan-400",
     desc: "1 Gespräch mit Partner",
     instructions:
       "Sie lösen eine Aufgabe im Gespräch mit einer Partnerin oder einem Partner. Reagieren Sie auf Vorschläge und finden Sie gemeinsam eine Lösung. Am Ende bewerten Sie sich selbst anhand des Prüfungsrasters.",
