@@ -26,8 +26,12 @@ export function SprechenPart({ run }: { run: MockExamRun }) {
   if (!examSet || !scenario) return null;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3">
-      <RunBar run={run} showTimer={false} />
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+      <div className="shrink-0">
+        <RunBar run={run} showTimer={false} />
+      </div>
+      {/* The dialogue grows turn by turn, so it scrolls inside the stage. */}
+      <div className="slim-scrollbar min-h-0 flex-1 overflow-y-auto">
       <ExamRunner
         examSet={examSet}
         scenario={scenario}
@@ -35,6 +39,7 @@ export function SprechenPart({ run }: { run: MockExamRun }) {
         embedded
         onFinish={(pct) => completePart({ pct })}
       />
+      </div>
     </div>
   );
 }

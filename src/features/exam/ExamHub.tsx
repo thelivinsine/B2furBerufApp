@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, ChevronRight, Clock, Play } from "lucide-react";
+import { GraduationCap, ChevronRight, Play } from "lucide-react";
 import {
   HUB_LEVELS,
   MOCK_PART_ORDER,
@@ -163,11 +163,12 @@ export function ExamHub() {
                     <p className={cn("font-semibold", !canStart && "text-muted-foreground")}>
                       {PART_LABEL[part]}
                     </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {canStart ? meta.desc : "Noch keine Inhalte"}
-                    </p>
+                    {/* Content and length on ONE line: two stacked muted lines
+                        cost a card row each and said one thing between them. */}
                     <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-                      {PART_MINUTES[part]} Min
+                      {canStart
+                        ? `${meta.desc} · ${PART_MINUTES[part]} Min`
+                        : "Noch keine Inhalte"}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
@@ -197,10 +198,6 @@ export function ExamHub() {
         </p>
       )}
 
-      <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-        <Clock className="h-3.5 w-3.5" /> Jeder Teil läuft mit eigenem Timer, wie in der echten
-        Prüfung.
-      </p>
     </div>
   );
 }

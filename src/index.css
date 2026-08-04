@@ -427,6 +427,19 @@ input:-webkit-autofill {
   .pb-safe-2 {
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
   }
+  /* Exam stage (s186, founder: "there should not be any page scroll here. only
+     internal scrolling"). A running Prüfungsteil is exactly the room left under
+     the sticky header (64px + safe area), so its chrome (RunBar, answer strip,
+     action buttons) stays pinned and the elastic region scrolls INSIDE. Height
+     only, never `overflow: hidden`: when the mobile keyboard opens it shrinks
+     the visual viewport, and the browser still needs to scroll the focused
+     field into view. */
+  .h-exam-stage {
+    /* 4rem header + its 1px bottom border + the safe area above it. The border
+       is not a detail: leaving it out overflowed the page by exactly 1px, which
+       is still a scrollbar. */
+    height: calc(100dvh - 4rem - 1px - env(safe-area-inset-top));
+  }
   .pb-nav {
     /* Bottom bar = 63px icon rail + safe area (the old name strip was removed).
        Keep a comfortable gap so content never sits under the bar. */

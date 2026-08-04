@@ -88,11 +88,15 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
   if (!task) return null;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3">
-      <RunBar run={run} />
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+      <div className="shrink-0">
+        <RunBar run={run} />
+      </div>
 
-      <Card>
-        <CardContent className="p-4">
+      {/* The Aufgabe takes at most a third of the stage and scrolls inside
+          (founder s186: no page scroll). The expand button reads it in full. */}
+      <Card className="max-h-[34%] shrink-0 overflow-hidden">
+        <CardContent className="slim-scrollbar h-full overflow-y-auto p-4">
           <div className="flex items-start justify-between gap-2">
             <p className="text-sm font-bold text-primary">Aufgabe</p>
             <button
@@ -117,17 +121,20 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-4">
+      {/* The elastic element: the field takes exactly the room left over and
+          scrolls internally once the text outgrows it. `resize-none` because a
+          hand-dragged textarea would push the page past one viewport again. */}
+      <Card className="flex min-h-0 flex-1 flex-col">
+        <CardContent className="flex min-h-0 flex-1 flex-col p-4">
           <textarea
             ref={textareaRef}
             value={run.essay}
             onChange={(e) => setEssay(e.target.value)}
             aria-label="Dein Text"
             placeholder="Schreibe hier deinen Text …"
-            className="min-h-[38dvh] w-full resize-y bg-transparent text-sm leading-relaxed outline-none"
+            className="slim-scrollbar min-h-0 w-full flex-1 resize-none bg-transparent text-sm leading-relaxed outline-none"
           />
-          <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2.5">
+          <div className="mt-2 flex shrink-0 items-center justify-between gap-2 border-t border-border pt-2.5">
             <span className="text-xs tabular-nums text-muted-foreground">
               {words} {words === 1 ? "Wort" : "Wörter"}
               {task.words ? ` · Ziel ca. ${task.words}` : ""}
@@ -137,6 +144,7 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
         </CardContent>
       </Card>
 
+      <div className="shrink-0 space-y-2">
       <Button variant="gradient" className="w-full" onClick={() => void submit()} disabled={submitting}>
         {submitting ? (
           <>
@@ -163,6 +171,7 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
       <p className="text-center text-xs text-muted-foreground">
         Dein Text wird zur Auswertung an eine KI gesendet.
       </p>
+      </div>
 
       <Dialog open={taskOpen} onOpenChange={setTaskOpen}>
         <DialogContent className="gap-3">

@@ -120,7 +120,9 @@ function PartFooter({
   const completePart = useExamStore((s) => s.completePart);
   const open = total - answeredCount;
   return (
-    <div className="space-y-2">
+    // Pinned below the scrolling middle: the way on must never be somewhere
+    // the learner has to scroll to find.
+    <div className="shrink-0 space-y-2 pt-1">
       <div className="flex gap-2.5">
         <Button
           variant="outline"
@@ -166,50 +168,54 @@ export function LesenPart({ run }: { run: MockExamRun }) {
   const answeredCount = questions.filter((x) => run.answers[x.check.id]).length;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3">
-      <RunBar run={run} />
-      <AnswerStrip
-        total={questions.length}
-        answered={(ix) => !!run.answers[questions[ix].check.id]}
-        active={qIx}
-        onJump={setQIx}
-      />
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+      <div className="shrink-0 space-y-3">
+        <RunBar run={run} />
+        <AnswerStrip
+          total={questions.length}
+          answered={(ix) => !!run.answers[questions[ix].check.id]}
+          active={qIx}
+          onJump={setQIx}
+        />
+      </div>
 
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-xs text-muted-foreground">
-                Text {textIndex + 1} von {run.plan.lesen.length} · {kindLabel(q.text.kind)}
-              </p>
-              <p className="mt-0.5 text-sm font-semibold leading-snug">{q.text.title}</p>
+      {/* The one elastic region: text + question scroll together here, so the
+          page itself never scrolls (founder s186). */}
+      <div className="slim-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">
+                  Text {textIndex + 1} von {run.plan.lesen.length} · {kindLabel(q.text.kind)}
+                </p>
+                <p className="mt-0.5 text-sm font-semibold leading-snug">{q.text.title}</p>
+              </div>
+              {/* Fullscreen (founder s186): the same expand affordance Schreiben
+                  has, for reading the whole text with room. */}
+              <button
+                type="button"
+                onClick={() => setTextOpen(true)}
+                aria-label="Text vergrößern"
+                title="Text vergrößern"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
             </div>
-            {/* Fullscreen (founder s186): the same expand affordance Schreiben
-                has, for reading the whole text with room. */}
-            <button
-              type="button"
-              onClick={() => setTextOpen(true)}
-              aria-label="Text vergrößern"
-              title="Text vergrößern"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-            >
-              <Maximize2 className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="slim-scrollbar mt-2 max-h-[32dvh] overflow-y-auto">
-            <p className="whitespace-pre-line text-sm leading-relaxed">{q.text.de}</p>
-          </div>
-        </CardContent>
-      </Card>
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">{q.text.de}</p>
+          </CardContent>
+        </Card>
 
-      <motion.div
-        key={q.check.id}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.15 }}
-      >
-        <QuestionCard run={run} q={q} ordinal={qIx + 1} total={questions.length} />
-      </motion.div>
+        <motion.div
+          key={q.check.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+        >
+          <QuestionCard run={run} q={q} ordinal={qIx + 1} total={questions.length} />
+        </motion.div>
+      </div>
 
       <PartFooter
         run={run}
@@ -261,15 +267,18 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
   const answeredCount = questions.filter((x) => run.answers[x.check.id]).length;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3">
-      <RunBar run={run} />
-      <AnswerStrip
-        total={questions.length}
-        answered={(ix) => !!run.answers[questions[ix].check.id]}
-        active={qIx}
-        onJump={setQIx}
-      />
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+      <div className="shrink-0 space-y-3">
+        <RunBar run={run} />
+        <AnswerStrip
+          total={questions.length}
+          answered={(ix) => !!run.answers[questions[ix].check.id]}
+          active={qIx}
+          onJump={setQIx}
+        />
+      </div>
 
+      <div className="slim-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto">
       <Card>
         <CardContent className="flex items-center gap-3 p-4">
           <button
@@ -338,6 +347,7 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
       >
         <QuestionCard run={run} q={q} ordinal={qIx + 1} total={questions.length} />
       </motion.div>
+      </div>
 
       <PartFooter
         run={run}

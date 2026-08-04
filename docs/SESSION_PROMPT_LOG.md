@@ -3699,3 +3699,32 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompt 5):** `src/store/useSessionStore.ts` · `src/components/layout/AppShell.tsx` ·
   `src/features/exam/MockExamRunner.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 6 (verbatim, 2026-08-04, with a screenshot of the exam's Schreiben part scrolling):**
+  `there should not be any page scroll here. only internal scrolling` · follow-up mid-turn:
+  `check for such instances across the prufung simulation screens`
+  **Response:** the running exam is now a **stage** rather than a document. `main` gets
+  `h-exam-stage` while exam chrome is on (`100dvh - 4rem - 1px - safe-top`; the 1px is the header's
+  bottom border, and leaving it out overflowed by exactly 1px, which is still a scrollbar) and each
+  part pins its RunBar, answer strip and action buttons around ONE `flex-1 min-h-0 overflow-y-auto`
+  region. Lesen/Hören scroll text + question together (the text card's nested `max-h-[32dvh]` went,
+  no nested scrollers), Schreiben caps the Aufgabe at 34 % with its own scroll and gives the field
+  the rest (`resize-none`: a hand-dragged textarea would re-break the viewport), Sprechen scrolls
+  the dialogue, Anleitung and Ergebnis scroll themselves (inner `min-h-full` wrapper so a tall
+  Sprechen briefing is not clipped by `justify-center`). Height only, never `overflow:hidden`, so
+  the mobile keyboard can still scroll the field into view. Registration moved to `useLayoutEffect`
+  so the stage swap is paint-atomic instead of showing one frame of the scrolling layout.
+  **Audited every screen at three phone sizes** (393x852, 375x667, 360x640) by driving the real
+  build: hub, four Anleitung pages, four Teile, Ergebnis. All ten in-exam screens rest at **0 px**
+  page overflow at every size (before: the exam Schreiben part overflowed on every phone).
+  **The hub is the one screen still scrolling** (95-151 px on a 667 px phone). Left scrolling on
+  purpose: it is a menu, not a Teil, and it is the LEAST scrolling hub in the app, measured at the
+  same size against `/anwenden` 237 px, Praktisch 253 px, Fortschritt 5562 px, Bibliothek 11688 px.
+  Two things did come off it, justified by the microcopy rules rather than by the pixels: the
+  "Jeder Teil läuft mit eigenem Timer" filler line (the Anleitung already says it) and the module
+  cards' second muted line (content and length now share one). That alone took the hub from 203 to
+  151 px on an SE. Say the word if it should fit exactly; that means shrinking the Option B cards.
+  Gates: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB.
+- **Artifacts (prompt 6):** `src/index.css` (`.h-exam-stage`) · `src/components/layout/AppShell.tsx` ·
+  `src/features/exam/MockExamRunner.tsx` · `src/features/exam/McParts.tsx` ·
+  `src/features/exam/SchreibenPart.tsx` · `src/features/exam/SprechenPart.tsx` ·
+  `src/features/exam/ExamHub.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · this log
