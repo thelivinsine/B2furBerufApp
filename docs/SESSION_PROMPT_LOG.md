@@ -3386,6 +3386,51 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompts 3-5):** `src/features/session/ReadingBlock.tsx` · `src/data/texts.ts` ·
   `preview/notizen-a-r2.html` (new) · `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` ·
   `docs/reports/CONTENT_AUDIT_2026-07-30.md` · this log.
+  **All six commits shipped as PR #785, squash-merged `863b7d4`** (`c7408c4` P9 · `97ea3bf` P7 ·
+  `6ef53c5` P5 · `dca9f05` P4 · `d9db84e` P3 · `d2d833e` docs · `5ab1a97` the Notizen step ·
+  `fea1d00` the merge of `main`).
+  **The merge was not clean, and the reason matters.** PRs #786 and #787 (session 185b, the database
+  architecture audit) landed on `main` while this branch's CI ran, so GitHub refused the merge. No
+  code overlap: the three conflicts were `CLAUDE.md` (auto-merged), `PROJECT_STATUS.md` and this log.
+  Both sessions' records were KEPT rather than one side taken, and since both branches had labelled
+  themselves "session 185", the handoffs and log headings are disambiguated **185a** (this one) and
+  **185b**. Gates were re-run on the merged tree, including the `lint:migrations` gate #786 added:
+  542 tests across 47 files, bundle 124.7 kB of 400 kB.
+
+- **Prompt 6 (verbatim, 2026-08-04):** `the other session is finished`
+  **Response:** informational, so nothing was built. Confirmed `main` was settled with both sessions
+  in and this one last (`863b7d4`), the branch clean and reset, and nothing outstanding. Noted that
+  the 185a/185b split in the two records now describes two CLOSED sessions rather than one in
+  flight, and restated what is left on the content side: P10 (0.4% verified, the audit's plan is the
+  ~320 highest-traffic items first), the 12 verified nouns awaiting a `numerus` at their next
+  review, and the writing-task quality audit still queued from s181.
+- **Artifacts (prompt 6):** none (status check in chat).
+
+- **Prompt 7 (verbatim, 2026-08-04):** `document the session`
+  **Response:** audited what was actually missing rather than restating the entries already written
+  during the session, and found four gaps.
+  (1) **A stale count this session created.** `docs/areas/CONTENT.md` still described the text bank
+  as "42 texts / 126 checks" and "the six `tx_c1_*` texts" as the only long band, which the eight
+  new B2 texts had falsified. It reads 50 texts / 150 checks and **14 exam-length texts** now, and
+  the file's freshness line moved from "counts as of s177" to s185, verified against
+  `pnpm lint:content`.
+  (2) **No paper trail on the PR itself.** The prompt-3-to-5 entry was written before the PR
+  existed, so it recorded no number and no merged SHA. It now carries #785, `863b7d4`, all eight
+  commit SHAs, and the conflict resolution, which is the part a future session would otherwise have
+  to reconstruct from git.
+  (3) **`docs/DECISIONS.md` had nothing from this session**, though it had the parallel session's
+  retention entry. Two decisions belong there because both will look like bugs later: **a new
+  content rule never edits a human-verified row** (so lint prints 12 warnings on a clean tree by
+  design), and **the Notizen step's settled shape**, with the founder's wording for each of the five
+  changes so it is not "improved" back.
+  (4) **"Resume here" still led with the closed audit.** It leads with the queued writing-task
+  quality audit now, with P10 and the 12 rows named as the smaller follow-ups.
+  Re-audited the rest and found nothing further stale: `PROJECT_FOUNDATION.md` covers architecture
+  and infra (neither moved on this branch), `docs/areas/COMMANDS.md` gained no script from this
+  session, and `PROJECT_REFERENCE.md`'s backlog is unchanged.
+  Gates: docs-only.
+- **Artifacts (prompt 7):** `docs/areas/CONTENT.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md`
+  · this log.
 
 ## Session 185b (2026-08-04) - branch `claude/database-architecture-audit-x4cdmu`
 

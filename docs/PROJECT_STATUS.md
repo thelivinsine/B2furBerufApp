@@ -125,34 +125,15 @@ review pass; see `strategy/DATA_GOVERNANCE.md`). The full picture of what the ba
 cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178).
 
 ## Open founder action items
-Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
-done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
-- [x] ~~Paste `supabase/migrations/0013_admins_table.sql`.~~ **APPLIED 2026-07-27** by the founder in
-      the SQL editor, without the lock-out guard firing (it raises rather than swapping the gate when
-      the seed finds no account, so a clean run means `public.admins` is seeded). Audit F1 closed:
-      the admin gate is now a user-id table, not an email claim. Live confirmation that `/admin`
-      still opens is the founder's last check; the rollback to the 0008 email gate sits in a comment
-      at the foot of the migration if it ever does not.
-- [x] ~~Paste `supabase/migrations/0014_writing_insight_en.sql` into the SQL editor.~~ **APPLIED
-      2026-07-31 by CI**, along with 0010, after the founder added `SUPABASE_DB_PASSWORD`. Migrations
-      now ship themselves on merge; **there is no SQL to paste any more.**
+Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`, and the ones that were ticked off
+in this list live in `docs/archive/PROJECT_STATUS_ARCHIVE.md` with their dates. The s147 Satzlabor
+redeploy is done (s150: all three AI functions deployed on the Gemini-primary cascade,
+`GEMINI_API_KEY` set). Still open:
 - [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
       is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
       `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
       then pasting the two branded templates. Full steps: `docs/reference/auth-emails/README.md`.
-- [x] ~~Enable "Confirm email".~~ **DONE 2026-07-27**, closing half of audit F1 (nobody can register
-      an address they do not own). Required the `/auth/confirm` work in the s174 handoff.
-- [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
-      Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
-      `PROJECT_FOUNDATION.md`.
-- [x] ~~Decide where Anwenden lives on MOBILE (s182, audit P4).~~ **DECIDED 2026-08-01 by the
-      founder:** "just move schreiben to anwenden and rename anwenden as prufung." Shipped in s182,
-      so the bar stays at five slots and now reads Praktisch · Bibliothek · **Prüfung** ·
-      Fortschritt · Einstellungen, with Sprechen, Schreiben and Prüfungssimulation inside the hub.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
-- [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
-      **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
-      live).
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
       now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
@@ -163,6 +144,13 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
+is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:
+**P10** itself (0.4% human-verified; the audit's plan is the ~320 highest-traffic items first), the
+**12 verified nouns** that need a `numerus` at their next review (`pnpm lint:content` names them
+every run, by design, see `docs/DECISIONS.md` §s185), and a live check of the **Notizen step** in a
+real listening exercise, which is the one thing that could only be verified by rendering.
 
 **Start with this: the queued quality audit.** The founder closed s181 by settling two open items and
 adding one task:
@@ -181,7 +169,8 @@ adding one task:
   prioritised fix list, like the s178 content audit.
 
 **Handoff after session 185a (2026-08-04): the content-audit backlog, minus P10.** Founder, after
-being shown what was left: "go ahead with all the items except for the p10."
+being shown what was left: "go ahead with all the items except for the p10." Shipped as PR **#785**,
+squash-merged `863b7d4`, after resolving a docs-only conflict with the parallel 185b branch.
 - **Closed outright: P9, P7, P5, P4.** P9 gave every noun a `plural` or a `numerus` and folded the
   two `pron` schemes into one documented, linted scheme. P7 re-levelled 108 items off the advanced
   bands and froze the rare-compound count with a linter ratchet. P5 took EVERY grammar topic to 10
