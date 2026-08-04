@@ -102,24 +102,22 @@ $$;
 revoke all on function public.purge_transform_cache(integer) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------------
--- 4. Learner-text retention: BUILT, NOT SCHEDULED. Founder decision required.
+-- 4. Learner-text retention: 2 YEARS (founder decision, 2026-08-04).
 --
---    The audit flagged indefinite retention of learner writing (finding F11 of
---    the 2026-07-27 security audit). It cannot simply be switched on, because
---    the published privacy policy currently promises the opposite:
---
---      "Schreibeinreichungen und ihr KI-Feedback bleiben gespeichert, damit
---       dein Analyseverlauf vollstaendig bleibt."
---
---    Deleting learner text on a timer would contradict that sentence, and the
---    learner's own Verlauf is the feature that promise describes. So this
---    function exists, is tested by being callable by hand, and is scheduled
---    only if the founder decides to shorten retention AND the privacy policy is
---    updated in the same change.
+--    This closes finding F11 of the 2026-07-27 security audit (learner text was
+--    kept indefinitely). The founder was asked directly, because the published
+--    privacy policy promised the opposite in as many words, and chose a 2-year
+--    window; src/features/legal/PrivacyPolicy.tsx was rewritten to match IN THE
+--    SAME CHANGE. A retention timer and the copy that documents it always ship
+--    together: never schedule this without checking the policy still describes
+--    what the job does.
 --
 --    It NULLS the text columns rather than deleting rows, so the daily/monthly
 --    AI limits, the cache bookkeeping and the admin aggregates keep working on
---    history that no longer holds anyone's prose.
+--    history that no longer holds anyone's prose. What survives in Verlauf is
+--    the evaluation itself (date, theme, weakness, tip), which is what the
+--    Entwicklung curve is built from, so the learner keeps their progress
+--    record and loses only the old raw text.
 -- ---------------------------------------------------------------------------
 create or replace function public.purge_old_learner_text(p_days integer default 730)
 returns integer
@@ -151,7 +149,7 @@ $$;
 revoke all on function public.purge_old_learner_text(integer) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------------
--- 5. Schedule the two safe jobs.
+-- 5. Schedule the retention jobs.
 --    pg_cron may not be enabled on the project, and a hard failure here would
 --    fail the migration step of the deploy workflow, which runs BEFORE the Edge
 --    Function deploys and would therefore block those too. So the whole block
@@ -176,9 +174,13 @@ begin
     perform cron.unschedule('genauly_purge_transform_cache');
   exception when others then null;
   end;
+  begin
+    perform cron.unschedule('genauly_purge_learner_text');
+  exception when others then null;
+  end;
 
-  -- Sundays 03:17 UTC and 03:42 UTC. Off-peak, and not on the hour, so they do
-  -- not pile onto whatever else the platform runs at :00.
+  -- Sundays, off-peak and not on the hour, so they do not pile onto whatever
+  -- else the platform runs at :00. Spaced so they never overlap each other.
   perform cron.schedule(
     'genauly_purge_stale_guests',
     '17 3 * * 0',
@@ -189,8 +191,13 @@ begin
     '42 3 * * 0',
     $job$select public.purge_transform_cache(60)$job$
   );
+  perform cron.schedule(
+    'genauly_purge_learner_text',
+    '7 4 * * 0',
+    $job$select public.purge_old_learner_text(730)$job$
+  );
 
-  raise notice 'retention jobs scheduled (guests 90d, transform cache 60d)';
+  raise notice 'retention jobs scheduled (guests 90d, transform cache 60d, learner text 730d)';
 exception
   when others then
     raise warning 'pg_cron unavailable (%), retention functions installed but NOT scheduled. Enable pg_cron under Database -> Extensions, then re-run this migration.', sqlerrm;

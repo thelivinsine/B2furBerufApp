@@ -1,9 +1,9 @@
 # Database architecture audit — 2026-08-04 (session 185)
 
-> **Status (same session):** the founder approved the four small fixes and they shipped. R3, R4
-> (partly), R1 and R6 are **fixed below**; R2 and R5 remain open by design, and the learner-text
-> half of R4 is **blocked on a founder decision** (the privacy policy currently promises the
-> opposite). Each finding carries its own status line.
+> **Status (same session):** the founder approved the four small fixes and they shipped, then
+> answered the one open question by choosing a **2-year** retention window for learner writing, so
+> R4 shipped whole and audit finding **F11 is closed**. R3, R4, R1 and R6 are **fixed below**; R2
+> and R5 remain open by design. Each finding carries its own status line.
 
 Prompted by the founder's concern that "the database architecture is concerningly linear."
 Scope: the full Supabase layer — all 14 migrations, the 5 Edge Functions, the client sync
@@ -182,13 +182,18 @@ F11, makes the 0010 evidence real, and flattens all three growth curves at once.
   has no `prompt_version` column, the prompt version is baked into the hash key, so
   "never reused" is the workable criterion and `hits = 0` states it exactly.) No personal
   data is involved.
-- (b) **BUILT BUT NOT SCHEDULED, founder decision required.** `purge_old_learner_text()`
-  exists and nulls the text columns (keeping rows so limits and aggregates still work), but
-  scheduling it would contradict the published privacy policy, which promises the opposite in
-  as many words: *"Schreibeinreichungen und ihr KI-Feedback bleiben gespeichert, damit dein
-  Analyseverlauf vollständig bleibt."* That promise describes the learner's own Verlauf, a
-  real feature. Turning the job on is therefore a product decision plus a policy edit in the
-  same change, not a maintenance task. **Audit F11 stays open until then.**
+- (b) **Done, at 2 years (founder decision, same session). Audit F11 is closed.** The
+  question could not be answered from the code, because the published privacy policy
+  promised the opposite in as many words (*"Schreibeinreichungen und ihr KI-Feedback bleiben
+  gespeichert, damit dein Analyseverlauf vollständig bleibt"*), and that promise describes
+  the Verlauf, a real feature. Asked directly, the founder chose a 2-year window.
+  `purge_old_learner_text(730)` runs Sundays 04:07 UTC and NULLS the text columns rather than
+  deleting rows, so the AI limits, cache bookkeeping and admin aggregates keep working. What
+  survives in Verlauf is the evaluation itself (date, theme, weakness, tip), which is what the
+  Entwicklung curve is built from: the learner loses the old raw text, never their progress
+  record. The privacy policy was rewritten in the same change to state the 2-year rule and
+  what survives it. **Rule to keep: a retention timer and the copy documenting it ship
+  together, and a conflict between them is never resolved by quietly editing the copy.**
 
 Because a job is now scheduled, `admin_gdpr_evidence().retention_scheduled` (migration 0010)
 reports `true` for the first time, which is the evidence that probe was written to collect.
@@ -259,7 +264,7 @@ passes, and a scratch file carrying all six violations fails with all six named.
 | 2 | Retention jobs: stale guests, dead cache rows (R4 a+c) | Small-medium | **Done, s185** |
 | 3 | Cap `daily_xp` / `active_days` to ~400 days (R1) | Small | **Done, s185** |
 | 4 | Idempotency lint for migrations (R6) | Small | **Done, s185** |
-| 2b | Learner-text retention (R4 b, audit F11) | Small | **Blocked:** needs a founder decision + a privacy-policy change |
+| 2b | Learner-text retention at 2 years (R4 b, audit F11) | Small | **Done, s185** (founder decision) |
 | 5 | Split `srs` into a per-card table (R1+R2) | Medium | Open, before serious growth |
 | 6 | Rollup table for admin analytics (R5) | Medium | Open, when the cockpit slows |
 
@@ -267,10 +272,11 @@ Items 1–4 were independent and low-risk, and together they removed every *sile
 mode found. Item 5 is the one real schema evolution this architecture will eventually need;
 everything else about the "linear" design can stay linear on purpose.
 
-## The one open question for the founder
+## What is left, and when it will matter
 
-**Should learner writing be kept forever?** Today it is, and the privacy policy promises
-exactly that, so nothing was changed. Keeping it is defensible (the Verlauf is a real
-feature and the data is the learner's own, protected by owner-only RLS) and it is also the
-largest and most sensitive data the product holds. If it should expire, say after how long
-(2 years is a common default), and the job plus the policy paragraph ship together.
+**R2 and R5 are accepted, not forgotten.** Cross-device last-write-wins (R2) self-heals at
+the next login and only ever costs a same-day duplicate review; the admin analytics scans
+(R5) are milliseconds at today's scale. Both are fixed by, or made irrelevant by, the
+`srs_cards` split. The trigger to do that work is growth: when a typical account carries a
+few hundred SRS cards, or when two-device use becomes common, the per-card table stops being
+an optimisation and starts being the correct model.

@@ -118,9 +118,11 @@ after pulling.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
   keep `RETAIN_DAYS` (400) days, folding dropped active days into `activeDaysFolded` so the
   lifetime "N aktive Tage" figure is unchanged; migration 0015 purges abandoned guest accounts
-  (90 days) and never-reused transform-cache rows (60 days) by `pg_cron`. **Learner text is NOT on
-  a timer:** the privacy policy promises the Verlauf stays complete, so `purge_old_learner_text()`
-  exists unscheduled and only ships together with a policy change (founder decision pending).
+  (90 days), never-reused transform-cache rows (60 days) and learner TEXT (730 days, founder
+  decision s185) by `pg_cron`. The text purge NULLs columns, never deletes rows, so limits and
+  aggregates survive and Verlauf keeps the evaluation. **A retention timer and the privacy-policy
+  copy describing it ship in the SAME change**; never resolve a conflict between them by editing
+  the copy alone.
 - **Never reload over a learner's unsaved work.** The PWA adopts deploys by reloading; every
   automatic reload is gated on `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later
   resume. Any new surface holding in-memory work claims it with `useLiveWork(active, label, flush)`

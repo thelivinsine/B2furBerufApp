@@ -168,11 +168,17 @@ function PrivacyDe() {
       <Section title="Wie lange wir deine Daten speichern">
         <p>
           Konto-, Profil- und Fortschrittsdaten werden so lange gespeichert, wie dein Konto
-          besteht. Schreibeinreichungen und ihr KI-Feedback bleiben gespeichert, damit dein
-          Analyseverlauf vollständig bleibt. Du kannst einzelne Auswertungen jederzeit selbst im
-          Schreibverlauf löschen oder mit deinem Konto alle auf einmal entfernen. Diese Daten
-          bleiben privat für dich (wieder Row-Level-Security) und werden nie für einen Zweck
-          verwendet, der über das Anzeigen deines eigenen Verlaufs hinausgeht.
+          besteht. Du kannst einzelne Auswertungen jederzeit selbst im Schreibverlauf löschen oder
+          mit deinem Konto alle auf einmal entfernen. Diese Daten bleiben privat für dich (wieder
+          Row-Level-Security) und werden nie für einen Zweck verwendet, der über das Anzeigen
+          deines eigenen Verlaufs hinausgeht.
+        </p>
+        <p className="mt-2">
+          Für deine eingereichten Texte gilt eine feste Frist: Zwei Jahre nach der Einreichung
+          löschen wir den Text selbst und die dazugehörige Korrektur automatisch. Die Auswertung
+          bleibt in deinem Verlauf (Datum, Thema und dein Schwerpunkt), damit deine
+          Entwicklungskurve vollständig bleibt. Es verschwindet also nur der alte Text, nicht dein
+          Fortschritt.
         </p>
         <p className="mt-2">
           Eine Ausnahme sind Gastkonten: Wenn du ohne Konto lernst, legen wir für dich ein

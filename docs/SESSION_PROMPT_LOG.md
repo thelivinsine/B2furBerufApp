@@ -3390,3 +3390,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `preview/sync-status.html` · `package.json` · `.github/workflows/validate.yml` · `CLAUDE.md` ·
   `docs/areas/COMMANDS.md` · `docs/DECISIONS.md` · `docs/reports/db-architecture-audit-2026-08-04.md`
   · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (2026-08-04, answers to two questions asked via the picker):** merge decision =
+  **"Merge it now"**; learner-text retention = **"Delete after 2 years"**.
+  **Response:** both answers implemented before merging. Migration 0015 (still unmerged, so it
+  carries the decision directly rather than needing a 0016) now schedules
+  `purge_old_learner_text(730)` on Sundays 04:07 UTC alongside the guest and cache purges, and its
+  §4 header changed from "BUILT, NOT SCHEDULED" to the founder decision and its reasoning. The
+  privacy policy was rewritten in the SAME change: the sentence promising indefinite retention is
+  gone, replaced by the 2-year rule plus what survives it (the evaluation stays in Verlauf, only the
+  raw text and its correction are removed), which is exactly what the job does since it NULLs
+  columns rather than deleting rows. **Security-audit finding F11 is closed.** The general rule was
+  recorded in `docs/DECISIONS.md` §s185: a retention timer and the copy documenting it ship
+  together, and a conflict between them is never resolved by quietly editing the copy.
+  Gates re-run after the change: typecheck · lint 0 errors · lint:content · lint:migrations ·
+  test:unit 515/515 · build · check:bundle.
+- **Artifacts (prompt 4):** `supabase/migrations/0015_retention.sql` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `CLAUDE.md` · `docs/DECISIONS.md` ·
+  `docs/reports/db-architecture-audit-2026-08-04.md` · `docs/PROJECT_STATUS.md` · this log.
+  Shipped as PR **#786**.

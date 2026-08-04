@@ -1322,14 +1322,18 @@ and the split is the decision worth remembering.
 - **Transform-cache rows with `hits = 0` expire after 60 days.** The cache key hashes the prompt
   version and model, so a row never reused in 60 days never will be. No personal data, pure cost
   hygiene.
-- **Learner writing does NOT expire, and the job that would delete it ships unscheduled.** The
-  published privacy policy promises the opposite in as many words ("Schreibeinreichungen und ihr
-  KI-Feedback bleiben gespeichert, damit dein Analyseverlauf vollständig bleibt"), and that promise
-  describes the Verlauf, a real feature built on the learner's own texts. `purge_old_learner_text()`
-  exists in migration 0015 so the capability is ready and reviewed, but scheduling it is a product
-  decision plus a policy edit in the same change, never a maintenance task. **Security-audit finding
-  F11 stays open until the founder decides.** The general rule: a retention timer may not
-  contradict published copy, and the fix for that conflict is never to quietly change the copy.
+- **Learner writing expires after 2 years (founder, asked directly, 2026-08-04).** This one could
+  not be decided from the code: the published privacy policy promised the opposite in as many words
+  ("Schreibeinreichungen und ihr KI-Feedback bleiben gespeichert, damit dein Analyseverlauf
+  vollständig bleibt"), and that promise describes the Verlauf, a real feature built on the
+  learner's own texts. So the audit shipped the job UNSCHEDULED and asked; the founder chose 730
+  days, and the policy paragraph was rewritten in the SAME change. `purge_old_learner_text(730)`
+  NULLS the text columns instead of deleting rows, so the AI limits, cache bookkeeping and admin
+  aggregates keep working, and the evaluation itself (date, theme, weakness, tip) survives in
+  Verlauf: the learner loses old raw text, never their progress record. **Closes security-audit
+  finding F11.** The general rule this establishes: a retention timer may not contradict published
+  copy, the two ship together, and the fix for a conflict between them is never to quietly change
+  the copy.
 
 **Deploy-safety rule that came with it:** the whole `pg_cron` block is wrapped in an exception
 handler. Migrations run BEFORE the Edge Function deploys in `supabase.yml`, so a hard failure there

@@ -7,8 +7,9 @@ growth/sync risks were found. Four shipped the same session: a **failed cloud wr
 silent** (Settings shows "Sync pausiert" with a retry), **retention jobs** purge abandoned guest
 accounts and dead cache rows on pg_cron (migration 0015), the **day maps are capped at 400 days**
 with the lifetime figure preserved, and **`pnpm lint:migrations`** gates migration idempotency.
-Auto-deleting learner writing is deliberately NOT scheduled: the privacy policy promises the
-opposite, so it needs a founder decision. Still open: the `srs` per-card table, admin rollups.
+Learner writing now expires after **2 years** (founder decision, asked because the privacy policy
+promised the opposite), which closes security-audit finding F11. Still open by design: the `srs`
+per-card table and the admin analytics rollups.
 Prior s184: **every filter and Aufgabe rail carries the Lebensbereich pills, Berufsleben · Alltag,
 directly below Branche** (one shared `LifeAreaPills` control, `?area=`, Grammatik excluded on
 purpose).
@@ -194,14 +195,17 @@ risks and recommendations?"
      "N aktive Tage" figure a learner sees is unchanged.
   4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules,
      files ≤ 0014 exempt as already-applied history. Verified in both directions.
-- **ONE PART DELIBERATELY NOT DONE, and it needs the founder:** auto-deleting **learner writing**
-  (audit F11). The published privacy policy promises the opposite in as many words
-  ("Schreibeinreichungen … bleiben gespeichert, damit dein Analyseverlauf vollständig bleibt"), so
-  `purge_old_learner_text()` ships **unscheduled**. Turning it on is a product decision plus a
-  policy edit in the same change. **Open question: should learner writing expire, and after how
-  long (2 years is a common default)?**
-- **The privacy policy DID change** in one place, because the code now does something the policy
-  did not describe: a paragraph stating that unused **guest** accounts are deleted after 90 days.
+- **The one question the code could not answer was put to the founder, who answered it:**
+  auto-deleting **learner writing** (audit F11). The published privacy policy promised the opposite
+  in as many words, so the job shipped unscheduled and the question was asked directly. **Founder:
+  delete after 2 years.** `purge_old_learner_text(730)` is now scheduled, and it NULLs the text
+  columns rather than deleting rows, so the AI limits and admin aggregates keep working and Verlauf
+  keeps the evaluation (date, Thema, Schwerpunkt, Tipp): the learner loses old raw text, never their
+  progress record. **Audit F11 is closed.**
+- **The privacy policy changed in two places**, both because the code now does something the policy
+  did not describe: unused **guest** accounts are deleted after 90 days, and submitted **texts**
+  after 2 years (with the sentence promising indefinite retention removed). Standing rule recorded
+  in `docs/DECISIONS.md` §s185: a retention timer and the copy documenting it ship together.
 - **Preview:** `preview/sync-status.html` (the three account-panel states side by side),
   screenshot-verified. The new state reuses the existing badge recipe with the warning token, so
   no new visual language was introduced.
