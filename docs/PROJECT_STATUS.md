@@ -1,6 +1,20 @@
 # Project Status
 
-_Last updated: 2026-08-03 (session 184). **Every filter and Aufgabe rail now carries the
+_Last updated: 2026-08-04 (session 185). **The content-audit backlog is down to one open item.**
+The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
+are closed outright, P3 all but one UI step.
+P9: every noun declares `plural` or `numerus` (329 had neither), and the `pron` respelling is ONE
+documented scheme with a linter gate instead of two schemes split by authoring wave.
+P7: 108 items re-levelled off the advanced bands, so the B1 half is **36%** of the bank (was 30%)
+and verify:cefr FLAG went 10 → **0**; a linter ratchet freezes the rare-compound count at 334.
+P5: **every** grammar topic now has 10 drills with ≥3 productive (bank 195 → **320**, productive
+19% → **33%**); the 21 B2/C1 topics had zero productive drills between them.
+P4: six level-3 scenarios, three of them Alltag, so the ladder is **13/15/8** not 13/15/2.
+P3: eight exam-length B2 texts (288-333 words), chosen so every domain has ≥2; gesundheit and
+bildung had none. All 6 voicemails carry `notes` for a Notizen task. **The Notizen STEP itself is
+the one thing left**: it is a new UI section, so three variants wait for a founder pick in
+`preview/notizen-varianten.html`.
+Prior s184: **Every filter and Aufgabe rail now carries the
 Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
 Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
 shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
@@ -124,6 +138,11 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       founder:** "just move schreiben to anwenden and rename anwenden as prufung." Shipped in s182,
       so the bar stays at five slots and now reads Praktisch · Bibliothek · **Prüfung** ·
       Fortschritt · Einstellungen, with Sprechen, Schreiben and Prüfungssimulation inside the hub.
+- [ ] **Pick a Notizen variant (s185, audit P3).** The six voicemails now carry the note fields a
+      Hörprüfung asks for (Rückrufnummer, neue Uhrzeit, Frist). Three designs for the learner-facing
+      step are in `preview/notizen-varianten.html`: **A** eintragen (tippt jedes Feld, am nächsten an
+      der Prüfung), **B** auf Papier (App nennt nur, worauf zu achten ist; kein Tippen), **C** ein
+      Feld nach dem anderen. Nothing ships until you pick one.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
       **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
@@ -154,6 +173,29 @@ adding one task:
   reads as B1, that its Leitpunkte are answerable in the word target, or that the Branche framing
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
+
+**Handoff after session 185 (2026-08-04): the content-audit backlog, minus P10.** Founder, after
+being shown what was left: "go ahead with all the items except for the p10."
+- **Closed outright: P9, P7, P5, P4.** P9 gave every noun a `plural` or a `numerus` and folded the
+  two `pron` schemes into one documented, linted scheme. P7 re-levelled 108 items off the advanced
+  bands and froze the rare-compound count with a linter ratchet. P5 took EVERY grammar topic to 10
+  drills with ≥3 productive (the 21 B2/C1 topics had zero productive between them). P4 added six
+  level-3 scenarios, three of them Alltag.
+- **P3 is done except one UI step.** Eight exam-length B2 texts shipped, and all six voicemails carry
+  `notes` fields for a Notizen task. **The founder needs to pick a variant** for the learner-facing
+  step: `preview/notizen-varianten.html` (A eintragen · B auf Papier · C ein Feld nach dem anderen).
+  It was NOT built unilaterally because a new UI section goes through previews first.
+- **Three things were deliberately left alone, and each is a rule, not a shortcut.** (1) The 12
+  human-verified rows that P9's new checks touch: editing one breaks the content fingerprint its
+  `verified` stamp is tied to, so the linter warns and they queue for the next human review. (2)
+  P7's "spend the next 200 items on core verbs, adjectives and connectors" is a standing authoring
+  rule in `docs/areas/CONTENT.md`, not a shippable change. (3) P10 itself, per the founder.
+- **Two rules are gates now, so they cannot rot:** `tests/grammar.test.ts` asserts 10 drills + 3
+  productive per topic, and `lint-content.mjs` gates noun numerus, the pron scheme and the
+  rare-compound ceiling. A future pack cannot quietly re-open any of them.
+- **One test fixture was rewritten, not patched.** The composer's listening test scoped to logistics
+  because that theme's only text WAS a voicemail; the new logistics text falsified that. It now
+  derives the theme from the bank, so adding a text anywhere cannot make it stale again.
 
 **Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
 a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app
@@ -193,45 +235,3 @@ right below the Branchen filter."
 - **Worth the founder's eye on the live site:** whether "Lebensbereich" is the right section label
   (one word, matches the two pills under it), and whether Grammatik should carry the pills anyway.
   Both are small changes.
-
-**Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
-Founder: "D and 2", then "keep them separate".
-- **Bar mark: the orange Absolventenhut** (`graduationCap` in `route-icons.tsx`). The target rings
-  it replaced were the bar's only OUTLINE mark among filled two-tone shapes, which is the whole
-  reason it read thinner than its neighbours. `/anwenden` and `/exam` now share that one mark on
-  purpose: the tab and the hub card are the same thing at two depths.
-- **Hub tiles: the branded route marks on tinted squircles** (`AnwendenHub.tsx`). Each card renders
-  `RouteIcon` for its own route, so the Schreiben card carries the exact pencil the nav does, the
-  microphone matches it in style, and the cap ties the exam card to the zone. The white-on-gradient
-  tiles this replaced turned every mark into the same white silhouette.
-- **Two fixes the implementation forced.** (1) Routes that are not `navItems` entries had no accent
-  colour, so all three marks would have drawn brand blue: `OFF_NAV_COLOR` now supplies cyan for
-  `/simulation` and orange for `/exam`. (2) The tiles were `rounded-2xl`, and `--radius + 10` is
-  24px, exactly half of a 48px tile, so they were rendering as full CIRCLES (already true of the old
-  gradient tiles). Now `rounded-xl`, matching the approved preview and the squircle law.
-  The `/simulation` teal also went from `#5eead4` to `#2dd4bf`, which washed out on the tinted tile.
-- **Sprechen vs. Prüfungssimulation: KEEP BOTH, founder decision.** Same dialogue engine and
-  scenario bank; Sprechen is untimed practice with hints across all 30 scenarios, Prüfungssimulation
-  wraps one scenario in exam conditions (Aufgabenblatt, 6-minute countdown, rubric self-check,
-  score). Nothing was merged and nothing changed in either runner.
-- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.2 kB.
-  Verified in the BUILT app at 320px, 390px (light + dark) and desktop: five even bar slots with the
-  cap active, the three tiles read apart at a glance, and all three cards still open their trainer.
-- **Approved mockups:** `preview/pruefung-icons.html` (variants A-D and 1-3 as shown to the founder).
-- **Shipped:** PR **#780**, squash-merged as `797f65d`. `Validate content` and `Deploy site to
-  GitHub Pages` both green on the merge commit, so this is live on genauly.de. Post-merge
-  housekeeping done: branch reset onto `main`, working tree clean. (The mockup round and the
-  implementation went out as ONE PR: the preview commit was still unmerged when the founder picked,
-  so the picks were added to the same branch.)
-- **One open one-liner for the founder:** the page's `HubHero` still shows the lucide target, so the
-  zone is a cap in the bar and the sidebar but a target at the top of its own page. Swapping it
-  would put two caps on that page (hero + Prüfungssimulation card), which is why it was left alone.
-
-**Session 182 is fully archived** in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`:
-part 1 (audit P6, the Redemittel phrase bank) and, aged out by this session, part 4 (the five-slot
-Prüfung nav zone, PR #778). Their law lives on in `docs/DECISIONS.md` §s182,
-`docs/areas/CONTENT.md` and `docs/areas/PRAKTISCH-NAV.md`. (Part 4 had been sitting in this file
-TWICE, once above the s183 handoff and once below it; the duplicate went with the archive move.)
-
-_(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
-mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

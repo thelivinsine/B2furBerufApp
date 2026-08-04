@@ -3308,3 +3308,54 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   backlog is untouched, with the queued writing-task quality audit still the next TODO.
   Gates: docs-only (no app code touched).
 - **Artifacts (prompt 3):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 185 — the content-audit backlog, minus P10 (branch `claude/content-analysis-actions-jm55sw`)
+
+- **Prompt 1 (verbatim, 2026-08-04):** `what's left in the content analysis actions?`
+  **Response:** read `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5 and reported the state of the
+  11-item backlog: 5 closed (P0/P1/P2 in s178, P8 in s181, P6 in s182), 3 half-done (P3 texts, P4
+  level-3 depth, P5 B2/C1 drills), 3 untouched (P7, P9, P10). Flagged that the audit's own text was
+  stale on P4's mobile-entry half, which s182 had already settled. Recommended P5 then P7 as the best
+  value per effort. No code touched.
+- **Artifacts (prompt 1):** none (analysis in chat).
+
+- **Prompt 2 (verbatim, 2026-08-04):** `go ahead with all the items except for the p10`
+  **Response:** shipped P9, P7, P5 and P4 in full, and P3 except for one UI step that needs a founder
+  pick. Five commits on the session branch:
+  (1) **P9 — `c7408c4`.** Every noun now declares `plural` or `numerus` (`uncountable` /
+  `pluralOnly`); 329 nouns had neither, so "unauthored" and "nothing to author" rendered identically.
+  49 got a real plural, 257 a numerus, classified BY HAND because both oracles attest "Stresse",
+  "Supporte", "Benzine" and "Konsense" and a generated backfill would have taught all four. The `pron`
+  respelling was two schemes split by authoring wave (`der Reisepass` shipped both); standardised on
+  the one that reads correctly in English, 135 strings converted, `checkPron` gates it. The duplicate
+  and two-correct-MCQ halves of P9 were already closed in s178.
+  (2) **P7 — `97ea3bf`.** 108 items re-levelled: 10 FLAG connectors off C1/B2.2, 98 of 105 WATCH down
+  to B1. Bands A2 13 · B1.1 147 · B1.2 482 · B2.1 690 · B2.2 382 · C1 29; verify:cefr FLAG 10 → 0.
+  The "freeze B2.2 compounds" half is a linter ratchet at 334, not a note.
+  (3) **P5 — `6ef53c5`.** 125 drills: 107 across the 21 B2/C1 topics (which had ZERO productive
+  drills between them) and 18 bringing the last 7 B1 topics to 10. Bank 195 → 320 drills, productive
+  19% → 33%, gated per topic.
+  (4) **P4 — `dca9f05`.** Six level-3 scenarios (customer, project, safety · behoerde, wohnen, arzt),
+  so the ladder is 13/15/8 instead of 13/15/2 and the Alltag half has hard practice for the first
+  time. Appended, not prepended, because "Empfohlen" is the first unfinished item in array order.
+  (5) **P3 — `d9db84e`.** Eight exam-length B2 texts (288-333 words), chosen so every domain has at
+  least two; gesundheit and bildung had none. All 6 voicemails carry `notes` fields for a Notizen
+  task.
+  **Deliberately not shipped, and why:** the Notizen STEP is a new UI section, and the design law is
+  previews first with a founder pick, so three variants went to `preview/notizen-varianten.html`
+  (artifact published) and the field is authored data until that pick lands. The 12 human-verified
+  rows that P9's two new rules touch were left alone: editing one breaks the content fingerprint its
+  `verified` stamp is tied to and only a human may re-verify, so the linter warns rather than errors
+  on them. P7's "spend the next 200 items on core words" clause became a standing authoring rule.
+  Gates: `pnpm lint:content` clean · `pnpm build` green · `pnpm test:unit` 533 passing ·
+  `pnpm verify:facts` 0 gate errors · `pnpm check:bundle` 123 kB of 400 kB.
+  One test fixture was rewritten rather than patched: the composer's listening test scoped to
+  logistics because that theme's only text WAS a voicemail, which the new logistics text falsified.
+  It now finds a voicemail's theme from the bank itself.
+- **Artifacts (prompt 2):** `src/data/vocabulary.ts` · `src/data/grammar.ts` · `src/data/dialogues.ts`
+  · `src/data/texts.ts` · `src/data/provenance.ts` · `src/types/index.ts` · `src/engine/quiz.ts` ·
+  `src/features/vocabulary/pluralLabel.ts` (new) · `src/features/vocabulary/VocabList.tsx` ·
+  `src/features/vocabulary/VocabViews.tsx` · `scripts/lint-content.mjs` · `scripts/verify-facts.mjs` ·
+  `tests/grammar.test.ts` · `tests/engine.test.ts` · `preview/notizen-varianten.html` (new) ·
+  `docs/areas/CONTENT.md` · `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` ·
+  this log. Commits `c7408c4`, `97ea3bf`, `6ef53c5`, `dca9f05`, `d9db84e`.

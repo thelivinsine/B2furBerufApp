@@ -388,16 +388,29 @@ the progress store tracks text or dialogue completion, so nothing can guarantee 
   **P8** by the Schreiben work in s181 (717 tasks, every one carrying the full brief);
   **P6** in s182 (5 Alltag packs, 62 phrases, 3 new speech-act categories, `themeId` tagging with
   untagged-=-universal semantics, Thema scope on the Redemittel tab).
-- **Started:** **P3** (six C1 texts at 305-344 words in s178). The rest of the bank is still ~90
-  words and listening is still 6 TTS voicemails with no note-taking task type.
-  **P4** in s182: all 30 scenarios now have a free-speak node with a model answer (was 10 of 30),
-  and Anwenden is back in `navItems` for the desktop sidebar. Open half: only 2 of 30 scenarios are
-  level 3, and the mobile bottom bar's 5 slots are locked, so mobile placement needs a founder call.
-  **P5** in s182: the four missing canon topics shipped with 10 drills each, and every B1 topic now
-  has ≥3 productive drills (bank 28 topics/137 drills → 32/195, productive 4% → 19%). Open half:
-  the 21 B2/C1 topics still cap at 5 MCQ-only drills.
-- **Open:** P3 (rest), P4 (level-3 depth + mobile entry), P5 (B2/C1 drill depth), P7, P9 (pron
-  scheme, `uncountable`, 329 plural-less nouns), P10.
+  **P4** across s182 (a free-speak node with a model answer on all 30 scenarios) and s185 (six
+  level-3 scenarios, three of them Alltag, so the ladder is 13/15/**8** not 13/15/2). The mobile
+  entry the audit listed as open was settled in s182: the bar's fifth zone is Prüfung.
+  **P5** across s182 (the four missing B1 canon topics) and s185 (125 drills, so EVERY topic has 10
+  drills with ≥3 productive; bank 137 → **320 drills**, productive 4% → **33%**, gated per topic in
+  `tests/grammar.test.ts`).
+  **P7** in s185: 108 items re-levelled (10 FLAG connectors + 98 of 105 WATCH), bands now A2 13 ·
+  B1.1 147 · B1.2 482 · B2.1 690 · B2.2 382 · C1 29, so the B1 half is 36% of the bank not 30%;
+  verify:cefr FLAG 10 → **0**. The "freeze new B2.2 compounds" half is a ratchet in the linter
+  (`lintAdvancedRareRatchet`, ceiling 334), not a note.
+  **P9** in s185: every noun declares `plural` or `numerus` (`uncountable` / `pluralOnly`), the
+  `pron` respelling is ONE documented scheme with a linter gate, and the duplicate + two-correct-MCQ
+  halves were already closed in s178 by `mcqOptions` and `lintVocabLabelCollisions`.
+- **Started:** **P3**: six C1 texts in s178, **eight B2 texts in s185** (288-333 words, chosen so
+  every domain has ≥2 exam-length texts; gesundheit and bildung had none), and all 6 voicemails now
+  carry `notes` fields for a Notizen task. Open: the learner-facing Notizen STEP is a new UI section,
+  so it is waiting on a founder pick from `preview/notizen-varianten.html`.
+- **Open:** P3 (the Notizen step, pending a founder pick), P10.
+- **Deliberately not done:** the 12 human-verified rows that P9's two new rules touch. Editing one
+  would break the content fingerprint its `verified` stamp is tied to, and only a human may
+  re-verify, so the linter WARNS on them instead of erroring and they are queued for the next
+  review pass. P7's third clause ("spend the next 200 items on core verbs, adjectives and
+  connectors") is a standing authoring rule in `docs/areas/CONTENT.md`, not a shippable change.
 
 ### Two structural observations, not gaps
 

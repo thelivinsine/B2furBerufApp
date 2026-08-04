@@ -1,0 +1,196 @@
+<style>
+  /* Real tokens, copied from src/index.css (light theme). */
+  :root {
+    --background: 180 45% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%;
+    --muted: 220 13% 88%;
+    --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --shadow: 221 40% 22%;
+    --radius: 0.875rem;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: linear-gradient(180deg, hsl(168 52% 96%), hsl(var(--background)));
+    color: hsl(var(--foreground));
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 28px 16px 64px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .lede { color: hsl(var(--muted-foreground)); font-size: 0.9rem; margin: 0 0 28px; max-width: 62ch; line-height: 1.55; }
+  .grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); align-items: start; }
+  .col > h2 { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: hsl(var(--primary)); margin: 0 0 4px; }
+  .col > p.note { font-size: 0.8rem; color: hsl(var(--muted-foreground)); margin: 0 0 12px; line-height: 1.5; min-height: 3.2em; }
+
+  /* --- phone frame: the block as it sits in SessionPlayer --- */
+  .phone { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 22px; padding: 14px; box-shadow: 0 10px 30px -12px hsl(var(--shadow) / 0.22); }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); font-size: 0.7rem; font-weight: 700; padding: 4px 9px; border-radius: 8px; }
+  .card { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 10px -4px hsl(var(--shadow) / 0.18); }
+  .title { font-weight: 700; font-size: 0.98rem; margin: 0 0 10px; }
+  .play { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border: 0; cursor: default;
+          background: linear-gradient(135deg, hsl(var(--primary)), hsl(206 90% 58%)); color: #fff; font-weight: 700; font-size: 0.88rem;
+          padding: 11px; border-radius: 12px; }
+  .btn { display: block; width: 100%; text-align: center; font-weight: 700; font-size: 0.86rem; padding: 10px; border-radius: 12px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground)); margin-top: 12px; cursor: default; }
+  .btn.primary { background: linear-gradient(135deg, hsl(var(--primary)), hsl(206 90% 58%)); color: #fff; border-color: transparent; }
+
+  /* accent rail: fill, border in its own fill colour, separated by shadow only */
+  .rail { background: hsl(var(--accent) / 0.2); border: 1px solid hsl(var(--accent) / 0.2); border-radius: var(--radius); padding: 14px; box-shadow: 0 2px 10px -4px hsl(var(--shadow) / 0.18); }
+  .rail-head { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: hsl(var(--accent-ink)); margin: 0 0 10px; }
+
+  .field { padding: 9px 0; border-bottom: 1px solid hsl(var(--accent-ink) / 0.1); }
+  .field:last-child { border-bottom: 0; }
+  .flabel { font-size: 0.78rem; font-weight: 600; color: hsl(var(--muted-foreground)); }
+  .fline { margin-top: 6px; height: 26px; border-radius: 8px; background: hsl(var(--surface)); border: 1px solid hsl(var(--accent-ink) / 0.12); }
+  .fvalue { margin-top: 5px; font-size: 0.84rem; font-weight: 700; color: hsl(var(--foreground)); display: flex; align-items: center; gap: 7px; }
+  .dot { width: 7px; height: 7px; border-radius: 999px; background: hsl(var(--success)); flex: none; }
+
+  /* variant B: paper checklist, no inputs */
+  .tick { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-bottom: 1px solid hsl(var(--accent-ink) / 0.1); }
+  .tick:last-child { border-bottom: 0; }
+  .box { width: 15px; height: 15px; border-radius: 5px; border: 1.5px solid hsl(var(--accent-ink) / 0.4); flex: none; margin-top: 1px; }
+  .tick .t { font-size: 0.82rem; font-weight: 600; }
+
+  /* variant C: two columns, note vs. actual */
+  .cmp { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid hsl(var(--accent-ink) / 0.1); font-size: 0.8rem; }
+  .cmp:last-child { border-bottom: 0; }
+  .cmp .lab { font-weight: 600; color: hsl(var(--muted-foreground)); }
+  .cmp .arrow { color: hsl(var(--accent-ink)); font-weight: 700; }
+  .cmp .val { font-weight: 700; }
+  .cmphead { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: hsl(var(--accent-ink)); padding-bottom: 6px; }
+  .muted { color: hsl(var(--muted-foreground)); font-size: 0.78rem; margin: 10px 0 0; line-height: 1.5; }
+  .stage { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: hsl(var(--muted-foreground)); margin: 16px 0 7px; }
+</style>
+
+<div class="wrap">
+  <h1>Notizen beim Hören: drei Varianten</h1>
+  <p class="lede">
+    Die sechs Nachrichten (Anrufbeantworter) tragen jetzt Notizfelder: Rückrufnummer, neue Uhrzeit,
+    Frist, was mitzubringen ist. Das ist die Aufgabe, die eine echte Hörprüfung stellt. Offen ist nur,
+    wie der Schritt aussieht. Alle drei Varianten sitzen zwischen dem Hören und den Verständnisfragen,
+    nutzen die Himmelblau-Kachel der Bibliothek und ändern nichts an der übrigen Blockmechanik.
+  </p>
+
+  <div class="grid">
+    <!-- ================= A ================= -->
+    <div class="col">
+      <h2>Variante A · Eintragen</h2>
+      <p class="note">Der Lernende tippt jedes Feld selbst ein, danach steht die richtige Antwort daneben. Am nächsten an der Prüfung, aber fünf Eingabefelder auf dem Handy.</p>
+
+      <div class="stage">Schritt 1 · hören und notieren</div>
+      <div class="phone">
+        <div class="row"><span class="badge">🎧 Hören · Nachricht</span><span class="badge">B1.2</span></div>
+        <div class="card" style="margin-bottom:12px">
+          <p class="title">Nachricht vom Reisebüro</p>
+          <div class="play">▶ Abspielen</div>
+        </div>
+        <div class="rail">
+          <p class="rail-head">Notizen</p>
+          <div class="field"><div class="flabel">Wer ruft an</div><div class="fline"></div></div>
+          <div class="field"><div class="flabel">Neue Abflugzeit</div><div class="fline"></div></div>
+          <div class="field"><div class="flabel">Bis wann zurückrufen</div><div class="fline"></div></div>
+          <div class="field"><div class="flabel">Rückrufnummer</div><div class="fline"></div></div>
+        </div>
+        <button class="btn primary">Notizen vergleichen</button>
+      </div>
+
+      <div class="stage">Schritt 2 · vergleichen</div>
+      <div class="phone">
+        <div class="rail">
+          <p class="rail-head">Notizen</p>
+          <div class="field"><div class="flabel">Wer ruft an</div><div class="fvalue"><span class="dot"></span>Markus Lang, Reisebüro Atlas</div></div>
+          <div class="field"><div class="flabel">Neue Abflugzeit</div><div class="fvalue"><span class="dot"></span>16:20 Uhr statt 19:40 Uhr</div></div>
+          <div class="field"><div class="flabel">Bis wann zurückrufen</div><div class="fvalue"><span class="dot"></span>Bis morgen 12 Uhr</div></div>
+          <div class="field"><div class="flabel">Rückrufnummer</div><div class="fvalue"><span class="dot"></span>030 55 44 88 12</div></div>
+        </div>
+        <button class="btn">Weiter zu den Fragen</button>
+      </div>
+    </div>
+
+    <!-- ================= B ================= -->
+    <div class="col">
+      <h2>Variante B · Auf Papier</h2>
+      <p class="note">Die App nennt nur, worauf zu achten ist. Notiert wird auf Papier, wie in der Prüfung; ein Tipp deckt die Lösung auf. Kein Tippen, schnellster Weg.</p>
+
+      <div class="stage">Schritt 1 · hören und notieren</div>
+      <div class="phone">
+        <div class="row"><span class="badge">🎧 Hören · Nachricht</span><span class="badge">B1.2</span></div>
+        <div class="card" style="margin-bottom:12px">
+          <p class="title">Nachricht vom Reisebüro</p>
+          <div class="play">▶ Abspielen</div>
+        </div>
+        <div class="rail">
+          <p class="rail-head">Achte auf</p>
+          <div class="tick"><span class="box"></span><span class="t">Wer ruft an</span></div>
+          <div class="tick"><span class="box"></span><span class="t">Neue Abflugzeit</span></div>
+          <div class="tick"><span class="box"></span><span class="t">Bis wann zurückrufen</span></div>
+          <div class="tick"><span class="box"></span><span class="t">Rückrufnummer</span></div>
+        </div>
+        <button class="btn primary">Lösung zeigen</button>
+      </div>
+
+      <div class="stage">Schritt 2 · vergleichen</div>
+      <div class="phone">
+        <div class="rail">
+          <p class="rail-head">Achte auf</p>
+          <div class="field"><div class="flabel">Wer ruft an</div><div class="fvalue"><span class="dot"></span>Markus Lang, Reisebüro Atlas</div></div>
+          <div class="field"><div class="flabel">Neue Abflugzeit</div><div class="fvalue"><span class="dot"></span>16:20 Uhr statt 19:40 Uhr</div></div>
+          <div class="field"><div class="flabel">Bis wann zurückrufen</div><div class="fvalue"><span class="dot"></span>Bis morgen 12 Uhr</div></div>
+          <div class="field"><div class="flabel">Rückrufnummer</div><div class="fvalue"><span class="dot"></span>030 55 44 88 12</div></div>
+        </div>
+        <button class="btn">Weiter zu den Fragen</button>
+      </div>
+    </div>
+
+    <!-- ================= C ================= -->
+    <div class="col">
+      <h2>Variante C · Ein Feld nach dem anderen</h2>
+      <p class="note">Ein Feld pro Schritt, wie die Verständnisfragen im selben Block. Nur ein Eingabefeld auf dem Schirm, dafür fünf Schritte statt einem.</p>
+
+      <div class="stage">Schritt 1 · hören</div>
+      <div class="phone">
+        <div class="row"><span class="badge">🎧 Hören · Nachricht</span><span class="badge">B1.2</span></div>
+        <div class="card" style="margin-bottom:12px">
+          <p class="title">Nachricht vom Reisebüro</p>
+          <div class="play">▶ Abspielen</div>
+        </div>
+        <p class="muted" style="text-align:center;margin-top:0">Gleich notierst du vier Angaben aus der Nachricht.</p>
+        <button class="btn primary">Notizen beginnen</button>
+      </div>
+
+      <div class="stage">Schritt 2 · Feld 2 von 4</div>
+      <div class="phone">
+        <div class="row"><span class="badge">📝 Notizen · 2/4</span><span class="badge">B1.2</span></div>
+        <div class="rail">
+          <p class="rail-head">Neue Abflugzeit</p>
+          <div class="fline" style="height:38px"></div>
+        </div>
+        <button class="btn primary">Prüfen</button>
+        <button class="btn">Nachricht noch einmal hören</button>
+      </div>
+
+      <div class="stage">Schritt 3 · nach dem Prüfen</div>
+      <div class="phone">
+        <div class="rail">
+          <p class="rail-head">Neue Abflugzeit</p>
+          <div class="cmphead"><span>Deine Notiz</span><span></span><span>In der Nachricht</span></div>
+          <div class="cmp"><span class="val">16.20</span><span class="arrow">→</span><span class="val">16:20 Uhr statt 19:40 Uhr</span></div>
+        </div>
+        <button class="btn primary">Weiter</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="muted" style="max-width:70ch;margin-top:30px">
+    Gleich in allen drei: der Schritt erscheint nur bei einer Nachricht mit Notizfeldern, er sitzt vor
+    den Verständnisfragen, und er zählt nicht in die SRS-Wertung. Ein Text ohne Notizfelder läuft
+    unverändert wie bisher.
+  </p>
+</div>

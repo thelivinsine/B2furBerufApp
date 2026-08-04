@@ -78,6 +78,14 @@ after pulling.
 - **Closed-enum rule:** every union added to `src/types/index.ts` is mirrored by an array +
   validate-when-present check in `scripts/lint-content.mjs`.
 - **Every content_id has a provenance row**, added in the same edit.
+- **Content facts are stated, never left blank** (audit P9/P5/P7, s185; all four are gates):
+  every noun carries `plural` XOR `numerus` (`uncountable`/`pluralOnly`); `pron` follows the ONE
+  documented respelling scheme (`docs/areas/CONTENT.md` §Pronunciation); every grammar topic has 10
+  drills with ≥3 productive (`tests/grammar.test.ts`); and the count of B2.2/C1 items that are
+  specialized-or-rarer is ratcheted at 334, because a rare compound is not an advanced word.
+- **A human-verified row is never edited by an AI to satisfy a new rule.** The content fingerprint
+  ties the `verified` stamp to exact content, so a new content-shape check WARNS on verified rows
+  and queues them for the next human pass; it never re-stamps and never flips them back to draft.
 - **A filter filters; it never substitutes.** In Schreiben's Aufgabe rail, Niveau, Textsorte and
   Unterthema are HARD (Branche stays soft, untagged-=-universal, and is applied last so it cannot
   hide a hard match), ONE function counts what the trainer draws, zero-yield options grey out with
