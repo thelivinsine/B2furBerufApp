@@ -68,9 +68,10 @@ after pulling.
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone
-  that holds Sprechen + Schreiben + Prüfungssimulation since s182; `/writing` keeps its route but
-  is a card in that hub, not a tab) · `/exam` **Prüfungssimulation** (the four-part mock exam,
-  s186: hub at rest, and the running Teil takes the route over) ·
+  that holds Sprechen + Schreiben + Modelltest since s182; `/writing` keeps its route but
+  is a card in that hub, not a tab) · `/exam` **Modelltest** (the four-part mock exam, s186;
+  renamed from "Prüfungssimulation" and re-laid-out s188: hub at rest, and the running Teil takes
+  the route over) ·
   `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
   `/auth/confirm` (email-confirmation landing, ungated on purpose) · `/hilfe`,
   `/privacy`,
@@ -164,6 +165,11 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
   Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,
   never a heading a learner sees; a third group in any dropdown or legend is a bug (founder, s181).
+- **A result is shown in ONE place per page** (founder s188, the Modelltest hub): past scores live
+  in that page's Verlauf block, never also on the run band or the part rows. The hub leads with the
+  RUN (one band containing the four Teile as a timeline, which is what stops the minutes being
+  printed twice), then "Einzeln üben", then Verlauf; it carries NO HubHero, just the `h1` and the
+  Niveau sliding-pill switcher beside it.
 - **Every filter and Aufgabe rail carries the Lebensbereich pills** (founder, s184): one shared
   `LifeAreaPills` control in a fixed slot, directly BELOW the Branche dropdown (top of the scope
   stack on a rail without one), single-select that toggles off, `?area=` in the URL, honest counts.
