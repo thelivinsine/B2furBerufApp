@@ -28,6 +28,20 @@ two-tone shapes, which is why it read thinner than its neighbours), Fortschritt 
 (trophy/cup); the pencil-on-the-diagonal Schreiben mark lives on inside the hub card.
 The Prüfung hub itself (`/anwenden`) is 3 cards → Sprechen / Schreiben / Prüfungssimulation (the
 exam card is NOT called "Prüfung": a card may not carry the name of the page it sits on).
+
+**Two states hide the bar, and they are NOT the same** (do not merge them):
+- **Focus mode** (`useSessionStore.focusMode`, route-gated to `/session`, `/revision`, `/welt`):
+  hides EVERYTHING, header and sidebar included; the composed session is a full-screen stage.
+- **Exam chrome** (`useSessionStore.examExit`, route-gated to `/exam`, founder s186): a running
+  Prüfungssimulation hides the bottom bar and swaps the header's streak pill + account menu for
+  ONE quiet muted X ("Prüfung verlassen", same 36px box the account button had). The header, the
+  logo and the desktop sidebar STAY: an exam still needs its top bar, and the founder scoped this
+  to the mobile bottom bar. `examExit` holds the runner's own exit handler rather than a boolean,
+  because `AppShell` is eager code and must never import `useExamStore` (it reaches the content
+  banks through the composer). That exit is the ONLY one: the in-exam RunBar and the Anleitung
+  page deliberately carry no abort control, so the learner is never offered two ways out. The
+  confirm dialog belongs to the runner (`danger` button, matching Settings' Konto löschen); on the
+  result screen the run is already recorded, so the X just closes without a confirm.
 **Those cards wear the branded route marks, not lucide icons** (founder pick 2, s183): each card
 renders `RouteIcon` for its own route on a 48px `rounded-xl` tile tinted in that mark's colour
 (cyan / brand blue / orange at 10%, 15% in dark). So the Schreiben card carries the exact pencil

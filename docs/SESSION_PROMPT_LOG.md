@@ -3664,3 +3664,38 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/lib/writing.ts` · `supabase/functions/evaluate-writing/index.ts` ·
   `supabase/migrations/0016_mock_exams.sql` · `tests/exam.test.ts` · `docs/PROJECT_STATUS.md` ·
   `docs/PROJECT_REFERENCE.md` · this log
+- **Prompt 4 (verbatim, 2026-08-04):** `are you done?`
+  **Response:** status check, not a work request. The rework was merged (PR #791, squash `a65a522`)
+  and the Pages deploy was green, but the **Supabase deploy had failed**: `esm.sh` returned 522 on
+  all three bundling attempts, so `evaluate-writing` could not build. Not our code, an upstream CDN
+  outage. Re-ran the failed job; it went green on attempt 2, so the exam-mode evaluator and
+  migration 0016 are live. Reported the partial state honestly rather than claiming completion
+  (the practical effect while it was red: an exam's Schreiben part would have shown "ohne
+  Punktzahl" and the other three parts would still have counted).
+- **Artifacts (prompt 4):** none (CI re-run only)
+- **Prompt 5 (verbatim, 2026-08-04):** `for the mobile view, when a user starts the test, I want you
+  to hide the navigation bottom bar selection at the bottom and the top bar should be intact but the
+  streak and account settings should be replaced with a minimalistic exit button that should not
+  grab attention but is available when the user looks for it.`
+  **Response:** added **exam chrome**, a lighter sibling of focus mode. While a run is on screen:
+  the mobile bottom bar is not rendered (and `pb-nav`'s reserved gap goes with it, so no dead space
+  under the last control), and the header keeps its logo but replaces the streak pill + account
+  menu with ONE muted X (`text-muted-foreground`, no fill, the same 36px box the account button
+  used, `aria-label`/`title` "Prüfung verlassen"). The header, the logo and the desktop sidebar
+  stay, since the founder scoped this to the mobile bottom bar and an exam still needs its top bar.
+  **Redundancy removed with it:** the RunBar's X and the Anleitung page's "Prüfung abbrechen" link
+  are gone, so there is exactly ONE exit. Mid-exam it confirms through the runner's own dialog
+  ("Prüfung verlassen?" · Weiter üben / Verlassen) with a `danger` button, matching Settings'
+  Konto löschen rather than the brand gradient, which stays the colour of submitting; on the result
+  screen the run is already recorded, so the X closes without a confirm.
+  **Architecture note:** the flag is `useSessionStore.examExit`, holding the runner's exit callback
+  rather than a boolean, because eager `AppShell` must never import `useExamStore` (it reaches the
+  content banks through the composer). Bundle 125.2 → **125.7 kB**, which is the proof nothing
+  leaked. The effect keys on "is a run active", not the run object, so the header does not
+  re-register once per timer tick.
+  Gates: typecheck · lint 0 errors · 551 tests · build · check:bundle. Verified on a 400px mobile
+  viewport in the real build: bottom nav absent from the DOM, the header's only button is
+  "Prüfung verlassen", confirm dialog renders correctly.
+- **Artifacts (prompt 5):** `src/store/useSessionStore.ts` · `src/components/layout/AppShell.tsx` ·
+  `src/features/exam/MockExamRunner.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/PROJECT_STATUS.md` · this log

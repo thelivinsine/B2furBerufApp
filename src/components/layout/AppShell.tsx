@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Loader2 } from "lucide-react";
+import { Flame, Loader2, X } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { BottomTabBar } from "./BottomTabBar";
 import { GlobalSearch } from "./GlobalSearch";
@@ -62,6 +62,15 @@ export function AppShell() {
       location.pathname === "/revision" ||
       location.pathname === "/welt");
 
+  // Exam chrome (s186, founder): a running Prüfungssimulation hides the mobile
+  // bottom bar and swaps the streak pill + account menu for ONE quiet exit, so
+  // nothing on screen competes with the task. Lighter than focus mode on
+  // purpose: the header and logo stay, because an exam still needs its top bar.
+  // Route-gated like focus mode, so a stale flag can never strip the chrome
+  // anywhere else.
+  const examExit = useSessionStore((s) => s.examExit);
+  const exam = !!examExit && location.pathname === "/exam";
+
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
   // send them back to /writing, where WritingHub restores the text and resumes
@@ -109,7 +118,7 @@ export function AppShell() {
       {/* Mobile bottom tab bar (hidden in focus mode). The "Mehr" sheet was
           retired (s-polish): the bar now ends in a fixed Einstellungen tab, and
           the middle sections reorder via a long-press easter egg. */}
-      {!focus && <BottomTabBar />}
+      {!focus && !exam && <BottomTabBar />}
 
       {/* The single feedback dialog is mounted app-wide (even in focus mode, so
           the in-session feedback button can open it). The quiet floating pill
@@ -143,13 +152,29 @@ export function AppShell() {
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* In an exam the right side is ONE quiet exit and nothing else:
+                  muted, unfilled, same 36px box as the account button it
+                  replaces, so it is found when looked for without pulling the
+                  eye off the task. The confirm lives with the runner, which
+                  owns the exam copy. */}
+              {exam && (
+                <button
+                  type="button"
+                  onClick={() => examExit?.()}
+                  aria-label="Prüfung verlassen"
+                  title="Prüfung verlassen"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
               {/* Streak chip: flame + day count. The daily-goal figure lives on
                   the dashboard ring now, so the header carries the streak alone
                   (no duplicated goal gauge). Koralle since the s133 rebrand:
                   streak/celebration rides the reward tokens, warning stays a
                   semantic state color. */}
               {/* Steuerung H7: the streak pill can be hidden from remote config. */}
-              {streakPillOn && (
+              {!exam && streakPillOn && (
                 <div
                   className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
                   role="img"
@@ -162,7 +187,7 @@ export function AppShell() {
                   </span>
                 </div>
               )}
-              <AccountMenu />
+              {!exam && <AccountMenu />}
             </div>
           </div>
         </header>
@@ -172,7 +197,10 @@ export function AppShell() {
           className={cn(
             focus
               ? "mx-auto flex min-h-screen w-full max-w-2xl flex-col px-4 pt-safe pb-safe sm:px-6"
-              : "mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8",
+              : "mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8 lg:pb-safe-8",
+            // `pb-nav` reserves the bottom bar's height; without the bar that
+            // gap is dead space under the last control.
+            !focus && (exam ? "pb-safe-8" : "pb-nav"),
           )}
         >
           {/* Desktop shows this nudge at the bottom of the sidebar instead; keep

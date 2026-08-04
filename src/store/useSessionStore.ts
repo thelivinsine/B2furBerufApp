@@ -36,6 +36,22 @@ interface SessionState {
    */
   focusMode: boolean;
   setFocusMode: (on: boolean) => void;
+
+  /**
+   * Exam chrome (s186, founder): while a Prüfungssimulation run is on screen
+   * the mobile bottom bar is hidden and the header drops the streak pill and
+   * account menu, so nothing competes with the task; the header keeps the logo
+   * and gains ONE quiet exit.
+   *
+   * The runner registers its own exit handler here (it owns the confirm dialog
+   * and the exam copy) and clears it on unmount, so a non-null value IS the
+   * "exam chrome" flag. A callback rather than a boolean for two reasons: the
+   * shell needs a way OUT that belongs to the exam, and AppShell is eager code
+   * that must never import `useExamStore`, which pulls the content banks in
+   * through the composer (the keep-eager-code-light invariant).
+   */
+  examExit: (() => void) | null;
+  setExamExit: (fn: (() => void) | null) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -52,4 +68,7 @@ export const useSessionStore = create<SessionState>((set) => ({
 
   focusMode: false,
   setFocusMode: (on) => set({ focusMode: on }),
+
+  examExit: null,
+  setExamExit: (fn) => set({ examExit: fn }),
 }));
