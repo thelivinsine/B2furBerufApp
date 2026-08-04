@@ -52,6 +52,10 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   live only in Supabase Edge Function secrets (never in the repo or browser).
 - **2A schema:** `profiles`, `progress`, `writing_evaluations`, `ai_usage`, owner-only RLS,
   auto-provision trigger on auth.users, `bump_ai_usage` atomic RPC. `profiles.tier` flag present.
+- **s186 added migration 0016:** `progress.mock_exams` (jsonb, the synced mock-exam runs, bounded
+  client-side to the newest 100) and `writing_evaluations.exam_score` (smallint, the 0-100 score
+  the evaluator returns in exam mode; null on every practice row and on any run the model could
+  not score).
 - **Full schema as of s185 (15 migrations).** Per-learner, owner-only RLS: `profiles`, `progress`,
   `writing_evaluations`, `sentence_checks`, `sentence_ai_ops`. Service-role only (no client
   policies at all): `ai_usage`, `feedback`, `admins`, `gdpr_events`, `sentence_transforms` (the one
