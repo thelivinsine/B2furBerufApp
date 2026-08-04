@@ -72,7 +72,7 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
 
 ## Banks
 - **Vocabulary** (`src/data/vocabulary.ts`, ~1,743 words): each entry has `id` (`v_`), article
-  (nouns), plural (countable nouns), pronunciation hint, two example sentences, related terms; all
+  (nouns), plural **or** `numerus` (see below), pronunciation hint, two example sentences, related terms; all
   tagged `cefr`, split themes carry `subThemeId`, sector-specific items a `sectors[]` multi-tag
   (1-4 typical; general words stay untagged). **The bank is two concatenated array literals**
   (`vocabularyPart1/2`, split for the TS2590 union-complexity limit); append new packs to part 2.
@@ -87,6 +87,41 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `vocabulary` stay the FULL bank so ids still resolve. `lintVocabCollocationOverlap` **errors** if
   a vocab `de` equals a collocation `full` unless the id is retired: add the combo to Kollokationen
   + the id to `RETIRED_VOCAB_IDS`.
+
+### Noun number: every noun says `plural` or `numerus` (audit P9, s185)
+329 nouns simply had no `plural`, so "nobody authored this" and "there is nothing to author" looked
+identical, and the Wörter card showed a blank where a fact belongs. Each of those now carries
+`numerus` instead: **`uncountable`** (Singularetantum, no plural in ordinary use: `der Stress`,
+`das Gepäck`, `die Nachhaltigkeit`) or **`pluralOnly`** (the headword IS the plural: `die Spesen`,
+`die Nebenkosten`, `die Stakeholder`). The linter requires exactly one of the two on every noun.
+**Do not backfill a plural from the oracle without reading it.** Both lexicons attest `Stresse`,
+`Supporte`, `Benzine` and `Konsense`; all four are wrong to teach a B1-B2 learner, which is why
+this classification was made by hand and not generated. `pluralLabel()`
+(`src/features/vocabulary/pluralLabel.ts`) renders the three cases as the plural, `kein Plural` or
+`nur Plural`, and `verify:facts` reads `pluralOnly` instead of inferring it from a `die` + masc/neut
+oracle disagreement.
+
+### Pronunciation: ONE respelling scheme (audit P9, s185)
+`pron` is an anglicised respelling for an English-reading learner. It used to be **two** schemes
+split by authoring wave (the workplace half wrote /aɪ/ `y` and /x/ `kh`; the daily-life half wrote
+them `ai` and `x`, and `der Reisepass` shipped both spellings side by side), which makes the field
+useless: a symbol has to mean one sound. The scheme, enforced by `checkPron` in the linter:
+
+| Sound | Write | Example | Never |
+|---|---|---|---|
+| /aɪ/ (ei, ai) after a consonant | `y` | `TSYT-plahn`, `ZI-cher-hyt` | `ai` (reads like "rain") |
+| /aɪ/ starting a syllable, closed by n | `INE` | `INE-kowfs-vaa-gen` | `AIN`, `AYN`, `EYN` |
+| /aɪ/ starting an open syllable | `EYE` | `EYE-mer` | a bare `Y` (reads /j/) |
+| /ɔʏ/ (eu, äu) | `oy` | `ROY-moong` | `oi` |
+| /x/ (ach-Laut) | `kh` | `NAAKH-for-de-roong` | `x` (reads /ks/) |
+| /eː/ (long e) | `ay` | `be-LAYK` | (this is why `AYN` is wrong for "ein") |
+| /yː/, /øː/ (ü, ö) | `UE`, `OE` | `UE-boong` | `Uu`, `Ou`, a bare `Ü` |
+
+The stressed syllable is CAPITALISED; a monosyllable has none to mark and is exempt. **Known gap,
+deliberately not in the lint:** the ich-Laut/ach-Laut split (`ch` vs `kh`) is still inconsistent
+across the bank, and `au` is written `au` in some entries and `ow` in others. Both are a bigger
+re-derivation than P9 covered; do not "fix" one item in passing, fix the class or leave it.
+
 - **Collocations** (`src/data/collocations.ts`, ~1,072 Nomen-Verb pairs): `id` (`c_` prefix +
   snake_case), `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`,
   `example {de, en}`, optional `cefr`/`subThemeId`/`sectors[]`.
@@ -205,7 +240,11 @@ battle graphs resolve and reach a win, content-bank ids exist, required key item
 acyclic dependencies; `GAME_SPRITES` errors on a `GameNpc.sprite` with no registered art); global
 content-id uniqueness ACROSS banks + per-bank id prefixes (v_/c_/g_/sc_/ex_/r_/cd_/tx_/m_/wp_);
 the verified-content fingerprint gate (`stamp:verified`); the `ID_RENAMES` registry; writing-task
-text/sub/sectors validity. Plural is intentionally NOT required on nouns (uncountable/plural-only).
+text/sub/sectors validity; **every noun carries `plural` XOR `numerus`**, and **`pron` follows the
+one respelling scheme** (both above). Those two report as a WARNING rather than an error on a
+human-verified row: fixing one would change the content its `verified` stamp is fingerprinted
+against, and only a human may re-verify, so the 12 affected rows are surfaced for the next review
+pass instead of being edited through the gate.
 It also writes `docs/reports/related-terms-report.md` (unresolvable `related` terms = dropped
 word-graph edges, by design; visible, not a gate).
 

@@ -57,6 +57,7 @@ const WEAKNESS_CATEGORIES = [
 ];
 const SPEAKERS = ["partner", "examiner", "narrator"];
 const ARTICLES = ["der", "die", "das"];
+const NOUN_NUMERUS = ["uncountable", "pluralOnly"]; // mirrors NounNumerus (audit P9, s185)
 const EM_DASH = "—";
 
 /* ---- taxonomy facets (mirror of src/types/index.ts unions, Phase 0) ---- */
@@ -233,22 +234,74 @@ function checkSubTheme(item, themeId, subThemeIndex, ds, w) {
     error(ds, w, `subThemeId "${item.subThemeId}" not declared on theme "${themeId}"`);
 }
 
-function lintVocabulary(vocab, subThemeIndex) {
+/**
+ * The `pron` respelling is ONE documented scheme (audit P9, s185; the key lives
+ * in docs/areas/CONTENT.md §Pronunciation). It used to be two, split by
+ * authoring wave: the workplace half wrote /aɪ/ as `y` and /x/ as `kh`, the
+ * daily-life half wrote them `ai` and `x`, and `der Reisepass` shipped both
+ * spellings side by side. A respelling only helps if one symbol means one
+ * sound, so the losing spellings are errors now.
+ *
+ * This checks the mechanical part only. It cannot tell whether a respelling is
+ * RIGHT, just that it uses the agreed symbols and marks a stress.
+ */
+function checkPron(pron, ds, w, report = error) {
+  // `ai` reads as the vowel in "rain" to an English eye, which is the wrong
+  // sound. The exception is the `air` digraph (/ɛːɐ/, "Verkehr", "Hardware"),
+  // where those two letters are doing a different job.
+  if (/ai(?!r)/i.test(pron))
+    report(ds, w, `pron "${pron}" spells /aɪ/ as "ai" (reads like "rain"). Use "y" after a consonant (TSYT-plahn), "INE"/"EYE" syllable-initially (INE-kowfs-…, EYE-mer).`);
+  if (/oi/i.test(pron))
+    report(ds, w, `pron "${pron}" spells /ɔʏ/ as "oi". Use "oy" (ROY-moong).`);
+  if (/x/i.test(pron))
+    report(ds, w, `pron "${pron}" spells /x/ as "x" (reads as /ks/). Use "kh" (NAAKH-for-de-roong).`);
+  if (/(^|-)(a[iy]n|e[iy]n)(?=[^aeiouäöü]|$)/i.test(pron))
+    report(ds, w, `pron "${pron}" spells the "Ein-" syllable as "ain/ayn/eyn". Use "INE" ("ay" is this scheme's long /eː/, so "AYN" reads "ayn").`);
+  // Multi-syllable respellings mark the stressed syllable in CAPITALS. A
+  // monosyllable has no stress to mark, so it is exempt. Multi-word phrases
+  // split on the space too, and mark the stress of each stressed word.
+  const syllables = pron.split(/[\s-]+/);
+  if (syllables.length > 1 && !syllables.some((s) => /[A-ZÄÖÜ]/.test(s) && s === s.toUpperCase()))
+    report(ds, w, `pron "${pron}" marks no stressed syllable. Put the stressed syllable in CAPITALS.`);
+}
+
+function lintVocabulary(vocab, subThemeIndex, verifiedIds = new Set()) {
   const ds = "vocabulary";
   checkDuplicateIds(vocab, ds);
   for (const v of vocab) {
     const w = v.id ?? "?";
+    // A human-verified row is reported but never failed on the two content-shape
+    // rules added in s185 (pron scheme, numerus). Fixing one would change the
+    // content its "verified" stamp is fingerprinted against, and only a human
+    // may re-verify, so the linter surfaces them for the next review pass
+    // instead of pushing an AI edit through the gate.
+    const report = verifiedIds.has(v.id) ? warn : error;
     for (const f of ["de", "en", "pron", "context"]) if (!isStr(v[f])) error(ds, w, `${f} empty`);
     if (!POS.includes(v.pos)) error(ds, w, `invalid pos "${v.pos}"`);
     if (!THEME_IDS.includes(v.themeId)) error(ds, w, `invalid themeId "${v.themeId}"`);
     if (!Array.isArray(v.examples) || v.examples.length === 0) error(ds, w, "no examples");
     else v.examples.forEach((ex, i) => checkExample(ex, ds, `${w}.examples[${i}]`));
     if (!Array.isArray(v.related)) error(ds, w, "related must be an array");
-    // Every German noun has a gender, so an article is required. Plural is
-    // intentionally omitted for uncountable/plural-only nouns, so it is not
-    // checked (that is a content-completeness concern, not an integrity one).
+    // Every German noun has a gender, so an article is required.
     if (v.pos === "noun" && !ARTICLES.includes(v.article))
       error(ds, w, `noun missing/invalid article "${v.article}"`);
+    // …and every noun states its plural OR why it has none (audit P9, s185).
+    // A missing plural used to be indistinguishable from an unauthored one, so
+    // 329 nouns silently taught no plural at all. Exactly one of the two.
+    if (v.numerus !== undefined && !NOUN_NUMERUS.includes(v.numerus))
+      error(ds, w, `invalid numerus "${v.numerus}"`);
+    if (v.pos === "noun") {
+      if (v.plural && v.numerus)
+        error(ds, w, `carries both plural "${v.plural}" and numerus "${v.numerus}"; pick one`);
+      if (!v.plural && !v.numerus)
+        report(
+          ds, w,
+          `noun has no plural and no numerus. Add plural: "die …", or numerus: "uncountable" (no plural in ordinary use) / "pluralOnly" (the headword IS the plural).`,
+        );
+    } else if (v.numerus !== undefined) {
+      error(ds, w, `numerus is a noun fact, but pos is "${v.pos}"`);
+    }
+    if (isStr(v.pron)) checkPron(v.pron, ds, w, report);
     if (v.cefr !== undefined && !CEFR_LEVELS.includes(v.cefr))
       error(ds, w, `invalid cefr "${v.cefr}"`);
     if (v.frequency !== undefined && !FREQUENCIES.includes(v.frequency))
@@ -1462,7 +1515,11 @@ async function main() {
   const subThemeIndex = buildSubThemeIndex(data.themes);
   lintDomains(data.domains);
   lintThemes(data.themes);
-  lintVocabulary(data.vocabulary, subThemeIndex);
+  lintVocabulary(
+    data.vocabulary,
+    subThemeIndex,
+    new Set(data.provenance.filter((r) => r?.review_status === "verified").map((r) => r.content_id)),
+  );
   lintCollocations(data.collocations, subThemeIndex);
   lintVocabCollocationOverlap(data.vocabulary, data.collocations, data.retiredVocabIds);
   lintVocabLabelCollisions(data.vocabulary, data.retiredVocabIds);

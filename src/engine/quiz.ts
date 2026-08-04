@@ -808,7 +808,12 @@ export function buildPoolQuiz(
   const colDistr = opts.collocationDistractors ?? (cols.length >= 4 ? cols : collocations);
   const themeId: ThemeId | "general" = opts.themeId ?? vocab[0]?.themeId ?? "general";
   const nouns = vocab.filter((v) => v.pos === "noun" && v.article);
-  const withPlural = vocab.filter((v) => v.plural && !/nur Plural/i.test(v.plural));
+  // A plural drill needs ONE unambiguous answer string. Nouns declaring
+  // `numerus` have no plural at all and never had one here; the new exclusion
+  // is the dual-gender job title ("die Ansprechpartner / die
+  // Ansprechpartnerinnen"), whose plural is two forms and cannot be typed or
+  // picked as a single option (s185, P9).
+  const withPlural = vocab.filter((v) => v.plural && !v.plural.includes(" / "));
   // Higher competency (difficulty 3): only the tricky plurals are worth asking.
   const withTrickyPlural = withPlural.filter(isTrickyPlural);
   const uniqueCols = distinctCols(cols); // noun/verb-distinct pool for the match grid
