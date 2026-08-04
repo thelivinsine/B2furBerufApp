@@ -211,7 +211,12 @@ export function AnswerStrip({
             ix === active
               ? "border-primary bg-primary text-primary-foreground"
               : answered(ix)
-                ? "border-accent/20 bg-accent/25 text-accent-ink dark:bg-accent/15"
+                ? // The DIGIT stays foreground-dark, not accent-ink (founder
+                  // s187: "the numbers when answered doesn't look good if the
+                  // text format is blue"). Blue-on-blue was the weakest pairing
+                  // on the strip; the Himmelblau tint alone carries "answered",
+                  // and the number now reads at 11:1 instead of 3.9:1.
+                  "border-accent/20 bg-accent/25 text-foreground dark:bg-accent/15"
                 : "border-border bg-surface text-muted-foreground hover:bg-muted/60",
           )}
         >

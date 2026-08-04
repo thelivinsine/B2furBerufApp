@@ -34,20 +34,20 @@ closest existing surface and reuse its building blocks (§5).
    German in a preview is the copy that is literally app copy in the mocked screen (task text,
    button labels, tooltips), because that is what is under review. Same for the chat summary and the
    PR body. The German-UI rule is about the product, not about what the founder reads.
-4. **Screenshot-verify before presenting.** Render the preview in headless Chromium
+5. **Screenshot-verify before presenting.** Render the preview in headless Chromium
    (`/opt/pw-browsers/chromium`) and check it against the live app's real controls. The founder
    instantly catches drift ("the view buttons are not same as in the app", s154).
-5. **Publish as an artifact** so the founder can view it inside Claude, AND save the file to
+6. **Publish as an artifact** so the founder can view it inside Claude, AND save the file to
    `preview/` (iteration rounds suffixed `-r2`, `-r3`). Keep one artifact URL per topic and
    redeploy it across rounds.
-6. **Wait for the pick, then implement EXACTLY the picked variant.** After implementing, verify the
+7. **Wait for the pick, then implement EXACTLY the picked variant.** After implementing, verify the
    live surface matches the approved preview (screenshot compare). "Preview ≠ live" is a top-4
    complaint.
-7. **Absorb every feedback point.** Founder feedback arrives as numbered lists; address every
+8. **Absorb every feedback point.** Founder feedback arrives as numbered lists; address every
    number and report back per-point. Half-absorbed feedback forced a re-listed 13-point correction
    plus a demanded full audit once (s149). Watch for mid-prompt self-corrections ("I meant Himmel
    Mint", "I said B by mistake, use A") and honor the correction.
-8. **Explain in plain, non-technical language.** The founder is non-technical and has asked
+9. **Explain in plain, non-technical language.** The founder is non-technical and has asked
    repeatedly. No jargon in chat summaries.
 
 ## 2. Pre-flight checklist (run over your own work BEFORE showing it)
@@ -124,8 +124,14 @@ Ranked by how often the founder had to correct AI output:
 - Decorative gradient pairs come ONLY from brand families (blue/sky/cyan, emerald/teal/green,
   amber/orange/yellow, orange/red, rose/pink). Never indigo/violet/purple/fuchsia.
 - Emerald stays the quiet Grammatik accent (icon tiles + Muster panel only).
-- Dark mode: warm navy hue 226/224, deep ground + brighter bluer cards (s154 Option C). Always use
-  tokens, never hardcoded hexes.
+- **Dark mode is near-neutral (s187, founder pick "N3 Slate"), never blue:** greys at 10-15%
+  saturation (ground `220 15% 4%`, card `220 10% 17%`, border `220 10% 38%`), and the two coloured
+  page radials are OFF in dark (`--wash-a`/`--wash-b` = 0), because on a dark ground they read as a
+  blue haze. The reference set the founder named is Claude / ChatGPT / GitHub / VS Code: neutral
+  greys, one accent, colour only where it acts. Three layers always separate: ground → card
+  (1.38:1) → nested-in-card (`--elevated`). Always use tokens, never hardcoded hexes.
+- **Corners are the "tighter" scale (s187):** `--radius: 0.5rem`, so card 10px, row 8px, pill 6px,
+  `2xl` 14px. Check a radius against its BOX, not the token name.
 
 ## 4. Type, copy, chrome
 

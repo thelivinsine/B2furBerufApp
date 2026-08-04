@@ -1,13 +1,25 @@
 # Project Status
 
-_Last updated: 2026-08-04 (session 186). **The Prüfungssimulation is a real four-part mock exam
-now**: Lesen, Hören, Schreiben, Sprechen with per-Teil timers, Anleitung pages, an answer-sheet
-strip, a Niveau row (A2 greyed honestly, no content yet) and a result screen with a 60 % pass line;
-all content drawn from the existing banks, writing scored by the evaluator's new exam mode
-(migration 0016). Four PRs (#791-#794): the exam itself, then **exam chrome** (no bottom bar, one
-quiet header exit), the **exam stage** (a running Teil is one viewport, internal scrolling only)
-and the **question-always-visible** layout, which goes side by side on desktop. Every in-exam
-screen is measured at 0 px page overflow down to 360x640.
+_Last updated: 2026-08-04 (session 187). **Dark mode is no longer blue, the corners are tighter,
+and the running Prüfungsteil got its polish round.** All four founder picks came off ONE interactive
+preview (`preview/exam-question-tile-polish.html`, artifact link in `docs/DECISIONS.md` §s187).
+**Palette "N3 Slate", app-wide:** the dark greys were a blue at 44 % saturation with two coloured
+radials laid over every screen; they are near-neutral now (10-15 %, ground `220 15% 4%`, cards
+`220 10% 17%`) with the washes off in dark, and blue survives only where it acts. The contrast
+relationship is the founder-confirmed one: card/ground 1.38:1, edge/ground 3.03:1, plus a third step
+for anything nested inside a card, because the exam's answer rows carried the very fill of the card
+they sat in (1.00:1). **Corners:** `--radius` 0.875rem → 0.5rem (card 10px, row 8px, pill 6px).
+**Exam:** the question carries NO tile any more (it floats on the ground beside the ONE card on
+screen), each block is content-tall with the pair centred, the number strip moved down beside
+Zurück/Weiter with real space around them, both blocks are drag-resizable (with arrow-key support)
+and reset on every question change, and the exit is red: the bare door mark on a phone, mark plus
+"Verlassen" from `sm` up. The answered number is no longer blue-on-blue. Verified by driving the
+real build: **225 in-exam screens** across five viewports and three fresh draws each of Lesen and
+Hören, all at 0 px page overflow with the question fully visible; gates green (typecheck, lint 0
+errors, 551 tests, check:contrast, bundle 126.0 kB).
+Prior s186: the Prüfungssimulation became a real four-part mock exam (Lesen, Hören, Schreiben,
+Sprechen) in four PRs (#791-#794), with per-Teil timers, an answer-sheet strip, the one-viewport
+exam stage and a result screen with a 60 % pass line.
 Prior s185: **The content-audit backlog is down to one open item.**
 The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
 are closed outright, and so is P3 now that the founder picked and refined the Notizen step.
@@ -116,6 +128,33 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 187 (2026-08-04): the exam polish round + the app-wide dark palette.**
+Founder feedback on the shipped Prüfungsteil (7 numbered points across the session), answered with
+ONE interactive preview and then implemented from their picks. **What shipped:**
+- **Dark palette "N3 Slate", app-wide** (`src/index.css` `.dark` + `--wash-a`/`--wash-b` read by
+  `bg-page`/`bg-mesh`): near-neutral greys, no coloured page radials in dark, blue only where it
+  acts. Contrast steps are the founder-confirmed "K2" relationships (card/ground 1.38:1,
+  edge/ground 3.03:1, nested-in-card 1.20:1). `pnpm check:contrast` green.
+- **Corner scale "tighter"**: `--radius: 0.5rem` + tightened ± steps in `tailwind.config.ts`
+  (card 10px, row 8px, pill 6px, `2xl` 14px). Affects every surface, on purpose.
+- **The exam screen** (`src/features/exam/McParts.tsx`, rewritten): the question has no tile, one
+  card per screen, content-tall blocks centred in the stage, the number strip in the bottom cluster
+  with 16/12/16 px of air, drag-resize on both axes with arrow-key steps and a reset on every
+  question change, fade-out on both scroll regions, `pb-safe-4`.
+- **The exit** (`AppShell`): red `LogOut`, icon-only on a phone, icon + "Verlassen" from `sm` up.
+- **The answered number** (`AnswerStrip`): `text-foreground` on the Himmelblau tint, not
+  `text-accent-ink`.
+**Verification:** a Playwright driver walked the real build over 225 in-exam screens (1440x900,
+1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × three fresh draws): 0 px page overflow
+everywhere, question fully visible on every screen, no console errors, light and dark.
+**Docs updated in the same PR:** CLAUDE.md (dark palette + corner law, and the English rule),
+`docs/areas/BRAND.md` (tokens, radius scale), `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, the
+`max-h-full` geometry trap), `docs/DECISIONS.md` §s187, the `/design` skill (English previews, never
+mark a recommendation, the new palette + corners).
+**Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
+open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
+(synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.
+
 **Handoff after session 186 (2026-08-04): the Prüfungssimulation rework, in four merged PRs.**
 Founder: the simulation "should actually feel like an exam with all the lesen, hören, schreiben and
 sprechen modules with a timer and clear instructions"; picks after a preview round
@@ -194,43 +233,3 @@ answerable in the word target, or that the Branche framing convinces someone who
 industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
 audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
 C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
-
-**Handoff after session 185b (2026-08-04, parallel branch): the database architecture audit.**
-Founder: "the database architecture is concerningly linear.. can you do a thorough audit and provide
-your analysis with risks and recommendations?"
-- **The report is `docs/reports/db-architecture-audit-2026-08-04.md`** (all 15 migrations, the 5 Edge
-  Functions, `cloudSync.ts`, the admin RPCs; findings R1-R8 with per-finding status). **Verdict:**
-  the "linear" schema is the correct consequence of keeping the ~5,000-id content catalog in the
-  repo; the real risks were growth-shaped, not shape-shaped. Read the report for the reasoning; this
-  handoff records only what changed and what is still owed.
-- **The founder then said "do the four fixes", and all four shipped:**
-  1. **R3, the silent sync.** The push helpers ignored the supabase-js `{ error }`, so a permanently
-     failing sync was indistinguishable from a working one. They now read it, retry with backoff,
-     and after 3 consecutive failures Settings shows an amber **"Sync pausiert"** with the last
-     backup time and a live retry. Also added an **unknown-column retry**: the site and migration
-     deploys are separate workflows, and an unknown column fails the whole upsert.
-  2. **R4, retention** (`0015_retention.sql`): three weekly `pg_cron` purges, guests 90 d, dead
-     transform-cache rows 60 d, learner text 730 d. Block exception-wrapped so a missing extension
-     warns instead of failing the migration step and blocking the function deploys behind it.
-  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, dropped active days folded into `activeDaysFolded`
-     (+ cloud column) so the lifetime "N aktive Tage" figure is unchanged.
-  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules, files
-     ≤ 0014 exempt as already-applied history. Verified in both directions.
-- **The one question the code could not answer went to the founder: learner text expires after
-  2 years** (audit F11, now CLOSED). The job NULLs the text columns rather than deleting rows, so AI
-  limits and aggregates keep working and Verlauf keeps the evaluation: the learner loses old raw
-  text, never their progress record. The privacy policy was rewritten in the same change (also
-  documenting the new 90-day guest rule, and dropping the sentence that had promised indefinite
-  retention). Standing rule in `docs/DECISIONS.md` §s185.
-- **The documentation pass then caught a real miss in that policy change and fixed it.** The rewrite
-  had shipped WITHOUT bumping `PRIVACY_LAST_UPDATED_ISO` and `CONSENT_VERSION`, so a legal page
-  rendered materially new retention terms under the old date. **The §G2 drift check provably cannot
-  catch this:** `consentInSync()` compares the two constants to each other, so forgetting BOTH stays
-  green. Both are now `2026-08-04`; the rule is written into `docs/areas/LEGAL-ADMIN.md`.
-- **Still owed (see "Resume here"):** confirm `/admin → Launch` reads `retention_scheduled: true`.
-- **Design:** `preview/sync-status.html`, screenshot-verified. The new state reuses the existing
-  badge recipe with the warning token, so no new visual language was introduced.
-- **Gates:** typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515**
-  (9 new) · build · check:bundle 124.7 kB. **Shipped:** PR **#786** (`7fe00dd`) and **#787**
-  (`f738544`), both squash-merged, all three workflows green, migration 0015 applied to the live
-  database.

@@ -3859,3 +3859,48 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   1400 px and 390 px, no console errors, light and dark.
 - **Artifacts (prompt 2):** `preview/exam-question-tile-polish.html` · `CLAUDE.md` ·
   `.claude/skills/design/SKILL.md` · this log
+- **Prompt 3 (verbatim, 2026-08-04):** `Dark palette - N3\nText - layout B looks good and keep it
+  "long" but no surrounding tile for the question - the question and options can just float on the
+  background\nExam exit icon - X1 for mobile, X2 for desktop view\nCorner - tighter\nThe numbers when
+  answered doesn't look good if the text format is blue in color (see attached) - use another color
+  from the pallette for better contrast - take your recommendation and go head without any preview
+  for this.\n\nImplement the above comments now with exceptional quality`
+  Mid-prompt addition (verbatim): `implement the dark mode palette selected above for the whole app`
+  · then `document the session`
+  **Response:** every pick implemented, verified against the real build, documented.
+  **Palette N3 Slate (app-wide, `src/index.css` `.dark`):** ground `220 15% 4%`, surface
+  `220 10% 17%`, elevated `220 9% 22%`, muted `220 9% 25%`, border `220 10% 38%`, foreground
+  `220 12% 94%`, muted-foreground `220 8% 72%`, primary/ring `219 90% 74%`, accent-ink
+  `198 72% 72%`, shadow `220 30% 2%`; the two coloured page radials are switched off in dark via new
+  `--wash-a`/`--wash-b` tokens read by `bg-page`/`bg-mesh` in `tailwind.config.ts`. `check:contrast`
+  green with every pairing.
+  **Corners "tighter":** `--radius` 0.875rem → **0.5rem** and the borderRadius steps tightened to
+  ±2/±4/+6, so card 10px, row 8px, pill 6px, `sm` 4px, `2xl` 14px (the old ±4/±10 would have
+  collapsed `sm` to 0).
+  **Exam (`McParts.tsx` rewritten around variant B):** the question renders with NO card, the ONE
+  card on screen is the text / Notizen sheet, both blocks are content-tall and the pair is centred,
+  the number strip moved into the bottom cluster (16 px above, 12 px to the buttons, `pb-safe-4`
+  below), the cluster is capped `lg:max-w-xl` and centred, both scroll regions fade their last line,
+  and a `role="separator"` drags the split sideways (desktop, 32-72 %) or up/down (phone, 24-64 %)
+  with a grow handle on the card and arrow-key steps, all reset on every question change.
+  **Exit (`AppShell`):** red `LogOut`, bare mark on a phone (X1), mark + "Verlassen" in a red
+  outline from `sm` up (X2), no tooltip beside a visible label.
+  **Answered number:** `text-foreground` on the Himmelblau tint instead of `text-accent-ink`
+  (~3.9:1 → ~11:1). Green was rejected on purpose: green means correct, and answered is not correct.
+  **One real bug found while verifying:** a percentage `max-height` only resolves against a parent
+  with a definite height, so the auto-height wrapper made every `max-h-full` a no-op and a tall
+  question pushed the stage 48 px past one viewport. Wrapper is `h-full` + `lg:items-center` now.
+  **Verification:** a Playwright driver over the real build, **225 in-exam screens** (1440x900,
+  1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × 3 fresh draws): 0 px page overflow, question
+  fully visible everywhere, no console errors, light + dark. Gates: typecheck · lint 0 errors ·
+  551 tests · check:contrast · build · check:bundle 126.0 kB.
+  **Documentation:** `PROJECT_STATUS.md` (`_Last updated_` rewritten to s187, new handoff, s185b
+  archived to `docs/archive/status-log/…W32.md`, back under the 250-line cap), `CLAUDE.md`
+  (dark-palette + corner law), `docs/areas/BRAND.md` (tokens + radius scale, s153 Option C replaced),
+  `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, resize, the geometry trap), `docs/DECISIONS.md`
+  §s187, and the `/design` skill.
+- **Artifacts (prompt 3):** `src/index.css` · `tailwind.config.ts` · `src/features/exam/McParts.tsx` ·
+  `src/features/exam/MockExamRunner.tsx` · `src/components/layout/AppShell.tsx` ·
+  `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/areas/BRAND.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log

@@ -177,6 +177,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile.
 - **Controls always visibly act:** no disabled-at-default buttons; zero-yield options grey out
   with honest counts.
+- **Dark mode is near-neutral, not blue** (founder s187, "N3 Slate"): the greys carry a whisper of
+  cool (10-15% saturation, ground `220 15% 4%`, cards `220 10% 17%`) and the two coloured page
+  radials are OFF in dark (`--wash-a`/`--wash-b`). Colour survives only where it ACTS: the gradient
+  CTA, an active number, a selected answer. Three layers always separate: ground → card (1.38:1) →
+  anything nested inside a card (`--elevated`); a row that carries its card's own fill is a bug, not
+  a style. Corners are the "tighter" scale (`--radius: 0.5rem` → card 10px, row 8px, pill 6px).
 - **Color language:** Himmelblau accent tiles for selection rails (not grey), and the accent is a
   FILL with NO visible edge: rails and the buttons that open them border in their own fill color
   and separate from the page by `shadow-soft` alone, like the Bibliothek cards (never an accent

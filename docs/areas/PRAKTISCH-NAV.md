@@ -34,7 +34,10 @@ exam card is NOT called "Prüfung": a card may not carry the name of the page it
   hides EVERYTHING, header and sidebar included; the composed session is a full-screen stage.
 - **Exam chrome** (`useSessionStore.examExit`, route-gated to `/exam`, founder s186): a running
   Prüfungssimulation hides the bottom bar and swaps the header's streak pill + account menu for
-  ONE quiet muted X ("Prüfung verlassen", same 36px box the account button had). The header, the
+  ONE exit in `--danger` red (founder s187, preview options X1 + X2): a phone gets the bare
+  `LogOut` mark on the same 36px box the account button had, and from `sm` up it grows the word
+  "Verlassen" in a quiet red outline. No tooltip beside a visible label; the phone keeps the
+  `aria-label`/`title`. The header, the
   logo and the desktop sidebar STAY: an exam still needs its top bar, and the founder scoped this
   to the mobile bottom bar. `examExit` holds the runner's own exit handler rather than a boolean,
   because `AppShell` is eager code and must never import `useExamStore` (it reaches the content
@@ -56,18 +59,34 @@ exam card is NOT called "Prüfung": a card may not carry the name of the page it
   (`resize-none`, since a dragged textarea re-breaks the viewport), Sprechen scrolls the dialogue,
   and the Anleitung/Ergebnis screens scroll themselves. Measured at 393x852, 375x667 and 360x640:
   all ten in-exam screens rest at **0 px** page overflow.
-  **The question tile is never the elastic one** (founder s186, "the question and options are not
-  visible here"): text (Lesen) and the Notizen sheet (Hören) shrink and scroll, the question keeps
-  its natural height and is verified fully on screen for every question at all three sizes. Three
-  rules fell out of making that fit on a 667 px phone, and they are load-bearing, not cosmetic:
-  the question card carries NO "Aufgabe N von M" eyebrow (the centred number strip already says
-  it), "Teil abschließen" appears only on the LAST question once everything is answered (a
-  permanent submit row cost every screen ~52 px, and until then Zurück/Weiter occupy that row,
-  with the submit replacing Weiter, which has nowhere useful to go there), and the strip is
-  `gap-1` so nine numbers stay on ONE row at 360 px. On the smallest phones the reading pane can
-  still fall to ~2 lines for the tallest questions; it scrolls, and the expand button reads the
-  text full-screen. **From `lg` up the two tiles sit side by side** (text/Aufgabe `basis-3/5`,
-  question `basis-2/5`; Schreiben mirrors it with the Aufgabe at `basis-2/5`). The hub is a menu, not a Teil, and scrolls
+  **The question is never the elastic one, and it carries no tile** (founder s186 + s187): the
+  reading text (Lesen) and the Notizen sheet (Hören) live in the ONE card on screen, shrink and
+  scroll; the question line and its answer rows sit straight on the page ground, so the screen is
+  never a big card beside a small one. Each block is as tall as its own content and the pair sits
+  CENTRED in the stage (preview variant "B"), so a short text leaves air around the card rather
+  than inside it. Three rules from the 667px fit are load-bearing, not cosmetic: no
+  "Aufgabe N von M" eyebrow (the number strip already says it), "Teil abschließen" appears only on
+  the LAST question once everything is answered (a permanent submit row cost every screen ~52 px),
+  and the strip is `gap-1` so nine numbers stay on ONE row at 360 px. The number strip moved DOWN
+  into the bottom cluster (s187), directly above Zurück/Weiter, with 16 px above it, 12 px to the
+  buttons and 16 px below (`pb-safe-4`); the cluster is capped at `lg:max-w-xl` and centred so a
+  600px-wide button never spans half a desktop window.
+  **The learner can resize** (s187): a separator between the two blocks drags sideways on desktop
+  (32-72 %) and up/down on a phone (24-64 %), and the reading card has a grow handle that takes
+  room from the air around it. Both are real `role="separator"` controls with arrow-key steps, and
+  **every question change resets them** to the default 56/44. Watch the geometry when touching
+  this: a percentage `max-height` only resolves against a parent with a DEFINITE height, so the
+  wrapper holding the pair is `h-full` and `lg:items-center` does the centring. With an auto-height
+  wrapper every `max-h-full` under it silently became a no-op and a tall question pushed the stage
+  past one viewport.
+  On the smallest phones the reading pane can still fall to ~2 lines for the tallest questions
+  (its floor is `min-h-[6.5rem]`, `sm:min-h-[8.25rem]`); it scrolls, both scroll regions fade their
+  last line while there is more below, and the expand button reads the text full-screen.
+  **From `lg` up the two blocks sit side by side** (reading side 56 % by default, question the
+  rest; Schreiben mirrors it with the Aufgabe at `basis-2/5`). Verified by driving the real build:
+  225 in-exam screens across 1440x900, 1024x768, 393x852, 375x667 and 360x640, three fresh draws of
+  Lesen and Hören each, all at **0 px** page overflow with the question fully visible. The hub is a
+  menu, not a Teil, and scrolls
   like every other hub (95-151 px on a 667 px phone, against 237 px for `/anwenden` and 253 px for
   Praktisch); it is deliberately NOT on the stage.
 **Those cards wear the branded route marks, not lucide icons** (founder pick 2, s183): each card

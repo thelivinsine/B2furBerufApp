@@ -105,7 +105,13 @@ input:-webkit-autofill {
     /* Warm-navy Schatten (#22304F): every shadow recipe reads it, so cards
        cast a brand-tinted shadow on the Papier ground, never gray-black. */
     --shadow: 221 40% 22%;
-    --radius: 0.875rem;
+    /* Corner scale (founder s187, "tighter"): 14px → 8px, so a card lands at
+       10px and a pill at 6px. Still a squircle, never a circle; the ± steps in
+       tailwind.config.ts tightened with it. */
+    --radius: 0.5rem;
+    /* Strength of the two coloured page radials; dark sets both to 0. */
+    --wash-a: 0.10;
+    --wash-b: 0.09;
 
     /* Accent-gradient stops (s137 premium pass): token-driven so the sweep
        retunes per theme (the old fixed end stop broke contrast in dark mode).
@@ -124,40 +130,46 @@ input:-webkit-autofill {
        on a violet hue left over from the indigo era; warm navy carries the
        Nachtblau identity instead. Same lightness/saturation, so every pairing
        still clears AA with room (see check-contrast.mjs). */
-    /* s153 contrast pass — dark "Option C": the flat 24%/10% ground let cards
-       (--surface) sit only 4% above the background, so they vanished. Now a
-       DEEP blue ground (6% L, 44% sat) carries BRIGHTER, bluer cards (18% L)
-       with an accent-tinted border and a lifted primary. The surface↔background
-       gap is 12% (was 4%), which does the separation; the brighter border
-       reinforces the card edge. Every check-contrast.mjs pairing re-verified. */
-    --background: 226 44% 6%;
-    /* bg-page is a no-op in dark: all three stops sit on the flat dark ground
-       (the mesh washes above them still give the usual subtle glow). */
-    --page-from: 226 44% 6%;
-    --page-mid: 226 44% 6%;
-    --page-to: 226 44% 6%;
-    --foreground: 224 24% 94%;
-    --surface: 224 26% 18%;
-    --elevated: 224 24% 22%;
+    /* s187 palette pass — founder pick "N3 Slate", after the s153 Option-C
+       greys read as "too much blue" beside Claude / ChatGPT / GitHub / VS Code.
+       Two things changed at once. COLOUR: the greys drop from 44% saturation to
+       10-15%, so they read as greys with a whisper of cool rather than as blue,
+       and the two page washes are switched off in dark (--wash-*, below), which
+       is where much of the blue haze came from. Blue now survives only where it
+       ACTS: the CTA gradient, the active answer number, a selected answer.
+       CONTRAST: the s186 exam feedback ("not enough contrast between the tiles")
+       measured out as card-over-ground 1.34:1, and answer rows carrying the very
+       fill of the card they sat in (1.00:1). The steps are now ground 4% →
+       card 17% → row-in-card 22%, i.e. card/ground 1.38:1, edge/ground 3.03:1,
+       row/card 1.20:1. Founder picked this contrast level as "K2" and the hue as
+       "N3" from preview/exam-question-tile-polish.html. All check-contrast.mjs
+       pairings re-verified. */
+    --background: 220 15% 4%;
+    /* bg-page is a no-op in dark: all three stops sit on the flat dark ground,
+       and --wash-a/--wash-b take the two coloured radials out entirely. */
+    --page-from: 220 15% 4%;
+    --page-mid: 220 15% 4%;
+    --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%;
+    --surface: 220 10% 17%;
+    --elevated: 220 9% 22%;
 
-    --muted: 224 22% 25%;
-    /* Dimmed secondary text; lifted 72%→77% for the brighter Option-C surfaces
-       so it still reads as secondary while clearing AA on surface AND muted. */
-    --muted-foreground: 224 13% 77%;
+    --muted: 220 9% 25%;
+    /* Dimmed secondary text: 72% clears AA on the card (6.98:1) and on muted. */
+    --muted-foreground: 220 8% 72%;
 
-    /* Accent-tinted, brighter card edge (Option C's "defined edge"): 26%→36% L,
-       hue pulled toward the sky accent so a card outline reads on-brand. */
-    --border: 216 28% 36%;
-    --input: 220 24% 31%;
-    /* Nachtblau lifted for the deep Option-C ground: 76% lightness clears AA as
-       text on the 6%-L background with wide margin. */
-    --ring: 219 96% 76%;
+    /* The card edge does a lot of the separating in this palette (3.03:1 against
+       the ground), so it is lifted to 38% L, and de-tinted with the rest. */
+    --border: 220 10% 38%;
+    --input: 220 9% 30%;
+    /* Nachtblau on the deep ground: 74% lightness clears AA with wide margin. */
+    --ring: 219 90% 74%;
 
-    --primary: 219 96% 76%;
+    --primary: 219 90% 74%;
     --primary-foreground: 228 30% 8%;
     --accent: 197 93% 77%; /* Himmel Soft, same swatch as light (s138) */
     --accent-foreground: 202 71% 10%;
-    --accent-ink: 198 85% 72%;
+    --accent-ink: 198 72% 72%;
 
     --success: 153 50% 52%;
     --success-foreground: 228 30% 8%;
@@ -181,7 +193,12 @@ input:-webkit-autofill {
     --das-bg: 145 35% 15%;
     --ink: 228 12% 85%;
 
-    --shadow: 221 60% 3%;
+    --shadow: 220 30% 2%;
+    /* The two coloured page radials (bg-page / bg-mesh in tailwind.config.ts)
+       are a light-mode effect only: on the dark ground they read as a blue haze
+       over every screen, which is exactly what the founder rejected in s187. */
+    --wash-a: 0;
+    --wash-b: 0;
 
     /* Dark gradient stops: the dark primary is a LIGHT blue with near-black
        text, so the sweep must stay light end to end (the s133 fixed end stop
@@ -426,6 +443,9 @@ input:-webkit-autofill {
   }
   .pb-safe-2 {
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+  .pb-safe-4 {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
   /* Exam stage (s186, founder: "there should not be any page scroll here. only
      internal scrolling"). A running Prüfungsteil is exactly the room left under
