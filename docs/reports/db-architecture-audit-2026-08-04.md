@@ -196,10 +196,19 @@ F11, makes the 0010 evidence real, and flattens all three growth curves at once.
   together, and a conflict between them is never resolved by quietly editing the copy.**
 
 Because a job is now scheduled, `admin_gdpr_evidence().retention_scheduled` (migration 0010)
-reports `true` for the first time, which is the evidence that probe was written to collect.
-The whole `pg_cron` block is wrapped in an exception handler: if the extension is unavailable
-the migration still succeeds with a warning and the purge functions stay callable by hand,
-rather than failing the migration step and blocking the Edge Function deploys behind it.
+should report `true` for the first time, which is the evidence that probe was written to
+collect. The whole `pg_cron` block is wrapped in an exception handler: if the extension is
+unavailable the migration still succeeds with a warning and the purge functions stay callable
+by hand, rather than failing the migration step and blocking the Edge Function deploys behind
+it.
+
+**Verification note.** That safety net has a cost worth stating plainly: `supabase db push`
+does not surface Postgres NOTICE/WARNING output, so a green deploy proves the migration
+applied but NOT that the three jobs were scheduled. The two states are distinguishable in one
+place, `/admin → Launch`, where `retention_scheduled` reads the live `cron.job` table. If it
+reads false, pg_cron is not enabled on the project: turn it on under Database → Extensions and
+re-run the Supabase workflow, which re-applies migration 0015 idempotently and schedules the
+jobs. Until that is checked, treat the purges as installed but unproven.
 
 ### R5 — Admin analytics recompute from the blobs, O(users × account-age) per dashboard view
 

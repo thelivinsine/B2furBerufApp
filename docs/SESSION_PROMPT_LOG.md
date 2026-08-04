@@ -3408,3 +3408,17 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/legal/PrivacyPolicy.tsx` · `CLAUDE.md` · `docs/DECISIONS.md` ·
   `docs/reports/db-architecture-audit-2026-08-04.md` · `docs/PROJECT_STATUS.md` · this log.
   Shipped as PR **#786**.
+- **Post-merge verification (2026-08-04, same session, no founder prompt):** all three workflows
+  green on the merge commit `7fe00dd` (Validate content · Deploy site to GitHub Pages · Deploy
+  Supabase functions), and the Supabase log shows `Applying migration 0015_retention.sql` followed
+  by `Finished supabase db push`, so the migration applied to the live database.
+  **One claim was walked back as an overclaim:** the handoff said
+  `admin_gdpr_evidence().retention_scheduled` now reports true. That is not verified and cannot be
+  from the deploy log, because `supabase db push` does not surface Postgres NOTICE/WARNING output
+  and the pg_cron block warns instead of failing by design (so that a project without the extension
+  cannot block the Edge Function deploys behind it). A green deploy therefore proves the migration
+  applied, NOT that the three jobs were scheduled. `PROJECT_STATUS.md` and the audit report now say
+  so and name the one place that distinguishes the two states, `/admin → Launch`, plus the recovery
+  (enable pg_cron under Database → Extensions, re-run the workflow, which re-applies 0015
+  idempotently).
+- **Artifacts (post-merge):** `docs/PROJECT_STATUS.md` · `docs/reports/db-architecture-audit-2026-08-04.md` · this log
