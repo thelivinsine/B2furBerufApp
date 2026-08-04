@@ -752,6 +752,15 @@ export interface TextCheck {
   explain?: string;
 }
 
+/** One field a learner notes down while listening: what to catch, and what the
+ *  message actually said, revealed for self-correction. */
+export interface TextNoteField {
+  /** German label for the field ("Rückrufnummer", "Neue Uhrzeit"). */
+  label: string;
+  /** The value as the text gives it, so the learner can check their own note. */
+  value: string;
+}
+
 /**
  * A short authentic-style German text for the Lesen/Hören session block
  * (Behörden letter, workplace email, memo, announcement, voicemail script).
@@ -775,6 +784,14 @@ export interface ReadingText {
   en: string;
   /** Two to three comprehension checks. */
   checks: TextCheck[];
+  /**
+   * Note-taking fields for a listening text (audit P3, s185). A telc/Goethe
+   * Hören task is not only "did you understand", it is "can you write down the
+   * callback number while the message runs" — and a voicemail whose whole point
+   * is a time, a number and a deadline is exactly that task. Present = this
+   * text carries a Notizen step; absent = comprehension checks only.
+   */
+  notes?: TextNoteField[];
   /** Optional sub-theme link; must be declared on the parent theme. */
   subThemeId?: SubThemeId;
   /** Optional Branche tags (scale-up Wave 2, 2026-07-12; array since the

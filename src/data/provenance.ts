@@ -42818,6 +42818,102 @@ const provenancePart4: ProvenanceEntry[] = [
     review_status: "draft",
     notes: "themeId=arzt; level=3. Authored branching dialogue (s185, audit P4: level 3 was 2 of 30 scenarios and workplace-only); verify German accuracy and the professional judgement behind each option quality."
   },
+  {
+    content_id: "tx_b2_arzt_op_aufklaerung",
+    content_type: "text",
+    label: "Vor Ihrer Operation: Was Sie wissen sollten",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; kind=letter; cefr=B2.1. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_arzt_vorsorge_merkblatt",
+    content_type: "text",
+    label: "Vorsorgeuntersuchungen: Wer zahlt was?",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; kind=announcement; cefr=B2.2. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_bildung_anerkennung",
+    content_type: "text",
+    label: "Merkblatt: Anerkennung ausländischer Berufsabschlüsse",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bildung; kind=announcement; cefr=B2.1. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_bildung_pruefungsordnung",
+    content_type: "text",
+    label: "Prüfungsordnung: Änderungen zum neuen Kursjahr",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bildung; kind=letter; cefr=B2.2. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_customer_kulanzantwort",
+    content_type: "text",
+    label: "Antwort auf Ihre Reklamation vom 14. März",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=customer; kind=email; cefr=B2.2. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_logistics_tourenplanung",
+    content_type: "text",
+    label: "Umstellung der Tourenplanung ab dem 1. Oktober",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=logistics; kind=memo; cefr=B2.1. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_bank_gebuehrenaenderung",
+    content_type: "text",
+    label: "Änderung Ihres Kontomodells zum 1. Juli",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bank; kind=letter; cefr=B2.2. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_b2_mobilitaet_baustellenfahrplan",
+    content_type: "text",
+    label: "Bauarbeiten auf der Linie 4: Was ab Montag gilt",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gb2.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=mobilitaet; kind=announcement; cefr=B2.1. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
+  },
 ];
 
 export const provenance: ProvenanceEntry[] = provenancePart1

@@ -797,6 +797,21 @@ function lintTexts(texts, subThemeIndex) {
     for (const f of ["title", "titleEn", "de", "en"]) if (!isStr(t[f])) error(ds, w, `${f} empty`);
     checkSubTheme(t, t.themeId, subThemeIndex, ds, w);
     checkSectors(t, ds, w);
+    // Notizen task (audit P3, s185): a listening text can ask the learner to
+    // note down the facts a voicemail exists to deliver. Every field needs both
+    // halves, because the value is what the learner self-corrects against, and
+    // a note-taking task only makes sense on something you LISTEN to.
+    if (t.notes !== undefined) {
+      if (!Array.isArray(t.notes) || t.notes.length < 2)
+        error(ds, w, "notes must have at least 2 fields (or be absent)");
+      else
+        for (const [i, f] of t.notes.entries()) {
+          if (!isStr(f?.label)) error(ds, `${w}/notes[${i}]`, "note label empty");
+          if (!isStr(f?.value)) error(ds, `${w}/notes[${i}]`, "note value empty");
+        }
+      if (t.kind !== "voicemail")
+        warn(ds, w, `carries a Notizen task but kind is "${t.kind}"; the task assumes a listening text`);
+    }
     // The 4.4 renderer shows a comprehension MCQ after every text, so the
     // 2-3 checks per item are part of the content contract, not optional.
     if (!Array.isArray(t.checks) || t.checks.length < 2) {

@@ -88,6 +88,21 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   a vocab `de` equals a collocation `full` unless the id is retired: add the combo to Kollokationen
   + the id to `RETIRED_VOCAB_IDS`.
 
+### Texts: exam length and the Notizen task (audit P3, s185)
+The bank's median was **90 words**, which can be read in full every time, so nothing exercised the
+two B2 reading skills (skim for gist, scan for detail) and all 108 checks were literal retrieval.
+s178 added 6 C1 texts at 305-344 words; s185 added **8 at B2**, chosen so every domain has at least
+two exam-length texts: gesundheit and bildung had **none** (arzt ×2, bildung ×2), plus customer,
+logistics · bank, mobilitaet. Range 288-333 words, three checks each, and a check must need an
+inference ACROSS paragraphs (which of three changes helps you and why; what follows from a
+condition stated two paragraphs earlier), never a lookup.
+**`notes?: TextNoteField[]`** marks a listening text that carries a **Notizen task**: the facts a
+voicemail exists to deliver (callback number, new time, deadline, what to bring). All 6 voicemails
+carry 5 fields each. `label` is what to catch, `value` is what the message said, so the learner
+self-corrects. The linter requires both halves and warns if a non-voicemail carries the field.
+**The learner-facing step is not built yet** and is waiting on a founder pick from
+`preview/notizen-*.html`; until then the field is authored data the UI can read.
+
 ### Noun number: every noun says `plural` or `numerus` (audit P9, s185)
 329 nouns simply had no `plural`, so "nobody authored this" and "there is nothing to author" looked
 identical, and the Wörter card showed a blank where a fact belongs. Each of those now carries
