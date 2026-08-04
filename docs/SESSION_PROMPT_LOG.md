@@ -3970,3 +3970,28 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/features/anwenden/AnwendenHub.tsx` · `src/components/layout/nav-items.ts` · `CLAUDE.md` ·
   `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+- **Prompt 3 (verbatim, 2026-08-04):** `document the session`
+  **Response:** the documentation for prompts 1 and 2 had already shipped inside PR #797 (merged),
+  so this pass was an audit for anything the rename left stale, plus this entry.
+  **One real leftover found and fixed:** the Sprechen runner (`ExamRunner.tsx`, reached through the
+  Modelltest Sprechen part) printed the exam set's raw title, and the bank titles carry a
+  "Prüfungssimulation: " prefix from the old page name, so the retired name was still on screen in
+  two places (the Aufgabenblatt header and the RunBar). The titles are CONTENT, with provenance rows
+  and human-verified stamps, so they were NOT rewritten to follow a UI rename: `examSetTitle()` in
+  `features/exam/partMeta.ts` strips the prefix at render, which `MockExamRunner` had been doing
+  inline. It sits in `partMeta` rather than `engine/exam` on purpose, so importing one string helper
+  cannot drag the content banks into a chunk. Verified by driving the real app into the Sprechen
+  part: the header reads "Sicherheitsmängel beheben".
+  Four code comments describing the CURRENT page were renamed with it (`route-icons`, `AppShell`,
+  `AnwendenHub`, `useSessionStore`); comments that date the s186 rework keep the name that change
+  shipped under, and `data/examSets.ts` + `data/provenance.ts` were left untouched.
+  **Docs in this pass:** the `/design` skill gained a Modelltest anchor in §6 (the run leads, one
+  place per result, no HubHero, one zero-state statement per control), `docs/DECISIONS.md` §s188
+  gained the content-vs-UI rename note, `docs/PROJECT_STATUS.md`'s s188 handoff records the
+  follow-up, and this log.
+  **Gates:** typecheck · lint 0 errors · 551 tests · build · check:bundle 126.0 kB.
+- **Artifacts (prompt 3):** `src/features/exam/partMeta.ts` · `src/features/exam/ExamRunner.tsx` ·
+  `src/features/exam/MockExamRunner.tsx` · `src/components/layout/route-icons.tsx` ·
+  `src/components/layout/AppShell.tsx` · `src/features/anwenden/AnwendenHub.tsx` ·
+  `src/store/useSessionStore.ts` · `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log

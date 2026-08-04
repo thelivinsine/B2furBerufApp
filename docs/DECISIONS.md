@@ -1461,3 +1461,9 @@ weight). The founder picked **B**, with two amendments.
 - **The A2 zero state states itself once per control.** The band in its CTA slot, each row in its
   content line, and no page-level sentence: "Wähle B1, B2 oder C1" was pointing at a switcher
   sitting directly above it.
+- **The rename stopped at the UI, not the content.** The Sprechen bank's exam sets are titled
+  "Prüfungssimulation: <Aufgabe>" and are content, with provenance rows and human-verified stamps,
+  so they were NOT rewritten to follow a UI rename. `examSetTitle()` in `features/exam/partMeta.ts`
+  strips the prefix wherever a title is shown (the Sprechen runner header and its RunBar were still
+  printing the old page name). It lives in `partMeta`, not `engine/exam`, so a caller does not pull
+  the content banks in behind one string helper.

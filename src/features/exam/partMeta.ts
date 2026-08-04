@@ -49,3 +49,15 @@ export const PART_META: Record<
       "Sie lösen eine Aufgabe im Gespräch mit einer Partnerin oder einem Partner. Reagieren Sie auf Vorschläge und finden Sie gemeinsam eine Lösung. Am Ende bewerten Sie sich selbst anhand des Prüfungsrasters.",
   },
 };
+
+/**
+ * Display title for an exam set. The bank's titles carry a "Prüfungssimulation:"
+ * prefix from the era when that was the page's name (they are content, with
+ * provenance rows and human-verified stamps, so they are not rewritten to follow
+ * a UI rename); every surface strips it here rather than each doing its own.
+ * Lives beside the part meta, NOT in `engine/exam`, so a caller does not pull the
+ * content banks in behind one string helper.
+ */
+export function examSetTitle(title: string): string {
+  return title.replace(/^Prüfungssimulation:\s*/, "");
+}

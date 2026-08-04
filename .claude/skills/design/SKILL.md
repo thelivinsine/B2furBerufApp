@@ -205,6 +205,14 @@ chip carries the correction count, or a green "fehlerfrei"), because one Verlauf
 reads identically whichever trainer produced it. A trend is only ever claimed from months with
 ≥2 texts; months without texts print "–".
 
+**Modelltest (`/exam` at rest)** (picked s188, variant B "Prüfungstag"): the page leads with the
+RUN, one band holding the four Teile as a connected timeline (which is what stops the minutes being
+printed twice), then "Einzeln üben" rows, then Verlauf. **A result is shown in ONE place per page**:
+Verlauf carries every past score, the band and the rows carry none. No HubHero here: the `h1` and
+the Niveau sliding-pill switcher share one line, because the eyebrow named the nav zone the page
+already sits in. A zero state (A2) states itself once per control, never also as a page-level
+sentence pointing at the switcher directly above it.
+
 **Fortschritt (`/analytics`)** (picked s171, variant 3 "Kompetenzkurve"): the Überblick block is
 unchanged; directly below it a Kompetenz curve (mastered words / Can-Dos over time, green
 milestone dots) replaces XP as the headline, XP stays in Details. Dranbleiben = Prüfung

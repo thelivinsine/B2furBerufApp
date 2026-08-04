@@ -129,7 +129,7 @@ const RENDERERS: Record<string, Render> = {
       <line x1="7.2" y1="17" x2="12.8" y2="17" stroke="#2dd4bf" strokeWidth="1.6" strokeLinecap="round" />
     </>
   ),
-  // Prüfungssimulation — the same graduation cap as the zone that holds it.
+  // Modelltest — the same graduation cap as the zone that holds it.
   "/exam": graduationCap,
   // Schnellwiederholung — lightning bolt (amber-yellow top, neon-yellow lower)
   "/revision": c => (

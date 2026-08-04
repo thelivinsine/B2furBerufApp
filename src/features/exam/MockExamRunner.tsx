@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn, formatSeconds, todayKey } from "@/lib/utils";
-import { PART_META } from "./partMeta";
+import { PART_META, examSetTitle } from "./partMeta";
 import { LesenPart, HoerenPart } from "./McParts";
 import { SchreibenPart } from "./SchreibenPart";
 import { SprechenPart } from "./SprechenPart";
@@ -275,7 +275,7 @@ function PartIntro({ run }: { run: MockExamRun }) {
           {examSet && (
             <>
               <div className="border-t border-border pt-3">
-                <p className="text-xs font-bold text-primary">Aufgabe: {examSet.title.replace("Prüfungssimulation: ", "")}</p>
+                <p className="text-xs font-bold text-primary">Aufgabe: {examSetTitle(examSet.title)}</p>
                 <p className="mt-1.5 text-sm leading-relaxed">{examSet.taskSheet}</p>
               </div>
               <ul className="space-y-1">

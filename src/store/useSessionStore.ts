@@ -38,7 +38,7 @@ interface SessionState {
   setFocusMode: (on: boolean) => void;
 
   /**
-   * Exam chrome (s186, founder): while a Prüfungssimulation run is on screen
+   * Exam chrome (s186, founder): while a Modelltest run is on screen
    * the mobile bottom bar is hidden and the header drops the streak pill and
    * account menu, so nothing competes with the task; the header keeps the logo
    * and gains ONE quiet exit.

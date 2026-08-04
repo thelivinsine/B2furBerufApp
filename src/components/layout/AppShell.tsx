@@ -62,7 +62,7 @@ export function AppShell() {
       location.pathname === "/revision" ||
       location.pathname === "/welt");
 
-  // Exam chrome (s186, founder): a running Prüfungssimulation hides the mobile
+  // Exam chrome (s186, founder): a running Modelltest hides the mobile
   // bottom bar and swaps the streak pill + account menu for ONE quiet exit, so
   // nothing on screen competes with the task. Lighter than focus mode on
   // purpose: the header and logo stay, because an exam still needs its top bar.
