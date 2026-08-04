@@ -189,7 +189,12 @@ risks and recommendations?"
      `purge_transform_cache(60)` scheduled on `pg_cron` (Sundays, off-peak), the whole block
      exception-wrapped so a missing extension warns instead of failing the migration step and
      blocking the Edge Function deploys behind it. `admin_gdpr_evidence().retention_scheduled`
-     (migration 0010) reports **true** for the first time since it shipped.
+     (migration 0010) should now report **true** for the first time since it shipped. **Not yet
+     verified:** `supabase db push` does not surface Postgres NOTICE/WARNING output, and the block
+     warns instead of failing by design, so a green deploy does not prove the three jobs were
+     scheduled. Confirm in **/admin → Launch** (`retention_scheduled`); if it reads false, enable
+     pg_cron under Database → Extensions and re-run the Supabase workflow, which re-applies the
+     migration idempotently.
   3. **R1, day-map caps:** `RETAIN_DAYS = 400`, folding dropped active days into
      `activeDaysFolded` (+ the `progress.active_days_folded` column) so the lifetime
      "N aktive Tage" figure a learner sees is unchanged.
