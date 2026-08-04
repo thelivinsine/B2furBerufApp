@@ -134,7 +134,17 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Start with this: the queued quality audit.** The founder closed s181 by settling two open items and
+**NEW, s184: Ukrainian + Arabic support languages are PLANNED but not started.**
+`docs/plans/MULTILINGUAL_SUPPORT_PLAN.md` carries the full architecture and a seven-wave rollout.
+Founder decisions are already settled in that file (full swap including graded exercises · LLM
+draft plus native-speaker review · Arabic RTL inline only, German UI stays LTR · public pages
+limited to landing and `/welcome`). Two things to read before touching it: `en` stays inline and
+new languages ship as keyed sidecars (widening the item shape breaks every verified content
+fingerprint and doubles the shipped banks for every learner), and the gloss is an ANSWER KEY in
+`engine/quiz.ts`, so the fallback is per-question, never per-item. Waves 1-2 are pure refactor and
+change nothing a learner sees.
+
+**Then: the queued quality audit.** The founder closed s181 by settling two open items and
 adding one task:
 - **The Niveau mix stays as shipped** (B1 307 / B2 302 / C1 108). Founder: "keep the Niveau mix as it
   is." The old 35/50/15 target is retired; do not rebalance it.

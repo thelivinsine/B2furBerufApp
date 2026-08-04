@@ -3225,3 +3225,41 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 4):** `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md` ·
   `.claude/skills/design/SKILL.md` · this log
+
+## Session 184 (2026-08-04) - branch `claude/non-english-translations-gnxjq4`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `How difficult is it to add other translations (user
+  language) to the app other than english?`
+  **Response:** research answer, no code. Established the framing the rest of the session runs on:
+  English in this app is NOT the interface language, it is the learner SUPPORT layer, so "another
+  user language" means another gloss language, not a translated UI. Counted the surface: 8,294
+  `en:`-shaped strings plus 343 `gloss:` fields (~8,637 strings, ~55,600 words per language) and
+  116 `.en` read sites in `src/`. Named the three things that make it more than a data drop: the
+  gloss is a graded ANSWER KEY in `engine/quiz.ts` (translation MCQ, matching grid, typing
+  prompts), `scripts/lint-content.mjs` enforces a gloss-collision rule per theme because a theme is
+  one quiz pool, and inline sibling fields would ship every language to every learner against the
+  400 kB budget. Recommended a keyed sidecar per language over widening the item shape, and
+  recommended against translating the German chrome (~1,200-1,800 strings, contradicts immersion).
+  Gates: read-only, nothing touched.
+- **Prompt 2 (verbatim, 2026-08-04):** `i want Ukrainian and arabic to be other alternative
+  languages to English in the app. go ahead and build a robust and comprehensive plan to implement
+  this idea.`
+  **Response:** four founder decisions taken up front (full swap including graded exercises · LLM
+  draft plus native-speaker review · Arabic RTL inline only, German UI stays LTR · public pages
+  limited to landing and `/welcome`), then a full architecture and a seven-wave plan.
+  Load-bearing calls: `en` STAYS inline and Ukrainian/Arabic ship as `Record<GlossKey, GlossEntry>`
+  sidecars, because widening items would break all 13 `review_status: "verified"` fingerprints
+  (`contentHash` hashes the whole item), roughly double the shipped bytes of the three biggest
+  banks for every learner regardless of language, and force a decision about ~17,000 new provenance
+  rows. `GlossKey` is `<content_id>#<path>`, so one resolver reads English off the live item and
+  the sidecar for the rest; array-index drift is caught by a source fingerprint per entry, the same
+  `content_hash` law `apply:reviews` already uses. The graded/hint firewall is the other core call:
+  `assessmentPool()` resolves a WHOLE question at once and falls back per-QUESTION, never per-item,
+  because an English distractor among Ukrainian options hands the learner the answer.
+  Gates: planning only, no code touched.
+- **Prompt 3 (verbatim, 2026-08-04):** `save the plan to the repo and brief me on the risks`
+  **Response:** the plan was written to `docs/plans/MULTILINGUAL_SUPPORT_PLAN.md` with the standard
+  status/trigger header, and the risks were briefed in chat, ranked, with mixed-language exercise
+  pools first and review throughput second.
+- **Artifacts (prompts 1-3):** `docs/plans/MULTILINGUAL_SUPPORT_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · this log
