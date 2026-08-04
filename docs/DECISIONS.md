@@ -1341,3 +1341,49 @@ handler. Migrations run BEFORE the Edge Function deploys in `supabase.yml`, so a
 reasoning is why `pnpm lint:migrations` now gates idempotency, and why a client write of a
 newly-added column falls back to a retry without it: the site deploy and the migration deploy are
 independent workflows and either can land first.
+
+## s185 — A new content rule never edits a human-verified row
+
+The content-audit pass added two rules that every noun and every `pron` string has to satisfy. Both
+found violations among the 13 rows a human had actually verified, which forced a choice the linter
+could not make on its own.
+
+The rejected option was the obvious one: fix the 12 rows and re-run `pnpm stamp:verified`. That is
+exactly the loophole the content fingerprint exists to close. A `verified` stamp means a human
+checked THAT text; re-stamping after an AI edit produces a row that claims human verification for
+content no human ever saw. The linter's own error message offers a second escape, flipping the row
+back to `draft`, which is honest but throws away 12 of the 13 verified rows in the bank, i.e. most
+of the founder's scarce verification effort, to satisfy a rule invented afterwards.
+
+So the rule bends instead of the data: **a content-shape check added after the fact WARNS on a
+human-verified row and errors on every other row.** The 12 rows keep their verification, the
+warning names them at every lint run so they surface at the next review pass, and the gate is fully
+strict for the other 3,260. The general principle: when a new rule and a human verification
+disagree, the human's work is the fixed point.
+
+Consequence worth stating, because it will look like a bug later: `pnpm lint:content` prints 12
+warnings on a clean tree, and clearing them is a human review, not a code change.
+
+## s185 — The Notizen step: the shape the founder settled
+
+Variant A was picked from `preview/notizen-varianten.html` (type each field, then compare) and then
+reshaped over three rounds of feedback on the live render. The end state is locked; the reasons are
+here so it is not "improved" back:
+
+- **Fields are ruled lines, not boxes.** The first build nested five boxed inputs inside a tinted
+  rail inside a card, which put ten rectangles on one screen. Founder: "way too many rectangles."
+  Lines remove five of them at once and are what a notepad actually looks like.
+- **The play control is a 40px button on the title row.** It was a 64px circle centred in a card of
+  its own, roughly 250px tall. Founder: "the audio button tile is way too big." The tallest element
+  on the screen was carrying the least content.
+- **Write lines are 44px, not 36px.** Founder: "the fields to write are too small."
+- **The message tile is Himmelblau, the Notizen sheet is white**, the reverse of the first build.
+  Founder asked for the swap directly; the play button became a white circle so it still pops.
+- **Both states are one 44px row.** The revealed answers used to be shorter than the inputs, so the
+  button under them jumped. Founder: "keep the buttons' position and the tile sizes intact before
+  and after vergleichen." This is also why note `value`s are kept under ~32 characters: a wrapping
+  value re-introduces the jump. Notes read like notes anyway ("Rückflug Do. gestrichen").
+
+`preview/notizen-a-r2.html` is generated FROM the component, not hand-built, so the approved preview
+and the live surface cannot drift.
+

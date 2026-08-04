@@ -33,3 +33,31 @@ Notes on the split:
   `ops-notes` file.
 - When a future session archives an aged-out handoff, append it to the current ISO-week file here
   (create the week file if it doesn't exist) and add a row above.
+
+
+## Founder action items, resolved (archived 2026-08-04, s185a)
+
+Moved out of the live list in `docs/PROJECT_STATUS.md` once done; kept here because each
+records WHEN and by whom a piece of setup was completed.
+
+- [x] ~~Paste `supabase/migrations/0013_admins_table.sql`.~~ **APPLIED 2026-07-27** by the founder in
+      the SQL editor, without the lock-out guard firing (it raises rather than swapping the gate when
+      the seed finds no account, so a clean run means `public.admins` is seeded). Audit F1 closed:
+      the admin gate is now a user-id table, not an email claim. Live confirmation that `/admin`
+      still opens is the founder's last check; the rollback to the 0008 email gate sits in a comment
+      at the foot of the migration if it ever does not.
+- [x] ~~Paste `supabase/migrations/0014_writing_insight_en.sql` into the SQL editor.~~ **APPLIED
+      2026-07-31 by CI**, along with 0010, after the founder added `SUPABASE_DB_PASSWORD`. Migrations
+      now ship themselves on merge; **there is no SQL to paste any more.**
+- [x] ~~Enable "Confirm email".~~ **DONE 2026-07-27**, closing half of audit F1 (nobody can register
+      an address they do not own). Required the `/auth/confirm` work in the s174 handoff.
+- [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
+      Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
+      `PROJECT_FOUNDATION.md`.
+- [x] ~~Decide where Anwenden lives on MOBILE (s182, audit P4).~~ **DECIDED 2026-08-01 by the
+      founder:** "just move schreiben to anwenden and rename anwenden as prufung." Shipped in s182,
+      so the bar stays at five slots and now reads Praktisch · Bibliothek · **Prüfung** ·
+      Fortschritt · Einstellungen, with Sprechen, Schreiben and Prüfungssimulation inside the hub.
+- [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
+      **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
+      live).

@@ -2,7 +2,7 @@
 
 Read this before adding or editing anything under `src/data/`. The add-content workflow checklist
 lives in the `/content` skill (`.claude/skills/content/SKILL.md`); this file is the reference.
-Counts below are as of s177; re-verify against `pnpm lint:content` before quoting.
+Counts below are as of s185 (verified against `pnpm lint:content`); re-verify before quoting.
 
 ## Hard invariants (also in CLAUDE.md)
 - **Shipped content ids are PERMANENT.** Learner progress (FSRS cards, practice counts, saved
@@ -215,17 +215,18 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
   (German, must start with "Ich kann"), `en`, `threshold` (0..1 theme-mastery ratio). Aligned to
   the CoE CEFR self-assessment descriptors (cited in provenance, never reproduced). Keep ascending
   `cefr`/`threshold` within a theme; add a `can_do` provenance row (`draft`).
-- **Lese-/Hörtexte** (`src/data/texts.ts`, 42 texts / 126 checks): `id` (`tx_`), `kind` (closed
+- **Lese-/Hörtexte** (`src/data/texts.ts`, 50 texts / 150 checks): `id` (`tx_`), `kind` (closed
   enum letter/email/memo/announcement/voicemail), `themeId`, `cefr`, `title`/`titleEn`, `de`
   (blank-line paragraphs), `en`, `checks` (2-3 MCQs: German `question`, `options`, `answer` among
   options, optional `explain`; check ids globally unique), optional `subThemeId`/`sector`.
   Authored authentic-STYLE (fictitious names/numbers), CEFR-calibrated. Results feed XP/theme
   progress, NOT vocab FSRS (no SRS fields). Voicemails double as TTS listening input.
-  **Two length bands (s178):** the original 36 run 57-116 words, which is fine for a quick check but
-  too short to train skimming or inference; the six `tx_c1_*` texts run 305-344 words with
-  inference-level checks, the band a B2/C1 reading task actually uses. New long texts follow the C1
-  six. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered side by
-  side).
+  **Two length bands:** the original 36 run 57-116 words, which is fine for a quick check but too
+  short to train skimming or inference; the **14 exam-length texts** run 288-344 words with
+  inference-level checks, the band a B2/C1 reading task actually uses (six `tx_c1_*` from s178,
+  eight `tx_b2_*` from s185). New long texts follow those fourteen, and every domain now has at
+  least two. The `de` and `en` paragraph counts MUST match (both are blank-line split and rendered
+  side by side).
 - **Writing prompts** (`src/data/writingPrompts.ts`, 717 tasks, ALL servable): per-theme POOLS of
   task objects `{ id, text, sub?, sectors?, level?, format?, points?, ... }`; the whole pool rides ONE
   `wp_<themeId>` provenance row (the mission pattern). `sub` = declared sub-theme slug;
