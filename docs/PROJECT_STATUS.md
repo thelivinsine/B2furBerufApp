@@ -149,9 +149,16 @@ colour per Teil):
 **Verification:** the real build driven over a CDP script (no Playwright in this repo) at 1280x900,
 390x844 and 360x640, light + dark, A2 and B2, Verlauf open and closed: 0 px horizontal overflow, no
 console errors, the hub scrolls ~220 px on a phone, which is what a menu does.
-**Docs updated in the same PR:** CLAUDE.md (route name + the one-place-per-result law),
-`docs/areas/PRAKTISCH-NAV.md` (the hub anatomy), `docs/DECISIONS.md` §s188, this file and the prompt
-log. The preview stays in `preview/exam-hub-redesign.html` as the record of the round.
+**Follow-up in the documentation pass:** the rename had one leftover the redesign did not touch.
+The Sprechen bank's exam sets are titled "Prüfungssimulation: <Aufgabe>" and are CONTENT (provenance
+rows, human-verified stamps), so they were not rewritten; `examSetTitle()` in
+`features/exam/partMeta.ts` strips the prefix at every render instead, which the mock-exam runner
+had been doing inline and the Sprechen runner had not been doing at all. Verified in the real app:
+the runner header now reads "Sicherheitsmängel beheben".
+**Docs updated:** CLAUDE.md (route name + the one-place-per-result law),
+`docs/areas/PRAKTISCH-NAV.md` (the hub anatomy), `docs/DECISIONS.md` §s188, the `/design` skill (the
+Modelltest anchor), this file and the prompt log. The preview stays in
+`preview/exam-hub-redesign.html` as the record of the round.
 **Next, if the founder does not redirect:** unchanged from s187 (the queued writing-quality audit,
 then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`). One item
 this session made cheaper: per-Teil exam history now has a real surface to grow into.

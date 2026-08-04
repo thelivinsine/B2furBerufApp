@@ -22,6 +22,7 @@ import {
   type DialogueState,
 } from "@/engine/dialogue";
 import { XP } from "@/engine/scoring";
+import { examSetTitle } from "./partMeta";
 import { speak } from "@/engine/speech";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
@@ -153,7 +154,7 @@ export function ExamRunner({
         <Card className="border-accent/40 shadow-glow">
           <CardContent className="space-y-4 p-6">
             <div className="flex items-center justify-between">
-              <p className="font-semibold">{examSet.title}</p>
+              <p className="font-semibold">{examSetTitle(examSet.title)}</p>
               <Badge variant="accent"><Clock className="h-3.5 w-3.5" /> {examSet.totalMinutes} Min</Badge>
             </div>
             <div>
@@ -267,7 +268,7 @@ export function ExamRunner({
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-            <span className="truncate min-w-0">{examSet.title}</span>
+            <span className="truncate min-w-0">{examSetTitle(examSet.title)}</span>
             <span className={cn("shrink-0 tabular-nums font-semibold", timeLeft < 60 && "text-danger")}>
               <Clock className="inline h-3 w-3 mr-0.5" />
               {formatSeconds(timeLeft)}

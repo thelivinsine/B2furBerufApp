@@ -73,7 +73,7 @@ export function AnwendenHub() {
                       // rounded-xl, not 2xl: `--radius + 10` is 24px, exactly
                       // half of a 48px tile, so the old gradient tiles were
                       // full circles. Squircle is the house shape for icon
-                      // tiles (Sprechen and Prüfungssimulation use it too).
+                      // tiles (Sprechen and Modelltest use it too).
                       "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
                       card.tint,
                     )}
