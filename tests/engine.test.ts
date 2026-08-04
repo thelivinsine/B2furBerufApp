@@ -12,7 +12,7 @@ import { missionContentIds } from "@/engine/mission";
 import { searchAll } from "@/lib/search";
 import { daysBetween, shuffle, todayKey } from "@/lib/utils";
 import { vocabulary } from "@/data/vocabulary";
-import { textById } from "@/data/texts";
+import { textById, texts } from "@/data/texts";
 import { redemittel } from "@/data/redemittel";
 import { grammar } from "@/data/grammar";
 import { missions } from "@/data/missions";
@@ -144,21 +144,33 @@ describe("session composer", () => {
   });
 
   it("plays a voicemail as listening only when the caller reports TTS (4.4)", () => {
-    // Scope to logistics, whose only text is a voicemail, so the reading block
-    // is deterministic. With listening support it plays as audio; without, it
-    // still appears as a readable text block.
-    const withTts = buildSession({
-      srs: {}, mode: "both", minutes: 15, scope: "logistics", listening: true,
-    });
-    const withoutTts = buildSession({
-      srs: {}, mode: "both", minutes: 15, scope: "logistics", listening: false,
-    });
+    // The rule is `listening: kind === "voicemail" && caller has TTS`, so assert
+    // it over many draws rather than by scoping to a theme with one text: the
+    // old fixture scoped to logistics because its only text WAS a voicemail,
+    // and the s185 exam-length text (audit P3) gave that theme a second one.
     const readOf = (p: ReturnType<typeof buildSession>) =>
       p.blocks.find((b) => b.kind === "reading") as
         | Extract<(typeof p.blocks)[number], { kind: "reading" }>
         | undefined;
-    expect(readOf(withTts)?.listening).toBe(true);
-    expect(readOf(withoutTts)?.listening).toBe(false);
+
+    // The theme comes from the bank, not from a hard-coded name, so adding a
+    // text to any theme can never make this fixture stale again.
+    const scope = texts.find((t) => t.kind === "voicemail")!.themeId;
+    let sawTrue = false;
+    let sawFalse = false;
+    for (let i = 0; i < 200 && !(sawTrue && sawFalse); i++) {
+      for (const listening of [true, false]) {
+        const block = readOf(buildSession({ srs: {}, mode: "both", minutes: 15, scope, listening }));
+        if (!block) continue;
+        const isVoicemail = textById(block.textId)?.kind === "voicemail";
+        expect(block.listening).toBe(isVoicemail && listening);
+        if (isVoicemail && listening) sawTrue = true;
+        if (isVoicemail && !listening) sawFalse = true;
+      }
+    }
+    // …and both voicemail cases actually occurred, so the assertion above was
+    // not satisfied trivially by draws that never hit a voicemail.
+    expect(sawTrue && sawFalse).toBe(true);
   });
 
   it("scopes the reading block to the requested theme when a text exists (4.4)", () => {

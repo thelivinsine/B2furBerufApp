@@ -16,6 +16,7 @@ import { RelatedPanel, relatedRows } from "./RelatedPanel";
 import { useAppConfigStore } from "@/lib/appConfig";
 import { verbFormsFor } from "@/data/verbForms";
 import { perfekt } from "@/lib/verbDisplay";
+import { pluralLabel } from "./pluralLabel";
 
 /**
  * The cross-module "Verbunden" dropdown (RelatedPanel: links from a word to a
@@ -56,6 +57,9 @@ const VocabCard = memo(function VocabCard({
   // non-verbs, and for any verb the oracle does not cover, so the card simply
   // shows nothing rather than a guessed form.
   const forms = v.pos === "verb" ? verbFormsFor(v.id) : undefined;
+  // The plural pill's text, or the reason there is no plural ("kein Plural" /
+  // "nur Plural"), so a noun's foot slot is never silently empty (s185, P9).
+  const plural = pluralLabel(v);
   // Replay trigger for the gender reveal effect: bumped on each front→back flip.
   const [effectPlay, setEffectPlay] = useState(0);
   // Fused doodle (Phase 2): the art chunk loads lazily on the FIRST flip of a
@@ -145,12 +149,12 @@ const VocabCard = memo(function VocabCard({
         <div
           className={cn(
             "mt-auto flex items-center pt-3",
-            v.plural || forms ? "justify-between" : "justify-end",
+            plural || forms ? "justify-between" : "justify-end",
           )}
         >
-          {v.plural ? (
+          {plural ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-              Pl.: {v.plural}
+              {v.plural ? `Pl.: ${plural}` : plural}
             </span>
           ) : forms ? (
             <span className="truncate rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
@@ -182,7 +186,11 @@ const VocabCard = memo(function VocabCard({
           </div>
         )}
         <p className="mt-1 text-base font-semibold sm:text-lg">{v.en}</p>
-        {v.plural && <p className="mt-1 text-xs text-muted-foreground">Plural: {v.plural}</p>}
+        {plural && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {v.plural ? `Plural: ${plural}` : plural}
+          </p>
+        )}
         {forms && (
           // Two label/value pairs per row (2026-07-31). As a single-pair column
           // the paradigm ran four rows tall, which made verb tiles the tallest

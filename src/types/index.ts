@@ -161,6 +161,22 @@ export type PartOfSpeech =
   | "phrase"
   | "connector";
 
+/**
+ * Why a noun carries no `plural` (audit P9, s185). Before this existed, 329 of
+ * 1,366 nouns simply had the field missing, and the surface could not tell
+ * "we never filled this in" apart from "there is nothing to fill in". Every
+ * noun now declares one or the other, and `lint:content` gates it.
+ *
+ * - `uncountable` — Singularetantum: no plural in ordinary use (`der Stress`,
+ *   `das Gepäck`, `die Nachhaltigkeit`). A dictionary may attest a plural for a
+ *   specialised sense ("Stresse"); teaching it to a B1-B2 learner is wrong, so
+ *   the entry declares the everyday truth instead.
+ * - `pluralOnly` — the headword itself is the plural form and is taught that
+ *   way (`die Spesen`, `die Nebenkosten`, `die Stakeholder`), so there is no
+ *   second form to learn.
+ */
+export type NounNumerus = "uncountable" | "pluralOnly";
+
 export interface VocabItem {
   id: string;
   de: string;
@@ -170,8 +186,11 @@ export interface VocabItem {
   pos: PartOfSpeech;
   /** Article for nouns: der / die / das. */
   article?: "der" | "die" | "das";
-  /** Plural form for nouns. */
+  /** Plural form for nouns. Mutually exclusive with `numerus`: a noun declares
+   *  either the form to learn or the reason there is none. */
   plural?: string;
+  /** Set instead of `plural` when the noun has no separate plural to teach. */
+  numerus?: NounNumerus;
   examples: { de: string; en: string }[];
   context: string;
   related: string[];
@@ -733,6 +752,15 @@ export interface TextCheck {
   explain?: string;
 }
 
+/** One field a learner notes down while listening: what to catch, and what the
+ *  message actually said, revealed for self-correction. */
+export interface TextNoteField {
+  /** German label for the field ("Rückrufnummer", "Neue Uhrzeit"). */
+  label: string;
+  /** The value as the text gives it, so the learner can check their own note. */
+  value: string;
+}
+
 /**
  * A short authentic-style German text for the Lesen/Hören session block
  * (Behörden letter, workplace email, memo, announcement, voicemail script).
@@ -756,6 +784,14 @@ export interface ReadingText {
   en: string;
   /** Two to three comprehension checks. */
   checks: TextCheck[];
+  /**
+   * Note-taking fields for a listening text (audit P3, s185). A telc/Goethe
+   * Hören task is not only "did you understand", it is "can you write down the
+   * callback number while the message runs" — and a voicemail whose whole point
+   * is a time, a number and a deadline is exactly that task. Present = this
+   * text carries a Notizen step; absent = comprehension checks only.
+   */
+  notes?: TextNoteField[];
   /** Optional sub-theme link; must be declared on the parent theme. */
   subThemeId?: SubThemeId;
   /** Optional Branche tags (scale-up Wave 2, 2026-07-12; array since the

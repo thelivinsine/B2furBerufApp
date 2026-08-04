@@ -155,14 +155,22 @@ async function main() {
     const anyArticle = views.some((x) => x.articles);
     const anyPlural = views.some((x) => x.plurals);
 
+    // A declared plural headword needs no oracle: "die Spesen" has no singular
+    // to look up, so oracle silence is the expected result, not a coverage hole.
+    if (v.numerus === "pluralOnly") {
+      pluralHeadwords.push({ id: v.id, label: v.de });
+      continue;
+    }
+
     if (!anyArticle && !anyPlural) {
       notCovered.push({ id: v.id, label: v.de });
       continue;
     }
     coveredCount++;
 
-    // Plurale-tantum: "die X", no asserted plural, and every covering oracle says
-    // the singular gender is masc/neut (so our "die" is a plural article).
+    // Undeclared plural headword: "die X", no asserted plural, and every
+    // covering oracle calls the singular masc/neut, so our "die" is a plural
+    // article rather than a feminine one. Declared ones exited above.
     const artUnion = new Set(views.flatMap((x) => x.articles ?? []));
     if (v.article === "die" && !v.plural && artUnion.size > 0 && !artUnion.has("die")) {
       pluralHeadwords.push({ id: v.id, label: v.de });

@@ -17,13 +17,13 @@ level (higher rungs of the ladder)._
 ## Summary
 
 - Nouns checked: **1366**
-- Covered by ≥1 oracle: **1334** (98%)  ·  not covered: **32**
+- Covered by ≥1 oracle: **1333** (98%)  ·  not covered: **33**
 - ✔ Article verified: **1315**  (639 by both oracles, 676 by one)
-- ✔ Plural verified: **864**  (512 by both oracles, 352 by one)
+- ✔ Plural verified: **877**  (516 by both oracles, 361 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **8**
-- ◑ Plural-form headwords (gender not comparable): **11**
-- ~ We assert a plural, but no oracle lists one to compare: **163**
+- ◑ Plural-form headwords (gender not comparable): **23**
+- ~ We assert a plural, but no oracle lists one to compare: **196**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -56,58 +56,58 @@ Auto-detected and skipped, not counted as errors.
 | id | headword |
 |---|---|
 | `v_bedenken` | die Bedenken |
+| `v_beschwerden` | die Beschwerden |
+| `v_daten` | die Daten |
+| `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
 | `v_heizkosten` | die Heizkosten |
 | `v_lagerhaltungskosten` | die Lagerhaltungskosten |
 | `v_lagerkosten` | die Lagerkosten |
 | `v_lieferbedingungen` | die Lieferbedingungen |
+| `v_mitarbeitende` | die Mitarbeitenden (Pl.) |
 | `v_nebenkosten` | die Nebenkosten |
+| `v_raeumlichkeiten` | die Räumlichkeiten (Pl.) |
+| `v_ressourcen` | die Ressourcen |
 | `v_schmerzen` | die Schmerzen |
 | `v_schulden` | die Schulden |
+| `v_sicherheitsschuhe` | die Sicherheitsschuhe |
 | `v_spesen` | die Spesen |
+| `v_stakeholder` | die Stakeholder (Pl.) |
+| `v_stammdaten` | die Stammdaten |
+| `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
 | `v_unterlagen` | die Unterlagen |
 | `v_zinsen` | die Zinsen |
+| `v_zugangsdaten` | die Zugangsdaten |
+| `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
 
 ## ~ Not covered by either oracle (informational — no error)
 
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>32 items</summary>
+<details><summary>20 items</summary>
 
 | id | headword |
 |---|---|
 | `v_anpassungsqualifizierung` | die Anpassungsqualifizierung |
 | `v_auslastung` | die Auslastung |
 | `v_bahncard` | die BahnCard |
-| `v_beschwerden` | die Beschwerden |
-| `v_daten` | die Daten |
 | `v_datenblatt` | das Datenblatt |
-| `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
 | `v_girocard` | die Girocard |
 | `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
 | `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
-| `v_mitarbeitende` | die Mitarbeitenden (Pl.) |
 | `v_nachbereitung` | die Nachbereitung |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
 | `v_prepaid` | das Prepaid |
 | `v_probenahme` | die Probenahme |
-| `v_raeumlichkeiten` | die Räumlichkeiten (Pl.) |
-| `v_ressourcen` | die Ressourcen |
 | `v_rezeptur` | die Rezeptur |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
-| `v_sicherheitsschuhe` | die Sicherheitsschuhe |
 | `v_spliss` | der Spliss |
-| `v_stakeholder` | die Stakeholder (Pl.) |
-| `v_stammdaten` | die Stammdaten |
 | `v_tan` | die TAN |
-| `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
-| `v_zugangsdaten` | die Zugangsdaten |
-| `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
 
 </details>
 
@@ -116,7 +116,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>163 items</summary>
+<details><summary>196 items</summary>
 
 | id | headword |
 |---|---|
@@ -127,7 +127,9 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_anbieterwechsel` | der Anbieterwechsel |
 | `v_anerkennungsverfahren` | das Anerkennungsverfahren |
 | `v_angehoerigengespraech` | das Angehörigengespräch |
+| `v_ansprechpartner` | der Ansprechpartner / die Ansprechpartnerin |
 | `v_antragsfrist` | die Antragsfrist |
+| `v_arbeitsstoffverzeichnis` | das Gefahrstoffverzeichnis |
 | `v_aufenthaltsgestattung` | die Aufenthaltsgestattung |
 | `v_aufenthaltskarte` | die Aufenthaltskarte |
 | `v_aufenthaltszweck` | der Aufenthaltszweck |
@@ -144,10 +146,15 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_bildungsgutschein` | der Bildungsgutschein |
 | `v_bildungspraemie` | die Bildungsprämie |
 | `v_buergeramt` | das Bürgeramt |
+| `v_datenmigration` | die Datenmigration |
 | `v_datenrate` | die Datenrate |
+| `v_deeskalationsstrategie` | die Deeskalationsstrategie |
 | `v_deutschlandticket` | das Deutschlandticket |
 | `v_dienstplan` | der Dienstplan |
+| `v_dienstreisegenehmigung` | die Dienstreisegenehmigung |
+| `v_dienstreisericht` | die Reiserichtlinie |
 | `v_digital_prozess` | der digitale Prozess |
+| `v_durchlaufzeit` | die Durchlaufzeit |
 | `v_echtzeitueberweisung` | die Echtzeitüberweisung |
 | `v_eigenanteil` | der Eigenanteil |
 | `v_einlasskontrolle` | die Einlasskontrolle |
@@ -155,6 +162,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_einzelfahrschein` | der Einzelfahrschein |
 | `v_endgeraet` | das Endgerät |
 | `v_endkontrolle` | die Endkontrolle |
+| `v_energieaudit` | das Energieaudit |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll |
 | `v_ernaehrungsberatung` | die Ernährungsberatung |
 | `v_ersatzraum` | der Ersatzraum |
@@ -167,6 +175,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_freizeitangebot` | das Freizeitangebot |
 | `v_fuehrungszeugnis` | das Führungszeugnis |
 | `v_garantieanspruch` | der Garantieanspruch |
+| `v_gefaehrdungsbeurteilung` | die Gefährdungsbeurteilung |
 | `v_gefahrstoff` | der Gefahrstoff |
 | `v_geschaeftsessen` | das Geschäftsessen |
 | `v_gesichtsbehandlung` | die Gesichtsbehandlung |
@@ -179,6 +188,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_ich_botschaft` | die Ich-Botschaft |
 | `v_indexmiete` | die Indexmiete |
 | `v_internetanschluss` | der Internetanschluss |
+| `v_just_in_time` | Just-in-time-Lieferung |
 | `v_kartenlesegeraet` | das Kartenlesegerät |
 | `v_kartennummer` | die Kartennummer |
 | `v_kartensperrung` | die Kartensperrung |
@@ -188,6 +198,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_kontovollmacht` | die Kontovollmacht |
 | `v_kontowechsel` | der Kontowechsel |
 | `v_kostenvoranschlag` | der Kostenvoranschlag |
+| `v_kulanzloesung` | die Kulanzlösung |
 | `v_kundenbeziehung` | die Kundenbeziehung |
 | `v_kundennummer` | die Kundennummer |
 | `v_kursgebuehr` | die Kursgebühr |
@@ -195,27 +206,36 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_ladezeit` | die Ladezeit |
 | `v_lagerbestand` | der Lagerbestand |
 | `v_lieferadresse` | die Lieferadresse |
+| `v_lieferantenbewertung` | die Lieferantenbewertung |
 | `v_liefertermin` | der Liefertermin |
 | `v_losgroesse` | die Losgröße |
 | `v_materialpruefung` | die Materialprüfung |
+| `v_mediationsverfahren` | das Mediationsverfahren |
 | `v_meldeadresse` | die Meldeadresse |
 | `v_meldebescheinigung` | die Meldebescheinigung |
 | `v_mietinteressent` | der Mietinteressent |
 | `v_mikrofasertuch` | das Mikrofasertuch |
+| `v_mindestbestand` | der Mindestbestand |
 | `v_mobilfunkvertrag` | der Mobilfunkvertrag |
 | `v_musterpruefung` | die Musterprüfung |
 | `v_nachbesserung` | die Nachbesserung |
 | `v_nachforderung` | die Nachforderung |
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
 | `v_niederlassungserlaubnis` | die Niederlassungserlaubnis |
+| `v_nutzeroberflaeche` | die Nutzeroberfläche |
+| `v_nutzerschulung` | die Nutzerschulung |
 | `v_objektleitung` | die Objektleitung |
+| `v_oeko_bilanz` | die Ökobilanz |
 | `v_personalengpass` | der Personalengpass |
 | `v_personaltrainer` | der Personaltrainer |
 | `v_pflegegrad` | der Pflegegrad |
 | `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probestunde` | die Probestunde |
 | `v_produktionslinie` | die Produktionslinie |
+| `v_projektabschluss` | der Projektabschluss |
+| `v_projektcharter` | der Projektauftrag |
 | `v_projektphase` | die Projektphase |
+| `v_projektsponsor` | der Projektsponsor |
 | `v_pruefprotokoll` | das Prüfprotokoll |
 | `v_punktzahl` | die Punktzahl |
 | `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung |
@@ -223,8 +243,11 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_reinigungsmaschine` | die Reinigungsmaschine |
 | `v_reinigungsplan` | der Reinigungsplan |
 | `v_reisebuchung` | die Reisebuchung |
+| `v_reisekostenrichtlinie` | die Reisekostenrichtlinie |
+| `v_review_meeting` | das Review-Meeting |
 | `v_roentgengeraet` | das Röntgengerät |
 | `v_rueckgaberecht` | das Rückgaberecht |
+| `v_rueckstandsliste` | die Rückstandsliste |
 | `v_ruestzeit` | die Rüstzeit |
 | `v_sachmangel` | der Sachmangel |
 | `v_schichtleitung` | die Schichtleitung |
@@ -232,10 +255,16 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_schoenheitsreparatur` | die Schönheitsreparatur |
 | `v_schuldnerberatung` | die Schuldnerberatung |
 | `v_schulungsraum` | der Schulungsraum |
+| `v_schutzmassnahmenkatalog` | der Schutzmaßnahmenkatalog |
 | `v_selbstbedienungskasse` | die Selbstbedienungskasse |
+| `v_serverausfall` | der Serverausfall |
+| `v_sicherheitscheck` | der Sicherheitscheck |
+| `v_sicherheitseinweisung` | die Sicherheitseinweisung |
 | `v_sicherheitskonzept` | das Sicherheitskonzept |
 | `v_sicherheitsregel` | die Sicherheitsregel |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung |
+| `v_softwareaktualisierung` | die Softwareaktualisierung |
+| `v_soll_ist_vergleich` | der Soll-Ist-Vergleich |
 | `v_sparziel` | das Sparziel |
 | `v_sperrhotline` | die Sperrhotline |
 | `v_sprachnachweis` | der Sprachnachweis |
@@ -252,6 +281,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_terminvorschlag` | der Terminvorschlag |
 | `v_ticketautomat` | der Ticketautomat |
 | `v_trainingsplan` | der Trainingsplan |
+| `v_transferzeit` | die Transferzeit |
 | `v_transportschaden` | der Transportschaden |
 | `v_uebergabeprotokoll` | das Übergabeprotokoll |
 | `v_ultraschallgeraet` | das Ultraschallgerät |
@@ -263,6 +293,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_unfallmeldung` | die Unfallmeldung |
 | `v_verbandswechsel` | der Verbandswechsel |
 | `v_verfuegungsrahmen` | der Verfügungsrahmen |
+| `v_vermittler` | der Vermittler / die Vermittlerin |
 | `v_vermittlungsgespraech` | das Vermittlungsgespräch |
 | `v_verpflichtungserklaerung` | die Verpflichtungserklärung |
 | `v_versichertenkarte` | die Versichertenkarte |
@@ -279,7 +310,9 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_wohnungsgeberbestaetigung` | die Wohnungsgeberbestätigung |
 | `v_zahlungsart` | die Zahlungsart |
 | `v_zahlungsausgang` | der Zahlungsausgang |
+| `v_zeitrahmen` | der Zeitrahmen |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter |
+| `v_zeitzonendifferenz` | die Zeitzonendifferenz |
 | `v_zeugnisbewertung` | die Zeugnisbewertung |
 | `v_zutrittskontrolle` | die Zutrittskontrolle |
 | `v_zwischenschritt` | der Zwischenschritt |
