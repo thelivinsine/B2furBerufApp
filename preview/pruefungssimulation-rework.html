@@ -1,4 +1,4 @@
-<title>Prüfungssimulation Rework: Varianten A / B / C</title>
+<title>Exam Simulation Rework: Options A / B / C</title>
 <style>
   /* Real tokens from src/index.css + tailwind.config.ts (light theme) */
   :root {
@@ -126,39 +126,51 @@
 
 <div class="wrap">
   <div class="intro">
-    <div class="kicker">Preview · Prüfung</div>
-    <h1>Prüfungssimulation: kompletter Rework</h1>
+    <div class="kicker">Preview · Prüfungssimulation</div>
+    <h1>Exam simulation: full rework</h1>
     <p>
-      Aus der reinen Sprech-Simulation wird eine echte Prüfungssimulation mit vier Teilen, wie bei
-      telc B2 Beruf und Goethe B2: Lesen, Hören, Schreiben, Sprechen. Jeder Teil hat eine klare
-      Anleitung, einen eigenen Timer und prüfungsechte Regeln (keine Übersetzung, Audio nur 2x).
-      Alle Inhalte kommen aus den bestehenden Banken. Drei Varianten unten; A ist die Empfehlung.
+      Today the "Prüfungssimulation" is only a speaking dialogue. The rework turns it into a
+      <b>complete mock exam with four parts</b>, like the real telc B2 Beruf and Goethe B2 exams:
+      Reading, Listening, Writing, Speaking. Each part gets a clear instruction page before it
+      starts, its own countdown timer, and real exam rules (no translation help, audio playable
+      only twice). All questions and tasks come from content the app already has, so nothing new
+      needs to be written.
+    </p>
+    <p style="margin-top:8px;">
+      <b>How to read this page:</b> every phone frame below is one screen of the app, shown with
+      real app colors and in German (as the learner sees it). There are <b>three design options,
+      labeled A, B and C</b>. They all contain the same exam; they differ only in how the start
+      page looks and where the timer and navigation sit. Pick one by letter (mixing is fine, for
+      example "A but with C's numbered strip"). The last section shows screens that are the same
+      in all three options.
     </p>
     <div class="structure">
       <table>
-        <tr><th>Teil</th><th>Modul</th><th>Inhalt</th><th>Zeit</th><th>Bewertung</th></tr>
-        <tr><td class="num">1</td><td><b>Lesen</b></td><td>3 Texte, 9 Aufgaben (Multiple Choice)</td><td class="num">15 Min</td><td>automatisch</td></tr>
-        <tr><td class="num">2</td><td><b>Hören</b></td><td>2 Ansagen (max. 2x), Notizen + Aufgaben</td><td class="num">10 Min</td><td>automatisch</td></tr>
-        <tr><td class="num">3</td><td><b>Schreiben</b></td><td>1 Aufgabe mit vollem Briefing</td><td class="num">20 Min</td><td>KI</td></tr>
-        <tr><td class="num">4</td><td><b>Sprechen</b></td><td>1 Gespräch (bestehender Runner)</td><td class="num">7 Min</td><td>automatisch + KI</td></tr>
-        <tr><td></td><td colspan="2"><b>Gesamt</b> · bestanden ab 60 %</td><td class="num"><b>52 Min</b></td><td></td></tr>
+        <tr><th>Part</th><th>Module</th><th>Content</th><th>Time</th><th>Graded by</th></tr>
+        <tr><td class="num">1</td><td><b>Lesen</b> (Reading)</td><td>3 texts, 9 multiple-choice questions</td><td class="num">15 min</td><td>app</td></tr>
+        <tr><td class="num">2</td><td><b>Hören</b> (Listening)</td><td>2 audio messages (max. 2 plays), note-taking + questions</td><td class="num">10 min</td><td>app</td></tr>
+        <tr><td class="num">3</td><td><b>Schreiben</b> (Writing)</td><td>1 task with a full exam briefing</td><td class="num">20 min</td><td>AI</td></tr>
+        <tr><td class="num">4</td><td><b>Sprechen</b> (Speaking)</td><td>1 conversation (the existing dialogue runner)</td><td class="num">7 min</td><td>app + AI</td></tr>
+        <tr><td></td><td colspan="2"><b>Total</b> · pass mark 60 %</td><td class="num"><b>52 min</b></td><td></td></tr>
       </table>
     </div>
   </div>
 
   <!-- ============================ VARIANTE A ============================ -->
   <section class="variant">
-    <div class="vhead"><div class="vbadge">A</div><h2>Prüfungstag (Empfehlung)</h2></div>
+    <div class="vhead"><div class="vbadge">A</div><h2>Option A · "Exam day" (recommended)</h2></div>
     <p class="vnotes">
-      Der Hub ist der <b>Ablaufplan eines Prüfungstags</b>: eine Karte, vier Teile als Zeitleiste,
-      ein Start-Button. Einzelne Teile lassen sich darunter separat üben. Im Runner: weiße
-      Top-Leiste mit Teil-Anzeige, Fortschritts-Punkten und Timer-Pill (wird unter 2 Minuten amber).
+      <b>Left phone:</b> the start page. It reads like the schedule of a real exam day: one card
+      listing the four parts in order with their times, and one start button. Below it, each part
+      can also be practiced on its own. <b>Right phone:</b> what a part looks like while running.
+      A white bar at the top shows which part you are in, four progress dots (one per part), and
+      the countdown timer. The timer turns amber when less than 2 minutes remain.
     </p>
     <div class="frames">
 
       <!-- A: hub -->
       <div class="frame">
-        <p class="flabel">Hub /exam</p>
+        <p class="flabel">Start page</p>
         <div class="phone"><div class="screen">
           <div class="hero">
             <div class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
@@ -229,7 +241,7 @@
 
       <!-- A: runner Lesen -->
       <div class="frame">
-        <p class="flabel">Runner · Teil 1 Lesen</p>
+        <p class="flabel">During the exam · Part 1 Reading</p>
         <div class="phone"><div class="screen">
           <div class="runbar">
             <span class="part">Lesen <span>· Teil 1 von 4</span></span>
@@ -272,17 +284,19 @@
 
   <!-- ============================ VARIANTE B ============================ -->
   <section class="variant">
-    <div class="vhead"><div class="vbadge">B</div><h2>Vier Module</h2></div>
+    <div class="vhead"><div class="vbadge">B</div><h2>Option B · "Four modules"</h2></div>
     <p class="vnotes">
-      Der Hub führt mit <b>vier gleichrangigen Modul-Karten</b> (je mit letzter Punktzahl); die
-      komplette Prüfung ist eine schmale CTA-Karte oben. Der Runner trägt den Timer unten in der
-      Aktionsleiste, in Daumen-Nähe; oben bleibt nur eine schmale Teil-Zeile.
+      <b>Left phone:</b> the start page leads with <b>four equal module cards</b>, each showing
+      its content, length and your last score. The full exam is the slim card at the top. This
+      puts practicing single skills first and the complete run second. <b>Right phone:</b> the
+      running view carries the timer in the <b>bottom bar next to the buttons</b>, close to the
+      thumb; the top keeps only a slim line naming the part.
     </p>
     <div class="frames">
 
       <!-- B: hub -->
       <div class="frame">
-        <p class="flabel">Hub /exam</p>
+        <p class="flabel">Start page</p>
         <div class="phone"><div class="screen">
           <div class="hero">
             <div class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
@@ -331,7 +345,7 @@
 
       <!-- B: runner -->
       <div class="frame">
-        <p class="flabel">Runner · Timer unten</p>
+        <p class="flabel">During the exam · timer at the bottom</p>
         <div class="phone"><div class="screen">
           <div style="display:flex; align-items:center; justify-content:space-between; padding:0 4px;">
             <span style="font-size:13px; font-weight:700;">Lesen <span style="color:var(--muted-fg); font-weight:600;">· Teil 1 von 4</span></span>
@@ -370,15 +384,17 @@
 
   <!-- ============================ VARIANTE C ============================ -->
   <section class="variant">
-    <div class="vhead"><div class="vbadge">C</div><h2>Antwortbogen</h2></div>
+    <div class="vhead"><div class="vbadge">C</div><h2>Option C · "Answer sheet"</h2></div>
     <p class="vnotes">
-      Maximale Prüfungstreue: der Runner trägt einen <b>nummerierten Antwortbogen-Streifen</b>
-      (beantwortet = Himmelblau, aktiv = Nachtblau), über den man frei zwischen Aufgaben springt,
-      wie auf dem Papierbogen. Der Hub ist der gleiche wie A, nur die Runner-Navigation ändert sich.
+      Closest to the paper exam: while a part runs, a <b>numbered strip like a paper answer
+      sheet</b> sits under the top bar. Answered questions turn light blue, the current one dark
+      blue, and tapping a number jumps straight to that question, so you can skip and come back
+      like in the real exam. The start page is the same as option A; only this in-exam navigation
+      is different.
     </p>
     <div class="frames">
       <div class="frame">
-        <p class="flabel">Runner · Antwortbogen-Navigation</p>
+        <p class="flabel">During the exam · answer-sheet navigation</p>
         <div class="phone"><div class="screen">
           <div class="runbar">
             <span class="part">Lesen <span>· Teil 1 von 4</span></span>
@@ -419,18 +435,22 @@
 
   <!-- ============================ SHARED FLOW ============================ -->
   <section class="variant">
-    <div class="vhead"><div class="vbadge" style="background:var(--muted-fg);">·</div><h2>Gemeinsamer Ablauf (alle Varianten)</h2></div>
+    <div class="vhead"><div class="vbadge" style="background:var(--muted-fg);">·</div><h2>Shared screens (same in A, B and C)</h2></div>
     <p class="vnotes">
-      Vor jedem Teil eine <b>Anleitungs-Seite</b> im Prüfungston; der Timer startet erst mit dem
-      Teil. Hören nutzt die Notizen-Anatomie aus s185 (40px-Play, Linien statt Boxen), Audio maximal
-      2x. Schreiben nutzt das bestehende Schreiben-Layout plus Timer. Am Ende ein Ergebnis mit
-      Punkten pro Teil, Bestanden-Grenze 60 % und dem gezielten nächsten Schritt.
+      These four screens are part of the exam flow whichever option you pick.
+      <b>1st phone:</b> before each part, an instruction page in exam style tells the learner
+      exactly what comes and how much time they have; the timer only starts when they tap start.
+      <b>2nd phone:</b> the Listening part, with a play button (each recording plays max. twice)
+      and the note-taking sheet you already approved for practice sessions.
+      <b>3rd phone:</b> the Writing part: the task briefing on top, the text field below, timer
+      running. <b>4th phone:</b> the final result: overall score, pass mark at 60 %, a score per
+      part, and a shortcut to practice the weakest part.
     </p>
     <div class="frames">
 
       <!-- Anleitung -->
       <div class="frame">
-        <p class="flabel">Anleitung vor Teil 2</p>
+        <p class="flabel">1 · Instruction page before a part</p>
         <div class="phone"><div class="screen" style="justify-content:center; gap:16px;">
           <div style="text-align:center;">
             <div class="mtile t-hoeren" style="margin:0 auto; width:52px; height:52px; border-radius:14px;"><svg class="ic" viewBox="0 0 24 24" style="width:26px;height:26px;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
@@ -455,7 +475,7 @@
 
       <!-- Hören -->
       <div class="frame">
-        <p class="flabel">Teil 2 · Hören mit Notizen</p>
+        <p class="flabel">2 · Listening with note-taking</p>
         <div class="phone"><div class="screen">
           <div class="runbar">
             <span class="part">Hören <span>· Teil 2 von 4</span></span>
@@ -494,7 +514,7 @@
 
       <!-- Schreiben -->
       <div class="frame">
-        <p class="flabel">Teil 3 · Schreiben mit Timer</p>
+        <p class="flabel">3 · Writing with timer</p>
         <div class="phone"><div class="screen">
           <div class="runbar">
             <span class="part">Schreiben <span>· Teil 3 von 4</span></span>
@@ -534,7 +554,7 @@
 
       <!-- Ergebnis -->
       <div class="frame">
-        <p class="flabel">Ergebnis</p>
+        <p class="flabel">4 · Result page</p>
         <div class="phone"><div class="screen">
           <div style="text-align:center; padding-top:8px;">
             <div class="eyebrow">Ergebnis</div>

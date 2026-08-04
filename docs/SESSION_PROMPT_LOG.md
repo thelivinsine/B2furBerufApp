@@ -3621,3 +3621,13 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   the founder's pick before implementation.
 - **Artifacts (prompt 1):** `preview/pruefungssimulation-rework.html` · `docs/PROJECT_STATUS.md` ·
   this log
+- **Prompt 2 (verbatim, 2026-08-04):** `I don't understand how to interpret the preview artifact.
+  The explanation isn't clear and is in German. Fix it. keep it in English. only the app renders
+  should be in German`
+  **Response:** rewrote every explanatory layer of the preview page in plain English (intro, the
+  "how to read this page" guidance, the structure table, all option notes, frame captions, page
+  title) and made each note say explicitly what the left/right phone shows. The phone mockups
+  themselves stay German, since they render the app as the learner sees it. Republished to the
+  same artifact URL. Standing rule for future previews: review-page chrome in English, app
+  renders in German.
+- **Artifacts (prompt 2):** `preview/pruefungssimulation-rework.html` · this log
