@@ -4,7 +4,10 @@ _Last updated: 2026-08-04 (session 186). **The Prüfungssimulation is a real fou
 now**: Lesen, Hören, Schreiben, Sprechen with per-Teil timers, Anleitung pages, an answer-sheet
 strip, a Niveau row (A2 greyed honestly, no content yet) and a result screen with a 60 % pass line;
 all content drawn from the existing banks, writing scored by the evaluator's new exam mode
-(migration 0016).
+(migration 0016). Four PRs (#791-#794): the exam itself, then **exam chrome** (no bottom bar, one
+quiet header exit), the **exam stage** (a running Teil is one viewport, internal scrolling only)
+and the **question-always-visible** layout, which goes side by side on desktop. Every in-exam
+screen is measured at 0 px page overflow down to 360x640.
 Prior s185: **The content-audit backlog is down to one open item.**
 The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
 are closed outright, and so is P3 now that the founder picked and refined the Notizen step.
@@ -37,46 +40,9 @@ Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, K
 Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
 shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
 drops a Thema from the other area so the three controls can never disagree.
-Prior s183: **The Prüfung zone has a new icon language: the orange
-Absolventenhut in the bar (founder pick D), and the branded route marks on tinted tiles in the hub
-(pick 2).** The founder also settled the merge question: **Sprechen and Prüfungssimulation stay
-separate.**
-Prior s182: **Three audit items closed in one session: P6, P4 and P5.**
-P6: Redemittel 158 → **220** with five Alltag packs and selective `themeId` tagging (untagged =
-universal), plus a Thema scope on the Redemittel tab.
-P4: **all 30 speaking scenarios now end in a free-speak turn with a model answer** (was 10 of 30),
-and Anwenden is back on the desktop sidebar.
-P5: the missing B1 accuracy canon shipped (Adjektivdeklination, Perfekt/Präteritum, Verben mit
-Präpositionen, Komparativ/Superlativ, 10 drills each) and **every B1 topic now has ≥3 productive
-drills**, so the bank stopped testing recognition and calling it practice (grammar 28 topics/137
-drills → **32/195**, productive 4% → 19%).
-Then the founder answered the nav question P4 had left open: **the bar's fifth zone is Prüfung and
-Schreiben lives inside it** (Praktisch · Bibliothek · Prüfung · Fortschritt · Einstellungen, still
-five slots; `/writing` keeps its route and is a card in the hub).
-Prior s181: **The Schreiben Aufgabe backlog is closed.** Waves 3 and 4
-of `docs/plans/SCHREIBEN-OVERHAUL.md` shipped together with the authoring to-do list s180 exposed:
-all 373 bare one-liners were authored up to the full exam brief in place, 74 tasks were added and 60
-tagged, so the bank is **717 tasks and every one of them is servable**. Coverage is gated now rather
-than aspirational: at least 2 tasks per Unterthema per length, all 15 Branchen at both lengths on all
-20 Themen (Alltag included, by founder decision, with the work context as the reason the everyday
-task is hard), and all 16 Textsorten live including `bewerbung`. Niveau: B1 307 / B2 302 / C1 108.
-One deliberate zero remains, C1 + E-Mail (privat), which has no exam analogue. **Next up (founder,
-not started): an audit of task QUALITY and filter fit** (`docs/PROJECT_REFERENCE.md`); the exam-source
-items are parked as low priority.
-Prior s180: **the Aufgabe filters now mean what they say.** Niveau, Textsorte and Unterthema became
-HARD filters, one counting rule serves both the rail and the draw, zero-yield options grey out with
-honest counts, and an empty scope gets an empty state naming the one filter to drop instead of a
-substituted task.
-Prior s179: **Bibliothek card grids, the floating toolbar and readable AI feedback**, plus
-self-applying Supabase migrations.
-Prior s178: **content audit + its P0/P1/P2 fixes** (duplicate quiz options, 234 verb paradigms
-generated into `src/data/verbForms.ts`, the empty C1 band filled).
-Prior s177 / s176: two founder word-field packs for answering written complaints (170 new items).
-Prior s175: the `/sources` chunk is excluded from the workbox precache (PR #751); a telc-sourced word
-pack stays parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
-Prior s174: **security audit + the sign-up flow it uncovered**, including the `onboarded` fault that
-discarded learner profiles on every sign-in (#745).
-Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`).
+Prior s183 and older (Prüfung icon language, the s182 audit items and the five-slot nav, the
+Schreiben Aufgabe backlog, hard filters, the security audit, liveWork): condensed away on purpose,
+per the doc-hygiene rule below. Read them in `docs/archive/status-log/` by ISO week.
 `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
 a CLI. Product name: **Genauly** (`genauly.de`)._
@@ -150,11 +116,15 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 186 (2026-08-04): the Prüfungssimulation rework.** Founder: the simulation
-"should actually feel like an exam with all the lesen, hören, schreiben and sprechen modules with a
-timer and clear instructions"; picks after a preview round (`preview/pruefungssimulation-rework.html`):
-**Option B start page + a Niveau row (A2 to C1), Option C answer-sheet runner, quiet outline
-Zurück/Weiter (dark blue only on submission moments), and the Schreiben expand button where useful.**
+**Handoff after session 186 (2026-08-04): the Prüfungssimulation rework, in four merged PRs.**
+Founder: the simulation "should actually feel like an exam with all the lesen, hören, schreiben and
+sprechen modules with a timer and clear instructions"; picks after a preview round
+(`preview/pruefungssimulation-rework.html`): **Option B start page + a Niveau row (A2 to C1),
+Option C answer-sheet runner, quiet outline Zurück/Weiter (dark blue only on submission moments),
+and the Schreiben expand button where useful.**
+**PRs: #791** (the exam) · **#792** (exam chrome) · **#793** (the stage, no page scroll) ·
+**#794** (question always visible, desktop side by side). All squash-merged; deploys green (one
+Supabase run needed a re-run after an `esm.sh` 522 outage, unrelated to the code).
 - **What shipped:** `engine/exam.ts` (level-aware composer + scoring; 3 Texte, 2 Ansagen max 2x,
   1 voll gebriefte Schreibaufgabe, 1 Sprechen-Szenario über die 1-3-Leiter; Bestanden ab 60 %),
   `useExamStore` (persisted run: plan ids, answers, Notizen, essay, remaining seconds; a reload
@@ -180,11 +150,29 @@ Zurück/Weiter (dark blue only on submission moments), and the Schreiben expand 
   375x667 and 360x640: all ten in-exam screens (hub-to-Ergebnis) rest at **0 px** page overflow.
   The hub itself still scrolls ~150 px on a 667 px phone and is meant to: it is a menu, and the
   least-scrolling hub in the app (`/anwenden` 237 px, Praktisch 253 px at the same size).
+- **The question tile is never what shrinks (founder follow-up, #794).** Sharing one scroll region
+  buried it under a long text. Now the text (Lesen) and the Notizen sheet (Hören) are the elastic
+  tiles and the question keeps its natural height, verified fully visible for **every** question
+  (9 Lesen + 6 Hören) at all three phone sizes. Three rules make it fit and are load-bearing: no
+  "Aufgabe N von M" eyebrow on the question card (the centred number strip says it), "Teil
+  abschließen" only on the LAST question once everything is answered (it replaces Weiter; the
+  permanent submit row cost every screen ~52 px), and a `gap-1` strip so nine numbers hold one row
+  at 360 px. **Desktop lays the two tiles side by side** (3/5 + 2/5, Schreiben mirrored) and exam
+  chrome additionally hides the sidebar and the Feedback pill there, which overlapped the Weiter
+  button; the header mark becomes a non-clickable `Logo`, since navigating away would end the run.
+  Known limit, accepted: on 375/360-wide phones the reading pane can fall to ~2 lines for the
+  tallest questions (it scrolls; the expand button reads full-screen). Giving it more would mean
+  shrinking the question tile, which is the thing this guarantees.
 - **Content gaps this exposed (PROJECT_REFERENCE backlog):** A2 has NO exam content anywhere (the
   A2 Niveau pill shows an honest empty state), and C1 Hören has a single audio text, so it tops up
   from B2.2. Both need an authoring wave before those levels feel native.
 - **Verify live after merge:** run one full B2 exam end to end (Hören audio is device TTS; the
   Schreiben score needs the deployed function + migration).
+- **Next, if the founder does not redirect:** the **queued writing-task quality audit** below is
+  still the oldest open item. The exam's own next steps, in the order they would pay off: the A2
+  and C1-Hören content waves (`PROJECT_REFERENCE` → CONTENT GAPS), then a Fortschritt tile reading
+  `progress.mock_exams` (the data is synced but nothing plots it yet), then per-Teil exam history.
+  Nothing is half-built: every part of the exam ships complete.
 
 **Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
 shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three

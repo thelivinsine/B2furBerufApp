@@ -47,10 +47,11 @@ after pulling.
 - `data/` — content banks + `provenance.ts` + generated `frequency.ts`/`verification.ts`/
   `verbForms.ts` (see `docs/areas/CONTENT.md`)
 - `engine/` — `srs.ts` (FSRS-6), `pronounce.ts`, `session.ts` (composed-session composer),
-  `mission.ts` (game runner), `collection.ts` (FSRS→Lv 1-5 mapping, stable game contract, don't
-  drift the bands), `dialogue.ts`, `scoring.ts`, `speech.ts`, `quiz.ts`
+  `exam.ts` (mock-exam composer + scoring, s186), `mission.ts` (game runner), `collection.ts`
+  (FSRS→Lv 1-5 mapping, stable game contract, don't drift the bands), `dialogue.ts`, `scoring.ts`,
+  `speech.ts`, `quiz.ts`
 - `store/` — `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`,
-  `useLibraryScope`
+  `useLibraryScope`, `useExamStore` (the one running mock exam, persisted)
 - `lib/` — `facets.ts` (single facet registry, ≤12-option rule + coverage floor), `cefr.ts`
   (single CEFR source), `lifeAreas.ts` (the ONE Berufsleben/Alltag fold + the `?area=` matcher) with
   `themeGroups.ts` (the grouped Thema options every dropdown reads), `search.ts`, `fuzzy.ts`,
@@ -59,6 +60,7 @@ after pulling.
   hooks/icons/utils
 - `features/` — `session/` (SessionPlayer + ReadingBlock), `library/`, `vocabulary/`,
   `collocations/`, `redemittel/`, `grammar/`, `writing/`, `dashboard/`, `welt/` (game),
+  `exam/` (mock exam: ExamHub, MockExamRunner + the four part views, ExamRunner dialogue),
   `collection/` (Sammlung), `help/`, `legal/`, `admin/`, `shared/` (FilterRail, LifeAreaPills,
   ViewSwitcher, DataTable, SearchField, useSlidingPill)
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
@@ -67,7 +69,8 @@ after pulling.
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone
   that holds Sprechen + Schreiben + Prüfungssimulation since s182; `/writing` keeps its route but
-  is a card in that hub, not a tab) ·
+  is a card in that hub, not a tab) · `/exam` **Prüfungssimulation** (the four-part mock exam,
+  s186: hub at rest, and the running Teil takes the route over) ·
   `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
   `/auth/confirm` (email-confirmation landing, ungated on purpose) · `/hilfe`,
   `/privacy`,

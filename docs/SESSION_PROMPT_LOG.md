@@ -3765,3 +3765,25 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompt 7):** `src/features/exam/McParts.tsx` · `src/features/exam/SchreibenPart.tsx` ·
   `src/features/exam/MockExamRunner.tsx` · `src/components/layout/AppShell.tsx` ·
   `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 8 (verbatim, 2026-08-04):** `document the session`
+  **Response:** the full documentation pass for s186, beyond the per-prompt entries above.
+  **`PROJECT_STATUS.md`:** the `_Last updated_` block now names all four PRs (#791 the exam, #792
+  exam chrome, #793 the stage, #794 the question layout) and the measured 0 px result; the s186
+  handoff gained the #794 round (the question tile is never what shrinks, the three rules that make
+  it fit, the desktop split, the accepted 2-line limit on 375/360-wide phones) and a **"next, if the
+  founder does not redirect"** line: the queued writing-quality audit stays the oldest open item,
+  with the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams` (synced
+  but unplotted), then per-Teil history as the exam's own follow-ups. Nothing is half-built.
+  The file was ALSO 270 lines with a `_Last updated_` block that had grown into the
+  session-by-session narrative its own hygiene rule forbids: s183-and-older collapsed to a pointer
+  at `docs/archive/status-log/`, back to **233 lines** and inside the ~250 cap. The two-handoff rule
+  was already satisfied (s186 + s185b), so nothing needed archiving this time.
+  **Stale docs the work created, now fixed:** `CLAUDE.md` layout gained `engine/exam.ts`,
+  `useExamStore` and `features/exam/`, and the route list gained `/exam` (hub at rest, the running
+  Teil takes the route over); `docs/PROJECT_FOUNDATION.md` gained migration 0016
+  (`progress.mock_exams`, `writing_evaluations.exam_score`) against a schema section that still
+  said "15 migrations". `CLAUDE.md`'s never-scrolls invariant and `docs/areas/PRAKTISCH-NAV.md`
+  (exam chrome vs focus mode, the stage anatomy, the question-tile law) were updated in the PRs
+  they shipped with, per the same-PR rule.
+- **Artifacts (prompt 8):** `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` ·
+  this log
