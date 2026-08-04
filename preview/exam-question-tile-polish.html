@@ -1,4 +1,4 @@
-<title>Prüfung: Kacheln, Kontrast und Chrome</title>
+<title>Exam screen: tiles, contrast and chrome</title>
 <style>
 /* ==========================================================================
    Preview · Prüfungssimulation, Politur-Runde (session 187)
@@ -25,6 +25,7 @@
   --danger: 4 73% 56%;
   --shadow: 221 40% 22%;
   --grad: linear-gradient(135deg, hsl(226 83% 47%), hsl(221 83% 54%) 45%, hsl(196 93% 38%));
+  --wash-a: 0.10; --wash-b: 0.09;
   --lift: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
   --lift-strong: 0 2px 4px hsl(var(--shadow) / 0.05), 0 12px 32px hsl(var(--shadow) / 0.12);
   --logo: var(--logo-light);
@@ -47,28 +48,46 @@
   --danger: 4 75% 64%;
   --shadow: 221 60% 3%;
   --grad: linear-gradient(135deg, hsl(226 90% 66%), hsl(219 96% 76%) 45%, hsl(198 90% 58%));
+  --wash-a: 0.10; --wash-b: 0.09;
   --lift: 0 1px 2px hsl(var(--shadow) / 0.4), 0 6px 16px -3px hsl(var(--shadow) / 0.5);
   --lift-strong: 0 2px 4px hsl(var(--shadow) / 0.4), 0 12px 32px hsl(var(--shadow) / 0.55);
   --logo: var(--logo-dark);
 }
 
-/* ---- Dark-mode contrast recipes (K1/K2/K3). Applied to the whole page by the
-   toolbar, or to a single board via data-contrast on the board itself. ------ */
-[data-theme="dark"][data-contrast="k1"], [data-theme="dark"] [data-contrast="k1"] {
-  --surface: 224 26% 22%; --elevated: 224 24% 27%; --muted: 224 22% 29%; --border: 216 28% 38%;
-}
+/* ---- Dark-mode palettes. K2 keeps today's blue and only deepens the ground
+   (the contrast relationship the founder confirmed); N1/N2/N3 keep exactly that
+   relationship and take the blue OUT of the greys, the way Claude, ChatGPT,
+   GitHub and VS Code do. Card/ground ~1.4, edge/ground ~3.1 in all four. ---- */
 [data-theme="dark"][data-contrast="k2"], [data-theme="dark"] [data-contrast="k2"] {
   --bg: 226 48% 4%; --page-from: 226 48% 4%; --page-mid: 226 48% 4%; --page-to: 226 48% 4%;
   --elevated: 224 24% 23%; --muted: 224 22% 26%; --border: 216 30% 40%;
 }
-[data-theme="dark"][data-contrast="k3"], [data-theme="dark"] [data-contrast="k3"] {
-  --bg: 226 46% 5%; --page-from: 226 46% 5%; --page-mid: 226 46% 5%; --page-to: 226 46% 5%;
-  --surface: 224 26% 21%; --elevated: 224 24% 27%; --muted: 224 22% 28%; --border: 216 30% 44%;
+[data-theme="dark"][data-contrast="n1"], [data-theme="dark"] [data-contrast="n1"] {
+  --bg: 220 5% 4%; --page-from: 220 5% 4%; --page-mid: 220 5% 4%; --page-to: 220 5% 4%;
+  --surface: 220 4% 17%; --elevated: 220 4% 22%; --muted: 220 4% 25%; --border: 220 5% 38%;
+  --fg: 220 6% 94%; --mfg: 220 4% 72%;
+  --primary: 219 90% 74%; --accent-ink: 198 72% 72%;
+  --shadow: 220 20% 2%; --wash-a: 0; --wash-b: 0;
+}
+[data-theme="dark"][data-contrast="n2"], [data-theme="dark"] [data-contrast="n2"] {
+  --bg: 35 7% 4%; --page-from: 35 7% 4%; --page-mid: 35 7% 4%; --page-to: 35 7% 4%;
+  --surface: 35 5% 17%; --elevated: 35 5% 22%; --muted: 35 5% 25%; --border: 35 6% 38%;
+  --fg: 35 8% 94%; --mfg: 35 5% 72%;
+  --primary: 219 90% 74%; --accent-ink: 198 72% 72%;
+  --shadow: 30 25% 2%; --wash-a: 0; --wash-b: 0;
+}
+[data-theme="dark"][data-contrast="n3"], [data-theme="dark"] [data-contrast="n3"] {
+  --bg: 220 15% 4%; --page-from: 220 15% 4%; --page-mid: 220 15% 4%; --page-to: 220 15% 4%;
+  --surface: 220 10% 17%; --elevated: 220 9% 22%; --muted: 220 9% 25%; --border: 220 10% 38%;
+  --fg: 220 12% 94%; --mfg: 220 8% 72%;
+  --primary: 219 90% 74%; --accent-ink: 198 72% 72%;
+  --shadow: 220 30% 2%; --wash-a: 0; --wash-b: 0;
 }
 
 /* ---- Corner radius: "jetzt" = today's tokens, "neu" = one notch down ------ */
 :root[data-corners="jetzt"], [data-corners="jetzt"] { --r-card: 18px; --r-ctl: 14px; --r-chip: 10px; }
 :root[data-corners="neu"],   [data-corners="neu"]   { --r-card: 14px; --r-ctl: 10px; --r-chip: 9px; }
+:root[data-corners="enger"], [data-corners="enger"] { --r-card: 10px; --r-ctl: 8px;  --r-chip: 7px; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
@@ -78,8 +97,8 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   font-family: "Inter Variable", "Inter var", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   background:
-    radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
     linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
   background-attachment: fixed;
   color: hsl(var(--fg));
@@ -144,8 +163,8 @@ table.map td.want { width: 32%; color: hsl(var(--mfg)); }
   border-radius: 20px; overflow: hidden;
   box-shadow: var(--lift-strong);
   background:
-    radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
     linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
 }
 .frame.desktop { width: 1200px; }
@@ -354,7 +373,7 @@ img.logo.forDark { display: block; }
 .tile.text { position: relative; }
 
 /* ============================ contrast section =========================== */
-.krow { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 18px; margin-top: 20px; }
+.krow { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px, 1fr)); gap: 14px; margin-top: 20px; }
 .kboard { border-radius: var(--r-card); overflow: hidden; border: 1px solid hsl(var(--border)); box-shadow: var(--lift); }
 .kboard .khead { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; background: hsl(var(--surface)); border-bottom: 1px solid hsl(var(--border)); }
 .kboard .khead b { font-size: 13.5px; }
@@ -362,8 +381,8 @@ img.logo.forDark { display: block; }
 .kmini {
   padding: 14px; display: flex; flex-direction: column; gap: 10px;
   background:
-    radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
     linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
   color: hsl(var(--fg));
 }
@@ -415,113 +434,129 @@ table.ratios td.weak { color: hsl(var(--warning)); font-weight: 700; }
 
 <div class="toolbar">
   <div class="inner">
-    <div class="tgroup"><span>Ansicht</span>
+    <div class="tgroup"><span>Theme</span>
       <div class="seg" id="segTheme">
-        <button data-v="dark" aria-pressed="true">Dunkel</button>
-        <button data-v="light" aria-pressed="false">Hell</button>
+        <button data-v="dark" aria-pressed="true">Dark</button>
+        <button data-v="light" aria-pressed="false">Light</button>
       </div>
     </div>
-    <div class="tgroup"><span>Ecken</span>
+    <div class="tgroup"><span>Corners</span>
       <div class="seg" id="segCorners">
-        <button data-v="jetzt" aria-pressed="false">Jetzt</button>
-        <button data-v="neu" aria-pressed="true">Neu</button>
+        <button data-v="jetzt" aria-pressed="false">Today</button>
+        <button data-v="neu" aria-pressed="false">New</button>
+        <button data-v="enger" aria-pressed="true">Tighter</button>
       </div>
     </div>
     <div class="tgroup"><span>Text</span>
       <div class="seg" id="segText">
-        <button data-v="lang" aria-pressed="true">Lang</button>
-        <button data-v="kurz" aria-pressed="false">Kurz</button>
+        <button data-v="lang" aria-pressed="true">Long</button>
+        <button data-v="kurz" aria-pressed="false">Short</button>
       </div>
     </div>
-    <div class="tgroup"><span>Kontrast</span>
+    <div class="tgroup"><span>Dark palette</span>
       <div class="seg" id="segContrast">
-        <button data-v="jetzt" aria-pressed="false">Jetzt</button>
-        <button data-v="k1" aria-pressed="false">K1</button>
+        <button data-v="jetzt" aria-pressed="false">Today</button>
         <button data-v="k2" aria-pressed="false">K2</button>
-        <button data-v="k3" aria-pressed="true">K3</button>
+        <button data-v="n1" aria-pressed="true">N1</button>
+        <button data-v="n2" aria-pressed="false">N2</button>
+        <button data-v="n3" aria-pressed="false">N3</button>
       </div>
     </div>
-    <p class="hint">Alle Regler gelten für die ganze Seite. Die Startansicht ist eine von vielen: schalte durch. „Text: Kurz“ zeigt den Fall, um den es geht.</p>
+    <p class="hint">Every switch applies to the whole page. The starting view is just one of many, click through them. The dark palette switch is the newest one: N1, N2 and N3 are the neutral greys.</p>
   </div>
 </div>
 
 <div class="wrap">
   <div class="intro">
-    <p class="kicker">Vorschau · Prüfungssimulation</p>
-    <h1>Kacheln, Kontrast und Chrome</h1>
+    <p class="kicker">Preview · Exam simulation</p>
+    <h1>Tiles, contrast and chrome</h1>
     <p class="lede">
-      Sieben Punkte aus deinem Feedback, in einer Vorschau. <b>Oben umschalten</b> und der ganzen
-      Seite beim Umziehen zusehen: Dunkel oder Hell, alte oder neue Eckenrundung, und die vier
-      Kontrast-Rezepte für den Dunkelmodus. Die drei Layouts <b>A, B, C</b> ganz unten sind die
-      eigentliche Wahl: <b>die Kacheln lassen sich dort wirklich ziehen</b>, mit der Maus am Rand
-      zwischen den beiden Kacheln (Desktop) beziehungsweise am Griff dazwischen (Handy).
+      Eight points from your feedback, in one preview. <b>Use the switches above</b> and watch the
+      whole page move: dark or light, old or new corner rounding, and the four dark-mode contrast
+      recipes. The three layouts <b>A, B, C</b> at the bottom are the real choice, and
+      <b>their tiles can actually be dragged</b>: on desktop grab the edge between the two tiles, on
+      the phone frames the handle between them.
     </p>
     <p class="lede" style="margin-top:10px">
-      <b>Antworte am einfachsten so:</b> Kontrast = <i>Jetzt / K1 / K2 / K3</i>, Ecken =
-      <i>Jetzt / Neu</i>, Ausgang = <i>X1 / X2 / X3</i>, Layout = <i>A / B / C</i>. Jede Option
-      steht mit ihrem Preis dabei, ausgewählt wird nichts vorab.
+      <b>Easiest way to reply:</b> dark palette = <i>Today / K2 / N1 / N2 / N3</i>, corners =
+      <i>Today / New / Tighter</i>, exit = <i>X1 / X2 / X3</i>, layout = <i>A / B / C</i>. Every option lists
+      its cost, and nothing is pre-picked.
+    </p>
+    <p class="lede" style="margin-top:10px">
+      Note on language: everything <i>inside</i> the phone and desktop frames is real app copy and
+      stays German. Everything around them, this page itself, is English.
     </p>
 
     <div class="tscroll"><table class="map">
-      <thead><tr><th></th><th>Dein Punkt</th><th>Antwort in dieser Vorschau</th></tr></thead>
+      <thead><tr><th></th><th>Your point</th><th>How this preview answers it</th></tr></thead>
       <tbody>
-        <tr><td class="n">1</td><td class="want">Schließen-Knopf als rote Tür mit Pfeil, mit kleinem Hinweis beim Darüberfahren</td><td>Abschnitt 3: drei Varianten des roten Ausgangs, Hinweis erscheint nach 0,3 Sekunden (echtes Tooltip-Rezept der App)</td></tr>
-        <tr><td class="n">2</td><td class="want">Fragen-Kachel wirkt gedrängt, Text-Kachel hat zu viel Leerraum; Text soll ziehbar sein</td><td>Abschnitt 4: A, B, C, alle mit größerer Frageschrift, mehr Innenabstand und Ziehgriff</td></tr>
-        <tr><td class="n">3</td><td class="want">Bei „Weiter“ zurück auf Standardgröße</td><td>In allen drei Layouts eingebaut: Nummer antippen oder Zurück/Weiter setzt die Größen zurück</td></tr>
-        <tr><td class="n">4</td><td class="want">Knöpfe kleben unten, keine Luft</td><td>16 px über der Nummernreihe, 12 px zwischen Reihe und Knöpfen, 16 px darunter, in jedem Layout gleich</td></tr>
-        <tr><td class="n">5</td><td class="want">Nummernreihe unter die Fragen-Kachel</td><td>Sie sitzt jetzt im unteren Block, direkt über Zurück/Weiter, wo die Navigation zusammengehört</td></tr>
-        <tr><td class="n">6</td><td class="want">Ecken etwas weniger rund</td><td>Abschnitt 2: eine Stufe runter (Karte 18 → 14 px, Zeile 14 → 10 px). Oben umschaltbar</td></tr>
-        <tr><td class="n">7</td><td class="want">Zu wenig Kontrast zwischen den Kacheln im Dunkelmodus, alle Kacheln</td><td>Abschnitt 1: drei Rezepte plus die Ebenen-Regel (Grund → Karte → Zeile in der Karte)</td></tr>
+        <tr><td class="n">1</td><td class="want">Close button should be a red exit door with an arrow, with a small note on hover</td><td>Section 3: three versions of the red exit, note appears after 0.3 s using the tooltip recipe the app already has</td></tr>
+        <tr><td class="n">2</td><td class="want">Question tile cramped, text tile too empty; text should be draggable</td><td>Section 4: A, B and C, all with a bigger question type size, more inner padding and drag handles</td></tr>
+        <tr><td class="n">3</td><td class="want">Back to default size on the next question</td><td>Built into all three layouts: tapping a number or Zurück/Weiter resets the sizes</td></tr>
+        <tr><td class="n">4</td><td class="want">Buttons pushed to the very bottom, no breathing room</td><td>16 px above the number row, 12 px between row and buttons, 16 px below, identical in every layout</td></tr>
+        <tr><td class="n">5</td><td class="want">Move the question navigation row below the question tile</td><td>It now sits in the bottom cluster, directly above Zurück/Weiter, where navigation belongs together</td></tr>
+        <tr><td class="n">6</td><td class="want">Corners slightly less round</td><td>Section 2: two steps offered, New (card 14 px) and Tighter (card 10 px). Switchable above</td></tr>
+        <tr><td class="n">7</td><td class="want">Too little contrast between the tiles in dark mode, all tiles</td><td>Section 1: the layer rule (ground → card → row in the card), at the contrast level you confirmed on K2</td></tr>
+        <tr><td class="n">8</td><td class="want">Too much blue in dark mode, take the reference apps as inspiration</td><td>Section 1: N1, N2 and N3 take the hue out of the greys and switch off the two blue page glows, at the same contrast</td></tr>
       </tbody>
     </table></div>
   </div>
 
-  <!-- ===================== 1 · KONTRAST ===================== -->
+  <!-- ===================== 1 · DARK PALETTE ===================== -->
   <section class="block">
-    <div class="shead"><p class="snum">Abschnitt 1</p><h2>Kontrast im Dunkelmodus</h2></div>
+    <div class="shead"><p class="snum">Section 1</p><h2>Dark mode: colour and contrast</h2></div>
     <p class="snote">
-      Zwei Dinge sind heute zu schwach. <b>Erstens</b> hebt sich eine Karte kaum vom Grund ab: das
-      Verhältnis liegt bei 1,34 zu 1, das Auge liest das als eine Fläche. <b>Zweitens</b>, und das
-      ist der eigentliche Fehler: die Antwortzeilen <i>in</i> der Fragenkachel haben exakt dieselbe
-      Farbe wie die Kachel selbst. Sie verschwinden, nur der dünne Rand bleibt.
+      Two separate problems, one section. <b>Contrast:</b> today a card lifts only 1.34 to 1 off the
+      ground, and the answer rows <i>inside</i> the question tile carry exactly the same colour as
+      the tile itself, so they vanish and only the thin border is left. <b>Colour:</b> the greys are
+      not grey. Today's dark ground is a blue at 44 % saturation, and two soft blue glows sit on top
+      of it, which is where the "too much blue" comes from.
     </p>
     <p class="snote" style="margin-top:10px">
-      Alle drei Rezepte enthalten deshalb dieselbe <b>Ebenen-Regel</b>: Grund → Karte → Zeile in
-      der Karte, jede Stufe eine Spur heller. Unterschiedlich ist nur, <i>wie</i> die Stufen
-      gesetzt werden. Die Werte sind Marken (Farbtöne der App), sie gelten also überall, nicht nur
-      in der Prüfung, deshalb steht unter jeder Spalte auch eine Bibliothek-Karte.
+      You said K2 is about the contrast you expect, so <b>all four options below carry exactly that
+      contrast relationship</b>: card 1.4 to 1 off the ground, a clearly visible card edge at 3.1,
+      and one layer rule (ground → card → row inside the card). They differ only in <b>how much hue
+      is left in the greys</b>. N1, N2 and N3 also switch the two blue page glows off.
+    </p>
+    <p class="snote" style="margin-top:10px">
+      The reference apps do the same thing: VS Code and ChatGPT use plain neutral greys, Claude uses
+      a slightly warm grey, GitHub keeps a whisper of cool in it. All four spend colour on <i>one</i>
+      accent and nothing else, which is what makes the blue register when it does appear. These are
+      brand tokens, so a pick applies app-wide, which is why each column also shows a Bibliothek card.
     </p>
     <div class="krow" id="krow"></div>
 
     <div class="tscroll"><table class="ratios">
-      <thead><tr><th>Kontrastverhältnis</th><th>Jetzt</th><th>K1</th><th>K2</th><th>K3</th></tr></thead>
+      <thead><tr><th>Contrast ratio</th><th>Today</th><th>K2</th><th>N1</th><th>N2</th><th>N3</th></tr></thead>
       <tbody>
-        <tr><td class="lab">Karte gegen Grund</td><td class="weak">1,34</td><td>1,52</td><td>1,37</td><td class="win">1,49</td></tr>
-        <tr><td class="lab">Kante gegen Grund</td><td class="weak">2,65</td><td>2,85</td><td>3,13</td><td class="win">3,57</td></tr>
-        <tr><td class="lab">Zeile gegen Karte</td><td class="weak">1,00</td><td>1,20</td><td>1,18</td><td class="win">1,24</td></tr>
-        <tr><td class="lab">Text auf Karte</td><td>12,59</td><td>11,10</td><td>12,59</td><td>11,46</td></tr>
-        <tr><td class="lab">Graue Beschriftung auf Karte</td><td>8,10</td><td>7,14</td><td>8,10</td><td>7,37</td></tr>
+        <tr><td class="lab">Card against ground</td><td class="weak">1.34</td><td>1.37</td><td>1.39</td><td>1.41</td><td>1.38</td></tr>
+        <tr><td class="lab">Edge against ground</td><td class="weak">2.65</td><td>3.13</td><td>3.10</td><td>3.26</td><td>3.03</td></tr>
+        <tr><td class="lab">Row against card</td><td class="weak">1.00</td><td>1.18</td><td>1.20</td><td>1.21</td><td>1.20</td></tr>
+        <tr><td class="lab">Text on card</td><td>12.59</td><td>12.59</td><td>12.40</td><td>12.27</td><td>12.55</td></tr>
+        <tr><td class="lab">Grey label on card</td><td>8.10</td><td>8.10</td><td>7.05</td><td>7.07</td><td>6.98</td></tr>
+        <tr><td class="lab">Saturation of the greys</td><td class="weak">44 %</td><td class="weak">48 %</td><td>5 %</td><td>7 %</td><td>15 %</td></tr>
       </tbody>
     </table></div>
     <div class="legend">
-      <span>Alle vier bestehen <b>pnpm check:contrast</b> mit Reserve</span>
-      <span>Textwerte bleiben weit über der AA-Grenze von 4,5</span>
-      <span>Deine Wahl gilt dann app-weit, nicht nur in der Prüfung</span>
+      <span>All five pass <b>pnpm check:contrast</b> with room to spare</span>
+      <span>Text values stay far above the AA floor of 4.5</span>
+      <span>Blue stays only where it acts: buttons, the active number, a selected answer</span>
     </div>
   </section>
 
-  <!-- ===================== 2 · ECKEN ===================== -->
+  <!-- ===================== 2 · CORNERS ===================== -->
   <section class="block">
-    <div class="shead"><p class="snum">Abschnitt 2</p><h2>Eckenrundung, eine Stufe runter</h2></div>
+    <div class="shead"><p class="snum">Section 2</p><h2>Corner rounding, two steps down</h2></div>
     <p class="snote">
-      Die App rechnet alle Radien aus einer Zahl aus. Heute steht eine Karte auf 18 px, eine
-      Antwortzeile auf 14 px. Eine Stufe runter heißt: Karte 14 px, Zeile 10 px, Nummer 9 px. Das
-      bleibt eine weiche Ecke (die Marke ist „squircle, nie Kreis“), wirkt aber ruhiger und etwas
-      technischer, was zu einer Prüfung passt.
+      The app derives every radius from a single number, so one change moves every card, row and
+      number at once. Today a card sits at 18 px. <b>New</b> is one notch down (14 px), <b>Tighter</b>
+      is the next one (10 px), which is roughly where VS Code and GitHub sit. It stays a soft corner
+      (the brand rule is "squircle, never circle"), it just reads more precise the tighter it gets.
+      The switch above applies your pick to the whole page, including the exam frames further down.
     </p>
     <div class="crow">
       <div data-corners="jetzt">
-        <p class="flabel"><b>Jetzt</b> · Karte 18 px · Zeile 14 px · Nummer 10 px</p>
+        <p class="flabel"><b>Today</b> · card 18 px · row 14 px · number 10 px</p>
         <div class="cdemo" style="border-radius:var(--r-card)">
           <p class="cl">Frage</p>
           <p class="cq">Was wurde bei der Wartung festgestellt?</p>
@@ -532,7 +567,18 @@ table.ratios td.weak { color: hsl(var(--warning)); font-weight: 700; }
         </div>
       </div>
       <div data-corners="neu">
-        <p class="flabel"><b>Neu</b> · Karte 14 px · Zeile 10 px · Nummer 9 px</p>
+        <p class="flabel"><b>New</b> · card 14 px · row 10 px · number 9 px</p>
+        <div class="cdemo" style="border-radius:var(--r-card)">
+          <p class="cl">Frage</p>
+          <p class="cq">Was wurde bei der Wartung festgestellt?</p>
+          <div class="cbits">
+            <div class="cbit" style="border-radius:var(--r-ctl)">Erhöhter Verschleiß</div>
+            <div class="cnum" style="border-radius:var(--r-chip)">4</div>
+          </div>
+        </div>
+      </div>
+      <div data-corners="enger">
+        <p class="flabel"><b>Tighter</b> · card 10 px · row 8 px · number 7 px</p>
         <div class="cdemo" style="border-radius:var(--r-card)">
           <p class="cl">Frage</p>
           <p class="cq">Was wurde bei der Wartung festgestellt?</p>
@@ -545,37 +591,37 @@ table.ratios td.weak { color: hsl(var(--warning)); font-weight: 700; }
     </div>
   </section>
 
-  <!-- ===================== 3 · AUSGANG ===================== -->
+  <!-- ===================== 3 · EXIT ===================== -->
   <section class="block">
-    <div class="shead"><p class="snum">Abschnitt 3</p><h2>Der Ausgang: rote Tür statt Kreuz</h2></div>
+    <div class="shead"><p class="snum">Section 3</p><h2>The exit: a red door instead of a cross</h2></div>
     <p class="snote">
-      Fahre mit der Maus über die Knöpfe, der Hinweis erscheint nach einem kurzen Moment, genau wie
-      im Screenshot. Der Hinweis nutzt das Tooltip-Rezept, das die App schon hat (dunkles Täfelchen,
-      helle Schrift). Am Handy gibt es keinen Hover, dort trägt der Knopf dieselbe Beschriftung als
-      Vorlesehilfe. Der Bestätigungsdialog dahinter bleibt unverändert.
+      Hover over the buttons, the note appears after a short moment, exactly like in your
+      screenshot. It uses the tooltip recipe the app already has (dark plate, light type). Phones
+      have no hover, so there the same wording rides the button as its screen-reader label. The
+      confirmation dialog behind it is unchanged.
     </p>
-    <div class="legend"><span>So sieht der Hinweis aus:</span><span class="tipsample">Prüfung verlassen</span></div>
+    <div class="legend"><span>This is the note:</span><span class="tipsample">Prüfung verlassen</span></div>
     <div class="cards3" id="exitRow"></div>
   </section>
 
   <!-- ===================== 4 · LAYOUTS ===================== -->
   <section class="block">
-    <div class="shead"><p class="snum">Abschnitt 4</p><h2>Drei Layouts für die Prüfungsseite</h2></div>
+    <div class="shead"><p class="snum">Section 4</p><h2>Three layouts for the exam screen</h2></div>
     <p class="snote">
-      Gemeinsam in allen dreien: größere Frageschrift (16 statt 14 px), mehr Innenabstand,
-      Nummernreihe unten, Luft um die Knöpfe, ziehbare Kacheln, Rücksprung auf Standard bei jedem
-      Fragenwechsel. Der Unterschied liegt darin, <b>wohin der Leerraum wandert</b>, wenn ein Text
-      kurz ist, also stell oben einmal auf <b>Text: Kurz</b> und vergleiche die drei.
-      <b>Probiere auch das Ziehen aus</b> und klicke dann auf „Weiter“: die Kacheln springen zurück.
+      Shared by all three: a bigger question type size (16 instead of 14 px), more inner padding,
+      the number row at the bottom, air around the buttons, draggable tiles, and a reset to the
+      default sizes on every question change. What differs is <b>where the leftover room goes</b>
+      when a text is short, so switch to <b>Text: Short</b> above and compare the three.
+      <b>Try the dragging too</b>, then hit "Weiter": the tiles snap back.
     </p>
     <div id="variants"></div>
   </section>
 
   <p class="foot">
-    <b>Was sich nicht ändert:</b> die Prüfungsseite bleibt genau ein Bildschirm hoch, ohne
-    Seitenscrollen, mit innerem Scrollen in der Textkachel. Die Fragenkachel bleibt immer
-    vollständig sichtbar. Die Desktop-Rahmen oben simulieren ein 1200 px breites Fenster, die
-    Handy-Rahmen ein 360 px breites Gerät, also den engsten Fall, den die Prüfung tragen muss.
+    <b>What does not change:</b> the exam screen stays exactly one screen tall, with no page
+    scrolling and internal scrolling in the text tile, and the question tile stays fully visible at
+    all times. The desktop frames simulate a 1200 px wide window, the phone frames a 360 px device,
+    which is the tightest case the exam has to survive.
   </p>
 </div>
 
@@ -643,15 +689,16 @@ const startTheme = root.getAttribute("data-theme") === "light" ? "light" : "dark
 root.setAttribute("data-theme", startTheme);
 [...document.getElementById("segTheme").children].forEach((b) =>
   b.setAttribute("aria-pressed", String(b.dataset.v === startTheme)));
-root.setAttribute("data-corners", "neu");
-root.setAttribute("data-contrast", "k3");
+root.setAttribute("data-corners", "enger");
+root.setAttribute("data-contrast", "n1");
 
 /* -------------------------------------------------- section 1: contrast */
 const RECIPES = [
-  { id: "jetzt", name: "Jetzt", sub: "Karte 18 % · Grund 6 %", note: "Die Zeilen in der Karte tragen dieselbe Farbe wie die Karte." },
-  { id: "k1", name: "K1 · Hellere Karten", sub: "Karte 22 % · Grund 6 %", note: "Nur die Karten steigen. Der Grund bleibt, wie er ist." },
-  { id: "k2", name: "K2 · Tieferer Grund", sub: "Karte 18 % · Grund 4 %", note: "Nur der Grund sinkt, die Karten bleiben. Wirkt am dunkelsten." },
-  { id: "k3", name: "K3 · Beides, klare Kante", sub: "Karte 21 % · Grund 5 % · Kante +8", note: "Beide Stufen plus eine deutlich sichtbare Kante." },
+  { id: "jetzt", name: "Today", sub: "blue · weak steps", note: "Blue greys, plus two blue page glows. The rows inside a card carry the card's own colour." },
+  { id: "k2", name: "K2 · today's blue", sub: "blue · deeper ground", note: "The contrast you confirmed, but the greys stay blue and the glows stay on." },
+  { id: "n1", name: "N1 · Graphite", sub: "neutral grey · 5 %", note: "Plain neutral grey, the VS Code and ChatGPT route. Nothing but the accent carries colour." },
+  { id: "n2", name: "N2 · Warm grey", sub: "warm · 7 %", note: "A trace of warmth in the grey, the Claude route. Reads softer, less clinical." },
+  { id: "n3", name: "N3 · Slate", sub: "cool · 15 %", note: "A whisper of cool left in, the GitHub route. Nearest to today without reading blue." },
 ];
 document.getElementById("krow").innerHTML = RECIPES.map((r) => `
   <div class="kboard" data-theme="dark" data-contrast="${r.id}">
@@ -673,16 +720,16 @@ document.getElementById("krow").innerHTML = RECIPES.map((r) => `
 
 /* ------------------------------------------------------ section 3: exit */
 const EXITS = [
-  { id: "X1", name: "Icon in Rot", rec: false, html: `<button class="exit" data-tip="Prüfung verlassen" aria-label="Prüfung verlassen">${svg(ICON.logout)}</button>`,
-    note: "Das Standard-Ausgangszeichen (Tür mit Pfeil nach draußen) in <b>Rot</b>, gleiche 36-px-Fläche wie heute das Kreuz, beim Darüberfahren ein zarter roter Grund und der Hinweis. Ruhig genug, dass es nicht mit der Aufgabe konkurriert, und trotzdem eindeutig." },
-  { id: "X2", name: "Icon mit Wort", rec: false, html: `<button class="exit worded">${svg(ICON.logout)}Verlassen</button>`,
-    note: "Dasselbe Zeichen mit Wort und dünnem roten Rand. Braucht keinen Hinweis, kostet aber Platz in der Kopfzeile und zieht mehr Aufmerksamkeit als der Timer daneben." },
-  { id: "X3", name: "Tür, offen", rec: false, html: `<button class="exit" data-tip="Prüfung verlassen" aria-label="Prüfung verlassen">${svg(ICON.door)}</button>`,
-    note: "Wörtlich eine offene Tür. Bildhafter, aber bei 17 px feiner gezeichnet und damit auf kleinen Bildschirmen etwas unruhiger als die Variante X1." },
+  { id: "X1", name: "Red icon", rec: false, html: `<button class="exit" data-tip="Prüfung verlassen" aria-label="Prüfung verlassen">${svg(ICON.logout)}</button>`,
+    note: "The standard exit mark (door with an arrow leading out) in <b>red</b>, on the same 36 px area the cross uses today, with a soft red wash and the note on hover. Quiet enough not to compete with the task, and still unmistakable." },
+  { id: "X2", name: "Icon with a word", rec: false, html: `<button class="exit worded">${svg(ICON.logout)}Verlassen</button>`,
+    note: "Same mark plus the word and a thin red outline. Needs no hover note, but it costs header space and pulls more attention than the timer beside it." },
+  { id: "X3", name: "Open door", rec: false, html: `<button class="exit" data-tip="Prüfung verlassen" aria-label="Prüfung verlassen">${svg(ICON.door)}</button>`,
+    note: "Literally an open door. More pictorial, but drawn with finer detail at 17 px, so it reads busier than X1 on small screens." },
 ];
 document.getElementById("exitRow").innerHTML = EXITS.map((x) => `
   <div class="pcard">
-    <div class="ptitle"><b>${x.id} · ${x.name}</b>${x.rec ? '<span class="pill-rec">Empfehlung</span>' : ""}</div>
+    <div class="ptitle"><b>${x.id} · ${x.name}</b>${x.rec ? '<span class="pill-rec">Recommended</span>' : ""}</div>
     <div class="frame" style="margin-top:14px;overflow:visible">
       <div class="apphead" style="height:56px;border-bottom:0;border-radius:19px">
         ${logoImgs}
@@ -695,19 +742,18 @@ document.getElementById("exitRow").innerHTML = EXITS.map((x) => `
 /* --------------------------------------------------- section 4: variants */
 const VARIANTS = [
   {
-    id: "A", name: "Gleichgewicht", rec: false,
-    note: "Beide Kacheln sind <b>immer gleich hoch</b>, so hoch wie die vollere von beiden, und das Paar sitzt <b>mittig</b> im Bildschirm. Die Frage steht mittig in ihrer Kachel, dadurch lesen sich die zwei Flächen als ein Paar statt als groß und klein. Bei einem kurzen Text schrumpfen <i>beide</i> und die Luft wandert nach außen. Preis: in der leereren der beiden Kacheln bleibt etwas Platz frei. Ziehen: seitlich und nach unten (Desktop), hoch und runter (Handy).",
+    id: "A", name: "Matched pair", rec: false,
+    note: "Both tiles are <b>always the same height</b>, as tall as the fuller of the two, and the pair sits <b>centred</b> on the screen. The question is centred inside its tile, so the two surfaces read as a pair instead of big-and-small. With a short text <i>both</i> shrink and the air moves outside them. Cost: the emptier of the two tiles keeps some free space. Dragging: sideways and downwards (desktop), up and down (phone).",
   },
   {
-    id: "B", name: "Ruhige Mitte", rec: false,
-    note: "Jede Kachel ist <b>so hoch wie ihr eigener Inhalt</b>, beide sitzen mittig. Es gibt damit <b>gar keinen Leerraum</b> in den Kacheln, dafür sind die beiden bei einem langen Text unterschiedlich hoch: die Textkachel deutlich größer als die Fragenkachel. Die untere Leiste bleibt fest, damit Zurück und Weiter nie springen. Ziehen: seitlich und nach unten (Desktop), hoch und runter (Handy).",
+    id: "B", name: "Own height", rec: false,
+    note: "Each tile is <b>as tall as its own content</b>, both centred. That leaves <b>no empty space inside</b> the tiles at all, but with a long text the two end up clearly different in height: a large text tile beside a small question tile. The bottom bar stays fixed, so Zurück and Weiter never move. Dragging: sideways and downwards (desktop), up and down (phone).",
   },
   {
-    id: "C", name: "Ein Arbeitsblatt", rec: false,
-    note: "<b>Eine</b> Karte über die volle Höhe, innen durch eine Haarlinie geteilt: Text links, Frage rechts. Zwei ungleiche Kacheln kann es hier gar nicht geben. Die Trennlinie ist zugleich der Ziehgriff, das Ziehen ist damit am selbsterklärendsten. Preis: bei einem kurzen Text steht die untere Hälfte der großen Karte leer, und der Bildschirm wirkt strenger als das Kachel-Paar.",
+    id: "C", name: "One worksheet", rec: false,
+    note: "<b>One</b> card over the full height, split inside by a hairline: text left, question right. Two mismatched tiles cannot happen here. The divider is also the drag handle, which makes the dragging the most self-explanatory. Cost: with a short text the lower half of the big card sits empty, and the screen reads stricter than the tile pair.",
   },
 ];
-
 function tileText(variant) {
   return `
     <section class="tile text">
@@ -766,17 +812,17 @@ function board(variant, mode) {
 document.getElementById("variants").innerHTML = VARIANTS.map((v) => `
   <div style="margin-top:34px">
     <div class="ptitle" style="display:flex;align-items:center;gap:10px">
-      <h3>Layout ${v.id} · ${v.name}</h3>${v.rec ? '<span class="pill-rec">Empfehlung</span>' : ""}
+      <h3>Layout ${v.id} · ${v.name}</h3>${v.rec ? '<span class="pill-rec">Recommended</span>' : ""}
     </div>
     <p class="snote">${v.note}</p>
     <div class="hscroll">
       <div style="display:flex;gap:26px;align-items:flex-start;width:max-content">
         <div>
-          <p class="flabel"><b>Desktop</b> · 1200 px Fenster</p>
+          <p class="flabel"><b>Desktop</b> · 1200 px window</p>
           ${board(v.id, "desktop")}
         </div>
         <div>
-          <p class="flabel"><b>Handy</b> · 360 px</p>
+          <p class="flabel"><b>Phone</b> · 360 px</p>
           ${board(v.id, "phone")}
         </div>
       </div>

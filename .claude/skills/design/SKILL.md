@@ -27,6 +27,13 @@ closest existing surface and reuse its building blocks (§5).
    `src/index.css` + `tailwind.config.ts`, and real component geometry, never approximations).
 3. **2-4 named variants** (A/B/C or 1/2/3), visibly different, each labeled. The founder picks by
    name ("I like option B", "go with 4a dark / 4b light"). One-option previews waste a round.
+   **Never mark a recommendation unless asked** (founder, s187): state each option's cost and let
+   them choose.
+4. **Write the preview in ENGLISH** (founder rule, restated s187 after a German preview page):
+   headings, option names, notes, tables, switch labels, every word of the review chrome. The only
+   German in a preview is the copy that is literally app copy in the mocked screen (task text,
+   button labels, tooltips), because that is what is under review. Same for the chat summary and the
+   PR body. The German-UI rule is about the product, not about what the founder reads.
 4. **Screenshot-verify before presenting.** Render the preview in headless Chromium
    (`/opt/pw-browsers/chromium`) and check it against the live app's real controls. The founder
    instantly catches drift ("the view buttons are not same as in the app", s154).

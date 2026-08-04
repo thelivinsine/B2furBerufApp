@@ -3829,3 +3829,33 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   no console errors, light + dark.
 - **Artifacts (prompt 1):** `preview/exam-question-tile-polish.html` ·
   artifact `https://claude.ai/code/artifact/dfcea42b-8258-464c-8e2c-d8084c665128` · this log
+- **Prompt 2 (verbatim, 2026-08-04):** `The explanation text in the artifact is in German!!!! it
+  should be in english as explained multiple times before. Save it as a rule in the documentation if
+  helpful - I don't want to repeat myself on this`
+  Mid-prompt additions (verbatim): `Attached are some apps in dark mode. I don't like too much usage
+  of the blue hues and shades in the dark mode in the app at the moment. Take inspiration from the
+  attached apps like claude, chatgpt, github and vs code. Apply similar contrast and colors` (with
+  screenshots of Claude, ChatGPT, GitHub and VS Code in dark mode) · `The k2 contrast is quite close
+  to what I would expect` · `the new reduced rounding is okay but I want it further reduced slightly
+  - add the next option in the artifact`
+  **Response:** three changes to the same preview + artifact URL.
+  **(a) Language, now a written rule.** The whole review page is English: headings, option names,
+  notes, tables, switch labels. The only German left is the copy that IS app copy inside the mocked
+  screens (task text, Zurück/Weiter, the exit tooltip), and the page says so. Written into
+  **`CLAUDE.md` §Writing style** ("Everything the FOUNDER reads is ENGLISH", chat, PRs, docs,
+  `preview/*.html`, artifacts) and into **`.claude/skills/design/SKILL.md` §1** as process step 4,
+  next to a new "never mark a recommendation unless asked" rule (founder, this session).
+  **(b) Dark mode is no longer blue.** Diagnosis: the ground is a blue at **44 % saturation** with
+  two blue radial glows on top of it, which is what reads as "too much blue". Section 1 became
+  "Dark mode: colour and contrast" with five columns: Today, K2 (the contrast the founder confirmed,
+  still blue) and three neutral palettes carrying **exactly K2's contrast relationship** (card 1.4:1
+  off the ground, edge 3.1, row-in-card 1.2) with the hue taken out and the glows switched off:
+  **N1 Graphite** (5 % sat, VS Code / ChatGPT), **N2 Warm grey** (7 %, Claude), **N3 Slate** (15 %,
+  GitHub). Blue survives only where it acts (CTA, active number, selected answer), which is what all
+  four reference apps do. Ratio table extended with a "saturation of the greys" row.
+  **(c) A third corner step.** Today 18 px · New 14 px · **Tighter 10 px** (row 8, number 7), all
+  three switchable page-wide, with the page opening on Tighter.
+  **Verified again after every change:** drag + reset, 0 stage overflow, 0 page h-overflow at
+  1400 px and 390 px, no console errors, light and dark.
+- **Artifacts (prompt 2):** `preview/exam-question-tile-polish.html` · `CLAUDE.md` ·
+  `.claude/skills/design/SKILL.md` · this log

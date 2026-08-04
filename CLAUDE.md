@@ -196,6 +196,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   `description` prop stays unset). German learning content itself is display-size and exempt;
   functional strings (EmptyState, form helpers, the session preview line) are kept.
 - In-app UI language is German (hold-to-peek EN pattern); public/landing pages English-first.
+- **Everything the FOUNDER reads is ENGLISH** (founder rule, restated s187 after a German preview
+  page): chat, PR bodies, docs, and every `preview/*.html` mockup or artifact, including its
+  headings, option names, notes, tables and switch labels. The German-UI rule above is about the
+  product, not about review material. The ONLY German inside a preview is the copy that is literally
+  app copy in the mocked screen (task text, button labels, tooltips), because that is the thing
+  under review. Same for any AI tool working on this app.
 
 ## Area guides (`docs/areas/` — read the matching file BEFORE touching an area)
 - `COMMANDS.md` — every script's full behavior, gates vs warn-only, integrity rules.
