@@ -74,20 +74,34 @@ NOT part of the app build: it needs a local Playwright Chromium (deterministic S
   HelpChrome); Cards keep plain `bg-mesh`. Flat `--background` (`180 45% 98%`) is the fallback +
   sticky-bar/input fill; the light `theme-color` meta rides the mint top stop `#F7FCF9`.
   Semantic `--warning` Butter and the app-icon Papier tile are deliberately untouched.
-- **Contrast + squircle pass (PR #665, founder-picked from
-  `preview/contrast-squircle-review.html`):** dark = "Option C" (`index.css` `.dark`): ground
-  `226 44% 6%`, brighter bluer cards `--surface 224 26% 18%` (12% gap), accent-tinted brighter
-  `--border 216 28% 36%`, lifted `--muted`/`--muted-foreground 224 13% 77%`/`--input`, brighter
-  `--primary`/`--ring 219 96% 76%`. Light = "Option B": card lift via a stronger shared
-  `shadow-soft` (tailwind.config.ts; light-only effect), deeper `--muted`/`--border` (`88%/84%`).
-  The mint→sky light ground + the `--background` contrast-gate anchor were left unchanged ON
-  PURPOSE (so `check-contrast.mjs` stays honest; deepen `--page-*` if the founder later wants
-  whiter cards to pop). All pairings pass the gate. Dark surfaces are warm navy — do not revert
-  toward the old violet 250 hue.
+- **Dark palette, s187 ("N3 Slate", founder-picked from
+  `preview/exam-question-tile-polish.html`):** the s153 "Option C" greys were a blue at 44 %
+  saturation, which read as "too much blue in the dark mode" beside Claude / ChatGPT / GitHub /
+  VS Code. The greys are now **near-neutral with a whisper of cool** and the two coloured page
+  radials are OFF in dark (`--wash-a`/`--wash-b`, read by `bg-page`/`bg-mesh` in
+  tailwind.config.ts), because on a dark ground they were a blue haze over every screen.
+  Ground `220 15% 4%` · card `--surface 220 10% 17%` · `--elevated 220 9% 22%` ·
+  `--muted 220 9% 25%` · `--border 220 10% 38%` · `--foreground 220 12% 94%` ·
+  `--muted-foreground 220 8% 72%` · `--primary`/`--ring 219 90% 74%` · `--accent-ink 198 72% 72%` ·
+  `--shadow 220 30% 2%`. **The contrast RELATIONSHIP is the founder-approved part** (preview option
+  "K2"): card over ground **1.38:1**, edge over ground **3.03:1**, and a third step for anything
+  nested INSIDE a card (`--elevated`, 1.20:1 over the card), because answer rows used to carry
+  `bg-surface` inside a `bg-surface` card, i.e. 1.00:1, and simply vanished. Blue now survives only
+  where it ACTS: the gradient CTA, an active answer number, a selected answer. Do not re-saturate
+  the greys, and do not switch the washes back on in dark.
+  Light = "Option B" (PR #665): card lift via a stronger shared `shadow-soft` (tailwind.config.ts;
+  light-only effect), deeper `--muted`/`--border` (`88%/84%`). The mint→sky light ground + the
+  `--background` contrast-gate anchor are unchanged ON PURPOSE (so `check-contrast.mjs` stays
+  honest). All pairings pass the gate.
 - **Squircle:** page toggles and filter pills are `rounded-lg` track / `rounded-md` pill
   (LibrarySwitcher, WritingModeSwitcher, Fokus toggle, FilterRail facet pills, GrammarRail
   pills). Dots, meters, count badges, avatars, circular icon buttons, and the landing page stay
   round.
+- **Corner scale, s187 ("tighter", founder):** `--radius` is **0.5rem** (was 0.875rem) and the
+  steps in tailwind.config.ts tightened with it, so a card (`rounded-xl`) is **10px**, an answer row
+  (`rounded-lg`) 8px, a pill (`rounded-md`) 6px, `rounded-sm` 4px and `rounded-2xl` 14px. The old
+  ±4/±10 steps would have collapsed `sm` to 0 and left `2xl` at twice the card radius. Still
+  squircle, never circle: check a radius against its BOX, not the token name.
 
 ## Dialog / overlay convention (locked)
 All popups/modals/dialogs: backdrop `bg-dialog-overlay` (a brand-tinted radial spotlight on the

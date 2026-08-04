@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Loader2, X } from "lucide-react";
+import { Flame, Loader2, LogOut } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { BottomTabBar } from "./BottomTabBar";
 import { GlobalSearch } from "./GlobalSearch";
@@ -142,7 +142,7 @@ export function AppShell() {
             <div className="flex items-center gap-2">
               {/* In an exam the mark is NOT a link: with the sidebar gone this
                   is the only thing left to click on the left, and navigating
-                  away would silently end the run. The X is the way out. */}
+                  away would silently end the run. The exit is the way out. */}
               {exam ? (
                 <Logo className="h-8 w-8" />
               ) : (
@@ -176,9 +176,19 @@ export function AppShell() {
                   onClick={() => examExit?.()}
                   aria-label="Prüfung verlassen"
                   title="Prüfung verlassen"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                  className={cn(
+                    "flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent",
+                    "text-danger transition-colors hover:bg-danger/12",
+                    // Phone: the mark alone, on the same 36px box the account
+                    // button used. Desktop: the mark plus the word in a quiet
+                    // red outline (founder s187, preview options X1 + X2), where
+                    // there is room for it and no hover to rely on for the
+                    // phone. No tooltip beside a visible label.
+                    "w-9 sm:w-auto sm:border-danger/30 sm:px-3",
+                  )}
                 >
-                  <X className="h-4 w-4" />
+                  <LogOut className="h-[17px] w-[17px]" />
+                  <span className="hidden text-sm font-semibold sm:inline">Verlassen</span>
                 </button>
               )}
               {/* Streak chip: flame + day count. The daily-goal figure lives on
@@ -216,7 +226,7 @@ export function AppShell() {
                   // bottom bar it was reserving room for.
                   // Wider from lg up, where the parts lay their two tiles side
                   // by side (founder s186) and a 3xl column would waste the room.
-                  "mx-auto flex h-exam-stage w-full max-w-3xl flex-col px-4 pt-4 pb-safe-2 sm:px-6 lg:max-w-6xl"
+                  "mx-auto flex h-exam-stage w-full max-w-3xl flex-col px-4 pt-4 pb-safe-4 sm:px-6 lg:max-w-6xl"
                 : "mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8",
           )}
         >

@@ -66,12 +66,17 @@ const config: Config = {
           bg: "hsl(var(--das-bg))",
         },
       },
+      // Corner scale (founder s187, "tighter"): --radius dropped 14px → 8px and
+      // the steps tightened with it, so a card (rounded-xl) lands at 10px, an
+      // answer row (rounded-lg) at 8px and a pill (rounded-md) at 6px. The
+      // ±4/±10 steps of the old scale would have collapsed sm to 0 and left 2xl
+      // twice the card radius.
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 8px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 10px)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 2px)",
+        "2xl": "calc(var(--radius) + 6px)",
       },
       fontFamily: {
         sans: [
@@ -112,8 +117,10 @@ const config: Config = {
         // A whisper of the two blues on the warm Papier ground. Nudged back up
         // 0.07/0.06 -> 0.10/0.09 in the s137 premium pass (the s133 values were
         // effectively invisible); still a wash, never a visible gradient band.
+        // The two wash alphas ride tokens (s187): dark sets both to 0, because
+        // on the dark ground they read as a blue haze over every screen.
         "mesh":
-          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%)",
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%)",
         // Page ground (s140, founder-picked "I1"): the same mesh washes over a
         // very subtle mint -> sky diagonal riding the --page-* tokens (dark mode
         // sets all three stops to the flat dark ground, so it is a no-op there).
@@ -122,7 +129,7 @@ const config: Config = {
         // radial stays top-left, and the linear angle is 120deg (150deg mirror).
         // Use on full-page shells; cards keep plain bg-mesh.
         "page":
-          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%), linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%)",
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%), linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%)",
         // Dialog backdrop: a brand-tinted radial that's lighter directly behind
         // the card and deepens toward the screen edges (a subtle spotlight). Uses
         // the cool-slate `--shadow` token instead of flat black, so it adapts to

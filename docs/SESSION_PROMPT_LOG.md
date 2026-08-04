@@ -3787,3 +3787,120 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   they shipped with, per the same-PR rule.
 - **Artifacts (prompt 8):** `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` ·
   this log
+
+## Session 187 — 2026-08-04 · branch `claude/question-tile-ui-polish-vv4t4c`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `I like this but there are still few polishing that could be
+  done.\n\n1. The close the test button should be replaced with a exit the door with an arrow kind
+  of button which should be in red color. In desktop view particularly, the button should also have
+  a small note saying schliessen or something when hovered upon - see screenshot for reference.\n2.
+  The question tile looks cramped and the text tile to the left has too much empty space. I want the
+  screen to have harmonious spacing and sizes of the tiles, and if needed the user should be able to
+  drag the text box vertically and horizontally to read more text if the text is too big\n3. when
+  pressed next question the tiles should go back to the default sizes.\n4. The back and forth buttons
+  are pushed way too down and the tiles doesn't have any breathing space vertically - it needs to be
+  fixed by keeping enough space above and below these buttons\n5. The questions navigation row can be
+  moved to below the question tile so that there won't be too much empty space there.\n6. Reduce the
+  rounded corners slightly as it seems too rounded!\n\ngenerate a few previews with the above
+  suggested changes. Do multiple checks keeping the design skill's high standards in consideration
+  before providing the preview to me. I want finest quality possible.`
+  Mid-prompt additions (verbatim): `There's not enough contrast between the tiles in the dark mode..
+  also improve the contrast and include a section in the preview file for different contrast options`
+  and `the contrast is not just about the question numbers navigation but for all the tiles`, then
+  `provide preview file as an artifact. I will decide which variants to go ahead with. Don't make
+  that decision yourself`.
+  **Response:** ONE interactive preview, `preview/exam-question-tile-polish.html`, built from the
+  real tokens (`src/index.css`) and the real geometry (`src/features/exam/*.tsx`), published as an
+  artifact. Four sections. **1 Kontrast (dark):** the diagnosis is two-part, a card/ground ratio of
+  1.34 AND answer rows that carry `bg-surface` inside a `bg-surface` card (ratio 1.00, they only
+  exist as a border); three recipes (K1 hellere Karten, K2 tieferer Grund, K3 beides + Kante) all
+  carrying one Ebenen rule (Grund → Karte → Zeile), with the measured ratios and a Bibliothek card
+  per recipe because the tokens are app-wide. **2 Ecken:** one notch down (Karte 18 → 14, Zeile
+  14 → 10, Nummer 10 → 9). **3 Ausgang:** X1 rotes LogOut-Icon + Tooltip (the app's real Radix
+  recipe, 0.3 s delay), X2 Icon + Wort, X3 offene Tür. **4 Layouts A/B/C:** A gleiche Höhe (pair
+  hugs the taller card, group centred), B je eigene Höhe, C ein Arbeitsblatt mit Haarlinie; all
+  three carry the answers to points 3, 4, 5 (drag resets on every question change; 16 px above the
+  number row, 12 px to the buttons, 16 px below; the number row moved into the bottom cluster) plus
+  a capped, centred button pair on desktop. Toolbar switches Ansicht / Ecken / Text (lang vs kurz,
+  the case that drives the whole leftover-room question) / Kontrast for the whole page.
+  **No recommendation is marked anywhere**, per the founder's instruction.
+  **Verified in headless Chromium:** drag (side 56 % → 42.1 %, vertical to the stage limit) and the
+  reset on Weiter, stage overflow 0 after interactions, page h-overflow 0 at 1400 px AND 390 px,
+  no console errors, light + dark.
+- **Artifacts (prompt 1):** `preview/exam-question-tile-polish.html` ·
+  artifact `https://claude.ai/code/artifact/dfcea42b-8258-464c-8e2c-d8084c665128` · this log
+- **Prompt 2 (verbatim, 2026-08-04):** `The explanation text in the artifact is in German!!!! it
+  should be in english as explained multiple times before. Save it as a rule in the documentation if
+  helpful - I don't want to repeat myself on this`
+  Mid-prompt additions (verbatim): `Attached are some apps in dark mode. I don't like too much usage
+  of the blue hues and shades in the dark mode in the app at the moment. Take inspiration from the
+  attached apps like claude, chatgpt, github and vs code. Apply similar contrast and colors` (with
+  screenshots of Claude, ChatGPT, GitHub and VS Code in dark mode) · `The k2 contrast is quite close
+  to what I would expect` · `the new reduced rounding is okay but I want it further reduced slightly
+  - add the next option in the artifact`
+  **Response:** three changes to the same preview + artifact URL.
+  **(a) Language, now a written rule.** The whole review page is English: headings, option names,
+  notes, tables, switch labels. The only German left is the copy that IS app copy inside the mocked
+  screens (task text, Zurück/Weiter, the exit tooltip), and the page says so. Written into
+  **`CLAUDE.md` §Writing style** ("Everything the FOUNDER reads is ENGLISH", chat, PRs, docs,
+  `preview/*.html`, artifacts) and into **`.claude/skills/design/SKILL.md` §1** as process step 4,
+  next to a new "never mark a recommendation unless asked" rule (founder, this session).
+  **(b) Dark mode is no longer blue.** Diagnosis: the ground is a blue at **44 % saturation** with
+  two blue radial glows on top of it, which is what reads as "too much blue". Section 1 became
+  "Dark mode: colour and contrast" with five columns: Today, K2 (the contrast the founder confirmed,
+  still blue) and three neutral palettes carrying **exactly K2's contrast relationship** (card 1.4:1
+  off the ground, edge 3.1, row-in-card 1.2) with the hue taken out and the glows switched off:
+  **N1 Graphite** (5 % sat, VS Code / ChatGPT), **N2 Warm grey** (7 %, Claude), **N3 Slate** (15 %,
+  GitHub). Blue survives only where it acts (CTA, active number, selected answer), which is what all
+  four reference apps do. Ratio table extended with a "saturation of the greys" row.
+  **(c) A third corner step.** Today 18 px · New 14 px · **Tighter 10 px** (row 8, number 7), all
+  three switchable page-wide, with the page opening on Tighter.
+  **Verified again after every change:** drag + reset, 0 stage overflow, 0 page h-overflow at
+  1400 px and 390 px, no console errors, light and dark.
+- **Artifacts (prompt 2):** `preview/exam-question-tile-polish.html` · `CLAUDE.md` ·
+  `.claude/skills/design/SKILL.md` · this log
+- **Prompt 3 (verbatim, 2026-08-04):** `Dark palette - N3\nText - layout B looks good and keep it
+  "long" but no surrounding tile for the question - the question and options can just float on the
+  background\nExam exit icon - X1 for mobile, X2 for desktop view\nCorner - tighter\nThe numbers when
+  answered doesn't look good if the text format is blue in color (see attached) - use another color
+  from the pallette for better contrast - take your recommendation and go head without any preview
+  for this.\n\nImplement the above comments now with exceptional quality`
+  Mid-prompt addition (verbatim): `implement the dark mode palette selected above for the whole app`
+  · then `document the session`
+  **Response:** every pick implemented, verified against the real build, documented.
+  **Palette N3 Slate (app-wide, `src/index.css` `.dark`):** ground `220 15% 4%`, surface
+  `220 10% 17%`, elevated `220 9% 22%`, muted `220 9% 25%`, border `220 10% 38%`, foreground
+  `220 12% 94%`, muted-foreground `220 8% 72%`, primary/ring `219 90% 74%`, accent-ink
+  `198 72% 72%`, shadow `220 30% 2%`; the two coloured page radials are switched off in dark via new
+  `--wash-a`/`--wash-b` tokens read by `bg-page`/`bg-mesh` in `tailwind.config.ts`. `check:contrast`
+  green with every pairing.
+  **Corners "tighter":** `--radius` 0.875rem → **0.5rem** and the borderRadius steps tightened to
+  ±2/±4/+6, so card 10px, row 8px, pill 6px, `sm` 4px, `2xl` 14px (the old ±4/±10 would have
+  collapsed `sm` to 0).
+  **Exam (`McParts.tsx` rewritten around variant B):** the question renders with NO card, the ONE
+  card on screen is the text / Notizen sheet, both blocks are content-tall and the pair is centred,
+  the number strip moved into the bottom cluster (16 px above, 12 px to the buttons, `pb-safe-4`
+  below), the cluster is capped `lg:max-w-xl` and centred, both scroll regions fade their last line,
+  and a `role="separator"` drags the split sideways (desktop, 32-72 %) or up/down (phone, 24-64 %)
+  with a grow handle on the card and arrow-key steps, all reset on every question change.
+  **Exit (`AppShell`):** red `LogOut`, bare mark on a phone (X1), mark + "Verlassen" in a red
+  outline from `sm` up (X2), no tooltip beside a visible label.
+  **Answered number:** `text-foreground` on the Himmelblau tint instead of `text-accent-ink`
+  (~3.9:1 → ~11:1). Green was rejected on purpose: green means correct, and answered is not correct.
+  **One real bug found while verifying:** a percentage `max-height` only resolves against a parent
+  with a definite height, so the auto-height wrapper made every `max-h-full` a no-op and a tall
+  question pushed the stage 48 px past one viewport. Wrapper is `h-full` + `lg:items-center` now.
+  **Verification:** a Playwright driver over the real build, **225 in-exam screens** (1440x900,
+  1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × 3 fresh draws): 0 px page overflow, question
+  fully visible everywhere, no console errors, light + dark. Gates: typecheck · lint 0 errors ·
+  551 tests · check:contrast · build · check:bundle 126.0 kB.
+  **Documentation:** `PROJECT_STATUS.md` (`_Last updated_` rewritten to s187, new handoff, s185b
+  archived to `docs/archive/status-log/…W32.md`, back under the 250-line cap), `CLAUDE.md`
+  (dark-palette + corner law), `docs/areas/BRAND.md` (tokens + radius scale, s153 Option C replaced),
+  `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, resize, the geometry trap), `docs/DECISIONS.md`
+  §s187, and the `/design` skill.
+- **Artifacts (prompt 3):** `src/index.css` · `tailwind.config.ts` · `src/features/exam/McParts.tsx` ·
+  `src/features/exam/MockExamRunner.tsx` · `src/components/layout/AppShell.tsx` ·
+  `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/areas/BRAND.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log

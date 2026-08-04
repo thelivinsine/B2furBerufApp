@@ -1387,3 +1387,44 @@ here so it is not "improved" back:
 `preview/notizen-a-r2.html` is generated FROM the component, not hand-built, so the approved preview
 and the live surface cannot drift.
 
+
+## s187 — The exam polish round, and dark mode stops being blue
+
+Founder feedback on the shipped Prüfungsteil, then four picks off
+`preview/exam-question-tile-polish.html` (artifact
+`https://claude.ai/code/artifact/dfcea42b-8258-464c-8e2c-d8084c665128`).
+
+- **Dark mode: "N3 Slate", near-neutral greys.** The founder named Claude, ChatGPT, GitHub and
+  VS Code and said there is "too much usage of the blue hues and shades". Measured, they were right
+  twice: the dark ground was a blue at **44 % saturation**, and `bg-page` laid two coloured radials
+  over every screen on top of it. The greys drop to 10-15 % saturation and the washes go to 0 in
+  dark (`--wash-a`/`--wash-b`). Blue now survives only where it ACTS: the gradient CTA, the active
+  answer number, a selected answer. Rejected on the way: keeping the blue and only fixing contrast
+  ("K2"), a fully achromatic grey ("N1") and a warm Claude-style grey ("N2") — the founder picked
+  the one that keeps a whisper of cool.
+- **The contrast level is the founder's, not a guess.** They confirmed preview option K2 as "quite
+  close to what I would expect", so all three neutral palettes were built to K2's relationships and
+  the picked one keeps them: card over ground **1.38:1**, edge over ground **3.03:1**, and a third
+  step for anything nested inside a card. That third step exists because the exam's answer rows
+  carried `bg-surface` INSIDE a `bg-surface` card, i.e. 1.00:1, and were held together by a 1px
+  border alone. A row that carries its card's own fill is a bug, not a style.
+- **Corners: "tighter".** `--radius` 0.875rem → **0.5rem**, with the ± steps in tailwind.config.ts
+  tightened so a card is 10px, an answer row 8px and a pill 6px. Two preview rounds: the founder
+  approved 14px, then asked for one more step down.
+- **The question gets no tile.** Preview variant B, plus "no surrounding tile for the question, the
+  question and options can just float on the background". One card per screen (the text, or the
+  Notizen sheet) removes the big-card-beside-small-card mismatch that started this round, and the
+  pair sits centred so a short text leaves air OUTSIDE the card.
+- **The exit is red, and it is two controls in one.** X1 on a phone (the bare `LogOut` mark) and X2
+  from `sm` up (mark + "Verlassen" in a quiet red outline). No tooltip beside a visible label.
+- **The answered number stopped being blue-on-blue.** `text-accent-ink` on a Himmelblau tint was
+  the weakest pairing on the strip (~3.9:1); the digit is `text-foreground` now (~11:1) and the tint
+  alone carries "answered". Green was not an option: green means correct, and an answered question
+  is not a correct one.
+- **A geometry trap worth remembering:** a percentage `max-height` only resolves against a parent
+  with a DEFINITE height. The wrapper holding the two blocks was auto-height for one build, which
+  silently turned every `max-h-full` under it into a no-op and let a tall question push the stage
+  48px past one viewport. It is `h-full` with `lg:items-center` now.
+- **Everything the founder reads is English** (they had asked before): previews, artifacts, chat,
+  PRs, docs. Only the copy that IS app copy inside a mockup stays German. Written into CLAUDE.md
+  and the design skill so it stops being a per-session reminder.

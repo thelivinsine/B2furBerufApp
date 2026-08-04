@@ -120,3 +120,43 @@ squash-merged `863b7d4`, after resolving a docs-only conflict with the parallel 
 - **One test fixture was rewritten, not patched.** The composer's listening test scoped to logistics
   because that theme's only text WAS a voicemail; the new logistics text falsified that. It now
   derives the theme from the bank, so adding a text anywhere cannot make it stale again.
+
+**Handoff after session 185b (2026-08-04, parallel branch): the database architecture audit.**
+Founder: "the database architecture is concerningly linear.. can you do a thorough audit and provide
+your analysis with risks and recommendations?"
+- **The report is `docs/reports/db-architecture-audit-2026-08-04.md`** (all 15 migrations, the 5 Edge
+  Functions, `cloudSync.ts`, the admin RPCs; findings R1-R8 with per-finding status). **Verdict:**
+  the "linear" schema is the correct consequence of keeping the ~5,000-id content catalog in the
+  repo; the real risks were growth-shaped, not shape-shaped. Read the report for the reasoning; this
+  handoff records only what changed and what is still owed.
+- **The founder then said "do the four fixes", and all four shipped:**
+  1. **R3, the silent sync.** The push helpers ignored the supabase-js `{ error }`, so a permanently
+     failing sync was indistinguishable from a working one. They now read it, retry with backoff,
+     and after 3 consecutive failures Settings shows an amber **"Sync pausiert"** with the last
+     backup time and a live retry. Also added an **unknown-column retry**: the site and migration
+     deploys are separate workflows, and an unknown column fails the whole upsert.
+  2. **R4, retention** (`0015_retention.sql`): three weekly `pg_cron` purges, guests 90 d, dead
+     transform-cache rows 60 d, learner text 730 d. Block exception-wrapped so a missing extension
+     warns instead of failing the migration step and blocking the function deploys behind it.
+  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, dropped active days folded into `activeDaysFolded`
+     (+ cloud column) so the lifetime "N aktive Tage" figure is unchanged.
+  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules, files
+     ≤ 0014 exempt as already-applied history. Verified in both directions.
+- **The one question the code could not answer went to the founder: learner text expires after
+  2 years** (audit F11, now CLOSED). The job NULLs the text columns rather than deleting rows, so AI
+  limits and aggregates keep working and Verlauf keeps the evaluation: the learner loses old raw
+  text, never their progress record. The privacy policy was rewritten in the same change (also
+  documenting the new 90-day guest rule, and dropping the sentence that had promised indefinite
+  retention). Standing rule in `docs/DECISIONS.md` §s185.
+- **The documentation pass then caught a real miss in that policy change and fixed it.** The rewrite
+  had shipped WITHOUT bumping `PRIVACY_LAST_UPDATED_ISO` and `CONSENT_VERSION`, so a legal page
+  rendered materially new retention terms under the old date. **The §G2 drift check provably cannot
+  catch this:** `consentInSync()` compares the two constants to each other, so forgetting BOTH stays
+  green. Both are now `2026-08-04`; the rule is written into `docs/areas/LEGAL-ADMIN.md`.
+- **Still owed (see "Resume here"):** confirm `/admin → Launch` reads `retention_scheduled: true`.
+- **Design:** `preview/sync-status.html`, screenshot-verified. The new state reuses the existing
+  badge recipe with the warning token, so no new visual language was introduced.
+- **Gates:** typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515**
+  (9 new) · build · check:bundle 124.7 kB. **Shipped:** PR **#786** (`7fe00dd`) and **#787**
+  (`f738544`), both squash-merged, all three workflows green, migration 0015 applied to the live
+  database.

@@ -177,6 +177,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile.
 - **Controls always visibly act:** no disabled-at-default buttons; zero-yield options grey out
   with honest counts.
+- **Dark mode is near-neutral, not blue** (founder s187, "N3 Slate"): the greys carry a whisper of
+  cool (10-15% saturation, ground `220 15% 4%`, cards `220 10% 17%`) and the two coloured page
+  radials are OFF in dark (`--wash-a`/`--wash-b`). Colour survives only where it ACTS: the gradient
+  CTA, an active number, a selected answer. Three layers always separate: ground → card (1.38:1) →
+  anything nested inside a card (`--elevated`); a row that carries its card's own fill is a bug, not
+  a style. Corners are the "tighter" scale (`--radius: 0.5rem` → card 10px, row 8px, pill 6px).
 - **Color language:** Himmelblau accent tiles for selection rails (not grey), and the accent is a
   FILL with NO visible edge: rails and the buttons that open them border in their own fill color
   and separate from the page by `shadow-soft` alone, like the Bibliothek cards (never an accent
@@ -196,6 +202,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   `description` prop stays unset). German learning content itself is display-size and exempt;
   functional strings (EmptyState, form helpers, the session preview line) are kept.
 - In-app UI language is German (hold-to-peek EN pattern); public/landing pages English-first.
+- **Everything the FOUNDER reads is ENGLISH** (founder rule, restated s187 after a German preview
+  page): chat, PR bodies, docs, and every `preview/*.html` mockup or artifact, including its
+  headings, option names, notes, tables and switch labels. The German-UI rule above is about the
+  product, not about review material. The ONLY German inside a preview is the copy that is literally
+  app copy in the mocked screen (task text, button labels, tooltips), because that is the thing
+  under review. Same for any AI tool working on this app.
 
 ## Area guides (`docs/areas/` — read the matching file BEFORE touching an area)
 - `COMMANDS.md` — every script's full behavior, gates vs warn-only, integrity rules.
