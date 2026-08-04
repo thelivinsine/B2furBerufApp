@@ -6,6 +6,29 @@ import { remapProgressIds } from "@/lib/idRenames";
 import { daysBetween, todayKey } from "@/lib/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
+/**
+ * One finished mock-exam run. Level/part keys are structural strings here (not
+ * the engine's unions) so this EAGER store never imports the bank-heavy exam
+ * engine; the engine's types narrow them at the call sites that write records.
+ */
+export interface MockExamRecord {
+  /** Unique per run (start timestamp). */
+  id: string;
+  level: string;
+  date: string;
+  /** Equal-weighted total over the scored parts, 0-100; null = nothing scored. */
+  total: number | null;
+  /** Part id ("lesen" | "hoeren" | "schreiben" | "sprechen") -> pct or null. */
+  parts: Record<string, number | null>;
+}
+
+/** Cloud row stays bounded (DB audit R1 discipline): keep the newest N runs. */
+const MOCK_EXAMS_RETAINED = 100;
+
+export function trimMockExams(list: MockExamRecord[]): MockExamRecord[] {
+  return list.length > MOCK_EXAMS_RETAINED ? list.slice(-MOCK_EXAMS_RETAINED) : list;
+}
+
 interface ProgressState {
   xp: number;
   /** Per-day XP earned, keyed by YYYY-MM-DD. */
@@ -26,6 +49,12 @@ interface ProgressState {
   redemittelSeen: Record<string, number>; // phraseId -> times practised
   scenariosDone: string[];
   examsDone: { id: string; score: number; date: string }[];
+  /**
+   * Full mock-exam runs (Prüfungssimulation rework, s186), newest last, with
+   * the per-part breakdown the result screen and Fortschritt read. Bounded at
+   * MOCK_EXAMS_RETAINED like every other synced collection.
+   */
+  mockExams: MockExamRecord[];
   totalSessions: number;
   /** Vocab ids the learner bookmarked for their custom deck (#29). */
   savedWords: string[];
@@ -65,6 +94,7 @@ interface ProgressState {
   practiceRedemittel: (phraseId: string) => void;
   completeScenario: (scenarioId: string) => void;
   completeExam: (examId: string, score: number) => void;
+  completeMockExam: (record: MockExamRecord) => void;
   registerSession: () => void;
   completeMission: (missionId: string) => void;
   grantKeyItems: (itemIds: string[]) => void;
@@ -137,6 +167,7 @@ const defaults = {
   redemittelSeen: {} as Record<string, number>,
   scenariosDone: [] as string[],
   examsDone: [] as { id: string; score: number; date: string }[],
+  mockExams: [] as MockExamRecord[],
   totalSessions: 0,
   savedWords: [] as string[],
   missionsDone: [] as string[],
@@ -218,6 +249,9 @@ export const useProgressStore = create<ProgressState>()(
         set((s) => ({
           examsDone: [...s.examsDone, { id: examId, score, date: todayKey() }],
         })),
+
+      completeMockExam: (record) =>
+        set((s) => ({ mockExams: trimMockExams([...s.mockExams, record]) })),
 
       registerSession: () => set((s) => ({ totalSessions: s.totalSessions + 1 })),
 

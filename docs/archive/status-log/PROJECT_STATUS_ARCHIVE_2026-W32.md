@@ -93,3 +93,30 @@ this session, the full s183 handoff (the Prüfung icon language, PR #780). Their
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
+
+**Handoff after session 185a (2026-08-04): the content-audit backlog, minus P10.** Founder, after
+being shown what was left: "go ahead with all the items except for the p10." Shipped as PR **#785**,
+squash-merged `863b7d4`, after resolving a docs-only conflict with the parallel 185b branch.
+- **Closed outright: P9, P7, P5, P4.** P9 gave every noun a `plural` or a `numerus` and folded the
+  two `pron` schemes into one documented, linted scheme. P7 re-levelled 108 items off the advanced
+  bands and froze the rare-compound count with a linter ratchet. P5 took EVERY grammar topic to 10
+  drills with ≥3 productive (the 21 B2/C1 topics had zero productive between them). P4 added six
+  level-3 scenarios, three of them Alltag.
+- **P3 is done.** Eight exam-length B2 texts shipped, all six voicemails carry `notes` fields, and
+  the Notizen step itself shipped as **variante A**, which the founder picked from
+  `preview/notizen-varianten.html` and then refined over three rounds. The settled shape is in
+  `docs/areas/CONTENT.md` and should be treated as locked: Himmelblau message tile above a WHITE
+  Notizen sheet (colours swapped on request), ruled lines rather than boxed inputs, a 40px play
+  button on the title row, and identical row heights before and after "Notizen vergleichen" so the
+  button underneath never moves. Final render: `preview/notizen-a-r2.html`.
+- **Three things were deliberately left alone, and each is a rule, not a shortcut.** (1) The 12
+  human-verified rows that P9's new checks touch: editing one breaks the content fingerprint its
+  `verified` stamp is tied to, so the linter warns and they queue for the next human review. (2)
+  P7's "spend the next 200 items on core verbs, adjectives and connectors" is a standing authoring
+  rule in `docs/areas/CONTENT.md`, not a shippable change. (3) P10 itself, per the founder.
+- **Two rules are gates now, so they cannot rot:** `tests/grammar.test.ts` asserts 10 drills + 3
+  productive per topic, and `lint-content.mjs` gates noun numerus, the pron scheme and the
+  rare-compound ceiling. A future pack cannot quietly re-open any of them.
+- **One test fixture was rewritten, not patched.** The composer's listening test scoped to logistics
+  because that theme's only text WAS a voicemail; the new logistics text falsified that. It now
+  derives the theme from the bank, so adding a text anywhere cannot make it stale again.

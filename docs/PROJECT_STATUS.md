@@ -1,6 +1,11 @@
 # Project Status
 
-_Last updated: 2026-08-04 (session 185). **The content-audit backlog is down to one open item.**
+_Last updated: 2026-08-04 (session 186). **The Prüfungssimulation is a real four-part mock exam
+now**: Lesen, Hören, Schreiben, Sprechen with per-Teil timers, Anleitung pages, an answer-sheet
+strip, a Niveau row (A2 greyed honestly, no content yet) and a result screen with a 60 % pass line;
+all content drawn from the existing banks, writing scored by the evaluator's new exam mode
+(migration 0016).
+Prior s185: **The content-audit backlog is down to one open item.**
 The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
 are closed outright, and so is P3 now that the founder picked and refined the Notizen step.
 P9: every noun declares `plural` or `numerus` (329 had neither), and the `pron` respelling is ONE
@@ -145,19 +150,28 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**In flight (s186): the Prüfungssimulation rework, waiting on the founder's variant pick.** The
-founder asked for a complete rework: the simulation should feel like a real exam with Lesen, Hören,
-Schreiben and Sprechen, a timer and clear instructions. The design round shipped as
-`preview/pruefungssimulation-rework.html` (three variants: A "Prüfungstag" timeline hub +
-top-bar runner, recommended; B "Vier Module" card hub + bottom-bar timer; C "Antwortbogen"
-numbered answer-strip navigation), published as a Claude artifact. The proposed structure: four
-Teile at 15/10/20/7 Min (52 Min total), Anleitung before each Teil, per-Teil timer, Ergebnis with
-per-Teil Punkte and a 60 % Bestanden line. All content comes from existing banks (exam-length B2
-texts + voicemail `notes` from s185, the 717 writing tasks, the 30 speaking scenarios), so the
-implementation is engine + UI only. **Do not implement until the founder picks a variant**; then:
-new exam composer in `engine/`, ExamHub/ExamRunner rework in `features/exam/`, per-Teil timer with
-`useLiveWork` + persistence (never lose a running exam to a reload), and `examsDone` grows a
-per-module breakdown (ids stay permanent).
+**Handoff after session 186 (2026-08-04): the Prüfungssimulation rework.** Founder: the simulation
+"should actually feel like an exam with all the lesen, hören, schreiben and sprechen modules with a
+timer and clear instructions"; picks after a preview round (`preview/pruefungssimulation-rework.html`):
+**Option B start page + a Niveau row (A2 to C1), Option C answer-sheet runner, quiet outline
+Zurück/Weiter (dark blue only on submission moments), and the Schreiben expand button where useful.**
+- **What shipped:** `engine/exam.ts` (level-aware composer + scoring; 3 Texte, 2 Ansagen max 2x,
+  1 voll gebriefte Schreibaufgabe, 1 Sprechen-Szenario über die 1-3-Leiter; Bestanden ab 60 %),
+  `useExamStore` (persisted run: plan ids, answers, Notizen, essay, remaining seconds; a reload
+  resumes mid-part; Sprechen restarts its dialogue with full time, documented), the reworked
+  `ExamHub` (Niveau row, slim full-exam card, four module cards, each startable alone, honest
+  zero states), `MockExamRunner` + parts (Anleitung pages, runbar with amber-under-2-min timer,
+  numbered answer strip, Hören with TTS + Notizen lines, Schreiben with fullscreen dialog +
+  UmlautKeys, embedded Sprechen), and the Ergebnis screen (per-Teil bars, weakest-part Üben CTA,
+  answer review). Writing is scored by `evaluate-writing`'s new **exam mode** (0-100, telc-weighted;
+  `exam_score` persisted, migration 0016) and the result renormalises honestly when no score came
+  back. `progress.mock_exams` syncs the runs (bounded at 100, unknown-column retry covers the
+  deploy window). Tests: `tests/exam.test.ts` (9) + the full suite green; bundle 125 kB.
+- **Content gaps this exposed (PROJECT_REFERENCE backlog):** A2 has NO exam content anywhere (the
+  A2 Niveau pill shows an honest empty state), and C1 Hören has a single audio text, so it tops up
+  from B2.2. Both need an authoring wave before those levels feel native.
+- **Verify live after merge:** run one full B2 exam end to end (Hören audio is device TTS; the
+  Schreiben score needs the deployed function + migration).
 
 **Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
 shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
@@ -179,33 +193,6 @@ answerable in the word target, or that the Branche framing convinces someone who
 industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
 audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
 C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
-
-**Handoff after session 185a (2026-08-04): the content-audit backlog, minus P10.** Founder, after
-being shown what was left: "go ahead with all the items except for the p10." Shipped as PR **#785**,
-squash-merged `863b7d4`, after resolving a docs-only conflict with the parallel 185b branch.
-- **Closed outright: P9, P7, P5, P4.** P9 gave every noun a `plural` or a `numerus` and folded the
-  two `pron` schemes into one documented, linted scheme. P7 re-levelled 108 items off the advanced
-  bands and froze the rare-compound count with a linter ratchet. P5 took EVERY grammar topic to 10
-  drills with ≥3 productive (the 21 B2/C1 topics had zero productive between them). P4 added six
-  level-3 scenarios, three of them Alltag.
-- **P3 is done.** Eight exam-length B2 texts shipped, all six voicemails carry `notes` fields, and
-  the Notizen step itself shipped as **variante A**, which the founder picked from
-  `preview/notizen-varianten.html` and then refined over three rounds. The settled shape is in
-  `docs/areas/CONTENT.md` and should be treated as locked: Himmelblau message tile above a WHITE
-  Notizen sheet (colours swapped on request), ruled lines rather than boxed inputs, a 40px play
-  button on the title row, and identical row heights before and after "Notizen vergleichen" so the
-  button underneath never moves. Final render: `preview/notizen-a-r2.html`.
-- **Three things were deliberately left alone, and each is a rule, not a shortcut.** (1) The 12
-  human-verified rows that P9's new checks touch: editing one breaks the content fingerprint its
-  `verified` stamp is tied to, so the linter warns and they queue for the next human review. (2)
-  P7's "spend the next 200 items on core verbs, adjectives and connectors" is a standing authoring
-  rule in `docs/areas/CONTENT.md`, not a shippable change. (3) P10 itself, per the founder.
-- **Two rules are gates now, so they cannot rot:** `tests/grammar.test.ts` asserts 10 drills + 3
-  productive per topic, and `lint-content.mjs` gates noun numerus, the pron scheme and the
-  rare-compound ceiling. A future pack cannot quietly re-open any of them.
-- **One test fixture was rewritten, not patched.** The composer's listening test scoped to logistics
-  because that theme's only text WAS a voicemail; the new logistics text falsified that. It now
-  derives the theme from the bank, so adding a text anywhere cannot make it stale again.
 
 **Handoff after session 185b (2026-08-04, parallel branch): the database architecture audit.**
 Founder: "the database architecture is concerningly linear.. can you do a thorough audit and provide

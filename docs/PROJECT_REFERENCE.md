@@ -84,6 +84,17 @@ sites, and open corpora. `strategy/DATA_GOVERNANCE.md` still forbids copying tel
 Deliverable shape: a report in `docs/reports/` with a prioritised fix list, like the s178 content
 audit.
 
+### CONTENT GAPS (s186): what the mock exam cannot serve yet
+
+The Prüfungssimulation rework composes every part from the existing banks, which made two gaps
+measurable. Both are authoring waves (load `/content` first), not engine work:
+1. **A2 has no exam content at all**: zero A2 texts, zero A2 writing tasks, no A2 speaking rung.
+   The hub's A2 Niveau pill shows an honest empty state until this exists. An A2 wave needs
+   reading/listening texts, short writing tasks with Inhaltspunkte, and level-0-style scenarios.
+2. **C1 Hören has a single audio text** (voicemail/announcement at C1), so the C1 exam tops up its
+   listening from B2.2 (`LISTENING_TOPUP` in `engine/exam.ts`). Fixed by ~4-6 C1 voicemails or
+   Durchsagen with `notes` fields; remove the top-up once the pool covers 2 draws comfortably.
+
 ### DEFERRED BY DESIGN (s185): the two database items the audit did not fix
 
 From `docs/reports/db-architecture-audit-2026-08-04.md`. Both were understood, costed and left

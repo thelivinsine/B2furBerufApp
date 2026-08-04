@@ -1,75 +1,188 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, Clock, ChevronRight, ListChecks, RotateCw } from "lucide-react";
-import { examSets } from "@/data/examSets";
-import { scenarioById } from "@/data/dialogues";
-import type { ExamSet } from "@/types";
+import { GraduationCap, ChevronRight, Clock, Play } from "lucide-react";
+import {
+  HUB_LEVELS,
+  MOCK_PART_ORDER,
+  PART_LABEL,
+  PART_MINUTES,
+  PASS_PCT,
+  mockExamAvailability,
+  type HubLevel,
+  type MockExamLevel,
+  type MockPartId,
+} from "@/engine/exam";
+import { useExamStore } from "@/store/useExamStore";
+import { useProgressStore } from "@/store/useProgressStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HubHero } from "@/components/shared/HubHero";
-import { useProgressStore } from "@/store/useProgressStore";
-import { ExamRunner } from "./ExamRunner";
+import { cn } from "@/lib/utils";
+import { PART_META } from "./partMeta";
+import { MockExamRunner } from "./MockExamRunner";
 
+const TOTAL_MIN = MOCK_PART_ORDER.reduce((sum, p) => sum + PART_MINUTES[p], 0);
+
+/**
+ * Prüfungssimulation hub (full rework s186, founder pick: Option B start page
+ * with a Niveau row on top). The Niveau selects which exam the four modules
+ * and the full run serve; A2 stays visible but honestly empty until content
+ * exists. Module cards start a single timed part; the slim card on top runs
+ * the whole four-part exam.
+ */
 export function ExamHub() {
-  const [active, setActive] = useState<ExamSet | null>(null);
-  const examsDone = useProgressStore((s) => s.examsDone);
+  const run = useExamStore((s) => s.run);
+  const start = useExamStore((s) => s.start);
+  const mockExams = useProgressStore((s) => s.mockExams);
+  const settingsLevel = useSettingsStore((s) => s.level);
+  const [level, setLevel] = useState<HubLevel>(() =>
+    (HUB_LEVELS as readonly string[]).includes(settingsLevel) ? (settingsLevel as HubLevel) : "B2",
+  );
 
-  if (active) {
-    const scenario = scenarioById(active.scenarioId);
-    if (!scenario) return null;
-    return <ExamRunner examSet={active} scenario={scenario} onBack={() => setActive(null)} />;
-  }
+  // A running (or just finished, un-dismissed) exam takes over the route, so
+  // a reload lands back inside the simulation, never on the hub.
+  if (run) return <MockExamRunner />;
+
+  const avail = mockExamAvailability(level);
+  const servable = level !== "A2";
+
+  const lastFull = [...mockExams]
+    .reverse()
+    .find((m) => m.level === level && Object.keys(m.parts).length === MOCK_PART_ORDER.length);
+  const lastPart = (part: MockPartId) =>
+    [...mockExams].reverse().find((m) => m.level === level && m.parts[part] != null)?.parts[
+      part
+    ] ?? null;
+
+  const partCount = (part: MockPartId) =>
+    part === "lesen"
+      ? avail.lesen
+      : part === "hoeren"
+        ? avail.hoeren
+        : part === "schreiben"
+          ? avail.schreiben
+          : avail.sprechen;
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <HubHero
         icon={GraduationCap}
         gradient="from-amber-500 to-orange-500"
-        eyebrow="Prüfungsmodus"
+        eyebrow="Prüfung"
         title="Prüfungssimulation"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {examSets.map((ex, i) => {
-          const lastAttempt = [...examsDone].reverse().find((e) => e.id === ex.id);
+      {/* Niveau row (founder s186): which exam the whole page serves. */}
+      <div>
+        <p className="mb-2 ml-0.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Niveau
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {HUB_LEVELS.map((lv) => {
+            const empty = lv === "A2";
+            const active = level === lv;
+            return (
+              <button
+                key={lv}
+                type="button"
+                onClick={() => setLevel(lv)}
+                className={cn(
+                  "rounded-md px-4 py-2 text-sm font-semibold transition-colors",
+                  active
+                    ? "border border-accent/20 bg-accent/20 text-accent-ink shadow-soft dark:bg-accent/10"
+                    : "border border-border bg-surface text-foreground hover:bg-muted/60",
+                  // Zero-yield greys out with its honest state, it never dead-ends:
+                  // tapping A2 shows WHY it is empty instead of doing nothing.
+                  empty && !active && "text-muted-foreground",
+                )}
+              >
+                {lv}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* The full exam, one slim card (Option B). */}
+      <Card>
+        <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold">Komplette Prüfung</p>
+            <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
+              <span className="tabular-nums">4 Teile · {TOTAL_MIN} Min</span>
+              {lastFull?.total != null && (
+                <span className="tabular-nums">· zuletzt {lastFull.total} %</span>
+              )}
+            </p>
+          </div>
+          {lastFull?.total != null && lastFull.total >= PASS_PCT && (
+            <Badge variant="success">Bestanden</Badge>
+          )}
+          {servable && avail.complete ? (
+            <Button variant="gradient" size="sm" onClick={() => start(level as MockExamLevel)}>
+              <Play className="h-4 w-4" /> Starten
+            </Button>
+          ) : (
+            <span className="text-sm text-muted-foreground">Noch keine Inhalte</span>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* The four modules (Option B), each startable on its own. */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {MOCK_PART_ORDER.map((part, i) => {
+          const meta = PART_META[part];
+          const Icon = meta.icon;
+          const count = partCount(part);
+          const canStart = servable && count > 0;
+          const last = lastPart(part);
           return (
             <motion.div
-              key={ex.id}
+              key={part}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07 }}
+              transition={{ delay: Math.min(i * 0.05, 0.2) }}
             >
-              <Card className="card-hover h-full cursor-pointer" onClick={() => setActive(ex)}>
-                <CardContent className="flex h-full flex-col gap-3 p-5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-ink">
-                      <GraduationCap className="h-5 w-5" />
-                    </div>
-                    {lastAttempt && (
-                      <Badge variant="success">{lastAttempt.score}% erreicht</Badge>
+              <Card
+                className={cn("h-full", canStart && "card-hover cursor-pointer")}
+                onClick={canStart ? () => start(level as MockExamLevel, [part]) : undefined}
+              >
+                <CardContent className="flex h-full flex-col gap-2.5 p-4">
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                      meta.tile,
+                      !canStart && "opacity-50",
                     )}
+                  >
+                    <Icon className={cn("h-5 w-5", meta.ink)} />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold leading-snug">{ex.title}</p>
-                    <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2">{ex.taskSheet}</p>
+                    <p className={cn("font-semibold", !canStart && "text-muted-foreground")}>
+                      {PART_LABEL[part]}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {canStart ? meta.desc : "Noch keine Inhalte"}
+                    </p>
+                    <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
+                      {PART_MINUTES[part]} Min
+                    </p>
                   </div>
-                  <div className="space-y-1.5 border-t border-border pt-3">
-                    <p className="text-xs font-semibold text-muted-foreground">Aspekte</p>
-                    {ex.aspects.map((a) => (
-                      <div key={a} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <ListChecks className="h-3.5 w-3.5 shrink-0" /> {a}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" /> {ex.totalMinutes} Min
-                    </div>
-                    <Button size="sm" variant="ghost" className="h-7 gap-1 px-2">
-                      {lastAttempt ? <RotateCw className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-                      {lastAttempt ? "Wiederholen" : "Starten"}
-                    </Button>
+                  <div className="flex items-center justify-between">
+                    {last != null ? (
+                      <Badge variant={last >= PASS_PCT ? "success" : "muted"} className="tabular-nums">
+                        {last} %
+                      </Badge>
+                    ) : (
+                      <span />
+                    )}
+                    {canStart && (
+                      <span className="inline-flex items-center gap-0.5 text-xs font-medium text-primary">
+                        Starten <ChevronRight className="h-3.5 w-3.5" />
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -78,19 +191,16 @@ export function ExamHub() {
         })}
       </div>
 
-      <Card className="bg-mesh">
-        <CardContent className="p-5">
-          <p className="text-sm font-semibold">Bewertungskriterien</p>
-          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {examSets[0].rubric.map((r) => (
-              <div key={r.id} className="text-sm">
-                <span className="font-medium">{r.label}: </span>
-                <span className="text-muted-foreground">{r.description}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {!servable && (
+        <p className="text-center text-sm text-muted-foreground">
+          Für A2 gibt es noch keine Prüfungsinhalte. Wähle B1, B2 oder C1.
+        </p>
+      )}
+
+      <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+        <Clock className="h-3.5 w-3.5" /> Jeder Teil läuft mit eigenem Timer, wie in der echten
+        Prüfung.
+      </p>
     </div>
   );
 }

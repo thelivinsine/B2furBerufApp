@@ -3,7 +3,12 @@ import { clearWritingDraft } from "@/features/writing/resumeDraft";
 import { remapProgressIds } from "@/lib/idRenames";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
-import { trimDayMaps, useProgressStore } from "@/store/useProgressStore";
+import {
+  trimDayMaps,
+  trimMockExams,
+  useProgressStore,
+  type MockExamRecord,
+} from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import type { SrsCard } from "@/types";
 
@@ -198,6 +203,15 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
   const examsMap = new Map(examsLocal.map((e) => [examKey(e), e]));
   for (const e of examsRemote) examsMap.set(examKey(e), e);
 
+  // Mock-exam runs (s186): ids are start timestamps, so a union by id merges
+  // devices without duplicating a run; re-trim to the retention cap after.
+  const mockRemote = (remote.mock_exams as MockExamRecord[]) ?? [];
+  const mockMap = new Map(s.mockExams.map((m) => [m.id, m]));
+  for (const m of mockRemote) if (!mockMap.has(m.id)) mockMap.set(m.id, m);
+  const mockExams = trimMockExams(
+    Array.from(mockMap.values()).sort((a, b) => a.id.localeCompare(b.id)),
+  );
+
   const dailyXp = mergeNumberMax(s.dailyXp, (remote.daily_xp as Record<string, number>) ?? {});
   const activeDays = unionStrings(s.activeDays, (remote.active_days as string[]) ?? []);
   // Both sides may hold days from before the retention window (a device that has
@@ -229,6 +243,7 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
     redemittelSeen: mergeNumberMax(s.redemittelSeen, r.redemittelSeen ?? {}),
     scenariosDone: unionStrings(s.scenariosDone, r.scenariosDone ?? []),
     examsDone: Array.from(examsMap.values()),
+    mockExams,
     totalSessions: Math.max(s.totalSessions, (remote.total_sessions as number) ?? 0),
     savedWords: unionStrings(s.savedWords, r.savedWords ?? []),
   });
@@ -284,6 +299,7 @@ function progressRow(s: ProgressSnapshot) {
     redemittel_seen: s.redemittelSeen,
     scenarios_done: s.scenariosDone,
     exams_done: s.examsDone,
+    mock_exams: s.mockExams,
     total_sessions: s.totalSessions,
     saved_words: s.savedWords,
     updated_at: new Date().toISOString(),
@@ -333,7 +349,7 @@ function isUnknownColumn(error: { code?: string; message?: string } | null): boo
 }
 
 /** Columns added after the initial schema, dropped on an unknown-column retry. */
-const YOUNG_PROGRESS_COLUMNS = ["active_days_folded"] as const;
+const YOUNG_PROGRESS_COLUMNS = ["active_days_folded", "mock_exams"] as const;
 
 async function pushProgress(): Promise<boolean> {
   if (!userId) return false;
