@@ -3787,3 +3787,45 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   they shipped with, per the same-PR rule.
 - **Artifacts (prompt 8):** `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` ·
   this log
+
+## Session 187 — 2026-08-04 · branch `claude/question-tile-ui-polish-vv4t4c`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `I like this but there are still few polishing that could be
+  done.\n\n1. The close the test button should be replaced with a exit the door with an arrow kind
+  of button which should be in red color. In desktop view particularly, the button should also have
+  a small note saying schliessen or something when hovered upon - see screenshot for reference.\n2.
+  The question tile looks cramped and the text tile to the left has too much empty space. I want the
+  screen to have harmonious spacing and sizes of the tiles, and if needed the user should be able to
+  drag the text box vertically and horizontally to read more text if the text is too big\n3. when
+  pressed next question the tiles should go back to the default sizes.\n4. The back and forth buttons
+  are pushed way too down and the tiles doesn't have any breathing space vertically - it needs to be
+  fixed by keeping enough space above and below these buttons\n5. The questions navigation row can be
+  moved to below the question tile so that there won't be too much empty space there.\n6. Reduce the
+  rounded corners slightly as it seems too rounded!\n\ngenerate a few previews with the above
+  suggested changes. Do multiple checks keeping the design skill's high standards in consideration
+  before providing the preview to me. I want finest quality possible.`
+  Mid-prompt additions (verbatim): `There's not enough contrast between the tiles in the dark mode..
+  also improve the contrast and include a section in the preview file for different contrast options`
+  and `the contrast is not just about the question numbers navigation but for all the tiles`, then
+  `provide preview file as an artifact. I will decide which variants to go ahead with. Don't make
+  that decision yourself`.
+  **Response:** ONE interactive preview, `preview/exam-question-tile-polish.html`, built from the
+  real tokens (`src/index.css`) and the real geometry (`src/features/exam/*.tsx`), published as an
+  artifact. Four sections. **1 Kontrast (dark):** the diagnosis is two-part, a card/ground ratio of
+  1.34 AND answer rows that carry `bg-surface` inside a `bg-surface` card (ratio 1.00, they only
+  exist as a border); three recipes (K1 hellere Karten, K2 tieferer Grund, K3 beides + Kante) all
+  carrying one Ebenen rule (Grund → Karte → Zeile), with the measured ratios and a Bibliothek card
+  per recipe because the tokens are app-wide. **2 Ecken:** one notch down (Karte 18 → 14, Zeile
+  14 → 10, Nummer 10 → 9). **3 Ausgang:** X1 rotes LogOut-Icon + Tooltip (the app's real Radix
+  recipe, 0.3 s delay), X2 Icon + Wort, X3 offene Tür. **4 Layouts A/B/C:** A gleiche Höhe (pair
+  hugs the taller card, group centred), B je eigene Höhe, C ein Arbeitsblatt mit Haarlinie; all
+  three carry the answers to points 3, 4, 5 (drag resets on every question change; 16 px above the
+  number row, 12 px to the buttons, 16 px below; the number row moved into the bottom cluster) plus
+  a capped, centred button pair on desktop. Toolbar switches Ansicht / Ecken / Text (lang vs kurz,
+  the case that drives the whole leftover-room question) / Kontrast for the whole page.
+  **No recommendation is marked anywhere**, per the founder's instruction.
+  **Verified in headless Chromium:** drag (side 56 % → 42.1 %, vertical to the stage limit) and the
+  reset on Weiter, stage overflow 0 after interactions, page h-overflow 0 at 1400 px AND 390 px,
+  no console errors, light + dark.
+- **Artifacts (prompt 1):** `preview/exam-question-tile-polish.html` ·
+  artifact `https://claude.ai/code/artifact/dfcea42b-8258-464c-8e2c-d8084c665128` · this log
