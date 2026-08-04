@@ -106,8 +106,10 @@ export function AppShell() {
     <div className="min-h-screen bg-background bg-page">
       <Toaster />
 
-      {/* Desktop sidebar */}
-      {!focus && (
+      {/* Desktop sidebar. Hidden during an exam too (founder s186): it is the
+          desktop counterpart of the bottom bar, and the room it frees is what
+          lets a Teil lay its two tiles side by side. */}
+      {!focus && !exam && (
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
           <Sidebar onSearch={() => setSearchOpen(true)} />
         </aside>
@@ -125,9 +127,11 @@ export function AppShell() {
           (desktop bottom-right) shows only outside focus mode; mobile + the
           session use their own triggers (icon beside Üben / in-session button). */}
       <FeedbackDialog />
-      {!focus && <FeedbackPill />}
+      {/* The floating pill sits bottom-right, exactly where a Teil parks its
+          Weiter button, so it is out during an exam as well. */}
+      {!focus && !exam && <FeedbackPill />}
 
-      <div className={cn(!focus && "lg:pl-64")}>
+      <div className={cn(!focus && !exam && "lg:pl-64")}>
         {/* Top bar */}
         {/* Mobile gets a lighter blur + more opaque surface: backdrop-filter on
             fixed/sticky layers repaints on every scroll frame and was a scroll-
@@ -136,19 +140,28 @@ export function AppShell() {
         <header className="sticky top-0 z-30 border-b border-border bg-surface/90 pt-safe backdrop-blur-md lg:bg-surface/70 lg:backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-2">
-              <Link
-                to="/welcome"
-                className="flex items-center gap-2 lg:hidden"
-                aria-label="Zur Startseite"
-              >
+              {/* In an exam the mark is NOT a link: with the sidebar gone this
+                  is the only thing left to click on the left, and navigating
+                  away would silently end the run. The X is the way out. */}
+              {exam ? (
                 <Logo className="h-8 w-8" />
-              </Link>
-              <div className="hidden leading-tight lg:block">
-                <p className="text-sm font-semibold">
-                  {greeting}
-                  {name ? `, ${name}` : ""}
-                </p>
-              </div>
+              ) : (
+                <Link
+                  to="/welcome"
+                  className="flex items-center gap-2 lg:hidden"
+                  aria-label="Zur Startseite"
+                >
+                  <Logo className="h-8 w-8" />
+                </Link>
+              )}
+              {!exam && (
+                <div className="hidden leading-tight lg:block">
+                  <p className="text-sm font-semibold">
+                    {greeting}
+                    {name ? `, ${name}` : ""}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -201,7 +214,9 @@ export function AppShell() {
                 ? // One viewport, no page scroll: the running Teil pins its own
                   // chrome and scrolls internally. `pb-nav` is gone with the
                   // bottom bar it was reserving room for.
-                  "mx-auto flex h-exam-stage w-full max-w-3xl flex-col px-4 pt-4 pb-safe-2 sm:px-6"
+                  // Wider from lg up, where the parts lay their two tiles side
+                  // by side (founder s186) and a 3xl column would waste the room.
+                  "mx-auto flex h-exam-stage w-full max-w-3xl flex-col px-4 pt-4 pb-safe-2 sm:px-6 lg:max-w-6xl"
                 : "mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8",
           )}
         >

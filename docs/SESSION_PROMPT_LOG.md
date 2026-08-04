@@ -3728,3 +3728,40 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/features/exam/MockExamRunner.tsx` · `src/features/exam/McParts.tsx` ·
   `src/features/exam/SchreibenPart.tsx` · `src/features/exam/SprechenPart.tsx` ·
   `src/features/exam/ExamHub.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 7 (verbatim, 2026-08-04, with a screenshot of Lesen showing only the text), four asks in
+  one round:** `the question and options are not visible here. reduce the height of the text and
+  keep the question and options tile fixed on the bottom of the text tile.` · `Teil abschliessen
+  button is occupying valuable pixels to the bottom. It should not be there - the back and forth
+  buttons should be in its place, and the Teil abschliessen should be only visible at the last
+  question when all questions are answered.` · `The question number row should be center aligned.`
+  · `The desktop view can be made better by using the space properly. The text and question with
+  options could be side by side for better space utilization`
+  **Response:** all four, plus two bugs the verification pass exposed.
+  **(1) The question tile is no longer elastic.** s186's single scroll region let a long text bury
+  the question. Now the TEXT (Lesen) and the Notizen sheet (Hören) shrink and scroll internally,
+  and the question keeps its natural height, pinned under them.
+  **(2) "Teil abschließen" left the permanent footer**: the row is Zurück/Weiter, and on the last
+  question with everything answered the submit REPLACES Weiter (which has nowhere useful to go
+  there) rather than adding a row back. That row was costing every screen ~52 px.
+  **(3) The number strip is centred**, and `gap-1` so nine numbers hold ONE row at 360 px (the
+  wrapped second row cost the text 44 px).
+  **(4) Desktop lays the two tiles side by side** (`lg:flex-row`, 3/5 + 2/5; Schreiben mirrors it
+  with the Aufgabe left), the stage widens to `lg:max-w-6xl`, and exam chrome now also hides the
+  **desktop sidebar** and the **Feedback pill** (which overlapped the Weiter button, visible in the
+  founder's screenshot) and drops `lg:pl-64`. With the sidebar gone the header mark became a plain
+  `Logo` instead of a link: it would have been the only clickable thing on the left, and it
+  navigates away, silently ending the run.
+  **Two bugs found by measuring rather than looking:** the Lesen text pane collapsed to **0 px** on
+  a 360 px phone, and on Hören the question tile **spilled below the stage** (invisible, and with
+  no page scroll to reach it, which is worse than scrolling). Fixed by giving the text a floor,
+  making the Notizen column the absorber, and removing the question card's "Aufgabe N von M"
+  eyebrow, which the centred strip already states.
+  **Verified by driving the real build over EVERY question** (9 Lesen + 6 Hören) at 393x852,
+  375x667 and 360x640: question fully visible in all 45 states, page overflow 0 everywhere; desktop
+  1440x900 side by side, 0 overflow, in dark mode. Honest limit: on 375/360-wide phones the reading
+  pane can fall to ~2 lines for the tallest questions; it scrolls and the expand button reads the
+  text full-screen.
+  Gates: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB.
+- **Artifacts (prompt 7):** `src/features/exam/McParts.tsx` · `src/features/exam/SchreibenPart.tsx` ·
+  `src/features/exam/MockExamRunner.tsx` · `src/components/layout/AppShell.tsx` ·
+  `docs/areas/PRAKTISCH-NAV.md` · this log

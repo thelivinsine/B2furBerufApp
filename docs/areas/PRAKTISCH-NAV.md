@@ -42,6 +42,12 @@ exam card is NOT called "Prüfung": a card may not carry the name of the page it
   page deliberately carry no abort control, so the learner is never offered two ways out. The
   confirm dialog belongs to the runner (`danger` button, matching Settings' Konto löschen); on the
   result screen the run is already recorded, so the X just closes without a confirm.
+  From `lg` up exam chrome ALSO hides the desktop sidebar and the Feedback pill and drops
+  `lg:pl-64` (founder s186): the sidebar is the bottom bar's desktop counterpart, the pill parks
+  exactly where a Teil puts its Weiter button, and the freed width is what the side-by-side layout
+  below spends. With the sidebar gone the header mark is rendered as a plain `Logo`, NOT a link:
+  it would be the only clickable thing left on the left, and navigating away would silently end
+  the run.
   Exam chrome also switches `main` to the **exam stage**: `h-exam-stage` (`100dvh - 4rem - 1px -
   safe-top`, the 1px being the header's bottom border, which is exactly the overflow leaving it out
   caused) as a flex column. Every part then pins its RunBar, answer strip and action buttons and
@@ -49,7 +55,19 @@ exam card is NOT called "Prüfung": a card may not carry the name of the page it
   Schreiben caps the Aufgabe at 34 % with its own scroll and lets the field take the rest
   (`resize-none`, since a dragged textarea re-breaks the viewport), Sprechen scrolls the dialogue,
   and the Anleitung/Ergebnis screens scroll themselves. Measured at 393x852, 375x667 and 360x640:
-  all ten in-exam screens rest at **0 px** page overflow. The hub is a menu, not a Teil, and scrolls
+  all ten in-exam screens rest at **0 px** page overflow.
+  **The question tile is never the elastic one** (founder s186, "the question and options are not
+  visible here"): text (Lesen) and the Notizen sheet (Hören) shrink and scroll, the question keeps
+  its natural height and is verified fully on screen for every question at all three sizes. Three
+  rules fell out of making that fit on a 667 px phone, and they are load-bearing, not cosmetic:
+  the question card carries NO "Aufgabe N von M" eyebrow (the centred number strip already says
+  it), "Teil abschließen" appears only on the LAST question once everything is answered (a
+  permanent submit row cost every screen ~52 px, and until then Zurück/Weiter occupy that row,
+  with the submit replacing Weiter, which has nowhere useful to go there), and the strip is
+  `gap-1` so nine numbers stay on ONE row at 360 px. On the smallest phones the reading pane can
+  still fall to ~2 lines for the tallest questions; it scrolls, and the expand button reads the
+  text full-screen. **From `lg` up the two tiles sit side by side** (text/Aufgabe `basis-3/5`,
+  question `basis-2/5`; Schreiben mirrors it with the Aufgabe at `basis-2/5`). The hub is a menu, not a Teil, and scrolls
   like every other hub (95-151 px on a 667 px phone, against 237 px for `/anwenden` and 253 px for
   Praktisch); it is deliberately NOT on the stage.
 **Those cards wear the branded route marks, not lucide icons** (founder pick 2, s183): each card
