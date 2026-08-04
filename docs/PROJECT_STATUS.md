@@ -167,6 +167,13 @@ Zurück/Weiter (dark blue only on submission moments), and the Schreiben expand 
   `exam_score` persisted, migration 0016) and the result renormalises honestly when no score came
   back. `progress.mock_exams` syncs the runs (bounded at 100, unknown-column retry covers the
   deploy window). Tests: `tests/exam.test.ts` (9) + the full suite green; bundle 125 kB.
+- **Exam chrome (founder follow-up, same session):** while a run is on screen the mobile bottom
+  bar is hidden and the header's streak pill + account menu become ONE quiet muted X. It is the
+  only exit (the RunBar X and the Anleitung abort link were removed with it), it confirms through
+  a `danger` dialog mid-exam and closes without one on the result screen. The flag is
+  `useSessionStore.examExit`, a callback rather than a boolean so eager `AppShell` never imports
+  the exam store (bundle held at 125.7 kB). Not the same thing as focus mode, which hides the
+  header too; both are documented in `docs/areas/PRAKTISCH-NAV.md`.
 - **Content gaps this exposed (PROJECT_REFERENCE backlog):** A2 has NO exam content anywhere (the
   A2 Niveau pill shows an honest empty state), and C1 Hören has a single audio text, so it tops up
   from B2.2. Both need an authoring wave before those levels feel native.

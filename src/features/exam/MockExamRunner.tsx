@@ -12,11 +12,19 @@ import {
 import { examSets } from "@/data/examSets";
 import { useExamStore, currentPart, type MockExamRun } from "@/store/useExamStore";
 import { useProgressStore } from "@/store/useProgressStore";
+import { useSessionStore } from "@/store/useSessionStore";
 import { useLiveWork } from "@/lib/liveWork";
 import { XP } from "@/engine/scoring";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn, formatSeconds, todayKey } from "@/lib/utils";
 import { PART_META } from "./partMeta";
 import { LesenPart, HoerenPart } from "./McParts";
@@ -33,9 +41,28 @@ import { SprechenPart } from "./SprechenPart";
 export function MockExamRunner() {
   const run = useExamStore((s) => s.run);
   const tick = useExamStore((s) => s.tick);
+  const abandon = useExamStore((s) => s.abandon);
+  const finish = useExamStore((s) => s.finish);
+  const setExamExit = useSessionStore((s) => s.setExamExit);
+  const [exitOpen, setExitOpen] = useState(false);
 
   // A running exam is live work: never reload a deploy over it.
   useLiveWork(!!run && run.phase !== "done", "exam");
+
+  // Register the ONE exit with the shell, which renders it as a quiet X in the
+  // header and drops the bottom bar for the duration (founder s186). On the
+  // result screen the run is already recorded, so leaving is not a loss and
+  // needs no confirm; mid-exam it does.
+  const onResult = run?.phase === "done";
+  // Depends on whether a run exists, NOT on the run object: that object changes
+  // on every tick and every answer, which would re-register the handler (and
+  // re-render the header) once a second.
+  const running = !!run;
+  useEffect(() => {
+    if (!running) return;
+    setExamExit(() => (onResult ? finish() : setExitOpen(true)));
+    return () => setExamExit(null);
+  }, [running, onResult, finish, setExamExit]);
 
   const part = run ? currentPart(run) : null;
   useEffect(() => {
@@ -45,35 +72,65 @@ export function MockExamRunner() {
   }, [run?.phase, part, tick, run]);
 
   if (!run) return null;
-  if (run.phase === "done") return <Ergebnis run={run} />;
-  if (run.phase === "intro") return <PartIntro run={run} />;
 
-  switch (part) {
-    case "lesen":
-      return <LesenPart run={run} />;
-    case "hoeren":
-      return <HoerenPart run={run} />;
-    case "schreiben":
-      return <SchreibenPart run={run} />;
-    case "sprechen":
-      return <SprechenPart run={run} />;
-    default:
-      return null;
-  }
+  const body =
+    run.phase === "done" ? (
+      <Ergebnis run={run} />
+    ) : run.phase === "intro" ? (
+      <PartIntro run={run} />
+    ) : part === "lesen" ? (
+      <LesenPart run={run} />
+    ) : part === "hoeren" ? (
+      <HoerenPart run={run} />
+    ) : part === "schreiben" ? (
+      <SchreibenPart run={run} />
+    ) : part === "sprechen" ? (
+      <SprechenPart run={run} />
+    ) : null;
+
+  return (
+    <>
+      {body}
+      <Dialog open={exitOpen} onOpenChange={setExitOpen}>
+        <DialogContent className="gap-3">
+          <DialogHeader>
+            <DialogTitle className="pr-8 text-base">Prüfung verlassen?</DialogTitle>
+            <DialogDescription>
+              Deine Antworten in dieser Prüfung werden nicht gespeichert.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2.5">
+            <Button variant="outline" className="flex-1" onClick={() => setExitOpen(false)}>
+              Weiter üben
+            </Button>
+            {/* `danger`, not the brand gradient: this app confirms destructive
+                actions in danger red (Settings' Konto löschen), and dark blue
+                stays the colour of submitting, never of quitting. */}
+            <Button
+              variant="danger"
+              className="flex-1"
+              onClick={() => {
+                setExitOpen(false);
+                abandon();
+              }}
+            >
+              Verlassen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 /* ------------------------------ shared chrome ----------------------------- */
 
-/** Sprechen carries its own clock (the dialogue runner's); the bar skips it. */
+/**
+ * Sprechen carries its own clock (the dialogue runner's); the bar skips it.
+ * No exit lives here: the one way out is the header X the shell renders while
+ * an exam runs, so the learner is never offered two of them.
+ */
 export function RunBar({ run, showTimer = true }: { run: MockExamRun; showTimer?: boolean }) {
-  const abandon = useExamStore((s) => s.abandon);
-  const [armed, setArmed] = useState(false);
-  useEffect(() => {
-    if (!armed) return;
-    const t = setTimeout(() => setArmed(false), 3000);
-    return () => clearTimeout(t);
-  }, [armed]);
-
   const part = currentPart(run);
   const many = run.plan.parts.length > 1;
   const low = run.remainingSec > 0 && run.remainingSec < 120;
@@ -118,17 +175,6 @@ export function RunBar({ run, showTimer = true }: { run: MockExamRun; showTimer?
             {formatSeconds(run.remainingSec)}
           </span>
         )}
-        <button
-          type="button"
-          onClick={() => (armed ? abandon() : setArmed(true))}
-          aria-label="Prüfung abbrechen"
-          className={cn(
-            "flex h-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground",
-            armed ? "px-2 text-xs font-semibold text-danger hover:text-danger" : "w-8",
-          )}
-        >
-          {armed ? "Abbrechen?" : <X className="h-4 w-4" />}
-        </button>
       </div>
     </div>
   );
@@ -174,9 +220,6 @@ export function AnswerStrip({
 
 function PartIntro({ run }: { run: MockExamRun }) {
   const beginPart = useExamStore((s) => s.beginPart);
-  const abandon = useExamStore((s) => s.abandon);
-  const [armed, setArmed] = useState(false);
-
   const part = currentPart(run);
   const meta = PART_META[part];
   const Icon = meta.icon;
@@ -246,16 +289,6 @@ function PartIntro({ run }: { run: MockExamRun }) {
       <p className="text-center text-xs text-muted-foreground">
         Der Timer läuft, sobald du startest.
       </p>
-      <button
-        type="button"
-        onClick={() => (armed ? abandon() : setArmed(true))}
-        className={cn(
-          "mx-auto text-sm text-muted-foreground transition-colors hover:text-foreground",
-          armed && "font-semibold text-danger hover:text-danger",
-        )}
-      >
-        {armed ? "Wirklich abbrechen?" : "Prüfung abbrechen"}
-      </button>
     </div>
   );
 }
