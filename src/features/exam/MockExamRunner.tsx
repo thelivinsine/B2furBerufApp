@@ -196,7 +196,10 @@ export function AnswerStrip({
   onJump: (ix: number) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
+    // Centred (founder s186). gap-1, not 1.5: nine numbers then fit ONE row at
+    // 360px wide, and the row the strip would otherwise wrap onto costs the
+    // text tile 44px.
+    <div className="flex flex-wrap justify-center gap-1">
       {Array.from({ length: total }, (_, ix) => (
         <button
           key={ix}

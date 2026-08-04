@@ -88,14 +88,18 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
   if (!task) return null;
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-2 sm:gap-3 lg:max-w-none">
       <div className="shrink-0">
         <RunBar run={run} />
       </div>
 
+      {/* Mobile: Aufgabe over the field. Desktop: side by side, same reasoning
+          as Lesen (founder s186), so the brief stays readable at full height
+          while writing instead of being capped to a third of the window. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
       {/* The Aufgabe takes at most a third of the stage and scrolls inside
           (founder s186: no page scroll). The expand button reads it in full. */}
-      <Card className="max-h-[34%] shrink-0 overflow-hidden">
+      <Card className="max-h-[34%] shrink-0 overflow-hidden lg:max-h-none lg:basis-2/5">
         <CardContent className="slim-scrollbar h-full overflow-y-auto p-4">
           <div className="flex items-start justify-between gap-2">
             <p className="text-sm font-bold text-primary">Aufgabe</p>
@@ -124,7 +128,7 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
       {/* The elastic element: the field takes exactly the room left over and
           scrolls internally once the text outgrows it. `resize-none` because a
           hand-dragged textarea would push the page past one viewport again. */}
-      <Card className="flex min-h-0 flex-1 flex-col">
+      <Card className="flex min-h-0 flex-1 flex-col lg:basis-3/5">
         <CardContent className="flex min-h-0 flex-1 flex-col p-4">
           <textarea
             ref={textareaRef}
@@ -143,6 +147,8 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
           </div>
         </CardContent>
       </Card>
+
+      </div>
 
       <div className="shrink-0 space-y-2">
       <Button variant="gradient" className="w-full" onClick={() => void submit()} disabled={submitting}>

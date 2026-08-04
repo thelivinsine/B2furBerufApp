@@ -21,9 +21,15 @@ import type { ReadingText, TextCheck } from "@/types";
 
 /**
  * The two auto-scored parts. One question is on screen at a time; the
- * answer-sheet strip (Option C) jumps freely, Zurück/Weiter step through.
- * Both buttons stay quiet outline controls (founder s186): the only dark blue
- * on screen is "Teil abschließen".
+ * answer-sheet strip (Option C) jumps freely, Zurück/Weiter step through, and
+ * both stay quiet outline controls (founder s186). Dark blue appears exactly
+ * once, on the last question with everything answered, where it replaces
+ * Weiter with "Teil abschließen".
+ *
+ * Layout law (founder s186): the question tile is ALWAYS fully visible. The
+ * text (Lesen) or the Notizen sheet (Hören) is the elastic tile that scrolls
+ * inside itself and gives room back; from `lg` up the two sit side by side
+ * rather than stacked, so a desktop window is not half empty.
  */
 
 interface Question {
@@ -65,13 +71,13 @@ function QuestionCard({
   const answer = useExamStore((s) => s.answer);
   const chosen = run.answers[q.check.id];
   return (
-    <Card>
-      <CardContent className="p-4">
-        <p className="text-xs font-bold uppercase tracking-wide text-primary">
-          Aufgabe {ordinal} von {total}
-        </p>
-        <p className="mt-1.5 text-sm font-semibold">{q.check.question}</p>
-        <div className="mt-2.5 space-y-2">
+    // No "Aufgabe N von M" eyebrow: the number strip above already highlights
+    // which question this is, and on a 667px phone that redundant line was
+    // costing the reading text a fifth of its remaining height (founder s186).
+    <Card data-exam-question aria-label={`Aufgabe ${ordinal} von ${total}`}>
+      <CardContent className="p-3.5">
+        <p className="text-sm font-semibold">{q.check.question}</p>
+        <div className="mt-2.5 space-y-1.5">
           {q.check.options.map((opt) => {
             const active = chosen === opt;
             return (
@@ -80,7 +86,7 @@ function QuestionCard({
                 type="button"
                 onClick={() => answer(q.check.id, opt)}
                 className={cn(
-                  "flex w-full items-start gap-2.5 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
+                  "flex w-full items-start gap-2.5 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
                   active
                     ? "border-accent/20 bg-accent/20 shadow-soft dark:bg-accent/10"
                     : "border-border bg-surface hover:bg-muted/50",
@@ -118,34 +124,36 @@ function PartFooter({
   answeredCount: number;
 }) {
   const completePart = useExamStore((s) => s.completePart);
-  const open = total - answeredCount;
+  // "Teil abschließen" only on the last question, once everything is answered
+  // (founder s186): a permanent submit row cost every screen ~52px, which on a
+  // 360px phone was the difference between a readable text tile and none. Until
+  // then the row is just the two nav buttons; on the last question Weiter has
+  // nowhere useful to go anyway, so the submit takes its place rather than
+  // adding a row back.
+  const done = answeredCount === total && qIx === total - 1;
   return (
     // Pinned below the scrolling middle: the way on must never be somewhere
     // the learner has to scroll to find.
-    <div className="shrink-0 space-y-2 pt-1">
-      <div className="flex gap-2.5">
+    <div className="flex shrink-0 gap-2.5 pt-1">
+      <Button
+        variant="outline"
+        className="flex-1"
+        onClick={() => setQIx((qIx - 1 + total) % total)}
+      >
+        Zurück
+      </Button>
+      {done ? (
         <Button
-          variant="outline"
+          variant="gradient"
           className="flex-1"
-          onClick={() => setQIx((qIx - 1 + total) % total)}
+          onClick={() => completePart(scoreChecks(ids, run.answers))}
         >
-          Zurück
+          Teil abschließen
         </Button>
+      ) : (
         <Button variant="outline" className="flex-1" onClick={() => setQIx((qIx + 1) % total)}>
           Weiter
         </Button>
-      </div>
-      <Button
-        variant="gradient"
-        className="w-full"
-        onClick={() => completePart(scoreChecks(ids, run.answers))}
-      >
-        Teil abschließen
-      </Button>
-      {open > 0 && (
-        <p className="text-center text-xs text-muted-foreground">
-          Noch {open} {open === 1 ? "Aufgabe" : "Aufgaben"} offen
-        </p>
       )}
     </div>
   );
@@ -168,7 +176,7 @@ export function LesenPart({ run }: { run: MockExamRun }) {
   const answeredCount = questions.filter((x) => run.answers[x.check.id]).length;
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-2 sm:gap-3 lg:max-w-none">
       <div className="shrink-0 space-y-3">
         <RunBar run={run} />
         <AnswerStrip
@@ -179,42 +187,53 @@ export function LesenPart({ run }: { run: MockExamRun }) {
         />
       </div>
 
-      {/* The one elastic region: text + question scroll together here, so the
-          page itself never scrolls (founder s186). */}
-      <div className="slim-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">
-                  Text {textIndex + 1} von {run.plan.lesen.length} · {kindLabel(q.text.kind)}
-                </p>
-                <p className="mt-0.5 text-sm font-semibold leading-snug">{q.text.title}</p>
-              </div>
-              {/* Fullscreen (founder s186): the same expand affordance Schreiben
-                  has, for reading the whole text with room. */}
-              <button
-                type="button"
-                onClick={() => setTextOpen(true)}
-                aria-label="Text vergrößern"
-                title="Text vergrößern"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-              >
-                <Maximize2 className="h-4 w-4" />
-              </button>
+      {/* Mobile: text over question. Desktop: side by side (founder s186), so a
+          wide screen reads the text at full height instead of leaving half the
+          window empty below a stacked column. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
+      {/* The TEXT is the elastic tile: it takes the room left over and scrolls
+          inside itself, so the question tile below it is always on screen
+          (founder s186: "the question and options are not visible here").
+          Scrolling them together buried the question under a long text. */}
+      <Card className="flex min-h-[8.25rem] flex-1 flex-col overflow-hidden lg:basis-3/5">
+        <CardContent className="flex min-h-0 flex-1 flex-col p-4">
+          <div className="flex shrink-0 items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">
+                Text {textIndex + 1} von {run.plan.lesen.length} · {kindLabel(q.text.kind)}
+              </p>
+              <p className="mt-0.5 text-sm font-semibold leading-snug">{q.text.title}</p>
             </div>
-            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">{q.text.de}</p>
-          </CardContent>
-        </Card>
+            {/* Fullscreen (founder s186): the same expand affordance Schreiben
+                has, for reading the whole text with room. */}
+            <button
+              type="button"
+              onClick={() => setTextOpen(true)}
+              aria-label="Text vergrößern"
+              title="Text vergrößern"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="slim-scrollbar mt-2 min-h-0 flex-1 overflow-y-auto">
+            <p className="whitespace-pre-line text-sm leading-relaxed">{q.text.de}</p>
+          </div>
+        </CardContent>
+      </Card>
 
-        <motion.div
-          key={q.check.id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.15 }}
-        >
-          <QuestionCard run={run} q={q} ordinal={qIx + 1} total={questions.length} />
-        </motion.div>
+      {/* Pinned under the text tile (beside it from lg up). `min-h-0` + its own
+          scroll so a long question can give the text back its floor on a short
+          phone instead of squeezing it to nothing. */}
+      <motion.div
+        key={q.check.id}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.15 }}
+        className="slim-scrollbar min-h-0 shrink overflow-y-auto lg:basis-2/5"
+      >
+        <QuestionCard run={run} q={q} ordinal={qIx + 1} total={questions.length} />
+      </motion.div>
       </div>
 
       <PartFooter
@@ -267,7 +286,7 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
   const answeredCount = questions.filter((x) => run.answers[x.check.id]).length;
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3">
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-2 sm:gap-3 lg:max-w-none">
       <div className="shrink-0 space-y-3">
         <RunBar run={run} />
         <AnswerStrip
@@ -278,8 +297,15 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
         />
       </div>
 
-      <div className="slim-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto">
-      <Card>
+      {/* Same rule as Lesen: player + Notizen on one side, the question tile
+          always visible on the other (below on mobile, beside from lg up), and
+          the Notizen sheet is what gives room back when both do not fit. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
+      {/* flex-1: this column (player + Notizen sheet) is what absorbs the
+          leftover AND what gives room back, so the question tile below keeps
+          its natural height instead of spilling off the stage. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:basis-3/5">
+      <Card className="shrink-0">
         <CardContent className="flex items-center gap-3 p-4">
           <button
             type="button"
@@ -311,8 +337,8 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
       </Card>
 
       {text.notes?.length ? (
-        <Card>
-          <CardContent className="p-4">
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <CardContent className="slim-scrollbar min-h-0 flex-1 overflow-y-auto p-4">
             <p className="text-xs font-bold uppercase tracking-wide text-primary">Deine Notizen</p>
             <div className="mt-1">
               {text.notes.map((n) => {
@@ -338,12 +364,14 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
           </CardContent>
         </Card>
       ) : null}
+      </div>
 
       <motion.div
         key={q.check.id}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.15 }}
+        className="slim-scrollbar min-h-0 shrink overflow-y-auto lg:basis-2/5"
       >
         <QuestionCard run={run} q={q} ordinal={qIx + 1} total={questions.length} />
       </motion.div>
