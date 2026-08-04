@@ -3579,3 +3579,23 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `docs/areas/LEGAL-ADMIN.md` · `docs/PROJECT_FOUNDATION.md` ·
   `docs/reports/security-audit-2026-07-27.md` · `docs/PROJECT_REFERENCE.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 7 (verbatim, 2026-08-04, with a screenshot of `/admin → Launch`):** `this is what I see`
+  **Response:** the screenshot closes the one item s185b left owed. The Compliance block renders the
+  green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron WAS available on the project and
+  all three weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) are genuinely
+  scheduled, not merely installed. This was worth checking rather than assuming: migration 0015
+  wraps its scheduling in an exception handler on purpose (so a missing extension cannot fail the
+  migration step and block the Edge Function deploys behind it), and `supabase db push` does not
+  surface Postgres NOTICE/WARNING output, so a green deploy alone could not distinguish "scheduled"
+  from "silently skipped". The same screenshot independently confirms the prompt-5 fix: the
+  Consent-Version card is green and reads "Im Gleichschritt: CONSENT_VERSION 2026-08-04 =
+  Rechtsseiten-Stand 2026-08-04".
+  Recorded as verified in `PROJECT_STATUS.md` (the owed item removed), the DB audit report (its
+  verification note closed) and the 2026-07-27 security audit (F11 + its founder-action item).
+  **One interaction noted, not acted on:** the Launch checklist item "Supabase-Plan geprüft
+  (Free-Tier pausiert nach 7 Tagen Inaktivität)" is still unticked and bears on this, since a paused
+  project runs no scheduled jobs. Harmless while the app is in daily use (these are weekly hygiene
+  tasks with no deadline), so it belongs to the pre-launch plan decision, not to this audit.
+- **Artifacts (prompt 7):** `docs/PROJECT_STATUS.md` ·
+  `docs/reports/db-architecture-audit-2026-08-04.md` ·
+  `docs/reports/security-audit-2026-07-27.md` · this log
