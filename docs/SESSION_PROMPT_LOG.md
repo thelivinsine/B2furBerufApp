@@ -3332,3 +3332,17 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   no code changed, per the prompt.
 - **Artifacts (prompt 1):** `docs/reports/db-architecture-audit-2026-08-04.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 2 (verbatim, 2026-08-04):** `a "richer" database would add cost and maintenance - how and why?`
+  **Response:** plain-language follow-up to the audit's verdict, no code. Four reasons the
+  repo-resident content catalog beats content-in-Postgres for this product: (1) the CI quality
+  gates (lint:content, provenance, verify:facts, the writingScope coverage tests) block a broken
+  edit before deploy and would have to be rebuilt as server-side tooling plus an editor UI,
+  approval step and audit trail; (2) bundled content is served free by GitHub Pages and cached by
+  the PWA for offline study, while DB-served content adds Supabase egress cost, latency and a
+  hand-built offline sync layer; (3) a content shape change is a type-checked code edit with
+  `git revert` as the undo, versus a live production migration with backup-restore as the undo;
+  (4) more RLS/backup/delete surface around tables whose ids learner progress is keyed to. Also
+  named when a content DB WOULD be right (daily non-technical editors, per-user content, a
+  catalog too big to ship), none of which apply. Conclusion unchanged: keep content in the repo,
+  spend the effort on the audit's learner-state fixes.
+- **Artifacts (prompt 2):** this log
