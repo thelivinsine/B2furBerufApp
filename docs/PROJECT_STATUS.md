@@ -1,11 +1,14 @@
 # Project Status
 
-_Last updated: 2026-08-04 (session 185). **Database architecture audit**, prompted by the founder's
-"concerningly linear" concern: full report in `docs/reports/db-architecture-audit-2026-08-04.md`.
-Verdict: the linear shape is deliberate (content lives in the repo; the DB holds only per-learner
-state + ops), but six growth/sync risks were found and ranked, with a small-fix list (sync-error
-indicator, retention jobs, day-map caps, migration idempotency lint) ahead of the one real schema
-evolution (split `srs` out of the progress blob into a per-card table). Analysis only, no code.
+_Last updated: 2026-08-04 (session 185). **Database architecture audit, and the four fixes it
+recommended.** Report: `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the linear
+shape is deliberate (content lives in the repo; the DB holds only per-learner state + ops), but six
+growth/sync risks were found. Four shipped the same session: a **failed cloud write is no longer
+silent** (Settings shows "Sync pausiert" with a retry), **retention jobs** purge abandoned guest
+accounts and dead cache rows on pg_cron (migration 0015), the **day maps are capped at 400 days**
+with the lifetime figure preserved, and **`pnpm lint:migrations`** gates migration idempotency.
+Auto-deleting learner writing is deliberately NOT scheduled: the privacy policy promises the
+opposite, so it needs a founder decision. Still open: the `srs` per-card table, admin rollups.
 Prior s184: **every filter and Aufgabe rail carries the Lebensbereich pills, Berufsleben · Alltag,
 directly below Branche** (one shared `LifeAreaPills` control, `?area=`, Grammatik excluded on
 purpose).
@@ -172,13 +175,39 @@ risks and recommendations?"
   learner believes the cloud backup works (R3); nothing is ever deleted, and the pg_cron retention
   job that migration 0010's evidence probe expects was never scheduled, which also keeps audit F11
   (indefinite learner-text retention) open (R4).
-- **Recommended order (all still TODO, founder to green-light):** 1) read the push result + quiet
-  "sync failing" indicator, 2) retention jobs (stale anonymous accounts, old learner text, dead
-  transform-cache rows), 3) cap `daily_xp`/`active_days` at ~400 days, 4) migration idempotency
-  lint in `validate.yml`, 5) the one real schema evolution, `srs` into a per-card `srs_cards`
-  table (also fixes cross-device last-write-wins, R2), 6) later, a nightly rollup for the admin
-  analytics RPCs (R5).
-- **Gates:** docs-only (report + status + prompt log); no app code, no build needed.
+- **Then the founder said "do the four fixes", and all four shipped in the same session:**
+  1. **R3, the silent sync.** Both push helpers read `{ error }` now and return a boolean;
+     `settle()` counts consecutive failures per channel and retries with backoff (5 s · 20 s · 60 s ·
+     5 min). Three in a row flip `useAuthStore.syncHealth` to `"failing"`, which the Settings
+     account panel shows as an amber **"Sync pausiert"** badge, one line of plain German, the last
+     successful backup time and an always-live "Erneut versuchen" button. A transient failure heals
+     itself unseen; a permanent one can no longer hide. The same change added an **unknown-column
+     retry**, because the site deploy and the migration deploy are separate workflows and an
+     unknown column otherwise fails the whole upsert.
+  2. **R4, retention** (`0015_retention.sql`): `purge_stale_guests(90)` and
+     `purge_transform_cache(60)` scheduled on `pg_cron` (Sundays, off-peak), the whole block
+     exception-wrapped so a missing extension warns instead of failing the migration step and
+     blocking the Edge Function deploys behind it. `admin_gdpr_evidence().retention_scheduled`
+     (migration 0010) reports **true** for the first time since it shipped.
+  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, folding dropped active days into
+     `activeDaysFolded` (+ the `progress.active_days_folded` column) so the lifetime
+     "N aktive Tage" figure a learner sees is unchanged.
+  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules,
+     files ≤ 0014 exempt as already-applied history. Verified in both directions.
+- **ONE PART DELIBERATELY NOT DONE, and it needs the founder:** auto-deleting **learner writing**
+  (audit F11). The published privacy policy promises the opposite in as many words
+  ("Schreibeinreichungen … bleiben gespeichert, damit dein Analyseverlauf vollständig bleibt"), so
+  `purge_old_learner_text()` ships **unscheduled**. Turning it on is a product decision plus a
+  policy edit in the same change. **Open question: should learner writing expire, and after how
+  long (2 years is a common default)?**
+- **The privacy policy DID change** in one place, because the code now does something the policy
+  did not describe: a paragraph stating that unused **guest** accounts are deleted after 90 days.
+- **Preview:** `preview/sync-status.html` (the three account-panel states side by side),
+  screenshot-verified. The new state reuses the existing badge recipe with the warning token, so
+  no new visual language was introduced.
+- **Gates:** typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515**
+  (9 new, `tests/retention.test.ts` + `tests/cloudSync.test.ts`) · build · check:bundle 124.7 kB.
+- **Founder note:** merging this applies migration 0015 automatically. Nothing to paste anywhere.
 
 **Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
 a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app

@@ -132,6 +132,17 @@ npm/yarn. Run `pnpm install` after pulling.
 - `pnpm test:unit` — Vitest smoke suite in `tests/`: stores, session composer, search, paged-list +
   debounce contracts, and the per-feature pins referenced throughout the area docs. Extend it when
   touching those areas.
+- `pnpm lint:migrations` — idempotency gate for `supabase/migrations/*.sql` (DB audit R6, s185).
+  `supabase.yml` applies migrations with `db push --include-all`, so any file the remote history
+  does not record is re-applied wherever its number sits. The script parses each statement (after
+  stripping comments, string literals and dollar-quoted function bodies) and fails on `create
+  table/index/extension/sequence` without `if not exists`, `add column` without `if not exists`,
+  `create function` without `or replace`, a `create policy`/`create trigger` with no matching
+  `drop … if exists` earlier in the same file, and `insert` without `on conflict`. Files numbered
+  ≤ `LEGACY_THROUGH` (0014) predate the gate and are already recorded remotely, so they are exempt.
+  **Never raise that baseline to silence a new file; fix the file.** The cost of a miss is high:
+  the migration step runs BEFORE the Edge Function deploys in the same workflow, so one bad
+  statement blocks every backend deploy behind it.
 - `pnpm check:contrast` — WCAG contrast gate for the brand token system: parses the `:root` and
   `.dark` HSL custom properties out of `src/index.css` and fails CI on contrast regressions
   (`scripts/check-contrast.mjs`). **Run after any change to the theme tokens in `src/index.css`.**

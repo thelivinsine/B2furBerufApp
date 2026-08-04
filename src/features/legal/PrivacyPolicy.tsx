@@ -174,6 +174,13 @@ function PrivacyDe() {
           bleiben privat für dich (wieder Row-Level-Security) und werden nie für einen Zweck
           verwendet, der über das Anzeigen deines eigenen Verlaufs hinausgeht.
         </p>
+        <p className="mt-2">
+          Eine Ausnahme sind Gastkonten: Wenn du ohne Konto lernst, legen wir für dich ein
+          anonymes Gastkonto an. Bleibt es 90 Tage lang ungenutzt, löschen wir es mitsamt allen
+          zugehörigen Daten automatisch. Ein Gastkonto hat keine E-Mail-Adresse, du könntest dich
+          also später ohnehin nicht wieder darin anmelden. Erstelle ein Konto, wenn du deinen
+          Fortschritt dauerhaft behalten möchtest.
+        </p>
       </Section>
 
       <Section title="Deine Rechte">

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cloud-Sync Status · Genauly</title>
+<style>
+  /* Real tokens, copied from src/index.css (light :root). */
+  :root {
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%; --surface: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%; --primary: 221 83% 54%;
+    --success: 153 55% 40%; --warning: 38 92% 46%;
+    --radius: 0.875rem;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: hsl(var(--foreground));
+    background: linear-gradient(160deg, hsl(var(--page-from)), hsl(var(--page-mid)) 45%, hsl(var(--page-to)));
+    min-height: 100vh;
+  }
+  .wrap { max-width: 42rem; margin: 0 auto; display: grid; gap: 28px; }
+  h1 { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--muted-foreground)); margin: 0; }
+  .caption { font-size: 12px; color: hsl(var(--muted-foreground)); margin: 0 0 8px; }
+  .card {
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgb(16 24 40 / .04), 0 4px 12px rgb(16 24 40 / .06);
+    padding: 20px;
+    display: grid; gap: 16px;
+  }
+  .row { display: flex; align-items: center; justify-content: space-between; }
+  .title { font-weight: 600; font-size: 15px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 9999px; padding: 4px 10px;
+    font-size: 12px; font-weight: 500;
+  }
+  .badge svg { width: 14px; height: 14px; }
+  .ok { background: hsl(var(--success) / .1); color: hsl(var(--success)); }
+  .warn { background: hsl(var(--warning) / .1); color: hsl(var(--warning)); }
+  .local { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .alert { background: hsl(var(--warning) / .1); border-radius: .75rem; padding: 12px; display: grid; gap: 8px; }
+  .alert p { margin: 0; font-size: 14px; line-height: 1.5; color: #475569; }
+  .btn {
+    justify-self: start;
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 32px; padding: 0 12px; border-radius: .5rem;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    font-size: 12px; font-weight: 500; color: hsl(var(--foreground)); cursor: pointer;
+  }
+  .btn svg { width: 14px; height: 14px; }
+  .who { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .who .mail { font-weight: 500; }
+  .who .sub { color: hsl(var(--muted-foreground)); }
+  .actions { display: flex; gap: 8px; border-top: 1px solid hsl(var(--border)); padding-top: 12px; }
+  .ghost { background: transparent; border-color: transparent; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <h1>Konto &amp; Cloud-Sync · Statuszustände</h1>
+  </div>
+
+  <div>
+    <p class="caption">1 · Normalzustand (unverändert)</p>
+    <div class="card">
+      <div class="row">
+        <span class="title">Konto &amp; Cloud-Sync</span>
+        <span class="badge ok">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          Synchronisiert
+        </span>
+      </div>
+      <div class="who"><span class="mail">lernerin@example.de</span><span class="sub">· angemeldet</span></div>
+      <div class="actions"><button class="btn ghost">Abmelden</button></div>
+    </div>
+  </div>
+
+  <div>
+    <p class="caption">2 · NEU: Sync pausiert (nach 3 fehlgeschlagenen Pushes)</p>
+    <div class="card">
+      <div class="row">
+        <span class="title">Konto &amp; Cloud-Sync</span>
+        <span class="badge warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12v4"/><path d="M12 20h.01"/><path d="M17 18h.5a4.5 4.5 0 0 0 0-9h-1.8A7 7 0 1 0 7 17"/></svg>
+          Sync pausiert
+        </span>
+      </div>
+      <div class="alert">
+        <p>Dein Fortschritt wird gerade nur auf diesem Gerät gespeichert. Er geht nicht verloren, erreicht aber die Cloud noch nicht. Zuletzt gesichert: vor 14 Min.</p>
+        <button class="btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          Erneut versuchen
+        </button>
+      </div>
+      <div class="who"><span class="mail">lernerin@example.de</span><span class="sub">· angemeldet</span></div>
+      <div class="actions"><button class="btn ghost">Abmelden</button></div>
+    </div>
+  </div>
+
+  <div>
+    <p class="caption">3 · Ohne Konto (unverändert)</p>
+    <div class="card">
+      <div class="row">
+        <span class="title">Konto &amp; Cloud-Sync</span>
+        <span class="badge local">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193"/><path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/></svg>
+          Nur lokal
+        </span>
+      </div>
+      <div class="who"><span class="sub">Erstelle ein Konto, um deinen Fortschritt geräteübergreifend zu sichern.</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

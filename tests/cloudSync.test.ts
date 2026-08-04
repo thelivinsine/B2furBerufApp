@@ -20,6 +20,16 @@ const pushed: Record<"progress" | "profiles", Record<string, unknown>[]> = {
   profiles: [],
 };
 
+/**
+ * What upsert() should return, per table. `null` = success. Set this to make a
+ * push fail the way supabase-js actually fails: a returned `{ error }`, never a
+ * thrown exception (which is exactly why the failure used to go unnoticed).
+ */
+const upsertError: Record<"progress" | "profiles", { code?: string; message?: string } | null> = {
+  progress: null,
+  profiles: null,
+};
+
 function makeQuery(table: "progress" | "profiles") {
   const state: { uid?: string } = {};
   const q = {
@@ -31,6 +41,8 @@ function makeQuery(table: "progress" | "profiles") {
     maybeSingle: async () => ({ data: remoteRows[table][state.uid ?? ""] ?? null, error: null }),
     upsert: async (row: Record<string, unknown>) => {
       pushed[table].push(row);
+      const error = upsertError[table];
+      if (error) return { error };
       const key = String(table === "progress" ? row.user_id : row.id);
       remoteRows[table][key] = row;
       return { error: null };
@@ -44,9 +56,15 @@ vi.mock("@/lib/supabase", () => ({
   SUPABASE_CONFIGURED: true,
 }));
 
-import { startCloudSync, stopCloudSync, clearLocalAccountData } from "@/lib/cloudSync";
+import {
+  startCloudSync,
+  stopCloudSync,
+  clearLocalAccountData,
+  retryCloudSync,
+} from "@/lib/cloudSync";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const SYNC_UID_KEY = "b2beruf.syncUid";
 
@@ -57,8 +75,11 @@ beforeEach(() => {
   remoteRows.profiles = {};
   pushed.progress = [];
   pushed.profiles = [];
+  upsertError.progress = null;
+  upsertError.profiles = null;
   useProgressStore.getState().resetProgress();
   useSettingsStore.getState().resetSettings();
+  useAuthStore.setState({ syncHealth: "unknown", lastSyncedAt: null });
 });
 
 afterEach(() => {
@@ -185,5 +206,66 @@ describe("onboarded survives a re-login", () => {
 
     // Local wins; the write-through pushes local → cloud, not the reverse.
     expect(useSettingsStore.getState().level).toBe("B1");
+  });
+});
+
+/**
+ * Sync health (database architecture audit R3, s185). supabase-js returns
+ * `{ error }` instead of throwing, and the push helpers ignored that value
+ * entirely: a push that never landed looked exactly like one that did, so a
+ * learner could believe their progress was backed up for months while nothing
+ * reached the cloud. These tests pin that a run of failures becomes visible and
+ * that recovery clears it.
+ */
+describe("sync health is reported, not swallowed", () => {
+  it("marks the sync as failing after a run of rejected pushes", async () => {
+    await startCloudSync("acct-h");
+    // The cloud starts rejecting writes (expired token, RLS, quota).
+    upsertError.progress = { code: "42501", message: "permission denied" };
+
+    // Three consecutive failures is the alarm threshold.
+    await retryCloudSync();
+    await retryCloudSync();
+    expect(useAuthStore.getState().syncHealth).not.toBe("failing");
+    await retryCloudSync();
+
+    expect(useAuthStore.getState().syncHealth).toBe("failing");
+  });
+
+  it("clears the alarm and stamps the time once pushes land again", async () => {
+    await startCloudSync("acct-h");
+    upsertError.progress = { code: "42501", message: "permission denied" };
+    await retryCloudSync();
+    await retryCloudSync();
+    await retryCloudSync();
+    expect(useAuthStore.getState().syncHealth).toBe("failing");
+
+    upsertError.progress = null;
+    await retryCloudSync();
+
+    expect(useAuthStore.getState().syncHealth).toBe("ok");
+    expect(useAuthStore.getState().lastSyncedAt).toBeGreaterThan(0);
+  });
+
+  it("retries without the young columns when the migration has not landed yet", async () => {
+    // The site deploy can beat the migration deploy, so a column the client
+    // writes may not exist for a few minutes. The whole upsert fails on it.
+    upsertError.progress = {
+      code: "PGRST204",
+      message: "Could not find the 'active_days_folded' column of 'progress'",
+    };
+    await startCloudSync("acct-young");
+
+    const attempts = pushed.progress.filter((r) => r.user_id === "acct-young");
+    // First attempt carries the column, the retry drops it rather than
+    // stranding every push in the deploy window.
+    expect(attempts[0]).toHaveProperty("active_days_folded");
+    expect(attempts.at(-1)).not.toHaveProperty("active_days_folded");
+  });
+
+  it("reports a healthy sync as ok", async () => {
+    await startCloudSync("acct-ok");
+    expect(useAuthStore.getState().syncHealth).toBe("ok");
+    expect(useAuthStore.getState().lastSyncedAt).toBeGreaterThan(0);
   });
 });

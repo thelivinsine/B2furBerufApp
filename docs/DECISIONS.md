@@ -1305,3 +1305,35 @@ Kollokationen, Redemittel and the Schreiben Kurz/Lang Aufgabe rail, on both brea
   first and looked deliberate, but "Berufsleben" truncated against a four-digit count in the 16rem
   desktop rail. The facet pill rows two sections below it in the same tile are content-sized and
   wrap, so matching them is both the fix and the more consistent answer.
+
+## s185 — Database retention: what expires, and what deliberately does not
+
+The database architecture audit (`docs/reports/db-architecture-audit-2026-08-04.md`) found that
+nothing in the database was ever deleted. Three purges were considered; two shipped, one did not,
+and the split is the decision worth remembering.
+
+- **Abandoned guest accounts expire after 90 days.** An anonymous account carries no email, so its
+  owner can never sign back into it: after 90 days with no write it is an abandoned trial, not a
+  learner. Deleting the auth user cascades to every dependent row. **Registered accounts are never
+  touched by a timer, whatever their age**, because the privacy policy ties their lifetime to the
+  account's. The policy gained a paragraph naming the 90-day guest rule, since the code now does
+  something the policy did not describe: a retention job and the sentence that documents it ship
+  together, always.
+- **Transform-cache rows with `hits = 0` expire after 60 days.** The cache key hashes the prompt
+  version and model, so a row never reused in 60 days never will be. No personal data, pure cost
+  hygiene.
+- **Learner writing does NOT expire, and the job that would delete it ships unscheduled.** The
+  published privacy policy promises the opposite in as many words ("Schreibeinreichungen und ihr
+  KI-Feedback bleiben gespeichert, damit dein Analyseverlauf vollständig bleibt"), and that promise
+  describes the Verlauf, a real feature built on the learner's own texts. `purge_old_learner_text()`
+  exists in migration 0015 so the capability is ready and reviewed, but scheduling it is a product
+  decision plus a policy edit in the same change, never a maintenance task. **Security-audit finding
+  F11 stays open until the founder decides.** The general rule: a retention timer may not
+  contradict published copy, and the fix for that conflict is never to quietly change the copy.
+
+**Deploy-safety rule that came with it:** the whole `pg_cron` block is wrapped in an exception
+handler. Migrations run BEFORE the Edge Function deploys in `supabase.yml`, so a hard failure there
+(a project without the extension) would block every backend deploy, not just the schedule. The same
+reasoning is why `pnpm lint:migrations` now gates idempotency, and why a client write of a
+newly-added column falls back to a retry without it: the site deploy and the migration deploy are
+independent workflows and either can land first.

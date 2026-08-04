@@ -38,6 +38,19 @@ interface AuthState {
    * at the start of each cloud sync; see lib/cloudSync.ts.
    */
   syncHydrated: boolean;
+  /**
+   * Is the cloud actually receiving this device's writes? `"unknown"` until the
+   * first push settles, `"failing"` after a run of consecutive failures.
+   *
+   * supabase-js does not throw on an HTTP or RLS error, it returns `{ error }`,
+   * and the push helpers used to ignore that value entirely: a permanently
+   * failing sync looked identical to a working one, because localStorage kept
+   * the app running. The learner only found out when they lost the device
+   * (audit R3). See lib/cloudSync.ts.
+   */
+  syncHealth: "unknown" | "ok" | "failing";
+  /** Epoch ms of the last push that landed, for the Settings status line. */
+  lastSyncedAt: number | null;
   error: string | null;
 
   init: () => void;
@@ -87,6 +100,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   status: "loading",
   busy: false,
   syncHydrated: false,
+  syncHealth: "unknown",
+  lastSyncedAt: null,
   error: null,
 
   init: () => {
