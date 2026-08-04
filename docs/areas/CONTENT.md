@@ -101,6 +101,26 @@ this classification was made by hand and not generated. `pluralLabel()`
 `nur Plural`, and `verify:facts` reads `pluralOnly` instead of inferring it from a `die` + masc/neut
 oracle disagreement.
 
+### CEFR band: what "advanced" means (audit P7, s185)
+A band is a claim about how demanding a word is, not about how rare it is. Two drifts were fixed:
+**the connectors were over-levelled** (`somit` B2.2, `angesichts`/`vielmehr`/`ferner` C1, when these
+are exactly what a B1 learner needs to sound coherent) and **B2.2 had become a Fachsprache bucket**
+(82% specialized-or-rarer, so `die Lieferkettentransparenz` held the same SRS slot as `trotzdem`).
+108 items were re-levelled: the 10 FLAG connectors to B2.1 (register is real, C1 was not), and 98 of
+the 105 WATCH items to B1.1/B1.2. Bands went A2 13 · B1.1 131→**147** · B1.2 396→**482** ·
+B2.1 774→**690** · B2.2 387→**382** · C1 34→**29**, so the B1 half is 36% of the bank, not 30%.
+Seven WATCH items stayed B2.1 on purpose because their register really is B2: `darüber hinaus`,
+`zudem`, `ebenso`, `zur Sprache bringen`, `einerseits … andererseits`, `die Anerkennung`,
+`die Ich-Botschaft`.
+
+**The rare-compound ratchet** (`lintAdvancedRareRatchet`) freezes the count of B2.2/C1 items that
+are specialized-or-rarer at its current 334. Existing ones are grandfathered; adding one fails the
+lint. When a new item trips it, the fix is nearly always to pitch it at the band a learner actually
+meets it in. **Standing rule from the same audit item:** new vocabulary slots go to core verbs,
+adjectives and connectors before they go to another closed compound. Only 9% of the bank is core
+(Zipf ≥ 4.5) and 54% sits below "häufig"; the collocation bank, at 71% häufig-or-above, is the
+model. Raising the ceiling is a deliberate edit with a reason, never a way to land a pack.
+
 ### Pronunciation: ONE respelling scheme (audit P9, s185)
 `pron` is an anglicised respelling for an English-reading learner. It used to be **two** schemes
 split by authoring wave (the workplace half wrote /aɪ/ `y` and /x/ `kh`; the daily-life half wrote

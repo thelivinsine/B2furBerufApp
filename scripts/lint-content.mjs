@@ -265,6 +265,35 @@ function checkPron(pron, ds, w, report = error) {
     report(ds, w, `pron "${pron}" marks no stressed syllable. Put the stressed syllable in CAPITALS.`);
 }
 
+/**
+ * The rare-compound ratchet (audit P7, s185).
+ *
+ * B2.2 had become a Fachsprache bucket: 82% of it was specialized-or-rarer, so
+ * "advanced" was being encoded as "rare compound" rather than "structurally or
+ * pragmatically demanding". Every `die Lieferkettentransparenz` occupies the
+ * same SRS slot as `trotzdem`.
+ *
+ * The 279 already in the bank are grandfathered (retiring them is a content
+ * decision, not a lint one), but the count may not grow: a new B2.2/C1 item
+ * has to be a word a B2 learner actually meets. Raising the ceiling is a
+ * deliberate edit to this number, with a reason.
+ */
+const ADVANCED_RARE_CEILING = 334; // the count on the day the ratchet landed
+
+function lintAdvancedRareRatchet(vocab, frequency) {
+  const rare = vocab.filter((v) => {
+    if (v.cefr !== "B2.2" && v.cefr !== "C1") return false;
+    const bin = frequency[v.id]?.bin;
+    return bin === "specialized" || bin === undefined; // undefined = below corpus evidence
+  });
+  if (rare.length > ADVANCED_RARE_CEILING)
+    error(
+      "frequency",
+      "advanced-rare-ratchet",
+      `${rare.length} B2.2/C1 items are specialized-or-rarer, over the ceiling of ${ADVANCED_RARE_CEILING} (audit P7). A rare compound is not an advanced word: pitch the new items at the band a learner meets them in, or spend the slot on a core verb, adjective or connector. Raising the ceiling is a deliberate edit in scripts/lint-content.mjs.`,
+    );
+}
+
 function lintVocabulary(vocab, subThemeIndex, verifiedIds = new Set()) {
   const ds = "vocabulary";
   checkDuplicateIds(vocab, ds);
@@ -1586,6 +1615,8 @@ async function main() {
     if (!FREQUENCIES.includes(entry?.bin))
       error("frequency", id, `invalid frequency bin "${entry?.bin}"`);
   }
+
+  lintAdvancedRareRatchet(data.vocabulary, data.frequency);
 
   /* Generated verb-morphology integrity (pnpm build:verb-forms).
    *
