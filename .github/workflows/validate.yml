@@ -37,6 +37,14 @@ jobs:
       - name: Lint content
         run: pnpm lint:content
 
+      # Migration idempotency gate (DB audit R6, s185): supabase.yml applies
+      # migrations with `db push --include-all`, so any file the remote history
+      # does not record is re-applied. A non-idempotent statement fails the
+      # migration step, which runs BEFORE the Edge Function deploys and would
+      # block those too. Files up to 0014 predate the gate and are exempt.
+      - name: Lint migrations
+        run: pnpm lint:migrations
+
       # Brand-token WCAG gate (brand plan PR A, s133): every designed token
       # pairing in src/index.css must hold its contrast ratio in both themes.
       - name: Check token contrast

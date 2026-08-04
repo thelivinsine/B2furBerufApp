@@ -1,10 +1,18 @@
 # Project Status
 
-_Last updated: 2026-08-03 (session 184). **Every filter and Aufgabe rail now carries the
-Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
-Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
-shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
-drops a Thema from the other area so the three controls can never disagree.
+_Last updated: 2026-08-04 (session 185). **Database architecture audit, and the four fixes it
+recommended.** Report: `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the linear
+shape is deliberate (content lives in the repo; the DB holds only per-learner state + ops), but six
+growth/sync risks were found. Four shipped the same session: a **failed cloud write is no longer
+silent** (Settings shows "Sync pausiert" with a retry), **retention jobs** purge abandoned guest
+accounts and dead cache rows on pg_cron (migration 0015), the **day maps are capped at 400 days**
+with the lifetime figure preserved, and **`pnpm lint:migrations`** gates migration idempotency.
+Learner writing now expires after **2 years** (founder decision, asked because the privacy policy
+promised the opposite), which closes security-audit finding F11. Still open by design: the `srs`
+per-card table and the admin analytics rollups.
+Prior s184: **every filter and Aufgabe rail carries the Lebensbereich pills, Berufsleben · Alltag,
+directly below Branche** (one shared `LifeAreaPills` control, `?area=`, Grammatik excluded on
+purpose).
 Prior s183: **The Prüfung zone has a new icon language: the orange
 Absolventenhut in the bar (founder pick D), and the branded route marks on tinted tiles in the hub
 (pick 2).** The founder also settled the merge question: **Sprechen and Prüfungssimulation stay
@@ -45,9 +53,7 @@ pack stays parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
 Prior s174: **security audit + the sign-up flow it uncovered**, including the `onboarded` fault that
 discarded learner profiles on every sign-in (#745).
 Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`).
-Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
-ONE shared module (`src/features/writing/correction.tsx`) with Fokus, Kurz/Lang and Verlauf
-(PR #739). `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
+`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
 a CLI. Product name: **Genauly** (`genauly.de`)._
 
@@ -155,6 +161,58 @@ adding one task:
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
 
+**Handoff after session 185 (2026-08-04): the database architecture audit.** Founder: "the database
+architecture is concerningly linear.. can you do a thorough audit and provide your analysis with
+risks and recommendations?"
+- **Deliverable:** `docs/reports/db-architecture-audit-2026-08-04.md`, covering all 14 migrations,
+  the 5 Edge Functions, `src/lib/cloudSync.ts` and the admin RPCs. Analysis only, no code changed,
+  because the prompt asked for an assessment.
+- **Verdict in one line:** the "linear" schema (11 small tables around `auth.users`, few relations)
+  is the correct consequence of keeping the ~5,000-id content catalog in the repo; the real risks
+  are growth-shaped, not shape-shaped.
+- **Findings, ranked R1-R8.** The three that matter most: the `progress` row is one ever-growing
+  JSONB blob re-uploaded whole every 1.5 s of activity (R1); `pushProgress`/`pushSettings` never
+  read the supabase-js `{ error }` result, so a permanently failing sync is invisible while the
+  learner believes the cloud backup works (R3); nothing is ever deleted, and the pg_cron retention
+  job that migration 0010's evidence probe expects was never scheduled, which also keeps audit F11
+  (indefinite learner-text retention) open (R4).
+- **Then the founder said "do the four fixes", and all four shipped in the same session:**
+  1. **R3, the silent sync.** Both push helpers read `{ error }` now and return a boolean;
+     `settle()` counts consecutive failures per channel and retries with backoff (5 s · 20 s · 60 s ·
+     5 min). Three in a row flip `useAuthStore.syncHealth` to `"failing"`, which the Settings
+     account panel shows as an amber **"Sync pausiert"** badge, one line of plain German, the last
+     successful backup time and an always-live "Erneut versuchen" button. A transient failure heals
+     itself unseen; a permanent one can no longer hide. The same change added an **unknown-column
+     retry**, because the site deploy and the migration deploy are separate workflows and an
+     unknown column otherwise fails the whole upsert.
+  2. **R4, retention** (`0015_retention.sql`): `purge_stale_guests(90)` and
+     `purge_transform_cache(60)` scheduled on `pg_cron` (Sundays, off-peak), the whole block
+     exception-wrapped so a missing extension warns instead of failing the migration step and
+     blocking the Edge Function deploys behind it. `admin_gdpr_evidence().retention_scheduled`
+     (migration 0010) reports **true** for the first time since it shipped.
+  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, folding dropped active days into
+     `activeDaysFolded` (+ the `progress.active_days_folded` column) so the lifetime
+     "N aktive Tage" figure a learner sees is unchanged.
+  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules,
+     files ≤ 0014 exempt as already-applied history. Verified in both directions.
+- **The one question the code could not answer was put to the founder, who answered it:**
+  auto-deleting **learner writing** (audit F11). The published privacy policy promised the opposite
+  in as many words, so the job shipped unscheduled and the question was asked directly. **Founder:
+  delete after 2 years.** `purge_old_learner_text(730)` is now scheduled, and it NULLs the text
+  columns rather than deleting rows, so the AI limits and admin aggregates keep working and Verlauf
+  keeps the evaluation (date, Thema, Schwerpunkt, Tipp): the learner loses old raw text, never their
+  progress record. **Audit F11 is closed.**
+- **The privacy policy changed in two places**, both because the code now does something the policy
+  did not describe: unused **guest** accounts are deleted after 90 days, and submitted **texts**
+  after 2 years (with the sentence promising indefinite retention removed). Standing rule recorded
+  in `docs/DECISIONS.md` §s185: a retention timer and the copy documenting it ship together.
+- **Preview:** `preview/sync-status.html` (the three account-panel states side by side),
+  screenshot-verified. The new state reuses the existing badge recipe with the warning token, so
+  no new visual language was introduced.
+- **Gates:** typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515**
+  (9 new, `tests/retention.test.ts` + `tests/cloudSync.test.ts`) · build · check:bundle 124.7 kB.
+- **Founder note:** merging this applies migration 0015 automatically. Nothing to paste anywhere.
+
 **Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
 a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app
 right below the Branchen filter."
@@ -194,44 +252,11 @@ right below the Branchen filter."
   (one word, matches the two pills under it), and whether Grammatik should carry the pills anyway.
   Both are small changes.
 
-**Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
-Founder: "D and 2", then "keep them separate".
-- **Bar mark: the orange Absolventenhut** (`graduationCap` in `route-icons.tsx`). The target rings
-  it replaced were the bar's only OUTLINE mark among filled two-tone shapes, which is the whole
-  reason it read thinner than its neighbours. `/anwenden` and `/exam` now share that one mark on
-  purpose: the tab and the hub card are the same thing at two depths.
-- **Hub tiles: the branded route marks on tinted squircles** (`AnwendenHub.tsx`). Each card renders
-  `RouteIcon` for its own route, so the Schreiben card carries the exact pencil the nav does, the
-  microphone matches it in style, and the cap ties the exam card to the zone. The white-on-gradient
-  tiles this replaced turned every mark into the same white silhouette.
-- **Two fixes the implementation forced.** (1) Routes that are not `navItems` entries had no accent
-  colour, so all three marks would have drawn brand blue: `OFF_NAV_COLOR` now supplies cyan for
-  `/simulation` and orange for `/exam`. (2) The tiles were `rounded-2xl`, and `--radius + 10` is
-  24px, exactly half of a 48px tile, so they were rendering as full CIRCLES (already true of the old
-  gradient tiles). Now `rounded-xl`, matching the approved preview and the squircle law.
-  The `/simulation` teal also went from `#5eead4` to `#2dd4bf`, which washed out on the tinted tile.
-- **Sprechen vs. Prüfungssimulation: KEEP BOTH, founder decision.** Same dialogue engine and
-  scenario bank; Sprechen is untimed practice with hints across all 30 scenarios, Prüfungssimulation
-  wraps one scenario in exam conditions (Aufgabenblatt, 6-minute countdown, rubric self-check,
-  score). Nothing was merged and nothing changed in either runner.
-- **Gates:** typecheck · lint 0 errors · test:unit **496/496** · build · check:bundle 123.2 kB.
-  Verified in the BUILT app at 320px, 390px (light + dark) and desktop: five even bar slots with the
-  cap active, the three tiles read apart at a glance, and all three cards still open their trainer.
-- **Approved mockups:** `preview/pruefung-icons.html` (variants A-D and 1-3 as shown to the founder).
-- **Shipped:** PR **#780**, squash-merged as `797f65d`. `Validate content` and `Deploy site to
-  GitHub Pages` both green on the merge commit, so this is live on genauly.de. Post-merge
-  housekeeping done: branch reset onto `main`, working tree clean. (The mockup round and the
-  implementation went out as ONE PR: the preview commit was still unmerged when the founder picked,
-  so the picks were added to the same branch.)
-- **One open one-liner for the founder:** the page's `HubHero` still shows the lucide target, so the
-  zone is a cap in the bar and the sidebar but a target at the top of its own page. Swapping it
-  would put two caps on that page (hero + Prüfungssimulation card), which is why it was left alone.
-
-**Session 182 is fully archived** in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`:
-part 1 (audit P6, the Redemittel phrase bank) and, aged out by this session, part 4 (the five-slot
-Prüfung nav zone, PR #778). Their law lives on in `docs/DECISIONS.md` §s182,
-`docs/areas/CONTENT.md` and `docs/areas/PRAKTISCH-NAV.md`. (Part 4 had been sitting in this file
-TWICE, once above the s183 handoff and once below it; the duplicate went with the archive move.)
+**Sessions 182 and 183 are fully archived** in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W31.md`: s182 parts 1 and 4, and, aged out by
+this session, the full s183 handoff (the Prüfung icon language, PR #780). Their law lives on in
+`docs/DECISIONS.md` §s182/§s183, `docs/areas/CONTENT.md`, `docs/areas/PRAKTISCH-NAV.md` and
+`docs/areas/BRAND.md`.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

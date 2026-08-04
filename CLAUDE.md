@@ -28,7 +28,8 @@ current-state-only too.
 after pulling.
 - `pnpm dev` · `pnpm build` (tsc + vite + help prerender; run before pushing) · `pnpm typecheck` ·
   `pnpm preview` · `pnpm audit`
-- CI gates: `pnpm lint:content` (after ANY content edit) · `pnpm lint` · `pnpm test:unit` ·
+- CI gates: `pnpm lint:content` (after ANY content edit) · `pnpm lint:migrations` (after ANY new
+  `supabase/migrations/*.sql`) · `pnpm lint` · `pnpm test:unit` ·
   `pnpm test:srs` (after `engine/srs.ts` edits) · `pnpm test:pronounce` (after
   `engine/pronounce.ts` edits) · `pnpm check:bundle` (400 kB main-chunk budget, after build) ·
   `pnpm check:contrast` (WCAG gate, after `src/index.css` token edits) ·
@@ -108,6 +109,20 @@ after pulling.
   account back through onboarding and discarded its level and goal. Where a not-onboarded visitor
   goes depends on their session: signed out → `/welcome`, signed in → `/start`
   (`docs/DECISIONS.md` §s174).
+- **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
+  instead of throwing, so an ignored result makes a permanently broken sync look identical to a
+  working one while localStorage keeps the app running. Every push reads its error, retries with
+  backoff, and after 3 consecutive failures flips `useAuthStore.syncHealth` to `"failing"`, which
+  the Settings account panel shows as "Sync pausiert" with a retry. Any new cloud write path does
+  the same; never `await` a Supabase call and drop its result.
+- **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
+  keep `RETAIN_DAYS` (400) days, folding dropped active days into `activeDaysFolded` so the
+  lifetime "N aktive Tage" figure is unchanged; migration 0015 purges abandoned guest accounts
+  (90 days), never-reused transform-cache rows (60 days) and learner TEXT (730 days, founder
+  decision s185) by `pg_cron`. The text purge NULLs columns, never deletes rows, so limits and
+  aggregates survive and Verlauf keeps the evaluation. **A retention timer and the privacy-policy
+  copy describing it ship in the SAME change**; never resolve a conflict between them by editing
+  the copy alone.
 - **Never reload over a learner's unsaved work.** The PWA adopts deploys by reloading; every
   automatic reload is gated on `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later
   resume. Any new surface holding in-memory work claims it with `useLiveWork(active, label, flush)`
@@ -192,7 +207,10 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   pasted into the SQL editor any more.
   **Keep migrations idempotent** (`add column if not exists`, `create table if not exists`,
   `drop policy if exists` before `create policy`): the push runs `--include-all`, so an unrecorded
-  file is applied wherever its number sits.
+  file is applied wherever its number sits. **`pnpm lint:migrations` gates this since s185** (files
+  ≤ 0014 are exempt as already-applied history; never raise that baseline to silence a new file).
+  Migrations run BEFORE the function deploys, so a non-idempotent statement blocks the whole
+  backend deploy.
   The workflow also carries three dispatch-only inputs for when something is off:
   `list_only` (print local vs remote history), `probe_schema` (print the live tables, columns,
   functions, policies and recorded migrations) and `repair_applied` (mark versions as applied

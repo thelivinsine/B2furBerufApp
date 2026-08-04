@@ -3,7 +3,7 @@ import { clearWritingDraft } from "@/features/writing/resumeDraft";
 import { remapProgressIds } from "@/lib/idRenames";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useProgressStore } from "@/store/useProgressStore";
+import { trimDayMaps, useProgressStore } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import type { SrsCard } from "@/types";
 
@@ -24,6 +24,65 @@ let progressTimer: ReturnType<typeof setTimeout> | null = null;
 let settingsTimer: ReturnType<typeof setTimeout> | null = null;
 
 const DEBOUNCE_MS = 1500;
+
+/* ---------------------------- sync health ---------------------------- */
+
+/**
+ * How many pushes in a row have to fail before the learner is told. One failure
+ * is normal life (a tunnel, a sleeping laptop, a token being refreshed); a run
+ * of them means the cloud copy is genuinely not being written, which the
+ * offline-first design otherwise hides completely: localStorage keeps working,
+ * the app looks perfect, and the backup silently does not exist (audit R3).
+ */
+const FAILURES_BEFORE_ALARM = 3;
+/** Automatic retry backoff. After the last step the learner drives it. */
+const RETRY_BACKOFF_MS = [5_000, 20_000, 60_000, 300_000];
+
+/** Consecutive failures per channel, so one healthy row cannot mask a stuck one. */
+const failures = { progress: 0, settings: 0 };
+let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearRetryTimer() {
+  if (retryTimer) clearTimeout(retryTimer);
+  retryTimer = null;
+}
+
+/**
+ * Record the outcome of one push. Success on BOTH channels clears the alarm and
+ * stamps the moment for the UI; a failure counts toward the alarm and schedules
+ * a backed-off retry, so a transient failure heals itself without the learner
+ * ever seeing it and a persistent one surfaces instead of being swallowed.
+ */
+function settle(channel: "progress" | "settings", ok: boolean) {
+  if (ok) {
+    failures[channel] = 0;
+    if (failures.progress === 0 && failures.settings === 0) {
+      clearRetryTimer();
+      useAuthStore.setState({ syncHealth: "ok", lastSyncedAt: Date.now() });
+    }
+    return;
+  }
+  failures[channel] += 1;
+  const worst = Math.max(failures.progress, failures.settings);
+  if (worst >= FAILURES_BEFORE_ALARM) useAuthStore.setState({ syncHealth: "failing" });
+  const delay = RETRY_BACKOFF_MS[Math.min(worst - 1, RETRY_BACKOFF_MS.length - 1)];
+  clearRetryTimer();
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    void retryCloudSync();
+  }, delay);
+}
+
+/**
+ * Push both rows now, outside the debounce. Backs the automatic retry above and
+ * the "Erneut versuchen" button in Settings, which must always act (a dead
+ * control at rest reads as broken).
+ */
+export async function retryCloudSync(): Promise<boolean> {
+  if (!userId) return false;
+  const [a, b] = await Promise.all([pushProgress(), pushSettings()]);
+  return a && b;
+}
 
 /**
  * The account id whose data currently sits in the device-global localStorage
@@ -139,10 +198,23 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
   const examsMap = new Map(examsLocal.map((e) => [examKey(e), e]));
   for (const e of examsRemote) examsMap.set(examKey(e), e);
 
+  const dailyXp = mergeNumberMax(s.dailyXp, (remote.daily_xp as Record<string, number>) ?? {});
+  const activeDays = unionStrings(s.activeDays, (remote.active_days as string[]) ?? []);
+  // Both sides may hold days from before the retention window (a device that has
+  // not rolled over yet, or a row written by an older client), so re-trim after
+  // the union. Math.max on the folded counter: each device increments from the
+  // same synced base, so a day is counted exactly once however many devices
+  // fold it. See trimDayMaps in the progress store.
+  const activeDaysFolded = Math.max(
+    s.activeDaysFolded,
+    (remote.active_days_folded as number) ?? 0,
+  );
+  const trimmed = trimDayMaps({ dailyXp, activeDays, activeDaysFolded });
+
   applyingRemote = true;
   useProgressStore.setState({
     xp: Math.max(s.xp, (remote.xp as number) ?? 0),
-    dailyXp: mergeNumberMax(s.dailyXp, (remote.daily_xp as Record<string, number>) ?? {}),
+    dailyXp,
     streak: Math.max(s.streak, (remote.streak as number) ?? 0),
     longestStreak: Math.max(s.longestStreak, (remote.longest_streak as number) ?? 0),
     lastActiveDay:
@@ -150,7 +222,9 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
         .filter(Boolean)
         .sort()
         .pop() ?? null,
-    activeDays: unionStrings(s.activeDays, (remote.active_days as string[]) ?? []),
+    activeDays,
+    activeDaysFolded,
+    ...trimmed,
     srs: mergeSrs(s.srs, r.srs ?? {}),
     redemittelSeen: mergeNumberMax(s.redemittelSeen, r.redemittelSeen ?? {}),
     scenariosDone: unionStrings(s.scenariosDone, r.scenariosDone ?? []),
@@ -205,6 +279,7 @@ function progressRow(s: ProgressSnapshot) {
     longest_streak: s.longestStreak,
     last_active_day: s.lastActiveDay,
     active_days: s.activeDays,
+    active_days_folded: s.activeDaysFolded,
     srs: s.srs,
     redemittel_seen: s.redemittelSeen,
     scenarios_done: s.scenariosDone,
@@ -241,21 +316,53 @@ function profileRow(s: SettingsSnapshot) {
   };
 }
 
-async function pushProgress() {
-  if (!userId) return;
+/**
+ * Does this error mean "that column does not exist yet"? The site deploy and
+ * the migration deploy are two independent workflows, so a build that writes a
+ * newly added column can go live minutes before the migration that creates it.
+ * An unknown column fails the WHOLE upsert, which would strand every push in
+ * that window, so the caller retries once without the young columns instead.
+ */
+function isUnknownColumn(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  return (
+    error.code === "PGRST204" ||
+    error.code === "42703" ||
+    /column .* does not exist|could not find the .* column/i.test(error.message ?? "")
+  );
+}
+
+/** Columns added after the initial schema, dropped on an unknown-column retry. */
+const YOUNG_PROGRESS_COLUMNS = ["active_days_folded"] as const;
+
+async function pushProgress(): Promise<boolean> {
+  if (!userId) return false;
   try {
-    await supabase.from("progress").upsert(progressRow(useProgressStore.getState()));
+    const row = progressRow(useProgressStore.getState());
+    let { error } = await supabase.from("progress").upsert(row);
+    if (isUnknownColumn(error)) {
+      const fallback = { ...row } as Record<string, unknown>;
+      for (const col of YOUNG_PROGRESS_COLUMNS) delete fallback[col];
+      ({ error } = await supabase.from("progress").upsert(fallback));
+    }
+    settle("progress", !error);
+    return !error;
   } catch {
-    /* best-effort: stay offline-first */
+    // Network-level throw: offline-first, so the local cache keeps the data.
+    settle("progress", false);
+    return false;
   }
 }
 
-async function pushSettings() {
-  if (!userId) return;
+async function pushSettings(): Promise<boolean> {
+  if (!userId) return false;
   try {
-    await supabase.from("profiles").upsert(profileRow(useSettingsStore.getState()));
+    const { error } = await supabase.from("profiles").upsert(profileRow(useSettingsStore.getState()));
+    settle("settings", !error);
+    return !error;
   } catch {
-    /* best-effort */
+    settle("settings", false);
+    return false;
   }
 }
 
@@ -266,15 +373,7 @@ async function pushSettings() {
  * merge (which takes Math.max/union) would silently restore the old values.
  */
 export async function pushProgressNow(): Promise<boolean> {
-  if (!userId) return false;
-  try {
-    const { error } = await supabase
-      .from("progress")
-      .upsert(progressRow(useProgressStore.getState()));
-    return !error;
-  } catch {
-    return false;
-  }
+  return pushProgress();
 }
 
 function scheduleProgressPush() {
@@ -394,7 +493,11 @@ export function stopCloudSync() {
   if (settingsTimer) clearTimeout(settingsTimer);
   progressTimer = null;
   settingsTimer = null;
+  clearRetryTimer();
+  failures.progress = 0;
+  failures.settings = 0;
   userId = null;
   // No session is syncing anymore; the next sign-in re-hydrates from its cloud.
-  useAuthStore.setState({ syncHydrated: false });
+  // The health verdict goes with it: it described the session that just ended.
+  useAuthStore.setState({ syncHydrated: false, syncHealth: "unknown", lastSyncedAt: null });
 }

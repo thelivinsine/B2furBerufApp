@@ -3308,3 +3308,103 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   backlog is untouched, with the queued writing-task quality audit still the next TODO.
   Gates: docs-only (no app code touched).
 - **Artifacts (prompt 3):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 185 (2026-08-04) - branch `claude/database-architecture-audit-x4cdmu`
+
+- **Prompt 1 (verbatim, 2026-08-04):** `the database architecture is concerningly linear.. can you
+  do a thorough audit and provide your analysis with risks and recommendations?`
+  **Response:** full audit of the Supabase layer (all 14 migrations, 5 Edge Functions, the
+  cloudSync protocol, admin RPCs), written up as
+  `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the "linear" shape (few relations,
+  everything hanging off `auth.users`) is deliberate and correct, because the ~5,000-id content
+  catalog lives in the repo, not the database; the DB only holds per-learner state, ops tables and
+  one global cache. The real risks are growth-shaped, not shape-shaped: (R1) the `progress` row is
+  one ever-growing JSONB blob re-uploaded whole on a 1.5 s debounce, with `daily_xp`/`active_days`
+  growing forever; (R2) between logins sync is whole-row last-write-wins across devices; (R3)
+  `pushProgress`/`pushSettings` never read the supabase-js `{ error }` result, so a permanently
+  failing sync is invisible to the learner; (R4) nothing is ever deleted (stale anonymous
+  accounts, indefinite learner text retention = open audit F11, stranded transform-cache rows) and
+  the pg_cron retention job the 0010 evidence probe expects was never scheduled; (R5) admin RPCs
+  recompute analytics from the blobs, O(users x account-age); (R6) migration idempotency is an
+  unchecked convention that can block the whole backend deploy chain. Recommended order: sync-error
+  indicator, retention jobs, day-map caps, idempotency lint (all small, independent), then the one
+  real schema evolution (split `srs` into a per-card table) before serious growth. Analysis only,
+  no code changed, per the prompt.
+- **Artifacts (prompt 1):** `docs/reports/db-architecture-audit-2026-08-04.md` ·
+  `docs/PROJECT_STATUS.md` · this log
+- **Prompt 2 (verbatim, 2026-08-04):** `a "richer" database would add cost and maintenance - how and why?`
+  **Response:** plain-language follow-up to the audit's verdict, no code. Four reasons the
+  repo-resident content catalog beats content-in-Postgres for this product: (1) the CI quality
+  gates (lint:content, provenance, verify:facts, the writingScope coverage tests) block a broken
+  edit before deploy and would have to be rebuilt as server-side tooling plus an editor UI,
+  approval step and audit trail; (2) bundled content is served free by GitHub Pages and cached by
+  the PWA for offline study, while DB-served content adds Supabase egress cost, latency and a
+  hand-built offline sync layer; (3) a content shape change is a type-checked code edit with
+  `git revert` as the undo, versus a live production migration with backup-restore as the undo;
+  (4) more RLS/backup/delete surface around tables whose ids learner progress is keyed to. Also
+  named when a content DB WOULD be right (daily non-technical editors, per-user content, a
+  catalog too big to ship), none of which apply. Conclusion unchanged: keep content in the repo,
+  spend the effort on the audit's learner-state fixes.
+- **Artifacts (prompt 2):** this log
+- **Prompt 3 (verbatim, 2026-08-04):** `do the four fixes`
+  **Response:** all four audit fixes implemented, plus the one part that could not ship as
+  described.
+  **(1) R3, the silent sync** (`src/lib/cloudSync.ts`, `src/store/useAuthStore.ts`,
+  `src/features/auth/AccountPanel.tsx`): the push helpers now read the supabase-js `{ error }` and
+  return a boolean; `settle()` counts consecutive failures PER CHANNEL (progress/settings
+  separately, so a healthy row cannot mask a stuck one) and schedules a backed-off retry
+  (5 s · 20 s · 60 s · 5 min). Three consecutive failures set `useAuthStore.syncHealth = "failing"`
+  and `lastSyncedAt` stamps every landing push. Settings shows a third badge state, amber
+  "Sync pausiert", with one line of German, the last backup time and an always-live
+  "Erneut versuchen" button (`retryCloudSync()`). `pushProgressNow()` collapsed into `pushProgress`
+  now that both read their result. Also added an **unknown-column retry** (PGRST204/42703): the
+  Pages deploy and the Supabase deploy are independent workflows, so a client can write a column
+  minutes before the migration creates it, and an unknown column fails the WHOLE upsert.
+  **(2) R4, retention** (`supabase/migrations/0015_retention.sql`): `purge_stale_guests(90)` and
+  `purge_transform_cache(60)`, both scheduled on pg_cron Sundays off-peak, the whole block
+  exception-wrapped so an unavailable extension warns rather than failing the migration step (which
+  runs BEFORE the function deploys and would block them). Migration 0010's
+  `admin_gdpr_evidence().retention_scheduled` finally reports true.
+  **(3) R1, day-map caps** (`src/store/useProgressStore.ts`, `cloudSync`, `Analytics.tsx`):
+  `RETAIN_DAYS = 400`, `trimDayMaps()` folds dropped ACTIVE days into the new `activeDaysFolded`
+  (cloud column `progress.active_days_folded`), folding once per day in `touchStreak` rather than on
+  the review hot path, and the activity calendar renders `activeDays.length + activeDaysFolded` so
+  the learner-visible lifetime figure is unchanged. Merge-safe across devices via Math.max.
+  **(4) R6, idempotency gate** (`scripts/lint-migrations.mjs`, `pnpm lint:migrations`,
+  `validate.yml`): six rules, dollar-quoted bodies and literals stripped before parsing, files
+  ≤ 0014 exempt as already-applied history. Verified in both directions (real tree passes; a scratch
+  file with all six violations fails with all six named).
+  **NOT DONE, on purpose:** auto-deleting learner writing (audit F11). The privacy policy promises
+  the opposite in as many words, so `purge_old_learner_text()` ships unscheduled and the founder was
+  asked whether writing should expire and after how long. The policy DID gain one paragraph, for the
+  new 90-day guest-account rule, because a retention job and the copy documenting it ship together.
+  Design: the `/design` skill was loaded before the UI work; the new state reuses the existing badge
+  recipe with the warning token (no new visual language), previewed in `preview/sync-status.html`
+  and screenshot-verified in headless Chromium.
+  Gates: typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515** (9 new)
+  · build · check:bundle 124.7 kB.
+- **Artifacts (prompt 3):** `supabase/migrations/0015_retention.sql` · `scripts/lint-migrations.mjs`
+  · `src/lib/cloudSync.ts` · `src/store/useAuthStore.ts` · `src/store/useProgressStore.ts` ·
+  `src/features/auth/AccountPanel.tsx` · `src/features/analytics/Analytics.tsx` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `tests/retention.test.ts` · `tests/cloudSync.test.ts` ·
+  `preview/sync-status.html` · `package.json` · `.github/workflows/validate.yml` · `CLAUDE.md` ·
+  `docs/areas/COMMANDS.md` · `docs/DECISIONS.md` · `docs/reports/db-architecture-audit-2026-08-04.md`
+  · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (2026-08-04, answers to two questions asked via the picker):** merge decision =
+  **"Merge it now"**; learner-text retention = **"Delete after 2 years"**.
+  **Response:** both answers implemented before merging. Migration 0015 (still unmerged, so it
+  carries the decision directly rather than needing a 0016) now schedules
+  `purge_old_learner_text(730)` on Sundays 04:07 UTC alongside the guest and cache purges, and its
+  §4 header changed from "BUILT, NOT SCHEDULED" to the founder decision and its reasoning. The
+  privacy policy was rewritten in the SAME change: the sentence promising indefinite retention is
+  gone, replaced by the 2-year rule plus what survives it (the evaluation stays in Verlauf, only the
+  raw text and its correction are removed), which is exactly what the job does since it NULLs
+  columns rather than deleting rows. **Security-audit finding F11 is closed.** The general rule was
+  recorded in `docs/DECISIONS.md` §s185: a retention timer and the copy documenting it ship
+  together, and a conflict between them is never resolved by quietly editing the copy.
+  Gates re-run after the change: typecheck · lint 0 errors · lint:content · lint:migrations ·
+  test:unit 515/515 · build · check:bundle.
+- **Artifacts (prompt 4):** `supabase/migrations/0015_retention.sql` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `CLAUDE.md` · `docs/DECISIONS.md` ·
+  `docs/reports/db-architecture-audit-2026-08-04.md` · `docs/PROJECT_STATUS.md` · this log.
+  Shipped as PR **#786**.
