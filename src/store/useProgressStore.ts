@@ -13,8 +13,14 @@ interface ProgressState {
   streak: number;
   longestStreak: number;
   lastActiveDay: string | null;
-  /** Set of active day keys (for the calendar). */
+  /** Set of active day keys (for the calendar), trimmed to `RETAIN_DAYS`. */
   activeDays: string[];
+  /**
+   * Active days that aged out of `activeDays` when the retention window moved.
+   * The lifetime figure a learner sees is `activeDays.length + activeDaysFolded`,
+   * so trimming the array costs nothing visible. See `trimDayMaps`.
+   */
+  activeDaysFolded: number;
 
   srs: Record<string, SrsCard>; // vocabId -> card
   redemittelSeen: Record<string, number>; // phraseId -> times practised
@@ -72,6 +78,53 @@ interface ProgressState {
  */
 export const SEEDED_MILESTONE = "seed";
 
+/**
+ * How many days of the two per-DAY structures (`dailyXp`, `activeDays`) stay in
+ * the store, and therefore in the cloud `progress` row.
+ *
+ * Both grow by one entry per day of account life, forever, and the whole row is
+ * re-uploaded on every write (audit R1). 400 days keeps a full year plus a
+ * buffer, which is more than any surface reads: the XP chart shows 30 days and
+ * the activity calendar 56. Nothing a learner can see is lost, because the days
+ * dropped from `activeDays` are counted into `activeDaysFolded` first and the
+ * lifetime total is rendered from the sum.
+ */
+export const RETAIN_DAYS = 400;
+
+/** The oldest day key still kept. Lexical comparison is fine for YYYY-MM-DD. */
+function retentionCutoff(today = new Date()): string {
+  const d = new Date(today);
+  d.setDate(d.getDate() - RETAIN_DAYS);
+  return todayKey(d);
+}
+
+/**
+ * Drop day entries older than the retention window, folding the number of
+ * dropped ACTIVE days into a counter so "N aktive Tage" stays a lifetime figure.
+ * Returns nothing to change when the window is not yet full, so the common case
+ * costs one comparison per day rather than a rebuild.
+ *
+ * Merge-safe: two devices trimming the same history increment from the same
+ * synced base, and `activeDaysFolded` merges with Math.max, so a day is counted
+ * exactly once however many devices fold it.
+ */
+export function trimDayMaps(
+  s: Pick<ProgressState, "dailyXp" | "activeDays" | "activeDaysFolded">,
+): Partial<ProgressState> {
+  const cutoff = retentionCutoff();
+  const keptDays = s.activeDays.filter((d) => d >= cutoff);
+  const droppedXpKeys = Object.keys(s.dailyXp).filter((d) => d < cutoff);
+  if (keptDays.length === s.activeDays.length && droppedXpKeys.length === 0) return {};
+
+  const dailyXp = { ...s.dailyXp };
+  for (const key of droppedXpKeys) delete dailyXp[key];
+  return {
+    dailyXp,
+    activeDays: keptDays,
+    activeDaysFolded: s.activeDaysFolded + (s.activeDays.length - keptDays.length),
+  };
+}
+
 const defaults = {
   xp: 0,
   dailyXp: {} as Record<string, number>,
@@ -79,6 +132,7 @@ const defaults = {
   longestStreak: 0,
   lastActiveDay: null as string | null,
   activeDays: [] as string[],
+  activeDaysFolded: 0,
   srs: {} as Record<string, SrsCard>,
   redemittelSeen: {} as Record<string, number>,
   scenariosDone: [] as string[],
@@ -105,6 +159,9 @@ function touchStreak(state: ProgressState): Partial<ProgressState> {
     longestStreak: Math.max(state.longestStreak, streak),
     lastActiveDay: today,
     activeDays,
+    // The day rolled over, so this is the one moment per day when the retention
+    // window can have moved. Folding here keeps it off the hot review path.
+    ...trimDayMaps({ ...state, activeDays }),
   };
 }
 

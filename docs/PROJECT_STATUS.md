@@ -2,7 +2,7 @@
 
 _Last updated: 2026-08-04 (session 185). **The content-audit backlog is down to one open item.**
 The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
-are closed outright, P3 all but one UI step.
+are closed outright, and so is P3 now that the founder picked and refined the Notizen step.
 P9: every noun declares `plural` or `numerus` (329 had neither), and the `pron` respelling is ONE
 documented scheme with a linter gate instead of two schemes split by authoring wave.
 P7: 108 items re-levelled off the advanced bands, so the B1 half is **36%** of the bank (was 30%)
@@ -16,6 +16,17 @@ bildung had none. All 6 voicemails carry `notes` for a Notizen task, and the fou
 write lines, a 40px play button instead of a tall tile, ruled lines instead of boxes, tile colours
 swapped, row heights locked so the button never jumps). **The whole audit backlog is closed except
 P10**, which the founder deferred.
+**The same session also ran a database architecture audit and shipped four of its fixes**, on a
+parallel branch (#786, #787).
+That work: Report: `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the linear
+shape is deliberate (content lives in the repo; the DB holds only per-learner state + ops), but six
+growth/sync risks were found. Four shipped the same session: a **failed cloud write is no longer
+silent** (Settings shows "Sync pausiert" with a retry), **retention jobs** purge abandoned guest
+accounts and dead cache rows on pg_cron (migration 0015), the **day maps are capped at 400 days**
+with the lifetime figure preserved, and **`pnpm lint:migrations`** gates migration idempotency.
+Learner writing now expires after **2 years** (founder decision, asked because the privacy policy
+promised the opposite), which closes security-audit finding F11. Still open by design: the `srs`
+per-card table and the admin analytics rollups.
 Prior s184: **Every filter and Aufgabe rail now carries the
 Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
 Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
@@ -61,9 +72,7 @@ pack stays parked and unmerged under `strategy/DATA_GOVERNANCE.md`.
 Prior s174: **security audit + the sign-up flow it uncovered**, including the `onboarded` fault that
 discarded learner profiles on every sign-in (#745).
 Prior s173: **a deploy can no longer refresh a learner's work away** (`src/lib/liveWork.ts`).
-Prior s172: the correction now appears in the Kurz/Lang trainer, rendered from
-ONE shared module (`src/features/writing/correction.tsx`) with Fokus, Kurz/Lang and Verlauf
-(PR #739). `docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
+`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
 `.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
 a CLI. Product name: **Genauly** (`genauly.de`)._
 
@@ -171,7 +180,7 @@ adding one task:
   convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
   prioritised fix list, like the s178 content audit.
 
-**Handoff after session 185 (2026-08-04): the content-audit backlog, minus P10.** Founder, after
+**Handoff after session 185a (2026-08-04): the content-audit backlog, minus P10.** Founder, after
 being shown what was left: "go ahead with all the items except for the p10."
 - **Closed outright: P9, P7, P5, P4.** P9 gave every noun a `plural` or a `numerus` and folded the
   two `pron` schemes into one documented, linted scheme. P7 re-levelled 108 items off the advanced
@@ -197,41 +206,59 @@ being shown what was left: "go ahead with all the items except for the p10."
   because that theme's only text WAS a voicemail; the new logistics text falsified that. It now
   derives the theme from the bank, so adding a text anywhere cannot make it stale again.
 
-**Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
-a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app
-right below the Branchen filter."
-- **Naming was asked BEFORE building**, because it was the only part that changed the scope: the
-  prompt said "Berufswelt", the app's locked word is **Berufsleben** (s181), and one surface saying
-  something different is the exact drift `lib/lifeAreas.ts` exists to stop. Founder kept
-  **Berufsleben**, so nothing was renamed and the change stayed additive.
-- **One shared control, `src/features/shared/LifeAreaPills.tsx`**, now in Wörter, Kollokationen,
-  Redemittel and the Schreiben Kurz/Lang Aufgabe rail, on desktop rails and mobile panels alike.
-  **Grammatik is the one deliberate exception:** grammar topics carry no `themeId`, so a life-area
-  filter there would be dead chrome, not a filter.
-- **The rail owns the slot, not the caller** (`area` prop on `FilterRail`, inserted after the
-  `sector` scope, or first on a tab with no Branche dropdown), so "right below the Branchen filter"
-  cannot drift per surface. Single-select that toggles off, `?area=`, pinnable, counted by the badge,
-  cleared by both rails' reset.
-- **Coherence is enforced, not hoped for:** picking an area narrows the Thema dropdown to that area
-  AND drops a Thema from the other one, so pill, dropdown and list can never contradict each other.
-  Pill counts are computed before Thema/search/facets, so the other pill never goes dead at exactly
-  the moment you want to switch. In Schreiben `area` became a HARD, coarsest axis, so the two areas
-  partition the 717-task pool exactly, with `blockingAxis` gaining `area` for the stale-deep-link case.
-- **One visual correction during the round:** an equal-width 2-column pill grid truncated
-  "Berufsleben" against a four-digit count in the 16rem desktop rail, so the pills use the
-  content-sized wrapping facet-pill layout the same tile already uses two sections below.
-- **Gates:** typecheck · lint 0 errors · lint:content · test:unit **506/506** (10 new) · build ·
-  check:bundle 123.1 kB. Verified in a headless browser on both rails: `theme=arzt` + tap Berufsleben
-  → `?area=professional` with Thema back to "Alle Themen", the Thema dropdown then listing exactly
-  one heading; toggle-off, pin+collapse and reset all behave.
-- **Shipped:** PR **#782**, squash-merged as `c612a5d`; `Validate content` and `Deploy site to
-  GitHub Pages` both green on the merge commit, so this is live on genauly.de. The session record
-  followed in PR **#783** (`f3b4395`) and the layout-index gaps it exposed in PR **#784**. Post-merge
-  housekeeping done after each: branch reset onto `main`, working tree clean.
-- **Not touched, on purpose:** Grammatik (no `themeId` on its topics), Sammlung (a Lv 1-5 chip row,
-  not a scope rail), the Fokus grammar dials (form controls, not a content scope), and
-  `libraryFocus` in `engine/session.ts` (Bibliothek Üben hands over already-filtered ids, so the
-  area rides along; only hand-built `/session?…` links would need the param, and nothing writes them).
-- **Worth the founder's eye on the live site:** whether "Lebensbereich" is the right section label
-  (one word, matches the two pills under it), and whether Grammatik should carry the pills anyway.
-  Both are small changes.
+**Handoff after session 185b (2026-08-04, parallel branch): the database architecture audit.** Founder: "the database
+architecture is concerningly linear.. can you do a thorough audit and provide your analysis with
+risks and recommendations?"
+- **Deliverable:** `docs/reports/db-architecture-audit-2026-08-04.md`, covering all 14 migrations,
+  the 5 Edge Functions, `src/lib/cloudSync.ts` and the admin RPCs. Analysis only, no code changed,
+  because the prompt asked for an assessment.
+- **Verdict in one line:** the "linear" schema (11 small tables around `auth.users`, few relations)
+  is the correct consequence of keeping the ~5,000-id content catalog in the repo; the real risks
+  are growth-shaped, not shape-shaped.
+- **Findings, ranked R1-R8.** The three that matter most: the `progress` row is one ever-growing
+  JSONB blob re-uploaded whole every 1.5 s of activity (R1); `pushProgress`/`pushSettings` never
+  read the supabase-js `{ error }` result, so a permanently failing sync is invisible while the
+  learner believes the cloud backup works (R3); nothing is ever deleted, and the pg_cron retention
+  job that migration 0010's evidence probe expects was never scheduled, which also keeps audit F11
+  (indefinite learner-text retention) open (R4).
+- **Then the founder said "do the four fixes", and all four shipped in the same session:**
+  1. **R3, the silent sync.** Both push helpers read `{ error }` now and return a boolean;
+     `settle()` counts consecutive failures per channel and retries with backoff (5 s · 20 s · 60 s ·
+     5 min). Three in a row flip `useAuthStore.syncHealth` to `"failing"`, which the Settings
+     account panel shows as an amber **"Sync pausiert"** badge, one line of plain German, the last
+     successful backup time and an always-live "Erneut versuchen" button. A transient failure heals
+     itself unseen; a permanent one can no longer hide. The same change added an **unknown-column
+     retry**, because the site deploy and the migration deploy are separate workflows and an
+     unknown column otherwise fails the whole upsert.
+  2. **R4, retention** (`0015_retention.sql`): `purge_stale_guests(90)` and
+     `purge_transform_cache(60)` scheduled on `pg_cron` (Sundays, off-peak), the whole block
+     exception-wrapped so a missing extension warns instead of failing the migration step and
+     blocking the Edge Function deploys behind it. `admin_gdpr_evidence().retention_scheduled`
+     (migration 0010) should now report **true** for the first time since it shipped. **Not yet
+     verified:** `supabase db push` does not surface Postgres NOTICE/WARNING output, and the block
+     warns instead of failing by design, so a green deploy does not prove the three jobs were
+     scheduled. Confirm in **/admin → Launch** (`retention_scheduled`); if it reads false, enable
+     pg_cron under Database → Extensions and re-run the Supabase workflow, which re-applies the
+     migration idempotently.
+  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, folding dropped active days into
+     `activeDaysFolded` (+ the `progress.active_days_folded` column) so the lifetime
+     "N aktive Tage" figure a learner sees is unchanged.
+  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules,
+     files ≤ 0014 exempt as already-applied history. Verified in both directions.
+- **The one question the code could not answer was put to the founder, who answered it:**
+  auto-deleting **learner writing** (audit F11). The published privacy policy promised the opposite
+  in as many words, so the job shipped unscheduled and the question was asked directly. **Founder:
+  delete after 2 years.** `purge_old_learner_text(730)` is now scheduled, and it NULLs the text
+  columns rather than deleting rows, so the AI limits and admin aggregates keep working and Verlauf
+  keeps the evaluation (date, Thema, Schwerpunkt, Tipp): the learner loses old raw text, never their
+  progress record. **Audit F11 is closed.**
+- **The privacy policy changed in two places**, both because the code now does something the policy
+  did not describe: unused **guest** accounts are deleted after 90 days, and submitted **texts**
+  after 2 years (with the sentence promising indefinite retention removed). Standing rule recorded
+  in `docs/DECISIONS.md` §s185: a retention timer and the copy documenting it ship together.
+- **Preview:** `preview/sync-status.html` (the three account-panel states side by side),
+  screenshot-verified. The new state reuses the existing badge recipe with the warning token, so
+  no new visual language was introduced.
+- **Gates:** typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515**
+  (9 new, `tests/retention.test.ts` + `tests/cloudSync.test.ts`) · build · check:bundle 124.7 kB.
+- **Founder note:** merging this applies migration 0015 automatically. Nothing to paste anywhere.

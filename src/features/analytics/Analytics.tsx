@@ -954,7 +954,11 @@ export function Analytics() {
 
 function ActivityCalendar() {
   const activeDays = useProgressStore((s) => s.activeDays);
+  const activeDaysFolded = useProgressStore((s) => s.activeDaysFolded);
   const activeSet = new Set(activeDays);
+  // `activeDays` holds only the retention window (RETAIN_DAYS); the days that
+  // aged out live on as a count, so this stays a lifetime figure.
+  const lifetimeActiveDays = activeDays.length + activeDaysFolded;
 
   const cells = useMemo(() => {
     const out: string[] = [];
@@ -986,7 +990,7 @@ function ActivityCalendar() {
             />
           ))}
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">Letzte 56 Tage · {activeDays.length} aktive Tage</p>
+        <p className="mt-2 text-xs text-muted-foreground">Letzte 56 Tage · {lifetimeActiveDays} aktive Tage</p>
       </CardContent>
     </Card>
   );
