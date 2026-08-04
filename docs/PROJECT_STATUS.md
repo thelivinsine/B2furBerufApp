@@ -145,78 +145,58 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Start with this: the queued quality audit.** The founder closed s181 by settling two open items and
-adding one task:
-- **The Niveau mix stays as shipped** (B1 307 / B2 302 / C1 108). Founder: "keep the Niveau mix as it
-  is." The old 35/50/15 target is retired; do not rebalance it.
-- **The exam-source items are PARKED**, not pending. Founder: "park the exam source items with
-  official documents task for later, it's not that important." (`SCHREIBEN-OVERHAUL.md` §12 + P0.3.)
-- **NEXT TODO, not started:** a thorough analysis of **writing-task quality and filter fit**, with
-  research from reliable sources. Founder: "I want you to do a thorough analysis of the quality of
-  these tasks and how they go with the filter, do the required research from reliable sources, this
-  is one of the next todos for later." Full scope, including which sources are usable now that the
-  exam documents are parked, is in **`docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)"**. The
-  short version: s181 proved COVERAGE (717 tasks, gated); nobody has verified that a task tagged B1
-  reads as B1, that its Leitpunkte are answerable in the word target, or that the Branche framing
-  convinces someone who works in that industry. Deliverable shape: a report in `docs/reports/` with a
-  prioritised fix list, like the s178 content audit.
+**One small thing is owed from s185:** confirm `/admin → Launch` shows `retention_scheduled: true`.
+A green Supabase deploy proves migration 0015 applied but not that pg_cron was available to schedule
+the three purge jobs. If it reads false: enable pg_cron under Database → Extensions, re-run the
+Supabase workflow (0015 re-applies idempotently).
+
+**Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
+**writing-task quality and filter fit**, with research from reliable sources. s181 proved COVERAGE
+(717 tasks, gated); nobody has verified that a task tagged B1 reads as B1, that its Leitpunkte are
+answerable in the word target, or that the Branche framing convinces someone who works in that
+industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
+audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
+C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
 
 **Handoff after session 185 (2026-08-04): the database architecture audit.** Founder: "the database
 architecture is concerningly linear.. can you do a thorough audit and provide your analysis with
 risks and recommendations?"
-- **Deliverable:** `docs/reports/db-architecture-audit-2026-08-04.md`, covering all 14 migrations,
-  the 5 Edge Functions, `src/lib/cloudSync.ts` and the admin RPCs. Analysis only, no code changed,
-  because the prompt asked for an assessment.
-- **Verdict in one line:** the "linear" schema (11 small tables around `auth.users`, few relations)
-  is the correct consequence of keeping the ~5,000-id content catalog in the repo; the real risks
-  are growth-shaped, not shape-shaped.
-- **Findings, ranked R1-R8.** The three that matter most: the `progress` row is one ever-growing
-  JSONB blob re-uploaded whole every 1.5 s of activity (R1); `pushProgress`/`pushSettings` never
-  read the supabase-js `{ error }` result, so a permanently failing sync is invisible while the
-  learner believes the cloud backup works (R3); nothing is ever deleted, and the pg_cron retention
-  job that migration 0010's evidence probe expects was never scheduled, which also keeps audit F11
-  (indefinite learner-text retention) open (R4).
-- **Then the founder said "do the four fixes", and all four shipped in the same session:**
-  1. **R3, the silent sync.** Both push helpers read `{ error }` now and return a boolean;
-     `settle()` counts consecutive failures per channel and retries with backoff (5 s · 20 s · 60 s ·
-     5 min). Three in a row flip `useAuthStore.syncHealth` to `"failing"`, which the Settings
-     account panel shows as an amber **"Sync pausiert"** badge, one line of plain German, the last
-     successful backup time and an always-live "Erneut versuchen" button. A transient failure heals
-     itself unseen; a permanent one can no longer hide. The same change added an **unknown-column
-     retry**, because the site deploy and the migration deploy are separate workflows and an
-     unknown column otherwise fails the whole upsert.
-  2. **R4, retention** (`0015_retention.sql`): `purge_stale_guests(90)` and
-     `purge_transform_cache(60)` scheduled on `pg_cron` (Sundays, off-peak), the whole block
-     exception-wrapped so a missing extension warns instead of failing the migration step and
-     blocking the Edge Function deploys behind it. `admin_gdpr_evidence().retention_scheduled`
-     (migration 0010) should now report **true** for the first time since it shipped. **Not yet
-     verified:** `supabase db push` does not surface Postgres NOTICE/WARNING output, and the block
-     warns instead of failing by design, so a green deploy does not prove the three jobs were
-     scheduled. Confirm in **/admin → Launch** (`retention_scheduled`); if it reads false, enable
-     pg_cron under Database → Extensions and re-run the Supabase workflow, which re-applies the
-     migration idempotently.
-  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, folding dropped active days into
-     `activeDaysFolded` (+ the `progress.active_days_folded` column) so the lifetime
-     "N aktive Tage" figure a learner sees is unchanged.
-  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules,
-     files ≤ 0014 exempt as already-applied history. Verified in both directions.
-- **The one question the code could not answer was put to the founder, who answered it:**
-  auto-deleting **learner writing** (audit F11). The published privacy policy promised the opposite
-  in as many words, so the job shipped unscheduled and the question was asked directly. **Founder:
-  delete after 2 years.** `purge_old_learner_text(730)` is now scheduled, and it NULLs the text
-  columns rather than deleting rows, so the AI limits and admin aggregates keep working and Verlauf
-  keeps the evaluation (date, Thema, Schwerpunkt, Tipp): the learner loses old raw text, never their
-  progress record. **Audit F11 is closed.**
-- **The privacy policy changed in two places**, both because the code now does something the policy
-  did not describe: unused **guest** accounts are deleted after 90 days, and submitted **texts**
-  after 2 years (with the sentence promising indefinite retention removed). Standing rule recorded
-  in `docs/DECISIONS.md` §s185: a retention timer and the copy documenting it ship together.
-- **Preview:** `preview/sync-status.html` (the three account-panel states side by side),
-  screenshot-verified. The new state reuses the existing badge recipe with the warning token, so
-  no new visual language was introduced.
+- **The report is `docs/reports/db-architecture-audit-2026-08-04.md`** (all 15 migrations, the 5 Edge
+  Functions, `cloudSync.ts`, the admin RPCs; findings R1-R8 with per-finding status). **Verdict:**
+  the "linear" schema is the correct consequence of keeping the ~5,000-id content catalog in the
+  repo; the real risks were growth-shaped, not shape-shaped. Read the report for the reasoning; this
+  handoff records only what changed and what is still owed.
+- **The founder then said "do the four fixes", and all four shipped:**
+  1. **R3, the silent sync.** The push helpers ignored the supabase-js `{ error }`, so a permanently
+     failing sync was indistinguishable from a working one. They now read it, retry with backoff,
+     and after 3 consecutive failures Settings shows an amber **"Sync pausiert"** with the last
+     backup time and a live retry. Also added an **unknown-column retry**: the site and migration
+     deploys are separate workflows, and an unknown column fails the whole upsert.
+  2. **R4, retention** (`0015_retention.sql`): three weekly `pg_cron` purges, guests 90 d, dead
+     transform-cache rows 60 d, learner text 730 d. Block exception-wrapped so a missing extension
+     warns instead of failing the migration step and blocking the function deploys behind it.
+  3. **R1, day-map caps:** `RETAIN_DAYS = 400`, dropped active days folded into `activeDaysFolded`
+     (+ cloud column) so the lifetime "N aktive Tage" figure is unchanged.
+  4. **R6, the idempotency gate:** `pnpm lint:migrations` + a `validate.yml` step, six rules, files
+     ≤ 0014 exempt as already-applied history. Verified in both directions.
+- **The one question the code could not answer went to the founder: learner text expires after
+  2 years** (audit F11, now CLOSED). The job NULLs the text columns rather than deleting rows, so AI
+  limits and aggregates keep working and Verlauf keeps the evaluation: the learner loses old raw
+  text, never their progress record. The privacy policy was rewritten in the same change (also
+  documenting the new 90-day guest rule, and dropping the sentence that had promised indefinite
+  retention). Standing rule in `docs/DECISIONS.md` §s185.
+- **The documentation pass then caught a real miss in that policy change and fixed it.** The rewrite
+  had shipped WITHOUT bumping `PRIVACY_LAST_UPDATED_ISO` and `CONSENT_VERSION`, so a legal page
+  rendered materially new retention terms under the old date. **The §G2 drift check provably cannot
+  catch this:** `consentInSync()` compares the two constants to each other, so forgetting BOTH stays
+  green. Both are now `2026-08-04`; the rule is written into `docs/areas/LEGAL-ADMIN.md`.
+- **Still owed (see "Resume here"):** confirm `/admin → Launch` reads `retention_scheduled: true`.
+- **Design:** `preview/sync-status.html`, screenshot-verified. The new state reuses the existing
+  badge recipe with the warning token, so no new visual language was introduced.
 - **Gates:** typecheck · lint 0 errors · lint:content · lint:migrations · test:unit **515/515**
-  (9 new, `tests/retention.test.ts` + `tests/cloudSync.test.ts`) · build · check:bundle 124.7 kB.
-- **Founder note:** merging this applies migration 0015 automatically. Nothing to paste anywhere.
+  (9 new) · build · check:bundle 124.7 kB. **Shipped:** PR **#786** (`7fe00dd`) and **#787**
+  (`f738544`), both squash-merged, all three workflows green, migration 0015 applied to the live
+  database.
 
 **Handoff after session 184 (2026-08-03): the Lebensbereich pills, in every rail.** Founder: "I want
 a clear Berufswelt and Alltag pills in each and every filter or aufgabe rail through out the app

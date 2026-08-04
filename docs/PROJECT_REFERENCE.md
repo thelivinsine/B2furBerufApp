@@ -84,6 +84,26 @@ sites, and open corpora. `strategy/DATA_GOVERNANCE.md` still forbids copying tel
 Deliverable shape: a report in `docs/reports/` with a prioritised fix list, like the s178 content
 audit.
 
+### DEFERRED BY DESIGN (s185): the two database items the audit did not fix
+
+From `docs/reports/db-architecture-audit-2026-08-04.md`. Both were understood, costed and left
+open on purpose, so neither is a discovery waiting to be re-made.
+
+1. **Split `srs` out of the `progress` blob into `srs_cards (user_id, content_id, card, updated_at)`
+   (audit R1 medium-term + R2).** Today a learner's whole progress row, whose bulk is one SRS entry
+   per card ever studied, is re-uploaded on a 1.5 s debounce after every answer. Per-card upserts
+   would write ~200 bytes instead of the whole row and shrink the cross-device clobber window from
+   "the entire account" to "one card", with a `where excluded.reps > srs_cards.reps` guard doing
+   server-side what `mergeSrs` does at login. **Trigger to do it:** typical accounts carrying a few
+   hundred cards, or two-device use becoming common. It is the single highest-leverage schema change
+   available and is much cheaper before growth than after.
+2. **A nightly rollup for the admin analytics RPCs (audit R5).** `admin_daily_series()` cross-joins
+   every `progress` row against its `active_days` array and `admin_overview()` counts the JSON keys
+   of every `srs` blob, so both are sequential scans costing O(users × account-age) on the same
+   database serving learners, every time the cockpit renders. Milliseconds today. **Trigger:** the
+   admin screens feeling slow. Fix is a `pg_cron` rollup into a small `daily_stats` table plus
+   re-pointing the two RPCs; capping `active_days` (done in s185) already bounds the worse query.
+
 ### PARKED (founder, s181): the exam-source documents and the §12 verification items
 
 `docs/plans/SCHREIBEN-OVERHAUL.md` §12 (per-band point values, Aufgabe weightings, module timings,

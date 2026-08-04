@@ -3422,3 +3422,37 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   (enable pg_cron under Database → Extensions, re-run the workflow, which re-applies 0015
   idempotently).
 - **Artifacts (post-merge):** `docs/PROJECT_STATUS.md` · `docs/reports/db-architecture-audit-2026-08-04.md` · this log
+- **Prompt 5 (verbatim, 2026-08-04):** `document the session`
+  **Response:** because every prompt in this session was already logged as it happened, this pass
+  looked for what the session had made STALE rather than restating it, and the first thing it found
+  was a bug in this session's own work.
+  **(1) The legal-consent invariant had been broken by prompt 4.** The privacy policy was materially
+  rewritten (2-year text retention, 90-day guest deletion, and the removal of the sentence promising
+  indefinite retention) but `PRIVACY_LAST_UPDATED_ISO` and `CONSENT_VERSION` were left at
+  `2026-06-08`. So the live page rendered new retention terms under the old date, and no stored
+  consent version recorded that the terms had changed. **The §G2 drift check provably cannot catch
+  this:** `consentInSync()` compares the two constants to EACH OTHER, so bumping neither passes
+  green, and `tests/consent.test.ts` did pass. Both are now `2026-08-04`. Blast radius today is
+  small (consent is recorded at signup/onboarding, and no live re-consent prompt exists yet), but
+  the rendered date was wrong on a legal page.
+  **(2) `docs/areas/LEGAL-ADMIN.md`** had no retention section at all, while §G4 described a pg_cron
+  probe whose answer had just changed. It now documents all three purges, the exception-wrapped
+  scheduling and why a green deploy does not prove the jobs are scheduled, and carries the rule the
+  area must not lose (a retention timer and its copy ship together; the drift check will not save
+  you).
+  **(3) `docs/PROJECT_FOUNDATION.md`** was stale in two ways, one of them predating this session:
+  the schema list still named only the four 2A tables (it now describes all 15 migrations' worth by
+  RLS posture, and says why the "linear" shape is deliberate), and it still claimed migrations are
+  applied by hand in the SQL editor, which stopped being true in s179.
+  **(4) `docs/reports/security-audit-2026-07-27.md`** still listed F11 as open with a
+  recommendation; F11 is now closed, and its founder-action item records the one confirmation still
+  owed (`/admin → Launch`).
+  **(5) `docs/PROJECT_REFERENCE.md`** gained a "DEFERRED BY DESIGN" section for the two database
+  items the audit deliberately did NOT fix (the `srs_cards` split, the admin analytics rollup), each
+  with its trigger condition, so neither is re-discovered from scratch later.
+  Gates: typecheck · lint 0 errors · lint:content · lint:migrations · test:unit · build ·
+  check:bundle.
+- **Artifacts (prompt 5):** `src/lib/legalMeta.ts` · `src/lib/consent.ts` ·
+  `docs/areas/LEGAL-ADMIN.md` · `docs/PROJECT_FOUNDATION.md` ·
+  `docs/reports/security-audit-2026-07-27.md` · `docs/PROJECT_REFERENCE.md` ·
+  `docs/PROJECT_STATUS.md` · this log

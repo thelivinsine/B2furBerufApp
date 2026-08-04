@@ -109,3 +109,26 @@ burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA
   a defensive `pg_cron` retention probe). `delete-account` logs erasures; `exportUserData` logs exports;
   both best-effort. `fetchGdprEvidence()` fails soft to null (the panel shows "run migration 0010").
   Founder action: run migration 0010 + redeploy `delete-account` (`PHASE2_SETUP.md` §5).
+- **Data retention (s185, migration `0015_retention.sql`).** Three weekly `pg_cron` purges, which is
+  what the §G4 probe above was built to detect:
+  **(1) learner text after 2 years** (founder decision; `purge_old_learner_text(730)` NULLS
+  `writing_evaluations.text`/`corrected_text` and `sentence_checks.source_text`/`corrected` rather
+  than deleting rows, so AI limits, cache bookkeeping and admin aggregates survive and Verlauf keeps
+  the evaluation, closing security-audit finding **F11**);
+  **(2) abandoned anonymous accounts after 90 days** (`purge_stale_guests`; a guest holds no email
+  so it can never be signed back into. Registered accounts are NEVER on a timer);
+  **(3) never-reused transform-cache rows after 60 days** (`purge_transform_cache`, `hits = 0`; no
+  personal data, pure cost hygiene).
+  The whole scheduling block is exception-wrapped: migrations run BEFORE the Edge Function deploys
+  in `supabase.yml`, so a project without pg_cron warns instead of blocking the entire backend
+  deploy. **A green deploy therefore does NOT prove the jobs are scheduled** — `/admin → Launch`
+  (`retention_scheduled`) is the only place that distinguishes installed from scheduled.
+- **THE RULE THIS AREA MUST NOT LOSE: a retention timer and the copy describing it ship in the SAME
+  change, and a conflict between them is never resolved by editing the copy alone.** s185 nearly got
+  this wrong twice. First it found the policy promising indefinite retention while the audit proposed
+  deleting text, and stopped to ask the founder rather than quietly weakening the sentence. Then,
+  having rewritten the policy, it shipped the change WITHOUT bumping `PRIVACY_LAST_UPDATED_ISO` and
+  `CONSENT_VERSION`, so the page rendered materially new retention terms under the old date. **The §G2
+  drift check cannot catch that:** `consentInSync()` only compares the two constants to each other, so
+  forgetting BOTH passes green. Editing `PrivacyPolicy.tsx` or `Terms.tsx` means bumping both
+  constants to the same new ISO date in the same commit, and no test will remind you.
