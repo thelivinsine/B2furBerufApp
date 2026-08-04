@@ -100,8 +100,16 @@ condition stated two paragraphs earlier), never a lookup.
 voicemail exists to deliver (callback number, new time, deadline, what to bring). All 6 voicemails
 carry 5 fields each. `label` is what to catch, `value` is what the message said, so the learner
 self-corrects. The linter requires both halves and warns if a non-voicemail carries the field.
-**The learner-facing step is not built yet** and is waiting on a founder pick from
-`preview/notizen-*.html`; until then the field is authored data the UI can read.
+**Keep a `value` under ~32 characters:** it is a note, not a sentence ("Rückflug Do. gestrichen",
+not "Der Rückflug am Donnerstag wurde gestrichen"), and a one-line value is what keeps the sheet the
+same height before and after the reveal.
+**The step ships as founder-picked variant A** (`preview/notizen-a-r2.html`), in `ReadingBlock`
+between the audio and the comprehension checks, and only while the text is actually being listened
+to: with the text on screen, noting it is copying. Its shape is founder-settled, so treat it as
+locked: the message tile carries the Himmelblau fill and the Notizen sheet is the white one (the
+colours were swapped on request); fields are ruled LINES, never boxes; the play control is a 40px
+button on the title row, never a tile of its own; and both states are one 44px row so the button
+underneath does not move when the answers appear.
 
 ### Noun number: every noun says `plural` or `numerus` (audit P9, s185)
 329 nouns simply had no `plural`, so "nobody authored this" and "there is nothing to author" looked

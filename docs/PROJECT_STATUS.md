@@ -11,9 +11,11 @@ P5: **every** grammar topic now has 10 drills with ≥3 productive (bank 195 →
 19% → **33%**); the 21 B2/C1 topics had zero productive drills between them.
 P4: six level-3 scenarios, three of them Alltag, so the ladder is **13/15/8** not 13/15/2.
 P3: eight exam-length B2 texts (288-333 words), chosen so every domain has ≥2; gesundheit and
-bildung had none. All 6 voicemails carry `notes` for a Notizen task. **The Notizen STEP itself is
-the one thing left**: it is a new UI section, so three variants wait for a founder pick in
-`preview/notizen-varianten.html`.
+bildung had none. All 6 voicemails carry `notes` for a Notizen task, and the founder picked
+**variante A** for the learner-facing step, which shipped after three rounds of feedback (bigger
+write lines, a 40px play button instead of a tall tile, ruled lines instead of boxes, tile colours
+swapped, row heights locked so the button never jumps). **The whole audit backlog is closed except
+P10**, which the founder deferred.
 Prior s184: **Every filter and Aufgabe rail now carries the
 Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
 Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
@@ -138,11 +140,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       founder:** "just move schreiben to anwenden and rename anwenden as prufung." Shipped in s182,
       so the bar stays at five slots and now reads Praktisch · Bibliothek · **Prüfung** ·
       Fortschritt · Einstellungen, with Sprechen, Schreiben and Prüfungssimulation inside the hub.
-- [ ] **Pick a Notizen variant (s185, audit P3).** The six voicemails now carry the note fields a
-      Hörprüfung asks for (Rückrufnummer, neue Uhrzeit, Frist). Three designs for the learner-facing
-      step are in `preview/notizen-varianten.html`: **A** eintragen (tippt jedes Feld, am nächsten an
-      der Prüfung), **B** auf Papier (App nennt nur, worauf zu achten ist; kein Tippen), **C** ein
-      Feld nach dem anderen. Nothing ships until you pick one.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
       **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
@@ -181,10 +178,13 @@ being shown what was left: "go ahead with all the items except for the p10."
   bands and froze the rare-compound count with a linter ratchet. P5 took EVERY grammar topic to 10
   drills with ≥3 productive (the 21 B2/C1 topics had zero productive between them). P4 added six
   level-3 scenarios, three of them Alltag.
-- **P3 is done except one UI step.** Eight exam-length B2 texts shipped, and all six voicemails carry
-  `notes` fields for a Notizen task. **The founder needs to pick a variant** for the learner-facing
-  step: `preview/notizen-varianten.html` (A eintragen · B auf Papier · C ein Feld nach dem anderen).
-  It was NOT built unilaterally because a new UI section goes through previews first.
+- **P3 is done.** Eight exam-length B2 texts shipped, all six voicemails carry `notes` fields, and
+  the Notizen step itself shipped as **variante A**, which the founder picked from
+  `preview/notizen-varianten.html` and then refined over three rounds. The settled shape is in
+  `docs/areas/CONTENT.md` and should be treated as locked: Himmelblau message tile above a WHITE
+  Notizen sheet (colours swapped on request), ruled lines rather than boxed inputs, a 40px play
+  button on the title row, and identical row heights before and after "Notizen vergleichen" so the
+  button underneath never moves. Final render: `preview/notizen-a-r2.html`.
 - **Three things were deliberately left alone, and each is a rule, not a shortcut.** (1) The 12
   human-verified rows that P9's new checks touch: editing one breaks the content fingerprint its
   `verified` stamp is tied to, so the linter warns and they queue for the next human review. (2)

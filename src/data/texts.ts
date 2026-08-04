@@ -518,7 +518,7 @@ export const texts: ReadingText[] = [
     ].join("\n\n"),
     notes: [
       { label: "Wer ruft an", value: "Markus Lang, Reisebüro Atlas" },
-      { label: "Was ist passiert", value: "Der Rückflug am Donnerstag wurde gestrichen" },
+      { label: "Was ist passiert", value: "Rückflug Do. gestrichen" },
       { label: "Neue Abflugzeit", value: "16:20 Uhr statt 19:40 Uhr" },
       { label: "Bis wann zurückrufen", value: "Bis morgen 12 Uhr" },
       { label: "Rückrufnummer", value: "030 55 44 88 12" },
@@ -584,7 +584,7 @@ export const texts: ReadingText[] = [
       { label: "Sendungsnummer", value: "774512" },
       { label: "Neues Zeitfenster", value: "Morgen zwischen 14 und 16 Uhr" },
       { label: "Grund der Verzögerung", value: "Vollsperrung auf der A7" },
-      { label: "Was wird verlangt", value: "Annahme bis 17 Uhr sicherstellen (Kühlware)" },
+      { label: "Was wird verlangt", value: "Annahme bis 17 Uhr (Kühlware)" },
       { label: "Nummer der Disposition", value: "040 33 21 90" },
     ],
     checks: [
@@ -705,9 +705,9 @@ export const texts: ReadingText[] = [
     ].join("\n\n"),
     notes: [
       { label: "Wer ruft an", value: "Stadt-Apotheke am Markt" },
-      { label: "Worum geht es", value: "Das bestellte Medikament ist eingetroffen" },
+      { label: "Worum geht es", value: "Medikament ist da" },
       { label: "Abholfrist", value: "Bis Samstag, 18 Uhr" },
-      { label: "Mitbringen", value: "Das Rezept, falls noch nicht abgegeben" },
+      { label: "Mitbringen", value: "Rezept, falls noch nicht da" },
       { label: "Zuzahlung", value: "Fünf Euro" },
     ],
     checks: [
@@ -946,10 +946,10 @@ export const texts: ReadingText[] = [
     ].join("\n\n"),
     notes: [
       { label: "Wer ruft an", value: "Sicherheitsdienst der Stadtbank" },
-      { label: "Auffällige Abbuchung", value: "480 Euro, Online-Händler im Ausland" },
-      { label: "Was wurde getan", value: "Die Karte wurde vorübergehend gesperrt" },
-      { label: "Wenn die Zahlung fremd ist", value: "Sofort die Nummer auf der Kartenrückseite anrufen" },
-      { label: "Wichtige Warnung", value: "Die PIN am Telefon niemals nennen" },
+      { label: "Auffällige Abbuchung", value: "480 Euro, Händler im Ausland" },
+      { label: "Was wurde getan", value: "Karte vorübergehend gesperrt" },
+      { label: "Wenn die Zahlung fremd ist", value: "Nummer auf der Kartenrückseite" },
+      { label: "Wichtige Warnung", value: "PIN nie am Telefon nennen" },
     ],
     checks: [
       {
@@ -1303,7 +1303,7 @@ export const texts: ReadingText[] = [
       { label: "Prüfungstermin", value: "Samstag, 8. März, 9:00 Uhr" },
       { label: "Wann da sein", value: "Spätestens 8:30 Uhr" },
       { label: "Unbedingt mitbringen", value: "Einen gültigen Ausweis" },
-      { label: "Mündlicher Teil", value: "Am Nachmittag, Uhrzeit hängt am Prüfungstag aus" },
+      { label: "Mündlicher Teil", value: "Nachmittags, Zeit hängt aus" },
       { label: "Absagefrist", value: "Spätestens eine Woche vorher" },
     ],
     checks: [
@@ -1544,9 +1544,9 @@ export const texts: ReadingText[] = [
     notes: [
       { label: "Wer spricht", value: "Yildiz von der Schichtleitung" },
       { label: "Was passiert Montag", value: "Anlage 2 wird umgerüstet" },
-      { label: "Schichttausch", value: "Linie 2 übernimmt Montag die Spätschicht an Linie 1" },
-      { label: "Bis wann prüfen", value: "Bis Sonntag die eigenen Zeiten prüfen" },
-      { label: "Pflichttermin", value: "Sicherheitsunterweisung Mittwoch 13 Uhr, Kantine" },
+      { label: "Schichttausch", value: "Linie 2 → Mo. Spätschicht Linie 1" },
+      { label: "Bis wann prüfen", value: "Eigene Zeiten bis Sonntag" },
+      { label: "Pflichttermin", value: "Unterweisung Mi. 13 Uhr, Kantine" },
     ],
     checks: [
       {

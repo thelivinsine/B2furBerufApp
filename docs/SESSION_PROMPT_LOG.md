@@ -3359,3 +3359,29 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `tests/grammar.test.ts` · `tests/engine.test.ts` · `preview/notizen-varianten.html` (new) ·
   `docs/areas/CONTENT.md` · `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/PROJECT_STATUS.md` ·
   this log. Commits `c7408c4`, `97ea3bf`, `6ef53c5`, `dca9f05`, `d9db84e`.
+
+- **Prompt 3 (verbatim, 2026-08-04):** `i like variant a for notizen. implement it and merge everything to main`
+  **Response:** implemented variant A in `ReadingBlock` (the Notizen sheet sits between the audio and
+  the comprehension checks, and only while the text is actually being listened to, since noting a
+  visible text is copying). Verified the LIVE component against the approved preview by rendering the
+  real component and screenshotting it with the built CSS, rather than eyeballing a mockup.
+- **Prompt 4 (verbatim, mid-turn, 2026-08-04):** `the fields to write are too small and the audio button tile is way too big. Also, it looks like there are way too many rectagles overall. update the design to adapt for these comments`
+  **Response:** three points, three changes. (1) Write fields 36px boxed inputs → **44px ruled lines**
+  with 15px text. (2) The play control was a 64px circle centred in a card of its own, ~250px tall for
+  the screen's least content; it is a **40px button on the title row** and the card collapses to that
+  row, ~72px. (3) Rectangle count went from ten (badge row, white card, accent rail, five input boxes,
+  CTA) to **four**, because ruled lines removed five boxes at once and "Text anzeigen" became a quiet
+  link instead of a ghost button.
+- **Prompt 5 (verbatim, mid-turn, 2026-08-04):** `keep the buttons' position and the tile sizes intact before and after vergleichen. swap the colors of the tiles. do these changes and proceed to implement. rest all looks good.`
+  **Response:** (1) Both states are now one 44px row (`min-h-11` + centred on the revealed side), so
+  the sheet keeps its height and the button underneath does not move. The twelve note values that ran
+  past one line were shortened to real note length ("Rückflug Do. gestrichen", not "Der Rückflug am
+  Donnerstag wurde gestrichen"), which is both better content and what keeps the rows single-line.
+  (2) Tile colours swapped: the message tile carries the Himmelblau fill, the Notizen sheet is white,
+  and the play button became a white circle so it pops on the accent fill. Final render published from
+  the real component: `preview/notizen-a-r2.html`.
+  Gates: lint 0 errors · content lint clean · 533 tests · build green · bundle 123 kB of 400 kB.
+- **Artifacts (prompts 3-5):** `src/features/session/ReadingBlock.tsx` · `src/data/texts.ts` ·
+  `preview/notizen-a-r2.html` (new) · `docs/areas/CONTENT.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/reports/CONTENT_AUDIT_2026-07-30.md` · this log.
+

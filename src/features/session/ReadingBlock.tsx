@@ -48,6 +48,19 @@ export function ReadingBlock({
   const listening = block.listening && ttsSupported();
 
   const [stage, setStage] = useState<"read" | "checks">("read");
+  /**
+   * Notizen task (audit P3, s185; founder picked variant A from
+   * `preview/notizen-varianten.html`). A telc/Goethe Hören task is not only
+   * "did you understand" but "can you catch the callback number while the
+   * message runs", so a marked voicemail asks for its facts BEFORE the
+   * comprehension checks, on the same screen as the audio. Only while the text
+   * is actually being listened to: with the text on screen, noting it is
+   * copying, not listening.
+   */
+  const noteFields = listening ? (text?.notes ?? []) : [];
+  const hasNotes = noteFields.length > 0;
+  const [noteInputs, setNoteInputs] = useState<string[]>(() => noteFields.map(() => ""));
+  const [notesRevealed, setNotesRevealed] = useState(false);
   // Listening: text stays hidden until the learner reveals it; reading shows it.
   const [textShown, setTextShown] = useState(!listening);
   const [translated, setTranslated] = useState(false);
@@ -115,28 +128,44 @@ export function ReadingBlock({
           <Badge variant="muted">{text.cefr}</Badge>
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface p-5 shadow-soft">
-          <Gloss
-            de={text.title}
-            en={text.titleEn}
-            className="text-lg font-semibold leading-snug"
-          />
-
-          {listening && !textShown ? (
-            <div className="mt-4 flex flex-col items-center gap-3 py-6">
+        {/* Collapsed listening state (founder feedback, s185): the play control
+            used to be a 64px circle centred in a card of its own, which made
+            the tallest element on screen the one carrying the least content.
+            It is a 40px icon button on the title row now, and the card shrinks
+            to that row until there is a text to show. */}
+        <div
+          className={cn(
+            "rounded-2xl shadow-soft",
+            listening && !textShown
+              ? // Colours swapped on founder request (s185): the message tile
+                // carries the Himmelblau fill and the Notizen sheet below it is
+                // the white one, so the thing you listen to and the thing you
+                // write on read as different surfaces.
+                "border border-accent/20 bg-accent/20 p-4 dark:bg-accent/10"
+              : "border border-border bg-surface p-5",
+          )}
+        >
+          <div className="flex items-center gap-3">
+            {listening && !textShown && (
               <button
                 onClick={play}
                 aria-label="Nachricht abspielen"
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+                className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-surface text-primary shadow-soft transition-transform hover:scale-105"
               >
-                <Play className="h-7 w-7" />
+                <Play className="h-5 w-5" />
               </button>
-              <p className="text-sm text-muted-foreground">Tippe zum Abspielen</p>
-              <Button variant="ghost" size="sm" onClick={() => setTextShown(true)}>
-                Text anzeigen
-              </Button>
-            </div>
-          ) : (
+            )}
+            <Gloss
+              de={text.title}
+              en={text.titleEn}
+              className={cn(
+                "font-semibold leading-snug",
+                listening && !textShown ? "text-base" : "text-lg",
+              )}
+            />
+          </div>
+
+          {listening && !textShown ? null : (
             <div className="mt-3 space-y-3">
               {paragraphs(translated ? text.en : text.de).map((p, i) => (
                 <p
@@ -164,8 +193,72 @@ export function ReadingBlock({
           )}
         </div>
 
-        <Button variant="gradient" className="h-12 w-full gap-2" onClick={goToChecks}>
-          Zu den Fragen <ArrowRight className="h-4 w-4" />
+        {/* The reveal-the-text escape hatch, as a quiet line rather than the
+            ghost BUTTON it was: one less box on a screen the founder called
+            rectangle-heavy, and it is a fallback, not an action. */}
+        {listening && !textShown && (
+          <button
+            onClick={() => setTextShown(true)}
+            className="-mt-1 block text-xs font-medium text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground"
+          >
+            Text anzeigen
+          </button>
+        )}
+
+        {/* Notizen (founder feedback, s185): written on RULED LINES, not in
+            boxes. Five boxed inputs inside a rail inside a card stacked ten
+            rectangles on one screen; a line under each field removes five of
+            them at once, lets the field grow to a comfortable 44px, and is what
+            a notepad actually looks like. */}
+        {hasNotes && (
+          <div className="rounded-2xl border border-border bg-surface p-4 shadow-soft">
+            <p className="text-eyebrow mb-1 text-primary">Notizen</p>
+            {noteFields.map((field, i) => (
+              <div key={field.label} className="pt-3">
+                <label
+                  htmlFor={`note-${i}`}
+                  className="text-[13px] font-medium text-muted-foreground"
+                >
+                  {field.label}
+                </label>
+                {/* Both states are one 44px ruled row, so the sheet keeps its
+                    height and the button underneath does not move when the
+                    answers appear (founder, s185). */}
+                {notesRevealed ? (
+                  <p className="flex min-h-11 items-center gap-2 border-b border-border py-1.5 text-[15px] font-semibold">
+                    <span className="h-1.5 w-1.5 flex-none rounded-full bg-success" />
+                    {field.value}
+                  </p>
+                ) : (
+                  <input
+                    id={`note-${i}`}
+                    value={noteInputs[i] ?? ""}
+                    onChange={(e) =>
+                      setNoteInputs((prev) => {
+                        const next = [...prev];
+                        next[i] = e.target.value;
+                        return next;
+                      })
+                    }
+                    autoComplete="off"
+                    className="h-11 w-full border-b border-border bg-transparent text-[15px] outline-none transition-colors focus:border-primary/60"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* One CTA in one place across all three shapes. With a Notizen task it
+            reveals the answers first, so "Notizen vergleichen" never sits
+            disabled: a learner who noted on paper reveals without typing. */}
+        <Button
+          variant="gradient"
+          className="h-12 w-full gap-2"
+          onClick={hasNotes && !notesRevealed ? () => setNotesRevealed(true) : goToChecks}
+        >
+          {hasNotes && !notesRevealed ? "Notizen vergleichen" : "Zu den Fragen"}
+          <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
     );

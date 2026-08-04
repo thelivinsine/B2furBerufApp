@@ -401,11 +401,11 @@ the progress store tracks text or dialogue completion, so nothing can guarantee 
   **P9** in s185: every noun declares `plural` or `numerus` (`uncountable` / `pluralOnly`), the
   `pron` respelling is ONE documented scheme with a linter gate, and the duplicate + two-correct-MCQ
   halves were already closed in s178 by `mcqOptions` and `lintVocabLabelCollisions`.
-- **Started:** **P3**: six C1 texts in s178, **eight B2 texts in s185** (288-333 words, chosen so
-  every domain has ≥2 exam-length texts; gesundheit and bildung had none), and all 6 voicemails now
-  carry `notes` fields for a Notizen task. Open: the learner-facing Notizen STEP is a new UI section,
-  so it is waiting on a founder pick from `preview/notizen-varianten.html`.
-- **Open:** P3 (the Notizen step, pending a founder pick), P10.
+  **P3** across s178 (six C1 texts) and s185: **eight B2 texts** (288-333 words, chosen so every
+  domain has ≥2 exam-length texts; gesundheit and bildung had none), all 6 voicemails carrying
+  `notes`, and the learner-facing **Notizen step shipped as founder-picked variant A**, refined over
+  three feedback rounds (`preview/notizen-a-r2.html`).
+- **Open:** P10 only, deferred by the founder.
 - **Deliberately not done:** the 12 human-verified rows that P9's two new rules touch. Editing one
   would break the content fingerprint its `verified` stamp is tied to, and only a human may
   re-verify, so the linter WARNS on them instead of erroring and they are queued for the next

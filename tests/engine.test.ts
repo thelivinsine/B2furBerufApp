@@ -164,7 +164,8 @@ describe("session composer", () => {
         if (!block) continue;
         const isVoicemail = textById(block.textId)?.kind === "voicemail";
         expect(block.listening).toBe(isVoicemail && listening);
-        if (isVoicemail) (listening ? (sawTrue = true) : (sawFalse = true));
+        if (isVoicemail && listening) sawTrue = true;
+        if (isVoicemail && !listening) sawFalse = true;
       }
     }
     // …and both voicemail cases actually occurred, so the assertion above was
