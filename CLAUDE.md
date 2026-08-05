@@ -48,7 +48,8 @@ after pulling.
   `verbForms.ts` (see `docs/areas/CONTENT.md`)
 - `engine/` — `srs.ts` (FSRS-6), `pronounce.ts`, `session.ts` (composed-session composer),
   `exam.ts` (mock-exam composer + scoring, s186), `mission.ts` (game runner), `collection.ts`
-  (FSRS→Lv 1-5 mapping, stable game contract, don't drift the bands), `dialogue.ts`, `scoring.ts`,
+  (FSRS→Lv 1-5 mapping, stable game contract, don't drift the bands), `conversation.ts` +
+  `speaking.ts` (the spoken-conversation state machine + brief derivation, s191), `scoring.ts`,
   `speech.ts`, `quiz.ts`
 - `store/` — `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`,
   `useLibraryScope`, `useExamStore` (the one running mock exam, persisted)
@@ -59,8 +60,9 @@ after pulling.
   `admin.ts` (FOUNDER_EMAILS), `appConfig.ts` (remote config; empty config == default behavior),
   hooks/icons/utils
 - `features/` — `pruefung/` (the one Prüfung hub), `session/` (SessionPlayer + ReadingBlock), `library/`, `vocabulary/`,
-  `collocations/`, `redemittel/`, `grammar/`, `writing/`, `dashboard/`, `welt/` (game),
-  `exam/` (mock exam: MockExamRunner + the four part views, ExamRunner dialogue),
+  `collocations/`, `redemittel/`, `grammar/`, `writing/`, `sprechen/` (the AI conversation
+  partner, s191), `dashboard/`, `welt/` (game),
+  `exam/` (mock exam: MockExamRunner + the four part views),
   `collection/` (Sammlung), `help/`, `legal/`, `admin/`, `shared/` (FilterRail, LifeAreaPills,
   ViewSwitcher, DataTable, SearchField, useSlidingPill)
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
@@ -121,6 +123,16 @@ after pulling.
   account back through onboarding and discarded its level and goal. Where a not-onboarded visitor
   goes depends on their session: signed out → `/welcome`, signed in → `/start`
   (`docs/DECISIONS.md` §s174).
+- **Sprechen is Schreiben with a microphone** (s191): a brief, a conversation, then the EXISTING
+  `features/writing/correction.tsx` card as the debrief (speaking is its fourth caller; never build
+  a fifth copy). Deliberately NOT an open chatbot: an LLM adapts down to the learner, never
+  corrects unless asked and produces no assessment, so the brief (named partner, register, 2-5
+  Leitpunkte) is what makes it an exercise. The partner never corrects mid-flow. **Which layout a
+  spoken task uses is a property of the TASK, never a setting**: practice runs the transcript
+  (`gespraech`), an exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it
+  (`anruf`). **The conversation row is written when a conversation STARTS**, so the daily limit
+  counts what costs money, and the turn ceiling is measured against the STORED transcript, never
+  the request body. Full detail in `docs/areas/SPRECHEN.md`.
 - **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
   instead of throwing, so an ignored result makes a permanently broken sync look identical to a
   working one while localStorage keeps the app running. Every push reads its error, retries with
@@ -253,6 +265,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - `SESSION.md` — the composed session engine, Üben auto-variety rules, focus mode, SRS engines.
 - `SCHREIBEN.md` — `/writing` Fokus/Kurz/Lang, rails, correction card, the mobile anatomy (fixed
   chrome, measured heights, Fokus dial tile), umlaut keys, AI cascade.
+- `SPRECHEN.md` — the AI conversation partner: the brief/conversation/debrief shape, the three
+  layouts and which task gets which, the cost guards, the `converse` function.
 - `PRAKTISCH-NAV.md` — dashboard Üben/Spielen, bottom tab bar (locked), header, feedback pill.
 - `GAME.md` — the Neuland layer: missions-as-data, scenes/sprites, pixel rules, hub surfaces.
 - `BRAND.md` — logo/wordmark rules, icons/favicons, theme tokens, dialog overlay convention.
