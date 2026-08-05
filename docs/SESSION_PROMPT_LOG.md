@@ -4644,3 +4644,35 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `scripts/lint-content.mjs` · `tests/conversation.test.ts` · `tests/scenarios.test.ts` ·
   `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
 
+
+## Session 194 · 2026-08-05 · branch `claude/prufung-hub-audit-5nvdvo`
+
+- **Prompt 1 (verbatim):** `i want you to do a thorough audit and analysis of the prufung hub to
+  find all bugs, inconsistencies, gaps with all kinds of things, be it front end or back end and
+  give me a detailed report`
+  **Response:** audit only, no app code touched. Scope: `/anwenden` (both tabs), the Modelltest
+  runner and its four Teile, the two free trainers the hub feeds (`/writing`, `/simulation`), the
+  engines (`engine/exam.ts`, `engine/speaking.ts`, `engine/conversation.ts`), the stores
+  (`useExamStore`, `mockExams` in `useProgressStore`), the `converse` Edge Function and migration
+  0017, the nav/shell integration, and how the zone's results surface on Fortschritt. Content pools
+  were measured by running the composer against the real banks rather than read off the docs.
+  **35 findings, ranked.** Six blocking: an untimed Lesen/Hören module cannot be finished with one
+  answer blank (Ohne Zeit is the resting state, so it is the default path); nothing has written
+  `examsDone` since the old exam runner retired, so Fortschritt's Prüfung card reads "noch keine
+  Simulation" and "0 Prüfungen" forever while `mockExams` fills up; the exam clock is a tick counter,
+  so a background tab or a reload pauses it; the conversation turn ceiling is enforced server-side
+  only and `canSpeak`/`turnsLeft`/`conversationOver` are all unread, so the local transcript diverges
+  from the graded one; Teil Sprechen offers "Nochmal", so a candidate can re-sit it; and `examBrief`
+  hardcodes `level: "B2.1"`, so every Modelltest speaking part is pitched and graded at B2.1 whatever
+  Niveau was chosen. **Three patterns explain most of it:** a retired feature left its readers
+  behind, Ohne Zeit was bolted onto a flow whose only exit was the clock, and the server enforces
+  what the client never displays. **Content findings:** Durchsagen are eligible as Lesen texts (38%
+  of the B2 reading pool); a C1 Hören is mostly B2.2 and can never carry the Notizen task its own
+  Anleitung promises; and no Alltag speaking task exists above scenario level 1, so a B2 or C1
+  Modelltest can only ever serve a workplace task. Also flagged: spoken transcripts are missing from
+  the GDPR export, the exam's Schreiben correction is computed and never shown, the zone awards
+  almost no XP, and opening the hub pulls ~825 kB of content banks and re-scans them unmemoised on
+  every render. Gates re-run green as a baseline: typecheck · lint 0 errors / 75 warnings ·
+  592 tests · build · check:bundle 127.0 kB.
+- **Artifacts (prompt 1):** `docs/reports/pruefung-audit-2026-08-05.md` ·
+  `docs/PROJECT_STATUS.md` · this log

@@ -1,6 +1,24 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 193). **Sprechen was rebuilt: the learner now actually speaks.**
+_Last updated: 2026-08-05 (session 194). **The Prüfung zone was audited end to end; nothing was
+changed.** Report: `docs/reports/pruefung-audit-2026-08-05.md`, 35 ranked findings across the hub,
+the Modelltest runner, the two free trainers, the `converse` function and how the zone's results
+surface on Fortschritt. Six are blocking. The one to fix first: **an untimed Lesen or Hören module
+cannot be finished if a single answer is left blank** — the submit button only appears when
+everything is answered, and without a clock there is no other completion path, so the only exit
+abandons the run and loses the work. Ohne Zeit is where a learner lands, so this is the default
+path. Next after it: **nothing has written `examsDone` since the old exam runner retired**, so
+Fortschritt's Prüfung card says "noch keine Simulation" and "0 Prüfungen" no matter how many
+Modelltests the learner sits (mock runs write `mockExams` instead). Then exam integrity —
+`examBrief` hardcodes `level: "B2.1"`, so every Modelltest speaking part is graded at B2.1 whatever
+Niveau was chosen; Teil Sprechen offers "Nochmal", so a candidate can re-sit it; and the exam clock
+is a tick counter that a background tab or a reload pauses. Three patterns explain most of the list:
+a retired feature left its readers behind, Ohne Zeit was bolted onto a flow whose only exit was the
+clock, and the server enforces limits the client never displays. **Resume here:** work the report's
+"Suggested order of work" section; gates are green as a baseline (typecheck · lint 0 errors ·
+592 tests · build · check:bundle 127.0 kB)._
+
+_Prior s193: **Sprechen was rebuilt: the learner now actually speaks.**
 Founder: "the sprechen part looks quite strange as the learner never get to speak."
 They were right and it was worse than it looked. The Sprechtrainer replayed a hand-authored
 branching tree answered by **tapping one of 2-4 written options** (its "free speaking" node offered
@@ -51,7 +69,7 @@ separate mechanical change. Backend note: `converse` needs no new secrets. `ANTH
 `GEMINI_API_KEY` have both been set since s150 ("all three AI functions deployed on the
 Gemini-primary cascade"), so the free Gemini leg is live and the ~2-4 cents per conversation figure
 holds rather than every turn falling through to Claude. Migration 0017 applies on the merge to
-`main`; the same merge deploys the new `converse` function.
+`main`; the same merge deploys the new `converse` function._
 
 Prior s192 (2026-08-05): **The Schreibtrainer got a way back, the nav bar learned
 which zone a page belongs to, and the exam frame was confined to Mit Zeit.** Three founder prompts
