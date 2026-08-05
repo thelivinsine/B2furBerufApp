@@ -213,7 +213,9 @@ Two founder prompts against a screenshot of `/anwenden`, Module üben.
 light and dark, and 1280x900, with no element inside `main` carrying a `background-image` any more.
 Gates green: build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
 check:bundle 126.6 kB · check:contrast.
-**Nothing is left open in this zone.**
+Shipped as **PR #803**, squash-merged into `main` as `f0fa0b7`; the founder verifies the live result.
+**Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
+so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
 
 **Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
 `claude/polish-ui-ux-design-92sbje`).**
