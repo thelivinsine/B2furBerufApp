@@ -381,11 +381,14 @@ function ModuleGrid({
   onOpen: (p: MockPartId) => void;
 }) {
   return (
-    // The cards keep their own height: stretching them to fill a tall phone
-    // opened a void inside every card between its description and its chip, and
-    // floating the block in the middle of the stage read as content that had
-    // run out. Top aligned, with the spare room trailing.
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    // 2x2 at EVERY width (founder s189): four across a 1152px column left the
+    // cards narrow and cramped against all that empty page. The block is capped
+    // and centred on a desktop, where the cards also grow their own padding,
+    // mark and title rather than being stretched into voids.
+    // `lg:w-full` is not redundant next to `lg:max-w-4xl`: this grid is a flex
+    // child, and auto cross-axis margins make a flex item fall back to its
+    // CONTENT width, which collapsed the block to 411px instead of 896.
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:gap-6">
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
@@ -406,26 +409,26 @@ function ModuleGrid({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.16), duration: 0.16 }}
             className={cn(
-              "flex flex-col items-start rounded-lg border border-border bg-surface p-4 text-left shadow-soft transition-transform sm:p-5",
+              "flex flex-col items-start rounded-lg border border-border bg-surface p-4 text-left shadow-soft transition-transform sm:p-5 lg:p-6",
               canOpen ? "card-hover" : "cursor-not-allowed opacity-60",
             )}
           >
             <span
               className={cn(
-                "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl",
+                "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl lg:h-16 lg:w-16 lg:rounded-2xl",
                 meta.tile,
               )}
             >
-              <Icon className={cn("h-7 w-7", meta.ink)} />
+              <Icon className={cn("h-7 w-7 lg:h-8 lg:w-8", meta.ink)} />
             </span>
-            <span className="mt-3.5 text-lg font-semibold leading-tight">
+            <span className="mt-3.5 text-lg font-semibold leading-tight lg:mt-4 lg:text-xl">
               {PART_LABEL[part]}
             </span>
-            <span className="mt-1.5 text-[13px] leading-snug text-muted-foreground">
+            <span className="mt-1.5 text-[13px] leading-snug text-muted-foreground lg:text-sm">
               {canOpen ? desc : "Noch keine Inhalte"}
             </span>
             {canOpen && (
-              <span className="mt-auto flex w-full items-center pt-4">
+              <span className="mt-auto flex w-full items-center pt-4 lg:pt-5">
                 <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
                   {free ? (
                     <>
@@ -470,7 +473,9 @@ function RunBand({
         <PartTrack />
       </div>
 
-      <div className="mt-4 flex items-center justify-end border-t border-border pt-4">
+      {/* No divider above the CTA and the button centred (founder s189): the
+          rule cut the band in two, and the run is one thing. */}
+      <div className="mt-5 flex items-center justify-center">
         {canStart ? (
           <Button variant="gradient" className="w-full sm:w-auto" onClick={onStart}>
             <Play className="h-4 w-4" /> Prüfung starten

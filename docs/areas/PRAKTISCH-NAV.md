@@ -48,7 +48,12 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   Niveau is a compact `Niveau B2 ▾` button, NOT a second pill row: the switcher above already
   owns switcher rank, and two grey tracks stacked before any content read as a heavier header than
   the page they introduce. This replaced the s188 Niveau pill switcher.
-- **Module üben:** the four modules as identical cards, 2×2 on a phone and four across from `lg`.
+- **Module üben:** the four modules as identical cards, **2×2 at every width** (founder s189:
+  four across a 1152px column left them narrow and cramped against all that empty page). On a
+  desktop the block caps at `max-w-4xl` and centres, and the cards grow their own padding, mark and
+  title rather than being stretched. `lg:w-full` beside `lg:max-w-4xl` is load-bearing: the grid is
+  a flex child, and auto cross-axis margins make a flex item fall back to its CONTENT width, which
+  collapsed the block to 411px.
   Mark, name, what it holds, and a chip. Top aligned with the spare room trailing: stretching them
   to fill a tall phone opened a void inside every card between description and chip, and centring
   the block read as content that had run out. This is where "Einzeln üben" went.
@@ -59,7 +64,8 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   in). The separate "Freies Üben" block the earlier rounds carried is gone with it, and those two
   trainers have no other entry point, so the switch is load-bearing.
 - **Modelltest:** the run band and Verlauf, nothing else. The band is eyebrow + countdown, the four
-  modules as a timeline, then the CTA on its own divided row; it takes the room the page leaves, so
+  modules as a timeline, then the CTA, **centred and with no rule above it** (founder s189: the
+  divider cut the band in two, and the run is one thing). It takes the room the page leaves, so
   "Prüfung starten" sits in the thumb's reach.
 - **The timeline connector is ONE SEGMENT PER GAP** (founder s189), drawn from the edge of one tile
   to the edge of the next. The single full-width line it replaced ran behind the marks and read as

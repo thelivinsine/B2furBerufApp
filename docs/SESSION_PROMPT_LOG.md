@@ -4098,3 +4098,16 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   852/852 phone.
 - **Artifacts (prompt 12):** `src/features/pruefung/PruefungHub.tsx` · `CLAUDE.md` ·
   `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 13 (verbatim):** `the module uben desktop view looks awkward and cramped. Can you make
+  the tile in 2x2 layout and spread them out a bit more so that it occupies the space well enough to
+  look good.  In the modeltest view for desktop, keep the start test blue button centered and remove
+  the line separating it from the rest of the tile`
+  **Response:** the module grid is 2×2 at every width now, capped at `max-w-4xl` and centred on a
+  desktop, with the cards growing their padding, mark (64px) and title rather than being stretched;
+  measured 896px block with 436px cards against the old 230px ones. The run band's CTA is centred
+  and the rule above it is gone. **One flexbox trap worth remembering:** `mx-auto` on a flex child
+  makes it fall back to its CONTENT width, so the first attempt collapsed the grid to 411px inside a
+  1024px column; `lg:w-full` gives the width back before `max-w` caps it. Re-verified: 900/900
+  desktop, 852/852 phone on both tabs.
+- **Artifacts (prompt 13):** `src/features/pruefung/PruefungHub.tsx` ·
+  `docs/areas/PRAKTISCH-NAV.md` · this log
