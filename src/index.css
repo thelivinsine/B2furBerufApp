@@ -291,6 +291,22 @@ input:-webkit-autofill {
   [contenteditable="true"]:focus-visible {
     @apply ring-0 ring-offset-0;
   }
+  /* A focus ring is for KEYBOARD navigation ONLY (founder s190: "why are there
+     blue outlines on toggle buttons and on filter button? it shouldn't be the
+     case"). `:focus-visible` is meant to be exactly that, but the browsers
+     disagree on controls that re-render under the pointer: a switcher pill that
+     navigates, or a filter toggle that swaps its own subtree, can come back
+     focused and still match, which is the blue rectangle the founder sees
+     around a tab or the Filter row after a plain click. `data-input` is set by
+     `trackInputMode()` on every pointerdown and cleared on the first keyboard
+     navigation, so the rule is deterministic in every browser instead of left
+     to a heuristic. Keyboard users keep the ring untouched, so this stays
+     within WCAG 2.4.7: the indicator is suppressed only for the pointer, which
+     already shows intent through the cursor. */
+  html[data-input="pointer"] :focus-visible {
+    @apply ring-0 ring-offset-0;
+    outline: none;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -596,6 +612,46 @@ input:-webkit-autofill {
           env(safe-area-inset-bottom)
       );
     }
+  }
+  /* Soft edges for an internal scroll region (founder s190: "the area
+     surrounding the Wörter cards look abruptly cut"). A scroll container slices
+     whatever crosses its edge, so with the desktop internal scroll of s189 a
+     card is chopped through the middle by a hard horizontal line.
+
+     A MASK, not a gradient overlay: the column paints no fill of its own, so
+     the cards have to fade into the real page ground behind them (the founder's
+     other half of the same note: "the background should be the page
+     background"). An overlay would need one flat colour and the ground is a
+     gradient, so it would show as a pale band in light mode and a grey one in
+     dark. The mask fades the CONTENT instead, which is correct on any ground
+     and in both themes. Fade distance matches the grid gap so a card meets the
+     edge already faded, never mid-title.
+
+     Applied per edge by `browseColumnClass`, and only where content actually
+     continues, so a region resting at its top is not faded for nothing. */
+  .mask-fade-y {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 1.25rem,
+      #000 calc(100% - 1.25rem),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 1.25rem,
+      #000 calc(100% - 1.25rem),
+      transparent 100%
+    );
+  }
+  .mask-fade-top {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 1.25rem);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 1.25rem);
+  }
+  .mask-fade-bottom {
+    -webkit-mask-image: linear-gradient(to top, transparent 0, #000 1.25rem);
+    mask-image: linear-gradient(to top, transparent 0, #000 1.25rem);
   }
   /* The ceiling for a tile the learner EXPANDED (Verlauf, and every filter or
      disclosure that adopts the rule): at most one screen, so its own top and

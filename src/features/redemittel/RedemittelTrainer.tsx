@@ -20,11 +20,14 @@ import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
+  useEdgeFade,
   browseHeaderClass,
+  browseColumnClass,
   ScrollTopButton,
   UebenLabel,
   BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
+  BROWSE_TOOLBAR_BUTTON_ON,
 } from "@/features/shared/browseScroll";
 import {
   CLUSTER_CLEARANCE,
@@ -94,7 +97,9 @@ export function RedemittelTrainer() {
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
-  const { hidden: headerHidden, scrolled } = useScrollDirection();
+  const { hidden: headerHidden, scrolled } = useScrollDirection(scrollRoot);
+  // Soft top/bottom edges for the internal scroll column (founder s190).
+  const edge = useEdgeFade(scrollRoot);
 
   // Thema is a SCOPE dropdown here (audit P6, s182), the same control the
   // sibling tabs carry, riding the same `?theme=` param so a scope travels
@@ -292,7 +297,18 @@ export function RedemittelTrainer() {
                 (`auto-rows-fr` sizes them all to the tallest). */}
             <CardContent className="flex h-full flex-col justify-center p-4">
               <div className="flex min-w-0 items-start gap-1.5">
-                <p className="min-w-0 flex-1 text-base font-semibold leading-snug sm:text-lg">
+                {/* Capped at three lines, which is the tallest headline the
+                    Kollokationen grid produces, so the two tabs' cards land at
+                    the SAME height (founder s189, restated s190: the Redemittel
+                    cards "abruptly become bigger in height"). `auto-rows-fr`
+                    sizes every row to the tallest card, so one five-line
+                    Wendung was stretching the whole grid by ~77px. The full
+                    phrase stays one hover (title), one flip or one view switch
+                    away, in Liste and Tabelle. */}
+                <p
+                  title={p.de}
+                  className="line-clamp-3 min-w-0 flex-1 text-base font-semibold leading-snug sm:text-lg"
+                >
                   {p.de}
                 </p>
                 <span onClick={(e) => e.stopPropagation()}>
@@ -313,10 +329,26 @@ export function RedemittelTrainer() {
               <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
                 Englisch
               </p>
-              <p className="text-sm font-medium">{p.en}</p>
-              {p.note && <p className="text-xs text-muted-foreground">💡 {p.note}</p>}
+              {/* The BACK is what actually sized this grid, not the Wendung:
+                  `FlipCard` gives a tile its TALLER face, and with a two-line
+                  translation, a three-line note and a three-line example the
+                  back ran to 272px while the front sat at 165. Every part is
+                  capped at two lines, so the back lands level with the front and
+                  the tab matches Kollokationen (founder s189/s190). The full
+                  text stays available in Liste and Tabelle. */}
+              <p className="line-clamp-2 text-sm font-medium" title={p.en}>
+                {p.en}
+              </p>
+              {p.note && (
+                <p className="line-clamp-2 text-xs text-muted-foreground" title={p.note}>
+                  💡 {p.note}
+                </p>
+              )}
               {p.example.en && (
-                <p className="border-t border-border pt-2 text-xs italic text-muted-foreground">
+                <p
+                  className="line-clamp-2 border-t border-border pt-2 text-xs italic text-muted-foreground"
+                  title={p.example.en}
+                >
                   „{p.example.en}"
                 </p>
               )}
@@ -395,12 +427,15 @@ export function RedemittelTrainer() {
               <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 <Button
                   size="icon"
-                  variant={searchOpen || search.trim() ? "default" : "outline"}
+                  variant="outline"
                   aria-pressed={searchOpen}
                   aria-expanded={searchOpen}
                   aria-label="Suche"
                   title="Suche"
-                  className={BROWSE_TOOLBAR_BUTTON}
+                  className={cn(
+                    BROWSE_TOOLBAR_BUTTON,
+                    (searchOpen || search.trim()) && BROWSE_TOOLBAR_BUTTON_ON,
+                  )}
                   onClick={() =>
                     setSearchOpen((o) => {
                       if (o) setSearch("");
@@ -452,7 +487,7 @@ export function RedemittelTrainer() {
 
         <div
           ref={setScrollRoot}
-          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+          className={browseColumnClass(edge)}
         >
           <ScrollRootProvider value={scrollRoot}>
             {/* The level-band chip rides with the CONTENT, not the sticky toolbar
@@ -486,7 +521,7 @@ export function RedemittelTrainer() {
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
-        <ScrollTopButton show={scrolled} />
+        <ScrollTopButton show={scrolled} root={scrollRoot} />
         <FloatingActionCluster note={<FeedbackNote />}>
           <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
@@ -506,7 +541,7 @@ export function RedemittelTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:self-start lg:max-h-[calc(100%-3.5rem)] lg:overflow-hidden"
         />
       </div>
     </div>

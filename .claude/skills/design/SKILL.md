@@ -90,6 +90,21 @@ Ranked by how often the founder had to correct AI output:
    as two labels stacked (the founder reported exactly this). Transient "you can't submit yet" hints
    belong in that cluster's caption slot, never at the card tail, which is where the pinned row
    parks. Never answer a future overlap here by re-adding a bar.
+9. **Focus rings answer the keyboard, never the pointer** (s190). The global `:focus-visible` ring is
+   suppressed while `<html data-input="pointer">` (set by `trackInputMode()`, `src/lib/inputMode.ts`).
+   Never style a focus ring per component to work around a stray outline, and never delete the
+   indicator outright: the keyboard ring is the accessibility floor.
+10. **A state class goes AFTER a shared class constant that ends in a background** (s190). A browse
+   toolbar toggle's ON state is `BROWSE_TOOLBAR_BUTTON_ON`, not the Button `default` variant:
+   `BROWSE_TOOLBAR_BUTTON` ends in `bg-surface`, which wins the tailwind-merge against `bg-primary`
+   while `text-primary-foreground` survives, so the variant renders white on white and the control
+   vanishes entirely. Same trap as `BROWSE_FILTER_BUTTON` (s189). It has now cost two sessions;
+   check the merge order whenever a shipped control "disappears".
+11. **A card grid is sized by its worst card, and on a `FlipCard` that is usually the BACK** (s190).
+   `auto-rows-fr` pushes every row to the tallest tile in the whole grid, and a tile takes its taller
+   FACE, so Redemittel sat 77 px above Kollokationen because of an unclamped translation, note and
+   English example on a back nobody was looking at. Clamp the worst case, give the clamped element a
+   `title`, and keep the full text in Liste/Tabelle.
 
 ## 3. Color language (locked)
 

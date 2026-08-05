@@ -22,11 +22,14 @@ import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
+  useEdgeFade,
   browseHeaderClass,
+  browseColumnClass,
   ScrollTopButton,
   UebenLabel,
   BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
+  BROWSE_TOOLBAR_BUTTON_ON,
 } from "@/features/shared/browseScroll";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -134,7 +137,9 @@ export function VocabularyTrainer() {
   // filter. It starts open if the page was deep-linked with a query.
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
-  const { hidden: headerHidden, scrolled } = useScrollDirection();
+  const { hidden: headerHidden, scrolled } = useScrollDirection(scrollRoot);
+  // Soft top/bottom edges for the internal scroll column (founder s190).
+  const edge = useEdgeFade(scrollRoot);
 
   // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
   // the bottom bar), inherit the shared library scope so the learner's context
@@ -384,11 +389,11 @@ export function VocabularyTrainer() {
   const savedButton = (
     <Button
       size="icon"
-      variant={savedActive ? "default" : "outline"}
+      variant="outline"
       aria-pressed={savedActive}
       aria-label={savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter"}
       title="Gespeichert"
-      className={BROWSE_TOOLBAR_BUTTON}
+      className={cn(BROWSE_TOOLBAR_BUTTON, savedActive && BROWSE_TOOLBAR_BUTTON_ON)}
       onClick={toggleSaved}
     >
       <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
@@ -399,12 +404,12 @@ export function VocabularyTrainer() {
   const searchButton = (
     <Button
       size="icon"
-      variant={searchOpen || search.trim() ? "default" : "outline"}
+      variant="outline"
       aria-pressed={searchOpen}
       aria-expanded={searchOpen}
       aria-label="Suche"
       title="Suche"
-      className={BROWSE_TOOLBAR_BUTTON}
+      className={cn(BROWSE_TOOLBAR_BUTTON, (searchOpen || search.trim()) && BROWSE_TOOLBAR_BUTTON_ON)}
       onClick={() =>
         setSearchOpen((o) => {
           if (o) setSearch("");
@@ -665,7 +670,7 @@ export function VocabularyTrainer() {
 
         <div
           ref={setScrollRoot}
-          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+          className={browseColumnClass(edge)}
         >
           <ScrollRootProvider value={scrollRoot}>
             {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
@@ -715,7 +720,7 @@ export function VocabularyTrainer() {
         {/* Mobile action bar: Üben (with the filtered-set count folded into the
             label) stays pinned at the bottom of the screen (above the nav) so
             the list scrolls above it. Desktop keeps Üben in the rail. */}
-        <ScrollTopButton show={scrolled} />
+        <ScrollTopButton show={scrolled} root={scrollRoot} />
         <FloatingActionCluster note={<FeedbackNote />}>
           <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
@@ -735,7 +740,7 @@ export function VocabularyTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:self-start lg:max-h-[calc(100%-3.5rem)] lg:overflow-hidden"
         />
       </div>
     </div>
