@@ -4080,3 +4080,13 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `preview/pruefung-hub-r2.html` + `preview/gen-pruefung-hub-r2.mjs` ·
   `preview/gen-pruefung-shared.mjs` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 11 (verbatim):** `for the modul uben - the desktop view should also have a heirarchy for
+  the toggles similar to mobile view`
+  **Response:** the header row split into two rows at every width, so the switcher leads and the
+  scope controls (Mit Zeit / Ohne Zeit, Niveau) sit under it, trailing on a desktop. Sharing one
+  line had given the two the same rank. One trap: inside the header column a flex item stretches, so
+  the two-segment track spanned the whole page (the "switcher too big" shape rejected in s149);
+  `lg:self-start` keeps it content-sized. Re-verified on the built app: 900/900 at 1280x900 on both
+  tabs, 852/852 on the phone.
+- **Artifacts (prompt 11):** `src/features/pruefung/PruefungHub.tsx` · `CLAUDE.md` ·
+  `docs/areas/PRAKTISCH-NAV.md` · this log

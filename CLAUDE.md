@@ -176,7 +176,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
   Verlauf). No HubHero, no `h1`. Niveau is a compact button, not a second pill row, and the scope
-  controls are CENTRED under the switcher on a phone. **Mit Zeit / Ohne Zeit** is one switch beside
+  controls sit BELOW the switcher at EVERY width (centred on a phone, trailing on a desktop, where
+  the switcher stays content-sized). **Mit Zeit / Ohne Zeit** is one switch beside
   it, resting on Ohne Zeit, and it is the ONLY way into the Schreib- and Sprechtrainer
   (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,
   never a fifth block. The run band's timeline connector is one segment per gap, drawn between the

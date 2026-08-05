@@ -39,8 +39,12 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
 
 - **Header:** the two-segment sliding-pill switcher IS the page header (`useSlidingPill`, one
   always-mounted pill). No HubHero, no `h1`. Full width on a phone, content-sized from `lg` up.
-- **Scope controls** sit with it: **centred** under the switcher on a phone, on its line from `lg`
-  up. Niveau is a compact `Niveau B2 ▾` button, NOT a second pill row: the switcher above already
+- **Scope controls** sit BELOW the switcher at every width (founder s189): navigation first, then
+  what it is scoped to. Sharing one line on a desktop gave the two the same rank. Centred on a
+  phone under the full-width switcher, trailing on a desktop where the switcher is content-sized
+  (`lg:self-start`, without which the flex column stretches a two-segment track across the whole
+  page, the shape rejected in s149).
+  Niveau is a compact `Niveau B2 ▾` button, NOT a second pill row: the switcher above already
   owns switcher rank, and two grey tracks stacked before any content read as a heavier header than
   the page they introduce. This replaced the s188 Niveau pill switcher.
 - **Module üben:** the four modules as identical cards, 2×2 on a phone and four across from `lg`.

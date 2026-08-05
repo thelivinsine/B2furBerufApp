@@ -134,9 +134,12 @@ export function PruefungHub() {
       )}
     >
       {/* The switcher IS the page header (no HubHero, no h1), and the scope
-          controls sit with it: centred under it on a phone, on its line from
-          lg up. */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          controls sit BELOW it at every width (founder s189): navigation first,
+          then what it is scoped to. Sharing one line on a desktop gave the two
+          the same rank, which is the hierarchy the phone layout already had
+          right. Centred on a phone under a full-width switcher, trailing on a
+          desktop where the switcher is content-sized and leads from the left. */}
+      <div className="flex flex-col gap-3">
         <TabSwitcher tab={tab} onSelect={selectTab} />
         <div className="flex items-center justify-center gap-2 lg:justify-end">
           {tab === "module" && <ClockSwitcher mode={clock} onSelect={setClock} />}
@@ -184,7 +187,10 @@ function TabSwitcher({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="tablist"
       aria-label="Prüfung"
-      className="relative flex w-full items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft lg:w-auto"
+      // `lg:self-start` is load-bearing: inside the header column a flex item
+      // stretches to the full width, and a two-segment track spanning the whole
+      // page is the "switcher too big" shape that was rejected in s149.
+      className="relative flex w-full items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft lg:w-auto lg:self-start"
     >
       {rect && (
         <motion.span
