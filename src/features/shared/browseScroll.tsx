@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { ArrowUp, Zap } from "lucide-react";
 
 /**
@@ -72,7 +73,10 @@ export function browseHeaderClass(hidden: boolean): string {
  * this AFTER the variant classes so the opaque fills win the merge.
  */
 export const BROWSE_TOOLBAR_BUTTON =
-  "shrink-0 rounded-lg bg-surface shadow-soft hover:bg-muted";
+  // 30px square since s189, a quarter down from 40 (founder: the WHOLE toolbar
+  // row, not just the view switcher). Overrides the `size="icon"` variant, so
+  // it has to come after it in the class list, which `cn()` handles.
+  "h-[1.875rem] w-[1.875rem] shrink-0 rounded-lg bg-surface shadow-soft hover:bg-muted";
 
 /**
  * The filter toggle is the one toolbar button that OPENS an accent rail, so it
@@ -186,5 +190,74 @@ function ScrollTopMobile({ show }: { show: boolean }) {
         </motion.button>
       )}
     </AnimatePresence>
+  );
+}
+
+/**
+ * A horizontally scrolling region that SAYS it scrolls (founder s189: "show a
+ * horizontal scroll wherever applicable in the views all across the bibliothek
+ * to indicate there are more columns to the right").
+ *
+ * A soft fade at whichever edge still has content behind it, and nothing at all
+ * once the region fits or has been scrolled to its end, so the hint is never a
+ * decoration that lies. `pointer-events-none` on the fades keeps the row itself
+ * fully clickable underneath.
+ */
+export function HScrollArea({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [edge, setEdge] = useState({ left: false, right: false });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setEdge({ left: el.scrollLeft > 1, right: max > 1 && el.scrollLeft < max - 1 });
+    };
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    // The column count changes with the filters, not only with the window, so
+    // a ResizeObserver where there is one. jsdom has none, and neither do a few
+    // old mobile browsers, so the window resize is the floor rather than a
+    // crash on mount.
+    const ro =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    if (ro) {
+      ro.observe(el);
+      if (el.firstElementChild) ro.observe(el.firstElementChild);
+    } else {
+      window.addEventListener("resize", measure);
+    }
+    return () => {
+      el.removeEventListener("scroll", measure);
+      if (ro) ro.disconnect();
+      else window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  return (
+    <div className="relative">
+      <div ref={ref} className={cn("overflow-x-auto", className)}>
+        {children}
+      </div>
+      {edge.left && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-px left-px w-8 rounded-l-xl bg-gradient-to-r from-surface to-transparent"
+        />
+      )}
+      {edge.right && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-px right-px w-8 rounded-r-xl bg-gradient-to-l from-surface to-transparent"
+        />
+      )}
+    </div>
   );
 }

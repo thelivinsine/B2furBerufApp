@@ -386,7 +386,7 @@ export function VocabularyTrainer() {
       className={BROWSE_TOOLBAR_BUTTON}
       onClick={toggleSaved}
     >
-      <Bookmark className={cn("h-4 w-4", savedActive && "fill-current")} />
+      <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
     </Button>
   );
 
@@ -407,7 +407,7 @@ export function VocabularyTrainer() {
         })
       }
     >
-      <Search className="h-4 w-4" />
+      <Search className="h-3.5 w-3.5" />
     </Button>
   );
 
@@ -430,7 +430,7 @@ export function VocabularyTrainer() {
       className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
       onClick={() => setFiltersOpen((o) => !o)}
     >
-      <SlidersHorizontal className="h-4 w-4" />
+      <SlidersHorizontal className="h-3.5 w-3.5" />
       {facetCount > 0 && (
         <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
           {facetCount}

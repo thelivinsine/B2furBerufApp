@@ -279,16 +279,26 @@ export function RedemittelTrainer() {
             {/* Content centered in the tile: every card in the grid is the same
                 height (auto-rows-fr), so a short Wendung would otherwise leave a
                 hollow half-card under it. */}
-            <CardContent className="flex h-full flex-col justify-center gap-2 p-4">
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
+            {/* Same anatomy as the Kollokationen card (founder s189: the
+                Redemittel cards "abruptly become bigger in height"): the same
+                `gap`-less stack, the same `mt-2 border-t pt-2` divider and the
+                same `text-sm` example, and the example is capped at two lines
+                so one long Beispiel cannot stretch every card in the grid
+                (`auto-rows-fr` sizes them all to the tallest). */}
+            <CardContent className="flex h-full flex-col justify-center p-4">
+              <div className="flex min-w-0 items-start gap-1.5">
+                <p className="min-w-0 flex-1 text-base font-semibold leading-snug sm:text-lg">
+                  {p.de}
+                </p>
                 <span onClick={(e) => e.stopPropagation()}>
-                  <SpeakButton text={p.de} />
+                  <SpeakButton text={p.de} className="shrink-0" />
                 </span>
               </div>
-              <p className="border-t border-border pt-2 text-xs italic text-muted-foreground">
-                „{p.example.de}"
-              </p>
+              <div className="mt-2 border-t border-border pt-2">
+                <p className="line-clamp-2 text-sm italic text-muted-foreground">
+                  „{p.example.de}"
+                </p>
+              </div>
             </CardContent>
           </Card>
         );
@@ -346,7 +356,7 @@ export function RedemittelTrainer() {
                   className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
                   {activeFilterCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
                       {activeFilterCount}
@@ -393,7 +403,7 @@ export function RedemittelTrainer() {
                     })
                   }
                 >
-                  <Search className="h-4 w-4" />
+                  <Search className="h-3.5 w-3.5" />
                 </Button>
               </motion.div>
             </motion.div>
