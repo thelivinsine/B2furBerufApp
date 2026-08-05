@@ -173,7 +173,11 @@ export function PruefungHub() {
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 sm:gap-5",
+        // The gap here is ONLY between the header block (switcher + scope row)
+        // and the tab's content, and it is deliberately wider than the gaps
+        // inside either (founder s191), so the controls and the tiles read as
+        // two sections rather than one stack of evenly spaced rows.
+        "flex flex-col gap-6 sm:gap-7",
         // Released while a Verlauf is open: an expanded tile needs the page to
         // be able to scroll, which a fixed stage height would forbid.
         !verlaufOpen && "h-page-stage min-h-0",
@@ -487,10 +491,6 @@ function ModuleGrid({
               canOpen ? "card-hover" : "cursor-not-allowed opacity-60",
             )}
           >
-            {/* The module's own hue, breathed into the corner the badge sits in,
-                so the reserved space reads as occupied on purpose. */}
-            {canOpen && <span aria-hidden className={cn("mod-wash", meta.wash)} />}
-
             <span className="relative flex w-full items-start justify-between gap-2">
               <span
                 className={cn(

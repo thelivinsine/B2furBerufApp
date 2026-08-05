@@ -63,11 +63,18 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   a flex child, and auto cross-axis margins make a flex item fall back to its CONTENT width, which
   collapsed the block to 411px.
   **The card (s190, founder pick B "Prüfungstag"):** the mark top-left and a quiet arrow top-right
-  (the card is a button and has to read like one), then the title and what it holds. The module's own
-  hue is breathed into the bottom-right corner (`.mod-wash-*` in `index.css`, 13 % of an already pale
-  hue) and **that corner is RESERVED in both clock states** via the card's bottom padding, so the
-  minutes badge appears and disappears with the switch without moving a single card edge, and a
-  two-line description can never run underneath it. This is where "Einzeln üben" went.
+  (the card is a button and has to read like one), then the title and what it holds. The badge corner
+  is **RESERVED in both clock states** via the card's bottom padding, so the minutes badge appears
+  and disappears with the switch without moving a single card edge, and a two-line description can
+  never run underneath it. This is where "Einzeln üben" went.
+  **No gradient on the card and none on the mark** (founder s191, "get rid of the colored gradient
+  from the tiles"): the s190 corner wash (`.mod-wash-*`) is deleted and `PART_META.tile` is a FLAT
+  tint of the module's hue. The colour still carries the receptive/productive fact, it just carries
+  it as one even wash on a white card. Do not reintroduce either.
+  **The header and the tiles are two sections:** the gap between the header block (switcher + scope
+  row) and the tab's content is deliberately wider than the gaps inside either one (`gap-6 sm:gap-7`
+  against `gap-4 sm:gap-5`, founder s191), so the controls do not read as the first row of an evenly
+  spaced stack.
 - **Mit Zeit / Ohne Zeit** (founder pick "idea 3", s189) is ONE switch beside Niveau, and
   **Ohne Zeit is the resting state**. It is how the free trainers merged INTO the modules rather
   than sitting beside them: Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit `/simulation`,
