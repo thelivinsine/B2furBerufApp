@@ -4090,3 +4090,11 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   tabs, 852/852 on the phone.
 - **Artifacts (prompt 11):** `src/features/pruefung/PruefungHub.tsx` · `CLAUDE.md` ·
   `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 12 (verbatim):** `center align the toggles and buttons in desktop view as well!!!`
+  **Response:** the header column became `items-center`, so on a desktop the switcher and the
+  scope row sit on the page's own axis instead of one leading from the left and the other trailing
+  right. The centring is also what keeps the two-segment track content-sized from `lg` up, so the
+  `lg:self-start` added a moment earlier was removed as redundant. Re-verified: 900/900 desktop,
+  852/852 phone.
+- **Artifacts (prompt 12):** `src/features/pruefung/PruefungHub.tsx` · `CLAUDE.md` ·
+  `docs/areas/PRAKTISCH-NAV.md` · this log
