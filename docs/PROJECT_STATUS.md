@@ -1,6 +1,12 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 190). **A defect session on the Bibliothek, all six items from
+_Last updated: 2026-08-05 (session 191). **The Prüfung module tiles lost their gradients.** The
+founder's screenshot of Module üben, two prompts: the s190 colour treatment (a hue radial across the
+card plus a gradient mark tile) is replaced by a FLAT tint of the same hue, and the gap between the
+header block and the tiles widened to `gap-6 sm:gap-7` so the toggles and the tiles read as two
+sections. Measured in headless Chromium: zero page scroll at 360x640, 393x852 (light + dark) and
+1280x900, and nothing inside `main` carries a background-image any more.
+Prior s190. **A defect session on the Bibliothek, all six items from
 the founder's own screenshots, all measured in a browser rather than guessed.** Five of them trace
 to one change: s189 moved the desktop scroll from the page into the content column.
 **Go to top** was reading `window.scrollY`, which no longer moves on desktop, so the button never
@@ -188,6 +194,27 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 191 (2026-08-05): the Prüfung module tiles went flat (branch
+`claude/remove-tile-gradient-4fcowe`).**
+Two founder prompts against a screenshot of `/anwenden`, Module üben.
+- **"Get rid of the colored gradient from the tiles here."** The cards carried TWO coloured
+  gradients from s190: the hue radial across the whole card (`.mod-wash-*`) and a gradient fill on
+  the mark tile. Both are gone. The wash span, the `wash` field on `PART_META` and the entire
+  `.mod-wash-*` block in `index.css` are deleted, and `tile` is now a flat tint
+  (`bg-emerald-500/15 dark:bg-emerald-400/20`, and the teal / primary / sky pairs). The colour still
+  carries the receptive-vs-productive fact, it just carries it evenly. The badge corner stays
+  reserved by the card's bottom padding, so the clock switch still cannot move a card edge.
+- **"Increase the space below the toggle buttons slightly."** The hub's outer column went
+  `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap sits ONLY between the header block (switcher + scope
+  row) and the tab content, so the toggles and the tiles now read as two sections while the gaps
+  inside each block are untouched.
+**Verified in the real build**, not in a mockup: the CDP driver was rebuilt (Node 22's built-in
+`WebSocket`, no new deps) and `/anwenden` rests at exactly zero page scroll at 360x640, 393x852
+light and dark, and 1280x900, with no element inside `main` carrying a `background-image` any more.
+Gates green: build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
+check:bundle 126.6 kB · check:contrast.
+**Nothing is left open in this zone.**
+
 **Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
 `claude/polish-ui-ux-design-92sbje`).**
 Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
@@ -213,36 +240,3 @@ URL), then implementation verified against the REAL app.
 button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
 surface has to be checked in the real app rather than in a mockup.
 **Nothing is left open in this zone.**
-
-**Handoff after session 190 (2026-08-05): six Bibliothek defects after the internal-scroll change
-(branch `claude/card-transparency-go-to-top-jygye9`).**
-Seven founder prompts, every one a defect report with a screenshot, against what PR #800 shipped the
-day before. No preview round: these were bugs in an already-approved surface, so each was reproduced
-in headless Chromium against the dev server, measured, fixed and re-measured.
-**What shipped:**
-- **`useScrollDirection(root)` + `ScrollTopButton root=`** (`features/shared/browseScroll.tsx`): the
-  hook reads whichever element actually scrolls, and the column only counts while it overflows,
-  which is false below `lg`. This is what brings the desktop go-to-top button back. Placement
-  unchanged and re-measured against the founder's s189 rule: button left edge 1000 px = the rail's
-  left edge, Feedback pill right edge 1256 px = the rail's right edge.
-- **`useEdgeFade` + `.mask-fade-y|-top|-bottom`**: the scroll column fades at whichever vertical edge
-  still has content, instead of slicing a card in half. A mask rather than an overlay, because the
-  page ground is a gradient and a flat overlay would band in light and grey out in dark.
-- **`BROWSE_TOOLBAR_BUTTON_ON`**: the ON state for the search and bookmark toggles, applied after
-  the base class so the fill wins the tailwind-merge. They were white-on-white, i.e. invisible.
-- **`lg:self-start` + `lg:max-h-[calc(100%-3.5rem)]` on all four rails**: content-sized, capped
-  against the stage, and clear of the floating bottom line.
-- **`src/lib/inputMode.ts` (new) + one rule in `index.css`**: the focus ring is keyboard-only.
-- **Redemittel card parity**: front headline capped at 3 lines, every BACK part at 2, each with a
-  `title`. 272 → 188 px against Kollokationen's 195.
-**Audit the founder asked for (prompt 6):** every s189 feedback item re-verified in the browser, not
-read off the log. Live and correct: the Redemittel **Beispiel** column, the horizontal-scroll fades,
-internal scroll with the page unscrollable on all four tabs, the 30 px toolbar row, the
-Feedback/go-to-top docking, the Wörter three-column grid. The only item still open from that list
-was the card-height parity, now closed.
-**Verification:** 1280x900 across all four tabs (rail open + collapsed, search open, mid-scroll) and
-390x844 for the mobile fallback, where the page still scrolls, the button stays centred above the
-Üben bar and no mask applies.
-**Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
-`3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
-moves, the reserve moves with it.

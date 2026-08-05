@@ -4433,3 +4433,29 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   founder verifies the live result. Documentation pass across `PROJECT_STATUS.md`, `DECISIONS.md`,
   `docs/areas/PRAKTISCH-NAV.md`, `CLAUDE.md` and this log.
 - **Artifacts (prompt 4):** PR #801 · `docs/PROJECT_STATUS.md` · this log
+
+## Session 191 — 2026-08-05 — branch `claude/remove-tile-gradient-4fcowe`
+
+- **Prompt 1 (verbatim):** `[screenshot of /anwenden, Module üben] get rid of the colored gradient
+  from the tiles here.`
+  **Response:** the cards carried two coloured gradients from s190, and both are gone. The card's
+  hue radial (`.mod-wash-*` in `index.css`, the span in `ModuleGrid`, the `wash` field on
+  `PART_META`) is deleted outright, and `PART_META.tile` went from an in-family gradient to a flat
+  tint per module (emerald / teal / primary / sky, `/15` light and `/20` dark), so the mark still
+  carries the receptive-vs-productive colour fact without a gradient. The badge corner is still
+  reserved by the card's bottom padding, so the Ohne Zeit / Mit Zeit switch cannot move a card edge.
+- **Prompt 2 (verbatim):** `increse the space below the toggle buttons slightly to subtly
+  differentiate the toggles and tiles sections.`
+  **Response:** the hub's outer column went `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap is only
+  between the header block (switcher + scope row) and the tab content, so the two sections separate
+  while the gaps inside each block (grid ↔ Verlauf, switcher ↔ scope row) stay as they were.
+  **Verification:** the s190 CDP driver was rebuilt in the session scratchpad (Node 22's built-in
+  `WebSocket`, no new deps): seeds `b2beruf.settings.v1`, opens `/anwenden` in the built app and
+  reports `scrollHeight` vs `innerHeight` plus every element inside `main` with a background-image.
+  Zero page scroll at 360x640, 393x852 (light and dark) and 1280x900; the gradient list is empty.
+  Gates green: build · typecheck · lint (0 errors, 77 warnings = the pre-change baseline) ·
+  `test:unit` 558/558 · `check:bundle` 126.6 kB of 400 · `check:contrast`.
+- **Artifacts (prompts 1-2):** `src/features/pruefung/PruefungHub.tsx` ·
+  `src/features/exam/partMeta.ts` · `src/index.css` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` ·
+  this log · commit 8a58e85

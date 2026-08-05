@@ -323,3 +323,37 @@ answerable in the word target, or that the Branche framing convinces someone who
 industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
 audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
 C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
+
+
+**Handoff after session 190 (2026-08-05): six Bibliothek defects after the internal-scroll change
+(branch `claude/card-transparency-go-to-top-jygye9`).**
+Seven founder prompts, every one a defect report with a screenshot, against what PR #800 shipped the
+day before. No preview round: these were bugs in an already-approved surface, so each was reproduced
+in headless Chromium against the dev server, measured, fixed and re-measured.
+**What shipped:**
+- **`useScrollDirection(root)` + `ScrollTopButton root=`** (`features/shared/browseScroll.tsx`): the
+  hook reads whichever element actually scrolls, and the column only counts while it overflows,
+  which is false below `lg`. This is what brings the desktop go-to-top button back. Placement
+  unchanged and re-measured against the founder's s189 rule: button left edge 1000 px = the rail's
+  left edge, Feedback pill right edge 1256 px = the rail's right edge.
+- **`useEdgeFade` + `.mask-fade-y|-top|-bottom`**: the scroll column fades at whichever vertical edge
+  still has content, instead of slicing a card in half. A mask rather than an overlay, because the
+  page ground is a gradient and a flat overlay would band in light and grey out in dark.
+- **`BROWSE_TOOLBAR_BUTTON_ON`**: the ON state for the search and bookmark toggles, applied after
+  the base class so the fill wins the tailwind-merge. They were white-on-white, i.e. invisible.
+- **`lg:self-start` + `lg:max-h-[calc(100%-3.5rem)]` on all four rails**: content-sized, capped
+  against the stage, and clear of the floating bottom line.
+- **`src/lib/inputMode.ts` (new) + one rule in `index.css`**: the focus ring is keyboard-only.
+- **Redemittel card parity**: front headline capped at 3 lines, every BACK part at 2, each with a
+  `title`. 272 → 188 px against Kollokationen's 195.
+**Audit the founder asked for (prompt 6):** every s189 feedback item re-verified in the browser, not
+read off the log. Live and correct: the Redemittel **Beispiel** column, the horizontal-scroll fades,
+internal scroll with the page unscrollable on all four tabs, the 30 px toolbar row, the
+Feedback/go-to-top docking, the Wörter three-column grid. The only item still open from that list
+was the card-height parity, now closed.
+**Verification:** 1280x900 across all four tabs (rail open + collapsed, search open, mid-scroll) and
+390x844 for the mobile fallback, where the page still scrolls, the button stays centred above the
+Üben bar and no mask applies.
+**Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
+`3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
+moves, the reserve moves with it.
