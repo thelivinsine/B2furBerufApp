@@ -11,7 +11,6 @@ export interface NavItem {
   to: string;
   label: string;
   icon: LucideIcon;
-  end?: boolean;
   /** Accent colour used in the bottom tab bar when this tab is active. */
   color: string;
   /** Tinted background for the active pill / icon backdrop. */
@@ -43,7 +42,9 @@ export interface NavItem {
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
 // pairing. The routes are unchanged (/ and /library).
 export const navItems: NavItem[] = [
-  { to: "/",          label: "Praktisch",    icon: Compass,         end: true, color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag" },
+  // No `end` flag any more: which routes belong to which tab is `navZoneOf`'s
+  // job (below), and Home matching only itself is stated there.
+  { to: "/",          label: "Praktisch",    icon: Compass,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag" },
   { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
   // Schreiben had its own tab from 2026-07-22 until s182, when the founder
   // moved it INTO the transfer hub and renamed that hub **Prüfung**: the three
