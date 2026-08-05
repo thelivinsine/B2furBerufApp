@@ -4458,4 +4458,13 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
 - **Artifacts (prompts 1-2):** `src/features/pruefung/PruefungHub.tsx` ·
   `src/features/exam/partMeta.ts` · `src/index.css` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` ·
-  this log · commit 8a58e85
+  this log · **PR #803**, squash-merged as `f0fa0b7`
+- **Prompt 3 (verbatim):** `document the session`
+  **Response:** the documentation pass had already shipped inside PR #803 (`PROJECT_STATUS.md` with
+  the s191 handoff and lead paragraph, the older s190 Bibliothek handoff moved into
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` to hold the ~250-line cap,
+  `docs/areas/PRAKTISCH-NAV.md` for the no-gradient card rule and the section gap, and this log).
+  This pass records the merge itself (PR number and squash SHA, which were not known when the entry
+  was written) and logs this prompt. `CLAUDE.md` needed no edit: it states the reserved badge corner
+  and the shared Prüfung frame, neither of which changed, and it never named the wash.
+- **Artifacts (prompt 3):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md`
