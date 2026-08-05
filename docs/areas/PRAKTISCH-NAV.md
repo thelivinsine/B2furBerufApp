@@ -63,10 +63,15 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   a flex child, and auto cross-axis margins make a flex item fall back to its CONTENT width, which
   collapsed the block to 411px.
   **The card (s190, founder pick B "Prüfungstag"):** the mark top-left and a quiet arrow top-right
-  (the card is a button and has to read like one), then the title and what it holds. The badge corner
-  is **RESERVED in both clock states** via the card's bottom padding, so the minutes badge appears
-  and disappears with the switch without moving a single card edge, and a two-line description can
-  never run underneath it. This is where "Einzeln üben" went.
+  (the card is a button and has to read like one), then the title. The badge corner is **RESERVED in
+  both clock states** via the card's bottom padding, so the minutes badge appears and disappears with
+  the switch without moving a single card edge. This is where "Einzeln üben" went.
+  **There is NO description line** (founder s191, a screenshot of the badge sitting on the text): a
+  24px badge held 12px off the bottom needs more room than the 28px reserve gave it, so with the
+  clock on it overlapped the description on every card. The card names the module, the badge states
+  the minutes, and nothing else has to fit. The ONE line that can still appear is the honest empty
+  state ("Noch keine Inhalte"), which only shows on a card that has no badge, so the two can never
+  collide. `FREE_DESC` went with it; `PART_META.desc` stays, because the Anleitung pages use it.
   **No gradient on the card and none on the mark** (founder s191, "get rid of the colored gradient
   from the tiles"): the s190 corner wash (`.mod-wash-*`) is deleted and `PART_META.tile` is a FLAT
   tint of the module's hue. The colour still carries the receptive/productive fact, it just carries
