@@ -109,8 +109,8 @@ after pulling.
 - **Locked structures** (change only on explicit founder request): the mobile bottom tab bar
   (structure, edit mode, icon rules — `docs/areas/PRAKTISCH-NAV.md`), the dialog/overlay recipe
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
-  lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the grey-tile/white-controls
-  FilterRail answer, the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
+  lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the Himmelblau-fill/white-controls
+  FilterRail answer (s189; it was grey from s104 to s189), the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
   `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
   Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
   `docs/areas/SCHREIBEN.md`).

@@ -115,7 +115,13 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   `max-h-[45dvh]` as a flex column (fixed header + one internal scroll region). Üben + word count
   are a sticky bottom action bar (full-bleed, `sticky bottom-[nav]`, backdrop-blur, after the
   content).
-- **Tile look:** subtle grey `bg-muted` (the ViewSwitcher-track shade), controls INSIDE white
+- **Tile look:** the Himmelblau wash (`bg-accent/20`, dark `bg-accent/10`) with the border in the
+  fill's own colour and `shadow-soft` doing the separating, i.e. byte-for-byte the Schreiben
+  "Aufgabe wählen" rail (founder s189: "apply the same blue shade from the Schreiben Aufgabe wählen
+  rail to the filter rails and filter button"). It was grey `bg-muted` from s104 until then. Header
+  and Üben footer strips carry the same wash and their dividers are tinted `border-accent-ink/10`,
+  never neutral grey. The filter TOGGLE wears the same fill (`BROWSE_FILTER_BUTTON`), never brand
+  blue, which would compete with the Üben CTA beside it. Controls INSIDE stay white
   (`bg-surface` dropdown triggers; unselected facet pills `bg-surface`). This grey-tile/
   white-controls split is the settled answer after multiple flip-flops — do not re-litigate
   (white-on-white was too low contrast; a flat `bg-border` slab read ugly).

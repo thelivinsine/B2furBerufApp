@@ -17,6 +17,7 @@ import {
   browseHeaderClass,
   ScrollTopButton,
   UebenLabel,
+  BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
 } from "@/features/shared/browseScroll";
 import { cn } from "@/lib/utils";
@@ -170,12 +171,12 @@ export function GrammarHub() {
               <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 <Button
                   size="icon"
-                  variant={filtersOpen ? "default" : "outline"}
+                  variant="accent"
                   aria-pressed={filtersOpen}
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
+                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />

@@ -4139,3 +4139,23 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompts 15-16):** `preview/filterrail-height.html` +
   `preview/gen-filterrail-height.mjs` · `src/index.css` · 10 feature files with hand-written focus
   rings on text fields · `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 17 (verbatim):** `The option a is fine for now. Can you apply the same blue shade from
+  the shcreiben aufgabe wahlen rail to the filter rails and filter button? Also, the buttons on the
+  bottom on mobile view should be in same positions and design as schreiben aufgabe walhen - they
+  should float with no background and on same position with a disclaimer below the buttons.`
+  **Response, parts 1 and 2 (shipped):** the filter cap stays at 45dvh, and both FilterRail layouts
+  (desktop tile, mobile panel), their header and Üben footer strips and all four filter toggles now
+  wear the Schreiben rail's Himmelblau fill, with dividers tinted `border-accent-ink/10` and the
+  border in the fill's own colour. This SUPERSEDES the grey `bg-muted` tile of s104, which is now
+  recorded as such in CLAUDE.md, the `/design` skill and `docs/areas/BIBLIOTHEK.md`; the surviving
+  half of s104 is that the controls inside stay white. The toggle needed a separate class constant
+  (`BROWSE_FILTER_BUTTON`) because `BROWSE_TOOLBAR_BUTTON` ends in `bg-surface`, which wins the
+  tailwind-merge against the `accent` variant.
+  **Part 3 (asked, not guessed):** the Schreiben cluster's lower line is the EU AI Act Art. 50
+  disclaimer, and the Bibliothek has no AI on that screen, so "a disclaimer below the buttons" has no
+  obvious content there. Put to the founder rather than invented.
+- **Artifacts (prompt 17):** `src/features/shared/FilterRail.tsx` ·
+  `src/features/shared/browseScroll.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `CLAUDE.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/areas/BIBLIOTHEK.md` · `docs/DECISIONS.md` · this log

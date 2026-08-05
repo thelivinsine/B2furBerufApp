@@ -109,9 +109,11 @@ Ranked by how often the founder had to correct AI output:
   blue wash). Fix tiles and result chips keep their accent edge: they are content, not rails.
 - **White `bg-surface` cards** for content, with `border-border` + `shadow-soft`. AI output cards
   are white, never a grey wash.
-- **Grey `bg-muted`** only as recessed chrome: the Bibliothek FilterRail tile, switcher tracks,
-  with WHITE controls inside so they pop (this exact grey-tile/white-controls split was settled
-  after multiple flip-flops, s104; do not re-litigate).
+- **Grey `bg-muted`** only as recessed chrome: switcher tracks and the like, with WHITE controls
+  inside so they pop. The Bibliothek FilterRail LEFT this group in s189: it now wears the same
+  Himmelblau fill as the Schreiben "Aufgabe wählen" rail, because the two rails do the same job, and
+  so does every filter toggle that opens one (`BROWSE_FILTER_BUTTON`). Controls inside stay white
+  either way, which is the part of the s104 answer that survived.
 - **Green `--success`**: strictly "correct/detected". Green dot = detected fact, green underline =
   the fix, green badge = done. Never decoration.
 - **Koralle `--reward`**: error marks in Fokus, loot/combo/streak celebration. Never on buildings,
@@ -230,8 +232,9 @@ marks at full opacity. Structure is locked; don't touch without an explicit foun
 
 ## 7. Landmines (shipped-then-reverted; do NOT reintroduce)
 
-- White filter tile (reverted to grey `bg-muted`, s104) and, equally, grey slab rails on Schreiben
-  (must be Himmelblau, s149).
+- White filter tile (reverted, s104): the FilterRail is a FILL, never white. Which fill changed in
+  s189 (grey → Himmelblau, matching Schreiben); the "never white, controls stay white" part holds.
+  Grey slab rails on Schreiben stay rejected (must be Himmelblau, s149).
 - Gold/reward color on domain-building windows (lit = white, s65).
 - Full-column-width 4-label switchers ("too big", s149) and fully-round toggles/pills (s154).
 - Accent-blue nav labels ("not premium", s141); butter yellow as layout chrome (s140).

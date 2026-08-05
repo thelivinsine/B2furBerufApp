@@ -1502,3 +1502,16 @@ that path may set `overscroll-behavior: contain`. The non-obvious failure found 
 `scrollIntoView` knows nothing about a sticky header or a fixed bottom bar, so without
 `scroll-mt-*`/`scroll-mb-*` the tile scrolls flush to the viewport edge and parks its own lower
 border underneath the tab bar, which is exactly the thing the rule exists to prevent.
+
+## s189 — the filter rail speaks the Schreiben rail's colour
+
+The Bibliothek FilterRail was grey (`bg-muted`) from s104, when a white tile was tried and reverted;
+the Schreiben "Aufgabe wählen" rail went Himmelblau in s149. Two rails doing the same job in two
+colours. The founder closed it in s189 ("apply the same blue shade from the Schreiben Aufgabe wählen
+rail to the filter rails and filter button"), so the filter rail, its header and footer strips, and
+every toggle that opens one now wear the accent fill. What survives from s104 is the part that was
+actually load-bearing: the controls inside the tile stay white, so they pop off the fill.
+
+The toggle needed one extra step: `BROWSE_TOOLBAR_BUTTON` ends in `bg-surface`, which wins the
+tailwind-merge against the `accent` button variant, so the fill is a separate class constant applied
+after it (`BROWSE_FILTER_BUTTON`).

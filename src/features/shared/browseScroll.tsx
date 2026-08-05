@@ -75,6 +75,16 @@ export const BROWSE_TOOLBAR_BUTTON =
   "shrink-0 rounded-lg bg-surface shadow-soft hover:bg-muted";
 
 /**
+ * The filter toggle is the one toolbar button that OPENS an accent rail, so it
+ * wears that rail's own Himmelblau fill rather than the white toolbar surface
+ * (founder s189; the same rule the Schreiben "Aufgabe wählen" toggle follows,
+ * s166). It has to come AFTER `BROWSE_TOOLBAR_BUTTON` in a `cn()` call, whose
+ * `bg-surface` would otherwise win the merge.
+ */
+export const BROWSE_FILTER_BUTTON =
+  "border-accent/35 bg-accent/35 text-accent-ink shadow-soft hover:border-accent/50 hover:bg-accent/50 dark:border-accent/[0.18] dark:bg-accent/[0.18] dark:hover:border-accent/[0.28] dark:hover:bg-accent/[0.28]";
+
+/**
  * Contents for the Bibliothek "Üben" button (founder 2026-07-13): the label is
  * centered in the button and the bolt icon floats to its left without shifting
  * the label off-center. The span is what the button's `justify-center` centers;
