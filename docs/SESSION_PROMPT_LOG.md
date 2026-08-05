@@ -4141,3 +4141,26 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompt 1):** `preview/gen-pruefung-polish.mjs` · `preview/pruefung-polish.html` ·
   `preview/pruefung-polish-artifact.html` (artifact
   https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04) · this log
+- **Prompt 2 (verbatim):** `I like option B overall but in the modul uben, the mit Zeit's badges should
+  not affect the size of the cards, they should rather appear on the bottom right of the cards where
+  there is empty space. Also, the verlauf section proposed in option B should be available in module
+  uben - adapt and build it for modul uben if it requires additional stuff. In case of modelltest
+  verlauf, I like the bester, letzter KPIs but it needs better visualization. By keeping this in mind,
+  provie me new set of previews`
+  **Response:** round 2 (`preview/pruefung-polish-r2.html`, artifact redeployed to the same URL). B is
+  locked; only the three asks carry options. **The card:** the minutes badge is absolutely placed in
+  the corner the colour wash already occupies and that corner is RESERVED in both clock states, so the
+  card has one height whether the clock is on or off, and a two-line description on a phone can never
+  run under the badge. **Modelltest Verlauf, three visualisations** (all keep Letzter/Bester/Bestanden,
+  none uses the three flat cells): V1 "Im Diagramm" (the chart carries the labels), V2 "Zahl und Kurve"
+  (display figure + delta, chart beside it), V3 "Ring und Punkte" (a gradient ring with the 60 % pass
+  tick, a meter for Bester, one dot per run for Bestanden). Sample data changed so the best run (82 %)
+  is not the last (78 %). **Module üben Verlauf, three shapes:** M1 "Vier Trends" (one row per module
+  with a colour-coded spark and the last score), M2 "Chronik" (the Modelltest card's shape, bars
+  coloured per module), M3 "Stärkeprofil" (four columns, pale = first attempt, solid = the gain since).
+  The one data addition all three need is stated in the preview: a small local last-practised stamp per
+  module written by all four surfaces, because the untimed trainers' results live in the cloud writing
+  history the hub must not fetch. Every one of the nine V/M combinations was measured at exactly
+  668 of the 668px a 393x852 phone leaves, in both clock states, so no combination scrolls at rest.
+- **Artifacts (prompt 2):** `preview/gen-pruefung-polish-r2.mjs` · `preview/pruefung-polish-r2.html` ·
+  `preview/pruefung-polish-artifact.html` (same artifact URL as round 1) · this log
