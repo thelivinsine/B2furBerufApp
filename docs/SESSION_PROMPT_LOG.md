@@ -4118,3 +4118,26 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   Merging `main` triggers the two deploy workflows; no migrations and no Edge Function changes are
   in this PR, so only the Pages deploy matters. The founder verifies the live result.
 - **Artifacts (prompt 14):** PR #799 · `docs/PROJECT_STATUS.md` · this log
+
+## Session 190 · 2026-08-05 · branch `claude/polish-ui-ux-design-92sbje`
+
+- **Prompt 1 (verbatim):** `These pages are okay at the moment but they still look cheap or like MVP.
+  I want them to look highly polished, excellent UI/UX, like a billion dollar edu tech app developed
+  by some of the best experts in the world known for front end design. Do a thorough analysis of the
+  current state and suggest improvements along with a few previews` (with two desktop screenshots of
+  `/anwenden`: the Modelltest tab and the Module üben tab)
+  **Response:** analysis first, no app code touched. Twelve findings across composition, content and
+  craft, the load-bearing ones being that the two tabs do not share a page width (Module üben caps at
+  896px, Modelltest runs the full 1152px column), that the desktop run band is a phone row stretched
+  over ~430px of hairline per gap, that "Ohne Uhr" is printed four times under a switch that already
+  says "Ohne Zeit", that the exam's total length is never stated, and that a first visit renders a
+  KPI row of three dashes. Three options previewed, each with desktop + phone frames for both tabs
+  and a light/dark and Ohne Zeit/Mit Zeit switch: **A "Verdichtet"** (mark, title and the affordance
+  on one line, no foot row, the card loses a third of its height), **B "Prüfungstag"** (the band
+  becomes a two-column ticket with the total as a display number and the four Teile as a ladder;
+  Verlauf leads with a development strip against the pass line; module cards get a corner wash in
+  their own hue) and **C "Bereit"** (a practice meter and a last-practised line per module card, a
+  recency line under the CTA). Seven fixes are shared by all three. Awaiting the founder's pick.
+- **Artifacts (prompt 1):** `preview/gen-pruefung-polish.mjs` · `preview/pruefung-polish.html` ·
+  `preview/pruefung-polish-artifact.html` (artifact
+  https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04) · this log
