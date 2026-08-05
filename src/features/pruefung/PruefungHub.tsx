@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, ChevronDown, Clock, Play, TimerOff } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Clock, Play, TrendingUp } from "lucide-react";
 import {
   HUB_LEVELS,
   MOCK_PART_ORDER,
@@ -26,27 +26,26 @@ import { PART_META } from "@/features/exam/partMeta";
 import { MockExamRunner } from "@/features/exam/MockExamRunner";
 
 /**
- * The Prüfung zone, one page (redesign s189).
+ * The Prüfung zone, one page (redesign s189, polished s190).
  *
- * It replaces two pages: the card hub that used to sit at `/anwenden`, and the
- * Modelltest page behind one of its cards. The header is now a two-segment
- * sliding-pill switcher in the Bibliothek's own language (founder: "insert a
- * toggle in place of the current header, similar to Bibliothek"), and the two
- * segments are the two ways to work:
+ * Two segments, both in the SAME 896px centred frame so switching tabs never
+ * changes the page's width:
  *
- *   Module üben  the four exam modules, each with what it holds and how long
- *                it takes. This is where the old "Einzeln üben" rows went.
- *   Modelltest   the complete run and the record of past runs, nothing else.
+ *   Module üben  the four exam modules as cards, then a Verlauf that reads as a
+ *                strength profile across the four (founder pick M3).
+ *   Modelltest   the complete run as a "ticket" band, then a Verlauf led by the
+ *                last score with the run history beside it (founder pick V2).
  *
- * The free Schreib- and Sprechtrainer are no longer a separate block: they are
- * what the SAME four modules do in "Ohne Zeit" (founder pick, idea 3), so the
- * clock is the only difference between practising and sitting the module, and
- * it is one switch the learner sets once. Ohne Zeit is the resting state.
+ * The free Schreib- and Sprechtrainer are what the SAME four modules do in
+ * "Ohne Zeit" (founder s189), so the clock is the only difference between
+ * practising and sitting the module, and it is one switch set once. Ohne Zeit is
+ * the resting state, and the minutes badge it hides has its corner RESERVED, so
+ * throwing that switch cannot move a card edge.
  *
  * Neither tab scrolls at rest: the page is sized to `h-page-stage` and the
- * elastic regions give up their room rather than push past one screen. The one
- * thing that may grow is Verlauf, and only when the learner opens it
- * (`useStagePanel`, the app-wide expand rule).
+ * elastic regions give up their room rather than push past one screen. What may
+ * grow is a Verlauf, and only when the learner opens it (`useStagePanel`, the
+ * app-wide expand rule).
  */
 
 type Tab = "module" | "modelltest";
@@ -57,8 +56,11 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "modelltest", label: "Modelltest" },
 ];
 
-/** Runs listed before the learner asks for the rest. */
+/** Runs listed before the learner asks for the rest (desktop; a phone rests at 0). */
 const VERLAUF_REST_ROWS = 3;
+
+/** How many past runs the development chart plots. */
+const CHART_RUNS = 7;
 
 /** Where a module goes when it is started without a clock. */
 const FREE_ROUTE: Partial<Record<MockPartId, string>> = {
@@ -72,6 +74,29 @@ const FREE_DESC: Partial<Record<MockPartId, string>> = {
   sprechen: "Dialoge mit Coaching",
 };
 
+const TOTAL_MINUTES = MOCK_PART_ORDER.reduce((n, p) => n + PART_MINUTES[p], 0);
+
+/* --------------------------------- records -------------------------------- */
+
+/** One practice of ONE module, derived from the runs that sat a single part. */
+export interface ModulePractice {
+  id: string;
+  date: string;
+  part: MockPartId;
+  pct: number | null;
+}
+
+/** A run that sat every part is a Modelltest; anything shorter is practice. */
+export function isFullRun(record: MockExamRecord): boolean {
+  return MOCK_PART_ORDER.every((p) => p in record.parts);
+}
+
+export function toPractice(record: MockExamRecord): ModulePractice | null {
+  const part = MOCK_PART_ORDER.find((p) => p in record.parts);
+  if (!part) return null;
+  return { id: record.id, date: record.date, part, pct: record.parts[part] ?? null };
+}
+
 export function PruefungHub() {
   const run = useExamStore((s) => s.run);
   const start = useExamStore((s) => s.start);
@@ -80,6 +105,7 @@ export function PruefungHub() {
   const mockExams = useProgressStore((s) => s.mockExams);
   const settingsLevel = useSettingsStore((s) => s.level);
   const examDate = useSettingsStore((s) => s.examDate);
+  const reduce = useReducedMotion();
 
   const tab: Tab = params.get("tab") === "modelltest" ? "modelltest" : "module";
   const [level, setLevel] = useState<HubLevel>(() =>
@@ -96,7 +122,17 @@ export function PruefungHub() {
 
   const avail = mockExamAvailability(level);
   const servable = level !== "A2";
-  const runs = mockExams.filter((m) => m.level === level).slice().reverse();
+
+  const scoped = mockExams.filter((m) => m.level === level);
+  // Newest first, and the two lists are disjoint: a Modelltest is a run that sat
+  // all four parts, a practice is a run that sat one. Before s190 both landed in
+  // the same list, so a single Lesen drill counted as a Modelltest result.
+  const runs = scoped.filter(isFullRun).slice().reverse();
+  const practice = scoped
+    .filter((m) => !isFullRun(m))
+    .map(toPractice)
+    .filter((p): p is ModulePractice => p !== null)
+    .reverse();
 
   const partCount = (part: MockPartId) =>
     part === "lesen"
@@ -124,12 +160,22 @@ export function PruefungHub() {
     setVerlaufOpen(false);
   };
 
+  // Same directional slide the Bibliothek uses (popLayout, 0.15s), so a tab
+  // switch here reads as the same gesture as a tab switch there.
+  const dir = tab === "module" ? -1 : 1;
+  const shift = reduce ? 0 : 24;
+  const slide = {
+    enter: (d: number) => ({ opacity: 0, x: d >= 0 ? shift : -shift }),
+    center: { opacity: 1, x: 0 },
+    exit: (d: number) => ({ opacity: 0, x: d >= 0 ? -shift : shift }),
+  };
+
   return (
     <div
       className={cn(
         "flex flex-col gap-4 sm:gap-5",
-        // Released while Verlauf is open: an expanded tile needs the page to be
-        // able to scroll, which a fixed stage height would forbid.
+        // Released while a Verlauf is open: an expanded tile needs the page to
+        // be able to scroll, which a fixed stage height would forbid.
         !verlaufOpen && "h-page-stage min-h-0",
       )}
     >
@@ -138,33 +184,63 @@ export function PruefungHub() {
           then what it is scoped to. Both are CENTRED at every width, desktop
           included, so the header reads as one stacked block on its own axis
           rather than two controls pushed to opposite edges. */}
-      <div className="flex flex-col items-center gap-3">
+      <div className="mx-auto flex w-full flex-col items-center gap-3 lg:max-w-4xl">
         <TabSwitcher tab={tab} onSelect={selectTab} />
-        <div className="flex items-center justify-center gap-2">
+        {/* Fixed height: the Modelltest tab hides the clock switch, and without
+            it the row would change height and shift the page on every switch. */}
+        <div className="flex h-9 items-center justify-center gap-2">
           {tab === "module" && <ClockSwitcher mode={clock} onSelect={setClock} />}
           <LevelSelect level={level} onSelect={setLevel} />
         </div>
       </div>
 
-      {tab === "module" ? (
-        <ModuleGrid
-          clock={clock}
-          servable={servable}
-          countFor={partCount}
-          onOpen={openModule}
-        />
-      ) : (
-        <>
-          <RunBand
-            examDate={examDate}
-            canStart={servable && avail.complete}
-            onStart={() => start(level as MockExamLevel)}
-          />
-          {runs.length > 0 && (
-            <Verlauf runs={runs} open={verlaufOpen} onToggle={() => setVerlaufOpen((v) => !v)} />
-          )}
-        </>
-      )}
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <AnimatePresence mode="popLayout" custom={dir} initial={false}>
+          <motion.div
+            key={tab}
+            custom={dir}
+            variants={slide}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: reduce ? 0 : 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5 lg:max-w-4xl"
+          >
+            {tab === "module" ? (
+              <>
+                <ModuleGrid
+                  clock={clock}
+                  servable={servable}
+                  countFor={partCount}
+                  onOpen={openModule}
+                />
+                {practice.length > 0 && (
+                  <ModuleVerlauf
+                    practice={practice}
+                    open={verlaufOpen}
+                    onToggle={() => setVerlaufOpen((v) => !v)}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <RunBand
+                  examDate={examDate}
+                  canStart={servable && avail.complete}
+                  onStart={() => start(level as MockExamLevel)}
+                />
+                {runs.length > 0 && (
+                  <RunVerlauf
+                    runs={runs}
+                    open={verlaufOpen}
+                    onToggle={() => setVerlaufOpen((v) => !v)}
+                  />
+                )}
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -189,7 +265,7 @@ function TabSwitcher({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }
       // The column is `items-center`, so from lg up the track sizes to its two
       // labels instead of stretching across the page, which is the "switcher
       // too big" shape rejected in s149. Full width on a phone.
-      className="relative flex w-full items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft lg:w-auto"
+      className="relative flex w-full max-w-sm items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft lg:w-auto lg:max-w-none"
     >
       {rect && (
         <motion.span
@@ -245,7 +321,7 @@ function ClockSwitcher({
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="group"
       aria-label="Zeit"
-      className="relative flex items-stretch gap-0.5 rounded-lg border border-border bg-muted p-0.5 shadow-soft"
+      className="relative flex h-9 items-stretch gap-0.5 rounded-lg border border-border bg-muted p-0.5 shadow-soft"
     >
       {rect && (
         <motion.span
@@ -266,7 +342,7 @@ function ClockSwitcher({
             aria-pressed={active}
             onClick={() => onSelect(m)}
             className={cn(
-              "relative z-10 whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold transition-colors",
+              "relative z-10 whitespace-nowrap rounded-md px-2.5 text-xs font-semibold transition-colors",
               active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -382,13 +458,8 @@ function ModuleGrid({
 }) {
   return (
     // 2x2 at EVERY width (founder s189): four across a 1152px column left the
-    // cards narrow and cramped against all that empty page. The block is capped
-    // and centred on a desktop, where the cards also grow their own padding,
-    // mark and title rather than being stretched into voids.
-    // `lg:w-full` is not redundant next to `lg:max-w-4xl`: this grid is a flex
-    // child, and auto cross-axis margins make a flex item fall back to its
-    // CONTENT width, which collapsed the block to 411px instead of 896.
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:mx-auto lg:w-full lg:max-w-4xl lg:gap-6">
+    // cards narrow and cramped against all that empty page.
+    <div className="grid flex-none grid-cols-2 gap-3 sm:gap-4">
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
@@ -409,37 +480,43 @@ function ModuleGrid({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.16), duration: 0.16 }}
             className={cn(
-              "flex flex-col items-start rounded-lg border border-border bg-surface p-4 text-left shadow-soft transition-transform sm:p-5 lg:p-6",
+              // The bottom padding RESERVES the minutes badge's corner in both
+              // clock states, so throwing the switch cannot move a card edge and
+              // a two-line description can never run underneath the badge.
+              "relative flex min-h-[8rem] flex-col items-start overflow-hidden rounded-xl border border-border bg-surface p-4 pb-[1.75rem] text-left shadow-soft transition-transform sm:min-h-[9rem] sm:p-5 sm:pb-9",
               canOpen ? "card-hover" : "cursor-not-allowed opacity-60",
             )}
           >
-            <span
-              className={cn(
-                "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl lg:h-16 lg:w-16 lg:rounded-2xl",
-                meta.tile,
+            {/* The module's own hue, breathed into the corner the badge sits in,
+                so the reserved space reads as occupied on purpose. */}
+            {canOpen && <span aria-hidden className={cn("mod-wash", meta.wash)} />}
+
+            <span className="relative flex w-full items-start justify-between gap-2">
+              <span
+                className={cn(
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12",
+                  meta.tile,
+                )}
+              >
+                <Icon className={cn("h-5 w-5 sm:h-[1.375rem] sm:w-[1.375rem]", meta.ink)} />
+              </span>
+              {canOpen && (
+                <span className="mod-go">
+                  <ArrowRight className="h-[0.9375rem] w-[0.9375rem]" />
+                </span>
               )}
-            >
-              <Icon className={cn("h-7 w-7 lg:h-8 lg:w-8", meta.ink)} />
             </span>
-            <span className="mt-3.5 text-lg font-semibold leading-tight lg:mt-4 lg:text-xl">
+
+            <span className="relative mt-2.5 text-base font-bold leading-tight tracking-[-0.015em] sm:mt-3 sm:text-xl">
               {PART_LABEL[part]}
             </span>
-            <span className="mt-1.5 text-[13px] leading-snug text-muted-foreground lg:text-sm">
+            <span className="relative mt-1 text-[12.5px] leading-snug text-muted-foreground sm:text-sm">
               {canOpen ? desc : "Noch keine Inhalte"}
             </span>
-            {canOpen && (
-              <span className="mt-auto flex w-full items-center pt-4 lg:pt-5">
-                <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
-                  {free ? (
-                    <>
-                      <TimerOff className="h-3.5 w-3.5" /> Ohne Uhr
-                    </>
-                  ) : (
-                    <>
-                      <Clock className="h-3.5 w-3.5" /> {PART_MINUTES[part]} Min
-                    </>
-                  )}
-                </span>
+
+            {canOpen && !free && (
+              <span className="absolute bottom-3 right-4 z-[1] inline-flex items-center gap-1 rounded-md bg-muted/85 px-2 py-[3px] text-xs font-semibold tabular-nums text-muted-foreground sm:bottom-4 sm:right-5">
+                <Clock className="h-3 w-3" /> {PART_MINUTES[part]} Min
               </span>
             )}
           </motion.button>
@@ -451,6 +528,12 @@ function ModuleGrid({
 
 /* -------------------------------- Modelltest ------------------------------ */
 
+/**
+ * The complete run. On a desktop it is a two-column ticket (founder pick B/V2
+ * round): the commitment as a display number with the countdown and the CTA on
+ * the left, the four Teile as a connected ladder on the right. A phone keeps the
+ * stacked band, because the ticket is a composition for width, not for height.
+ */
 function RunBand({
   examDate,
   canStart,
@@ -460,29 +543,52 @@ function RunBand({
   canStart: boolean;
   onStart: () => void;
 }) {
+  const cta = canStart ? (
+    <Button variant="gradient" className="w-full sm:w-auto" onClick={onStart}>
+      <Play className="h-4 w-4" /> Prüfung starten
+    </Button>
+  ) : (
+    <span className="text-sm text-muted-foreground">Noch keine Inhalte</span>
+  );
+
   return (
-    <Card className="flex flex-1 flex-col p-4 sm:p-5 lg:flex-none">
-      <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-3">
-        <p className="text-eyebrow text-muted-foreground">Komplette Prüfung</p>
+    <Card className="flex flex-1 flex-col overflow-hidden sm:flex-none lg:grid lg:grid-cols-[minmax(0,1fr)_1px_18.5rem]">
+      {/* Desktop: the left half of the ticket. Phone/tablet: the whole band. */}
+      <div className="flex flex-1 flex-col p-4 sm:p-5 lg:items-start lg:p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 lg:block">
+          <p className="text-eyebrow text-muted-foreground">Komplette Prüfung</p>
+          {/* The total is stated ONCE. On a desktop it is the display figure the
+              ticket leads with; below lg it is the quiet fact beside the eyebrow,
+              because there the four Teile are already a full-width timeline. */}
+          <p className="text-sm tabular-nums text-muted-foreground lg:hidden">
+            <span className="font-bold text-foreground">{TOTAL_MINUTES} Min</span> gesamt
+          </p>
+          <p className="hidden text-display text-[2.875rem] leading-none tabular-nums lg:mt-3 lg:block">
+            {TOTAL_MINUTES}
+            <span className="ml-1.5 text-[1.1875rem] font-bold text-muted-foreground">Min</span>
+          </p>
+          <p className="hidden text-sm text-muted-foreground lg:mt-2 lg:block">
+            Vier Teile am Stück, wie am Prüfungstag
+          </p>
+        </div>
+
         <ExamCountdown examDate={examDate} />
+
+        {/* Below lg the timeline lives in the band; from lg up it is the ticket's
+            right column, so this copy is hidden rather than duplicated. */}
+        <div className="flex flex-1 flex-col justify-center lg:hidden">
+          <PartTrack />
+        </div>
+
+        <div className="mt-4 flex items-center justify-center sm:mt-5 lg:mt-auto lg:justify-start lg:pt-5">
+          {cta}
+        </div>
       </div>
 
-      {/* Centred in whatever room the band gains, so the CTA sits low enough to
-          reach with a thumb without the timeline drifting off its own line. */}
-      <div className="flex flex-1 flex-col justify-center">
-        <PartTrack />
-      </div>
+      <div aria-hidden className="hidden bg-border lg:block" />
 
-      {/* No divider above the CTA and the button centred (founder s189): the
-          rule cut the band in two, and the run is one thing. */}
-      <div className="mt-5 flex items-center justify-center">
-        {canStart ? (
-          <Button variant="gradient" className="w-full sm:w-auto" onClick={onStart}>
-            <Play className="h-4 w-4" /> Prüfung starten
-          </Button>
-        ) : (
-          <span className="text-sm text-muted-foreground">Noch keine Inhalte</span>
-        )}
+      <div className="hidden flex-col justify-center p-5 lg:flex">
+        <PartLadder />
       </div>
     </Card>
   );
@@ -492,11 +598,12 @@ function RunBand({
  * The four modules in exam order, connected. The connector is ONE SEGMENT PER
  * GAP, drawn from the edge of one tile to the edge of the next (founder s189):
  * the single full-width line it replaced ran behind the marks and read as if it
- * crossed them.
+ * crossed them. Capped and centred so four 44px marks read as one sequence
+ * instead of four islands stranded across a wide card.
  */
 function PartTrack() {
   return (
-    <div className="mt-3.5 flex items-start justify-between">
+    <div className="mx-auto mt-3.5 flex w-full max-w-[35rem] items-start justify-between">
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
@@ -527,6 +634,40 @@ function PartTrack() {
   );
 }
 
+/** The same four parts as the ticket's right column: a vertical ladder. */
+function PartLadder() {
+  return (
+    <div className="flex flex-col">
+      {MOCK_PART_ORDER.map((part, i) => {
+        const meta = PART_META[part];
+        const Icon = meta.icon;
+        return (
+          <div key={part} className="relative flex items-center gap-3 py-1.5">
+            {i < MOCK_PART_ORDER.length - 1 && (
+              <span
+                aria-hidden
+                className="absolute left-[1.0625rem] top-[calc(50%+19px)] h-[calc(100%-38px)] w-0.5 rounded-full bg-border"
+              />
+            )}
+            <span
+              className={cn(
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                meta.tile,
+              )}
+            >
+              <Icon className={cn("h-[1.0625rem] w-[1.0625rem]", meta.ink)} />
+            </span>
+            <span className="text-sm font-semibold">{PART_LABEL[part]}</span>
+            <span className="ml-auto text-xs tabular-nums text-muted-foreground">
+              {PART_MINUTES[part]} Min
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /**
  * The countdown lives on the page it belongs to, and retires itself once the
  * date has passed, so it can never sit at "0 Tage" forever.
@@ -538,7 +679,7 @@ function ExamCountdown({ examDate }: { examDate: string | null }) {
     new Date(`${examDate}T00:00:00`),
   );
   return (
-    <span className="inline-flex items-center gap-1.5 text-sm tabular-nums text-muted-foreground">
+    <span className="mt-2 inline-flex items-center gap-1.5 text-sm tabular-nums text-muted-foreground lg:mt-2.5">
       <Clock className="h-3.5 w-3.5 shrink-0" />
       {days === 0 ? "Heute ist Prüfungstag" : `Noch ${days} Tage bis zum ${label}`}
     </span>
@@ -548,28 +689,38 @@ function ExamCountdown({ examDate }: { examDate: string | null }) {
 /* --------------------------------- Verlauf -------------------------------- */
 
 /**
- * The one place a past result is shown (founder s188), reworked in s189: it
- * RESTS OPEN, leading with three figures and then the newest runs, and hands
- * the rest to a button at its foot. Opening that is what allows the page to
- * grow past one screen, and the tile then obeys the app-wide expand rule
- * (`useStagePanel`): never taller than the screen, its own list scrolling
- * inside, the scroll handed on to the page at the top of that list.
+ * The shell every Verlauf shares: one card, one expandable list, one rule.
+ *
+ * `split` puts the summary and the list SIDE BY SIDE from lg up. The Module tab
+ * needs it: a 2x2 grid, a four-column profile and a list stacked come to 930px,
+ * which scrolls a 900px laptop on a page that is supposed to rest. Side by side
+ * they come to 750px, and the card stops wasting the 400px of width the profile
+ * does not use. The Modelltest tab's summary is already a left/right
+ * composition and its page fits, so it stays stacked.
  */
-function Verlauf({
-  runs,
+function VerlaufCard({
+  count,
   open,
   onToggle,
+  head,
+  rows,
+  restRows,
+  moreLabel,
+  split = false,
 }: {
-  runs: MockExamRecord[];
+  count: string;
   open: boolean;
   onToggle: () => void;
+  head: React.ReactNode;
+  rows: React.ReactNode[];
+  restRows: number;
+  moreLabel: string;
+  split?: boolean;
 }) {
   const panelRef = useStagePanel<HTMLDivElement>(open);
-  const scored = useMemo(() => runs.filter((r) => r.total != null), [runs]);
-  const best = scored.length ? Math.max(...scored.map((r) => r.total as number)) : null;
-  const passed = scored.filter((r) => (r.total as number) >= PASS_PCT).length;
-  const shown = open ? runs : runs.slice(0, VERLAUF_REST_ROWS);
-  const rest = runs.length - shown.length;
+  const shown = open ? rows : rows.slice(0, restRows);
+  const hidden = rows.length - shown.length;
+  const more = hidden > 0 || open;
 
   return (
     <Card
@@ -579,66 +730,203 @@ function Verlauf({
         // it is scrolled into view: `scrollIntoView` knows nothing about the
         // sticky header or the fixed bottom bar, so without them the expanded
         // tile parks its lower edge underneath the tab bar.
-        "flex scroll-mt-20 scroll-mb-24 flex-col overflow-hidden lg:scroll-mb-8",
-        open ? "max-h-panel-stage" : "max-h-[19rem] flex-none",
+        "flex scroll-mb-24 scroll-mt-20 flex-col overflow-hidden lg:scroll-mb-8",
+        open ? "max-h-panel-stage" : "flex-none",
       )}
     >
-      <div className="flex items-baseline justify-between gap-3 px-4 pb-2.5 pt-3.5">
+      <div className="flex flex-none items-baseline justify-between gap-3 px-4 pt-3.5 sm:px-5 lg:px-6">
         <p className="text-eyebrow text-muted-foreground">Verlauf</p>
-        <p className="text-xs tabular-nums text-muted-foreground">
-          {runs.length} {runs.length === 1 ? "Durchlauf" : "Durchläufe"}
-        </p>
+        <p className="text-xs tabular-nums text-muted-foreground">{count}</p>
       </div>
 
-      {/* Three figures, each centred in its own third: a label-left/value-right
-          pair stretches to opposite ends and stops reading as one fact. */}
-      <div className="grid grid-cols-3 divide-x divide-border border-y border-border">
-        <Kpi label="Letzter" value={fmtPct(runs[0]?.total ?? null)} />
-        <Kpi label="Bester" value={fmtPct(best)} />
-        <Kpi
-          label="Bestanden"
-          value={scored.length ? `${passed} von ${scored.length}` : "–"}
-        />
-      </div>
-
-      <div className="slim-scrollbar min-h-0 flex-1 divide-y divide-border overflow-y-auto">
-        {shown.map((r) => (
-          <VerlaufRow key={r.id} record={r} />
-        ))}
-      </div>
-
-      {(rest > 0 || open) && (
-        <div className="flex justify-center border-t border-border p-1.5">
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-expanded={open}
-            className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-muted/60"
-          >
-            {open ? "Weniger anzeigen" : `Alle ${runs.length} anzeigen`}
-            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
-          </button>
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 flex-col",
+          split && "lg:grid lg:grid-cols-[minmax(0,26rem)_1px_minmax(0,1fr)] lg:items-stretch",
+        )}
+      >
+        <div className={cn(
+            "flex-none px-4 pb-3 pt-2.5 sm:px-5 sm:pb-4 lg:px-6",
+            split && "lg:flex lg:flex-col lg:justify-center lg:pb-5",
+          )}>
+          {head}
         </div>
-      )}
+
+        {split && <div aria-hidden className="hidden bg-border lg:block" />}
+
+        <div className={cn("flex min-h-0 flex-1 flex-col", split && "lg:justify-center")}>
+          {/* At rest a phone shows the summary only, because a 2x2 grid plus a
+              summary plus a list does not fit one phone screen; from sm up the
+              newest rows are listed too. Opening is what lets the page grow. */}
+          <div
+            className={cn(
+              "slim-scrollbar min-h-0 divide-y divide-border border-t border-border",
+              split && "lg:border-t-0",
+              open ? "flex-1 overflow-y-auto" : "hidden flex-none sm:block",
+            )}
+          >
+            {shown}
+          </div>
+
+          {more && (
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-expanded={open}
+              className={cn(
+                "flex flex-none items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-semibold text-primary transition-colors hover:bg-muted/60",
+                split && "lg:border-t-0",
+              )}
+            >
+              {open ? "Weniger anzeigen" : moreLabel}
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+            </button>
+          )}
+        </div>
+      </div>
     </Card>
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+/* ---------------------------- Modelltest Verlauf --------------------------- */
+
+/**
+ * Founder pick V2 "Zahl und Kurve". The last score leads as a display figure
+ * with its delta against the run before it; Bester and Bestanden stay as
+ * figures (the founder kept them) but as supporting stats rather than three
+ * equal cells; the chart carries the shape of the whole history beside them.
+ */
+function RunVerlauf({
+  runs,
+  open,
+  onToggle,
+}: {
+  runs: MockExamRecord[];
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const scored = useMemo(() => runs.filter((r) => r.total != null), [runs]);
+  const best = scored.length ? Math.max(...scored.map((r) => r.total as number)) : null;
+  const passed = scored.filter((r) => (r.total as number) >= PASS_PCT).length;
+  const last = scored[0]?.total ?? null;
+  const prev = scored[1]?.total ?? null;
+  const delta = last != null && prev != null ? last - prev : null;
+  // Oldest first, so the chart reads left to right like a timeline.
+  const series = scored.slice(0, CHART_RUNS).reverse().map((r) => r.total as number);
+
   return (
-    <div className="px-2 py-2.5 text-center">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-0.5 text-lg font-bold tabular-nums leading-tight">{value}</p>
+    <VerlaufCard
+      count={`${runs.length} ${runs.length === 1 ? "Durchlauf" : "Durchläufe"}`}
+      open={open}
+      onToggle={onToggle}
+      restRows={VERLAUF_REST_ROWS}
+      moreLabel={`Alle ${runs.length} anzeigen`}
+      head={
+        last == null ? (
+          <NoScoreYet />
+        ) : (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-5">
+            <div className="flex flex-none flex-col justify-center">
+              <p className="text-xs text-muted-foreground">Letzter Durchlauf</p>
+              <p className="mt-0.5 flex items-baseline gap-2">
+                <span className="text-display text-[2.5rem] leading-none tabular-nums">
+                  {last} %
+                </span>
+                {delta != null && delta !== 0 && (
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-bold tabular-nums",
+                      delta > 0
+                        ? "bg-success/15 text-success"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    <TrendingUp
+                      className={cn("h-3 w-3", delta < 0 && "-scale-y-100")}
+                      aria-hidden
+                    />
+                    {delta > 0 ? `+${delta}` : delta}
+                  </span>
+                )}
+              </p>
+              <div className="mt-2.5 flex gap-5">
+                <p className="text-xs text-muted-foreground">
+                  <span className="block text-base font-bold tabular-nums text-foreground">
+                    {best} %
+                  </span>
+                  Bester
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  <span className="block text-base font-bold tabular-nums text-foreground">
+                    {passed} von {scored.length}
+                  </span>
+                  Bestanden
+                </p>
+              </div>
+            </div>
+            <div className="flex min-w-0 flex-1 items-end justify-start sm:justify-end">
+              <ScoreChart series={series} best={best ?? 0} />
+            </div>
+          </div>
+        )
+      }
+      rows={runs.map((r) => <RunRow key={r.id} record={r} />)}
+    />
+  );
+}
+
+/**
+ * The run history as bars against the pass line. The last bar is the gradient
+ * one (it is the figure printed beside the chart), the best is outlined, and the
+ * pass threshold is a dashed rule named in the caption rather than labelled on
+ * the chart, where the label sat on top of the early bars.
+ */
+function ScoreChart({ series, best }: { series: number[]; best: number }) {
+  const H = 68;
+  return (
+    <div className="flex flex-col items-start">
+      <div className="relative flex h-[68px] w-fit items-end gap-2">
+        <span
+          aria-hidden
+          className="absolute -left-1.5 -right-1.5 border-t border-dashed border-success/70"
+          style={{ bottom: (PASS_PCT / 100) * H }}
+        />
+        {series.map((t, i) => {
+          const isNow = i === series.length - 1;
+          const isTop = t === best && !isNow;
+          return (
+            <span
+              key={i}
+              className={cn(
+                "w-8 rounded-t-[4px] sm:w-9",
+                isNow
+                  ? "bg-gradient-to-b from-primary to-[hsl(var(--gradient-to))]"
+                  : isTop
+                    ? "bg-primary/[0.16] ring-[1.5px] ring-inset ring-primary/55 dark:bg-primary/20 dark:ring-primary/70"
+                    : "bg-primary/30 dark:bg-primary/40",
+              )}
+              style={{ height: Math.max(3, (t / 100) * H) }}
+            />
+          );
+        })}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        <span
+          aria-hidden
+          className="mr-1.5 inline-block w-3.5 border-t border-dashed border-success align-middle"
+        />
+        bestanden ab {PASS_PCT} %
+      </p>
     </div>
   );
 }
 
-function fmtPct(pct: number | null | undefined) {
-  return pct == null ? "–" : `${pct} %`;
-}
-
-function VerlaufRow({ record }: { record: MockExamRecord }) {
+/** One Modelltest run: date, the four parts as segments, the total. */
+function RunRow({ record }: { record: MockExamRecord }) {
   const [expanded, setExpanded] = useState(false);
+  // A run that produced no score at all: four empty tracks read as a loading
+  // skeleton, so the row states the fact instead of drawing nothing.
+  const unscored = MOCK_PART_ORDER.every((p) => record.parts[p] == null);
   const date = useMemo(
     () =>
       new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(
@@ -653,29 +941,33 @@ function VerlaufRow({ record }: { record: MockExamRecord }) {
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/40 sm:gap-4"
+        className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/40 sm:gap-4 sm:px-5 lg:px-6"
       >
         <span className="w-[62px] shrink-0 text-sm font-semibold tabular-nums sm:w-[76px]">
           {date}
         </span>
         {/* Four segments in exam order: which module carried the run, at a
-            glance. A single-module run leaves the other three tracks empty,
-            which is the honest picture of what was actually sat. */}
-        <span className="flex min-w-0 max-w-[320px] flex-1 gap-1">
-          {MOCK_PART_ORDER.map((part) => {
-            const pct = record.parts[part];
-            return (
-              <span key={part} className="h-1.5 flex-1 rounded-full bg-muted">
-                {pct != null && (
-                  <span
-                    className={cn("block h-full rounded-full", PART_META[part].bar)}
-                    style={{ width: `${pct}%` }}
-                  />
-                )}
-              </span>
-            );
-          })}
-        </span>
+            glance. An unscored part leaves its track empty, which is the honest
+            picture of what the run actually produced. */}
+        {unscored ? (
+          <span className="text-sm text-muted-foreground">Nicht bewertet</span>
+        ) : (
+          <span className="flex min-w-0 max-w-[320px] flex-1 gap-1">
+            {MOCK_PART_ORDER.map((part) => {
+              const pct = record.parts[part];
+              return (
+                <span key={part} className="h-1.5 flex-1 rounded-full bg-muted">
+                  {pct != null && (
+                    <span
+                      className={cn("block h-full rounded-full", PART_META[part].bar)}
+                      style={{ width: `${pct}%` }}
+                    />
+                  )}
+                </span>
+              );
+            })}
+          </span>
+        )}
         <span className="ml-auto flex shrink-0 items-center gap-2">
           {record.total != null && (
             <Badge variant={record.total >= PASS_PCT ? "success" : "muted"} className="tabular-nums">
@@ -692,7 +984,7 @@ function VerlaufRow({ record }: { record: MockExamRecord }) {
       </button>
 
       {expanded && (
-        <div className="grid grid-cols-4 gap-3 border-t border-border px-4 py-3">
+        <div className="grid grid-cols-4 gap-3 border-t border-border px-4 py-3 sm:px-5 lg:px-6">
           {MOCK_PART_ORDER.map((part) => {
             const pct = record.parts[part];
             return (
@@ -710,6 +1002,165 @@ function VerlaufRow({ record }: { record: MockExamRecord }) {
             );
           })}
         </div>
+      )}
+    </div>
+  );
+}
+
+/** A run exists but produced no score (abandoned, or nothing gradeable). */
+function NoScoreYet() {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+        <Clock className="h-[17px] w-[17px]" />
+      </span>
+      <p className="text-[13px] leading-snug text-muted-foreground">
+        <span className="block text-sm font-semibold text-foreground">Noch keine Bewertung</span>
+        Sitze einen Durchlauf zu Ende, dann steht hier dein Ergebnis.
+      </p>
+    </div>
+  );
+}
+
+/* --------------------------- Module üben Verlauf --------------------------- */
+
+/**
+ * Founder pick M3 "Stärkeprofil". Four columns on ONE scale, so the modules are
+ * directly comparable: the pale part is where the learner started, the solid cap
+ * on top is what they have gained since. A dotted marker line was tried first
+ * and disappeared against a saturated fill.
+ *
+ * It plots the score of a module SAT AS A MODULE. The untimed Schreib- and
+ * Sprechtrainer produce a correction, not a percentage, and keep their own
+ * Verlauf on their own pages.
+ */
+function ModuleVerlauf({
+  practice,
+  open,
+  onToggle,
+}: {
+  practice: ModulePractice[];
+  open: boolean;
+  onToggle: () => void;
+}) {
+  // Oldest first per module, so "first" is the learner's first attempt.
+  const byPart = useMemo(() => {
+    const map = {} as Record<MockPartId, number[]>;
+    for (const part of MOCK_PART_ORDER) map[part] = [];
+    for (const p of practice.slice().reverse()) {
+      if (p.pct != null) map[p.part].push(p.pct);
+    }
+    return map;
+  }, [practice]);
+
+  const scored = practice.filter((p) => p.pct != null);
+
+  return (
+    <VerlaufCard
+      count={`${practice.length} ${practice.length === 1 ? "Übung" : "Übungen"}`}
+      open={open}
+      onToggle={onToggle}
+      restRows={VERLAUF_REST_ROWS}
+      moreLabel={`Alle ${practice.length} anzeigen`}
+      split
+      head={
+        scored.length === 0 ? (
+          <NoScoreYet />
+        ) : (
+          <>
+            <div className="mx-auto grid w-full max-w-[28.75rem] grid-cols-4 gap-3 sm:gap-3.5">
+              {MOCK_PART_ORDER.map((part) => {
+                const list = byPart[part];
+                const first = list[0] ?? null;
+                const last = list.length ? list[list.length - 1] : null;
+                const base = last == null || first == null ? 0 : Math.min(first, last);
+                const meta = PART_META[part];
+                const Icon = meta.icon;
+                return (
+                  <div key={part} className="flex flex-col items-center gap-1.5">
+                    <span
+                      className={cn(
+                        "flex h-5 items-center text-sm font-bold tabular-nums",
+                        last == null && "text-xs font-semibold text-muted-foreground",
+                      )}
+                    >
+                      {last == null ? "–" : `${last} %`}
+                    </span>
+                    <span
+                      className={cn(
+                        "relative h-12 w-full overflow-hidden rounded-md sm:h-24",
+                        last == null ? "bg-muted/40" : "bg-muted/80",
+                      )}
+                    >
+                      {last != null && (
+                        <span className="absolute inset-0 flex flex-col-reverse">
+                          <i className={cn("block w-full", meta.fillPale)} style={{ height: `${base}%` }} />
+                          <i
+                            className={cn("block w-full rounded-t-[4px]", meta.fillSolid)}
+                            style={{ height: `${last - base}%` }}
+                          />
+                        </span>
+                      )}
+                    </span>
+                    <span className="flex flex-col items-center gap-1 text-[11px] font-semibold sm:flex-row sm:gap-1.5 sm:text-xs">
+                      <span
+                        className={cn(
+                          "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md",
+                          meta.tile,
+                        )}
+                      >
+                        <Icon className={cn("h-3 w-3", meta.ink)} />
+                      </span>
+                      {PART_LABEL[part]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-2.5 text-center text-xs text-muted-foreground">
+              Blass: dein erster Versuch · Kräftig: dein Fortschritt
+            </p>
+          </>
+        )
+      }
+      rows={practice.map((p) => <PracticeRow key={p.id} entry={p} />)}
+    />
+  );
+}
+
+/** One module practice: date, which module, the score it produced. */
+function PracticeRow({ entry }: { entry: ModulePractice }) {
+  const meta = PART_META[entry.part];
+  const Icon = meta.icon;
+  const date = useMemo(
+    () =>
+      new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(
+        new Date(`${entry.date}T00:00:00`),
+      ),
+    [entry.date],
+  );
+
+  return (
+    <div className="flex w-full items-center gap-3 px-4 py-2.5 sm:gap-4 sm:px-5 lg:px-6">
+      <span className="w-[62px] shrink-0 text-sm font-semibold tabular-nums sm:w-[76px]">
+        {date}
+      </span>
+      <span
+        className={cn(
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+          meta.tile,
+        )}
+      >
+        <Icon className={cn("h-[15px] w-[15px]", meta.ink)} />
+      </span>
+      <span className="text-sm font-semibold">{PART_LABEL[entry.part]}</span>
+      {entry.pct != null && (
+        <Badge
+          variant={entry.pct >= PASS_PCT ? "success" : "muted"}
+          className="ml-auto tabular-nums"
+        >
+          {entry.pct} %
+        </Badge>
       )}
     </div>
   );

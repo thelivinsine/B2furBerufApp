@@ -1,6 +1,35 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 189). **The Prüfung zone became ONE page.** Founder prompt:
+_Last updated: 2026-08-05 (session 190). **The Prüfung zone was polished to a finished product.**
+Founder: the two tabs "still look cheap or like MVP", make them read like "a billion dollar edu tech
+app". Analysis first (twelve findings), three options previewed, then a second round on the pick:
+the founder took **B "Prüfungstag"**, **V2 "Zahl und Kurve"** for the Modelltest Verlauf and
+**M3 "Stärkeprofil"** for a NEW Module üben Verlauf.
+**What shipped.** ONE 896px frame for both tabs (they had different widths, so the page jumped on
+every switch), a height-stable scope row, the Bibliothek's directional tab slide, in-family gradient
+mark tiles, and a module card that reads as a button: mark top-left, arrow top-right, the module's
+hue washed into the bottom-right corner, and **that corner RESERVED in both clock states**, so the
+Mit Zeit badge appears without moving a card edge (the founder's first amendment). The Modelltest
+band becomes a two-column ticket from `lg` (52 Min as a display figure, countdown and CTA left, the
+four Teile as a ladder right) and states the total once per breakpoint. Modelltest's Verlauf now
+leads with the last score and its delta, with Bester/Bestanden as supporting stats and the last seven
+runs as bars against the 60 % pass line; Module üben's is a Stärkeprofil where the pale segment is
+the first attempt and the solid cap the gain since. **A Modelltest is a run that sat all four parts;
+a run that sat one is module practice** (`isFullRun`/`toPractice`, 7 new tests) — before this a
+single Lesen drill counted as a Modelltest result and its score landed in "Bester". Dash tables are
+gone: an unscored run says "Noch keine Bewertung" and its row says "Nicht bewertet".
+**Verified by driving the real build over CDP**, not by reading mockups: 14 states across
+1280×900 / 1440×900 / 1024×820 / 834×1112 / 393×852, light + dark, both clock states, expanded,
+first visit, unscored and A2, each reporting `scrollHeight` vs `innerHeight`. That is what caught the
+four bugs the mockups could not: the desktop Module tab scrolled at rest (930px against 780px of
+room, fixed by splitting that Verlauf into summary | rows from `lg`), the switcher stretched the full
+column on an 834px tablet, the run band stretched to 800px on a tall tablet (filling the stage is a
+PHONE rule now), and M3's dotted "first attempt" marker was invisible over a saturated fill.
+Gates green: build · typecheck · lint 0 errors · 558 tests · check:bundle 125.8 kB · check:contrast.
+Shipped as **PR #800**, squash-merged into `main`.
+**Resume here:** nothing is open in the Prüfung zone. The one deliberate open question from s189
+still stands (below).
+Prior s189 (2026-08-05). **The Prüfung zone became ONE page.** Founder prompt:
 "this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
 ... Module wide practice and model test as the two options". The three-card `/anwenden` hub and the
 `/exam` Modelltest page folded into a single page whose header IS a two-segment sliding-pill
@@ -26,9 +55,9 @@ for the header and bottom bar. Verified by driving the real build over CDP at 39
 viewport, top 80 / bottom 772 (the bar starts at 789), and its list scrolls 859/547 internally.
 Gates green: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
 Shipped as **PR #799**, squash-merged into `main`.
-**Resume here:** one question is deliberately open, `FilterRail`'s mobile panel keeps its own
+One question is deliberately open from that session: `FilterRail`'s mobile panel keeps its own
 `max-h-[45dvh]` cap instead of the new one-screen `max-h-panel-stage`; ask the founder before
-changing an approved surface. Everything else in the Prüfung zone is done.
+changing an approved surface.
 Prior s188: the Prüfungssimulation hub was re-done and renamed **Modelltest** (founder pick
 "Prüfungstag"): the page led with the run band, then "Einzeln üben", then Verlauf as the one place
 a result is shown. s189 kept the band, the one-place rule and the countdown, and moved the rest.
@@ -147,6 +176,33 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
+`claude/polish-ui-ux-design-92sbje`).**
+Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
+a billion dollar edu tech app", then "V2 and M3 ... take screenshots during the testing phase and
+optimize and polish the spacing ... without any bugs".
+**Process:** analysis in chat first (no code touched), three named options previewed
+(`preview/pruefung-polish.html`), a second round on the pick (`preview/pruefung-polish-r2.html`,
+artifact https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04, redeployed to the same
+URL), then implementation verified against the REAL app.
+**What shipped** (`src/features/pruefung/PruefungHub.tsx` rewritten; `partMeta.ts` gained
+`wash`/`fillPale`/`fillSolid` and gradient `tile`s; `index.css` gained `.mod-wash-*` + `.mod-go`):
+- One 896px frame for both tabs, a fixed-height scope row, the Bibliothek's `popLayout` tab slide.
+- The module card: mark + arrow row, title, description, the hue wash in the bottom-right corner and
+  that corner reserved by the card's bottom padding, so Ohne Zeit / Mit Zeit never resizes anything.
+- The run band: a two-column ticket from `lg`, today's stacked band below it, `flex-1` on phones only.
+- Modelltest Verlauf **V2**: display figure + delta chip, Bester/Bestanden as stats, seven bars
+  against the pass line (named in the caption, never on the chart).
+- Module üben Verlauf **M3**: four columns on one scale, pale = first attempt, solid = the gain;
+  split into summary | rows from `lg`, which is what keeps a 1280×900 laptop at zero scroll.
+- The `mockExams` split into full runs vs single-module practice (`tests/pruefungHub.test.ts`).
+**Verification tooling** lives in the session scratchpad, not the repo: a ~60-line CDP driver
+(Node 22's built-in WebSocket, no new deps) that seeds localStorage, sets a viewport, clicks by
+button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
+surface has to be checked in the real app rather than in a mockup.
+**Nothing is left open in this zone.**
+
+
 **Handoff after session 188 (2026-08-04): the Modelltest hub (branch `claude/page-redesign-7md2zi`).**
 Founder: "re-do this page" (a dark screenshot of `/exam`), then "go with B" plus two amendments.
 **What shipped** (`src/features/exam/ExamHub.tsx`, rewritten; `partMeta.ts` gained a solid `bar`
@@ -181,51 +237,3 @@ Modelltest anchor), this file and the prompt log. The preview stays in
 **Next, if the founder does not redirect:** unchanged from s187 (the queued writing-quality audit,
 then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`). One item
 this session made cheaper: per-Teil exam history now has a real surface to grow into.
-
-**Handoff after session 187 (2026-08-04): the exam polish round + the app-wide dark palette.**
-Founder feedback on the shipped Prüfungsteil (7 numbered points across the session), answered with
-ONE interactive preview and then implemented from their picks. **What shipped:**
-- **Dark palette "N3 Slate", app-wide** (`src/index.css` `.dark` + `--wash-a`/`--wash-b` read by
-  `bg-page`/`bg-mesh`): near-neutral greys, no coloured page radials in dark, blue only where it
-  acts. Contrast steps are the founder-confirmed "K2" relationships (card/ground 1.38:1,
-  edge/ground 3.03:1, nested-in-card 1.20:1). `pnpm check:contrast` green.
-- **Corner scale "tighter"**: `--radius: 0.5rem` + tightened ± steps in `tailwind.config.ts`
-  (card 10px, row 8px, pill 6px, `2xl` 14px). Affects every surface, on purpose.
-- **The exam screen** (`src/features/exam/McParts.tsx`, rewritten): the question has no tile, one
-  card per screen, content-tall blocks centred in the stage, the number strip in the bottom cluster
-  with 16/12/16 px of air, drag-resize on both axes with arrow-key steps and a reset on every
-  question change, fade-out on both scroll regions, `pb-safe-4`.
-- **The exit** (`AppShell`): red `LogOut`, icon-only on a phone, icon + "Verlassen" from `sm` up.
-- **The answered number** (`AnswerStrip`): `text-foreground` on the Himmelblau tint, not
-  `text-accent-ink`.
-**Verification:** a Playwright driver walked the real build over 225 in-exam screens (1440x900,
-1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × three fresh draws): 0 px page overflow
-everywhere, question fully visible on every screen, no console errors, light and dark.
-**Docs updated in the same PR:** CLAUDE.md (dark palette + corner law, and the English rule),
-`docs/areas/BRAND.md` (tokens, radius scale), `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, the
-`max-h-full` geometry trap), `docs/DECISIONS.md` §s187, the `/design` skill (English previews, never
-mark a recommendation, the new palette + corners).
-**Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
-open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
-(synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.
-
-**Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
-shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
-weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
-merely installed. The same screenshot confirms the Consent-Version card green and **im Gleichschritt
-at 2026-08-04**, so the legal-date fix is live too.
-
-**The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
-is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:
-**P10** itself (0.4% human-verified; the audit's plan is the ~320 highest-traffic items first), the
-**12 verified nouns** that need a `numerus` at their next review (`pnpm lint:content` names them
-every run, by design, see `docs/DECISIONS.md` §s185), and a live check of the **Notizen step** in a
-real listening exercise, which is the one thing that could only be verified by rendering.
-
-**Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
-**writing-task quality and filter fit**, with research from reliable sources. s181 proved COVERAGE
-(717 tasks, gated); nobody has verified that a task tagged B1 reads as B1, that its Leitpunkte are
-answerable in the word target, or that the Branche framing convinces someone who works in that
-industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
-audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
-C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**

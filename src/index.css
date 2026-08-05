@@ -314,6 +314,81 @@ input:-webkit-autofill {
   .text-eyebrow {
     @apply text-xs font-bold uppercase tracking-[0.14em];
   }
+
+  /* Prüfung module cards (s190): the module's own hue breathed into the corner
+     that the minutes badge reserves, so the space reads as occupied on purpose
+     rather than left over. It is a WASH, never decoration: 13 % of an already
+     pale hue in light, 12-16 % in dark, and it fades out well before the middle
+     of the card. Lives here rather than in a Tailwind class because each hue
+     needs a dark-mode pair. */
+  .mod-wash {
+    @apply pointer-events-none absolute inset-0;
+  }
+  .mod-wash-lesen {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(160 84% 39% / 0.13),
+      transparent 62%
+    );
+  }
+  .mod-wash-hoeren {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(173 80% 40% / 0.13),
+      transparent 62%
+    );
+  }
+  .mod-wash-schreiben {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(var(--primary) / 0.13),
+      transparent 62%
+    );
+  }
+  .mod-wash-sprechen {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(199 89% 48% / 0.13),
+      transparent 62%
+    );
+  }
+  .dark .mod-wash-lesen {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(158 64% 52% / 0.12),
+      transparent 62%
+    );
+  }
+  .dark .mod-wash-hoeren {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(172 66% 50% / 0.12),
+      transparent 62%
+    );
+  }
+  .dark .mod-wash-schreiben {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(var(--primary) / 0.16),
+      transparent 62%
+    );
+  }
+  .dark .mod-wash-sprechen {
+    background: radial-gradient(
+      120% 110% at 100% 100%,
+      hsl(198 93% 60% / 0.12),
+      transparent 62%
+    );
+  }
+
+  /* The "this card is pressable" mark: a quiet square that answers in the brand
+     blue on hover, so a module card reads as a button rather than a panel. */
+  .mod-go {
+    @apply grid h-[26px] w-[26px] shrink-0 place-items-center rounded-md bg-muted/80 text-muted-foreground transition-colors;
+  }
+  .card-hover:hover .mod-go {
+    @apply bg-primary/10 text-primary;
+  }
 }
 
 /* The Bibliothek tab-switch slide moved to framer-motion (LibraryHub uses an

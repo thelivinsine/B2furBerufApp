@@ -181,6 +181,13 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,
   never a fifth block. The run band's timeline connector is one segment per gap, drawn between the
   tiles, never a line behind them.
+- **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): one `max-w-4xl` centred
+  column, so switching never changes the page's width; a height-stable scope row; the module card's
+  minutes badge in a corner RESERVED in both clock states, so the clock switch cannot move a card
+  edge. Modelltest's Verlauf leads with the last score plus its delta (Bester and Bestanden as
+  supporting stats, the last seven runs as bars against the pass line); Module üben's is a
+  Stärkeprofil (pale = first attempt, solid = the gain since). **A Modelltest is a run that sat all
+  four parts; a run that sat one is module practice**, and the two lists never mix.
 - **Every filter and Aufgabe rail carries the Lebensbereich pills** (founder, s184): one shared
   `LifeAreaPills` control in a fixed slot, directly BELOW the Branche dropdown (top of the scope
   stack on a rail without one), single-select that toggles off, `?area=` in the URL, honest counts.

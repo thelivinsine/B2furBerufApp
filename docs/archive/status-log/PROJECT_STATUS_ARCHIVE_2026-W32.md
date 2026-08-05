@@ -218,3 +218,51 @@ Supabase run needed a re-run after an `esm.sh` 522 outage, unrelated to the code
   and C1-Hören content waves (`PROJECT_REFERENCE` → CONTENT GAPS), then a Fortschritt tile reading
   `progress.mock_exams` (the data is synced but nothing plots it yet), then per-Teil exam history.
   Nothing is half-built: every part of the exam ships complete.
+
+**Handoff after session 187 (2026-08-04): the exam polish round + the app-wide dark palette.**
+Founder feedback on the shipped Prüfungsteil (7 numbered points across the session), answered with
+ONE interactive preview and then implemented from their picks. **What shipped:**
+- **Dark palette "N3 Slate", app-wide** (`src/index.css` `.dark` + `--wash-a`/`--wash-b` read by
+  `bg-page`/`bg-mesh`): near-neutral greys, no coloured page radials in dark, blue only where it
+  acts. Contrast steps are the founder-confirmed "K2" relationships (card/ground 1.38:1,
+  edge/ground 3.03:1, nested-in-card 1.20:1). `pnpm check:contrast` green.
+- **Corner scale "tighter"**: `--radius: 0.5rem` + tightened ± steps in `tailwind.config.ts`
+  (card 10px, row 8px, pill 6px, `2xl` 14px). Affects every surface, on purpose.
+- **The exam screen** (`src/features/exam/McParts.tsx`, rewritten): the question has no tile, one
+  card per screen, content-tall blocks centred in the stage, the number strip in the bottom cluster
+  with 16/12/16 px of air, drag-resize on both axes with arrow-key steps and a reset on every
+  question change, fade-out on both scroll regions, `pb-safe-4`.
+- **The exit** (`AppShell`): red `LogOut`, icon-only on a phone, icon + "Verlassen" from `sm` up.
+- **The answered number** (`AnswerStrip`): `text-foreground` on the Himmelblau tint, not
+  `text-accent-ink`.
+**Verification:** a Playwright driver walked the real build over 225 in-exam screens (1440x900,
+1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × three fresh draws): 0 px page overflow
+everywhere, question fully visible on every screen, no console errors, light and dark.
+**Docs updated in the same PR:** CLAUDE.md (dark palette + corner law, and the English rule),
+`docs/areas/BRAND.md` (tokens, radius scale), `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, the
+`max-h-full` geometry trap), `docs/DECISIONS.md` §s187, the `/design` skill (English previews, never
+mark a recommendation, the new palette + corners).
+**Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
+open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
+(synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.
+
+**Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
+shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
+weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
+merely installed. The same screenshot confirms the Consent-Version card green and **im Gleichschritt
+at 2026-08-04**, so the legal-date fix is live too.
+
+**The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
+is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:
+**P10** itself (0.4% human-verified; the audit's plan is the ~320 highest-traffic items first), the
+**12 verified nouns** that need a `numerus` at their next review (`pnpm lint:content` names them
+every run, by design, see `docs/DECISIONS.md` §s185), and a live check of the **Notizen step** in a
+real listening exercise, which is the one thing that could only be verified by rendering.
+
+**Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
+**writing-task quality and filter fit**, with research from reliable sources. s181 proved COVERAGE
+(717 tasks, gated); nobody has verified that a task tagged B1 reads as B1, that its Leitpunkte are
+answerable in the word target, or that the Branche framing convinces someone who works in that
+industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
+audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
+C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**

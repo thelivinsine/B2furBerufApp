@@ -1502,3 +1502,54 @@ that path may set `overscroll-behavior: contain`. The non-obvious failure found 
 `scrollIntoView` knows nothing about a sticky header or a fixed bottom bar, so without
 `scroll-mt-*`/`scroll-mb-*` the tile scrolls flush to the viewport edge and parks its own lower
 border underneath the tab bar, which is exactly the thing the rule exists to prevent.
+
+## s190 — the Prüfung hub made to look finished
+
+Founder prompt: the two tabs "still look cheap or like MVP", they should read like "a billion dollar
+edu tech app". Analysis first (twelve findings), then three options
+(`preview/pruefung-polish.html`), then a second round on the pick
+(`preview/pruefung-polish-r2.html`, artifact
+https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04). The founder picked **B
+"Prüfungstag"**, then **V2 "Zahl und Kurve"** for the Modelltest Verlauf and **M3 "Stärkeprofil"**
+for the new Module üben one.
+
+**What was actually making it read as unfinished.** Not the structure, which s189 had settled. Four
+load-bearing findings: the two tabs did not share a page width (the grid capped at 896px, the band
+ran the full 1152px column, so the frame jumped on every switch); the desktop run band was a phone
+row stretched over ~430px of hairline per gap; "Ohne Uhr" was printed four times under a switch that
+already said "Ohne Zeit"; and a first visit rendered three KPI cells reading "–", which is honest and
+looks broken. The rest were craft: no pressable affordance on the cards, flat 10 % mark tiles where
+the system asks for a gradient, no transition on the tab switch, and the exam's total length never
+stated.
+
+**Why the badge's corner is reserved rather than laid out.** The founder's first amendment was that
+the "Mit Zeit" badge must not change the card's size. Laying it out in a foot row does exactly that,
+so it is absolutely placed in the corner the colour wash already occupies and the card's bottom
+padding reserves that corner in BOTH states. The reserve is also what stops a two-line description on
+a phone from running underneath the badge.
+
+**Why the Module üben Verlauf exists at all, and what feeds it.** The founder asked for B's Verlauf on
+that tab too, "adapt and build it for modul uben if it requires additional stuff". It needed no new
+data, only an honest split of one that was already there: `mockExams` held full runs AND single-module
+runs in one list, so a Lesen drill counted as a Modelltest result and its percentage landed in
+"Bester". A run that sat all four parts is a Modelltest; a run that sat one is practice
+(`isFullRun`/`toPractice`, pinned in `tests/pruefungHub.test.ts`). The consequence to state plainly:
+the profile plots the score of a module SAT AS A MODULE. The untimed trainers produce a correction,
+not a percentage, so they cannot feed a percentage-based profile and keep their own Verlauf.
+
+**Why M3 stacks two segments instead of drawing a marker.** The first build drew the first attempt as
+a dotted line across the column; over a saturated fill it was invisible. Pale segment to the first
+score, solid cap for the gain, so the improvement IS the coloured part.
+
+**Why the Module Verlauf splits on a desktop and the Modelltest one does not.** Measured, not guessed:
+stacked, the Module tab came to 930px of content against the 780px a 1280×900 laptop leaves, so the
+page scrolled at rest. Side by side it comes to 750px, and the card stops wasting the 400px of width
+a four-column profile does not use. The Modelltest tab already fit exactly, and V2's summary is
+already a left/right composition, so splitting it would have bought nothing.
+
+**Two responsive traps found by screenshotting the real app rather than the mockup.** The two-segment
+switcher was `w-full lg:w-auto`, which on an 834px tablet stretched the track across the whole
+column (the shape rejected in s149) — it is capped at `max-w-sm` between those breakpoints now. And
+the run band was `flex-1 lg:flex-none`, which on a 1112px-tall tablet stretched one card to 800px
+with the timeline floating in its middle; filling the stage is a PHONE rule (`flex-1 sm:flex-none`),
+where it exists to keep the CTA in the thumb's reach.

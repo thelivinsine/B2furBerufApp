@@ -4164,3 +4164,35 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   668 of the 668px a 393x852 phone leaves, in both clock states, so no combination scrolls at rest.
 - **Artifacts (prompt 2):** `preview/gen-pruefung-polish-r2.mjs` · `preview/pruefung-polish-r2.html` ·
   `preview/pruefung-polish-artifact.html` (same artifact URL as round 1) · this log
+- **Prompt 3 (verbatim):** `V2 and M3. while implementing take screenshots during the testing phase
+  and optimize and polish the spacing based on my taste and how I suggested in previous design
+  sessions. Make it as smooth, refined and finished as possible before finilising the design without
+  any bugs. I want the implementation to look like a final product, not an mvp or intermediate stage.`
+  **Response:** built V2 + M3 into `PruefungHub.tsx`, then drove the REAL app in headless Chromium
+  (a small CDP driver, no new deps: seeds localStorage, sets the viewport, screenshots, and reports
+  `scrollHeight` vs `innerHeight` so "rests at zero scroll" is measured rather than eyeballed).
+  Fourteen states were shot and read: both tabs × {1280×900, 1440×900, 1024×820, 834×1112, 393×852}
+  × {light, dark} plus Ohne Zeit / Mit Zeit, expanded, first visit, an unscored run and A2.
+  **What the screenshots caught that the mockups could not:** the desktop Module tab scrolled at rest
+  (930px of content against 780px of room) → the Module Verlauf splits into summary | rows from `lg`,
+  which also stops the card wasting the width the profile does not use; the switcher stretched the
+  full column on an 834px tablet → capped at `max-w-sm` between `sm` and `lg`; the run band was
+  `flex-1` up to `lg` → on a 1112px-tall tablet it stretched one card to 800px, so filling the stage
+  is a phone rule now; M3's dotted "first attempt" marker was invisible over a saturated fill → two
+  stacked segments (pale = start, solid = gain); a "–" column rode 4px higher than a scored one →
+  fixed line height; the profile columns did not centre against an expanded list → vertical centring;
+  and a run with no score printed four empty tracks that read as a skeleton → "Nicht bewertet".
+  Also shipped: one shared 896px frame for both tabs, a height-stable scope row, the Bibliothek's
+  directional tab slide, in-family gradient mark tiles, the card corner wash + reserved badge corner,
+  "52 Min gesamt" stated once per breakpoint, and the honest split of `mockExams` into full runs vs
+  module practice (`tests/pruefungHub.test.ts`, 7 new tests). Gates green: build, typecheck,
+  `lint` (0 errors), `test:unit` 558/558, `check:contrast`, `check:bundle` (125.8 kB of 400).
+- **Artifacts (prompt 3):** `src/features/pruefung/PruefungHub.tsx` · `src/features/exam/partMeta.ts` ·
+  `src/index.css` · `tests/pruefungHub.test.ts` · `docs/areas/PRAKTISCH-NAV.md` · `CLAUDE.md` ·
+  `docs/DECISIONS.md` · this log
+- **Prompt 4 (verbatim):** `once done, push it live and document the session`
+  **Response:** opened and squash-merged the PR into `main` (auto-ship), which triggers the Pages
+  deploy; no migrations and no Edge Function changes are in it, so only the site deploy matters. The
+  founder verifies the live result. Documentation pass across `PROJECT_STATUS.md`, `DECISIONS.md`,
+  `docs/areas/PRAKTISCH-NAV.md`, `CLAUDE.md` and this log.
+- **Artifacts (prompt 4):** PR #800 · `docs/PROJECT_STATUS.md` · this log
