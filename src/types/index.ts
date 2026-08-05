@@ -328,6 +328,67 @@ export interface Scenario {
   nodes: Record<string, DialogueNode>;
   /** Key Redemittel a strong candidate would deploy. */
   targetRedemittel: RedemittelCategory[];
+  /**
+   * Who the AI partner plays in the spoken conversation (s191). Optional only
+   * because it arrived after the scenarios did; `speakingBrief()` falls back to
+   * a neutral partner when it is absent, so a scenario is never unservable.
+   */
+  partner?: SpeakingPartner;
+  /**
+   * What the learner must actually get done, 2-5 items. This is the thing the
+   * AI grades as Aufgabenerfüllung, so a scenario without it gets language
+   * feedback only. Same law as Schreiben: only a task carrying a full brief can
+   * be graded against its brief.
+   */
+  goals?: string[];
+}
+
+/* ---------------- Speaking: the AI conversation partner (s191) ------------ */
+
+/**
+ * How a spoken task is staged. Founder s191: practice is always the chat thread
+ * (the learner said the transcript is the useful part), and an exam task picks
+ * by whether its brief has to stay readable while speaking.
+ *
+ *  gespraech  chat thread, transcript visible      — all practice
+ *  buehne     one turn on a fixed stage, brief on screen — exam tasks that work
+ *             FROM a written Aufgabe (discuss, agree, present)
+ *  anruf      no text at all while speaking        — exam tasks that would be
+ *             defeated by reading, i.e. listen-and-hold (Notiz machen)
+ */
+export type SpeakingStage = "gespraech" | "buehne" | "anruf";
+
+/** Who the learner is talking to. Drives the persona the AI partner plays. */
+export interface SpeakingPartner {
+  /** Display name, e.g. "Sabine Berger". */
+  name: string;
+  /** Their role in the situation, e.g. "Teamleiterin". */
+  role: string;
+  /** Whether they address the learner with du or Sie. */
+  register: "du" | "sie";
+}
+
+/**
+ * Everything the AI partner needs to play a role, and everything the debrief
+ * needs to grade against. Built by `speakingBrief()` from a Scenario (practice)
+ * or an ExamSet (exam) rather than authored twice.
+ */
+export interface ConversationBrief {
+  /** The permanent id of the Scenario or ExamSet this came from. */
+  id: string;
+  title: string;
+  partner: SpeakingPartner;
+  /** The situation, in German, as the learner reads it. */
+  situation: string;
+  /** 2-5 things the learner must accomplish. Graded as Aufgabenerfüllung. */
+  goals: string[];
+  targetRedemittel: RedemittelCategory[];
+  /** CEFR band the conversation is pitched at. */
+  level: ContentCefr;
+  minutes: number;
+  stage: SpeakingStage;
+  /** True for a Modelltest run: no hints, a clock, and a scored debrief. */
+  exam: boolean;
 }
 
 /* ---------------- Exam mode ---------------- */
@@ -349,6 +410,15 @@ export interface ExamSet {
   scenarioId: string;
   totalMinutes: number;
   rubric: ExamRubricCriterion[];
+  /**
+   * Which layout the exam task runs in (founder s191). Absent = "buehne", which
+   * is right for every task that works from a written Aufgabe. Only a task that
+   * reading would DEFEAT (listen-and-hold, Notiz machen) sets "anruf".
+   * "gespraech" is not valid here: the transcript is a practice affordance.
+   */
+  stage?: Exclude<SpeakingStage, "gespraech">;
+  /** Who the examiner/partner plays. Falls back to a neutral Prüfer:in. */
+  partner?: SpeakingPartner;
 }
 
 /* ---------------- Grammar support ---------------- */

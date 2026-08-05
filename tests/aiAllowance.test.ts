@@ -25,9 +25,12 @@ describe("daily AI allowance", () => {
     vi.resetModules();
   });
 
-  it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2)", async () => {
+  // Sprechen joined the allowance system in s191 at 2 conversations/day
+  // (founder-approved), sitting beside Lang because a spoken conversation costs
+  // about what a long evaluation costs.
+  it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2 / Sprechen 2)", async () => {
     const { DAILY_ALLOWANCE } = await load();
-    expect(DAILY_ALLOWANCE).toEqual({ fokus: 10, kurz: 4, lang: 2 });
+    expect(DAILY_ALLOWANCE).toEqual({ fokus: 10, kurz: 4, lang: 2, sprechen: 2 });
   });
 
   it("adopts the limit the server reports, not the compiled default", async () => {

@@ -56,6 +56,11 @@ const WEAKNESS_CATEGORIES = [
   "daWords", "collocations", "register", "spelling",
 ];
 const SPEAKERS = ["partner", "examiner", "narrator"];
+// mirrors SpeakingStage (s191). "gespraech" is practice-only: an exam set that
+// asks for it would be asking for the transcript affordance in a Modelltest.
+const SPEAKING_STAGES = ["gespraech", "buehne", "anruf"];
+const EXAM_SPEAKING_STAGES = ["buehne", "anruf"];
+const SPEAKING_REGISTERS = ["du", "sie"]; // mirrors SpeakingPartner["register"]
 const ARTICLES = ["der", "die", "das"];
 const NOUN_NUMERUS = ["uncountable", "pluralOnly"]; // mirrors NounNumerus (audit P9, s185)
 const EM_DASH = "—";
@@ -568,6 +573,23 @@ function lintScenarios(scenarios) {
       for (const r of s.targetRedemittel)
         if (!REDEMITTEL_CATEGORIES.includes(r)) error(ds, w, `invalid targetRedemittel "${r}"`);
 
+    // The spoken brief (s191). Both are optional (they arrived after the
+    // scenarios did and `speakingBrief` falls back), but a present one has to
+    // be usable: the AI plays the partner and the debrief grades the goals.
+    if (s.partner !== undefined) {
+      if (!isStr(s.partner?.name)) error(ds, w, "partner.name empty");
+      if (!isStr(s.partner?.role)) error(ds, w, "partner.role empty");
+      if (!SPEAKING_REGISTERS.includes(s.partner?.register))
+        error(ds, w, `invalid partner.register "${s.partner?.register}"`);
+    }
+    if (s.goals !== undefined) {
+      if (!Array.isArray(s.goals) || s.goals.length === 0) error(ds, w, "goals present but empty");
+      else if (s.goals.length > 5) error(ds, w, `${s.goals.length} goals (max 5)`);
+      else
+        for (const g of s.goals)
+          if (!isStr(g)) error(ds, w, "goal empty");
+    }
+
     const nodes = s.nodes;
     if (!nodes || typeof nodes !== "object") {
       error(ds, w, "nodes missing");
@@ -636,6 +658,23 @@ function lintExamSets(examSets, scenarioIds) {
     if (!Array.isArray(e.aspects) || e.aspects.length === 0) error(ds, w, "aspects empty");
     if (!isNum(e.totalMinutes) || e.totalMinutes <= 0) error(ds, w, "totalMinutes must be positive");
     if (!scenarioIds.has(e.scenarioId)) error(ds, w, `scenarioId "${e.scenarioId}" not found`);
+    // Which layout the spoken task runs in (s191). Absent = "buehne", right for
+    // every task that works FROM a written Aufgabe; only a task that reading
+    // would defeat (listen-and-hold, Notiz machen) sets "anruf".
+    if (e.stage !== undefined && !EXAM_SPEAKING_STAGES.includes(e.stage))
+      error(
+        ds,
+        w,
+        SPEAKING_STAGES.includes(e.stage)
+          ? `stage "${e.stage}" is practice-only; an exam set uses ${EXAM_SPEAKING_STAGES.join(" or ")}`
+          : `invalid stage "${e.stage}"`,
+      );
+    if (e.partner !== undefined) {
+      if (!isStr(e.partner?.name)) error(ds, w, "partner.name empty");
+      if (!isStr(e.partner?.role)) error(ds, w, "partner.role empty");
+      if (!SPEAKING_REGISTERS.includes(e.partner?.register))
+        error(ds, w, `invalid partner.register "${e.partner?.register}"`);
+    }
     if (!Array.isArray(e.rubric) || e.rubric.length === 0) error(ds, w, "rubric empty");
     else {
       const rubricIds = new Set();

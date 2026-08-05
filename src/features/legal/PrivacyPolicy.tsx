@@ -122,6 +122,31 @@ function PrivacyDe() {
         </p>
       </Section>
 
+      <Section title="Sprechen mit der KI: was mit deiner Stimme passiert">
+        <p>
+          Im Sprechtrainer sprichst du mit einer KI-Gesprächspartnerin. Dein{" "}
+          <strong>Mikrofon ist nur während eines Gesprächs aktiv</strong>, und du erlaubst den
+          Zugriff vorher selbst im Browser.
+        </p>
+        <p className="mt-2">
+          Wichtig: <strong>Deine Audioaufnahme verlässt dein Gerät nicht.</strong> Dein Browser
+          wandelt das Gesprochene direkt auf deinem Gerät in Text um. Nur dieser Text wird an
+          unsere Serverfunktion gesendet, damit die Gesprächspartnerin antworten und dir am Ende
+          eine Rückmeldung geben kann. Wir speichern keine Sprachaufnahmen, weder auf deinem Gerät
+          noch bei uns.
+        </p>
+        <p className="mt-2">
+          Für diesen Text gilt dasselbe wie beim Schreibfeedback: Je nach Auslastung verarbeitet{" "}
+          <strong>Google Gemini</strong>, <strong>Anthropics Claude</strong> oder{" "}
+          <strong>OpenAI</strong> ihn, um die Antwort und die Rückmeldung zu erstellen. Deine
+          E-Mail oder Identität geben wir nie weiter. Auch hier gelten Nutzungslimits pro Person.
+        </p>
+        <p className="mt-2">
+          Wenn dein Browser das Umwandeln von Sprache in Text nicht unterstützt, kannst du
+          stattdessen tippen. Dann wird gar kein Mikrofon benutzt.
+        </p>
+      </Section>
+
       <Section title="Wie wir deine Informationen verwenden">
         <ul className="list-disc space-y-2 pl-5">
           <li>Um dein Konto zu erstellen und zu sichern und dir die geräteübergreifende Anmeldung zu ermöglichen.</li>
@@ -174,11 +199,12 @@ function PrivacyDe() {
           deines eigenen Verlaufs hinausgeht.
         </p>
         <p className="mt-2">
-          Für deine eingereichten Texte gilt eine feste Frist: Zwei Jahre nach der Einreichung
-          löschen wir den Text selbst und die dazugehörige Korrektur automatisch. Die Auswertung
-          bleibt in deinem Verlauf (Datum, Thema und dein Schwerpunkt), damit deine
-          Entwicklungskurve vollständig bleibt. Es verschwindet also nur der alte Text, nicht dein
-          Fortschritt.
+          Für deine eingereichten Texte und für deine Gesprächstranskripte aus dem Sprechtrainer
+          gilt dieselbe feste Frist: Zwei Jahre nach der Einreichung beziehungsweise nach dem
+          Gespräch löschen wir den Text, das Transkript und die dazugehörige Korrektur
+          automatisch. Die Auswertung bleibt in deinem Verlauf (Datum, Thema und dein
+          Schwerpunkt), damit deine Entwicklungskurve vollständig bleibt. Es verschwindet also nur
+          der alte Wortlaut, nicht dein Fortschritt.
         </p>
         <p className="mt-2">
           Eine Ausnahme sind Gastkonten: Wenn du ohne Konto lernst, legen wir für dich ein
@@ -345,6 +371,30 @@ function PrivacyEn() {
         </p>
       </Section>
 
+      <Section title="Speaking with the AI: what happens to your voice">
+        <p>
+          In the speaking trainer you talk to an AI conversation partner. Your{" "}
+          <strong>microphone is only active during a conversation</strong>, and you grant that
+          access yourself in your browser beforehand.
+        </p>
+        <p className="mt-2">
+          Importantly: <strong>your audio never leaves your device.</strong> Your browser converts
+          your speech to text locally, on your device. Only that text is sent to our server
+          function, so the partner can reply and give you feedback at the end. We do not store
+          voice recordings, either on your device or on our servers.
+        </p>
+        <p className="mt-2">
+          That text is handled exactly like a writing submission: depending on load,{" "}
+          <strong>Google Gemini</strong>, <strong>Anthropic's Claude</strong>, or{" "}
+          <strong>OpenAI</strong> processes it to produce the reply and the feedback. We never
+          share your email or identity. Per-user usage limits apply here too.
+        </p>
+        <p className="mt-2">
+          If your browser does not support speech-to-text, you can type instead. In that case no
+          microphone is used at all.
+        </p>
+      </Section>
+
       <Section title="How we use your information">
         <ul className="list-disc space-y-2 pl-5">
           <li>To create and secure your account, and let you sign in across devices.</li>
@@ -388,12 +438,23 @@ function PrivacyEn() {
 
       <Section title="How long we keep your data">
         <p>
-          Account, profile, and progress data are kept for as long as your account exists. Writing
-          submissions and their AI feedback are retained so your Analytics history stays complete.
-          You can delete individual evaluations yourself in your writing history at any time, or
-          remove them all at once by deleting your account. This data stays private to you
-          (row-level security again) and is never used for any purpose beyond showing you your own
-          history.
+          Account, profile, and progress data are kept for as long as your account exists. You can
+          delete individual evaluations yourself in your writing history at any time, or remove
+          them all at once by deleting your account. This data stays private to you (row-level
+          security again) and is never used for any purpose beyond showing you your own history.
+        </p>
+        <p className="mt-2">
+          Submitted texts and speaking-trainer transcripts share one fixed deadline: two years
+          after the submission or the conversation, we automatically delete the text, the
+          transcript, and the correction that goes with them. The evaluation stays in your history
+          (date, topic, and your focus area) so your progress curve stays complete. Only the old
+          wording disappears, not your progress.
+        </p>
+        <p className="mt-2">
+          Guest accounts are an exception: if you learn without an account, we create an anonymous
+          guest account for you. If it goes unused for 90 days, we delete it along with all of its
+          data. A guest account has no email address, so you could not sign back into it later
+          anyway. Create an account if you want to keep your progress permanently.
         </p>
       </Section>
 

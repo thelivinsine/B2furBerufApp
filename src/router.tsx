@@ -49,8 +49,12 @@ const QuizHub = lazyWithReload(() =>
 const WritingHub = lazyWithReload(() =>
   import("@/features/writing/WritingHub").then((m) => ({ default: m.WritingHub })),
 );
-const SimulationHub = lazyWithReload(() =>
-  import("@/features/simulation/SimulationHub").then((m) => ({ default: m.SimulationHub })),
+// s191: `/simulation` is the Sprechtrainer, and it now talks to an AI partner
+// instead of replaying an authored branching script. The route id is unchanged
+// so every existing link (the Prüfung hub's "Sprechen ohne Zeit", bookmarks)
+// keeps working.
+const SprechenHub = lazyWithReload(() =>
+  import("@/features/sprechen/SprechenHub").then((m) => ({ default: m.SprechenHub })),
 );
 const QuickRevision = lazyWithReload(() =>
   import("@/features/revision/QuickRevision").then((m) => ({ default: m.QuickRevision })),
@@ -342,7 +346,7 @@ export const router = createBrowserRouter([
         path: "/simulation",
         element: (
           <RequireOnboarding>
-            <SimulationHub />
+            <SprechenHub />
           </RequireOnboarding>
         ),
       },
