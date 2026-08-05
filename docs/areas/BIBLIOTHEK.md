@@ -113,9 +113,34 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - **Mobile:** a toolbar Filter icon toggles a body-only `layout="panel"` tile that slides open via
   AnimatePresence (height/opacity), sits in normal flow (scrolls away, does not stick), capped
   `max-h-[45dvh]` as a flex column (fixed header + one internal scroll region). Üben + word count
-  are a sticky bottom action bar (full-bleed, `sticky bottom-[nav]`, backdrop-blur, after the
+  are the shared `FloatingActionCluster` (founder s189): fixed above the nav at the SAME offset as
+  Schreiben's, with no bar chrome at all, so the buttons float over the cards. The founder asked for
+  the two zones to be identical ("same positions and design as schreiben aufgabe wählen"), and the
+  lower line Schreiben carries is its Art. 50 note, so the Bibliothek's cluster is buttons only.
+  Every control needs its own opaque backing (`floatingSlot`), or the card behind shines through.
+  The surface owes the flow `CLUSTER_CLEARANCE`. It replaced a sticky bar (full-bleed,
+  `sticky bottom-[nav]`, backdrop-blur, after the
   content).
-- **Tile look:** subtle grey `bg-muted` (the ViewSwitcher-track shade), controls INSIDE white
+- **Desktop scrolls INSIDE, not the page** (founder s189): the hub is one
+  `h-browse-stage` tall, the tabs and the toolbar row hold their place, and the CONTENT column is the
+  only thing that scrolls (`lg:min-h-0 lg:overflow-y-auto`). Mobile is untouched and still scrolls
+  the page. The catch that makes this more than a class: `usePagedList` grows the list from an
+  IntersectionObserver, which measures against the VIEWPORT by default, so inside a scroll container
+  its sentinel is clipped and paging dies silently. Each surface publishes its scroll element through
+  `ScrollRootProvider` (`src/lib/scrollRoot.tsx`) and the hook observes that instead. Verified at
+  1280x900: page 900/900, inner 5142/655, and the card count still goes 60 → 120 on reaching the
+  inner bottom.
+- **Toolbar row:** every control is 30px since s189 (a quarter down from 40), the view switcher
+  included, and the transient search field matches.
+- **Horizontal scroll says so** (`HScrollArea`): a soft fade on whichever edge still has content
+  behind it, nothing once the region fits or has been scrolled to its end.
+- **Tile look:** the Himmelblau wash (`bg-accent/20`, dark `bg-accent/10`) with the border in the
+  fill's own colour and `shadow-soft` doing the separating, i.e. byte-for-byte the Schreiben
+  "Aufgabe wählen" rail (founder s189: "apply the same blue shade from the Schreiben Aufgabe wählen
+  rail to the filter rails and filter button"). It was grey `bg-muted` from s104 until then. Header
+  and Üben footer strips carry the same wash and their dividers are tinted `border-accent-ink/10`,
+  never neutral grey. The filter TOGGLE wears the same fill (`BROWSE_FILTER_BUTTON`), never brand
+  blue, which would compete with the Üben CTA beside it. Controls INSIDE stay white
   (`bg-surface` dropdown triggers; unselected facet pills `bg-surface`). This grey-tile/
   white-controls split is the settled answer after multiple flip-flops — do not re-litigate
   (white-on-white was too low contrast; a flat `bg-border` slab read ugly).

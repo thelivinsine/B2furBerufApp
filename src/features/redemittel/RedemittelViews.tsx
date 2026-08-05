@@ -37,6 +37,15 @@ const REDEMITTEL_COLUMNS: DataColumn<RedemittelPhrase>[] = [
     className: "min-w-[12rem]",
   },
   {
+    // A Wendung on its own says little; the example is what shows how it is
+    // actually used, and the card view has carried one all along (founder s189).
+    id: "beispiel",
+    label: "Beispiel",
+    cell: (p) => <span className="italic text-muted-foreground">„{p.example.de}"</span>,
+    sortValue: (p) => p.example.de,
+    className: "min-w-[18rem]",
+  },
+  {
     id: "kategorie",
     label: "Kategorie",
     cell: (p) => <span className="text-muted-foreground">{categoryLabel(p.category)}</span>,

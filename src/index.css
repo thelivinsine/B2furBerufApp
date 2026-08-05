@@ -271,6 +271,26 @@ input:-webkit-autofill {
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
+  /* Text fields are the exception (founder s189): a field already shows where
+     the focus is with its blinking caret, so the ring only draws a second, much
+     louder rectangle around it. On the big writing surfaces that box IS the
+     whole card. Buttons, links, toggles and the check/radio inputs KEEP the
+     ring: they have no caret, so it is their only focus indicator. */
+  textarea:focus-visible,
+  input:is(
+      [type="text"],
+      [type="search"],
+      [type="email"],
+      [type="password"],
+      [type="url"],
+      [type="tel"],
+      [type="number"],
+      [type="date"],
+      :not([type])
+    ):focus-visible,
+  [contenteditable="true"]:focus-visible {
+    @apply ring-0 ring-offset-0;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -483,6 +503,23 @@ input:-webkit-autofill {
   @media (min-width: 1024px) {
     .h-page-stage {
       height: auto;
+    }
+  }
+  /* The DESKTOP browse stage (s189, founder: "instead of a page scroll in
+     desktop view, keep internal scroll"). `h-page-stage` above is the mobile
+     answer and deliberately goes `auto` from lg up; this is its counterpart:
+     the room `<main>` has on a desktop, where there is no bottom bar and the
+     padding is `pt-8` / `pb-safe-8`. Below lg it stays `auto`, so the phone
+     keeps scrolling the page. */
+  .h-browse-stage {
+    height: auto;
+  }
+  @media (min-width: 1024px) {
+    .h-browse-stage {
+      height: calc(
+        100dvh - 4rem - 1px - env(safe-area-inset-top) - 2rem - 2rem -
+          env(safe-area-inset-bottom)
+      );
     }
   }
   /* The ceiling for a tile the learner EXPANDED (Verlauf, and every filter or

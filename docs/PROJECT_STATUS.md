@@ -25,7 +25,12 @@ for the header and bottom bar. Verified by driving the real build over CDP at 39
 `scrollHeight === innerHeight`; with 20 runs expanded the tile measures 692 px inside an 852 px
 viewport, top 80 / bottom 772 (the bar starts at 789), and its list scrolls 859/547 internally.
 Gates green: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
-Shipped as **PR #799**, squash-merged into `main`.
+Shipped as **PR #799**, squash-merged into `main`, then **PR #800** carried the follow-up run:
+the filter rails took the Schreiben rail's Himmelblau fill (superseding the grey tile of s104), the
+four hand-copied Bibliothek action bars became ONE shared `FloatingActionCluster` with Schreiben,
+text fields lost the global focus ring (the caret is the indicator; buttons keep theirs), and the
+Bibliothek desktop scrolls INSIDE its content column instead of scrolling the page, which needed
+`usePagedList` made root-aware first.
 **Resume here:** one question is deliberately open, `FilterRail`'s mobile panel keeps its own
 `max-h-[45dvh]` cap instead of the new one-screen `max-h-panel-stage`; ask the founder before
 changing an approved surface. Everything else in the Prüfung zone is done.

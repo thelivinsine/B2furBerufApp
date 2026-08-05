@@ -77,7 +77,7 @@ Ranked by how often the founder had to correct AI output:
    (Fokus + Kurz/Lang), where the founder moved the Art. 50 note to a fixed bottom line level with
    the floating Feedback pill on desktop and a condensed line under the floating action buttons on
    mobile (s160, `docs/DECISIONS.md`; do not re-center these two). Primary actions sit in the same place
-   across sibling modes (sticky bottom bars on mobile everywhere) — and "the same place" means to
+   across sibling modes (ONE floating cluster on mobile everywhere) — and "the same place" means to
    the pixel: the three Schreiben trainers share ONE fixed-cluster offset and ONE fixed KI line,
    because a 13px difference reads as a jump on every tab switch (s169).
 7. **Motion.** One timing family: 0.12-0.18s panels/popovers, directional tab slides ~0.16s,
@@ -109,9 +109,11 @@ Ranked by how often the founder had to correct AI output:
   blue wash). Fix tiles and result chips keep their accent edge: they are content, not rails.
 - **White `bg-surface` cards** for content, with `border-border` + `shadow-soft`. AI output cards
   are white, never a grey wash.
-- **Grey `bg-muted`** only as recessed chrome: the Bibliothek FilterRail tile, switcher tracks,
-  with WHITE controls inside so they pop (this exact grey-tile/white-controls split was settled
-  after multiple flip-flops, s104; do not re-litigate).
+- **Grey `bg-muted`** only as recessed chrome: switcher tracks and the like, with WHITE controls
+  inside so they pop. The Bibliothek FilterRail LEFT this group in s189: it now wears the same
+  Himmelblau fill as the Schreiben "Aufgabe wählen" rail, because the two rails do the same job, and
+  so does every filter toggle that opens one (`BROWSE_FILTER_BUTTON`). Controls inside stay white
+  either way, which is the part of the s104 answer that survived.
 - **Green `--success`**: strictly "correct/detected". Green dot = detected fact, green underline =
   the fix, green badge = done. Never decoration.
 - **Koralle `--reward`**: error marks in Fokus, loot/combo/streak celebration. Never on buildings,
@@ -168,7 +170,12 @@ Ranked by how often the founder had to correct AI output:
   rows two sections below it in the same tile are exactly that. An equal-width 2-column grid was
   tried and truncated "Berufsleben" against a four-digit count in the 16rem rail. Never add it to a
   surface whose content carries no Thema (Grammatik): that is dead chrome, not a filter.
-- Sticky mobile bottom action bar for the primary action; `SearchField` transient toolbar search;
+- **`FloatingActionCluster`** (`features/shared/floatingCluster.tsx`) for the primary mobile action:
+  fixed above the nav at ONE offset, no bar chrome, every control on its own opaque backing,
+  portalled to `<body>` because both hubs slide their panels with a transform. Schreiben's three
+  trainers and all four Bibliothek tabs share it (founder s189: "same positions and design as
+  schreiben"). Sticky bars were rejected (s168) and the four hand-copied Bibliothek bars are gone.
+  `SearchField` transient toolbar search;
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).
 - Modals/sheets inherit `bg-dialog-overlay` + `shadow-elevated-soft` from the shared dialog
@@ -230,8 +237,9 @@ marks at full opacity. Structure is locked; don't touch without an explicit foun
 
 ## 7. Landmines (shipped-then-reverted; do NOT reintroduce)
 
-- White filter tile (reverted to grey `bg-muted`, s104) and, equally, grey slab rails on Schreiben
-  (must be Himmelblau, s149).
+- White filter tile (reverted, s104): the FilterRail is a FILL, never white. Which fill changed in
+  s189 (grey → Himmelblau, matching Schreiben); the "never white, controls stay white" part holds.
+  Grey slab rails on Schreiben stay rejected (must be Himmelblau, s149).
 - Gold/reward color on domain-building windows (lit = white, s65).
 - Full-column-width 4-label switchers ("too big", s149) and fully-round toggles/pills (s154).
 - Accent-blue nav labels ("not premium", s141); butter yellow as layout chrome (s140).

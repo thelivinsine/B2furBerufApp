@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePagedList } from "@/lib/usePagedList";
+import { HScrollArea } from "@/features/shared/browseScroll";
 import { cn } from "@/lib/utils";
 
 /**
@@ -67,7 +68,7 @@ export function DataTable<T>({
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+      <HScrollArea className="rounded-xl border border-border bg-surface">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border">
@@ -128,7 +129,7 @@ export function DataTable<T>({
             ))}
           </tbody>
         </table>
-      </div>
+      </HScrollArea>
       {hasMore && (
         <div ref={sentinelRef} className="flex justify-center pt-4">
           <Button variant="outline" size="sm" onClick={showMore}>

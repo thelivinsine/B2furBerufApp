@@ -322,7 +322,7 @@ export function SimulationRunner({
                   value={freeText}
                   onChange={(e) => setFreeText(e.target.value)}
                   placeholder="Tippe deine Antwort (optional) …"
-                  className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
                 />
                 {freeRevealed && node.model && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-primary/30 bg-surface p-4 text-sm">
