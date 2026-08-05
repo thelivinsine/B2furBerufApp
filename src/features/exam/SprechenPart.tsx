@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { examSets } from "@/data/examSets";
 import { scenarioById } from "@/data/dialogues";
+import { EXAM_BAND } from "@/engine/exam";
 import { examBrief } from "@/engine/speaking";
 import { useExamStore, type MockExamRun } from "@/store/useExamStore";
 import { RunBar } from "./MockExamRunner";
@@ -22,15 +23,21 @@ import { ConversationRunner } from "@/features/sprechen/ConversationRunner";
  *
  * A conversation is not resumable mid-flight, so a reload restarts this part
  * with its full time, exactly as before.
+ *
+ * The RunBar is handed to the runner, which frames EVERY screen of the Teil
+ * with it (s194 audit P25), not just the talking one.
  */
 export function SprechenPart({ run }: { run: MockExamRun }) {
   const completePart = useExamStore((s) => s.completePart);
 
   const examSet = examSets.find((e) => e.id === run.plan.sprechen);
   const scenario = examSet ? scenarioById(examSet.scenarioId) : undefined;
+  // The run's Niveau reaches the brief (s194 audit P6). It used to be hardcoded
+  // to B2.1 inside `examBrief`, so the partner spoke and the debrief graded at
+  // B2.1 in every Modelltest while the other three Teile honoured the level.
   const brief = useMemo(
-    () => (examSet ? examBrief(examSet, scenario) : null),
-    [examSet, scenario],
+    () => (examSet ? examBrief(examSet, scenario, EXAM_BAND[run.plan.level]) : null),
+    [examSet, scenario, run.plan.level],
   );
 
   // A plan without a servable speaking set (should not happen for B1-C1, but

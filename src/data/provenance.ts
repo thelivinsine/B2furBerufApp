@@ -42914,6 +42914,102 @@ const provenancePart4: ProvenanceEntry[] = [
     review_status: "draft",
     notes: "themeId=mobilitaet; kind=announcement; cefr=B2.1. Exam-length reading text authored in s185 (audit P3: the bank's median was 90 words, so nothing exercised skimming or scanning); checks require an inference across paragraphs. Verify German accuracy and factual claims about the procedures described."
   },
+  {
+    content_id: "ex_auslaenderbehoerde",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Behördentermin vorbereiten",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; scenarioId=sc_auslaenderbehoerde. Authored exam simulation for the s194 audit finding P17: every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only ever serve a workplace speaking task. Verify task sheet wording and the factual claims about the procedures described."
+  },
+  {
+    content_id: "ex_wohnungsmangel",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Mangel in der Wohnung melden",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=wohnen; scenarioId=sc_wohnungsmangel. Authored exam simulation for the s194 audit finding P17: every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only ever serve a workplace speaking task. Verify task sheet wording and the factual claims about the procedures described."
+  },
+  {
+    content_id: "ex_internetstoerung",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Störung reklamieren",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=digitales; scenarioId=sc_internet_stoerung. Authored exam simulation for the s194 audit finding P17: every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only ever serve a workplace speaking task. Verify task sheet wording and the factual claims about the procedures described."
+  },
+  {
+    content_id: "ex_widerspruch",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Widerspruch gegen einen Bescheid",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; scenarioId=sc_widerspruch. Authored exam simulation for the s194 audit finding P17: every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only ever serve a workplace speaking task. Verify task sheet wording and the factual claims about the procedures described."
+  },
+  {
+    content_id: "ex_mietminderung",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Schimmel und Mietminderung",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=wohnen; scenarioId=sc_mietminderung. Authored exam simulation for the s194 audit finding P17: every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only ever serve a workplace speaking task. Verify task sheet wording and the factual claims about the procedures described."
+  },
+  {
+    content_id: "ex_kostenuebernahme",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Kasse lehnt die Behandlung ab",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; scenarioId=sc_kostenuebernahme. Authored exam simulation for the s194 audit finding P17: every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only ever serve a workplace speaking task. Verify task sheet wording and the factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_c1_arzt_kostenzusage_mailbox",
+    content_type: "text",
+    label: "Mailbox: Rückmeldung zur Kostenzusage",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gc1.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; kind=voicemail; cefr=C1. Authored for the s194 audit finding P16: the bank held one C1 text that reads as audio, so a C1 Hoeren topped up from B2.2, and note fields existed only on B1/B2 voicemails, so the part's Anleitung promised a Notizen task C1 could not serve. Verify German accuracy and the factual claims about the procedures described."
+  },
+  {
+    content_id: "tx_c1_behoerde_verfahrensdurchsage",
+    content_type: "text",
+    label: "Durchsage: Geänderter Ablauf in der Ausländerbehörde",
+    origin: "authored",
+    reference: "https://www.goethe.de/de/spr/kup/prf/prf/gc1.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; kind=announcement; cefr=C1. Authored for the s194 audit finding P16: the bank held one C1 text that reads as audio, so a C1 Hoeren topped up from B2.2, and note fields existed only on B1/B2 voicemails, so the part's Anleitung promised a Notizen task C1 could not serve. Verify German accuracy and the factual claims about the procedures described."
+  },
 ];
 
 export const provenance: ProvenanceEntry[] = provenancePart1

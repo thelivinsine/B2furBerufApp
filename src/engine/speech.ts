@@ -44,6 +44,12 @@ export interface SpeakOptions {
   voiceURI?: string;
   /** Rotate through the available German voices instead of the default. Ignored when `voiceURI` is set. */
   variety?: boolean;
+  /**
+   * Called once when the utterance is over, whichever way it ended: finished,
+   * cancelled or failed. A caller that gates UI on "is it still speaking"
+   * (the exam's Hören play button) would otherwise latch forever on an
+   * utterance that errored, because `onend` does not fire for those.
+   */
   onEnd?: () => void;
 }
 
@@ -63,7 +69,16 @@ export function speak(text: string, opts: SpeakOptions = {}): void {
   const resolvedURI = opts.voiceURI ?? (opts.variety ? nextGermanVoiceURI() : undefined);
   const chosen = (resolvedURI && voices.find((v) => v.voiceURI === resolvedURI)) || voices[0];
   if (chosen) u.voice = chosen;
-  if (opts.onEnd) u.onend = opts.onEnd;
+  if (opts.onEnd) {
+    let fired = false;
+    const done = () => {
+      if (fired) return;
+      fired = true;
+      opts.onEnd!();
+    };
+    u.onend = done;
+    u.onerror = done;
+  }
   synth.speak(u);
 }
 

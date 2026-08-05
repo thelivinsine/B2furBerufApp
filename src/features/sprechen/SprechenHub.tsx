@@ -1,14 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, Mic, Play, RotateCw, Star } from "lucide-react";
 import { scenarios } from "@/data/dialogues";
 import { speakingBrief } from "@/engine/speaking";
+import { XP } from "@/engine/scoring";
 import type { Scenario } from "@/types";
 import { useProgressStore } from "@/store/useProgressStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { HubHero } from "@/components/shared/HubHero";
+import { BackToPruefung } from "@/features/writing/bottomChrome";
 import { ConversationRunner } from "./ConversationRunner";
 import { cn } from "@/lib/utils";
 
@@ -18,22 +20,60 @@ import { cn } from "@/lib/utils";
  * Practice always runs as the chat thread (founder s193), so this hub hands the
  * runner a brief whose stage is "gespraech" and never asks the learner to pick
  * a layout: which layout a task uses is a property of the task, not a setting.
+ *
+ * It is the Sprechen module WITHOUT a clock, so three things follow (s194
+ * audit): it carries the same Zurück back to the Prüfung hub the Schreibtrainer
+ * got in s192 (P10); it reads the `?level=` the hub hands it, so the Niveau
+ * chosen there is not silently dropped on the way in (P11); and no HubHero,
+ * because this zone's header is the hub's switcher (P22).
  */
 
-const levelLabel = ["", "Einsteiger", "Mittelstufe", "Fortgeschritten"] as const;
+const LEVELS = [
+  { level: 1, label: "Einsteiger", band: "B1" },
+  { level: 2, label: "Mittelstufe", band: "B2" },
+  { level: 3, label: "Fortgeschritten", band: "C1" },
+] as const;
+
+/** The hub's Niveau, mapped onto the scenarios' own 1-3 ladder. */
+const LEVEL_BY_BAND: Record<string, number> = { A2: 1, B1: 1, B2: 2, C1: 3 };
 
 export function SprechenHub() {
-  const [active, setActive] = useState<Scenario | null>(null);
+  const [params, setParams] = useSearchParams();
   const scenariosDone = useProgressStore((s) => s.scenariosDone);
   const completeScenario = useProgressStore((s) => s.completeScenario);
   const registerSession = useProgressStore((s) => s.registerSession);
+  const addXp = useProgressStore((s) => s.addXp);
+
+  // Both the running scenario and the scope live in the URL, so a reload, a
+  // share and the browser's back button all land where the learner was.
+  const activeId = params.get("sz");
+  const active = useMemo(
+    () => scenarios.find((s) => s.id === activeId) ?? null,
+    [activeId],
+  );
+  const band = params.get("level") ?? "";
+  const wanted = LEVEL_BY_BAND[band] ?? null;
+
+  const setActive = (sc: Scenario | null) => {
+    const p = new URLSearchParams(params);
+    if (sc) p.set("sz", sc.id);
+    else p.delete("sz");
+    setParams(p, { replace: !sc });
+  };
+
+  const setBand = (next: string) => {
+    const p = new URLSearchParams(params);
+    if (next) p.set("level", next);
+    else p.delete("level");
+    setParams(p, { replace: true });
+  };
 
   const byLevel = useMemo(
     () =>
-      [1, 2, 3]
-        .map((level) => ({ level, items: scenarios.filter((s) => s.level === level) }))
+      LEVELS.filter((l) => wanted == null || l.level === wanted)
+        .map((l) => ({ ...l, items: scenarios.filter((s) => s.level === l.level) }))
         .filter((x) => x.items.length > 0),
-    [],
+    [wanted],
   );
 
   if (active) {
@@ -45,7 +85,10 @@ export function SprechenHub() {
           onFinished={() => {
             // Marked done when the debrief lands, not when the learner leaves,
             // so closing the tab on the feedback screen still counts the work.
+            // It pays too, since s194 (audit P19): a graded conversation used to
+            // award nothing while a single flashcard awarded 6.
             completeScenario(active.id);
+            addXp(XP.scenarioComplete);
             registerSession();
           }}
         />
@@ -57,13 +100,47 @@ export function SprechenHub() {
 
   return (
     <div className="space-y-5 sm:space-y-8">
-      <HubHero icon={Mic} gradient="from-cyan-500 to-sky-500" eyebrow="Anwenden" title="Sprechen" />
+      {/* The scope row, in the Prüfung hub's shape: the Niveau it was opened
+          with, and the one way back. */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-sm text-muted-foreground">Niveau</span>
+          <button
+            type="button"
+            onClick={() => setBand("")}
+            aria-pressed={!band}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-semibold transition-colors",
+              !band ? "bg-accent/30 text-accent-ink" : "bg-muted text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Alle
+          </button>
+          {LEVELS.map((l) => (
+            <button
+              key={l.band}
+              type="button"
+              onClick={() => setBand(l.band)}
+              aria-pressed={band === l.band}
+              className={cn(
+                "rounded-md px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors",
+                band === l.band
+                  ? "bg-accent/30 text-accent-ink"
+                  : "bg-muted text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {l.band}
+            </button>
+          ))}
+        </div>
+        <BackToPruefung />
+      </div>
 
-      {byLevel.map(({ level, items }) => (
+      {byLevel.map(({ level, label, items }) => (
         <section key={level} className="space-y-3">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {levelLabel[level]}
+              {label}
             </h2>
             <Badge variant="muted">{items.length}</Badge>
           </div>

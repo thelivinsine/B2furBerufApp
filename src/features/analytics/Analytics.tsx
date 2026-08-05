@@ -36,6 +36,7 @@ import {
   useProgressStore,
   useEffectiveStreak,
   useTodayXp,
+  isFullMockRun,
   SEEDED_MILESTONE,
 } from "@/store/useProgressStore";
 import { useSettingsStore, type LearningGoal } from "@/store/useSettingsStore";
@@ -300,7 +301,7 @@ export function Analytics() {
   const dailyXp = useProgressStore((s) => s.dailyXp);
   const srs = useProgressStore((s) => s.srs);
   const scenariosDone = useProgressStore((s) => s.scenariosDone);
-  const examsDone = useProgressStore((s) => s.examsDone);
+  const mockExams = useProgressStore((s) => s.mockExams);
   const totalSessions = useProgressStore((s) => s.totalSessions);
   const savedWords = useProgressStore((s) => s.savedWords);
   const todayXp = useTodayXp();
@@ -448,7 +449,20 @@ export function Analytics() {
   // Prüfung block: only while the date is still ahead. A past date would sit at
   // "0 Tage" forever, so the card retires itself once the exam has happened.
   const examUpcoming = examDate !== null && examDate >= todayKey() && daysToExam !== null;
-  const lastExam = examsDone.length ? examsDone[examsDone.length - 1] : null;
+  // The Modelltest history, newest first. It used to read `examsDone`, which
+  // NOTHING has written since the branching exam runner was retired, so this
+  // whole block reported "noch keine Simulation" and "0 Prüfungen" however many
+  // Modelltests a learner sat (s194 audit P2). A Modelltest is a run that sat
+  // all four parts, the same rule the Prüfung hub's Verlauf uses.
+  const fullRuns = useMemo(
+    () =>
+      mockExams
+        .filter(isFullMockRun)
+        .slice()
+        .reverse(),
+    [mockExams],
+  );
+  const lastExam = fullRuns.find((m) => m.total != null) ?? null;
   const examDateLabel = examDate
     ? new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long" }).format(
         new Date(`${examDate}T00:00:00`),
@@ -540,7 +554,7 @@ export function Analytics() {
             <StatCard icon={Zap} label="Gesamt-XP" value={xp.toLocaleString()} hint={`${totalSessions} Sitzungen`} />
             <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak}`} accent="reward" />
             <StatCard icon={BookOpen} label="Vokabeln" value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={`${pct(masteryGroups.mastered, vocabulary.length)}% gemeistert`} accent="success" />
-            <StatCard icon={Trophy} label="Szenarien" value={`${scenariosDone.length}/${scenarios.length}`} hint={`${examsDone.length} Prüfungen`} accent="accent" />
+            <StatCard icon={Trophy} label="Szenarien" value={`${scenariosDone.length}/${scenarios.length}`} hint={`${fullRuns.length} Modelltests`} accent="accent" />
           </div>
         )}
       </section>
@@ -614,8 +628,8 @@ export function Analytics() {
                     </p>
                     <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">
                       {lastExam
-                        ? `letzte Simulation ${lastExam.score} %`
-                        : "noch keine Simulation"}
+                        ? `letzter Modelltest ${lastExam.total} %`
+                        : "noch kein Modelltest"}
                     </p>
                   </div>
                 </div>
@@ -625,7 +639,7 @@ export function Analytics() {
                   className="self-start"
                   onClick={() => navigate("/exam")}
                 >
-                  <Trophy className="h-4 w-4" /> Simulation starten
+                  <Trophy className="h-4 w-4" /> Modelltest starten
                 </Button>
               </CardContent>
             </Card>
@@ -925,19 +939,24 @@ export function Analytics() {
             {/* Activity calendar */}
             <ActivityCalendar />
 
-            {/* Exam history */}
-            {examsDone.length > 0 && (
+            {/* Modelltest history. The detail (per-part breakdown, the
+                development chart) lives in the Prüfung hub's own Verlauf, which
+                is the ONE place a result is shown per page (founder s188); this
+                is the same list in the Fortschritt frame. */}
+            {fullRuns.length > 0 && (
               <Card>
                 <CardContent className="p-5">
-                  <p className="mb-3 font-semibold">Prüfungsverlauf</p>
+                  <p className="mb-3 font-semibold">Modelltests</p>
                   <div className="space-y-2">
-                    {[...examsDone].reverse().slice(0, 10).map((e, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm">
+                    {fullRuns.slice(0, 10).map((e) => (
+                      <div key={e.id} className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">{e.date}</span>
-                        <span className="font-medium">{e.id.replace("ex_", "")}</span>
+                        <span className="font-medium tabular-nums">{e.level}</span>
                         <div className="flex items-center gap-2">
-                          <Progress value={e.score} className="w-20" />
-                          <span className="w-10 text-right font-semibold tabular-nums">{e.score}%</span>
+                          <Progress value={e.total ?? 0} className="w-20" />
+                          <span className="w-16 text-right font-semibold tabular-nums">
+                            {e.total != null ? `${e.total}%` : "ohne"}
+                          </span>
                         </div>
                       </div>
                     ))}

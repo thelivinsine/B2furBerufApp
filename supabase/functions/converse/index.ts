@@ -455,13 +455,17 @@ Deno.serve(async (req) => {
   // conversations to farm free turns.
   const { data: existing } = await admin
     .from("speaking_conversations")
-    .select("id, turns, exam, created_at")
+    .select("id, turns, exam, created_at, cost_estimate")
     .eq("id", conversationId)
     .eq("user_id", user.id)
     .maybeSingle();
 
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
+  /** Rows used today, counted once. Cannot change mid-conversation. */
+  let todayUsed: number;
+  /** True for the request that CREATED the row, which is what may need undoing. */
+  let created = false;
 
   if (!existing) {
     if (mode === "debrief")
@@ -472,7 +476,8 @@ Deno.serve(async (req) => {
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .gte("created_at", startOfDay.toISOString());
-    if ((todayCount ?? 0) >= DAILY_LIMIT) {
+    todayUsed = todayCount ?? 0;
+    if (todayUsed >= DAILY_LIMIT) {
       return json({
         ok: false,
         limitReached: true,
@@ -516,6 +521,18 @@ Deno.serve(async (req) => {
         message: "Das Gespräch konnte nicht gestartet werden. Bitte versuche es später erneut.",
       });
     }
+    created = true;
+    todayUsed += 1;
+  } else {
+    // An existing conversation: the row was already counted on the turn that
+    // created it, so today's usage is read once here rather than re-counted on
+    // every single turn the way it used to be (s194 audit P31).
+    const { count } = await admin
+      .from("speaking_conversations")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", startOfDay.toISOString());
+    todayUsed = count ?? 0;
   }
 
   // The transcript of record is the STORED one. A forged body cannot extend a
@@ -525,27 +542,48 @@ Deno.serve(async (req) => {
     : [];
   const learnerTurns = storedTurns.filter((t) => t.role === "learner").length;
 
-  const remainingAfter = Math.max(
-    0,
-    DAILY_LIMIT -
-      ((
-        await admin
-          .from("speaking_conversations")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .gte("created_at", startOfDay.toISOString())
-      ).count ?? 0),
-  );
+  const remainingAfter = Math.max(0, DAILY_LIMIT - todayUsed);
+
+  /**
+   * Give the daily unit back when the conversation never got off the ground
+   * (s194 audit P30). The row is inserted BEFORE the model is called so an
+   * abandoned run cannot farm free turns, but that also meant one transient
+   * upstream failure cost the learner half of a two-per-day allowance for a
+   * conversation that produced nothing. Only the request that created the row
+   * can undo it, and only while the transcript is still empty, so this can
+   * never erase a conversation that actually happened.
+   */
+  const undoEmptyStart = async () => {
+    if (!created) return;
+    const { error } = await admin
+      .from("speaking_conversations")
+      .delete()
+      .eq("id", conversationId)
+      .eq("user_id", user.id)
+      .eq("turns", "[]");
+    if (error) console.error("speaking_conversations rollback failed", error.message);
+  };
 
   /* ------------------------------- turn mode ------------------------------ */
 
   if (mode === "turn") {
+    const raw = typeof body.utterance === "string" ? body.utterance.trim() : "";
     const utterance = clip(body.utterance, MAX_UTTERANCE);
     // An empty utterance is the learner opening the conversation: the partner
     // speaks first. Any later empty turn is a recognition miss and is refused
     // rather than spending a call to have the partner answer silence.
     if (!utterance && storedTurns.length > 0)
       return json({ ok: false, message: "Nichts verstanden." }, 400);
+    // Too long is REFUSED, not silently shortened (s194 audit P34): the client
+    // showed the whole thing in the transcript while the stored and graded one
+    // stopped at 800 characters, so the two quietly disagreed.
+    if (raw.length > MAX_UTTERANCE) {
+      await undoEmptyStart();
+      return json({
+        ok: false,
+        message: "Das war zu lang für einen Beitrag. Sag es bitte kürzer.",
+      });
+    }
 
     if (learnerTurns >= MAX_LEARNER_TURNS) {
       return json({
@@ -566,6 +604,7 @@ Deno.serve(async (req) => {
 
     const out = await cascade(turnSystemPrompt(brief), wire, TURN_MODEL);
     if (!out) {
+      await undoEmptyStart();
       return json({
         ok: false,
         message: "Deine Gesprächspartnerin ist gerade nicht erreichbar. Bitte versuche es erneut.",
@@ -579,9 +618,18 @@ Deno.serve(async (req) => {
       ...(utterance ? [{ role: "learner", text: utterance }] : []),
       { role: "partner", text: reply },
     ];
+    // ACCUMULATED, not overwritten (s194 audit P29): the row used to report the
+    // cost of its most recent turn, which made per-conversation cost reporting
+    // wrong by roughly the number of turns. The global fuse was never affected,
+    // because `bump_ai_usage` has always added.
+    const spentSoFar = Number(existing?.cost_estimate ?? 0) || 0;
     const { error: updErr } = await admin
       .from("speaking_conversations")
-      .update({ turns: nextTurns, cost_estimate: out.cost, model: out.model })
+      .update({
+        turns: nextTurns,
+        cost_estimate: spentSoFar + out.cost,
+        model: out.model,
+      })
       .eq("id", conversationId)
       .eq("user_id", user.id);
     if (updErr) console.error("speaking_conversations turn update failed", updErr.message);
@@ -672,6 +720,9 @@ Deno.serve(async (req) => {
       tip_en: insightEn,
       score,
       model: out.model,
+      // The debrief is the most expensive call of the conversation and used to
+      // be left out of the row's cost entirely (s194 audit P29).
+      cost_estimate: (Number(existing?.cost_estimate ?? 0) || 0) + out.cost,
     })
     .eq("id", conversationId)
     .eq("user_id", user.id);

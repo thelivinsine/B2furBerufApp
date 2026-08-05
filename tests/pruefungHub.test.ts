@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isFullRun, toPractice } from "@/features/pruefung/PruefungHub";
+import { isFullRun, toPractices } from "@/features/pruefung/PruefungHub";
 import type { MockExamRecord } from "@/store/useProgressStore";
 
 /**
@@ -41,21 +41,26 @@ describe("isFullRun", () => {
   });
 });
 
-describe("toPractice", () => {
+describe("toPractices", () => {
   it("names the module a single-part run belongs to", () => {
-    expect(toPractice(rec({ hoeren: 61 }, 61))).toEqual({
-      id: "r",
-      date: "2026-08-04",
-      part: "hoeren",
-      pct: 61,
-    });
+    expect(toPractices(rec({ hoeren: 61 }, 61))).toEqual([
+      { id: "r|hoeren", date: "2026-08-04", part: "hoeren", pct: 61 },
+    ]);
   });
 
   it("keeps an unscored practice, with a null percentage", () => {
-    expect(toPractice(rec({ sprechen: null }))?.pct).toBeNull();
+    expect(toPractices(rec({ sprechen: null }))[0]?.pct).toBeNull();
   });
 
-  it("returns null when the record names no known part", () => {
-    expect(toPractice(rec({}))).toBeNull();
+  it("is empty when the record names no known part", () => {
+    expect(toPractices(rec({}))).toEqual([]);
+  });
+
+  it("keeps EVERY module a partial run sat, in exam order (s194 audit P32)", () => {
+    // The single-part version dropped the Hoeren score on the floor.
+    expect(toPractices(rec({ hoeren: 61, lesen: 84 }))).toEqual([
+      { id: "r|lesen", date: "2026-08-04", part: "lesen", pct: 84 },
+      { id: "r|hoeren", date: "2026-08-04", part: "hoeren", pct: 61 },
+    ]);
   });
 });

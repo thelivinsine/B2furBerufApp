@@ -22,6 +22,24 @@ export interface MockExamRecord {
   parts: Record<string, number | null>;
 }
 
+/**
+ * The four module keys as plain strings, so a surface can classify a run
+ * WITHOUT importing `engine/exam` and, behind it, the text/dialogue/writing
+ * banks. Fortschritt needs exactly that (s194 audit P2) and is a lazy route
+ * that has no other reason to carry ~500 kB of content.
+ *
+ * It must equal `MOCK_PART_ORDER`; `tests/exam.test.ts` pins the pair.
+ */
+export const MOCK_EXAM_PART_KEYS = ["lesen", "hoeren", "schreiben", "sprechen"] as const;
+
+/**
+ * A Modelltest is a run that sat all four parts; a run that sat one is module
+ * practice (founder s190). The two lists never mix, on any surface.
+ */
+export function isFullMockRun(record: MockExamRecord): boolean {
+  return MOCK_EXAM_PART_KEYS.every((p) => p in record.parts);
+}
+
 /** Cloud row stays bounded (DB audit R1 discipline): keep the newest N runs. */
 const MOCK_EXAMS_RETAINED = 100;
 
@@ -48,6 +66,13 @@ interface ProgressState {
   srs: Record<string, SrsCard>; // vocabId -> card
   redemittelSeen: Record<string, number>; // phraseId -> times practised
   scenariosDone: string[];
+  /**
+   * RETIRED (s194 audit P2). Written by the branching exam runner that s186
+   * replaced; a finished exam has been a `mockExams` row ever since. Kept, and
+   * still synced, because it is real history for learners who used the app
+   * before s186 (retire, never delete). Nothing reads it for display any more,
+   * and nothing writes it: `completeExam` is gone.
+   */
   examsDone: { id: string; score: number; date: string }[];
   /**
    * Full mock-exam runs (Prüfungssimulation rework, s186), newest last, with
@@ -93,7 +118,6 @@ interface ProgressState {
   toggleSavedWord: (vocabId: string) => void;
   practiceRedemittel: (phraseId: string) => void;
   completeScenario: (scenarioId: string) => void;
-  completeExam: (examId: string, score: number) => void;
   completeMockExam: (record: MockExamRecord) => void;
   registerSession: () => void;
   completeMission: (missionId: string) => void;
@@ -243,11 +267,6 @@ export const useProgressStore = create<ProgressState>()(
           scenariosDone: s.scenariosDone.includes(scenarioId)
             ? s.scenariosDone
             : [...s.scenariosDone, scenarioId],
-        })),
-
-      completeExam: (examId, score) =>
-        set((s) => ({
-          examsDone: [...s.examsDone, { id: examId, score, date: todayKey() }],
         })),
 
       completeMockExam: (record) =>

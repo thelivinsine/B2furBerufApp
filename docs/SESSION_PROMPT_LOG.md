@@ -4644,3 +4644,94 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `scripts/lint-content.mjs` · `tests/conversation.test.ts` · `tests/scenarios.test.ts` ·
   `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
 
+
+## Session 194 · 2026-08-05 · branch `claude/prufung-hub-audit-5nvdvo`
+
+- **Prompt 1 (verbatim):** `i want you to do a thorough audit and analysis of the prufung hub to
+  find all bugs, inconsistencies, gaps with all kinds of things, be it front end or back end and
+  give me a detailed report`
+  **Response:** audit only, no app code touched. Scope: `/anwenden` (both tabs), the Modelltest
+  runner and its four Teile, the two free trainers the hub feeds (`/writing`, `/simulation`), the
+  engines (`engine/exam.ts`, `engine/speaking.ts`, `engine/conversation.ts`), the stores
+  (`useExamStore`, `mockExams` in `useProgressStore`), the `converse` Edge Function and migration
+  0017, the nav/shell integration, and how the zone's results surface on Fortschritt. Content pools
+  were measured by running the composer against the real banks rather than read off the docs.
+  **35 findings, ranked.** Six blocking: an untimed Lesen/Hören module cannot be finished with one
+  answer blank (Ohne Zeit is the resting state, so it is the default path); nothing has written
+  `examsDone` since the old exam runner retired, so Fortschritt's Prüfung card reads "noch keine
+  Simulation" and "0 Prüfungen" forever while `mockExams` fills up; the exam clock is a tick counter,
+  so a background tab or a reload pauses it; the conversation turn ceiling is enforced server-side
+  only and `canSpeak`/`turnsLeft`/`conversationOver` are all unread, so the local transcript diverges
+  from the graded one; Teil Sprechen offers "Nochmal", so a candidate can re-sit it; and `examBrief`
+  hardcodes `level: "B2.1"`, so every Modelltest speaking part is pitched and graded at B2.1 whatever
+  Niveau was chosen. **Three patterns explain most of it:** a retired feature left its readers
+  behind, Ohne Zeit was bolted onto a flow whose only exit was the clock, and the server enforces
+  what the client never displays. **Content findings:** Durchsagen are eligible as Lesen texts (38%
+  of the B2 reading pool); a C1 Hören is mostly B2.2 and can never carry the Notizen task its own
+  Anleitung promises; and no Alltag speaking task exists above scenario level 1, so a B2 or C1
+  Modelltest can only ever serve a workplace task. Also flagged: spoken transcripts are missing from
+  the GDPR export, the exam's Schreiben correction is computed and never shown, the zone awards
+  almost no XP, and opening the hub pulls ~825 kB of content banks and re-scans them unmemoised on
+  every render. Gates re-run green as a baseline: typecheck · lint 0 errors / 75 warnings ·
+  592 tests · build · check:bundle 127.0 kB.
+- **Artifacts (prompt 1):** `docs/reports/pruefung-audit-2026-08-05.md` ·
+  `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 2 (verbatim):** `fix all the issue and open a pr and merge. once done document the
+  session`
+  **Response:** all 35 findings fixed, gates green, PR opened and squash-merged.
+  **Blocking six.** P1 the untimed dead end: "Teil abschließen" is unconditional on the last
+  question, blanks cost a confirm naming the count. P2 Fortschritt reads `mockExams` through a new
+  bank-free `isFullMockRun` in the progress store (so a lazy route classifies runs without pulling
+  ~500 kB of content banks behind it); `completeExam` deleted, `examsDone` RETIRED but kept and
+  synced because it is real pre-s186 history. P3 the clock is a deadline (`endsAt`), ticked on
+  mount and on `visibilitychange`, with a legacy fallback so a run persisted mid-part across the
+  deploy still finishes. P4 the client enforces the 14-turn ceiling, counts down from three and
+  ROLLS BACK a turn whose round trip failed (`dropLastLearnerTurn`), because the debrief grades the
+  stored transcript. P5 no "Nochmal" in exam mode. P6 `examBrief` takes the run's band
+  (`EXAM_BAND[plan.level]`) instead of a hard-coded "B2.1".
+  **Gaps.** The exam's Schreiben correction renders (`correction.tsx`'s fifth caller, from
+  `run.essay` + `corrected`); the brief card's `disabledReason` is wired to the daily allowance;
+  the Modelltest band states what a run costs the daily writing AND speaking budget and warns when
+  either is out; the Sprechtrainer got `BackToPruefung` and a `?level=`/`?sz=` URL scope (so ⌘K now
+  deep-links a searched situation); Hören guards TTS, offers the text when the browser cannot speak,
+  counts a play on a real start, cannot be double-tapped and stops when the Ansage changes;
+  `useSpeechInput` re-opens across the recogniser's automatic end instead of wiping the transcript;
+  `speaking_conversations` is in the GDPR export.
+  **Content.** `readingPool` excludes audio kinds (Durchsagen were 38% of the B2 reading pool;
+  pools stay 9/16/5). Two C1 audio texts authored, one carrying the first C1 Notizen sheet, so a C1
+  Hören no longer tops up from B2.2 at all, plus the Anleitung now describes the DRAWN plan
+  (`instructionsPlain` when there is no Notizen sheet). Six Alltag exam sets authored at B2 and C1
+  over scenarios that already existed at those rungs (`ex_auslaenderbehoerde`, `ex_wohnungsmangel`,
+  `ex_internetstoerung`, `ex_widerspruch`, `ex_mietminderung`, `ex_kostenuebernahme`), because every
+  Alltag set hung off a level-1 scenario and a B2/C1 Modelltest could only serve a workplace task.
+  The authored `rubric` is on screen again (the Sprechen Anleitung's "Bewertet wird" line) rather
+  than being linter-required and rendered nowhere, and `lintExamSets` now caps `aspects` at the 5
+  the debrief can grade.
+  **Backend.** `converse` accumulates `cost_estimate` instead of overwriting it per turn (the
+  debrief was not counted at all), refunds the daily unit when a conversation's very first turn
+  fails, counts the day's rows once instead of on every turn, and REFUSES an over-long utterance
+  rather than clipping it so the shown and stored transcripts cannot disagree.
+  **XP.** A graded conversation pays `scenarioComplete` (defined since the branching era, awarded by
+  nobody) and a single module sitting pays a new `moduleComplete`; both used to pay zero while
+  counting for the streak.
+  **A11y + perf.** The switcher is a real tablist (ids, `aria-controls`, roving tab stop, arrow
+  keys), the Niveau listbox has arrow keys and returns focus, the Verlauf expander has
+  `aria-controls`, the score chart and the run rows have text alternatives; availability is
+  memoised per mount for every level instead of re-walking two banks on every render, and the
+  Niveau list shows each level's honest count so A2 looks dead before it is picked.
+  **Not taken further, on purpose:** the second half of P28. The per-render re-scan is fixed but the
+  hub still LOADS the banks, because `engine/exam` imports them; the real fix is precomputing
+  availability at build time like `frequency.ts`, which is a generator job rather than a bug fix.
+  Gates: typecheck · lint 0 errors (75 warnings, unchanged) · 610 tests (up from 592) · build ·
+  check:bundle 127.1 kB · check:contrast · lint:content · lint:migrations.
+- **Artifacts (prompt 2):** `src/features/pruefung/PruefungHub.tsx` ·
+  `src/features/exam/{MockExamRunner,McParts,SchreibenPart,SprechenPart,partMeta}` ·
+  `src/features/sprechen/{ConversationRunner,ConversationBriefCard,ConversationDebrief,MicCluster,useSpeechInput,SprechenHub}` ·
+  `src/engine/{exam,speaking,conversation,scoring,speech}.ts` · `src/store/{useExamStore,useProgressStore}.ts` ·
+  `src/features/analytics/Analytics.tsx` · `src/features/dashboard/recommend.ts` ·
+  `src/lib/{dataExport,search}.ts` · `src/data/{examSets,texts,provenance}.ts` ·
+  `supabase/functions/converse/index.ts` · `scripts/lint-content.mjs` ·
+  `tests/{exam,conversation,pruefungHub}.test.ts` · `docs/areas/PRUEFUNG.md` (new) ·
+  `docs/areas/SPRECHEN.md` · `docs/reports/pruefung-audit-2026-08-05.md` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · this log

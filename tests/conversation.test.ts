@@ -7,6 +7,7 @@ import {
   canDebrief,
   canSpeak,
   closeConversation,
+  dropLastLearnerTurn,
   editLastLearnerTurn,
   failTurn,
   learnerText,
@@ -14,9 +15,10 @@ import {
   learnerWordCount,
   startConversation,
   toWire,
+  turnsLeft,
   applyHint,
 } from "@/engine/conversation";
-import { briefGoals, examBrief, showsTextWhileSpeaking, speakingBrief } from "@/engine/speaking";
+import { briefGoals, examBrief, speakingBrief } from "@/engine/speaking";
 import type { ConversationBrief, ExamSet, Scenario } from "@/types";
 
 const brief: ConversationBrief = {
@@ -196,9 +198,45 @@ describe("brief derivation", () => {
     expect(examBrief({ ...set, stage: "anruf" }).stage).toBe("anruf");
   });
 
-  it("only hides text in the Anruf stage", () => {
-    expect(showsTextWhileSpeaking("gespraech")).toBe(true);
-    expect(showsTextWhileSpeaking("buehne")).toBe(true);
-    expect(showsTextWhileSpeaking("anruf")).toBe(false);
+  // s194 audit P6: `examBrief` hard-coded "B2.1", so every Modelltest speaking
+  // part was pitched and graded at B2.1 whatever Niveau the learner chose.
+  it("pitches the exam brief at the level it is given, not a constant", () => {
+    expect(examBrief(set).level).toBe("B2.1");
+    expect(examBrief(set, undefined, "B1.2").level).toBe("B1.2");
+    expect(examBrief(set, undefined, "C1").level).toBe("C1");
+  });
+});
+
+// s194 audit P4: the client showed turns the stored transcript never received.
+describe("turn ceiling and rollback", () => {
+  it("counts the turns still available", () => {
+    let s = startConversation(brief);
+    expect(turnsLeft(s)).toBe(MAX_LEARNER_TURNS);
+    s = addLearnerTurn(s, "Hallo");
+    expect(turnsLeft(s)).toBe(MAX_LEARNER_TURNS - 1);
+  });
+
+  it("reaches zero exactly when the learner may no longer speak", () => {
+    let s = startConversation(brief);
+    for (let i = 0; i < MAX_LEARNER_TURNS; i++) {
+      s = addPartnerTurn(addLearnerTurn(s, `Beitrag ${i}`), `Antwort ${i}`);
+    }
+    expect(turnsLeft(s)).toBe(0);
+    expect(canSpeak(s)).toBe(false);
+  });
+
+  it("takes back the last learner turn when its round trip failed", () => {
+    let s = addPartnerTurn(startConversation(brief), "Guten Tag.");
+    s = addLearnerTurn(s, "Nicht angekommen");
+    expect(learnerTurnCount(s)).toBe(1);
+    s = dropLastLearnerTurn(s);
+    expect(learnerTurnCount(s)).toBe(0);
+    // The partner's line is untouched: only the turn that was never stored goes.
+    expect(s.turns).toEqual([{ role: "partner", text: "Guten Tag." }]);
+  });
+
+  it("is a no-op when there is no learner turn to take back", () => {
+    const s = addPartnerTurn(startConversation(brief), "Guten Tag.");
+    expect(dropLastLearnerTurn(s)).toEqual(s);
   });
 });

@@ -112,17 +112,17 @@ after pulling.
   (structure, edit mode, icon rules — `docs/areas/PRAKTISCH-NAV.md`), the dialog/overlay recipe
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
   lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the Himmelblau-fill/white-controls
-  FilterRail answer (s189; it was grey from s104 to s189), the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
-  `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
-  Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
+  FilterRail answer (s189), the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
+  `layoutId`), the Prüfung module card's anatomy (s191: no description line, the minutes badge's
+  corner reserved in both clock states), the Schreiben mobile anatomy (ONE fixed bottom-chrome
+  geometry shared by Fokus, Kurz and Lang + measured tile heights + the Fokus dial tile,
   `docs/areas/SCHREIBEN.md`).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`. `mergeRemoteSettings` adopts on `settings.onboarded === true` and nothing
-  else: a proxy field (it was `profile.name`, which onboarding never collects) silently sent every
-  account back through onboarding and discarded its level and goal. Where a not-onboarded visitor
-  goes depends on their session: signed out → `/welcome`, signed in → `/start`
-  (`docs/DECISIONS.md` §s174).
+  else (a proxy field sent every account back through onboarding and discarded its level and goal).
+  Where a not-onboarded visitor goes depends on their session: signed out → `/welcome`, signed in →
+  `/start` (`docs/DECISIONS.md` §s174).
 - **Sprechen is Schreiben with a microphone** (s193): a brief, a conversation, then the EXISTING
   `features/writing/correction.tsx` card as the debrief (speaking is its fourth caller; never build
   a fifth copy). Deliberately NOT an open chatbot: an LLM adapts down to the learner, never
@@ -132,7 +132,16 @@ after pulling.
   (`gespraech`), an exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it
   (`anruf`). **The conversation row is written when a conversation STARTS**, so the daily limit
   counts what costs money, and the turn ceiling is measured against the STORED transcript, never
-  the request body. Full detail in `docs/areas/SPRECHEN.md`.
+  the request body, AND on the client, so a learner never speaks into turns the grader will not see
+  (s194). Full detail in `docs/areas/SPRECHEN.md`.
+- **An exercise the app scores can always be handed in, and every score it produces is reachable**
+  (s194 audit). A clock is never the ONLY way a part ends: "Teil abschließen" sits on the last
+  question unconditionally, blank answers cost a confirm (Ohne Zeit has no clock, so requiring every
+  answer was a dead end on the default path), and a clock is measured against a DEADLINE, never by
+  decrementing, or a background tab pauses the exam. Every correction the evaluator returns is
+  rendered, and a result surfaces in exactly ONE Verlauf: **a Modelltest sat all four parts, a run
+  that sat one is module practice** (`isFullMockRun`, bank-free so Fortschritt applies the same rule
+  without pulling a bank; `examsDone` is retired). Detail in `docs/areas/PRUEFUNG.md`.
 - **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
   instead of throwing, so an ignored result makes a permanently broken sync look identical to a
   working one while localStorage keeps the app running. Every push reads its error, retries with
@@ -269,6 +278,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - `CONTENT.md` — banks, schemas, taxonomy, linter checklist, provenance. Pair with `/content`.
 - `BIBLIOTHEK.md` — the `/library` tabs, views, graphs, FilterRail, search, Grammatik lessons.
 - `SESSION.md` — the composed session engine, Üben auto-variety rules, focus mode, SRS engines.
+- `PRUEFUNG.md` — the `/anwenden` zone: the two tabs, the run and its deadline clock, what a level
+  can serve, what a Modelltest costs the daily AI budget, where a result is shown.
 - `SCHREIBEN.md` — `/writing` Fokus/Kurz/Lang, rails, correction card, the mobile anatomy (fixed
   chrome, measured heights, Fokus dial tile), umlaut keys, AI cascade.
 - `SPRECHEN.md` — the AI conversation partner: the brief/conversation/debrief shape, the three

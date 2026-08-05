@@ -40,6 +40,9 @@ shared.
 rejected there by the content linter, because the transcript is a practice affordance.
 `speakingBrief()` always returns `gespraech`.
 
+**The exam RunBar frames every screen of a Teil** (s194), the brief and the debrief included, not
+only the talking one.
+
 **No exam set is `anruf` yet.** Every one of the 15 authored sets is a "discuss the aspects and
 agree" task whose aspects must stay readable, so the Anruf layout is built, tested and unreached
 until listen-and-hold speaking tasks are authored. That is the next content job, not a bug.
@@ -50,7 +53,11 @@ Briefs are **derived, never authored twice** (`src/engine/speaking.ts`):
 
 - practice → `speakingBrief(scenario)`; `partner` + `goals` are authored on the scenario, and
   fall back to a neutral partner and the task line so nothing is ever unservable.
-- exam → `examBrief(set, scenario)`; `aspects` **are** the Leitpunkte, and always were.
+- exam → `examBrief(set, scenario, EXAM_BAND[level])`; `aspects` **are** the Leitpunkte, and always
+  were. **The level is the RUN's**, passed in: it was hard-coded to `B2.1` until s194, so every
+  Modelltest's speaking part was pitched and graded at B2.1 while the other three Teile honoured the
+  chosen Niveau. The content linter caps `aspects` at 5, the number the debrief can return verdicts
+  for, so authoring a sixth is an error rather than a silent truncation.
 
 The authored branching `nodes` are no longer read at runtime. They stay in the bank (ids are
 permanent, the linter still validates them); retiring them is a separate mechanical change.
@@ -69,7 +76,19 @@ never leaves the device, which is why the privacy policy can say so.
   rows, so it counts what actually costs money; a learner cannot abandon conversations to farm
   free turns.
 - **Turn count is read from the stored row**, never the request body, so a forged transcript
-  cannot push a run past `MAX_LEARNER_TURNS` (14, mirrored in `engine/conversation.ts`).
+  cannot push a run past `MAX_LEARNER_TURNS` (14, mirrored in `engine/conversation.ts`) — and since
+  s194 the CLIENT enforces it too, because a ceiling the learner cannot see is a ceiling they walk
+  into. The mic closes at zero, the caption counts down from three, and a turn whose round trip
+  FAILED is rolled back off the transcript (`dropLastLearnerTurn`): the debrief grades the stored
+  transcript, so anything not in it must not be on screen either.
+- **The daily allowance gates the START button**, not a caption after the fact: with nothing left,
+  the brief card says so and cannot be started (s194).
+- **A conversation whose very first turn fails gives its unit back.** The row is still inserted
+  before the model call, so an abandoned run cannot farm free turns, but a transient upstream
+  failure no longer costs half of a two-per-day allowance for a conversation that never happened.
+- **`cost_estimate` accumulates** across turns and the debrief; it used to be overwritten per turn.
+- **An over-long utterance is refused, not silently clipped**, so the shown and the stored
+  transcripts cannot disagree.
 - Per-user monthly ceiling, plus the shared `MONTHLY_SPEND_CAP_USD` fuse every AI feature sits
   behind.
 
@@ -79,6 +98,11 @@ never leaves the device, which is why the privacy policy can say so.
   looks identical whichever trainer produced it (s172); never hand-build a fifth copy.
 - **No score on the debrief screen**, even in exam mode. A result is shown in ONE place per page
   (founder s188) and that place is the Verlauf.
+- **No "Nochmal" in exam mode** (s194). A Teil is sat once; the retry restarted the part from its
+  brief and discarded the first score, so a candidate could re-sit until the number looked good.
+- **An automatic end of the recogniser does not end the utterance.** Chrome stops after a silence
+  and mobile Chrome ignores `continuous`; `useSpeechInput` re-opens and keeps the finals, because
+  the old behaviour reset the transcript on the learner's next press.
 - **Whether a Redemittel was used is asked of the model**, not matched against the transcript: a
   learner making a suggestion does not say the words "Vorschläge machen".
 - **The exam part completes on EXIT, carrying the score**, not when the debrief arrives. Firing on
@@ -89,6 +113,8 @@ never leaves the device, which is why the privacy policy can say so.
   recognition, so `supported` is false and the learner types. That is exactly what Sprechen did
   before this feature existed, so nobody is worse off.
 - A running conversation claims `useLiveWork`, so the PWA cannot reload over it.
+- **The transcript is in the GDPR export.** `speaking_conversations` is the learner's own speech;
+  `lib/dataExport.ts` ships it beside their writing (s194).
 
 ## Files
 
@@ -101,7 +127,7 @@ never leaves the device, which is why the privacy policy can say so.
 | `features/sprechen/ConversationDebrief.tsx` | Goals, correction card, Redemittel. |
 | `features/sprechen/MicCluster.tsx` | The shared control cluster + typed fallback. |
 | `features/sprechen/useSpeechInput.ts` | The microphone, over `engine/speech.ts`. |
-| `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. |
+| `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. Reads `?level=` and `?sz=`, and carries the same Zurück to the Prüfung hub the Schreibtrainer has. |
 | `features/exam/SprechenPart.tsx` | Teil Sprechen of the Modelltest. |
 | `lib/speaking.ts` | Edge Function client. |
 | `supabase/functions/converse/` | Turns + debrief, all secrets, all guards. |

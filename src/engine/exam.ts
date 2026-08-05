@@ -102,9 +102,24 @@ function listeningPool(level: MockExamLevel): ReadingText[] {
 
 function readingPool(level: MockExamLevel): ReadingText[] {
   const bands = new Set(LEVEL_BANDS[level]);
-  // Voicemail transcripts stay in Hören; everything else reads as a text.
-  return texts.filter((t) => t.kind !== "voicemail" && bands.has(t.cefr));
+  // Audio material stays in Hören. Excluding only voicemails left every
+  // Durchsage eligible as a reading text (38% of the B2 pool, audit P15), so a
+  // Lesen part regularly served listening material read silently. The pools
+  // stay servable without them: B1 9, B2 16, C1 5, all above READING_COUNT.
+  return texts.filter((t) => !AUDIO_KINDS.has(t.kind) && bands.has(t.cefr));
 }
+
+/**
+ * The CEFR band a Modelltest level is pitched at, for anything that needs one
+ * band rather than the level's pair (the spoken brief, audit P6). The lower
+ * half of a band is where a level's own exam sits: a B2 candidate is prepared
+ * for B2, not held to B2.2.
+ */
+export const EXAM_BAND: Record<MockExamLevel, ContentCefr> = {
+  B1: "B1.2",
+  B2: "B2.1",
+  C1: "C1",
+};
 
 /** B1 writes the short format (Goethe B1: 40-80 words); B2/C1 the long one. */
 export function writingLengthFor(level: MockExamLevel): WritingLength {

@@ -26,6 +26,7 @@ export function MicCluster({
   onHint,
   onEnd,
   endLabel = "Beenden",
+  highlightEnd = false,
   caption,
   typed,
   onTypedChange,
@@ -33,13 +34,19 @@ export function MicCluster({
 }: {
   listening: boolean;
   supported: boolean;
-  /** Waiting for the partner: the microphone must not open on top of it. */
+  /**
+   * Waiting for the partner, or out of turns: the microphone must not open on
+   * top of either. Speaking past the turn ceiling used to be possible and
+   * produced turns the grader never saw (s194 audit P4).
+   */
   busy: boolean;
   onStart: () => void;
   onStop: () => void;
   /** Absent in exam mode: there are no hints in the Modelltest. */
   onHint?: () => void;
   onEnd: () => void;
+  /** The conversation is over: the way out becomes the primary action. */
+  highlightEnd?: boolean;
   /** "Auflegen" in the call layout. Neutral, never danger red: that colour is
    *  reserved for errors (founder s193 kept the rule rather than the phone
    *  convention). */
@@ -129,6 +136,7 @@ export function MicCluster({
           }
           label={endLabel}
           onClick={onEnd}
+          highlight={highlightEnd}
         />
       </div>
       <p className="mt-2.5 min-h-[18px] text-center text-xs text-muted-foreground">
@@ -143,20 +151,32 @@ function ClusterButton({
   label,
   onClick,
   disabled,
+  highlight,
 }: {
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  /** The only thing left to do: the mark takes the accent, the geometry does not
+   *  move (the cluster's positions are fixed across all three layouts). */
+  highlight?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex shrink-0 flex-col items-center gap-1 text-[11.5px] font-semibold text-muted-foreground disabled:opacity-50"
+      className={cn(
+        "flex shrink-0 flex-col items-center gap-1 text-[11.5px] font-semibold disabled:opacity-50",
+        highlight ? "text-primary" : "text-muted-foreground",
+      )}
     >
-      <span className="grid h-[44px] w-[44px] place-items-center rounded-full border border-border bg-surface shadow-soft">
+      <span
+        className={cn(
+          "grid h-[44px] w-[44px] place-items-center rounded-full border shadow-soft",
+          highlight ? "border-primary/40 bg-primary/10" : "border-border bg-surface",
+        )}
+      >
         {icon}
       </span>
       {label}

@@ -75,6 +75,23 @@ export function canSpeak(state: ConversationState): boolean {
   );
 }
 
+/** Learner turns still available. Shown once it gets low. */
+export function turnsLeft(state: ConversationState): number {
+  return Math.max(0, MAX_LEARNER_TURNS - learnerTurnCount(state));
+}
+
+/**
+ * Undo the most recent learner turn. Used when the round trip that turn was
+ * sent in FAILED: the turn is on screen but was never written to the stored
+ * transcript, and the debrief grades the stored one, so leaving it would show
+ * the learner words nobody will read (s194 audit P4).
+ */
+export function dropLastLearnerTurn(state: ConversationState): ConversationState {
+  const idx = state.turns.map((t) => t.role).lastIndexOf("learner");
+  if (idx === -1) return state;
+  return { ...state, turns: state.turns.filter((_, i) => i !== idx) };
+}
+
 /** Whether there is enough material for a debrief to say anything true. */
 export function canDebrief(state: ConversationState): boolean {
   return learnerTurnCount(state) >= MIN_LEARNER_TURNS;

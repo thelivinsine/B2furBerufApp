@@ -66,11 +66,12 @@ export function recommendedNext(opts: {
 
   return {
     to: "/simulation",
-    label: "Sprechsimulation starten",
+    label: "Sprechen üben",
     icon: Compass,
     headline: "Tagesziel erreicht 🎉",
     subline:
-      examLine ?? "Stark! Lust auf eine Extra-Runde? Übe das Sprechen oder erkunde ein neues Thema.",
+      examLine ??
+      "Stark! Lust auf eine Extra-Runde? Sprich mit deiner KI-Partnerin oder erkunde ein neues Thema.",
     goalMet: true,
   };
 }

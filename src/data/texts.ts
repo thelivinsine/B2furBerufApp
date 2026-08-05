@@ -3030,6 +3030,134 @@ export const texts: ReadingText[] = [
       },
     ],
   },
+
+  /* --------------------------------------------------------------------------
+   * C1 audio, and the first C1 Notizen (s194 audit P16).
+   *
+   * The bank held exactly ONE C1 text that reads as audio, so a C1 Hören topped
+   * up from B2.2 and was usually two thirds a band low. And note fields existed
+   * only on voicemails, none of which were C1, so the part's own Anleitung
+   * promised a note-taking task that could not appear at that level. These two
+   * close both: a C1 voicemail that carries the Notizen sheet, and a C1
+   * Durchsage beside it.
+   * ------------------------------------------------------------------------ */
+  {
+    id: "tx_c1_arzt_kostenzusage_mailbox",
+    kind: "voicemail",
+    themeId: "arzt",
+    cefr: "C1",
+    title: "Mailbox: Rückmeldung zur Kostenzusage",
+    titleEn: "Voicemail: response on the funding decision",
+    de: [
+      "Guten Tag, Frau Adamu, hier spricht Dr. Ingrid Hellwig aus der Leistungsabteilung der Nordsee BKK.",
+      "Ich melde mich zu Ihrem Antrag auf Kostenübernahme für die ambulante Reha. Der Medizinische Dienst hat den Vorgang geprüft und kommt zu dem Ergebnis, dass die beantragte Maßnahme in der vorliegenden Form nicht bewilligt werden kann. Ausschlaggebend war, dass die ärztliche Begründung den Behandlungsbedarf zwar schildert, ihn aber nicht durch aktuelle Befunde belegt.",
+      "Das heißt ausdrücklich nicht, dass die Sache erledigt ist. Wenn Ihre behandelnde Ärztin uns einen ergänzenden Befundbericht mit den Untersuchungsergebnissen der letzten sechs Monate zusendet, prüfen wir den Antrag erneut, ohne dass Sie ihn neu stellen müssen.",
+      "Diese Unterlagen sollten bis zum 30. September bei uns eingehen, sonst schließen wir den Vorgang ab und Sie müssten von vorn beginnen. Meine Durchwahl ist 040 27 61 90 34, mein Zeichen lautet LA dreihundertzwölf. Auf Wiederhören.",
+    ].join("\n\n"),
+    en: [
+      "Good afternoon, Ms Adamu, this is Dr Ingrid Hellwig from the benefits department at Nordsee BKK.",
+      "I'm calling about your application for funding for outpatient rehabilitation. The medical review service has examined the case and concluded that the measure you applied for cannot be approved in its present form. The decisive point was that the doctor's justification describes the need for treatment but does not support it with current findings.",
+      "That expressly does not mean the matter is closed. If your treating doctor sends us a supplementary medical report with the examination results from the last six months, we will review the application again without you having to submit a new one.",
+      "Those documents should reach us by 30 September, otherwise we will close the case and you would have to start over. My direct line is 040 27 61 90 34, my reference is LA three hundred and twelve. Goodbye.",
+    ].join("\n\n"),
+    notes: [
+      { label: "Wer ruft an", value: "Dr. Hellwig, Nordsee BKK" },
+      { label: "Entscheidung", value: "Antrag so nicht bewilligt" },
+      { label: "Grund", value: "Befunde fehlen als Beleg" },
+      { label: "Was fehlt", value: "Befundbericht der letzten 6 Monate" },
+      { label: "Frist", value: "30. September" },
+    ],
+    checks: [
+      {
+        id: "tx_c1_arzt_kostenzusage_q1",
+        question: "Woran ist der Antrag gescheitert?",
+        options: [
+          "Die Begründung war nicht durch aktuelle Befunde belegt",
+          "Die Maßnahme gehört nicht zum Leistungskatalog",
+          "Der Antrag wurde zu spät eingereicht",
+        ],
+        answer: "Die Begründung war nicht durch aktuelle Befunde belegt",
+        explain: "The review service accepted the description of need but not the evidence behind it.",
+      },
+      {
+        id: "tx_c1_arzt_kostenzusage_q2",
+        question: "Was muss Frau Adamu tun, damit weiter geprüft wird?",
+        options: [
+          "Ihre Ärztin einen ergänzenden Befundbericht schicken lassen",
+          "Einen völlig neuen Antrag stellen",
+          "Persönlich in der Leistungsabteilung vorsprechen",
+        ],
+        answer: "Ihre Ärztin einen ergänzenden Befundbericht schicken lassen",
+        explain: "The caller stresses that no new application is needed, only the supplementary report.",
+      },
+      {
+        id: "tx_c1_arzt_kostenzusage_q3",
+        question: "Was passiert, wenn die Unterlagen nach dem 30. September ankommen?",
+        options: [
+          "Der Vorgang wird geschlossen und muss neu begonnen werden",
+          "Die Frist verlängert sich automatisch um einen Monat",
+          "Die Kasse entscheidet dann ohne die Unterlagen",
+        ],
+        answer: "Der Vorgang wird geschlossen und muss neu begonnen werden",
+        explain: "The deadline is hard: after it the case is closed and she would start from scratch.",
+      },
+    ],
+  },
+  {
+    id: "tx_c1_behoerde_verfahrensdurchsage",
+    kind: "announcement",
+    themeId: "behoerde",
+    cefr: "C1",
+    title: "Durchsage: Geänderter Ablauf in der Ausländerbehörde",
+    titleEn: "Announcement: changed procedure at the immigration office",
+    de: [
+      "Sehr geehrte Besucherinnen und Besucher, eine Durchsage der Amtsleitung.",
+      "Ab dem kommenden Montag stellen wir die Vorsprache in diesem Haus vollständig auf ein Terminverfahren um. Wartemarken werden dann nicht mehr ausgegeben. Wer ohne gebuchten Termin erscheint, kann nicht bearbeitet werden, auch nicht in dringenden Fällen.",
+      "Für Anliegen, die keinen Aufschub dulden, etwa eine ablaufende Fiktionsbescheinigung, richten wir stattdessen ein Notfallpostfach ein. Schildern Sie Ihr Anliegen dort schriftlich; die Sachbearbeitung meldet sich innerhalb von zwei Werktagen mit einem kurzfristigen Termin zurück.",
+      "Bereits vergebene Termine behalten ihre Gültigkeit und müssen nicht neu gebucht werden. Bringen Sie bitte weiterhin alle Unterlagen im Original mit, da Kopien vor Ort nicht mehr angefertigt werden können.",
+    ].join("\n\n"),
+    en: [
+      "Dear visitors, an announcement from the management.",
+      "From next Monday we are moving appearances in this building entirely to an appointment system. Waiting tickets will no longer be issued. Anyone arriving without a booked appointment cannot be dealt with, not even in urgent cases.",
+      "For matters that cannot wait, such as an expiring provisional residence document, we are setting up an emergency mailbox instead. Describe your matter there in writing; the case worker will come back to you within two working days with an appointment at short notice.",
+      "Appointments already issued remain valid and do not need to be rebooked. Please continue to bring all documents as originals, as copies can no longer be made on site.",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_c1_behoerde_verfahren_q1",
+        question: "Was ändert sich ab Montag?",
+        options: [
+          "Eine Vorsprache ist nur noch mit gebuchtem Termin möglich",
+          "Das Amt öffnet an zwei Tagen pro Woche länger",
+          "Wartemarken werden erst ab 8 Uhr ausgegeben",
+        ],
+        answer: "Eine Vorsprache ist nur noch mit gebuchtem Termin möglich",
+        explain: "Waiting tickets end entirely; only booked appointments are handled.",
+      },
+      {
+        id: "tx_c1_behoerde_verfahren_q2",
+        question: "Wie sollen dringende Fälle vorgehen?",
+        options: [
+          "Ihr Anliegen schriftlich über das Notfallpostfach schildern",
+          "Trotzdem ohne Termin erscheinen und warten",
+          "Bei der Amtsleitung persönlich vorsprechen",
+        ],
+        answer: "Ihr Anliegen schriftlich über das Notfallpostfach schildern",
+        explain: "Urgency no longer buys walk-in access; it routes through the written emergency mailbox.",
+      },
+      {
+        id: "tx_c1_behoerde_verfahren_q3",
+        question: "Was gilt für Unterlagen weiterhin?",
+        options: [
+          "Sie müssen im Original mitgebracht werden",
+          "Sie können vor Ort kopiert werden",
+          "Sie sollen vorab per E-Mail geschickt werden",
+        ],
+        answer: "Sie müssen im Original mitgebracht werden",
+        explain: "Copies can no longer be made on site, so originals are required.",
+      },
+    ],
+  },
 ];
 
 export const textById = (id: string) => texts.find((t) => t.id === id);

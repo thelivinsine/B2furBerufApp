@@ -269,6 +269,116 @@ export const examSets: ExamSet[] = [
     ],
     rubric: sharedRubric,
   },
+
+  /* ------------------------------------------------------------------------
+   * Alltag above the entry rung (s194 audit P17).
+   *
+   * Every Alltag set authored before this one hangs off a level-1 scenario, and
+   * the Modelltest picks its speaking task by that ladder (B1 -> 1, B2 -> 2,
+   * C1 -> 3). A B2 or C1 candidate could therefore only ever be given a
+   * WORKPLACE speaking task, which contradicts the product's own scope: daily
+   * life is a pillar, not an extra.
+   *
+   * The scenarios were already there at both rungs; only the exam framings were
+   * missing. These six sit on them: three level-2 (B2) and three level-3 (C1),
+   * across Behörde, Wohnen, Arzt and Digitales.
+   * ---------------------------------------------------------------------- */
+  {
+    id: "ex_auslaenderbehoerde",
+    title: "Prüfungssimulation: Behördentermin vorbereiten",
+    themeId: "behoerde",
+    scenarioId: "sc_auslaenderbehoerde",
+    totalMinutes: 7,
+    taskSheet:
+      "Sie und Ihre Partnerin / Ihr Partner haben einen Termin bei der Ausländerbehörde und wollen ihn zusammen vorbereiten. Klären Sie gemeinsam, was mitgebracht werden muss, und einigen Sie sich auf ein Vorgehen.",
+    aspects: [
+      "Welche Unterlagen brauchen Sie und was fehlt noch?",
+      "Wie gehen Sie vor, wenn ein Dokument nicht rechtzeitig da ist?",
+      "Wie formulieren Sie Ihr Anliegen am Schalter?",
+      "Wer übernimmt welchen Schritt vor dem Termin?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_wohnungsmangel",
+    title: "Prüfungssimulation: Mangel in der Wohnung melden",
+    themeId: "wohnen",
+    scenarioId: "sc_wohnungsmangel",
+    totalMinutes: 7,
+    taskSheet:
+      "In Ihrer Wohnung gibt es seit Wochen einen Mangel, den die Hausverwaltung nicht behoben hat. Besprechen Sie gemeinsam, wie Sie vorgehen, und einigen Sie sich auf die nächsten Schritte.",
+    aspects: [
+      "Wie beschreiben Sie den Mangel und seine Folgen?",
+      "Welche Frist setzen Sie der Hausverwaltung?",
+      "Was tun Sie, wenn nichts passiert?",
+      "Wer kümmert sich um welchen Schritt?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_internetstoerung",
+    title: "Prüfungssimulation: Störung reklamieren",
+    themeId: "digitales",
+    scenarioId: "sc_internet_stoerung",
+    totalMinutes: 6,
+    taskSheet:
+      "Ihr Internetanschluss fällt seit Tagen immer wieder aus, und beide von Ihnen arbeiten von zu Hause. Besprechen Sie gemeinsam, wie Sie den Anbieter dazu bringen, das Problem zu lösen.",
+    aspects: [
+      "Wie schildern Sie die Störung nachvollziehbar?",
+      "Welche Lösung fordern Sie vom Anbieter?",
+      "Was verlangen Sie als Ausgleich für die Ausfälle?",
+      "Wie überbrücken Sie die Zeit bis zur Reparatur?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_widerspruch",
+    title: "Prüfungssimulation: Widerspruch gegen einen Bescheid",
+    themeId: "behoerde",
+    scenarioId: "sc_widerspruch",
+    totalMinutes: 7,
+    taskSheet:
+      "Sie haben einen ablehnenden Bescheid von einer Behörde bekommen und halten ihn für falsch. Besprechen Sie gemeinsam mit Ihrer Partnerin / Ihrem Partner, wie Sie Widerspruch einlegen, und einigen Sie sich auf eine Strategie.",
+    aspects: [
+      "Auf welche Punkte des Bescheids gehen Sie ein?",
+      "Womit begründen Sie Ihren Widerspruch?",
+      "Welche Nachweise legen Sie bei?",
+      "Wie gehen Sie vor, wenn der Widerspruch abgelehnt wird?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_mietminderung",
+    title: "Prüfungssimulation: Schimmel und Mietminderung",
+    themeId: "wohnen",
+    scenarioId: "sc_mietminderung",
+    totalMinutes: 7,
+    taskSheet:
+      "In der Wohnung tritt seit Monaten Schimmel auf, und die Vermieterin macht Ihnen Vorwürfe wegen falschen Lüftens. Besprechen Sie gemeinsam, wie Sie reagieren, und einigen Sie sich auf ein gemeinsames Vorgehen.",
+    aspects: [
+      "Wie widersprechen Sie dem Vorwurf sachlich?",
+      "Wie dokumentieren Sie den Schaden?",
+      "Unter welchen Bedingungen mindern Sie die Miete?",
+      "Wann schalten Sie eine Beratungsstelle ein?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_kostenuebernahme",
+    title: "Prüfungssimulation: Kasse lehnt die Behandlung ab",
+    themeId: "arzt",
+    scenarioId: "sc_kostenuebernahme",
+    totalMinutes: 7,
+    taskSheet:
+      "Ihre Krankenkasse hat die Kostenübernahme für eine ärztlich empfohlene Behandlung abgelehnt. Besprechen Sie gemeinsam, wie Sie darauf reagieren, und einigen Sie sich auf die nächsten Schritte.",
+    aspects: [
+      "Wie begründen Sie, dass die Behandlung nötig ist?",
+      "Welche Unterlagen holen Sie bei der Ärztin oder dem Arzt ein?",
+      "Wie formulieren Sie Ihren Antrag an die Kasse?",
+      "Welche Alternative haben Sie, falls es bei der Ablehnung bleibt?",
+    ],
+    rubric: sharedRubric,
+  },
 ];
 
 export const examById = (id: string) => examSets.find((e) => e.id === id);

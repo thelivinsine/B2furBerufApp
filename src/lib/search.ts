@@ -85,7 +85,10 @@ function buildIndex(): NonNullable<typeof INDEX> {
         id: sc.id,
         title: sc.title,
         subtitle: sc.task,
-        to: "/simulation",
+        // The scenario itself, not the list it sits in: the Sprechtrainer reads
+        // `?sz=` since s194, so a searched situation opens where it was searched
+        // for rather than dropping the learner back on the hub to find it again.
+        to: `/simulation?sz=${sc.id}`,
       }),
     ),
   };

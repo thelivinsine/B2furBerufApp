@@ -5,7 +5,7 @@ import { readingTextById, scoreChecks } from "@/engine/exam";
 import { MAX_PLAYS } from "@/engine/exam";
 import { useExamStore, type MockExamRun } from "@/store/useExamStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { speak, stopSpeaking } from "@/engine/speech";
+import { speak, stopSpeaking, ttsSupported } from "@/engine/speech";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -293,28 +293,70 @@ function PartFooter({
   answeredCount: number;
 }) {
   const completePart = useExamStore((s) => s.completePart);
-  // "Teil abschließen" only on the last question, once everything is answered
-  // (founder s186): a permanent submit row cost every screen ~52px.
-  const done = answeredCount === total && qIx === total - 1;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  // "Teil abschließen" only on the LAST question (founder s186): a permanent
+  // submit row cost every screen ~52px.
+  //
+  // Until the s194 audit (P1) it also required every answer, and the only other
+  // way a part could end was the clock reaching zero. Ohne Zeit has no clock, so
+  // an untimed drill with one blank answer had NO completion path at all: the
+  // learner's only exit was the header Zurück, which abandons the run and loses
+  // the work. Ohne Zeit is where a learner lands, so that was the default path.
+  // The button is now always there on the last question; leaving answers blank
+  // costs a confirm that names the count, not the ability to hand in.
+  const last = qIx === total - 1;
+  const open = total - answeredCount;
+  const submit = () => completePart(scoreChecks(ids, run.answers));
+
   return (
-    <div className="flex gap-2.5 pt-3">
-      <Button variant="outline" className="flex-1" onClick={() => go((qIx - 1 + total) % total)}>
-        Zurück
-      </Button>
-      {done ? (
-        <Button
-          variant="gradient"
-          className="flex-1"
-          onClick={() => completePart(scoreChecks(ids, run.answers))}
-        >
-          Teil abschließen
+    <>
+      <div className="flex gap-2.5 pt-3">
+        <Button variant="outline" className="flex-1" onClick={() => go((qIx - 1 + total) % total)}>
+          Zurück
         </Button>
-      ) : (
-        <Button variant="outline" className="flex-1" onClick={() => go((qIx + 1) % total)}>
-          Weiter
-        </Button>
-      )}
-    </div>
+        {last ? (
+          <Button
+            variant="gradient"
+            className="flex-1"
+            onClick={() => (open > 0 ? setConfirmOpen(true) : submit())}
+          >
+            Teil abschließen
+          </Button>
+        ) : (
+          <Button variant="outline" className="flex-1" onClick={() => go((qIx + 1) % total)}>
+            Weiter
+          </Button>
+        )}
+      </div>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="gap-3">
+          <DialogHeader>
+            <DialogTitle className="pr-8 text-base">Teil abschließen?</DialogTitle>
+            <DialogDescription>
+              {open === 1
+                ? "Eine Aufgabe ist noch nicht beantwortet und zählt als falsch."
+                : `${open} Aufgaben sind noch nicht beantwortet und zählen als falsch.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2.5">
+            <Button variant="outline" className="flex-1" onClick={() => setConfirmOpen(false)}>
+              Weiter bearbeiten
+            </Button>
+            <Button
+              variant="gradient"
+              className="flex-1"
+              onClick={() => {
+                setConfirmOpen(false);
+                submit();
+              }}
+            >
+              Abschließen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -450,15 +492,31 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
   const setNote = useExamStore((s) => s.setNote);
   const voiceURI = useSettingsStore((s) => s.voiceURI);
   const speechRate = useSettingsStore((s) => s.speechRate);
+  // Keyed by text id rather than a bare boolean: moving to the next Ansage then
+  // makes `playing` false by derivation instead of by resetting state from an
+  // effect, so nothing cascades a render.
+  const [playingId, setPlayingId] = useState<string | null>(null);
   useAutoFinish(run, run.plan.hoeren);
   useEffect(() => () => stopSpeaking(), []);
 
   const q = questions[Math.min(qIx, questions.length - 1)];
+  const activeId = q?.text.id;
+  // Moving to a question about the NEXT Ansage stops the previous one: two
+  // recordings talking over each other is not a listening exercise (audit P12).
+  useEffect(() => stopSpeaking(), [activeId]);
+
   if (!q) return null;
   const text = q.text;
   const textIndex = run.plan.hoeren.indexOf(text.id);
   const playsUsed = run.plays[text.id] ?? 0;
   const playsLeft = MAX_PLAYS - playsUsed;
+  const playing = playingId === text.id;
+  // No speech synthesis (or no voice at all) means this part cannot be heard.
+  // It used to fail silently: both plays were consumed by clicks that produced
+  // nothing, the questions were unanswerable and the part scored 0 with no
+  // explanation. Now the card says so and the text is offered instead, which is
+  // a worse exercise than listening but an honest one (audit P12).
+  const audible = ttsSupported();
 
   return (
     <SplitShell
@@ -473,15 +531,24 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
             <CardContent className="flex items-center gap-3 p-4">
               <button
                 type="button"
-                disabled={playsLeft <= 0}
+                // Disabled WHILE PLAYING too: `speak` opens with
+                // `synth.cancel()`, so a double tap used to burn both plays and
+                // let the learner hear only the second one (audit P12).
+                disabled={playsLeft <= 0 || playing || !audible}
                 onClick={() => {
+                  // Counted on a play that really starts, never on the click.
+                  setPlayingId(text.id);
                   registerPlay(text.id);
-                  speak(text.de, { voiceURI: voiceURI ?? undefined, rate: speechRate });
+                  speak(text.de, {
+                    voiceURI: voiceURI ?? undefined,
+                    rate: speechRate,
+                    onEnd: () => setPlayingId(null),
+                  });
                 }}
                 aria-label="Ansage abspielen"
                 className={cn(
                   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-gradient text-white shadow-soft transition-opacity",
-                  playsLeft <= 0 && "opacity-40",
+                  (playsLeft <= 0 || playing || !audible) && "opacity-40",
                 )}
               >
                 <Play className="ml-0.5 h-4 w-4 fill-current" />
@@ -492,13 +559,28 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
                 </p>
                 <p className="text-xs tabular-nums text-muted-foreground">
                   {kindLabel(text.kind)} ·{" "}
-                  {playsLeft > 0
-                    ? `noch ${playsLeft}x abspielbar`
-                    : "keine Wiedergabe mehr, wie in der Prüfung"}
+                  {!audible
+                    ? "Dein Browser kann keine Ansagen vorlesen"
+                    : playing
+                      ? "läuft …"
+                      : playsLeft > 0
+                        ? `noch ${playsLeft}x abspielbar`
+                        : "keine Wiedergabe mehr, wie in der Prüfung"}
                 </p>
               </div>
             </CardContent>
           </Card>
+
+          {!audible && (
+            <Card className="shrink-0">
+              <CardContent className="p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                  Text der Ansage
+                </p>
+                <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed">{text.de}</p>
+              </CardContent>
+            </Card>
+          )}
 
           {text.notes?.length ? (
             <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">

@@ -42,7 +42,8 @@ export function ConversationDebrief({
 }: {
   brief: ConversationBrief;
   result: DebriefResult;
-  onRetry: () => void;
+  /** Absent in the Modelltest: a Teil is sat once (s194 audit P5). */
+  onRetry?: () => void;
   onDone: () => void;
 }) {
   const [view, setView] = useState<CorrectionViewMode>("orig");
@@ -146,9 +147,11 @@ export function ConversationDebrief({
 
       <div className="mt-auto">
         <div className="flex gap-2.5">
-          <Button variant="outline" className="flex-1" onClick={onRetry}>
-            <RotateCw className="h-4 w-4" /> Nochmal
-          </Button>
+          {onRetry && (
+            <Button variant="outline" className="flex-1" onClick={onRetry}>
+              <RotateCw className="h-4 w-4" /> Nochmal
+            </Button>
+          )}
           <Button variant="gradient" className="flex-1" onClick={onDone}>
             Weiter
           </Button>
