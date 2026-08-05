@@ -47,8 +47,11 @@ Gates green: typecheck · lint 0 errors (75 warnings, down from 77 with the dead
 authored sets are "discuss the aspects and agree" tasks, so the Anruf layout is built, tested and
 unreached until listen-and-hold speaking tasks are authored. That is the next content job. Also open:
 the authored `nodes` graphs stay in the bank but are no longer read at runtime; retiring them is a
-separate mechanical change. Backend note: `converse` needs `ANTHROPIC_API_KEY` (already set) and
-optionally `GEMINI_API_KEY` for the free leg; migration 0017 applies on the next merge to `main`.
+separate mechanical change. Backend note: `converse` needs no new secrets. `ANTHROPIC_API_KEY` and
+`GEMINI_API_KEY` have both been set since s150 ("all three AI functions deployed on the
+Gemini-primary cascade"), so the free Gemini leg is live and the ~2-4 cents per conversation figure
+holds rather than every turn falling through to Claude. Migration 0017 applies on the merge to
+`main`; the same merge deploys the new `converse` function.
 
 Prior s190 (2026-08-05):
 _(was: last updated session 190). **A defect session on the Bibliothek, all six items from
