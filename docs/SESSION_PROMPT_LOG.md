@@ -4485,3 +4485,11 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
 - **Artifacts (prompt 4):** `src/features/pruefung/PruefungHub.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/PROJECT_STATUS.md` · this log · **PR #805**
 
+- **Prompt 5 (verbatim):** `merge everything to main and document the session`
+  **Response:** PR #805 was green (`lint-content` success) and is squash-merged into `main` as
+  `68b500c`, after PR #803 (`f0fa0b7`) and the docs PR #804 (`14b2a20`) earlier in the session, so
+  everything from s191 is on `main` and nothing is left on the branch. Post-merge housekeeping ran
+  after each merge (`fetch origin main` → `reset --hard` → `push --force-with-lease`); the branch is
+  clean at `68b500c`. Documentation for prompts 1-4 had shipped inside their own PRs; this pass adds
+  the #805 merge SHA to the s191 handoff and logs this prompt.
+- **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · this log

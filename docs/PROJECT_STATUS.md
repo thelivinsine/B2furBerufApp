@@ -1,12 +1,12 @@
 # Project Status
 
 _Last updated: 2026-08-05 (session 191). **The Prüfung module tiles lost their gradients.** The
-founder's screenshot of Module üben, two prompts: the s190 colour treatment (a hue radial across the
-card plus a gradient mark tile) is replaced by a FLAT tint of the same hue, and the gap between the
-header block and the tiles widened to `gap-6 sm:gap-7` so the toggles and the tiles read as two
-sections. Measured in headless Chromium: zero page scroll at 360x640, 393x852 (light + dark) and
-1280x900, and nothing inside `main` carries a background-image any more.
-Prior s190. **A defect session on the Bibliothek, all six items from
+Three founder prompts against screenshots of Module üben: the s190 colour treatment (a hue radial
+across the card plus a gradient mark tile) is now a FLAT tint of the same hue, the gap between the
+header block and the tiles widened to `gap-6 sm:gap-7`, and the minutes badge, which crossed the
+description line whenever the clock was on, REPLACES that line instead. Measured in headless
+Chromium in both clock states: zero page scroll, zero badge/text overlap, no background-image left
+inside `main`. Prior s190. **A defect session on the Bibliothek, all six items from
 the founder's own screenshots, all measured in a browser rather than guessed.** Five of them trace
 to one change: s189 moved the desktop scroll from the page into the content column.
 **Go to top** was reading `window.scrollY`, which no longer moves on desktop, so the button never
@@ -208,19 +208,18 @@ Two founder prompts against a screenshot of `/anwenden`, Module üben.
   `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap sits ONLY between the header block (switcher + scope
   row) and the tab content, so the toggles and the tiles now read as two sections while the gaps
   inside each block are untouched.
-**Verified in the real build**, not in a mockup: the CDP driver was rebuilt (Node 22's built-in
-`WebSocket`, no new deps) and `/anwenden` rests at exactly zero page scroll at 360x640, 393x852
-light and dark, and 1280x900, with no element inside `main` carrying a `background-image` any more.
-Gates green: build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
-check:bundle 126.6 kB · check:contrast.
+**Verified in the real build**, not in a mockup: a rebuilt CDP driver (Node 22's built-in
+`WebSocket`, no new deps) reports zero page scroll, zero badge/text overlap and no `background-image`
+inside `main` at 360x640, 393x852 light and dark, and 1280x900, in BOTH clock states. Gates green:
+build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests · check:bundle · contrast.
 - **"The time badges [are] overlapping on the text ... just remove the text and just keep the
   badges."** A real bug, and the reserve was the cause: the badge is 24px tall and sits 12px off the
   bottom, i.e. 36px, against a 28px `pb-[1.75rem]` reserve, so with the clock ON it sat across the
   description on all four cards. The description line is gone (`FREE_DESC` with it; `PART_META.desc`
   stays for the Anleitung pages). What remains is mark, arrow, title, badge. The one line that can
   still appear is the honest empty state, and it only shows on a card that has no badge.
-Shipped as **PR #803** (the first two) and **PR #805** (the badge overlap), squash-merged into
-`main`; the founder verifies the live result.
+Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, the badge overlap),
+both squash-merged into `main`; the founder verifies the live result.
 **Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
 so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
 
