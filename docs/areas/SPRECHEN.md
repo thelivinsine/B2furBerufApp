@@ -24,7 +24,7 @@ conversation they just had and nowhere else. Three things make it an exercise in
    information the learner is meant to ask for.
 3. **A debrief** — all correction lands at the end, in the card the learner already knows.
 
-## The three layouts (founder s191)
+## The three layouts (founder s193)
 
 The layout is a property of the **task**, never a learner setting. `ConversationRunner` is one
 runner with three middles; everything else (brief, turn-taking, mic cluster, debrief, guards) is
@@ -84,7 +84,7 @@ never leaves the device, which is why the privacy policy can say so.
 - **The exam part completes on EXIT, carrying the score**, not when the debrief arrives. Firing on
   arrival unmounts the runner before the learner reads a word of it.
 - **`Auflegen` is neutral, not red.** Danger red is reserved for errors; the founder kept the
-  colour law over the phone convention (s191).
+  colour law over the phone convention (s193).
 - **The typed fallback is not a degraded mode to apologise for.** Firefox has no speech
   recognition, so `supported` is false and the learner types. That is exactly what Sprechen did
   before this feature existed, so nobody is worse off.

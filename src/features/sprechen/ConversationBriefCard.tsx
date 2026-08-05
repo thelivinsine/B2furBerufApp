@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 const CATEGORY_LABEL_DE = new Map(redemittelCategories.map((c) => [c.id, c.labelDe]));
 
 /**
- * The screen before a spoken conversation (s191).
+ * The screen before a spoken conversation (s193).
  *
  * This is the thing that makes it an exercise rather than small talk. An LLM
  * will happily chat with a B1 learner forever: it adapts down to their level,

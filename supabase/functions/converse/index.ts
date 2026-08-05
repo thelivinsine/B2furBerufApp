@@ -1,6 +1,6 @@
 // Supabase Edge Function: converse
 // ---------------------------------------------------------------------------
-// The AI conversation partner behind Sprechen (s191).
+// The AI conversation partner behind Sprechen (s193).
 //
 // Two modes, because they cost very different amounts:
 //   mode "turn"     — the partner's next spoken line. Short, frequent, cheap.

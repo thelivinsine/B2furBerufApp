@@ -14,13 +14,13 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { FeedbackLangChip } from "../FeedbackLang";
+import { BackToPruefung, MobileAiNote } from "../bottomChrome";
 import { GrammarRail } from "./GrammarRail";
 import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
 import { AllowanceNote, LeftCount, variantTitle } from "../AllowanceNote";
-import { floatingNote, floatingSlot } from "@/features/shared/floatingCluster";
+import { floatingSlot } from "@/features/shared/floatingCluster";
 import { CorrectionToggle, FixTiles, MarkedTokens } from "../correction";
 import { useFokusMachine, MIN_WORDS, TRANSFORM_VARIANTS } from "./useFokusMachine";
 import { useDailyAllowance } from "@/lib/aiAllowance";
@@ -795,9 +795,9 @@ export function FokusTrainer({
               className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
             >
               {/* Every control sits on its own opaque backing (see
-                  `floatingCluster`); FeedbackIconButton is already solid. */}
+                  `floatingCluster`); BackToPruefung is already solid. */}
               <div className="flex items-stretch gap-2">
-                <FeedbackIconButton />
+                <BackToPruefung />
                 <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
                   {korrigierenButton}
                 </div>
@@ -806,18 +806,9 @@ export function FokusTrainer({
           )}
           {/* The one bottom line, and it never changes content (founder s169):
               the "how many words to go" hint moved into the card, under the
-              umlaut keys, so this slot is the Art. 50 note in every state. */}
-          <p
-            ref={kiNoteRef}
-            className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden"
-          >
-            <span className={floatingNote}>
-              KI-geprüft, kann Fehler enthalten.{" "}
-              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                Mehr
-              </Link>
-            </span>
-          </p>
+              umlaut keys, so this slot is the Art. 50 note plus the Feedback
+              link in every state. */}
+          <MobileAiNote ref={kiNoteRef} />
         </>,
         document.body,
       )}

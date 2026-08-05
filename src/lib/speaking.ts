@@ -9,7 +9,7 @@ import type { ConversationBrief } from "@/types";
 const CATEGORY_LABEL_DE = new Map(redemittelCategories.map((c) => [c.id, c.labelDe]));
 
 /**
- * Client for the `converse` Edge Function (s191), which holds every secret.
+ * Client for the `converse` Edge Function (s193), which holds every secret.
  * Same shape and same failure discipline as `lib/writing.ts`: speaking needs an
  * authenticated user, so a fully signed-out learner is given a guest session
  * first, and every response reports the daily allowance so the trainer can

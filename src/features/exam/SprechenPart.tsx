@@ -7,7 +7,7 @@ import { RunBar } from "./MockExamRunner";
 import { ConversationRunner } from "@/features/sprechen/ConversationRunner";
 
 /**
- * Teil Sprechen of the Modelltest (rebuilt s191).
+ * Teil Sprechen of the Modelltest (rebuilt s193).
  *
  * What this replaces: the part embedded the branching-script runner and then
  * asked the learner to TICK THEIR OWN RUBRIC CHECKBOXES, so the speaking grade
@@ -15,7 +15,7 @@ import { ConversationRunner } from "@/features/sprechen/ConversationRunner";
  * now runs a real spoken conversation and is graded by the same debrief the
  * trainer uses, in exam mode (a 0-100 score weighted like the oral rubric).
  *
- * The layout is a property of the TASK, not the learner (founder s191):
+ * The layout is a property of the TASK, not the learner (founder s193):
  * `examBrief` reads `ExamSet.stage`, so a task that works from a written
  * Aufgabe keeps it on screen ("buehne") and a task that reading would defeat
  * runs blind ("anruf"). The learner never picks.

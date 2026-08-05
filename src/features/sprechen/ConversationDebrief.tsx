@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 const CATEGORY_LABEL_DE = new Map(redemittelCategories.map((c) => [c.id, c.labelDe]));
 
 /**
- * What the learner gets after speaking (s191), and the reason the whole feature
+ * What the learner gets after speaking (s193), and the reason the whole feature
  * is worth building.
  *
  * Three things, in this order: did you get the job done (the brief's

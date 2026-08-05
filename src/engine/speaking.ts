@@ -8,7 +8,7 @@ import type {
 } from "@/types";
 
 /**
- * The bridge from authored content to a spoken conversation (s191).
+ * The bridge from authored content to a spoken conversation (s193).
  *
  * Before this session the Sprechen surface replayed a hand-authored branching
  * tree: the learner tapped one of 2-4 written options and `scoreDialogue`
@@ -52,7 +52,7 @@ const LEVEL_BY_DIFFICULTY: Record<1 | 2 | 3, ContentCefr> = {
 };
 
 /**
- * Practice always runs as the chat thread (founder s191: the learner finds the
+ * Practice always runs as the chat thread (founder s193: the learner finds the
  * transcript useful), so this never consults the scenario.
  */
 export const PRACTICE_STAGE: SpeakingStage = "gespraech";
@@ -87,7 +87,7 @@ export function speakingBrief(scenario: Scenario): ConversationBrief {
 /**
  * Build the brief for a Modelltest task.
  *
- * The stage is the founder's s191 rule, and it is a property of the TASK, not
+ * The stage is the founder's s193 rule, and it is a property of the TASK, not
  * of the learner: a task that works from a written Aufgabe keeps it on screen
  * ("buehne"), and a task that reading would defeat runs blind ("anruf"). An
  * exam set that says nothing gets "buehne", because every set authored so far
@@ -113,7 +113,7 @@ export function examBrief(set: ExamSet, scenario?: Scenario): ConversationBrief 
 /**
  * Whether the learner may read anything while speaking. The Anruf stage is the
  * one that says no, and the "Untertitel" escape hatch is the only way text
- * appears there (resting off, founder s191).
+ * appears there (resting off, founder s193).
  */
 export function showsTextWhileSpeaking(stage: SpeakingStage): boolean {
   return stage !== "anruf";

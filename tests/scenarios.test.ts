@@ -4,7 +4,7 @@ import { examSets } from "@/data/examSets";
 import { examBrief, speakingBrief } from "@/engine/speaking";
 
 /**
- * The speaking scenarios, as briefs (rewritten s191).
+ * The speaking scenarios, as briefs (rewritten s193).
  *
  * WHAT CHANGED AND WHY. The previous version of this file pinned an invariant
  * of the branching-script era: every scenario had to contain a free-speak node,
@@ -41,7 +41,7 @@ describe("every practice scenario is servable as a spoken brief", () => {
     for (const g of brief.goals) expect(g.trim()).toBeTruthy();
 
     expect(brief.minutes).toBeGreaterThan(0);
-    // Practice is always the chat thread (founder s191).
+    // Practice is always the chat thread (founder s193).
     expect(brief.stage).toBe("gespraech");
     expect(brief.exam).toBe(false);
   });

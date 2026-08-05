@@ -11,7 +11,6 @@ export interface NavItem {
   to: string;
   label: string;
   icon: LucideIcon;
-  end?: boolean;
   /** Accent colour used in the bottom tab bar when this tab is active. */
   color: string;
   /** Tinted background for the active pill / icon backdrop. */
@@ -43,7 +42,9 @@ export interface NavItem {
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
 // pairing. The routes are unchanged (/ and /library).
 export const navItems: NavItem[] = [
-  { to: "/",          label: "Praktisch",    icon: Compass,         end: true, color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag" },
+  // No `end` flag any more: which routes belong to which tab is `navZoneOf`'s
+  // job (below), and Home matching only itself is stated there.
+  { to: "/",          label: "Praktisch",    icon: Compass,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag" },
   { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
   // Schreiben had its own tab from 2026-07-22 until s182, when the founder
   // moved it INTO the transfer hub and renamed that hub **Prüfung**: the three
@@ -83,3 +84,47 @@ export const ROUTE_SUCCESSOR: Record<string, string> = {
 
 /** @deprecated use pinnedTabs from useSettingsStore instead */
 export const PRIMARY_TAB_PATHS = DEFAULT_PINNED_TABS;
+
+// Routes that are NOT tabs themselves but live INSIDE a nav zone. The bar and
+// the sidebar mark that zone's tab while one of them is open (founder s192:
+// "the prufung bottom bar isn't selected here", on /writing). Without this the
+// bar is visible with nothing lit on every page reached from a hub, which reads
+// as "I have left the app" rather than "I am one level down".
+//
+// This is the same fold as ROUTE_SUCCESSOR (which remaps a persisted PIN) plus
+// the routes that never were tabs: /welt, /session and /sammlung. The two lists
+// answer different questions, so they stay separate.
+export const NAV_ZONE_OF_ROUTE: Record<string, string> = {
+  // Bibliothek: the retired per-tool routes redirect into /library, and the
+  // quiz is a Bibliothek surface reached by deep link.
+  "/vocabulary": "/library",
+  "/collocations": "/library",
+  "/redemittel": "/library",
+  "/grammar": "/library",
+  "/quiz": "/library",
+  // Prüfung: the four modules and the two free trainers all sit under the hub.
+  "/writing": "/anwenden",
+  "/simulation": "/anwenden",
+  "/exam": "/anwenden",
+  // Praktisch: everything the dashboard starts (Üben, Spielen).
+  "/session": "/",
+  "/revision": "/",
+  "/welt": "/",
+  // Fortschritt: the Sammlung is entered from the quest board.
+  "/sammlung": "/analytics",
+};
+
+/**
+ * The nav tab a pathname belongs to, or null when it belongs to none (the
+ * standalone surfaces: /sources, /hilfe, the legal pages, /admin). A tab route
+ * matches itself and anything below it; everything else goes through
+ * NAV_ZONE_OF_ROUTE. Home only ever matches exactly, like its `end` flag.
+ */
+export function navZoneOf(pathname: string): string | null {
+  if (pathname === "/") return "/";
+  const under = (base: string) => pathname === base || pathname.startsWith(`${base}/`);
+  const tab = navItems.find((i) => i.to !== "/" && under(i.to));
+  if (tab) return tab.to;
+  const zone = Object.keys(NAV_ZONE_OF_ROUTE).find(under);
+  return zone ? NAV_ZONE_OF_ROUTE[zone] : null;
+}

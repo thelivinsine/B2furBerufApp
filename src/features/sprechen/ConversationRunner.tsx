@@ -26,7 +26,7 @@ import { useSpeechInput } from "./useSpeechInput";
 import { cn } from "@/lib/utils";
 
 /**
- * The one runner behind all three spoken layouts (s191).
+ * The one runner behind all three spoken layouts (s193).
  *
  * The founder picked three layouts, and they are three MIDDLES, not three
  * screens: the brief, the turn-taking, the microphone cluster, the debrief and
@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
  * only decides what the learner looks at while talking.
  *
  *   gespraech  practice — the scrolling transcript ("the learner finds it
- *              useful to keep track", founder s191)
+ *              useful to keep track", founder s193)
  *   buehne     exam — one turn on a fixed stage, the Aufgabe stays readable
  *   anruf      exam — no text at all; reading would defeat the task
  */

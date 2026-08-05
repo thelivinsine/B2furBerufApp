@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/speech";
 
 /**
- * The microphone, as a hook (s191).
+ * The microphone, as a hook (s193).
  *
  * `engine/speech.ts` has shipped a working, feature-detected speech-recognition
  * wrapper since the one-word production drill, and until now the entire

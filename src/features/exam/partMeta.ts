@@ -20,12 +20,14 @@ import type { MockPartId } from "@/engine/exam";
  * `bar` is the solid version of the same hue, for the Verlauf result segments:
  * a 6 px bar needs the full colour, not the 10 % tile wash.
  *
- * s190 added three fields and made `tile` a gradient. Premium in this design
- * system means a subtle gradient, never a flat tint, so the mark tile now fades
- * within its own hue. `wash` is the card-corner radial (defined in index.css,
- * because it needs a dark-mode pair), and `fillPale`/`fillSolid` are the two
- * segments of a Stärkeprofil column: pale = the first attempt, solid = the gain
- * since.
+ * `fillPale`/`fillSolid` are the two segments of a Stärkeprofil column: pale =
+ * the first attempt, solid = the gain since.
+ *
+ * **`tile` is a FLAT tint, never a gradient** (founder s191: "get rid of the
+ * colored gradient from the tiles"). s190 had made it fade within its own hue
+ * and had added a matching hue radial across the whole card (`.mod-wash-*`);
+ * both are gone. The colour still carries the receptive/productive fact, it
+ * just carries it as one even wash.
  */
 export const PART_META: Record<
   MockPartId,
@@ -34,7 +36,6 @@ export const PART_META: Record<
     tile: string;
     ink: string;
     bar: string;
-    wash: string;
     fillPale: string;
     fillSolid: string;
     desc: string;
@@ -43,10 +44,9 @@ export const PART_META: Record<
 > = {
   lesen: {
     icon: FileText,
-    tile: "bg-gradient-to-br from-emerald-500/20 to-emerald-500/[0.06] dark:from-emerald-400/25 dark:to-emerald-400/[0.08]",
+    tile: "bg-emerald-500/15 dark:bg-emerald-400/20",
     ink: "text-emerald-700 dark:text-emerald-300",
     bar: "bg-emerald-500 dark:bg-emerald-400",
-    wash: "mod-wash-lesen",
     fillPale: "bg-emerald-500/30 dark:bg-emerald-400/25",
     fillSolid: "bg-emerald-500 dark:bg-emerald-400",
     desc: "3 Texte mit Aufgaben",
@@ -55,10 +55,9 @@ export const PART_META: Record<
   },
   hoeren: {
     icon: AudioLines,
-    tile: "bg-gradient-to-br from-teal-500/20 to-teal-500/[0.06] dark:from-teal-400/25 dark:to-teal-400/[0.08]",
+    tile: "bg-teal-500/15 dark:bg-teal-400/20",
     ink: "text-teal-700 dark:text-teal-300",
     bar: "bg-teal-500 dark:bg-teal-400",
-    wash: "mod-wash-hoeren",
     fillPale: "bg-teal-500/30 dark:bg-teal-400/25",
     fillSolid: "bg-teal-500 dark:bg-teal-400",
     desc: "2 Ansagen · Notizen",
@@ -67,10 +66,9 @@ export const PART_META: Record<
   },
   schreiben: {
     icon: SquarePen,
-    tile: "bg-gradient-to-br from-primary/20 to-primary/[0.05] dark:from-primary/25 dark:to-primary/[0.08]",
+    tile: "bg-primary/15 dark:bg-primary/20",
     ink: "text-primary",
     bar: "bg-primary",
-    wash: "mod-wash-schreiben",
     fillPale: "bg-primary/30 dark:bg-primary/25",
     fillSolid: "bg-primary",
     desc: "1 Aufgabe · voller Brief",
@@ -79,10 +77,9 @@ export const PART_META: Record<
   },
   sprechen: {
     icon: MessagesSquare,
-    tile: "bg-gradient-to-br from-sky-500/20 to-sky-500/[0.06] dark:from-sky-400/25 dark:to-sky-400/[0.08]",
+    tile: "bg-sky-500/15 dark:bg-sky-400/20",
     ink: "text-sky-700 dark:text-sky-300",
     bar: "bg-sky-500 dark:bg-sky-400",
-    wash: "mod-wash-sprechen",
     fillPale: "bg-sky-500/30 dark:bg-sky-400/25",
     fillSolid: "bg-sky-500 dark:bg-sky-400",
     desc: "1 Gespräch mit Partner",

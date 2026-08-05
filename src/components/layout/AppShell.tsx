@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Loader2, LogOut } from "lucide-react";
+import { ArrowLeft, Flame, Loader2, LogOut } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { BottomTabBar } from "./BottomTabBar";
 import { GlobalSearch } from "./GlobalSearch";
@@ -69,6 +69,9 @@ export function AppShell() {
   // Route-gated like focus mode, so a stale flag can never strip the chrome
   // anywhere else.
   const examExit = useSessionStore((s) => s.examExit);
+  // Ohne Zeit: the same stage, a practice frame (s192). The flag rides the same
+  // channel as the handler, because this file may not read the exam store.
+  const examUntimed = useSessionStore((s) => s.examUntimed);
   // The runner took the `/exam` route over until s189; it now takes over the
   // Prüfung hub instead, and `/exam` is a redirect into that hub. Both are
   // listed so a stale flag still cannot strip the chrome anywhere else.
@@ -174,25 +177,38 @@ export function AppShell() {
                   replaces, so it is found when looked for without pulling the
                   eye off the task. The confirm lives with the runner, which
                   owns the exam copy. */}
+              {/* Ohne Zeit is practice, not an exam (founder s192), so the way
+                  out is the quiet Zurück the Schreibtrainer carries, in neutral
+                  grey with a back arrow. The red Verlassen stays for a run
+                  against the clock, where leaving really does end a Prüfung. */}
               {exam && (
                 <button
                   type="button"
                   onClick={() => examExit?.()}
-                  aria-label="Prüfung verlassen"
-                  title="Prüfung verlassen"
+                  aria-label={examUntimed ? "Zurück zur Prüfung" : "Prüfung verlassen"}
+                  title={examUntimed ? "Zurück zur Prüfung" : "Prüfung verlassen"}
                   className={cn(
-                    "flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent",
-                    "text-danger transition-colors hover:bg-danger/12",
+                    "flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent transition-colors",
+                    examUntimed
+                      ? "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                      : "text-danger hover:bg-danger/12",
                     // Phone: the mark alone, on the same 36px box the account
                     // button used. Desktop: the mark plus the word in a quiet
-                    // red outline (founder s187, preview options X1 + X2), where
+                    // outline (founder s187, preview options X1 + X2), where
                     // there is room for it and no hover to rely on for the
                     // phone. No tooltip beside a visible label.
-                    "w-9 sm:w-auto sm:border-danger/30 sm:px-3",
+                    "w-9 sm:w-auto sm:px-3",
+                    examUntimed ? "sm:border-border" : "sm:border-danger/30",
                   )}
                 >
-                  <LogOut className="h-[17px] w-[17px]" />
-                  <span className="hidden text-sm font-semibold sm:inline">Verlassen</span>
+                  {examUntimed ? (
+                    <ArrowLeft className="h-[17px] w-[17px]" />
+                  ) : (
+                    <LogOut className="h-[17px] w-[17px]" />
+                  )}
+                  <span className="hidden text-sm font-semibold sm:inline">
+                    {examUntimed ? "Zurück" : "Verlassen"}
+                  </span>
                 </button>
               )}
               {/* Streak chip: flame + day count. The daily-goal figure lives on

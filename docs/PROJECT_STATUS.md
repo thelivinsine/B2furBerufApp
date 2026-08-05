@@ -1,6 +1,6 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 191). **Sprechen was rebuilt: the learner now actually speaks.**
+_Last updated: 2026-08-05 (session 193). **Sprechen was rebuilt: the learner now actually speaks.**
 Founder: "the sprechen part looks quite strange as the learner never get to speak."
 They were right and it was worse than it looked. The Sprechtrainer replayed a hand-authored
 branching tree answered by **tapping one of 2-4 written options** (its "free speaking" node offered
@@ -53,35 +53,19 @@ Gemini-primary cascade"), so the free Gemini leg is live and the ~2-4 cents per 
 holds rather than every turn falling through to Claude. Migration 0017 applies on the merge to
 `main`; the same merge deploys the new `converse` function.
 
-Prior s190 (2026-08-05):
-_(was: last updated session 190). **A defect session on the Bibliothek, all six items from
-the founder's own screenshots, all measured in a browser rather than guessed.** Five of them trace
-to one change: s189 moved the desktop scroll from the page into the content column.
-**Go to top** was reading `window.scrollY`, which no longer moves on desktop, so the button never
-appeared (mobile still worked, which is why it read as "missing"); `useScrollDirection(root)` now
-reads whichever element actually scrolls, and the placement is the founder's s189 rule, measured:
-button at the filter rail's left edge, Feedback pill at its right.
-**The filter rail** stretched to its cap in every state, because a grid item defaults to
-`align-self: stretch`, so a collapsed rail was 564 px of empty Himmelblau: `lg:self-start` plus a
-stage-relative cap, open 655 px / collapsed **119 px**.
-**The search and bookmark toggles** rendered white on white (`BROWSE_TOOLBAR_BUTTON` ends in
-`bg-surface` and wins the tailwind-merge against the `default` variant's `bg-primary`), i.e. the
-blank square in the founder's crop; new `BROWSE_TOOLBAR_BUTTON_ON` constant.
-**"The background surrounding the cards"** was already transparent (measured `rgba(0,0,0,0)` on the
-column and its parent); the real defect was the second half of that prompt, cards sliced by the
-scroll container's edge, answered with `useEdgeFade` + `mask-fade-*` (a mask, not an overlay: the
-ground is a gradient).
-**The blue outlines** were the global `:focus-visible` ring firing after a click; `trackInputMode()`
-marks `<html data-input="pointer|keyboard">` and the ring is now keyboard-only, which keeps
-WCAG 2.4.7.
-**Redemittel vs Kollokationen card height** was not the Wendung: `FlipCard` takes the taller face and
-the unclamped BACK ran to 272 px against a 165 px front, so `auto-rows-fr` pushed all 193 cards to
-272. Capped: **272 → 188 px**, against Kollokationen's 195.
-The founder also asked for an audit of the previous session's feedback; every item was re-verified
-live (Beispiel column, horizontal-scroll fades, internal scroll on all four tabs, the 30 px toolbar,
-the Wörter three-column grid), and the only one still open was the card-height parity above.
-Gates green: typecheck · lint 0 errors (77 warnings = the pre-change baseline) · 551 tests · build ·
-check:bundle 126.6 kB · check:contrast.
+Prior s192 (2026-08-05): **The Schreibtrainer got a way back, the nav bar learned
+which zone a page belongs to, and the exam frame was confined to Mit Zeit.** Three founder prompts
+from phone screenshots. The mobile action cluster's left slot is **Zurück** (to `/anwenden`) instead
+of Feedback, and Feedback moved into the caption line in the Bibliothek's shape
+("KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben"), measured as one line down to 320px.
+A bottom-bar tab is now lit by its ZONE (`navZoneOf`), so `/writing` marks Prüfung, `/session`
+marks Praktisch and `/sammlung` marks Fortschritt; both rails render plain `Link`s, because
+`NavLink` swallows the `aria-current` we set. And **Ohne Zeit no longer opens the Anleitung**: an
+untimed module starts on its first question, its exit is a neutral Zurück rather than the red
+Verlassen, and an untouched drill closes with no confirm. Prior s191: **the Prüfung module tiles
+lost their gradients** (a flat tint of the same hue, a wider gap under the header block, and the
+minutes badge replacing the description line it used to overlap), all measured in headless Chromium
+in both clock states.
 **The same day, a parallel branch polished the Prüfung zone to a finished product.**
 Founder: the two tabs "still look cheap or like MVP", make them read like "a billion dollar edu tech
 app". Analysis first (twelve findings), three options previewed, then a second round on the pick:
@@ -162,61 +146,66 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
-`claude/polish-ui-ux-design-92sbje`).**
-Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
-a billion dollar edu tech app", then "V2 and M3 ... take screenshots during the testing phase and
-optimize and polish the spacing ... without any bugs".
-**Process:** analysis in chat first (no code touched), three named options previewed
-(`preview/pruefung-polish.html`), a second round on the pick (`preview/pruefung-polish-r2.html`,
-artifact https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04, redeployed to the same
-URL), then implementation verified against the REAL app.
-**What shipped** (`src/features/pruefung/PruefungHub.tsx` rewritten; `partMeta.ts` gained
-`wash`/`fillPale`/`fillSolid` and gradient `tile`s; `index.css` gained `.mod-wash-*` + `.mod-go`):
-- One 896px frame for both tabs, a fixed-height scope row, the Bibliothek's `popLayout` tab slide.
-- The module card: mark + arrow row, title, description, the hue wash in the bottom-right corner and
-  that corner reserved by the card's bottom padding, so Ohne Zeit / Mit Zeit never resizes anything.
-- The run band: a two-column ticket from `lg`, today's stacked band below it, `flex-1` on phones only.
-- Modelltest Verlauf **V2**: display figure + delta chip, Bester/Bestanden as stats, seven bars
-  against the pass line (named in the caption, never on the chart).
-- Module üben Verlauf **M3**: four columns on one scale, pale = first attempt, solid = the gain;
-  split into summary | rows from `lg`, which is what keeps a 1280×900 laptop at zero scroll.
-- The `mockExams` split into full runs vs single-module practice (`tests/pruefungHub.test.ts`).
-**Verification tooling** lives in the session scratchpad, not the repo: a ~60-line CDP driver
-(Node 22's built-in WebSocket, no new deps) that seeds localStorage, sets a viewport, clicks by
-button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
-surface has to be checked in the real app rather than in a mockup.
-**Nothing is left open in this zone.**
+**Handoff after session 192 (2026-08-05): the trainer's way back, and the exam frame confined to
+Mit Zeit (branch `claude/prufung-ui-bottom-bar-u0fdwf`).**
+Two founder prompts, both from phone screenshots.
+- **"Replace the feedback button with zurück ... add feedback geben right next to KI geprüft,
+  similar to Bibliothek."** The mobile floating cluster's left slot is now `BackToPruefung`
+  (`src/features/writing/bottomChrome.tsx`): the same 44px squircle geometry the Feedback button
+  had, linking to `/anwenden` rather than to history, because `/writing` is entered from three
+  places. Feedback moved down into the caption line as the Bibliothek's own `FeedbackLink`:
+  "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben", measured as ONE line down to 320px.
+  Both trainers now render the same `MobileAiNote`, so the two hand-kept copies cannot drift.
+  `FeedbackIconButton` is deleted; `FeedbackNote` is built from `FeedbackLink`.
+- **"The prufung bottom bar isn't selected here, check this for all the pages."** A tab is lit by
+  its ZONE now (`navZoneOf` in `nav-items.ts`), not by the URL: `/writing`, `/simulation`, `/exam`
+  light Prüfung; `/quiz` and the retired per-tool routes light Bibliothek; `/session`, `/revision`,
+  `/welt` light Praktisch; `/sammlung` lights Fortschritt. The bar and the sidebar render plain
+  `Link`s, because `NavLink` re-decides the state and also SWALLOWS `aria-current` (it reads that
+  prop as the value to use when it considers itself active), so the lit tab announced nothing.
+  Measured across all twelve in-shell routes: every one lights its zone, `/session` and `/revision`
+  have no bar (focus mode), none is blank.
+- **"Such screens for hören and lesen for Ohne Zeit ... this screen mode represents exam mode. This
+  should only be shown when a user is in mit zeit mode."** The Anleitung is Mit Zeit's screen now:
+  `useExamStore.start` opens an untimed module straight in `phase: "part"` (and `completePart` never
+  routes the next part through an intro either). The frame follows: the header's exit is a neutral
+  **Zurück** arrow instead of the red Verlassen (`useSessionStore.examUntimed`, since AppShell may
+  not import the exam store), leaving an untouched untimed drill asks nothing at all, and the
+  confirm it does show reads "Übung verlassen?". The STAGE is unchanged: one viewport, no bottom
+  bar, the drill scrolling internally. Verified in the real build: Ohne Zeit Lesen and Hören open on
+  the question, Mit Zeit still opens on "PRÜFUNGSTEIL ... der Timer läuft, sobald du startest".
+**Gates green:** build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
+check:bundle 126.7 kB of 400 · check:contrast.
+**Open question for the founder:** the untimed drill still hides the bottom tab bar and holds the
+one-viewport stage. That is deliberate (the stage is what keeps a Teil at zero page scroll, and a
+visible tab bar would let a learner re-enter the persisted run in a loop), but say the word and it
+can go too.
 
-**Handoff after session 190 (2026-08-05): six Bibliothek defects after the internal-scroll change
-(branch `claude/card-transparency-go-to-top-jygye9`).**
-Seven founder prompts, every one a defect report with a screenshot, against what PR #800 shipped the
-day before. No preview round: these were bugs in an already-approved surface, so each was reproduced
-in headless Chromium against the dev server, measured, fixed and re-measured.
-**What shipped:**
-- **`useScrollDirection(root)` + `ScrollTopButton root=`** (`features/shared/browseScroll.tsx`): the
-  hook reads whichever element actually scrolls, and the column only counts while it overflows,
-  which is false below `lg`. This is what brings the desktop go-to-top button back. Placement
-  unchanged and re-measured against the founder's s189 rule: button left edge 1000 px = the rail's
-  left edge, Feedback pill right edge 1256 px = the rail's right edge.
-- **`useEdgeFade` + `.mask-fade-y|-top|-bottom`**: the scroll column fades at whichever vertical edge
-  still has content, instead of slicing a card in half. A mask rather than an overlay, because the
-  page ground is a gradient and a flat overlay would band in light and grey out in dark.
-- **`BROWSE_TOOLBAR_BUTTON_ON`**: the ON state for the search and bookmark toggles, applied after
-  the base class so the fill wins the tailwind-merge. They were white-on-white, i.e. invisible.
-- **`lg:self-start` + `lg:max-h-[calc(100%-3.5rem)]` on all four rails**: content-sized, capped
-  against the stage, and clear of the floating bottom line.
-- **`src/lib/inputMode.ts` (new) + one rule in `index.css`**: the focus ring is keyboard-only.
-- **Redemittel card parity**: front headline capped at 3 lines, every BACK part at 2, each with a
-  `title`. 272 → 188 px against Kollokationen's 195.
-**Audit the founder asked for (prompt 6):** every s189 feedback item re-verified in the browser, not
-read off the log. Live and correct: the Redemittel **Beispiel** column, the horizontal-scroll fades,
-internal scroll with the page unscrollable on all four tabs, the 30 px toolbar row, the
-Feedback/go-to-top docking, the Wörter three-column grid. The only item still open from that list
-was the card-height parity, now closed.
-**Verification:** 1280x900 across all four tabs (rail open + collapsed, search open, mid-scroll) and
-390x844 for the mobile fallback, where the page still scrolls, the button stays centred above the
-Üben bar and no mask applies.
-**Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
-`3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
-moves, the reserve moves with it.
+**Handoff after session 191 (2026-08-05): the Prüfung module tiles went flat (branch
+`claude/remove-tile-gradient-4fcowe`).**
+Two founder prompts against a screenshot of `/anwenden`, Module üben.
+- **"Get rid of the colored gradient from the tiles here."** The cards carried TWO coloured
+  gradients from s190: the hue radial across the whole card (`.mod-wash-*`) and a gradient fill on
+  the mark tile. Both are gone. The wash span, the `wash` field on `PART_META` and the entire
+  `.mod-wash-*` block in `index.css` are deleted, and `tile` is now a flat tint
+  (`bg-emerald-500/15 dark:bg-emerald-400/20`, and the teal / primary / sky pairs). The colour still
+  carries the receptive-vs-productive fact, it just carries it evenly. The badge corner stays
+  reserved by the card's bottom padding, so the clock switch still cannot move a card edge.
+- **"Increase the space below the toggle buttons slightly."** The hub's outer column went
+  `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap sits ONLY between the header block (switcher + scope
+  row) and the tab content, so the toggles and the tiles now read as two sections while the gaps
+  inside each block are untouched.
+**Verified in the real build**, not in a mockup: a rebuilt CDP driver (Node 22's built-in
+`WebSocket`, no new deps) reports zero page scroll, zero badge/text overlap and no `background-image`
+inside `main` at 360x640, 393x852 light and dark, and 1280x900, in BOTH clock states. Gates green:
+build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests · check:bundle · contrast.
+- **"The time badges [are] overlapping on the text ... just remove the text and just keep the
+  badges."** A real bug, and the reserve was the cause: the badge is 24px tall and sits 12px off the
+  bottom, i.e. 36px, against a 28px `pb-[1.75rem]` reserve, so with the clock ON it sat across the
+  description on all four cards. The description line is gone (`FREE_DESC` with it; `PART_META.desc`
+  stays for the Anleitung pages). What remains is mark, arrow, title, badge. The one line that can
+  still appear is the honest empty state, and it only shows on a card that has no badge.
+Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, the badge overlap),
+both squash-merged into `main`; the founder verifies the live result.
+**Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
+so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.

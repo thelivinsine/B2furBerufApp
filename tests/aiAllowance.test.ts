@@ -25,7 +25,7 @@ describe("daily AI allowance", () => {
     vi.resetModules();
   });
 
-  // Sprechen joined the allowance system in s191 at 2 conversations/day
+  // Sprechen joined the allowance system in s193 at 2 conversations/day
   // (founder-approved), sitting beside Lang because a spoken conversation costs
   // about what a long evaluation costs.
   it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2 / Sprechen 2)", async () => {

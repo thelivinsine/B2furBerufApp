@@ -5,7 +5,7 @@ import { UmlautKeys } from "@/features/writing/UmlautKeys";
 import { cn } from "@/lib/utils";
 
 /**
- * The one control cluster every spoken layout shares (s191).
+ * The one control cluster every spoken layout shares (s193).
  *
  * Same geometry as the Schreiben floating cluster: no bar behind it, every
  * control on its own opaque backing, and the primary action in the SAME place
@@ -41,7 +41,7 @@ export function MicCluster({
   onHint?: () => void;
   onEnd: () => void;
   /** "Auflegen" in the call layout. Neutral, never danger red: that colour is
-   *  reserved for errors (founder s191 kept the rule rather than the phone
+   *  reserved for errors (founder s193 kept the rule rather than the phone
    *  convention). */
   endLabel?: string;
   caption?: string | null;

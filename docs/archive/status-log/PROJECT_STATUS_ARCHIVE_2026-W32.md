@@ -3,6 +3,33 @@
 Handoffs moved out of `docs/PROJECT_STATUS.md` once they aged past the two most recent.
 
 
+**Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
+`claude/polish-ui-ux-design-92sbje`).**
+Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
+a billion dollar edu tech app", then "V2 and M3 ... take screenshots during the testing phase and
+optimize and polish the spacing ... without any bugs".
+**Process:** analysis in chat first (no code touched), three named options previewed
+(`preview/pruefung-polish.html`), a second round on the pick (`preview/pruefung-polish-r2.html`,
+artifact https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04, redeployed to the same
+URL), then implementation verified against the REAL app.
+**What shipped** (`src/features/pruefung/PruefungHub.tsx` rewritten; `partMeta.ts` gained
+`wash`/`fillPale`/`fillSolid` and gradient `tile`s; `index.css` gained `.mod-wash-*` + `.mod-go`):
+- One 896px frame for both tabs, a fixed-height scope row, the Bibliothek's `popLayout` tab slide.
+- The module card: mark + arrow row, title, description, the hue wash in the bottom-right corner and
+  that corner reserved by the card's bottom padding, so Ohne Zeit / Mit Zeit never resizes anything.
+- The run band: a two-column ticket from `lg`, today's stacked band below it, `flex-1` on phones only.
+- Modelltest Verlauf **V2**: display figure + delta chip, Bester/Bestanden as stats, seven bars
+  against the pass line (named in the caption, never on the chart).
+- Module üben Verlauf **M3**: four columns on one scale, pale = first attempt, solid = the gain;
+  split into summary | rows from `lg`, which is what keeps a 1280×900 laptop at zero scroll.
+- The `mockExams` split into full runs vs single-module practice (`tests/pruefungHub.test.ts`).
+**Verification tooling** lives in the session scratchpad, not the repo: a ~60-line CDP driver
+(Node 22's built-in WebSocket, no new deps) that seeds localStorage, sets a viewport, clicks by
+button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
+surface has to be checked in the real app rather than in a mockup.
+**Nothing is left open in this zone.**
+
+
 **Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
 Founder: "D and 2", then "keep them separate".
 - **Bar mark: the orange Absolventenhut** (`graduationCap` in `route-icons.tsx`). The target rings
@@ -325,7 +352,40 @@ audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1
 C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
 
 
-## Archived from PROJECT_STATUS.md in session 191 (2026-08-05)
+**Handoff after session 190 (2026-08-05): six Bibliothek defects after the internal-scroll change
+(branch `claude/card-transparency-go-to-top-jygye9`).**
+Seven founder prompts, every one a defect report with a screenshot, against what PR #800 shipped the
+day before. No preview round: these were bugs in an already-approved surface, so each was reproduced
+in headless Chromium against the dev server, measured, fixed and re-measured.
+**What shipped:**
+- **`useScrollDirection(root)` + `ScrollTopButton root=`** (`features/shared/browseScroll.tsx`): the
+  hook reads whichever element actually scrolls, and the column only counts while it overflows,
+  which is false below `lg`. This is what brings the desktop go-to-top button back. Placement
+  unchanged and re-measured against the founder's s189 rule: button left edge 1000 px = the rail's
+  left edge, Feedback pill right edge 1256 px = the rail's right edge.
+- **`useEdgeFade` + `.mask-fade-y|-top|-bottom`**: the scroll column fades at whichever vertical edge
+  still has content, instead of slicing a card in half. A mask rather than an overlay, because the
+  page ground is a gradient and a flat overlay would band in light and grey out in dark.
+- **`BROWSE_TOOLBAR_BUTTON_ON`**: the ON state for the search and bookmark toggles, applied after
+  the base class so the fill wins the tailwind-merge. They were white-on-white, i.e. invisible.
+- **`lg:self-start` + `lg:max-h-[calc(100%-3.5rem)]` on all four rails**: content-sized, capped
+  against the stage, and clear of the floating bottom line.
+- **`src/lib/inputMode.ts` (new) + one rule in `index.css`**: the focus ring is keyboard-only.
+- **Redemittel card parity**: front headline capped at 3 lines, every BACK part at 2, each with a
+  `title`. 272 → 188 px against Kollokationen's 195.
+**Audit the founder asked for (prompt 6):** every s189 feedback item re-verified in the browser, not
+read off the log. Live and correct: the Redemittel **Beispiel** column, the horizontal-scroll fades,
+internal scroll with the page unscrollable on all four tabs, the 30 px toolbar row, the
+Feedback/go-to-top docking, the Wörter three-column grid. The only item still open from that list
+was the card-height parity, now closed.
+**Verification:** 1280x900 across all four tabs (rail open + collapsed, search open, mid-scroll) and
+390x844 for the mobile fallback, where the page still scrolls, the button stays centred above the
+Üben bar and no mask applies.
+**Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
+`3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
+moves, the reserve moves with it.
+
+## Archived from PROJECT_STATUS.md in session 193 (2026-08-05)
 
 Prior s189 (2026-08-05): **the Prüfung zone became ONE page.** Founder prompt:
 "this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
@@ -409,3 +469,4 @@ most recent into the current ISO-week chunk under `docs/archive/status-log/` (se
 `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Do NOT let the `_Last updated_` block above grow into a
 session-by-session narrative — keep it to the latest session only. Keep the whole file under ~250
 lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
+

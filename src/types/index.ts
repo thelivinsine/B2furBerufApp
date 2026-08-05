@@ -329,7 +329,7 @@ export interface Scenario {
   /** Key Redemittel a strong candidate would deploy. */
   targetRedemittel: RedemittelCategory[];
   /**
-   * Who the AI partner plays in the spoken conversation (s191). Optional only
+   * Who the AI partner plays in the spoken conversation (s193). Optional only
    * because it arrived after the scenarios did; `speakingBrief()` falls back to
    * a neutral partner when it is absent, so a scenario is never unservable.
    */
@@ -343,10 +343,10 @@ export interface Scenario {
   goals?: string[];
 }
 
-/* ---------------- Speaking: the AI conversation partner (s191) ------------ */
+/* ---------------- Speaking: the AI conversation partner (s193) ------------ */
 
 /**
- * How a spoken task is staged. Founder s191: practice is always the chat thread
+ * How a spoken task is staged. Founder s193: practice is always the chat thread
  * (the learner said the transcript is the useful part), and an exam task picks
  * by whether its brief has to stay readable while speaking.
  *
@@ -411,7 +411,7 @@ export interface ExamSet {
   totalMinutes: number;
   rubric: ExamRubricCriterion[];
   /**
-   * Which layout the exam task runs in (founder s191). Absent = "buehne", which
+   * Which layout the exam task runs in (founder s193). Absent = "buehne", which
    * is right for every task that works from a written Aufgabe. Only a task that
    * reading would DEFEAT (listen-and-hold, Notiz machen) sets "anruf".
    * "gespraech" is not valid here: the transcript is a practice affordance.

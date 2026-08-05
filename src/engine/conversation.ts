@@ -1,7 +1,7 @@
 import type { ConversationBrief } from "@/types";
 
 /**
- * The spoken-conversation state machine (s191).
+ * The spoken-conversation state machine (s193).
  *
  * Pure and side-effect free, like `engine/srs.ts` and `engine/pronounce.ts`, so
  * the turn-taking rules and the cost ceiling are unit-checkable without a

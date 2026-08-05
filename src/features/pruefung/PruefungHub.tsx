@@ -68,12 +68,6 @@ const FREE_ROUTE: Partial<Record<MockPartId, string>> = {
   sprechen: "/simulation",
 };
 
-/** What a module holds when the clock is off (the trainers' own shape). */
-const FREE_DESC: Partial<Record<MockPartId, string>> = {
-  schreiben: "Fokus, Kurz und Lang",
-  sprechen: "Dialoge mit Coaching",
-};
-
 const TOTAL_MINUTES = MOCK_PART_ORDER.reduce((n, p) => n + PART_MINUTES[p], 0);
 
 /* --------------------------------- records -------------------------------- */
@@ -173,7 +167,11 @@ export function PruefungHub() {
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 sm:gap-5",
+        // The gap here is ONLY between the header block (switcher + scope row)
+        // and the tab's content, and it is deliberately wider than the gaps
+        // inside either (founder s191), so the controls and the tiles read as
+        // two sections rather than one stack of evenly spaced rows.
+        "flex flex-col gap-6 sm:gap-7",
         // Released while a Verlauf is open: an expanded tile needs the page to
         // be able to scroll, which a fixed stage height would forbid.
         !verlaufOpen && "h-page-stage min-h-0",
@@ -468,7 +466,6 @@ function ModuleGrid({
         const free = clock === "free";
         const viaTrainer = free && !!FREE_ROUTE[part];
         const canOpen = viaTrainer || (servable && countFor(part) > 0);
-        const desc = (free && FREE_DESC[part]) || meta.desc;
 
         return (
           <motion.button
@@ -481,16 +478,11 @@ function ModuleGrid({
             transition={{ delay: Math.min(i * 0.04, 0.16), duration: 0.16 }}
             className={cn(
               // The bottom padding RESERVES the minutes badge's corner in both
-              // clock states, so throwing the switch cannot move a card edge and
-              // a two-line description can never run underneath the badge.
+              // clock states, so throwing the switch cannot move a card edge.
               "relative flex min-h-[8rem] flex-col items-start overflow-hidden rounded-xl border border-border bg-surface p-4 pb-[1.75rem] text-left shadow-soft transition-transform sm:min-h-[9rem] sm:p-5 sm:pb-9",
               canOpen ? "card-hover" : "cursor-not-allowed opacity-60",
             )}
           >
-            {/* The module's own hue, breathed into the corner the badge sits in,
-                so the reserved space reads as occupied on purpose. */}
-            {canOpen && <span aria-hidden className={cn("mod-wash", meta.wash)} />}
-
             <span className="relative flex w-full items-start justify-between gap-2">
               <span
                 className={cn(
@@ -510,9 +502,17 @@ function ModuleGrid({
             <span className="relative mt-2.5 text-base font-bold leading-tight tracking-[-0.015em] sm:mt-3 sm:text-xl">
               {PART_LABEL[part]}
             </span>
-            <span className="relative mt-1 text-[12.5px] leading-snug text-muted-foreground sm:text-sm">
-              {canOpen ? desc : "Noch keine Inhalte"}
-            </span>
+            {/* No description line (founder s191): with the clock on, the badge
+                sat ON that line, because a 24px badge 12px off the bottom needs
+                more room than the reserved padding gave it. The card says what
+                the module is, the badge says how long it takes, and nothing
+                else has to fit. The one line that stays is the honest empty
+                state, which never shares the card with a badge. */}
+            {!canOpen && (
+              <span className="relative mt-1 text-[12.5px] leading-snug text-muted-foreground sm:text-sm">
+                Noch keine Inhalte
+              </span>
+            )}
 
             {canOpen && !free && (
               <span className="absolute bottom-3 right-4 z-[1] inline-flex items-center gap-1 rounded-md bg-muted/85 px-2 py-[3px] text-xs font-semibold tabular-nums text-muted-foreground sm:bottom-4 sm:right-5">

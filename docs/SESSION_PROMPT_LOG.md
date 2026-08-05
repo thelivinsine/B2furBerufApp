@@ -4434,7 +4434,122 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `docs/areas/PRAKTISCH-NAV.md`, `CLAUDE.md` and this log.
 - **Artifacts (prompt 4):** PR #801 · `docs/PROJECT_STATUS.md` · this log
 
-## Session 191 · 2026-08-05 · branch `claude/sprechen-ai-speaking-redesign-oa9fu1`
+## Session 191 — 2026-08-05 — branch `claude/remove-tile-gradient-4fcowe`
+
+- **Prompt 1 (verbatim):** `[screenshot of /anwenden, Module üben] get rid of the colored gradient
+  from the tiles here.`
+  **Response:** the cards carried two coloured gradients from s190, and both are gone. The card's
+  hue radial (`.mod-wash-*` in `index.css`, the span in `ModuleGrid`, the `wash` field on
+  `PART_META`) is deleted outright, and `PART_META.tile` went from an in-family gradient to a flat
+  tint per module (emerald / teal / primary / sky, `/15` light and `/20` dark), so the mark still
+  carries the receptive-vs-productive colour fact without a gradient. The badge corner is still
+  reserved by the card's bottom padding, so the Ohne Zeit / Mit Zeit switch cannot move a card edge.
+- **Prompt 2 (verbatim):** `increse the space below the toggle buttons slightly to subtly
+  differentiate the toggles and tiles sections.`
+  **Response:** the hub's outer column went `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap is only
+  between the header block (switcher + scope row) and the tab content, so the two sections separate
+  while the gaps inside each block (grid ↔ Verlauf, switcher ↔ scope row) stay as they were.
+  **Verification:** the s190 CDP driver was rebuilt in the session scratchpad (Node 22's built-in
+  `WebSocket`, no new deps): seeds `b2beruf.settings.v1`, opens `/anwenden` in the built app and
+  reports `scrollHeight` vs `innerHeight` plus every element inside `main` with a background-image.
+  Zero page scroll at 360x640, 393x852 (light and dark) and 1280x900; the gradient list is empty.
+  Gates green: build · typecheck · lint (0 errors, 77 warnings = the pre-change baseline) ·
+  `test:unit` 558/558 · `check:bundle` 126.6 kB of 400 · `check:contrast`.
+- **Artifacts (prompts 1-2):** `src/features/pruefung/PruefungHub.tsx` ·
+  `src/features/exam/partMeta.ts` · `src/index.css` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` ·
+  this log · **PR #803**, squash-merged as `f0fa0b7`
+- **Prompt 3 (verbatim):** `document the session`
+  **Response:** the documentation pass had already shipped inside PR #803 (`PROJECT_STATUS.md` with
+  the s191 handoff and lead paragraph, the older s190 Bibliothek handoff moved into
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` to hold the ~250-line cap,
+  `docs/areas/PRAKTISCH-NAV.md` for the no-gradient card rule and the section gap, and this log).
+  This pass records the merge itself (PR number and squash SHA, which were not known when the entry
+  was written) and logs this prompt. `CLAUDE.md` needed no edit: it states the reserved badge corner
+  and the shared Prüfung frame, neither of which changed, and it never named the wash.
+- **Artifacts (prompt 3):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md`
+- **Prompt 4 (verbatim):** `[screenshot of /anwenden, Mit Zeit] there seems to be a big with the
+  time badges overlapping on the text. Can you just remove the text and just keep the badges in this
+  page?`
+  **Response:** confirmed as a real bug and fixed at the cause: the minutes badge is ~24px tall and
+  is held 12px off the card's bottom edge, so it needs 36px, while the reserve added for it in s190
+  was `pb-[1.75rem]` (28px). With the clock ON it therefore crossed the description line on all four
+  cards. Per the founder's instruction the description is removed rather than the reserve grown:
+  `ModuleGrid` renders mark, arrow, title and badge, `FREE_DESC` is deleted, and `PART_META.desc`
+  stays because the Anleitung pages read it. The only line that can still appear is the empty state
+  "Noch keine Inhalte", which renders only when the card has no badge, so the two can never collide.
+  **Verification:** the CDP driver now clicks "Mit Zeit" and reports every badge/text rectangle
+  intersection inside a card. Six states shot (Mit Zeit at 360x640, 393x852 light + dark, 1280x900;
+  Ohne Zeit at 393x852 and 1280x900): zero intersections, zero page scroll everywhere, and the card
+  edges are identical in both clock states, so the reserve still does its job.
+- **Artifacts (prompt 4):** `src/features/pruefung/PruefungHub.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/PROJECT_STATUS.md` · this log · **PR #805**
+
+- **Prompt 5 (verbatim):** `merge everything to main and document the session`
+  **Response:** PR #805 was green (`lint-content` success) and is squash-merged into `main` as
+  `68b500c`, after PR #803 (`f0fa0b7`) and the docs PR #804 (`14b2a20`) earlier in the session, so
+  everything from s191 is on `main` and nothing is left on the branch. Post-merge housekeeping ran
+  after each merge (`fetch origin main` → `reset --hard` → `push --force-with-lease`); the branch is
+  clean at `68b500c`. Documentation for prompts 1-4 had shipped inside their own PRs; this pass adds
+  the #805 merge SHA to the s191 handoff and logs this prompt.
+- **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 192 — 2026-08-05 — branch `claude/prufung-ui-bottom-bar-u0fdwf`
+
+- **Prompt 1 (verbatim):** `[screenshot of /writing, Fokus, on a phone] replace the feedback button
+  with zuruck and the user should navigate back to the prufung hub. add feedback geben right next to
+  KI geprüft, similar to Bibliothek section. the prufung bottom bar isn't selected here - check this
+  for all the pages where the bottom bar is visible but not selected and fix it. fix any other bugs
+  spotted`
+  **Response:** three changes.
+  (1) The mobile floating cluster's left slot is `BackToPruefung`, a new
+  `src/features/writing/bottomChrome.tsx`: the retired Feedback button's exact geometry (44px,
+  `rounded-xl`, quiet outline, opaque `bg-surface` because the cluster has no bar behind it) linking
+  to `/anwenden`, not to history, since `/writing` is entered from the hub card, the dashboard
+  recommendation and ⌘K. Fokus keeps its rule that the cluster disappears once a correction exists;
+  the lit Prüfung tab is the way back in that state.
+  (2) Feedback moved DOWN beside the KI note as the Bibliothek's own link:
+  "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben". `FeedbackLink` is factored out of
+  `FeedbackNote` so both surfaces share one definition, and `FeedbackIconButton` is deleted (it had
+  no other call site). Both trainers now render ONE `MobileAiNote`, which is what stops the two
+  copies of the locked bottom geometry from drifting apart. Measured in the real build: one line at
+  360px AND at 320px, so it cannot grow into the buttons above it.
+  (3) The bar bug: `NavLink` decided the active tab from the URL, so every page one level below a
+  hub left the bar visible with nothing lit. `navZoneOf` (`nav-items.ts`) folds a route into the tab
+  that owns it (`/writing`, `/simulation`, `/exam` → Prüfung; `/quiz` + the retired per-tool routes
+  → Bibliothek; `/session`, `/revision`, `/welt` → Praktisch; `/sammlung` → Fortschritt), and the
+  bar and the sidebar both read it. Both now render a plain `Link`: `NavLink` would re-decide the
+  state AND it swallows `aria-current` (it treats that prop as "the value to use when I consider
+  myself active"), so the lit tab announced nothing to a screen reader. That was the "other bug"
+  worth fixing here. Verified by driving the built app: all twelve in-shell routes light their zone,
+  `/session` and `/revision` have no bar (focus mode), none is blank.
+- **Prompt 2 (verbatim):** `[screenshot of the Hören Anleitung, Ohne Zeit] I see such screens for
+  hören and lesen for Ohne Zeit as well - the problem is that this screen mode represents exam mode.
+  This should only be shown when a user is in mit zeit mode. Keep this consistent for all the
+  modules`
+  **Response:** the Anleitung is Mit Zeit's screen now. `useExamStore.start` opens an untimed module
+  straight in `phase: "part"` (and `completePart` never routes a next part through an intro either),
+  so Ohne Zeit lands on the first question, exactly as Schreiben and Sprechen ohne Zeit land in
+  their trainer. The FRAME follows the same logic: the header's exit is a neutral **Zurück** arrow
+  instead of the red Verlassen (the flag rides `useSessionStore.examUntimed`, because AppShell is
+  eager code that may not import the exam store), leaving an untimed drill with nothing answered,
+  noted or written asks no confirm at all, and the confirm it does show says "Übung verlassen?".
+  What deliberately stays exam-shaped is the STAGE (one viewport, no bottom bar, internal scroll):
+  it is what keeps a Teil at zero page scroll, and a visible tab bar would let a learner re-enter
+  the persisted run in a loop. Flagged to the founder as an open question. `PartIntro` keeps its
+  untimed wording for the one case that can still reach it, a run persisted mid-intro before this
+  deploy. Verified in the real build: Ohne Zeit Lesen and Hören open on the question, Mit Zeit still
+  opens on "PRÜFUNGSTEIL … der Timer läuft, sobald du startest".
+- **Artifacts (prompts 1-2):** `src/features/writing/bottomChrome.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/components/layout/nav-items.ts` ·
+  `src/components/layout/BottomTabBar.tsx` · `src/components/layout/Sidebar.tsx` ·
+  `src/components/layout/AppShell.tsx` · `src/store/useSessionStore.ts` · `src/store/useExamStore.ts` ·
+  `src/features/exam/MockExamRunner.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+
+## Session 193 · 2026-08-05 · branch `claude/sprechen-ai-speaking-redesign-oa9fu1`
 
 - **Prompt 1 (verbatim):** `the sprechen part looks quite strange as the learner never get to speak.
   can you rethink the whole sprechen stuff and maybe determine how it would look like to insert a
@@ -4528,3 +4643,4 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `src/features/legal/PrivacyPolicy.tsx` · `src/lib/legalMeta.ts` · `src/lib/consent.ts` ·
   `scripts/lint-content.mjs` · `tests/conversation.test.ts` · `tests/scenarios.test.ts` ·
   `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+

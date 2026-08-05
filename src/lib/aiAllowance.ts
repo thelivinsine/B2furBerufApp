@@ -40,7 +40,7 @@ export const DAILY_ALLOWANCE: Record<AiMode, number> = {
   fokus: 10,
   kurz: 4,
   lang: 2,
-  // Founder s191: a spoken conversation costs about what a Lang evaluation
+  // Founder s193: a spoken conversation costs about what a Lang evaluation
   // costs, so it sits beside Lang rather than getting its own generous budget.
   sprechen: 2,
 };

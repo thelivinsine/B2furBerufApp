@@ -1,5 +1,5 @@
 -- 0017_speaking_conversations.sql
--- Sprechen with an AI partner (s191): the spoken-conversation record.
+-- Sprechen with an AI partner (s193): the spoken-conversation record.
 --
 -- WHY. Until now nothing in the Sprechen area recorded what a learner said,
 -- because nothing ever heard them: the trainer replayed an authored branching
@@ -63,7 +63,7 @@ create policy speaking_delete_own on public.speaking_conversations
   for delete using (auth.uid() = user_id);
 
 comment on table public.speaking_conversations is
-  'One finished spoken conversation with the AI partner (s191): transcript, correction, goals met. Also the daily-allowance counter for the converse function.';
+  'One finished spoken conversation with the AI partner (s193): transcript, correction, goals met. Also the daily-allowance counter for the converse function.';
 
 -- ---------------------------------------------------------------------------
 -- Retention. The 730-day learner-text purge from migration 0015 has to cover
@@ -98,7 +98,7 @@ begin
   get diagnostics v_n = row_count;
   v_touched := v_touched + v_n;
 
-  -- s191: spoken transcripts age out on the same clock. `turns` holds the same
+  -- s193: spoken transcripts age out on the same clock. `turns` holds the same
   -- words as `learner_text` plus the partner's lines, so it is reset too.
   update public.speaking_conversations
     set learner_text = null, corrected_text = null, turns = '[]'::jsonb

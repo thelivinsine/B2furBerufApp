@@ -1598,7 +1598,7 @@ where it exists to keep the CTA in the thumb's reach.
 
 ---
 
-## Sprechen: the AI conversation partner (session 191)
+## Sprechen: the AI conversation partner (session 193)
 
 **The prompt.** "the sprechen part looks quite strange as the learner never get to speak. can you
 rethink the whole sprechen stuff and maybe determine how it would look like to insert a feature

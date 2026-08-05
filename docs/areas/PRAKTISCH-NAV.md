@@ -30,6 +30,17 @@ The Prüfung hub itself lives at `/anwenden` and is ONE page with a two-segment 
 (s189, below). `/exam` redirects into it (`?tab=modelltest`) and is kept forever: it is in
 learners' history, in the dashboard recommendation and in ⌘K.
 
+**A tab is lit by its ZONE, not by its URL** (s192, founder: "the prufung bottom bar isn't selected
+here", on `/writing`). A zone owns more routes than its own path, so `navZoneOf(pathname)`
+(`nav-items.ts`) folds them: `/writing`, `/simulation`, `/exam` → Prüfung; `/quiz` and the retired
+per-tool routes → Bibliothek; `/session`, `/revision`, `/welt` → Praktisch; `/sammlung` →
+Fortschritt; everything else (`/sources`, `/hilfe`, the legal pages, `/admin`) lights nothing. The
+bar and the sidebar both read it, and both render a plain `Link`: `NavLink` would re-decide the
+state from the URL and it also SWALLOWS `aria-current` (it reads that prop as "the value to use when
+I consider myself active"), so the lit tab announced nothing to a screen reader. `NAV_ZONE_OF_ROUTE`
+is the same fold as `ROUTE_SUCCESSOR` plus the routes that never were tabs; the two answer different
+questions (pin migration vs. active state), so they stay separate.
+
 ### The Prüfung hub (`/anwenden`, redesign s189, polished s190)
 
 Founder brief: "insert a toggle in place of the current header, similar to Bibliothek", with
@@ -63,17 +74,39 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   a flex child, and auto cross-axis margins make a flex item fall back to its CONTENT width, which
   collapsed the block to 411px.
   **The card (s190, founder pick B "Prüfungstag"):** the mark top-left and a quiet arrow top-right
-  (the card is a button and has to read like one), then the title and what it holds. The module's own
-  hue is breathed into the bottom-right corner (`.mod-wash-*` in `index.css`, 13 % of an already pale
-  hue) and **that corner is RESERVED in both clock states** via the card's bottom padding, so the
-  minutes badge appears and disappears with the switch without moving a single card edge, and a
-  two-line description can never run underneath it. This is where "Einzeln üben" went.
+  (the card is a button and has to read like one), then the title. The badge corner is **RESERVED in
+  both clock states** via the card's bottom padding, so the minutes badge appears and disappears with
+  the switch without moving a single card edge. This is where "Einzeln üben" went.
+  **There is NO description line** (founder s191, a screenshot of the badge sitting on the text): a
+  24px badge held 12px off the bottom needs more room than the 28px reserve gave it, so with the
+  clock on it overlapped the description on every card. The card names the module, the badge states
+  the minutes, and nothing else has to fit. The ONE line that can still appear is the honest empty
+  state ("Noch keine Inhalte"), which only shows on a card that has no badge, so the two can never
+  collide. `FREE_DESC` went with it; `PART_META.desc` stays, because the Anleitung pages use it.
+  **No gradient on the card and none on the mark** (founder s191, "get rid of the colored gradient
+  from the tiles"): the s190 corner wash (`.mod-wash-*`) is deleted and `PART_META.tile` is a FLAT
+  tint of the module's hue. The colour still carries the receptive/productive fact, it just carries
+  it as one even wash on a white card. Do not reintroduce either.
+  **The header and the tiles are two sections:** the gap between the header block (switcher + scope
+  row) and the tab's content is deliberately wider than the gaps inside either one (`gap-6 sm:gap-7`
+  against `gap-4 sm:gap-5`, founder s191), so the controls do not read as the first row of an evenly
+  spaced stack.
 - **Mit Zeit / Ohne Zeit** (founder pick "idea 3", s189) is ONE switch beside Niveau, and
   **Ohne Zeit is the resting state**. It is how the free trainers merged INTO the modules rather
   than sitting beside them: Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit `/simulation`,
   and Lesen/Hören run the same drill with `untimed` set (no tick, no timer pill, never auto-handed
   in). The separate "Freies Üben" block the earlier rounds carried is gone with it, and those two
   trainers have no other entry point, so the switch is load-bearing.
+  **The exam FRAME belongs to Mit Zeit alone** (founder s192: "this screen mode represents exam
+  mode, this should only be shown when a user is in mit zeit mode, keep this consistent for all the
+  modules"). Ohne Zeit therefore: skips the Anleitung and opens the drill directly
+  (`useExamStore.start` sets `phase: "part"`, and `completePart` never hands the next part over
+  through an intro either); calls the way out **Zurück**, a neutral arrow in the header instead of
+  the red Verlassen (the flag rides `useSessionStore.examUntimed`, because AppShell may not import
+  the exam store); leaves with NO confirm while nothing has been answered, noted or written; and
+  names the confirm it does show "Übung verlassen?". What stays exam-shaped is the STAGE: one
+  viewport, the bottom bar out, the drill scrolling internally. Mit Zeit keeps the Anleitung
+  verbatim ("Prüfungsteil", the minutes, "der Timer läuft, sobald du startest").
 - **Modelltest:** the run band and Verlauf, nothing else. Below `lg` the band is eyebrow +
   "52 Min gesamt" + countdown, the four modules as a timeline, then the CTA, **centred and with no
   rule above it** (founder s189: the divider cut the band in two, and the run is one thing). It takes

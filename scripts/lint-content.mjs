@@ -56,7 +56,7 @@ const WEAKNESS_CATEGORIES = [
   "daWords", "collocations", "register", "spelling",
 ];
 const SPEAKERS = ["partner", "examiner", "narrator"];
-// mirrors SpeakingStage (s191). "gespraech" is practice-only: an exam set that
+// mirrors SpeakingStage (s193). "gespraech" is practice-only: an exam set that
 // asks for it would be asking for the transcript affordance in a Modelltest.
 const SPEAKING_STAGES = ["gespraech", "buehne", "anruf"];
 const EXAM_SPEAKING_STAGES = ["buehne", "anruf"];
@@ -573,7 +573,7 @@ function lintScenarios(scenarios) {
       for (const r of s.targetRedemittel)
         if (!REDEMITTEL_CATEGORIES.includes(r)) error(ds, w, `invalid targetRedemittel "${r}"`);
 
-    // The spoken brief (s191). Both are optional (they arrived after the
+    // The spoken brief (s193). Both are optional (they arrived after the
     // scenarios did and `speakingBrief` falls back), but a present one has to
     // be usable: the AI plays the partner and the debrief grades the goals.
     if (s.partner !== undefined) {
@@ -658,7 +658,7 @@ function lintExamSets(examSets, scenarioIds) {
     if (!Array.isArray(e.aspects) || e.aspects.length === 0) error(ds, w, "aspects empty");
     if (!isNum(e.totalMinutes) || e.totalMinutes <= 0) error(ds, w, "totalMinutes must be positive");
     if (!scenarioIds.has(e.scenarioId)) error(ds, w, `scenarioId "${e.scenarioId}" not found`);
-    // Which layout the spoken task runs in (s191). Absent = "buehne", right for
+    // Which layout the spoken task runs in (s193). Absent = "buehne", right for
     // every task that works FROM a written Aufgabe; only a task that reading
     // would defeat (listen-and-hold, Notiz machen) sets "anruf".
     if (e.stage !== undefined && !EXAM_SPEAKING_STAGES.includes(e.stage))

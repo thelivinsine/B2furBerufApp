@@ -13,9 +13,9 @@ import { ConversationRunner } from "./ConversationRunner";
 import { cn } from "@/lib/utils";
 
 /**
- * The free Sprechtrainer (s191): pick a situation, then talk to an AI partner.
+ * The free Sprechtrainer (s193): pick a situation, then talk to an AI partner.
  *
- * Practice always runs as the chat thread (founder s191), so this hub hands the
+ * Practice always runs as the chat thread (founder s193), so this hub hands the
  * runner a brief whose stage is "gespraech" and never asks the learner to pick
  * a layout: which layout a task uses is a property of the task, not a setting.
  */

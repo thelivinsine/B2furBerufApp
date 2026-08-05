@@ -80,7 +80,13 @@ export const useExamStore = create<ExamStore>()(
             startedAt: new Date().toISOString(),
             plan: composeMockExam(level, parts),
             partIx: 0,
-            phase: "intro",
+            // The Anleitung page IS the exam frame ("Prüfungsteil", the minutes,
+            // "der Timer läuft, sobald du startest"), so Ohne Zeit skips it and
+            // opens the drill directly (founder s192: "this screen mode
+            // represents exam mode, this should only be shown in mit zeit").
+            // That also makes the four modules consistent: Schreiben and
+            // Sprechen ohne Zeit land straight in their trainer.
+            phase: opts?.untimed ? "part" : "intro",
             remainingSec: 0,
             answers: {},
             notes: {},
@@ -142,7 +148,9 @@ export const useExamStore = create<ExamStore>()(
               ...s.run,
               results,
               partIx: done ? s.run.partIx : nextIx,
-              phase: done ? "done" : "intro",
+              // Same fold as `start`: without a clock there is no Anleitung to
+              // hand the next part over, because there is no clock to arm.
+              phase: done ? "done" : s.run.untimed ? "part" : "intro",
               remainingSec: 0,
             },
           };
