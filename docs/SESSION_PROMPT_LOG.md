@@ -4202,3 +4202,12 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/features/shared/browseScroll.tsx` · `src/features/shared/floatingCluster.tsx` ·
   `src/components/layout/FeedbackButton.tsx` · `src/features/library/LibraryHub.tsx` ·
   `src/features/vocabulary/VocabList.tsx` · the four Bibliothek tab files · this log
+- **Prompt 20 (verbatim):** `feedback geben should not be a button below the uben! it should be a
+  texxt line with a hyperlinked word same like the KI gepruft and mehr lesen link!!`
+  **Response:** corrected. `FeedbackNote` is now a muted sentence carrying ONE blue word,
+  "Etwas verbessern? **Feedback geben**", with no icon and no chrome of its own, which is the exact
+  shape of Schreiben's "KI-geprüft, kann Fehler enthalten. **Mehr**". The previous version kept the
+  sparkles mark and made the whole label blue, and an icon plus a short blue label reads as a second
+  button under the CTA.
+- **Artifacts (prompt 20):** `src/components/layout/FeedbackButton.tsx` · the four Bibliothek tab
+  files · this log

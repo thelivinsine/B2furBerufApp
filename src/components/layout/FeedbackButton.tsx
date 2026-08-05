@@ -154,25 +154,25 @@ export function FeedbackPill() {
  * purpose unambiguous.
  */
 /**
- * Feedback as a plain text link, for the lower line of the floating mobile
- * cluster (founder s189). The Bibliothek's cluster carries no disclaimer, so
- * that line was empty and Feedback was taking a button slot beside the CTA;
- * as a link it frees the row for the one action that matters.
+ * Feedback as the cluster's lower LINE, byte-for-byte the shape of Schreiben's
+ * Art. 50 line (founder s189: "it should be a text line with a hyperlinked word
+ * same like the KI geprüft and mehr lesen link"): a muted sentence carrying one
+ * blue word, no icon and no chrome of its own. An icon plus a short blue label
+ * read as a second button under the CTA, which is exactly what it must not be.
  */
-export function FeedbackTextLink({ className }: { className?: string }) {
+export function FeedbackNote() {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   return (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      className={cn(
-        "inline-flex items-center gap-1 text-[11px] font-medium text-primary underline-offset-2 hover:underline",
-        className,
-      )}
-    >
-      <Sparkles className="h-3 w-3" />
-      Feedback geben
-    </button>
+    <>
+      Etwas verbessern?{" "}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="font-medium text-primary underline-offset-2 hover:underline"
+      >
+        Feedback geben
+      </button>
+    </>
   );
 }
 

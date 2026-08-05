@@ -26,7 +26,7 @@ import {
 } from "@/lib/facets";
 import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackTextLink } from "@/components/layout/FeedbackButton";
+import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
@@ -620,7 +620,7 @@ export function CollocationsBrowser() {
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <FloatingActionCluster note={<FeedbackTextLink />}>
+        <FloatingActionCluster note={<FeedbackNote />}>
           <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
               variant="gradient"

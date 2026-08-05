@@ -19,7 +19,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackTextLink } from "@/components/layout/FeedbackButton";
+import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
@@ -706,7 +706,7 @@ export function VocabularyTrainer() {
             label) stays pinned at the bottom of the screen (above the nav) so
             the list scrolls above it. Desktop keeps Üben in the rail. */}
         <ScrollTopButton show={scrolled} />
-        <FloatingActionCluster note={<FeedbackTextLink />}>
+        <FloatingActionCluster note={<FeedbackNote />}>
           <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
               variant="gradient"
