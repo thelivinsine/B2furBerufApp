@@ -132,24 +132,33 @@ export function ScrollTopButton({ show }: { show: boolean }) {
 
 function ScrollTopDesktop({ show }: { show: boolean }) {
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.button
-          key="scrolltop-desktop"
-          type="button"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ duration: 0.15 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Nach oben"
-          title="Nach oben"
-          className="fixed bottom-4 right-4 z-40 hidden rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft transition-colors hover:text-foreground lg:block"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </motion.button>
-      )}
-    </AnimatePresence>
+    // Same wrapper as the Feedback pill (see `FeedbackButton`), so this button
+    // sits at the LEFT edge of the filter rail's column while the pill sits at
+    // its right edge (founder s189).
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 hidden lg:block lg:pl-64">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <div className="ml-auto flex w-64 justify-start">
+          <AnimatePresence>
+            {show && (
+              <motion.button
+                key="scrolltop-desktop"
+                type="button"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.15 }}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                aria-label="Nach oben"
+                title="Nach oben"
+                className="pointer-events-auto rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft transition-colors hover:text-foreground"
+              >
+                <ArrowUp className="h-5 w-5" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -64,8 +64,14 @@ export function FloatingActionCluster({
         <div className="flex items-stretch justify-center gap-2">{children}</div>
       </div>
       {note && (
+        // No `floatingNote` plate here (founder s189): on Schreiben the plate
+        // is invisible because the page ground sits behind it, but the
+        // Bibliothek's line floats over WHITE cards, where the same
+        // `bg-background/90` reads as a frosted chip. Plain text is what the
+        // founder is matching. The cost is that the line has no backing where
+        // it happens to cross a card.
         <p className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden">
-          <span className={floatingNote}>{note}</span>
+          {note}
         </p>
       )}
     </>,

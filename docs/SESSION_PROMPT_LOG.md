@@ -4211,3 +4211,27 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   button under the CTA.
 - **Artifacts (prompt 20):** `src/components/layout/FeedbackButton.tsx` · the four Bibliothek tab
   files · this log
+- **Prompt 21 (verbatim):** `in desktop view:\n\nthe worter cards look too long now. Shorten them and
+  move the bookmark button to the bottom right. If the word is too big that it goes to the second
+  line, make sure to keep the emoji and the article in the first line and the word to be followed
+  from the left in the second line. \n\nThe feedback button can be right aligned vertically with the
+  filter rail, and the move to top button to the left of the feedback button, aligneed to vertically
+  to left with the filter rail.`
+- **Prompt 22 (verbatim):** `Etwas verbessern? Feedback geben - this still looks like a chip with
+  some frosted background. Apply same design as from the schreiben section`
+  **Response:** the chip was the `floatingNote` plate. It is invisible on Schreiben because the page
+  ground sits behind it, but the Bibliothek's line floats over WHITE cards, where the same
+  `bg-background/90` reads as frosted glass. The cluster's note slot now renders plain text.
+  Wörter cards: the example is capped at two lines, which is what actually shortens the grid because
+  `auto-rows-fr` sizes every card to the tallest one; the bookmark moved from the headline to the
+  foot's right edge beside the speak button; and the headline became three flex ITEMS (creature,
+  article, noun) so a noun that does not fit beside its article drops to the next line at the card's
+  left edge instead of hanging indented under the article.
+  Feedback pill and the scroll-to-top button now share ONE wrapper that mirrors AppShell's `<main>`
+  (sidebar allowance, `max-w-6xl`, same padding) with a 16rem block pinned right: the pill sits at
+  that block's right edge and the scroll button at its left, i.e. exactly the filter rail's two
+  edges, at every width. Restoring the pill's remote-config route suppression was part of the same
+  edit; the first rewrite dropped it, which would have broken the `app_config` contract silently.
+- **Artifacts (prompts 21-22):** `src/features/shared/floatingCluster.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` · `src/components/layout/FeedbackButton.tsx` ·
+  `src/features/shared/browseScroll.tsx` · this log

@@ -134,32 +134,30 @@ export function FeedbackPill() {
   if (!feedback.enabled) return null;
   if (feedback.hiddenRoutes.some((r) => r && pathname.startsWith(r))) return null;
   return (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      aria-label="Feedback geben"
-      className="fixed bottom-4 right-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:flex lg:translate-x-1/2 lg:right-[calc(9.5rem_+_max(0px,(100vw_-_88rem)/2))]"
-    >
-      <MessageSquareText className="h-3.5 w-3.5 text-primary" />
-      <span>{feedback.label ?? "Feedback"}</span>
-    </button>
+    // Docked to the FILTER RAIL's column (founder s189): the wrapper mirrors
+    // AppShell's <main> (sidebar allowance, max-w-6xl, the same padding), and
+    // the inner 16rem block is the rail's own width pinned to the right, so the
+    // pill's right edge lands exactly on the rail's right edge at every width.
+    // `ScrollTopDesktop` uses the identical wrapper and sits at that block's
+    // LEFT edge, which is the rail's left edge.
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 hidden lg:block lg:pl-64">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <div className="ml-auto flex w-64 justify-end">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Feedback geben"
+            className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground"
+          >
+            <MessageSquareText className="h-3.5 w-3.5 text-primary" />
+            <span>{feedback.label ?? "Feedback"}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
-/**
- * Compact labelled "Feedback" pill for the mobile Üben action bars (left of the
- * Üben button). Deliberately NOT a bare message-bubble icon: a lone chat glyph
- * read as a live-chat / support widget (founder, 2026-07-14). The Sparkles mark
- * ties it to the "built with AI" disclaimer and the visible label makes the
- * purpose unambiguous.
- */
-/**
- * Feedback as the cluster's lower LINE, byte-for-byte the shape of Schreiben's
- * Art. 50 line (founder s189: "it should be a text line with a hyperlinked word
- * same like the KI geprüft and mehr lesen link"): a muted sentence carrying one
- * blue word, no icon and no chrome of its own. An icon plus a short blue label
- * read as a second button under the CTA, which is exactly what it must not be.
- */
 export function FeedbackNote() {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   return (
