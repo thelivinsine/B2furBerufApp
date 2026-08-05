@@ -14,6 +14,7 @@ import {
 } from "./lib/recover";
 import { watchSwUpdates } from "./lib/swUpdate";
 import { installLiveWorkFlush } from "./lib/liveWork";
+import { trackInputMode } from "./lib/inputMode";
 // Self-hosted Inter (variable). Replaces the third-party rsms.me stylesheet —
 // no external font dependency, no IP leak, and a tighter CSP.
 import "@fontsource-variable/inter";
@@ -130,6 +131,9 @@ watchSwUpdates();
 // reload we do not control (a manual refresh, iOS discarding the tab) is
 // recoverable rather than lost work.
 installLiveWorkFlush();
+// Marks pointer vs keyboard on <html>, so a focus ring only ever answers
+// keyboard navigation (see index.css).
+trackInputMode();
 
 window.addEventListener("error", (e) => {
   const err = e.error ?? e.message;

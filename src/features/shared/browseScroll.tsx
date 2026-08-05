@@ -10,13 +10,22 @@ import { ArrowUp, Zap } from "lucide-react";
  * is scrolled a bit. `hidden` = collapse the header, `scrolled` = show the
  * go-to-top button. Near the very top both reset to visible.
  */
-export function useScrollDirection() {
+export function useScrollDirection(root?: HTMLElement | null) {
   const [state, setState] = useState({ hidden: false, scrolled: false });
   const lastY = useRef(0);
   useEffect(() => {
-    lastY.current = window.scrollY;
+    // WHICH element actually scrolls depends on the breakpoint since s189:
+    // desktop scrolls inside the content column, mobile still scrolls the page.
+    // Reading only `window.scrollY` is what silently killed the go-to-top button
+    // on desktop (founder s190: "where is the go to top button?"): the window
+    // never moves there, so `scrolled` never flipped. `root` is the column; it
+    // only counts as the scroller when it actually overflows, which is false
+    // below lg where it has no height cap.
+    const rootScrolls = () => !!root && root.scrollHeight > root.clientHeight + 1;
+    const readY = () => (rootScrolls() ? root!.scrollTop : window.scrollY);
+    lastY.current = readY();
     const onScroll = () => {
-      const y = window.scrollY;
+      const y = readY();
       const scrolled = y > 280;
       if (y < 72) {
         setState({ hidden: false, scrolled });
@@ -32,9 +41,79 @@ export function useScrollDirection() {
       lastY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    root?.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      root?.removeEventListener("scroll", onScroll);
+    };
+  }, [root]);
   return state;
+}
+
+/**
+ * Which vertical edges of an internal scroll region still have content behind
+ * them (founder s190: "the area surrounding the Wörter cards look abruptly
+ * cut"). Desktop scrolls the content column since s189, and a scroll container
+ * slices whatever crosses its top and bottom edge, so a card is chopped through
+ * the middle with a hard horizontal line. This is the vertical twin of
+ * `HScrollArea`'s edge fades: the caller turns these into a mask, so the cards
+ * fade into the PAGE GROUND (the column paints no fill of its own, which is the
+ * other half of the founder's note) instead of ending at a cut. Both false when
+ * the region fits or is resting at an edge, so the hint never lies.
+ */
+export function useEdgeFade(root?: HTMLElement | null) {
+  const [edge, setEdge] = useState({ top: false, bottom: false });
+  useEffect(() => {
+    if (!root) return;
+    const measure = () => {
+      const max = root.scrollHeight - root.clientHeight;
+      setEdge((prev) => {
+        const next = { top: root.scrollTop > 1, bottom: max > 1 && root.scrollTop < max - 1 };
+        return prev.top === next.top && prev.bottom === next.bottom ? prev : next;
+      });
+    };
+    measure();
+    root.addEventListener("scroll", measure, { passive: true });
+    // The list grows as `usePagedList` pages in, and the column resizes with the
+    // window, so a static measure would go stale. jsdom has no ResizeObserver.
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    if (ro) {
+      ro.observe(root);
+      if (root.firstElementChild) ro.observe(root.firstElementChild);
+    } else {
+      window.addEventListener("resize", measure);
+    }
+    return () => {
+      root.removeEventListener("scroll", measure);
+      if (ro) ro.disconnect();
+      else window.removeEventListener("resize", measure);
+    };
+  }, [root]);
+  return edge;
+}
+
+/**
+ * The scroll column's classes, fade included. Kept here so all four Bibliothek
+ * tabs share ONE geometry instead of four hand-copied strings.
+ */
+export function browseColumnClass(edge: { top: boolean; bottom: boolean }): string {
+  return cn(
+    "slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1",
+    // Mask only where content actually continues, and only on desktop, where the
+    // column is the scroller.
+    edge.top && edge.bottom && "lg:mask-fade-y",
+    edge.top && !edge.bottom && "lg:mask-fade-top",
+    !edge.top && edge.bottom && "lg:mask-fade-bottom",
+  );
+}
+
+/** Send whichever element is actually scrolling back to the top. */
+function scrollToTop(root?: HTMLElement | null) {
+  if (root && root.scrollHeight > root.clientHeight + 1) {
+    root.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 
 /**
@@ -77,6 +156,19 @@ export const BROWSE_TOOLBAR_BUTTON =
   // row, not just the view switcher). Overrides the `size="icon"` variant, so
   // it has to come after it in the class list, which `cn()` handles.
   "h-[1.875rem] w-[1.875rem] shrink-0 rounded-lg bg-surface shadow-soft hover:bg-muted";
+
+/**
+ * The ON state for a toolbar toggle (search open, bookmark filter active).
+ *
+ * It has to be a class rather than the Button's `default` variant: that variant
+ * pairs `bg-primary` with `text-primary-foreground`, and `BROWSE_TOOLBAR_BUTTON`
+ * above ends in `bg-surface`, which WINS the tailwind-merge and leaves white
+ * text on a white fill. The button then vanished entirely (founder s190: "search
+ * button is buggy", showing an empty white square where the magnifier should
+ * be). Append this AFTER `BROWSE_TOOLBAR_BUTTON` so the filled state wins.
+ */
+export const BROWSE_TOOLBAR_BUTTON_ON =
+  "border-primary bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 hover:text-primary-foreground";
 
 /**
  * The filter toggle is the one toolbar button that OPENS an accent rail, so it
@@ -125,16 +217,16 @@ export function UebenLabel({
  * it was mobile-only before). The desktop one clears the Feedback pill, which
  * floats further left on its own offset.
  */
-export function ScrollTopButton({ show }: { show: boolean }) {
+export function ScrollTopButton({ show, root }: { show: boolean; root?: HTMLElement | null }) {
   return (
     <>
-      <ScrollTopMobile show={show} />
-      <ScrollTopDesktop show={show} />
+      <ScrollTopMobile show={show} root={root} />
+      <ScrollTopDesktop show={show} root={root} />
     </>
   );
 }
 
-function ScrollTopDesktop({ show }: { show: boolean }) {
+function ScrollTopDesktop({ show, root }: { show: boolean; root?: HTMLElement | null }) {
   return (
     // Same wrapper as the Feedback pill (see `FeedbackButton`), so this button
     // sits at the LEFT edge of the filter rail's column while the pill sits at
@@ -151,7 +243,7 @@ function ScrollTopDesktop({ show }: { show: boolean }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.15 }}
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                onClick={() => scrollToTop(root)}
                 aria-label="Nach oben"
                 title="Nach oben"
                 className="pointer-events-auto rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft transition-colors hover:text-foreground"
@@ -166,7 +258,7 @@ function ScrollTopDesktop({ show }: { show: boolean }) {
   );
 }
 
-function ScrollTopMobile({ show }: { show: boolean }) {
+function ScrollTopMobile({ show, root }: { show: boolean; root?: HTMLElement | null }) {
   return (
     <AnimatePresence>
       {show && (
@@ -181,7 +273,7 @@ function ScrollTopMobile({ show }: { show: boolean }) {
           animate={{ opacity: 1, x: "-50%", y: 0 }}
           exit={{ opacity: 0, x: "-50%", y: 8 }}
           transition={{ duration: 0.15 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={() => scrollToTop(root)}
           aria-label="Nach oben"
           title="Nach oben"
           className="fixed left-1/2 z-30 rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft backdrop-blur transition-colors hover:text-foreground lg:hidden bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+3.5rem)]"
