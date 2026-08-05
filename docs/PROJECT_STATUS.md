@@ -1,39 +1,19 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 191). **The Prüfung module tiles lost their gradients.** The
-Three founder prompts against screenshots of Module üben: the s190 colour treatment (a hue radial
-across the card plus a gradient mark tile) is now a FLAT tint of the same hue, the gap between the
-header block and the tiles widened to `gap-6 sm:gap-7`, and the minutes badge, which crossed the
-description line whenever the clock was on, REPLACES that line instead. Measured in headless
-Chromium in both clock states: zero page scroll, zero badge/text overlap, no background-image left
-inside `main`. Prior s190. **A defect session on the Bibliothek, all six items from
-the founder's own screenshots, all measured in a browser rather than guessed.** Five of them trace
-to one change: s189 moved the desktop scroll from the page into the content column.
-**Go to top** was reading `window.scrollY`, which no longer moves on desktop, so the button never
-appeared (mobile still worked, which is why it read as "missing"); `useScrollDirection(root)` now
-reads whichever element actually scrolls, and the placement is the founder's s189 rule, measured:
-button at the filter rail's left edge, Feedback pill at its right.
-**The filter rail** stretched to its cap in every state, because a grid item defaults to
-`align-self: stretch`, so a collapsed rail was 564 px of empty Himmelblau: `lg:self-start` plus a
-stage-relative cap, open 655 px / collapsed **119 px**.
-**The search and bookmark toggles** rendered white on white (`BROWSE_TOOLBAR_BUTTON` ends in
-`bg-surface` and wins the tailwind-merge against the `default` variant's `bg-primary`), i.e. the
-blank square in the founder's crop; new `BROWSE_TOOLBAR_BUTTON_ON` constant.
-**"The background surrounding the cards"** was already transparent (measured `rgba(0,0,0,0)` on the
-column and its parent); the real defect was the second half of that prompt, cards sliced by the
-scroll container's edge, answered with `useEdgeFade` + `mask-fade-*` (a mask, not an overlay: the
-ground is a gradient).
-**The blue outlines** were the global `:focus-visible` ring firing after a click; `trackInputMode()`
-marks `<html data-input="pointer|keyboard">` and the ring is now keyboard-only, which keeps
-WCAG 2.4.7.
-**Redemittel vs Kollokationen card height** was not the Wendung: `FlipCard` takes the taller face and
-the unclamped BACK ran to 272 px against a 165 px front, so `auto-rows-fr` pushed all 193 cards to
-272. Capped: **272 → 188 px**, against Kollokationen's 195.
-The founder also asked for an audit of the previous session's feedback; every item was re-verified
-live (Beispiel column, horizontal-scroll fades, internal scroll on all four tabs, the 30 px toolbar,
-the Wörter three-column grid), and the only one still open was the card-height parity above.
-Gates green: typecheck · lint 0 errors (77 warnings = the pre-change baseline) · 551 tests · build ·
-check:bundle 126.6 kB · check:contrast.
+_Last updated: 2026-08-05 (session 192). **The Schreibtrainer got a way back, the nav bar learned
+which zone a page belongs to, and the exam frame was confined to Mit Zeit.** Three founder prompts
+from phone screenshots. The mobile action cluster's left slot is **Zurück** (to `/anwenden`) instead
+of Feedback, and Feedback moved into the caption line in the Bibliothek's shape
+("KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben"), measured as one line down to 320px.
+A bottom-bar tab is now lit by its ZONE (`navZoneOf`), so `/writing` marks Prüfung, `/session`
+marks Praktisch and `/sammlung` marks Fortschritt; both rails render plain `Link`s, because
+`NavLink` swallows the `aria-current` we set. And **Ohne Zeit no longer opens the Anleitung**: an
+untimed module starts on its first question, its exit is a neutral Zurück rather than the red
+Verlassen, and an untouched drill closes with no confirm. Prior s191: **the Prüfung module tiles
+lost their gradients** (a flat tint of the same hue, a wider gap under the header block, and the
+minutes badge replacing the description line it used to overlap), all measured in headless Chromium
+in both clock states.
+
 **The same day, a parallel branch polished the Prüfung zone to a finished product.**
 Founder: the two tabs "still look cheap or like MVP", make them read like "a billion dollar edu tech
 app". Analysis first (twelve findings), three options previewed, then a second round on the pick:
@@ -194,6 +174,41 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 192 (2026-08-05): the trainer's way back, and the exam frame confined to
+Mit Zeit (branch `claude/prufung-ui-bottom-bar-u0fdwf`).**
+Two founder prompts, both from phone screenshots.
+- **"Replace the feedback button with zurück ... add feedback geben right next to KI geprüft,
+  similar to Bibliothek."** The mobile floating cluster's left slot is now `BackToPruefung`
+  (`src/features/writing/bottomChrome.tsx`): the same 44px squircle geometry the Feedback button
+  had, linking to `/anwenden` rather than to history, because `/writing` is entered from three
+  places. Feedback moved down into the caption line as the Bibliothek's own `FeedbackLink`:
+  "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben", measured as ONE line down to 320px.
+  Both trainers now render the same `MobileAiNote`, so the two hand-kept copies cannot drift.
+  `FeedbackIconButton` is deleted; `FeedbackNote` is built from `FeedbackLink`.
+- **"The prufung bottom bar isn't selected here, check this for all the pages."** A tab is lit by
+  its ZONE now (`navZoneOf` in `nav-items.ts`), not by the URL: `/writing`, `/simulation`, `/exam`
+  light Prüfung; `/quiz` and the retired per-tool routes light Bibliothek; `/session`, `/revision`,
+  `/welt` light Praktisch; `/sammlung` lights Fortschritt. The bar and the sidebar render plain
+  `Link`s, because `NavLink` re-decides the state and also SWALLOWS `aria-current` (it reads that
+  prop as the value to use when it considers itself active), so the lit tab announced nothing.
+  Measured across all twelve in-shell routes: every one lights its zone, `/session` and `/revision`
+  have no bar (focus mode), none is blank.
+- **"Such screens for hören and lesen for Ohne Zeit ... this screen mode represents exam mode. This
+  should only be shown when a user is in mit zeit mode."** The Anleitung is Mit Zeit's screen now:
+  `useExamStore.start` opens an untimed module straight in `phase: "part"` (and `completePart` never
+  routes the next part through an intro either). The frame follows: the header's exit is a neutral
+  **Zurück** arrow instead of the red Verlassen (`useSessionStore.examUntimed`, since AppShell may
+  not import the exam store), leaving an untouched untimed drill asks nothing at all, and the
+  confirm it does show reads "Übung verlassen?". The STAGE is unchanged: one viewport, no bottom
+  bar, the drill scrolling internally. Verified in the real build: Ohne Zeit Lesen and Hören open on
+  the question, Mit Zeit still opens on "PRÜFUNGSTEIL ... der Timer läuft, sobald du startest".
+**Gates green:** build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
+check:bundle 126.7 kB of 400 · check:contrast.
+**Open question for the founder:** the untimed drill still hides the bottom tab bar and holds the
+one-viewport stage. That is deliberate (the stage is what keeps a Teil at zero page scroll, and a
+visible tab bar would let a learner re-enter the persisted run in a loop), but say the word and it
+can go too.
+
 **Handoff after session 191 (2026-08-05): the Prüfung module tiles went flat (branch
 `claude/remove-tile-gradient-4fcowe`).**
 Two founder prompts against a screenshot of `/anwenden`, Module üben.
@@ -222,29 +237,3 @@ Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, th
 both squash-merged into `main`; the founder verifies the live result.
 **Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
 so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
-
-**Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
-`claude/polish-ui-ux-design-92sbje`).**
-Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
-a billion dollar edu tech app", then "V2 and M3 ... take screenshots during the testing phase and
-optimize and polish the spacing ... without any bugs".
-**Process:** analysis in chat first (no code touched), three named options previewed
-(`preview/pruefung-polish.html`), a second round on the pick (`preview/pruefung-polish-r2.html`,
-artifact https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04, redeployed to the same
-URL), then implementation verified against the REAL app.
-**What shipped** (`src/features/pruefung/PruefungHub.tsx` rewritten; `partMeta.ts` gained
-`wash`/`fillPale`/`fillSolid` and gradient `tile`s; `index.css` gained `.mod-wash-*` + `.mod-go`):
-- One 896px frame for both tabs, a fixed-height scope row, the Bibliothek's `popLayout` tab slide.
-- The module card: mark + arrow row, title, description, the hue wash in the bottom-right corner and
-  that corner reserved by the card's bottom padding, so Ohne Zeit / Mit Zeit never resizes anything.
-- The run band: a two-column ticket from `lg`, today's stacked band below it, `flex-1` on phones only.
-- Modelltest Verlauf **V2**: display figure + delta chip, Bester/Bestanden as stats, seven bars
-  against the pass line (named in the caption, never on the chart).
-- Module üben Verlauf **M3**: four columns on one scale, pale = first attempt, solid = the gain;
-  split into summary | rows from `lg`, which is what keeps a 1280×900 laptop at zero scroll.
-- The `mockExams` split into full runs vs single-module practice (`tests/pruefungHub.test.ts`).
-**Verification tooling** lives in the session scratchpad, not the repo: a ~60-line CDP driver
-(Node 22's built-in WebSocket, no new deps) that seeds localStorage, sets a viewport, clicks by
-button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
-surface has to be checked in the real app rather than in a mockup.
-**Nothing is left open in this zone.**

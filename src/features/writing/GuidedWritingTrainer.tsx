@@ -44,7 +44,7 @@ import { UmlautKeys } from "./UmlautKeys";
 import { AllowanceNote } from "./AllowanceNote";
 import { FeedbackLangChip } from "./FeedbackLang";
 import { useDailyAllowance } from "@/lib/aiAllowance";
-import { floatingNote, floatingSlot } from "@/features/shared/floatingCluster";
+import { floatingSlot } from "@/features/shared/floatingCluster";
 import { useFillEditor } from "./useFillEditor";
 import {
   CorrectionToggle,
@@ -65,7 +65,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { BackToPruefung, MobileAiNote } from "./bottomChrome";
 import { cn } from "@/lib/utils";
 
 /**
@@ -977,9 +977,9 @@ export function GuidedWritingTrainer({
             className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
           >
             {/* Every control sits on its own opaque backing (see
-                `floatingCluster`); FeedbackIconButton is already solid. */}
+                `floatingCluster`); BackToPruefung is already solid. */}
             <div className="flex items-stretch gap-2">
-              <FeedbackIconButton />
+              <BackToPruefung />
               {/* Nothing to evaluate while the scope has no Aufgabe: the cluster
                   keeps its geometry, the button that would only be disabled is
                   not printed. */}
@@ -1003,17 +1003,11 @@ export function GuidedWritingTrainer({
             </div>
           </div>
           {/* The KI line is locked just above the nav in EVERY state, exactly
-              like Fokus: the "how many words to go" hint moved into the editor
-              card (founder s169), so this slot carries the Art. 50 note alone
-              and never swaps content under the learner. */}
-          <p className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden">
-            <span className={floatingNote}>
-              KI-geprüft, kann Fehler enthalten.{" "}
-              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                Mehr
-              </Link>
-            </span>
-          </p>
+              like Fokus (it is literally the same component now): the "how many
+              words to go" hint moved into the editor card (founder s169), so
+              this slot carries the Art. 50 note plus the Feedback link and
+              never swaps content under the learner. */}
+          <MobileAiNote />
           {aiNoteDesktop}
         </>,
         document.body,

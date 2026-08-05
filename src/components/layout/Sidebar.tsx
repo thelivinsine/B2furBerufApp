@@ -1,7 +1,7 @@
-import { NavLink, Link } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Search, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { navItems } from "./nav-items";
+import { navItems, navZoneOf } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { Logo } from "@/components/shared/Logo";
@@ -22,6 +22,9 @@ export function Sidebar({
   const { navLabels, hiddenTabs } = useAppConfig();
   const shownNav = navItems.filter((i) => !hiddenTabs.includes(i.to));
   const founder = isFounder(useAuthStore((s) => s.user));
+  // Same zone fold as the bottom bar (s192): the Schreibtrainer marks Prüfung,
+  // a running session marks Praktisch, the Sammlung marks Fortschritt.
+  const activeZone = navZoneOf(useLocation().pathname);
   return (
     <div className="flex h-full flex-col gap-1 p-4">
       <Link
@@ -48,32 +51,30 @@ export function Sidebar({
       )}
 
       <nav className="flex flex-col gap-0.5">
-        {shownNav.map(({ to, label, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
+        {shownNav.map(({ to, label }) => {
+          const active = activeZone === to;
+          return (
+            // Plain Link: the active row is the ZONE's, see BottomTabBar.
+            <Link
+              key={to}
+              to={to}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              className={cn(
                 "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                isActive
+                active
                   ? "bg-muted font-semibold text-foreground"
                   : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
-              )
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {/* Same custom branded mark as the bottom tab bar and More sheet
-                    (full opacity everywhere; the active row is marked by its grey
-                    gradient + bold text). */}
-                <RouteIcon path={to} size={18} active={isActive} />
-                {navLabels[to] ?? label}
-              </>
-            )}
-          </NavLink>
-        ))}
+              )}
+            >
+              {/* Same custom branded mark as the bottom tab bar and More sheet
+                  (full opacity everywhere; the active row is marked by its grey
+                  gradient + bold text). */}
+              <RouteIcon path={to} size={18} active={active} />
+              {navLabels[to] ?? label}
+            </Link>
+          );
+        })}
 
         {/* Founder tooling: the Control Center lives in the nav panel on desktop
             (moved out of the account menu, s164-follow-up). Styled like the other

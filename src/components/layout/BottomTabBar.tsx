@@ -1,7 +1,7 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Reorder, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
+import { navItems, DEFAULT_PINNED_TABS, navZoneOf } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useNavLabel, useAppConfigStore } from "@/lib/appConfig";
@@ -33,19 +33,31 @@ function TabIcon({ path }: { path: string }) {
   return <RouteIcon path={path} size={IZ} />;
 }
 
-/** Normal-mode tab: a NavLink with the compact squircle active pill + underline. */
-function BarTab({ path, moreHidden }: { path: string; moreHidden?: boolean }) {
+/**
+ * Normal-mode tab: a link with the compact squircle active pill + underline.
+ *
+ * The active state comes from `navZoneOf`, NOT from NavLink's own `isActive`:
+ * a zone owns more routes than its own path (the Schreibtrainer is Prüfung, a
+ * running session is Praktisch), and matching the URL alone left the bar with
+ * nothing lit on every page one level below a hub (founder s192).
+ */
+function BarTab({ path, active, moreHidden }: { path: string; active: boolean; moreHidden?: boolean }) {
   const item = navItems.find(i => i.to === path);
   // Steuerung H1: apply a remote label override (falls back to the built-in).
   // Called unconditionally before the early return to respect the hooks rule.
   const label = useNavLabel(path, item?.label ?? "");
   if (!item) return null;
-  const { to, end } = item;
+  const { to } = item;
+  const showActive = active && !moreHidden;
   return (
-    <NavLink
+    // A plain Link, not a NavLink: the active state is the ZONE's, and NavLink
+    // would both re-decide it from the URL and swallow the `aria-current` we
+    // set (it treats that prop as "the value to use when I consider myself
+    // active"), so the lit tab would never announce itself.
+    <Link
       to={to}
-      end={end}
       aria-label={label}
+      aria-current={showActive ? "page" : undefined}
       // `min-w-0` is what lets a slot shrink below its label width, so the
       // truncate on the name actually fires. Without it the longest label
       // ("Einstellungen") set a 73px floor, and at six slots that pushed the
@@ -53,39 +65,34 @@ function BarTab({ path, moreHidden }: { path: string; moreHidden?: boolean }) {
       className="flex min-w-0 flex-1 p-1"
       onContextMenu={e => e.preventDefault()}
     >
-      {({ isActive }) => {
-        const showActive = isActive && !moreHidden;
-        return (
-          <div className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5">
-            {/* Compact squircle "cloud" hugs the icon instead of filling the whole
-                slot. Flat, even grey (no raised dome). */}
-            <div
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-2xl transition-colors duration-150",
-                showActive && ACTIVE_BOX,
-              )}
-            >
-              <TabIcon path={to} />
-            </div>
-            {/* Section name under the icon. The label slot is reserved on EVERY
-                tab (fixed height) so selecting a tab never shifts the icon rail;
-                the name only becomes visible on the active tab (founder request:
-                "add the name to the bottom of the icon, only when selected"). */}
-            <span
-              className={cn(
-                // Neutral dark grey (theme-aware) reads more premium than the
-                // section accent under the coloured icon (founder).
-                "h-3 max-w-full truncate text-[10px] font-semibold leading-none text-slate-600 transition-opacity duration-150 dark:text-slate-300",
-                showActive ? "opacity-100" : "opacity-0",
-              )}
-              aria-hidden={!showActive}
-            >
-              {label}
-            </span>
-          </div>
-        );
-      }}
-    </NavLink>
+      <div className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5">
+        {/* Compact squircle "cloud" hugs the icon instead of filling the whole
+            slot. Flat, even grey (no raised dome). */}
+        <div
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-2xl transition-colors duration-150",
+            showActive && ACTIVE_BOX,
+          )}
+        >
+          <TabIcon path={to} />
+        </div>
+        {/* Section name under the icon. The label slot is reserved on EVERY
+            tab (fixed height) so selecting a tab never shifts the icon rail;
+            the name only becomes visible on the active tab (founder request:
+            "add the name to the bottom of the icon, only when selected"). */}
+        <span
+          className={cn(
+            // Neutral dark grey (theme-aware) reads more premium than the
+            // section accent under the coloured icon (founder).
+            "h-3 max-w-full truncate text-[10px] font-semibold leading-none text-slate-600 transition-opacity duration-150 dark:text-slate-300",
+            showActive ? "opacity-100" : "opacity-0",
+          )}
+          aria-hidden={!showActive}
+        >
+          {label}
+        </span>
+      </div>
+    </Link>
   );
 }
 
@@ -115,6 +122,11 @@ export function BottomTabBar() {
   // hideable (locked bar structure).
   const hiddenTabs = useAppConfigStore(s => s.config.hiddenTabs);
   const shownMiddle = middle.filter(p => !hiddenTabs.includes(p));
+
+  // Which tab is lit: the ZONE the current route belongs to, so a page one
+  // level below a hub (the Schreibtrainer under Prüfung, a session under
+  // Praktisch) still marks its section instead of leaving the bar blank.
+  const activeZone = navZoneOf(pathname);
 
   // Navigating anywhere ends the reorder easter egg (there is no sheet to close).
   useEffect(() => { setEditMode(false); }, [pathname]);
@@ -216,9 +228,11 @@ export function BottomTabBar() {
           ) : (
             /* Normal mode: Home · content sections · Einstellungen */
             <>
-              <BarTab path="/" />
-              {shownMiddle.map(path => <BarTab key={path} path={path} />)}
-              <BarTab path="/settings" />
+              <BarTab path="/" active={activeZone === "/"} />
+              {shownMiddle.map(path => (
+                <BarTab key={path} path={path} active={activeZone === path} />
+              ))}
+              <BarTab path="/settings" active={activeZone === "/settings"} />
             </>
           )}
         </div>

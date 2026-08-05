@@ -56,16 +56,34 @@ export function MockExamRunner() {
   const onResult = run?.phase === "done";
   // Depends on whether a run exists, NOT on the run object: that object changes
   // on every tick and every answer, which would re-register the handler (and
-  // re-render the header) once a second.
+  // re-render the header) once a second. Anything the handler needs from the
+  // live run is read inside it, from the store.
   const running = !!run;
+  const untimed = !!run?.untimed;
   // Layout effect, not effect: registering also switches the shell to the
   // one-viewport exam stage, and doing that after paint would show one frame of
   // the normal (bottom-bar, page-scrolling) layout first.
   useLayoutEffect(() => {
     if (!running) return;
-    setExamExit(() => (onResult ? finish() : setExitOpen(true)));
+    setExamExit(
+      () => {
+        if (onResult) return finish();
+        // Ohne Zeit, nothing written yet: there is nothing to lose, so leaving
+        // is immediate. A confirm over an empty practice drill is friction that
+        // teaches the learner to click through confirms (s192).
+        const live = useExamStore.getState().run;
+        const untouched =
+          !!live &&
+          Object.keys(live.answers).length === 0 &&
+          Object.keys(live.notes).length === 0 &&
+          live.essay.trim() === "";
+        if (live?.untimed && untouched) return abandon();
+        setExitOpen(true);
+      },
+      { untimed },
+    );
     return () => setExamExit(null);
-  }, [running, onResult, finish, setExamExit]);
+  }, [running, onResult, untimed, finish, abandon, setExamExit]);
 
   const part = run ? currentPart(run) : null;
   useEffect(() => {
@@ -96,10 +114,16 @@ export function MockExamRunner() {
       {body}
       <Dialog open={exitOpen} onOpenChange={setExitOpen}>
         <DialogContent className="gap-3">
+          {/* Without a clock this is practice, not an exam, so the confirm says
+              so (s192, with the Anleitung skip): the run is the same, the frame
+              around it is not. */}
           <DialogHeader>
-            <DialogTitle className="pr-8 text-base">Prüfung verlassen?</DialogTitle>
+            <DialogTitle className="pr-8 text-base">
+              {run.untimed ? "Übung verlassen?" : "Prüfung verlassen?"}
+            </DialogTitle>
             <DialogDescription>
-              Deine Antworten in dieser Prüfung werden nicht gespeichert.
+              Deine Antworten in {run.untimed ? "dieser Übung" : "dieser Prüfung"} werden nicht
+              gespeichert.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2.5">
@@ -230,6 +254,12 @@ export function AnswerStrip({
 
 /* ------------------------------- Anleitung -------------------------------- */
 
+/**
+ * The Anleitung. Since s192 this is the MIT-ZEIT screen: an Ohne-Zeit module
+ * opens its drill directly (`useExamStore.start`). The untimed wording below
+ * stays for the one case that can still reach it, a run that was persisted
+ * mid-intro before that change and resumes after the deploy.
+ */
 function PartIntro({ run }: { run: MockExamRun }) {
   const beginPart = useExamStore((s) => s.beginPart);
   const part = currentPart(run);

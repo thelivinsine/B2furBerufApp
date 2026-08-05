@@ -4493,3 +4493,58 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   clean at `68b500c`. Documentation for prompts 1-4 had shipped inside their own PRs; this pass adds
   the #805 merge SHA to the s191 handoff and logs this prompt.
 - **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 192 — 2026-08-05 — branch `claude/prufung-ui-bottom-bar-u0fdwf`
+
+- **Prompt 1 (verbatim):** `[screenshot of /writing, Fokus, on a phone] replace the feedback button
+  with zuruck and the user should navigate back to the prufung hub. add feedback geben right next to
+  KI geprüft, similar to Bibliothek section. the prufung bottom bar isn't selected here - check this
+  for all the pages where the bottom bar is visible but not selected and fix it. fix any other bugs
+  spotted`
+  **Response:** three changes.
+  (1) The mobile floating cluster's left slot is `BackToPruefung`, a new
+  `src/features/writing/bottomChrome.tsx`: the retired Feedback button's exact geometry (44px,
+  `rounded-xl`, quiet outline, opaque `bg-surface` because the cluster has no bar behind it) linking
+  to `/anwenden`, not to history, since `/writing` is entered from the hub card, the dashboard
+  recommendation and ⌘K. Fokus keeps its rule that the cluster disappears once a correction exists;
+  the lit Prüfung tab is the way back in that state.
+  (2) Feedback moved DOWN beside the KI note as the Bibliothek's own link:
+  "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben". `FeedbackLink` is factored out of
+  `FeedbackNote` so both surfaces share one definition, and `FeedbackIconButton` is deleted (it had
+  no other call site). Both trainers now render ONE `MobileAiNote`, which is what stops the two
+  copies of the locked bottom geometry from drifting apart. Measured in the real build: one line at
+  360px AND at 320px, so it cannot grow into the buttons above it.
+  (3) The bar bug: `NavLink` decided the active tab from the URL, so every page one level below a
+  hub left the bar visible with nothing lit. `navZoneOf` (`nav-items.ts`) folds a route into the tab
+  that owns it (`/writing`, `/simulation`, `/exam` → Prüfung; `/quiz` + the retired per-tool routes
+  → Bibliothek; `/session`, `/revision`, `/welt` → Praktisch; `/sammlung` → Fortschritt), and the
+  bar and the sidebar both read it. Both now render a plain `Link`: `NavLink` would re-decide the
+  state AND it swallows `aria-current` (it treats that prop as "the value to use when I consider
+  myself active"), so the lit tab announced nothing to a screen reader. That was the "other bug"
+  worth fixing here. Verified by driving the built app: all twelve in-shell routes light their zone,
+  `/session` and `/revision` have no bar (focus mode), none is blank.
+- **Prompt 2 (verbatim):** `[screenshot of the Hören Anleitung, Ohne Zeit] I see such screens for
+  hören and lesen for Ohne Zeit as well - the problem is that this screen mode represents exam mode.
+  This should only be shown when a user is in mit zeit mode. Keep this consistent for all the
+  modules`
+  **Response:** the Anleitung is Mit Zeit's screen now. `useExamStore.start` opens an untimed module
+  straight in `phase: "part"` (and `completePart` never routes a next part through an intro either),
+  so Ohne Zeit lands on the first question, exactly as Schreiben and Sprechen ohne Zeit land in
+  their trainer. The FRAME follows the same logic: the header's exit is a neutral **Zurück** arrow
+  instead of the red Verlassen (the flag rides `useSessionStore.examUntimed`, because AppShell is
+  eager code that may not import the exam store), leaving an untimed drill with nothing answered,
+  noted or written asks no confirm at all, and the confirm it does show says "Übung verlassen?".
+  What deliberately stays exam-shaped is the STAGE (one viewport, no bottom bar, internal scroll):
+  it is what keeps a Teil at zero page scroll, and a visible tab bar would let a learner re-enter
+  the persisted run in a loop. Flagged to the founder as an open question. `PartIntro` keeps its
+  untimed wording for the one case that can still reach it, a run persisted mid-intro before this
+  deploy. Verified in the real build: Ohne Zeit Lesen and Hören open on the question, Mit Zeit still
+  opens on "PRÜFUNGSTEIL … der Timer läuft, sobald du startest".
+- **Artifacts (prompts 1-2):** `src/features/writing/bottomChrome.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/components/layout/nav-items.ts` ·
+  `src/components/layout/BottomTabBar.tsx` · `src/components/layout/Sidebar.tsx` ·
+  `src/components/layout/AppShell.tsx` · `src/store/useSessionStore.ts` · `src/store/useExamStore.ts` ·
+  `src/features/exam/MockExamRunner.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
