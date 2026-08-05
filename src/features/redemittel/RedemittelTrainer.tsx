@@ -31,6 +31,7 @@ import {
   FloatingActionCluster,
   floatingSlot,
 } from "@/features/shared/floatingCluster";
+import { ScrollRootProvider } from "@/lib/scrollRoot";
 import { cn } from "@/lib/utils";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -75,6 +76,10 @@ const REDEMITTEL_FACET_IDS = REDEMITTEL_FACETS.map((f) => f.id);
 // the repo (the session engine's redemittel pool covers the practice loop).
 export function RedemittelTrainer() {
   const [params, setParams] = useSearchParams();
+  // The desktop scroll container, handed to `usePagedList` through context so
+  // its sentinel observes THIS element rather than the viewport (s189).
+  const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
+
   const navigate = useNavigate();
   const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [search, setSearch] = useState("");
@@ -324,7 +329,7 @@ export function RedemittelTrainer() {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-[1.05rem]">
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:space-y-[1.05rem]">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
@@ -332,7 +337,7 @@ export function RedemittelTrainer() {
           the tile still starts level with the first card. Mobile renders the
           SAME filter tile inline (collapsed by default; Register is a facet
           group in it now); only one FilterRail is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:min-h-0 lg:flex-1 lg:grid-rows-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
         <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
@@ -445,33 +450,38 @@ export function RedemittelTrainer() {
           )}
         </AnimatePresence>
 
-        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {/* The level-band chip rides with the CONTENT, not the sticky toolbar
-              (2026-07-31): the toolbar row is transparent now, so a chip pinned
-              there would float on top of the cards scrolling underneath. */}
-          {bandActive && bandHiddenCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
-          {filtered.length > 0 &&
-            (view === "tabelle" ? (
-              <RedemittelTable items={filtered} />
-            ) : view === "liste" ? (
-              <RedemittelCompactList items={filtered} />
-            ) : (
-              cardGrid
-            ))}
-
-          {filtered.length === 0 && (
-            <div className="py-16 text-center text-muted-foreground">
-              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-            </div>
-          )}
+        <div
+          ref={setScrollRoot}
+          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+        >
+          <ScrollRootProvider value={scrollRoot}>
+            {/* The level-band chip rides with the CONTENT, not the sticky toolbar
+                (2026-07-31): the toolbar row is transparent now, so a chip pinned
+                there would float on top of the cards scrolling underneath. */}
+            {bandActive && bandHiddenCount > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <ActiveFilterChip
+                  label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                  onRemove={() => setShowAllLevels(true)}
+                />
+              </div>
+            )}
+  
+            {filtered.length > 0 &&
+              (view === "tabelle" ? (
+                <RedemittelTable items={filtered} />
+              ) : view === "liste" ? (
+                <RedemittelCompactList items={filtered} />
+              ) : (
+                cardGrid
+              ))}
+  
+            {filtered.length === 0 && (
+              <div className="py-16 text-center text-muted-foreground">
+                Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+              </div>
+            )}
+          </ScrollRootProvider>
         </div>
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the

@@ -121,6 +121,19 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   The surface owes the flow `CLUSTER_CLEARANCE`. It replaced a sticky bar (full-bleed,
   `sticky bottom-[nav]`, backdrop-blur, after the
   content).
+- **Desktop scrolls INSIDE, not the page** (founder s189): the hub is one
+  `h-browse-stage` tall, the tabs and the toolbar row hold their place, and the CONTENT column is the
+  only thing that scrolls (`lg:min-h-0 lg:overflow-y-auto`). Mobile is untouched and still scrolls
+  the page. The catch that makes this more than a class: `usePagedList` grows the list from an
+  IntersectionObserver, which measures against the VIEWPORT by default, so inside a scroll container
+  its sentinel is clipped and paging dies silently. Each surface publishes its scroll element through
+  `ScrollRootProvider` (`src/lib/scrollRoot.tsx`) and the hook observes that instead. Verified at
+  1280x900: page 900/900, inner 5142/655, and the card count still goes 60 → 120 on reaching the
+  inner bottom.
+- **Toolbar row:** every control is 30px since s189 (a quarter down from 40), the view switcher
+  included, and the transient search field matches.
+- **Horizontal scroll says so** (`HScrollArea`): a soft fade on whichever edge still has content
+  behind it, nothing once the region fits or has been scrolled to its end.
 - **Tile look:** the Himmelblau wash (`bg-accent/20`, dark `bg-accent/10`) with the border in the
   fill's own colour and `shadow-soft` doing the separating, i.e. byte-for-byte the Schreiben
   "Aufgabe wählen" rail (founder s189: "apply the same blue shade from the Schreiben Aufgabe wählen

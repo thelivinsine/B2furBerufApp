@@ -40,6 +40,7 @@ import {
   FloatingActionCluster,
   floatingSlot,
 } from "@/features/shared/floatingCluster";
+import { ScrollRootProvider } from "@/lib/scrollRoot";
 import { cn } from "@/lib/utils";
 import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
@@ -121,6 +122,10 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
 
 export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
+  // The desktop scroll container, handed to `usePagedList` through context so
+  // its sentinel observes THIS element rather than the viewport (s189).
+  const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
+
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
   // Mode pre-selects which DOMAINS the grouped theme dropdown shows (founder
@@ -443,7 +448,7 @@ export function CollocationsBrowser() {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
@@ -451,7 +456,7 @@ export function CollocationsBrowser() {
           the tile still starts level with the first card. Mobile renders the
           SAME filter tile inline (collapsed by default); only one FilterRail
           is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:min-h-0 lg:flex-1 lg:grid-rows-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
         <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
@@ -564,57 +569,62 @@ export function CollocationsBrowser() {
           )}
         </AnimatePresence>
 
-        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {/* The level-band chip rides with the CONTENT, not the sticky toolbar
-              (2026-07-31): the toolbar row is transparent now, so a chip pinned
-              there would float on top of the cards scrolling underneath. */}
-          {hiddenLabel && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
-          {/* Sub-theme drill-down now lives in the filter (the Unterthema
-              dropdown), not a separate picker page. This breadcrumb shows the
-              active sub-theme context and jumps back to the whole theme. */}
-          {hasSubThemes && subs.length > 0 && (
-            <button
-              onClick={() => setSubs([])}
-              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {activeTheme?.titleDe}
-              <span className="text-muted-foreground/60">/</span>
-              <span className="text-foreground">
-                {subs.length === 1
-                  ? (activeSub?.titleDe ?? "Gesamtes Thema")
-                  : `${subs.length} Unterthemen`}
-              </span>
-            </button>
-          )}
-
-          {filtered.length === 0 ? (
-            <div className="py-16 text-center text-muted-foreground">
-              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-            </div>
-          ) : view === "tabelle" ? (
-            <CollocationTable items={filtered} />
-          ) : view === "liste" ? (
-            <CollocationCompactList items={filtered} />
-          ) : view === "graph" ? (
-            <Suspense
-              fallback={
-                <div className="h-[62dvh] min-h-[440px] animate-pulse rounded-xl border border-border bg-surface" />
-              }
-            >
-              <CollocationGraph items={filtered} />
-            </Suspense>
-          ) : (
-            cardGrid
-          )}
+        <div
+          ref={setScrollRoot}
+          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+        >
+          <ScrollRootProvider value={scrollRoot}>
+            {/* The level-band chip rides with the CONTENT, not the sticky toolbar
+                (2026-07-31): the toolbar row is transparent now, so a chip pinned
+                there would float on top of the cards scrolling underneath. */}
+            {hiddenLabel && (
+              <div className="flex flex-wrap items-center gap-2">
+                <ActiveFilterChip
+                  label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                  onRemove={() => setShowAllLevels(true)}
+                />
+              </div>
+            )}
+  
+            {/* Sub-theme drill-down now lives in the filter (the Unterthema
+                dropdown), not a separate picker page. This breadcrumb shows the
+                active sub-theme context and jumps back to the whole theme. */}
+            {hasSubThemes && subs.length > 0 && (
+              <button
+                onClick={() => setSubs([])}
+                className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {activeTheme?.titleDe}
+                <span className="text-muted-foreground/60">/</span>
+                <span className="text-foreground">
+                  {subs.length === 1
+                    ? (activeSub?.titleDe ?? "Gesamtes Thema")
+                    : `${subs.length} Unterthemen`}
+                </span>
+              </button>
+            )}
+  
+            {filtered.length === 0 ? (
+              <div className="py-16 text-center text-muted-foreground">
+                Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+              </div>
+            ) : view === "tabelle" ? (
+              <CollocationTable items={filtered} />
+            ) : view === "liste" ? (
+              <CollocationCompactList items={filtered} />
+            ) : view === "graph" ? (
+              <Suspense
+                fallback={
+                  <div className="h-[62dvh] min-h-[440px] animate-pulse rounded-xl border border-border bg-surface" />
+                }
+              >
+                <CollocationGraph items={filtered} />
+              </Suspense>
+            ) : (
+              cardGrid
+            )}
+          </ScrollRootProvider>
         </div>
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the

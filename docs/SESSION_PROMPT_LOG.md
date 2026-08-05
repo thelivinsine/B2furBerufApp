@@ -4235,3 +4235,25 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompts 21-22):** `src/features/shared/floatingCluster.tsx` ·
   `src/features/vocabulary/VocabList.tsx` · `src/components/layout/FeedbackButton.tsx` ·
   `src/features/shared/browseScroll.tsx` · this log
+- **Prompt 23 (verbatim):** `I see the view buttons were decreased in size but I meant all the
+  buttons in the row to be redcued not just view buttons! decrease the size of other buttons in the
+  row as well.` + `and then carry on with other open comments`
+  **Response:** the whole toolbar row is 30px now (the size moved into
+  `BROWSE_TOOLBAR_BUTTON`, so filter, bookmark and search shrink with the switcher) and the
+  transient search field matches. Then the rest of prompt 18 closed out:
+  Redemittel cards took the Kollokationen anatomy and a two-line clamp; the Redemittel table gained
+  a **Beispiel** column beside Englisch; `HScrollArea` fades whichever edge of a scrolling table
+  still has content behind it; and **desktop now scrolls internally**.
+  The last one was the only structural change: the hub is one `h-browse-stage` tall, the tabs and
+  toolbar hold their place and the content column scrolls. `usePagedList` had to become root-aware
+  first, via `ScrollRootProvider`, because its IntersectionObserver measures against the viewport and
+  a sentinel inside a scroll container is clipped, which would have killed auto-paging silently.
+  Two things went wrong on the way and were caught by verification, not by review: a naive div-depth
+  matcher swallowed the FilterRail (self-closing `<div />` counted as a nesting level), and
+  `.h-page-stage` goes `auto` from lg up by design, so the first attempt constrained nothing.
+  **Verified at 1280x900 on all four tabs:** page 900/900, the content column scrolling internally,
+  and the card count going 60 → 120 on reaching its bottom.
+- **Artifacts (prompt 23):** `src/lib/scrollRoot.tsx` (new) · `src/lib/usePagedList.ts` ·
+  `src/index.css` · `src/features/library/LibraryHub.tsx` · `src/features/shared/browseScroll.tsx` ·
+  `src/features/shared/DataTable.tsx` · `src/features/shared/SearchField.tsx` ·
+  `src/features/redemittel/RedemittelViews.tsx` · the four Bibliothek tab files · this log

@@ -100,18 +100,22 @@ export function LibraryHub() {
   };
 
   return (
-    // Desktop tightens the stack around the toolbar row by 30% (founder s189).
-    <div className="space-y-4 sm:space-y-6 lg:space-y-[1.05rem]">
+    // Desktop tightens the stack around the toolbar row by 30%, and becomes a
+    // STAGE (founder s189: "instead of a page scroll in desktop view, keep
+    // internal scroll"): the hub is exactly one screen tall, the tabs hold
+    // their place, and the panel below them gets whatever room is left to
+    // scroll inside. Mobile is untouched and still scrolls the page.
+    <div className="space-y-4 sm:space-y-6 h-browse-stage lg:flex lg:min-h-0 lg:flex-col lg:space-y-[1.05rem]">
       {/* Static page header. On desktop it sits at the content-column width (col
           1 of the same [1fr, 16rem] grid the trainers use for their content +
           filter rail), so the tabs line up with the cards, not the rail. */}
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
+      <div className="lg:grid lg:shrink-0 lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
         <div className="lg:col-start-1">
           <LibrarySwitcher />
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative lg:min-h-0 lg:flex-1">
         <AnimatePresence mode="popLayout" custom={dir} initial={false}>
           <motion.div
             key={tab}
@@ -121,6 +125,7 @@ export function LibraryHub() {
             animate="center"
             exit="exit"
             transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:h-full"
           >
             <Suspense fallback={fallback}>
               <Segment />
