@@ -213,7 +213,14 @@ Two founder prompts against a screenshot of `/anwenden`, Module üben.
 light and dark, and 1280x900, with no element inside `main` carrying a `background-image` any more.
 Gates green: build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
 check:bundle 126.6 kB · check:contrast.
-Shipped as **PR #803**, squash-merged into `main` as `f0fa0b7`; the founder verifies the live result.
+- **"The time badges [are] overlapping on the text ... just remove the text and just keep the
+  badges."** A real bug, and the reserve was the cause: the badge is 24px tall and sits 12px off the
+  bottom, i.e. 36px, against a 28px `pb-[1.75rem]` reserve, so with the clock ON it sat across the
+  description on all four cards. The description line is gone (`FREE_DESC` with it; `PART_META.desc`
+  stays for the Anleitung pages). What remains is mark, arrow, title, badge. The one line that can
+  still appear is the honest empty state, and it only shows on a card that has no badge.
+Shipped as **PR #803** (the first two) and **PR #805** (the badge overlap), squash-merged into
+`main`; the founder verifies the live result.
 **Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
 so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
 

@@ -4468,3 +4468,20 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   was written) and logs this prompt. `CLAUDE.md` needed no edit: it states the reserved badge corner
   and the shared Prüfung frame, neither of which changed, and it never named the wash.
 - **Artifacts (prompt 3):** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md`
+- **Prompt 4 (verbatim):** `[screenshot of /anwenden, Mit Zeit] there seems to be a big with the
+  time badges overlapping on the text. Can you just remove the text and just keep the badges in this
+  page?`
+  **Response:** confirmed as a real bug and fixed at the cause: the minutes badge is ~24px tall and
+  is held 12px off the card's bottom edge, so it needs 36px, while the reserve added for it in s190
+  was `pb-[1.75rem]` (28px). With the clock ON it therefore crossed the description line on all four
+  cards. Per the founder's instruction the description is removed rather than the reserve grown:
+  `ModuleGrid` renders mark, arrow, title and badge, `FREE_DESC` is deleted, and `PART_META.desc`
+  stays because the Anleitung pages read it. The only line that can still appear is the empty state
+  "Noch keine Inhalte", which renders only when the card has no badge, so the two can never collide.
+  **Verification:** the CDP driver now clicks "Mit Zeit" and reports every badge/text rectangle
+  intersection inside a card. Six states shot (Mit Zeit at 360x640, 393x852 light + dark, 1280x900;
+  Ohne Zeit at 393x852 and 1280x900): zero intersections, zero page scroll everywhere, and the card
+  edges are identical in both clock states, so the reserve still does its job.
+- **Artifacts (prompt 4):** `src/features/pruefung/PruefungHub.tsx` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/PROJECT_STATUS.md` · this log · **PR #805**
+
