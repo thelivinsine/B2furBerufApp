@@ -76,9 +76,9 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
 
   // The clock ran out: submit whatever is on the page, exactly once.
   useEffect(() => {
-    if (run.phase === "part" && run.remainingSec === 0) void submit();
+    if (!run.untimed && run.phase === "part" && run.remainingSec === 0) void submit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [run.phase, run.remainingSec]);
+  }, [run.untimed, run.phase, run.remainingSec]);
 
   // A stale ref after a bank re-authoring: nothing to write against, skip on.
   const missing = !task;

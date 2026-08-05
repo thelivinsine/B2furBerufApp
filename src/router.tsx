@@ -40,8 +40,8 @@ const ConfirmEmail = lazyWithReload(() =>
 const LibraryHub = lazyWithReload(() =>
   import("@/features/library/LibraryHub").then((m) => ({ default: m.LibraryHub })),
 );
-const AnwendenHub = lazyWithReload(() =>
-  import("@/features/anwenden/AnwendenHub").then((m) => ({ default: m.AnwendenHub })),
+const PruefungHub = lazyWithReload(() =>
+  import("@/features/pruefung/PruefungHub").then((m) => ({ default: m.PruefungHub })),
 );
 const QuizHub = lazyWithReload(() =>
   import("@/features/quiz/QuizHub").then((m) => ({ default: m.QuizHub })),
@@ -51,9 +51,6 @@ const WritingHub = lazyWithReload(() =>
 );
 const SimulationHub = lazyWithReload(() =>
   import("@/features/simulation/SimulationHub").then((m) => ({ default: m.SimulationHub })),
-);
-const ExamHub = lazyWithReload(() =>
-  import("@/features/exam/ExamHub").then((m) => ({ default: m.ExamHub })),
 );
 const QuickRevision = lazyWithReload(() =>
   import("@/features/revision/QuickRevision").then((m) => ({ default: m.QuickRevision })),
@@ -316,7 +313,7 @@ export const router = createBrowserRouter([
         path: "/anwenden",
         element: (
           <RequireOnboarding>
-            <AnwendenHub />
+            <PruefungHub />
           </RequireOnboarding>
         ),
       },
@@ -350,12 +347,11 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        // The Modelltest is a TAB of the Prüfung hub since s189, not a page of
+        // its own. The old address is kept forever: it is in learners' history,
+        // in the dashboard recommendation and in ⌘K.
         path: "/exam",
-        element: (
-          <RequireOnboarding>
-            <ExamHub />
-          </RequireOnboarding>
-        ),
+        element: <Navigate to="/anwenden?tab=modelltest" replace />,
       },
       {
         // The Neuland game world (G1, Beta): off the nav, reached via the

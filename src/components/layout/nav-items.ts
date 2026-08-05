@@ -51,7 +51,7 @@ export const navItems: NavItem[] = [
   // which keeps the bar at five slots. `/writing` keeps its route, its icon and
   // every deep link; it is simply not a top-level nav entry any more, so it is
   // absent from this list on purpose (see ROUTE_SUCCESSOR below).
-  { to: "/anwenden",  label: "Prüfung",      icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Sprechen, Schreiben und Modelltest" },
+  { to: "/anwenden",  label: "Prüfung",      icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Module üben und Modelltest" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];

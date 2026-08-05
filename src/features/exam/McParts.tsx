@@ -60,10 +60,10 @@ function useQuestions(ids: string[]): Question[] {
 function useAutoFinish(run: MockExamRun, ids: string[]) {
   const completePart = useExamStore((s) => s.completePart);
   useEffect(() => {
-    if (run.phase === "part" && run.remainingSec === 0) {
+    if (!run.untimed && run.phase === "part" && run.remainingSec === 0) {
       completePart(scoreChecks(ids, run.answers));
     }
-  }, [run.phase, run.remainingSec, run.answers, ids, completePart]);
+  }, [run.untimed, run.phase, run.remainingSec, run.answers, ids, completePart]);
 }
 
 /**
