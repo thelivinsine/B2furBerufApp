@@ -4111,3 +4111,10 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   desktop, 852/852 phone on both tabs.
 - **Artifacts (prompt 13):** `src/features/pruefung/PruefungHub.tsx` ·
   `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 14 (verbatim):** `create the PR into main and merge. document the session`
+  **Response:** shipped as **PR #799** (squash-merged into `main`), which is the whole s189 redesign:
+  commits `1cfe0f7` + `c1d5879` (the two preview rounds), `10c2dc8` (the build), `fc27d08`,
+  `988beca`, `2ce64e3` (the three desktop-layout follow-ups) and this documentation pass.
+  Merging `main` triggers the two deploy workflows; no migrations and no Edge Function changes are
+  in this PR, so only the Pages deploy matters. The founder verifies the live result.
+- **Artifacts (prompt 14):** PR #799 · `docs/PROJECT_STATUS.md` · this log

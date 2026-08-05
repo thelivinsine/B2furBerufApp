@@ -25,6 +25,10 @@ for the header and bottom bar. Verified by driving the real build over CDP at 39
 `scrollHeight === innerHeight`; with 20 runs expanded the tile measures 692 px inside an 852 px
 viewport, top 80 / bottom 772 (the bar starts at 789), and its list scrolls 859/547 internally.
 Gates green: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
+Shipped as **PR #799**, squash-merged into `main`.
+**Resume here:** one question is deliberately open, `FilterRail`'s mobile panel keeps its own
+`max-h-[45dvh]` cap instead of the new one-screen `max-h-panel-stage`; ask the founder before
+changing an approved surface. Everything else in the Prüfung zone is done.
 Prior s188: the Prüfungssimulation hub was re-done and renamed **Modelltest** (founder pick
 "Prüfungstag"): the page led with the run band, then "Einzeln üben", then Verlauf as the one place
 a result is shown. s189 kept the band, the one-place rule and the countdown, and moved the rest.
