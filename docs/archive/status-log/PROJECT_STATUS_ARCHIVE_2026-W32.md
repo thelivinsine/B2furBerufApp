@@ -384,3 +384,89 @@ was the card-height parity, now closed.
 **Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
 `3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
 moves, the reserve moves with it.
+
+## Archived from PROJECT_STATUS.md in session 193 (2026-08-05)
+
+Prior s189 (2026-08-05): **the Prüfung zone became ONE page.** Founder prompt:
+"this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
+... Module wide practice and model test as the two options". The three-card `/anwenden` hub and the
+`/exam` Modelltest page folded into a single page whose header IS a two-segment sliding-pill
+switcher: **Module üben** | **Modelltest**. `/exam` redirects into it.
+Two preview rounds settled it (`preview/pruefung-hub-redesign.html`, `-r2`); the founder picked
+layout **A "Kompakt"**, the **Modern** module marks in **Rezeptiv / Produktiv** colours, and kept
+the zone name **Prüfung**.
+**Module üben** is the four modules as identical cards, and the free Schreib- and Sprechtrainer
+merged INTO them (founder pick "idea 3"): **Mit Zeit / Ohne Zeit** is one switch beside Niveau,
+**resting on Ohne Zeit**, so Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit
+`/simulation`, and Lesen/Hören run the same drill `untimed` (no tick, no timer pill, never
+auto-handed in). The separate "Freies Üben" block is gone with it. "Einzeln üben" is gone from the
+Modelltest tab: it IS this tab now.
+**Modelltest** is the run band plus Verlauf and nothing else. Verlauf rests OPEN, leading with three
+centred figures (Letzter · Bester · Bestanden), and the timeline connector is now one segment per
+gap drawn BETWEEN the tiles (founder: "should not overlap the icons").
+**The session also set an app-wide law: the expand rule.** A page rests at zero scroll
+(`.h-page-stage`); expanding a tile releases that cap; the expanded tile is never taller than one
+screen (`.max-h-panel-stage`) so its own borders stay visible; ONE inner region scrolls and hands
+the scroll on to the page at its top; and `useStagePanel` scrolls it into view with scroll margins
+for the header and bottom bar. Verified by driving the real build over CDP at 393x852: at rest
+`scrollHeight === innerHeight`; with 20 runs expanded the tile measures 692 px inside an 852 px
+viewport, top 80 / bottom 772 (the bar starts at 789), and its list scrolls 859/547 internally.
+Gates green: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
+Shipped as **PR #799**, squash-merged into `main`, then **PR #800** carried the follow-up run:
+the filter rails took the Schreiben rail's Himmelblau fill (superseding the grey tile of s104), the
+four hand-copied Bibliothek action bars became ONE shared `FloatingActionCluster` with Schreiben,
+text fields lost the global focus ring (the caret is the indicator; buttons keep theirs), and the
+Bibliothek desktop scrolls INSIDE its content column instead of scrolling the page, which needed
+`usePagedList` made root-aware first.
+One question is deliberately open from that session: `FilterRail`'s mobile panel keeps its own
+`max-h-[45dvh]` cap instead of the new one-screen `max-h-panel-stage`; ask the founder before
+changing an approved surface.
+Prior s188: the Prüfungssimulation hub was re-done and renamed **Modelltest** (founder pick
+"Prüfungstag"): the page led with the run band, then "Einzeln üben", then Verlauf as the one place
+a result is shown. s189 kept the band, the one-place rule and the countdown, and moved the rest.
+Prior s187: dark mode became near-neutral ("N3 Slate", ground `220 15% 4%`, cards `220 10% 17%`,
+page radials off in dark), the corner scale tightened (`--radius` 0.5rem → card 10px, row 8px,
+pill 6px), and the running Prüfungsteil got its polish round (no tile on the question, drag-resizable
+blocks, the number strip beside Zurück/Weiter, a red exit), verified over 225 in-exam screens.
+Prior s186: the Prüfungssimulation became a real four-part mock exam (Lesen, Hören, Schreiben,
+Sprechen) in four PRs (#791-#794), with per-Teil timers, an answer-sheet strip, the one-viewport
+exam stage and a result screen with a 60 % pass line.
+Prior s185: **the content-audit backlog closed except P10** (P9 noun facts, P7 re-levelling, P5
+grammar drills, P4 scenarios, P3 exam-length texts + the Notizen step), and a parallel **database
+architecture audit** shipped four fixes (#786, #787): no silent cloud write, pg_cron retention,
+400-day day maps, `pnpm lint:migrations`. Detail in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5
+and `docs/reports/db-architecture-audit-2026-08-04.md`; the still-open items are listed under
+"Resume here" below.
+Prior s184: **Every filter and Aufgabe rail now carries the
+Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
+Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
+shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
+drops a Thema from the other area so the three controls can never disagree.
+Prior s183 and older (Prüfung icon language, the s182 audit items and the five-slot nav, the
+Schreiben Aufgabe backlog, hard filters, the security audit, liveWork): condensed away on purpose,
+per the doc-hygiene rule below. Read them in `docs/archive/status-log/` by ISO week.
+`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
+`.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
+a CLI. Product name: **Genauly** (`genauly.de`)._
+
+This is the **lean, living** status doc: current state plus the two most recent session handoffs.
+**Start at the `## Resume here (next session)` section at the end.** Companion files:
+- **`docs/PROJECT_FOUNDATION.md`** — the stable technical baseline that rarely changes: shipped
+  architecture (Phase 1/2), locked architectural decisions, backend/infra, and completed founder
+  action items. Read it when you need the "what's built and how" detail that used to sit here.
+- **`docs/PROJECT_REFERENCE.md`** — stable reference: the founder backlog, product-evaluation
+  findings, per-session model guidance, and reusable research findings.
+- **`docs/DECISIONS.md`** — the "why" behind locked UX decisions.
+- **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only session-log history,
+  chunked by ISO week under `docs/archive/status-log/`.
+- **`../CLAUDE.md`** — the lean always-on operating rules (restructured s155, ~180 lines); deep
+  per-area detail lives in **`docs/areas/`** (COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN,
+  PRAKTISCH-NAV, GAME, BRAND, LEGAL-ADMIN, COMPONENTS) + the `/design` and `/content` skills.
+
+**Doc-hygiene rule (keep this file lean):** hold only **current state + the two most recent
+handoffs**. When you append a new handoff to `## Resume here`, move any handoff older than the two
+most recent into the current ISO-week chunk under `docs/archive/status-log/` (see the index at
+`docs/archive/PROJECT_STATUS_ARCHIVE.md`). Do NOT let the `_Last updated_` block above grow into a
+session-by-session narrative — keep it to the latest session only. Keep the whole file under ~250
+lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
+

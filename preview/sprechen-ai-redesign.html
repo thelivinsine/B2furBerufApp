@@ -1,0 +1,1005 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprechen rethought — talking to an AI partner</title>
+<style>
+  /* ---------------------------------------------------------------
+     REVIEW CHROME (deliberately not the app palette, so the mocked
+     app screens below read as separate objects).
+     --------------------------------------------------------------- */
+  :root {
+    --c-ground: #eceef1; --c-panel: #ffffff; --c-ink: #191d24;
+    --c-muted: #5c6672; --c-line: #d3d8de; --c-accent: #1f6f68; --c-chip: #e2e6ea;
+  }
+  [data-appearance="dark"] {
+    --c-ground: #0e1013; --c-panel: #16191d; --c-ink: #e6e9ec;
+    --c-muted: #98a1ab; --c-line: #292e35; --c-accent: #58bdb2; --c-chip: #212630;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--c-ground); color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55; padding: 32px 24px 96px; min-height: 100vh;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p { margin: 0; }
+  .lede { color: var(--c-muted); max-width: 74ch; }
+  .kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--c-accent); }
+  .rule { height: 1px; background: var(--c-line); border: 0; margin: 34px 0 0; }
+
+  .controls {
+    position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px;
+    padding: 12px 14px; margin: 22px 0 30px; box-shadow: 0 6px 18px -12px rgba(0,0,0,.4);
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl > span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); }
+  .seg { display: inline-flex; background: var(--c-chip); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent;
+    color: var(--c-muted); padding: 5px 12px; border-radius: 7px; cursor: pointer; transition: background .14s, color .14s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--c-panel); color: var(--c-ink); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+  .seg button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+  .panel { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px; padding: 20px 22px; }
+  .panel + .panel { margin-top: 16px; }
+  .findings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 14px; }
+  .finding { display: flex; gap: 11px; align-items: flex-start; }
+  .finding b { display: block; font-size: 14px; }
+  .finding p { font-size: 13.5px; color: var(--c-muted); }
+  .num {
+    flex: none; width: 22px; height: 22px; border-radius: 7px; background: var(--c-chip);
+    color: var(--c-accent); font-size: 12px; font-weight: 700; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); font-weight: 700; }
+  td:first-child { font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; margin-top: 14px; }
+  .yes { color: #157a4a; font-weight: 650; }
+  .no { color: #b4331f; font-weight: 650; }
+  [data-appearance="dark"] .yes { color: #56c98e; }
+  [data-appearance="dark"] .no { color: #f08a76; }
+
+  .option { margin-top: 46px; }
+  .opthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .optname {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--c-panel); background: var(--c-accent); padding: 3px 9px; border-radius: 6px;
+  }
+  .framerow { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; align-items: flex-start; }
+  .framebox.phone { flex: 0 0 auto; }
+  .framebox.desk { flex: 1 1 100%; }
+  .notecol { flex: 1 1 380px; min-width: 300px; }
+  .framelabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); margin: 0 0 7px; }
+  .frame { border: 1px solid var(--c-line); border-radius: 14px; overflow: hidden; }
+  .frame.desk .screen { padding: 26px 24px 32px; }
+  .frame.desk .inner { max-width: 896px; margin: 0 auto; width: 100%; }
+  /* The phone frame is the REAL content area a 393x852 phone leaves between the
+     app header and the bottom tab bar (668 px), and it does NOT scroll: if a
+     screen did not fit, it would visibly overflow here. */
+  .frame.mob { width: 372px; }
+  .frame.mob .screen { padding: 16px 15px 20px; height: 668px; overflow: hidden; }
+  .fitnote { font-size: 12px; color: var(--c-muted); margin-top: 7px; }
+  .note { font-size: 13.5px; color: var(--c-muted); }
+  .note + .note { margin-top: 10px; }
+  .note b { color: var(--c-ink); font-weight: 650; }
+  .cost { margin-top: 12px; font-size: 13px; color: var(--c-muted); border-left: 3px solid var(--c-line); padding-left: 10px; }
+  .cost b { color: var(--c-ink); }
+  ul.tight { margin: 8px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--c-muted); }
+  ul.tight li + li { margin-top: 5px; }
+  ul.tight b { color: var(--c-ink); font-weight: 650; }
+
+  /* ---------------------------------------------------------------
+     APP TOKENS — verbatim from src/index.css (light + s187 "N3 Slate"
+     dark) and tailwind.config.ts.
+     --------------------------------------------------------------- */
+  .screen {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%; --elevated: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --reward: 11 82% 54%; --reward-bg: 16 77% 93%;
+    --shadow: 221 40% 22%;
+    --radius: 0.5rem;
+    --wash-a: .10; --wash-b: .09;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+    --sprechen: #0ea5e9; --sprechen-tile: rgba(14,165,233,.12); --sprechen-ink: #0369a1;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    color: hsl(var(--foreground)); font-size: 16px; line-height: 1.5;
+  }
+  [data-appearance="dark"] .screen {
+    --background: 220 15% 4%;
+    --page-from: 220 15% 4%; --page-mid: 220 15% 4%; --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%;
+    --surface: 220 10% 17%; --elevated: 220 9% 22%;
+    --muted: 220 9% 25%; --muted-foreground: 220 8% 72%;
+    --border: 220 10% 38%;
+    --primary: 219 90% 74%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-ink: 198 72% 72%;
+    --success: 153 50% 52%;
+    --reward: 11 88% 68%; --reward-bg: 12 30% 20%;
+    --shadow: 220 30% 2%;
+    --wash-a: 0; --wash-b: 0;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+    --sprechen: #38bdf8; --sprechen-tile: rgba(56,189,248,.16); --sprechen-ink: #7dd3fc;
+  }
+
+  .screen button { font: inherit; color: inherit; }
+  .screen .col { display: flex; flex-direction: column; gap: 14px; }
+  .frame.mob .screen { display: flex; }
+  /* min-width:0 on both: a flex item's automatic minimum size is its min-content
+     width, so without this the column refuses to shrink under the phone frame and
+     silently overflows it (the ribbon's nowrap spans are enough to trigger it). */
+  .frame.mob .screen .inner { flex: 1; min-height: 0; min-width: 0; display: flex; width: 100%; }
+  /* Direct child only: a nested .col (the brief's cards, the stage's "Du" block)
+     must keep its natural height, not grow and shove the layout around. */
+  .frame.mob .screen > .inner > .col { flex: 1; min-height: 0; min-width: 0; }
+  .frame.mob .screen .card, .frame.mob .screen .rail { flex: none; }
+
+  .card {
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .pad { padding: 16px; }
+  .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+  .eyebrow.brand { color: hsl(var(--primary)); }
+  .eyebrow.mut { color: hsl(var(--muted-foreground)); }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .muted { color: hsl(var(--muted-foreground)); }
+  .disc { font-size: 11.5px; color: hsl(var(--muted-foreground)); text-align: center; line-height: 1.4; }
+
+  .tile {
+    flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px;
+    background: var(--sprechen-tile); color: var(--sprechen-ink);
+  }
+  .tile.lg { width: 44px; height: 44px; border-radius: 11px; }
+  .avatar {
+    flex: none; display: grid; place-items: center; border-radius: 999px;
+    width: 38px; height: 38px; background: var(--sprechen-tile); color: var(--sprechen-ink); font-weight: 700; font-size: 14px;
+  }
+  .avatar.xl { width: 84px; height: 84px; font-size: 28px; }
+
+  /* Accent rail: a FILL with no visible edge (borders in its own fill colour). */
+  .rail {
+    background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .2); border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  [data-appearance="dark"] .rail { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .1); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+    background: hsl(var(--surface)); border-radius: 6px; padding: 4px 9px; color: hsl(var(--foreground));
+  }
+  .chip.pale { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); font-weight: 500; }
+  .chip.done { color: hsl(var(--success)); }
+  .chiprow { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer;
+    border-radius: 8px; font-size: 14.5px; font-weight: 650; padding: 0 16px; height: 42px; white-space: nowrap;
+  }
+  .btn.grad {
+    border: 0; color: #fff;
+    background: linear-gradient(100deg, hsl(var(--gradient-from)), hsl(var(--primary)) 55%, hsl(var(--gradient-to)));
+  }
+  [data-appearance="dark"] .btn.grad { color: hsl(var(--primary-foreground)); }
+  .btn.out { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); }
+  .btn.acc { background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .2); color: hsl(var(--accent-ink)); }
+  [data-appearance="dark"] .btn.acc { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .1); }
+  .btn.full { width: 100%; }
+  .iconbtn {
+    flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); color: hsl(var(--muted-foreground)); cursor: pointer;
+  }
+
+  /* The mic cluster: ONE floating bottom cluster, no bar behind it, every
+     control on its own opaque backing (features/shared/floatingCluster.tsx). */
+  .cluster { margin-top: auto; padding-top: 14px; display: flex; align-items: center; justify-content: center; gap: 18px; }
+  .mic {
+    flex: none; display: grid; place-items: center; width: 68px; height: 68px; border-radius: 999px; border: 0; cursor: pointer;
+    color: #fff; background: linear-gradient(140deg, hsl(var(--gradient-from)), hsl(var(--primary)) 55%, hsl(var(--gradient-to)));
+    box-shadow: 0 2px 6px hsl(var(--shadow) / .18), 0 14px 28px -8px hsl(var(--shadow) / .30);
+  }
+  [data-appearance="dark"] .mic { color: hsl(var(--primary-foreground)); }
+  .mic.live { background: hsl(var(--surface)); border: 2px solid hsl(var(--primary)); color: hsl(var(--primary)); }
+  .mic.live .stopsq { width: 22px; height: 22px; border-radius: 5px; background: hsl(var(--primary)); }
+  .sidebtn {
+    flex: none; display: inline-flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+    background: transparent; border: 0; font-size: 11.5px; font-weight: 600; color: hsl(var(--muted-foreground));
+  }
+  .sidebtn .ring {
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .caption { text-align: center; font-size: 12.5px; color: hsl(var(--muted-foreground)); margin-top: 10px; min-height: 18px; }
+
+  /* Brief ribbon (collapsed brief, shared by all three) */
+  .ribbon {
+    display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; cursor: pointer;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 8px; padding: 8px 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    font-size: 13px;
+  }
+  .ribbon .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .ribbon .s { color: hsl(var(--muted-foreground)); font-weight: 500; }
+
+  /* A — transcript */
+  .thread { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 2px 0; }
+  .turn { display: flex; gap: 9px; max-width: 88%; }
+  .turn.me { align-self: flex-end; flex-direction: row-reverse; }
+  .bub {
+    border-radius: 10px; padding: 10px 12px; font-size: 15px; line-height: 1.42;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .turn.me .bub { background: hsl(var(--accent) / .2); border-color: hsl(var(--accent) / .2); }
+  [data-appearance="dark"] .turn.me .bub { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .1); }
+  .bub .name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: hsl(var(--muted-foreground)); margin-bottom: 3px; }
+  .bubfoot { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+  .replay { display: inline-flex; align-items: center; gap: 4px; background: transparent; border: 0; cursor: pointer; color: hsl(var(--muted-foreground)); font-size: 11.5px; font-weight: 600; }
+
+  /* B — stage */
+  .stageline { font-size: 22px; line-height: 1.32; font-weight: 600; letter-spacing: -.01em; }
+  .frame.desk .stageline { font-size: 26px; }
+  .myline { font-size: 19px; line-height: 1.35; }
+  .myline .interim { color: hsl(var(--muted-foreground)); }
+
+  /* C — call */
+  .callstage { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  .eq { display: flex; align-items: flex-end; gap: 4px; height: 34px; }
+  .eq i { display: block; width: 5px; border-radius: 3px; background: hsl(var(--primary)); opacity: .85; }
+  .calltimer { font-size: 15px; font-weight: 650; color: hsl(var(--muted-foreground)); }
+
+  /* Debrief — the Schreiben correction language, verbatim */
+  .corrtoggle {
+    position: relative; display: inline-flex; gap: 2px; padding: 3px; align-self: flex-start;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+  }
+  .corrtoggle button {
+    position: relative; z-index: 1; border: 0; background: transparent; cursor: pointer;
+    font-size: 13px; font-weight: 600; padding: 5px 14px; border-radius: 6px; color: hsl(var(--muted-foreground));
+  }
+  .corrtoggle button[aria-pressed="true"] { background: hsl(var(--surface)); color: hsl(var(--foreground)); box-shadow: 0 1px 3px hsl(var(--shadow) / .16); }
+  .mark { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  .mark.err { text-decoration-color: hsl(var(--reward)); }
+  .mark.fix { text-decoration-color: hsl(var(--success)); }
+  .fixtile {
+    background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .35); border-radius: 8px; padding: 9px 11px;
+  }
+  [data-appearance="dark"] .fixtile { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .25); }
+  .fixtile .cat { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: hsl(var(--accent-ink)); }
+  .fixtile .body { margin-top: 3px; font-size: 14.5px; }
+  .fixtile s { color: hsl(var(--muted-foreground)); text-decoration-color: hsl(var(--reward)); }
+  .fixtile b { color: hsl(var(--success)); font-weight: 650; }
+  .goal { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; line-height: 1.4; }
+  .goal .dot { flex: none; width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; margin-top: 2px; }
+  .goal.ok .dot { background: hsl(var(--success) / .15); color: hsl(var(--success)); }
+  .goal.miss .dot { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .goal.miss { color: hsl(var(--muted-foreground)); }
+
+  /* The debrief is the one screen with more than a screenful. It takes the exam's
+     stage treatment: header and actions pinned, ONE inner region scrolling. */
+  .scrollzone {
+    flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+    /* A scroll container slices whatever crosses its edge, so the edge is faded
+       (the app's useEdgeFade / mask-fade answer, s190) rather than cut. */
+    mask-image: linear-gradient(to bottom, transparent 0, #000 10px, #000 calc(100% - 22px), transparent 100%);
+  }
+  .frame.desk .scrollzone { overflow: visible; mask-image: none; }
+  .divide { height: 1px; background: hsl(var(--border)); }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .grow { flex: 1; min-width: 0; }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <p class="kicker">Genauly · design review</p>
+  <h1>Sprechen, rethought: a partner you actually talk to</h1>
+  <p class="lede" style="margin-top:10px">
+    Today nothing in the Sprechen area records a learner's voice. This review sets out what is
+    actually there now, proposes one design thesis, prices the three technical ways of building it,
+    and shows <b>three named layouts</b> for the live conversation screen. Pick one layout by name
+    (and one pipeline), and I will build it.
+  </p>
+
+  <div class="controls">
+    <div class="ctl">
+      <span>Appearance</span>
+      <div class="seg" id="seg-appearance">
+        <button aria-pressed="true" data-v="light">Light</button>
+        <button aria-pressed="false" data-v="dark">Dark</button>
+      </div>
+    </div>
+    <p class="note" style="margin-left:auto">Every mocked screen below uses the app's real colour tokens and real control geometry.</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="panel">
+    <h2>1 · What "Sprechen" is today</h2>
+    <p class="note" style="margin-top:8px">
+      Sprechen is currently three separate surfaces, and none of them listens to the learner.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Surface</th><th>What the learner does</th><th>How it is scored</th><th>Voice?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sprechtrainer<br><span class="muted" style="font-weight:400">Sprechen without a clock</span></td>
+            <td>Reads a scripted line, then <b>taps one of 2–4 written answers</b>. On "free speaking" nodes, a text box appears with the placeholder "Tippe deine Antwort (optional)".</td>
+            <td>Averages a quality number the author attached to each option. It measures whether you picked the answer the author liked.</td>
+            <td class="no">No</td>
+          </tr>
+          <tr>
+            <td>Modelltest, Teil Sprechen</td>
+            <td>The same scripted dialogue, on a clock.</td>
+            <td><b>The learner ticks their own checkboxes.</b> The speaking grade in the mock exam is a self-assessment.</td>
+            <td class="no">No</td>
+          </tr>
+          <tr>
+            <td>The Üben session's speaking drill</td>
+            <td>Says <b>one word</b> out loud; the browser transcribes it and it is matched against the target.</td>
+            <td>Correct / not correct, plus response latency.</td>
+            <td class="yes">Yes, one word</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="findings">
+      <div class="finding"><span class="num">1</span><div>
+        <b>The tips card asks for something the app cannot see</b>
+        <p>It literally says: "speak out loud, then confirm." The learner performs into the void and grades themselves.</p>
+      </div></div>
+      <div class="finding"><span class="num">2</span><div>
+        <b>The microphone code already exists and is unused here</b>
+        <p><code>engine/speech.ts</code> ships a working, feature-detected speech-recognition wrapper. Only the one-word drill calls it. The Sprechen surface never does.</p>
+      </div></div>
+      <div class="finding"><span class="num">3</span><div>
+        <b>Every conversation is the same conversation</b>
+        <p>4,000 lines of hand-authored branching script. Replaying a scenario replays the identical tree, so there is nothing to come back for.</p>
+      </div></div>
+      <div class="finding"><span class="num">4</span><div>
+        <b>It shares nothing with Schreiben</b>
+        <p>Schreiben has an AI evaluator, a correction card, a daily budget and a Verlauf. Sprechen has none of it, and no progress record beyond "done".</p>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="panel">
+    <h2>2 · The thesis</h2>
+    <p class="note" style="margin-top:8px">
+      <b>Sprechen should be Schreiben with a microphone.</b> The app already knows how to take a
+      learner's own production, send it to an AI, and hand back a correction the learner recognises.
+      Speaking is that same loop, one modality further out. That gives us a shape to copy rather than
+      a new one to invent, and it is the reason a spoken correction should look exactly like a written one.
+    </p>
+    <p class="note" style="margin-top:12px">
+      <b>But an open ChatGPT-style voice chat is not, by itself, good practice.</b> A large language
+      model will happily talk to a B1 learner forever: it adapts down to their level, never corrects
+      unless asked, has no task to complete and produces no assessment. The learner leaves fluent in
+      the conversation they just had and nowhere else. So the feature is not "a chatbot with a voice".
+      It is:
+    </p>
+    <ul class="tight">
+      <li><b>A brief.</b> A real situation with a named partner, a role, a register (du/Sie), a level, and 2–4 things you must get done. This is the same law Schreiben already lives by: only a task carrying a full brief is served, because the AI grades task completion against it.</li>
+      <li><b>A conversation.</b> The partner stays in character, stays at the learner's level, pushes back, and does <em>not</em> correct mid-flow (interrupting to correct is what kills speaking confidence).</li>
+      <li><b>A debrief.</b> All the correction lands at the end, in the correction card the learner already knows from Schreiben: coral marks on what they said, green on the fix, Himmelblau fix tiles.</li>
+    </ul>
+    <p class="note" style="margin-top:12px">
+      One consequence worth stating plainly: the 645 hand-authored dialogue nodes stop being a script
+      and become <b>briefs</b>. Their title, task, context and target Redemittel are exactly the
+      material the AI partner needs as its role instructions, so the authoring work is not thrown
+      away. The branching tree underneath retires. Scenario ids stay, as they must.
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="panel">
+    <h2>3 · How the voice actually works, and what it costs</h2>
+    <p class="note" style="margin-top:8px">
+      There are three ways to build "talk to an AI". They differ enormously in cost, and the
+      difference is the single most important thing on this page, because the app currently runs
+      under a <b>$5-per-month global AI spending cap</b>.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Pipeline</th><th>How it works</th><th>Feels like</th><th>Cost</th><th>Effort</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>A · Browser ears and voice</b><br><span class="muted" style="font-weight:400">recommended first build</span></td>
+            <td>The browser transcribes speech for free, sends the <em>text</em> to our server, an AI writes the partner's reply, and the browser reads it aloud. No audio ever leaves the device.</td>
+            <td>A slightly patient conversation. Roughly 1.5–3 seconds between you stopping and the partner answering.</td>
+            <td><b>≈ 2–4 cents</b> for a whole 12-turn conversation including the debrief, and effectively <b>0</b> while the free Gemini Flash tier in our existing cascade absorbs the turns.</td>
+            <td>Medium. One new server function; the microphone wrapper already exists.</td>
+          </tr>
+          <tr>
+            <td><b>B · Cloud ears and voice</b></td>
+            <td>We record short audio clips, upload them, a cloud service transcribes them and reads the reply back in a natural voice.</td>
+            <td>Noticeably better at understanding accented German, and a far nicer partner voice. Same 2–3 second pauses.</td>
+            <td>Roughly <b>10–20 cents</b> per conversation.</td>
+            <td>Higher. Audio upload, storage and a retention rule, which means the privacy policy changes in the same release.</td>
+          </tr>
+          <tr>
+            <td><b>C · Real-time voice</b><br><span class="muted" style="font-weight:400">the ChatGPT voice-mode feel</span></td>
+            <td>An open audio connection straight to the model. It hears you as you speak and can be interrupted.</td>
+            <td>An actual phone call. Around a third of a second of lag; you can talk over it.</td>
+            <td><b>5–10 cents per minute</b> with careful caching, up to 18–46 cents per minute without. A six-minute conversation can cost more than a dollar, i.e. more than a fifth of the current monthly cap for one learner, once.</td>
+            <td>Highest, and it needs its own commercial answer (a paid tier) before it can ship.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note" style="margin-top:14px">
+      <b>My recommendation: build A, structure it so B is a one-function swap, and hold C for a paid tier.</b>
+      A gets a real speaking feature in front of learners at a cost the current cap can absorb, and the
+      layout you pick below is identical in all three cases. The one honest limitation of A is browser
+      support: it works in Chrome, Edge and Safari but not Firefox, so a typed fallback stays for
+      everyone else. That fallback is the current experience, so nobody ends up worse off than today.
+    </p>
+    <p class="note" style="margin-top:10px">
+      <b>The budget.</b> Schreiben already meters AI use per learner per day (10 Fokus, 4 Kurz, 2 Lang).
+      Sprechen joins that system with its own allowance. My proposal is <b>2 conversations per day</b>,
+      which sits alongside Lang and keeps the worst case predictable.
+    </p>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============================================================ -->
+  <h2 style="margin-top:34px">4 · Before the conversation: the brief</h2>
+  <p class="lede" style="margin-top:8px">
+    The same in all three options. This is the screen that makes the difference between practice and
+    small talk, and it is deliberately the Schreiben Aufgabe card in a different suit.
+  </p>
+
+  <div class="framerow">
+    <div class="framebox phone">
+      <p class="framelabel">Phone · 393 × 852</p>
+      <div class="frame mob">
+        <div class="screen"><div class="inner"><div class="col">
+
+          <div class="row">
+            <span class="tile lg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </span>
+            <div class="grow">
+              <p class="eyebrow brand">Situation</p>
+              <p style="font-weight:650;font-size:17px;line-height:1.25">Krankmeldung beim Chef</p>
+            </div>
+          </div>
+
+          <div class="card pad col" style="gap:12px">
+            <div class="row">
+              <span class="avatar">SB</span>
+              <div class="grow">
+                <p style="font-weight:650;font-size:15px">Sabine Berger</p>
+                <p class="muted" style="font-size:13px">Teamleiterin · sie siezt dich</p>
+              </div>
+            </div>
+            <div class="divide"></div>
+            <div>
+              <p class="eyebrow mut">Das musst du schaffen</p>
+              <div class="col" style="gap:6px;margin-top:8px">
+                <div class="goal miss"><span class="dot">1</span><span style="color:hsl(var(--foreground))">Sag ab, dass du heute nicht kommen kannst.</span></div>
+                <div class="goal miss"><span class="dot">2</span><span style="color:hsl(var(--foreground))">Nenne einen Grund.</span></div>
+                <div class="goal miss"><span class="dot">3</span><span style="color:hsl(var(--foreground))">Kläre, wer den Termin um 14 Uhr übernimmt.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rail pad col" style="gap:9px">
+            <p class="eyebrow" style="color:hsl(var(--accent-ink))">Nützliche Redemittel</p>
+            <div class="chiprow">
+              <span class="chip">Ich melde mich krank</span>
+              <span class="chip">Es tut mir leid, aber …</span>
+              <span class="chip">Könnten Sie bitte …</span>
+              <span class="chip">Ich schlage vor, dass …</span>
+            </div>
+          </div>
+
+          <div class="row" style="gap:8px">
+            <span class="chip pale">B2</span>
+            <span class="chip pale">Sie-Form</span>
+            <span class="chip pale" style="margin-left:auto">Heute noch 2 von 2</span>
+          </div>
+
+          <div style="margin-top:auto">
+            <button class="btn grad full">
+              Gespräch starten
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+            <p class="disc" style="margin-top:10px">Dein Mikrofon wird nur während des Gesprächs benutzt. KI-Rückmeldung kann Fehler enthalten.</p>
+          </div>
+
+        </div></div></div>
+      </div>
+      <p class="fitnote">Rests at exactly 0 page scroll. Nothing is cut off.</p>
+    </div>
+
+    <div class="notecol">
+      <p class="note"><b>Why this screen exists.</b> It is what turns a chat into an exercise. The
+      partner has a name and a job, the register is stated, and the three Leitpunkte are the thing the
+      AI grades at the end. Without them the debrief has nothing to measure.</p>
+      <p class="note"><b>Everything here already exists in the content bank.</b> Title, task, context
+      and target Redemittel are fields the 645 authored scenarios already carry. The partner persona
+      and the Leitpunkte are the one thing that needs authoring, and they can be derived from the
+      existing task text for a first pass.</p>
+      <p class="note"><b>The daily allowance is stated up front</b>, not discovered by hitting it.
+      That is the same fix Schreiben got: "Heute noch 2 von 2" sits beside the start button.</p>
+      <p class="note"><b>The microphone permission line is a legal requirement, not chrome.</b> It sits
+      as a standalone muted line below the card, which is where AI and legal notes live everywhere else
+      in the app.</p>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============================================================ -->
+  <h2 style="margin-top:34px">5 · The live conversation: three layouts</h2>
+  <p class="lede" style="margin-top:8px">
+    This is the actual decision. All three do the same thing and cost the same to run. They differ in
+    what the learner looks at while they are talking, and that changes what the learner practises.
+  </p>
+
+  <!-- ---------------- OPTION A ---------------- -->
+  <div class="option">
+    <div class="opthead">
+      <span class="optname">Option A</span>
+      <h2>Gespräch — the chat thread</h2>
+    </div>
+    <p class="lede">The familiar shape. A scrolling transcript of what was said, with the microphone in a fixed cluster at the bottom. This is what ChatGPT and Gemini look like.</p>
+
+    <div class="framerow">
+      <div class="framebox phone">
+        <p class="framelabel">Phone · mid-conversation</p>
+        <div class="frame mob">
+          <div class="screen"><div class="inner"><div class="col" style="gap:12px">
+
+            <button class="ribbon">
+              <span class="tile" style="width:26px;height:26px;border-radius:7px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              </span>
+              <span class="t">Krankmeldung <span class="s">· Frau Berger</span></span>
+              <span class="s tnum">1 von 3</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--muted-foreground))"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+
+            <div class="thread">
+              <div class="turn">
+                <span class="avatar" style="width:28px;height:28px;font-size:11px">SB</span>
+                <div class="bub">
+                  <p class="name">Frau Berger</p>
+                  Berger, guten Morgen. Was gibt's denn so früh?
+                  <div class="bubfoot">
+                    <button class="replay">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                      Nochmal hören
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="turn me">
+                <div class="bub">
+                  Guten Morgen Frau Berger. Ich muss mich leider krank melden, ich habe seit gestern Fieber.
+                  <div class="bubfoot" style="justify-content:flex-end">
+                    <button class="replay">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      Falsch gehört?
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="turn">
+                <span class="avatar" style="width:28px;height:28px;font-size:11px">SB</span>
+                <div class="bub">
+                  <p class="name">Frau Berger</p>
+                  Oje, gute Besserung. Und was machen wir mit dem Termin um zwei?
+                  <div class="bubfoot">
+                    <button class="replay">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                      Nochmal hören
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="turn me">
+                <div class="bub" style="opacity:.72">
+                  <span class="muted">Ich könnte Herrn Weber fragen ob er</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="cluster">
+              <button class="sidebtn">
+                <span class="ring">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                </span>
+                Hilfe
+              </button>
+              <button class="mic live"><span class="stopsq"></span></button>
+              <button class="sidebtn">
+                <span class="ring">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </span>
+                Beenden
+              </button>
+            </div>
+            <p class="caption">Ich höre zu … tippe zum Stoppen</p>
+
+          </div></div></div>
+        </div>
+        <p class="fitnote">The page does not scroll; the transcript is the one inner scrolling region.</p>
+      </div>
+
+      <div class="notecol">
+        <p class="note"><b>What it is good at.</b> Nobody needs to be taught how to use it. The learner
+        can always see what the microphone heard, which matters a lot, because mis-transcription is the
+        one thing that makes a speaking feature feel broken. "Falsch gehört?" lets them fix a word
+        rather than argue with the machine.</p>
+        <p class="note"><b>What it costs you.</b> It invites reading. A B2 learner who can see the
+        German written down will read it instead of listening, and that is the opposite of what a
+        speaking exercise is for. It is also the least distinguishable from every other AI chat app
+        the learner already has on their phone.</p>
+        <p class="note"><b>Rules it respects.</b> One inner region scrolls and hands the scroll on at
+        its top; the page itself rests at zero. The mic cluster is the Schreiben floating cluster
+        geometry: no bar behind it, every control on its own opaque backing.</p>
+        <div class="cost"><b>Build:</b> the largest of the three, because a growing transcript with
+        replay, edit and an autoscroll that behaves on a mobile keyboard is genuinely fiddly.</div>
+      </div>
+
+      <div class="framebox desk">
+        <p class="framelabel">Desktop · 1280 wide</p>
+        <div class="frame desk">
+          <div class="screen"><div class="inner"><div class="col" style="gap:14px">
+            <button class="ribbon" style="max-width:640px;width:100%;margin:0 auto">
+              <span class="t">Krankmeldung beim Chef <span class="s">· Frau Berger, Teamleiterin</span></span>
+              <span class="s tnum">1 von 3 Zielen</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--muted-foreground))"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div style="display:flex;flex-direction:column;gap:12px;height:300px;overflow-y:auto;max-width:640px;margin:0 auto;width:100%">
+              <div class="turn">
+                <span class="avatar" style="width:28px;height:28px;font-size:11px">SB</span>
+                <div class="bub"><p class="name">Frau Berger</p>Berger, guten Morgen. Was gibt's denn so früh?</div>
+              </div>
+              <div class="turn me"><div class="bub">Guten Morgen Frau Berger. Ich muss mich leider krank melden, ich habe seit gestern Fieber.</div></div>
+              <div class="turn">
+                <span class="avatar" style="width:28px;height:28px;font-size:11px">SB</span>
+                <div class="bub"><p class="name">Frau Berger</p>Oje, gute Besserung. Und was machen wir mit dem Termin um zwei?</div>
+              </div>
+              <div class="turn me"><div class="bub" style="opacity:.72"><span class="muted">Ich könnte Herrn Weber fragen ob er</span></div></div>
+            </div>
+            <div class="cluster" style="margin-top:0">
+              <button class="sidebtn"><span class="ring"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>Hilfe</button>
+              <button class="mic live"><span class="stopsq"></span></button>
+              <button class="sidebtn"><span class="ring"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Beenden</button>
+            </div>
+            <p class="caption">Ich höre zu … klicke zum Stoppen</p>
+          </div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------- OPTION B ---------------- -->
+  <div class="option">
+    <div class="opthead">
+      <span class="optname">Option B</span>
+      <h2>Bühne — one turn at a time</h2>
+    </div>
+    <p class="lede">No transcript at rest. The screen holds exactly what is being said right now: their line, large, and yours underneath as it comes out. History collapses into a ribbon you can open.</p>
+
+    <div class="framerow">
+      <div class="framebox phone">
+        <p class="framelabel">Phone · mid-conversation</p>
+        <div class="frame mob">
+          <div class="screen"><div class="inner"><div class="col" style="gap:12px">
+
+            <button class="ribbon">
+              <span class="t">Krankmeldung <span class="s">· Frau Berger</span></span>
+              <span class="s tnum">3 Züge</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--muted-foreground))"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px">
+              <div class="card pad col" style="gap:12px">
+                <div class="row">
+                  <span class="avatar" style="width:32px;height:32px;font-size:12px">SB</span>
+                  <p class="eyebrow mut grow">Frau Berger</p>
+                  <button class="iconbtn">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a7 7 0 0 1 0 14.14"/></svg>
+                  </button>
+                </div>
+                <p class="stageline">Oje, gute Besserung. Und was machen wir mit dem Termin um zwei?</p>
+              </div>
+
+              <div class="col" style="gap:7px">
+                <p class="eyebrow mut">Du</p>
+                <p class="myline">Ich könnte Herrn Weber fragen<span class="interim">, ob er</span></p>
+              </div>
+            </div>
+
+            <div class="cluster" style="padding-top:0">
+              <button class="sidebtn">
+                <span class="ring"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>
+                Hilfe
+              </button>
+              <button class="mic live"><span class="stopsq"></span></button>
+              <button class="sidebtn">
+                <span class="ring"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+                Beenden
+              </button>
+            </div>
+            <p class="caption">Ich höre zu … tippe zum Stoppen</p>
+
+          </div></div></div>
+        </div>
+        <p class="fitnote">Fixed stage. Never scrolls at any turn count, the same trick the exam uses.</p>
+      </div>
+
+      <div class="notecol">
+        <p class="note"><b>What it is good at.</b> It puts the learner's attention on one German
+        sentence and one answer. There is no wall of text to skim, so listening is the only way
+        forward, which is the point of a speaking exercise. It is also the only one of the three
+        whose height is fixed, so it cannot grow past a phone screen however long the conversation
+        runs.</p>
+        <p class="note"><b>It also reads as ours.</b> This is the exam's stage shape and the
+        Bibliothek's card language, not a cloned messenger. A learner would not mistake it for
+        something they already have.</p>
+        <p class="note"><b>What it costs you.</b> The learner cannot glance back at what was said
+        three turns ago without opening the ribbon. For a learner who has lost the thread, that extra
+        tap arrives at the worst moment.</p>
+        <div class="cost"><b>Build:</b> the smallest of the three. One turn on screen means no
+        autoscroll, no keyboard-avoidance and no transcript virtualisation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------- OPTION C ---------------- -->
+  <div class="option">
+    <div class="opthead">
+      <span class="optname">Option C</span>
+      <h2>Anruf — no text at all</h2>
+    </div>
+    <p class="lede">A phone call. While you are talking there is nothing to read: a partner, a sound level, a timer. Every word appears for the first time in the debrief afterwards.</p>
+
+    <div class="framerow">
+      <div class="framebox phone">
+        <p class="framelabel">Phone · mid-call</p>
+        <div class="frame mob">
+          <div class="screen"><div class="inner"><div class="col" style="gap:12px">
+
+            <button class="ribbon">
+              <span class="t">Krankmeldung <span class="s">· Frau Berger</span></span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--muted-foreground))"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+
+            <div class="callstage">
+              <span class="avatar xl">SB</span>
+              <div style="text-align:center">
+                <p style="font-weight:650;font-size:19px">Sabine Berger</p>
+                <p class="muted" style="font-size:14px">Teamleiterin</p>
+              </div>
+              <div class="eq">
+                <i style="height:9px"></i><i style="height:19px"></i><i style="height:30px"></i><i style="height:14px"></i>
+                <i style="height:24px"></i><i style="height:34px"></i><i style="height:11px"></i><i style="height:20px"></i>
+                <i style="height:28px"></i><i style="height:12px"></i>
+              </div>
+              <p class="calltimer tnum">02:14</p>
+            </div>
+
+            <div class="card pad" style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13.5px;font-weight:600;flex:1">Untertitel</span>
+              <span class="chip pale">Aus</span>
+            </div>
+
+            <div class="cluster" style="padding-top:0">
+              <button class="sidebtn">
+                <span class="ring"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>
+                Hilfe
+              </button>
+              <button class="mic live"><span class="stopsq"></span></button>
+              <button class="sidebtn">
+                <span class="ring"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="22" x2="2" y1="2" y2="22"/></svg></span>
+                Auflegen
+              </button>
+            </div>
+            <p class="caption">Frau Berger spricht …</p>
+
+          </div></div></div>
+        </div>
+        <p class="fitnote">Never scrolls. The least content of the three by a wide margin.</p>
+      </div>
+
+      <div class="notecol">
+        <p class="note"><b>What it is good at.</b> It is the only one that rehearses the real thing.
+        Nobody gets subtitles at the Ausländerbehörde or on the phone to a Hausarzt, and the anxiety a
+        learner feels in those rooms comes precisely from having nothing to read. This trains that.
+        It also makes the debrief land hard, because it is the first time the learner sees what they
+        actually said.</p>
+        <p class="note"><b>What it costs you.</b> It is the most likely to be abandoned mid-way by a
+        learner who cannot follow. The "Untertitel" switch is the escape hatch, resting off, and I
+        would expect a lot of learners to turn it on and leave it on, at which point this becomes
+        Option B with extra steps.</p>
+        <p class="note"><b>One thing to decide.</b> Every phone interface on earth makes the
+        hang-up button red. Our red is reserved for errors. I have drawn "Auflegen" neutral to keep
+        that law intact; if you would rather it read as a call, say so and I will make the exception
+        deliberate rather than accidental.</p>
+        <div class="cost"><b>Build:</b> small, plus a live audio level meter, which is a few lines of
+        Web Audio.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============================================================ -->
+  <h2 style="margin-top:34px">6 · After the conversation: the debrief</h2>
+  <p class="lede" style="margin-top:8px">
+    The same in all three options, and the reason the whole feature is worth building. This is the
+    Schreiben correction card, unchanged: coral marks on what you said, green on the fix, Himmelblau
+    fix tiles. A correction looks identical whichever trainer produced it.
+  </p>
+
+  <div class="framerow">
+    <div class="framebox phone">
+      <p class="framelabel">Phone · debrief</p>
+      <div class="frame mob">
+        <div class="screen"><div class="inner"><div class="col" style="gap:12px">
+
+          <div>
+            <p class="eyebrow brand">Rückmeldung</p>
+            <p style="font-weight:650;font-size:17px;line-height:1.25">Krankmeldung beim Chef</p>
+          </div>
+
+          <div class="scrollzone">
+
+          <div class="card pad col" style="gap:10px">
+            <p class="eyebrow mut">Deine Ziele</p>
+            <div class="goal ok">
+              <span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span>Abgesagt, klar und höflich.</span>
+            </div>
+            <div class="goal ok">
+              <span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span>Grund genannt.</span>
+            </div>
+            <div class="goal miss">
+              <span class="dot">3</span>
+              <span>Der Termin um 14 Uhr blieb offen. Du hast Herrn Weber vorgeschlagen, aber nicht gefragt, ob Frau Berger einverstanden ist.</span>
+            </div>
+          </div>
+
+          <div class="card pad col" style="gap:11px">
+            <div class="between">
+              <p class="eyebrow mut">Deine Worte</p>
+              <div class="corrtoggle">
+                <button aria-pressed="true">Original</button>
+                <button aria-pressed="false">Korrigiert</button>
+              </div>
+            </div>
+            <p style="font-size:15px;line-height:1.5">
+              Ich könnte <span class="mark err">Herrn Weber fragen ob er</span> den Termin
+              <span class="mark err">übernehmen kann</span>, wenn das für Sie
+              <span class="mark err">in Ordnung ist</span>.
+            </p>
+            <div class="col" style="gap:8px">
+              <div class="fixtile">
+                <p class="cat">Komma</p>
+                <p class="body"><s>fragen ob</s> → <b>fragen, ob</b></p>
+              </div>
+              <div class="fixtile">
+                <p class="cat">Register</p>
+                <p class="body"><s>Ich könnte …</s> → <b>Wäre es Ihnen recht, wenn …</b></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card pad col" style="gap:9px">
+            <p class="eyebrow mut">Redemittel</p>
+            <div class="chiprow">
+              <span class="chip done">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Ich melde mich krank
+              </span>
+              <span class="chip done">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Es tut mir leid, aber …
+              </span>
+              <span class="chip pale">Könnten Sie bitte …</span>
+              <span class="chip pale">Ich schlage vor, dass …</span>
+            </div>
+          </div>
+
+          </div>
+
+          <div style="margin-top:auto">
+            <div class="row" style="gap:10px">
+              <button class="btn out" style="flex:1">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                Nochmal
+              </button>
+              <button class="btn grad" style="flex:1">Weiter</button>
+            </div>
+            <p class="disc" style="margin-top:10px">KI-Rückmeldung kann Fehler enthalten.</p>
+          </div>
+
+        </div></div></div>
+      </div>
+      <p class="fitnote">Rests inside one screen; the correction card expands under the app-wide expand rule.</p>
+    </div>
+
+    <div class="notecol">
+      <p class="note"><b>Three things, in this order.</b> Did you get the job done (the Leitpunkte,
+      which is what the exam calls Aufgabenerfüllung); what you actually said, corrected; and which of
+      the target Redemittel you reached for. Nothing else. There is no score out of a hundred on this
+      screen, because a result is shown in one place per page and that place is the Verlauf.</p>
+      <p class="note"><b>The third goal is the interesting one.</b> The AI can say the learner
+      proposed a colleague but never asked for agreement. That is a genuinely useful thing to be told
+      and no amount of multiple-choice scripting can produce it.</p>
+      <p class="note"><b>This is the existing correction module, not a fourth copy of it.</b>
+      <code>src/features/writing/correction.tsx</code> renders this today on three surfaces. Sprechen
+      becomes the fourth caller, which is the whole reason the correction language must not drift.</p>
+      <p class="note"><b>And it feeds everything downstream.</b> A spoken conversation with a
+      correction and a Redemittel tally is a Verlauf row, a Fortschritt data point and a source of
+      SRS-worthy weaknesses, exactly like a Kurz text. Today's Sprechen produces none of that.</p>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============================================================ -->
+  <div class="panel" style="margin-top:34px">
+    <h2>7 · What I need from you</h2>
+    <ul class="tight" style="font-size:14.5px">
+      <li><b>One layout, by name:</b> Gespräch, Bühne or Anruf. (If you want, I can build Bühne and put the Anruf behaviour behind the existing Untertitel switch, so one build covers two of them.)</li>
+      <li><b>The pipeline.</b> My recommendation is A, the browser-ears version, because it fits inside the current $5 monthly cap and the microphone code already exists. Say if you would rather pay for B's better ears and nicer voice from the start.</li>
+      <li><b>The daily allowance:</b> 2 conversations per learner per day, unless you want it tighter or looser.</li>
+      <li><b>The hang-up button in Option C:</b> neutral (keeps our colour law) or red (matches every phone on earth).</li>
+    </ul>
+    <p class="note" style="margin-top:14px">
+      Two things I am <b>not</b> asking about, because they follow from the thesis rather than being
+      choices: the mock exam's Teil Sprechen stops being self-graded and gets the same debrief, and the
+      authored dialogue scripts become briefs rather than trees. Say so if you disagree with either.
+    </p>
+  </div>
+
+</div>
+</div>
+
+<script>
+  const seg = document.getElementById('seg-appearance');
+  seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    document.documentElement.setAttribute('data-appearance', b.dataset.v);
+  });
+</script>

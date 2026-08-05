@@ -1,6 +1,59 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 192). **The Schreibtrainer got a way back, the nav bar learned
+_Last updated: 2026-08-05 (session 193). **Sprechen was rebuilt: the learner now actually speaks.**
+Founder: "the sprechen part looks quite strange as the learner never get to speak."
+They were right and it was worse than it looked. The Sprechtrainer replayed a hand-authored
+branching tree answered by **tapping one of 2-4 written options** (its "free speaking" node offered
+a text box placeholder, "Tippe deine Antwort (optional)"), and `scoreDialogue` averaged an
+author-assigned quality number per chosen option, so the score measured which button was pressed,
+never the learner's German. The Modelltest's **Teil Sprechen embedded that same runner and was
+graded by the learner ticking their own rubric checkboxes** — the speaking grade in a mock exam was
+a self-assessment. The only real speaking drill in the app was the single-word STT block in the Üben
+session, which meant `engine/speech.ts` had shipped a working recognition wrapper all along that the
+Sprechen surface never called.
+**The thesis: Sprechen is Schreiben with a microphone** — a brief, a conversation, then the EXISTING
+`features/writing/correction.tsx` card as the debrief (speaking is its fourth caller). Explicitly not
+an open chatbot: an LLM adapts down to a B1 learner, never corrects unless asked and produces no
+assessment, so the brief (named partner, register, 2-5 Leitpunkte) is what makes it an exercise, and
+the partner is instructed never to correct mid-flow.
+**Three layouts were previewed** (`preview/sprechen-ai-redesign.html`, artifact published) and the
+founder answered with a **mapping** rather than a pick: practice gets the chat thread ("useful to
+keep track of the transcripts"), exams get Bühne or Anruf **decided by the task**. So the layout is a
+property of the TASK, never a setting: `ExamSet.stage` defaults to `buehne` (Aufgabe stays readable)
+and only a task reading would defeat sets `anruf`. One runner, three middles.
+**Cost was the real decision** (the app runs under a $5/month AI cap): browser transcription + text
+LLM + browser TTS is ~2-4 cents per 12-turn conversation and ~0 while the free Gemini Flash leg
+absorbs turns, against 5-46 cents *per minute* for real-time speech-to-speech. Pipeline A shipped,
+structured so cloud STT/TTS is a one-function swap. Founder took the recommendation and 2
+conversations/day.
+**Guards:** the conversation row is written when a conversation STARTS, so the daily limit counts what
+costs money and abandoned runs cannot farm free turns; the 14-turn ceiling is measured against the
+STORED transcript, never the request body.
+**Two honesty fixes during the build:** the debrief first *guessed* whether a target Redemittel was
+used by matching its label against the transcript (theatre — nobody says "Vorschläge machen"), now
+the model is asked; and the exam part first completed when the score arrived, which would have
+unmounted the runner before the learner read their feedback, now it completes on exit carrying the
+score.
+**Content:** partner + 3 goals authored for all 36 scenarios. Verified by driving the REAL built app
+in headless Chromium, which is what caught that the fallback made every brief read
+"Gesprächspartner:in" with the whole task sentence as its single goal.
+**Privacy:** new microphone section in both languages (audio never leaves the device; only text is
+sent), the 730-day retention job extended to transcripts, and `PRIVACY_LAST_UPDATED_ISO` +
+`CONSENT_VERSION` bumped together as the drift gate requires.
+**Retired:** `features/simulation/`, `features/exam/ExamRunner.tsx`, `engine/dialogue.ts`.
+Gates green: typecheck · lint 0 errors (75 warnings, down from 77 with the dead code) ·
+592 tests · build · check:bundle 126.6 kB · check:contrast · lint:content · lint:migrations.
+**Resume here:** the one deliberate gap is that **no exam set is `anruf` shaped yet** — all 15
+authored sets are "discuss the aspects and agree" tasks, so the Anruf layout is built, tested and
+unreached until listen-and-hold speaking tasks are authored. That is the next content job. Also open:
+the authored `nodes` graphs stay in the bank but are no longer read at runtime; retiring them is a
+separate mechanical change. Backend note: `converse` needs no new secrets. `ANTHROPIC_API_KEY` and
+`GEMINI_API_KEY` have both been set since s150 ("all three AI functions deployed on the
+Gemini-primary cascade"), so the free Gemini leg is live and the ~2-4 cents per conversation figure
+holds rather than every turn falling through to Claude. Migration 0017 applies on the merge to
+`main`; the same merge deploys the new `converse` function.
+
+Prior s192 (2026-08-05): **The Schreibtrainer got a way back, the nav bar learned
 which zone a page belongs to, and the exam frame was confined to Mit Zeit.** Three founder prompts
 from phone screenshots. The mobile action cluster's left slot is **Zurück** (to `/anwenden`) instead
 of Feedback, and Feedback moved into the caption line in the Bibliothek's shape
@@ -13,7 +66,6 @@ Verlassen, and an untouched drill closes with no confirm. Prior s191: **the Prü
 lost their gradients** (a flat tint of the same hue, a wider gap under the header block, and the
 minutes badge replacing the description line it used to overlap), all measured in headless Chromium
 in both clock states.
-
 **The same day, a parallel branch polished the Prüfung zone to a finished product.**
 Founder: the two tabs "still look cheap or like MVP", make them read like "a billion dollar edu tech
 app". Analysis first (twelve findings), three options previewed, then a second round on the pick:
@@ -43,88 +95,8 @@ Gates green: build · typecheck · lint 0 errors · 558 tests · check:bundle 12
 Shipped as **PR #801**, squash-merged into `main`.
 **Resume here:** nothing is open in the Prüfung zone. The one deliberate open question from s189
 still stands (below).
-Prior s189 (2026-08-05): **the Prüfung zone became ONE page.** Founder prompt:
-"this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
-... Module wide practice and model test as the two options". The three-card `/anwenden` hub and the
-`/exam` Modelltest page folded into a single page whose header IS a two-segment sliding-pill
-switcher: **Module üben** | **Modelltest**. `/exam` redirects into it.
-Two preview rounds settled it (`preview/pruefung-hub-redesign.html`, `-r2`); the founder picked
-layout **A "Kompakt"**, the **Modern** module marks in **Rezeptiv / Produktiv** colours, and kept
-the zone name **Prüfung**.
-**Module üben** is the four modules as identical cards, and the free Schreib- and Sprechtrainer
-merged INTO them (founder pick "idea 3"): **Mit Zeit / Ohne Zeit** is one switch beside Niveau,
-**resting on Ohne Zeit**, so Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit
-`/simulation`, and Lesen/Hören run the same drill `untimed` (no tick, no timer pill, never
-auto-handed in). The separate "Freies Üben" block is gone with it. "Einzeln üben" is gone from the
-Modelltest tab: it IS this tab now.
-**Modelltest** is the run band plus Verlauf and nothing else. Verlauf rests OPEN, leading with three
-centred figures (Letzter · Bester · Bestanden), and the timeline connector is now one segment per
-gap drawn BETWEEN the tiles (founder: "should not overlap the icons").
-**The session also set an app-wide law: the expand rule.** A page rests at zero scroll
-(`.h-page-stage`); expanding a tile releases that cap; the expanded tile is never taller than one
-screen (`.max-h-panel-stage`) so its own borders stay visible; ONE inner region scrolls and hands
-the scroll on to the page at its top; and `useStagePanel` scrolls it into view with scroll margins
-for the header and bottom bar. Verified by driving the real build over CDP at 393x852: at rest
-`scrollHeight === innerHeight`; with 20 runs expanded the tile measures 692 px inside an 852 px
-viewport, top 80 / bottom 772 (the bar starts at 789), and its list scrolls 859/547 internally.
-Gates green: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
-Shipped as **PR #799**, squash-merged into `main`, then **PR #800** carried the follow-up run:
-the filter rails took the Schreiben rail's Himmelblau fill (superseding the grey tile of s104), the
-four hand-copied Bibliothek action bars became ONE shared `FloatingActionCluster` with Schreiben,
-text fields lost the global focus ring (the caret is the indicator; buttons keep theirs), and the
-Bibliothek desktop scrolls INSIDE its content column instead of scrolling the page, which needed
-`usePagedList` made root-aware first.
-One question is deliberately open from that session: `FilterRail`'s mobile panel keeps its own
-`max-h-[45dvh]` cap instead of the new one-screen `max-h-panel-stage`; ask the founder before
-changing an approved surface.
-Prior s188: the Prüfungssimulation hub was re-done and renamed **Modelltest** (founder pick
-"Prüfungstag"): the page led with the run band, then "Einzeln üben", then Verlauf as the one place
-a result is shown. s189 kept the band, the one-place rule and the countdown, and moved the rest.
-Prior s187: dark mode became near-neutral ("N3 Slate", ground `220 15% 4%`, cards `220 10% 17%`,
-page radials off in dark), the corner scale tightened (`--radius` 0.5rem → card 10px, row 8px,
-pill 6px), and the running Prüfungsteil got its polish round (no tile on the question, drag-resizable
-blocks, the number strip beside Zurück/Weiter, a red exit), verified over 225 in-exam screens.
-Prior s186: the Prüfungssimulation became a real four-part mock exam (Lesen, Hören, Schreiben,
-Sprechen) in four PRs (#791-#794), with per-Teil timers, an answer-sheet strip, the one-viewport
-exam stage and a result screen with a 60 % pass line.
-Prior s185: **the content-audit backlog closed except P10** (P9 noun facts, P7 re-levelling, P5
-grammar drills, P4 scenarios, P3 exam-length texts + the Notizen step), and a parallel **database
-architecture audit** shipped four fixes (#786, #787): no silent cloud write, pg_cron retention,
-400-day day maps, `pnpm lint:migrations`. Detail in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5
-and `docs/reports/db-architecture-audit-2026-08-04.md`; the still-open items are listed under
-"Resume here" below.
-Prior s184: **Every filter and Aufgabe rail now carries the
-Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
-Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
-shared `LifeAreaPills` control, `?area=` in the URL, and the pill narrows the Thema dropdown and
-drops a Thema from the other area so the three controls can never disagree.
-Prior s183 and older (Prüfung icon language, the s182 audit items and the five-slot nav, the
-Schreiben Aufgabe backlog, hard filters, the security audit, liveWork): condensed away on purpose,
-per the doc-hygiene rule below. Read them in `docs/archive/status-log/` by ISO week.
-`docs/plans/SCHREIBEN-OVERHAUL.md` carries the writing-content roadmap.
-`.github/workflows/supabase.yml` deploys Edge Functions on merge, so backend changes no longer need
-a CLI. Product name: **Genauly** (`genauly.de`)._
-
-This is the **lean, living** status doc: current state plus the two most recent session handoffs.
-**Start at the `## Resume here (next session)` section at the end.** Companion files:
-- **`docs/PROJECT_FOUNDATION.md`** — the stable technical baseline that rarely changes: shipped
-  architecture (Phase 1/2), locked architectural decisions, backend/infra, and completed founder
-  action items. Read it when you need the "what's built and how" detail that used to sit here.
-- **`docs/PROJECT_REFERENCE.md`** — stable reference: the founder backlog, product-evaluation
-  findings, per-session model guidance, and reusable research findings.
-- **`docs/DECISIONS.md`** — the "why" behind locked UX decisions.
-- **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only session-log history,
-  chunked by ISO week under `docs/archive/status-log/`.
-- **`../CLAUDE.md`** — the lean always-on operating rules (restructured s155, ~180 lines); deep
-  per-area detail lives in **`docs/areas/`** (COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN,
-  PRAKTISCH-NAV, GAME, BRAND, LEGAL-ADMIN, COMPONENTS) + the `/design` and `/content` skills.
-
-**Doc-hygiene rule (keep this file lean):** hold only **current state + the two most recent
-handoffs**. When you append a new handoff to `## Resume here`, move any handoff older than the two
-most recent into the current ISO-week chunk under `docs/archive/status-log/` (see the index at
-`docs/archive/PROJECT_STATUS_ARCHIVE.md`). Do NOT let the `_Last updated_` block above grow into a
-session-by-session narrative — keep it to the latest session only. Keep the whole file under ~250
-lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
+Older handoffs (s189 and earlier) are archived in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
 
 ## Where things stand
 

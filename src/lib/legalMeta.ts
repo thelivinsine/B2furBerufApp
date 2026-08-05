@@ -9,10 +9,10 @@
  * Launch screen shows a red warning, so a re-consent prompt can never silently
  * fall out of sync with the pages a user actually agreed to.
  */
-export const PRIVACY_LAST_UPDATED_ISO = "2026-08-04";
+export const PRIVACY_LAST_UPDATED_ISO = "2026-08-05";
 
 /** Bilingual prose rendering of the date above, shown on the legal pages. */
 export const PRIVACY_LAST_UPDATED: { de: string; en: string } = {
-  de: "4. August 2026",
-  en: "4 August 2026",
+  de: "5. August 2026",
+  en: "5 August 2026",
 };

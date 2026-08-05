@@ -4548,3 +4548,99 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `src/features/exam/MockExamRunner.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+
+## Session 193 · 2026-08-05 · branch `claude/sprechen-ai-speaking-redesign-oa9fu1`
+
+- **Prompt 1 (verbatim):** `the sprechen part looks quite strange as the learner never get to speak.
+  can you rethink the whole sprechen stuff and maybe determine how it would look like to insert a
+  feature where the learner gets to speak with ai llm model like in chatgpt or gemini?`
+  **Response:** analysis + preview only, no app code touched (design skill rule 1: report and preview
+  before implementing). **The audit confirmed the founder's observation and found it is worse than it
+  looks:** the Sprechtrainer (`features/simulation/`) is a branching script answered by tapping one of
+  2-4 written options, its "free speaking" node offers a text box placeholder ("Tippe deine Antwort
+  (optional)"), and `scoreDialogue` averages an author-assigned `quality` number, so it measures which
+  option was picked, never the learner's German. The mock exam's **Teil Sprechen embeds that same
+  runner and is graded by the learner ticking their own rubric checkboxes** (`ExamRunner` →
+  `submitSelfScore`), so the speaking grade in the Modelltest is a self-assessment. The one genuine
+  speaking drill in the app is the single-word STT block in the Üben session, which means
+  `engine/speech.ts` already ships a working feature-detected `listen()` wrapper that the entire
+  Sprechen area never calls.
+  **Thesis proposed:** Sprechen is Schreiben with a microphone (brief → conversation → the EXISTING
+  `features/writing/correction.tsx` card as the debrief), and explicitly NOT an open chatbot: an LLM
+  adapts down to the learner, never corrects unless asked, and produces no assessment, so the brief
+  (named partner, register, 2-4 Leitpunkte) is what makes it an exercise rather than small talk. The
+  645 authored dialogue nodes become briefs (title/task/context/targetRedemittel are already the right
+  fields); the branching trees retire; scenario ids stay.
+  **Three voice pipelines costed** (grounded in current provider pricing, not memory): A browser
+  STT + text LLM + browser TTS ≈ 2-4 cents per 12-turn conversation and ~0 while the existing free
+  Gemini Flash tier absorbs the turns; B cloud STT/TTS ≈ 10-20 cents plus an audio-retention change to
+  the privacy policy; C realtime speech-to-speech at 5-10 cents/min cached, 18-46 cents/min uncached,
+  i.e. one six-minute conversation can exceed a fifth of the $5 monthly cap. Recommended A now,
+  structured so B is a one-function swap, C reserved for a paid tier.
+  **Three named layouts previewed** for the live conversation: **Gespräch** (chat thread),
+  **Bühne** (one turn on a fixed stage), **Anruf** (no text at all, debrief is the reveal), plus the
+  shared brief and debrief screens.
+  **Verified in headless Chromium rather than eyeballed**, which caught three real bugs in the mockup:
+  a flex column without `min-width: 0` sat 21px wider than the phone frame and dragged the transcript
+  out of view; `flex: none` on the cards exposed that the debrief is genuinely taller than one screen
+  (answered with the exam's stage treatment, pinned header/actions + ONE inner scroll region + a
+  `mask-image` edge fade, per the s190 slicing rule); and a `.col` rule matching NESTED columns
+  stretched the Bühne "Du" block and shoved the stage off-centre. Final state: all five phone frames
+  rest at exactly 0 scroll with 0 overhang, light and dark.
+  **Open for the founder:** the layout by name; the pipeline; the daily allowance (proposed 2
+  conversations/day, alongside Lang); and whether Anruf's "Auflegen" may be red (drawn neutral, since
+  danger red is reserved for errors).
+- **Artifacts (prompt 1):** `preview/sprechen-ai-redesign.html` ·
+  artifact `https://claude.ai/code/artifact/acf10478-7f26-4924-b451-fb620b56e15a` · this log
+- **Prompt 2 (verbatim):** `use option a for practice sessions where user could find useful to keep
+  track of the transcripts, and use option b and c for exams - decide which layout to use depending
+  on the tasks, like notiz machen should take option c and other tasks may show the aufgabe on the
+  screen with layout b. for all other asepcts, go ahead with your recommendations.`
+  **Response:** built the whole feature. The founder's answer was a MAPPING rather than a pick, so
+  the layout became **a property of the task, never a learner setting**: `ExamSet.stage` defaults to
+  `buehne` (the Aufgabe stays readable, right for all 15 authored "discuss and agree" sets) and only
+  a task that reading would defeat sets `anruf`; practice is always `gespraech`. The content linter
+  rejects `"gespraech"` on an exam set, because the transcript is a practice affordance. The three
+  layouts are three MIDDLES of one `ConversationRunner`, not three screens.
+  **Shipped:** `engine/conversation.ts` (pure turn state machine, 14-turn cost ceiling, no scoring
+  at all) · `engine/speaking.ts` (briefs DERIVED from scenarios and exam sets rather than authored
+  twice; exam `aspects` were always the Leitpunkte) · `supabase/functions/converse` (two modes:
+  cheap turns and one richer debrief; free Gemini Flash → Claude → OpenAI) · migration 0017 ·
+  `lib/speaking.ts` · `features/sprechen/*` (runner + three stages, brief, debrief, mic cluster,
+  speech hook) · rewritten `features/exam/SprechenPart.tsx` (self-scored checkboxes gone) ·
+  `sprechen` added to `lib/aiAllowance.ts` at 2/day.
+  **Cost guards worth keeping:** the conversation row is written when a conversation STARTS, not
+  when it finishes, so the daily limit counts what actually costs money and a learner cannot abandon
+  conversations to farm free turns; and the turn ceiling is measured against the STORED transcript,
+  never the request body, so a forged body cannot extend a run past its cost ceiling.
+  **Two things I got wrong first and fixed:** the debrief inferred "did you use this Redemittel?" by
+  matching the category label against the transcript, which is theatre (nobody says "Vorschläge
+  machen"), so the model is asked for it instead; and the exam part completed the moment the score
+  arrived, which would have unmounted the runner before the learner read a word of their feedback,
+  so it completes on EXIT carrying the score. A third, caught by the linter: an engine function
+  named `useHint` read as a React Hook (`applyHint`).
+  **Verified by driving the REAL built app** in headless Chromium at 393x852 and 1280x900, not by
+  reading mockups: both rest at exactly 0 scroll, and it caught that the brief fallback made every
+  situation read "Gesprächspartner:in" with the whole task sentence as its single goal. Partner + 3
+  goals were then authored for **all 36 scenarios**.
+  **Privacy shipped in the same change** (the repo's law: a retention timer and the copy describing
+  it never ship apart): a microphone section in both languages stating that audio never leaves the
+  device, the 730-day purge extended to transcripts, and `PRIVACY_LAST_UPDATED_ISO` +
+  `CONSENT_VERSION` bumped together for the drift gate.
+  **Retired:** `features/simulation/`, `features/exam/ExamRunner.tsx`, `engine/dialogue.ts`.
+  `tests/scenarios.test.ts` was rewritten: it pinned an invariant of the branching era ("every
+  scenario contains a free-speak node"), which this change makes meaningless because every turn is
+  now production.
+  **The one deliberate gap, reported not papered over:** "notiz machen" names a task SHAPE (`notiz`
+  is a Hören `TextKind`), and no authored speaking set is listen-and-hold, so **Anruf is built,
+  tested and unreached** until such tasks are authored. That is the next content job.
+  Gates: typecheck · lint 0 errors (75 warnings, down from 77) · 592 tests · build ·
+  check:bundle 126.6 kB · check:contrast · lint:content · lint:migrations.
+- **Artifacts (prompt 2):** `src/engine/conversation.ts` · `src/engine/speaking.ts` ·
+  `src/features/sprechen/*` · `src/features/exam/SprechenPart.tsx` · `src/lib/speaking.ts` ·
+  `src/lib/aiAllowance.ts` · `src/data/dialogues.ts` (36 briefs) ·
+  `supabase/functions/converse/index.ts` · `supabase/migrations/0017_speaking_conversations.sql` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `src/lib/legalMeta.ts` · `src/lib/consent.ts` ·
+  `scripts/lint-content.mjs` · `tests/conversation.test.ts` · `tests/scenarios.test.ts` ·
+  `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+

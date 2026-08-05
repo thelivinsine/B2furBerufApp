@@ -1595,3 +1595,79 @@ column (the shape rejected in s149) — it is capped at `max-w-sm` between those
 the run band was `flex-1 lg:flex-none`, which on a 1112px-tall tablet stretched one card to 800px
 with the timeline floating in its middle; filling the stage is a PHONE rule (`flex-1 sm:flex-none`),
 where it exists to keep the CTA in the thumb's reach.
+
+---
+
+## Sprechen: the AI conversation partner (session 193)
+
+**The prompt.** "the sprechen part looks quite strange as the learner never get to speak. can you
+rethink the whole sprechen stuff and maybe determine how it would look like to insert a feature
+where the learner gets to speak with ai llm model like in chatgpt or gemini?"
+
+**What was actually there.** The founder's observation was right and understated it. Sprechen was
+three surfaces and none of them listened:
+
+1. The Sprechtrainer replayed a hand-authored branching tree. The learner **tapped one of 2-4
+   written options**; the "free speaking" node offered a text box whose placeholder read "Tippe
+   deine Antwort (optional)". `scoreDialogue` averaged an author-assigned `quality` number per
+   chosen option, so the score measured *which button was pressed*, never the learner's German.
+2. The Modelltest's **Teil Sprechen embedded that same runner and was graded by the learner
+   ticking their own rubric checkboxes**. The speaking grade in a mock exam was a self-assessment
+   of a conversation nobody had held.
+3. The only genuine speaking drill was the single-word STT block in the Üben session. Which meant
+   `engine/speech.ts` had shipped a working, feature-detected recognition wrapper all along, and
+   the entire Sprechen area never called it.
+
+**The design thesis (accepted).** Sprechen is Schreiben with a microphone. The app already knew how
+to take a learner's own production, send it to an AI and hand back a correction they recognise;
+speaking is that loop one modality further out. That gave a shape to copy rather than one to invent,
+and it is why a spoken correction renders through `features/writing/correction.tsx` rather than a
+fourth copy of it.
+
+**Why not just a chatbot.** Stated in the review and worth keeping: an LLM will talk to a B1 learner
+forever. It adapts down to their level, never corrects unless asked, has no task and produces no
+assessment, so the learner leaves fluent in that one conversation and nowhere else. The brief
+(named partner, role, register, 2-5 Leitpunkte) is the thing that makes it an exercise, and the
+partner is instructed never to correct mid-flow, because interrupting a learner is the most
+reliable way to stop them speaking.
+
+**Three layouts were previewed** (`preview/sprechen-ai-redesign.html`): **Gespräch** (chat thread),
+**Bühne** (one turn on a fixed stage), **Anruf** (no text at all). The founder's pick was not one of
+them but a **mapping**:
+
+> "use option a for practice sessions where user could find useful to keep track of the transcripts,
+> and use option b and c for exams - decide which layout to use depending on the tasks, like notiz
+> machen should take option c and other tasks may show the aufgabe on the screen with layout b."
+
+So the layout became **a property of the task, never a learner setting**: practice runs the
+transcript; an exam task keeps its Aufgabe on screen unless reading would defeat it. That is why
+`ExamSet.stage` exists, why the content linter rejects `"gespraech"` on an exam set, and why the
+three layouts are three *middles* of one runner rather than three screens.
+
+**On "notiz machen".** The founder named a task *shape*, not an existing set: `notiz` is a Hören
+`TextKind`, and every one of the 15 authored speaking sets is a "discuss the aspects and agree"
+task whose aspects must stay readable. So Anruf shipped built, tested and **unreached**: no current
+exam set is listen-and-hold shaped. Authoring those tasks is the next content job, and was reported
+as the one deliberate gap rather than papered over.
+
+**Three cost pipelines were priced** because the app runs under a $5/month global AI cap. Browser
+transcription + text LLM + browser TTS costs ~2-4 cents per 12-turn conversation (effectively 0
+while the free Gemini Flash leg absorbs turns); cloud STT/TTS ~10-20 cents; real-time
+speech-to-speech 5-46 cents *per minute*, i.e. one six-minute conversation can exceed a fifth of
+the monthly cap for one learner once. Pipeline A shipped, structured so B is a one-function swap;
+C is held for a paid tier. Founder took the recommendation, and 2 conversations/day.
+
+**Guards worth not undoing.** The conversation row is written when a conversation **starts**, not
+when it finishes, so the daily limit counts what actually costs money and a learner cannot abandon
+conversations to farm free turns. The turn ceiling is measured against the **stored** transcript,
+never the request body, so a forged body cannot extend a run past its cost ceiling.
+
+**Honesty fixes made during the build.** The debrief first inferred "did you use this Redemittel?"
+by matching the category label against the transcript, which is theatre (a learner making a
+suggestion does not say the words "Vorschläge machen"); the model is asked instead. And the exam
+part first completed when the score arrived, which would have unmounted the runner before the
+learner read a word of their feedback; it completes on exit, carrying the score.
+
+**Retired.** `features/simulation/`, `features/exam/ExamRunner.tsx` and `engine/dialogue.ts`. The
+authored `nodes` graphs stay in the bank (ids are permanent and the linter still validates them)
+but are no longer read at runtime; retiring them is a separate mechanical change.

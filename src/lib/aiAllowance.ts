@@ -33,13 +33,16 @@ import { useAuthStore } from "@/store/useAuthStore";
  * shows NO number rather than one it cannot stand behind.
  */
 
-export type AiMode = "fokus" | "kurz" | "lang";
+export type AiMode = "fokus" | "kurz" | "lang" | "sprechen";
 
 /** Defaults, mirroring the Edge Function defaults. A server value always wins. */
 export const DAILY_ALLOWANCE: Record<AiMode, number> = {
   fokus: 10,
   kurz: 4,
   lang: 2,
+  // Founder s193: a spoken conversation costs about what a Lang evaluation
+  // costs, so it sits beside Lang rather than getting its own generous budget.
+  sprechen: 2,
 };
 
 /* ------------------------- what the server last said ---------------------- */
@@ -110,11 +113,18 @@ export async function fetchUsedToday(mode: AiMode): Promise<number | null> {
             .from("sentence_checks")
             .select("id", { count: "exact", head: true })
             .gte("created_at", since)
-        : supabase
-            .from("writing_evaluations")
-            .select("id", { count: "exact", head: true })
-            .eq("length", mode === "lang" ? "long" : "short")
-            .gte("created_at", since);
+        : mode === "sprechen"
+          ? // One row per conversation, written when it STARTS (migration 0017),
+            // which is the same thing the `converse` function counts.
+            supabase
+              .from("speaking_conversations")
+              .select("id", { count: "exact", head: true })
+              .gte("created_at", since)
+          : supabase
+              .from("writing_evaluations")
+              .select("id", { count: "exact", head: true })
+              .eq("length", mode === "lang" ? "long" : "short")
+              .gte("created_at", since);
     const { count, error } = await query;
     if (error) return null;
     return count ?? 0;

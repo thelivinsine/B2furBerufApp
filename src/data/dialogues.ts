@@ -16,6 +16,12 @@ const sommerfest: Scenario = {
   level: 1,
   minutes: 6,
   targetRedemittel: ["suggestions", "agree", "compromise", "negotiation"],
+  partner: { name: "Katrin Vogel", role: "Kollegin aus dem Orga-Team", register: "sie" },
+  goals: [
+    "Schlage einen Termin und einen Ort vor.",
+    "Einige dich mit ihr auf ein Programm.",
+    "Klärt, wer welche Aufgabe übernimmt.",
+  ],
   start: "n1",
   nodes: {
     n1: {
@@ -176,6 +182,12 @@ const reklamation: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["clarification", "suggestions", "negotiation", "reactions"],
+  partner: { name: "Markus Lehmann", role: "Kollege im Kundenservice", register: "sie" },
+  goals: [
+    "Beschreibe, was mit der Lieferung passiert ist.",
+    "Schlage eine schnelle Lösung für den Kunden vor.",
+    "Einigt euch, wer den Kunden informiert.",
+  ],
   start: "m1",
   nodes: {
     m1: {
@@ -299,6 +311,12 @@ const nachhaltigkeit: Scenario = {
   level: 3,
   minutes: 7,
   targetRedemittel: ["suggestions", "opinion", "prosCons", "compromise"],
+  partner: { name: "Anja Roth", role: "Kollegin aus dem Büro", register: "sie" },
+  goals: [
+    "Nenne mindestens zwei konkrete Maßnahmen.",
+    "Begründe, welche Maßnahme zuerst kommen soll.",
+    "Einigt euch auf einen Vorschlag für die Chefin.",
+  ],
   start: "k1",
   nodes: {
     k1: {
@@ -414,6 +432,12 @@ const projektplanung: Scenario = {
   level: 2,
   minutes: 7,
   targetRedemittel: ["suggestions", "prosCons", "compromise", "negotiation"],
+  partner: { name: "Daniel Krause", role: "Kollege in der Projektleitung", register: "sie" },
+  goals: [
+    "Erkläre, warum das Projekt in Verzug ist.",
+    "Schlage Maßnahmen vor, um die Deadline zu halten.",
+    "Einigt euch, wer was bis wann macht.",
+  ],
   start: "p1",
   nodes: {
     p1: {
@@ -568,6 +592,12 @@ const homeoffice: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["opinion", "compromise", "negotiation", "clarification"],
+  partner: { name: "Petra Sommer", role: "Kollegin aus dem Team", register: "sie" },
+  goals: [
+    "Sag, wie viele Tage Homeoffice du für sinnvoll hältst.",
+    "Geh auf ihre Bedenken ein.",
+    "Einigt euch auf eine Regelung für das ganze Team.",
+  ],
   start: "h1",
   nodes: {
     h1: {
@@ -719,6 +749,12 @@ const konflikt: Scenario = {
   level: 3,
   minutes: 7,
   targetRedemittel: ["suggestions", "clarification", "negotiation", "compromise"],
+  partner: { name: "Frau Bergmann", role: "Teamleiterin", register: "sie" },
+  goals: [
+    "Beschreibe sachlich, was du im Team beobachtet hast.",
+    "Schlage ein Vorgehen zur Vermittlung vor.",
+    "Klärt, wer mit den beiden Kolleg:innen spricht.",
+  ],
   start: "c1",
   nodes: {
     c1: {
@@ -873,6 +909,12 @@ const sicherheit: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["opinion", "negotiation", "compromise", "suggestions"],
+  partner: { name: "Herr Ziegler", role: "Sicherheitsbeauftragter", register: "sie" },
+  goals: [
+    "Sag, welchen Mangel du zuerst beheben würdest, und warum.",
+    "Schlage für jeden Mangel eine Maßnahme vor.",
+    "Klärt die Zuständigkeiten und einen Termin.",
+  ],
   start: "s1",
   nodes: {
     s1: {
@@ -1024,6 +1066,12 @@ const teambesprechung: Scenario = {
   level: 1,
   minutes: 6,
   targetRedemittel: ["suggestions", "negotiation", "compromise", "opinion"],
+  partner: { name: "Nina Fischer", role: "Kollegin", register: "sie" },
+  goals: [
+    "Schlage die Themen für die Tagesordnung vor.",
+    "Verteile die 60 Minuten auf die Themen.",
+    "Klärt, wer moderiert und wer das Protokoll schreibt.",
+  ],
   start: "t1",
   nodes: {
     t1: {
@@ -1178,6 +1226,12 @@ const lieferproblem: Scenario = {
   level: 2,
   minutes: 7,
   targetRedemittel: ["clarification", "suggestions", "negotiation", "compromise"],
+  partner: { name: "Herr Baumann", role: "Kollege aus dem Einkauf", register: "sie" },
+  goals: [
+    "Erkläre, welche Aufträge durch die Verzögerung gefährdet sind.",
+    "Schlage eine Zwischenlösung vor.",
+    "Einigt euch, wie ihr die Produktion informiert.",
+  ],
   start: "l1",
   nodes: {
     l1: {
@@ -1332,6 +1386,12 @@ const dienstreise: Scenario = {
   level: 1,
   minutes: 6,
   targetRedemittel: ["opinion", "prosCons", "compromise", "clarification"],
+  partner: { name: "Julia Weber", role: "Kollegin", register: "sie" },
+  goals: [
+    "Schlage Anreise und Uhrzeit vor.",
+    "Klärt die Übernachtung.",
+    "Einigt euch, wer was für das Kundengespräch vorbereitet.",
+  ],
   start: "d1",
   nodes: {
     d1: {
@@ -1475,6 +1535,12 @@ const anmeldung: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Frau Neumann", role: "Sachbearbeiterin im Bürgeramt", register: "sie" },
+  goals: [
+    "Sag, warum du da bist, und nenne dein Einzugsdatum.",
+    "Frag nach, welche Unterlagen du brauchst.",
+    "Kläre, wann du die Meldebescheinigung bekommst.",
+  ],
   start: "a1",
   nodes: {
     a1: {
@@ -1555,6 +1621,12 @@ const auslaenderbehoerde: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["clarification", "compromise", "suggestions", "agree"],
+  partner: { name: "Herr Sander", role: "Sachbearbeiter der Ausländerbehörde", register: "sie" },
+  goals: [
+    "Erkläre, dass du deinen Aufenthaltstitel verlängern willst.",
+    "Reagiere darauf, dass eine Unterlage fehlt.",
+    "Vereinbare, wie und bis wann du sie nachreichst.",
+  ],
   start: "m1",
   nodes: {
     m1: {
@@ -1635,6 +1707,12 @@ const arztbesuch: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Dr. Hoffmann", role: "Hausarzt", register: "sie" },
+  goals: [
+    "Beschreibe deine Beschwerden und seit wann du sie hast.",
+    "Beantworte seine Rückfragen.",
+    "Kläre die Behandlung und ob du eine Krankschreibung bekommst.",
+  ],
   start: "d1",
   nodes: {
     d1: {
@@ -1715,6 +1793,12 @@ const wohnungsbesichtigung: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Herr Kaiser", role: "Vermieter", register: "sie" },
+  goals: [
+    "Stell Fragen zu Miete und Nebenkosten.",
+    "Frag nach Einzugstermin und Kaution.",
+    "Sag deutlich, dass du Interesse hast, und kläre den nächsten Schritt.",
+  ],
   start: "w1",
   nodes: {
     w1: {
@@ -1795,6 +1879,12 @@ const kontoeroeffnung: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Frau Schuster", role: "Bankberaterin", register: "sie" },
+  goals: [
+    "Sag, welches Konto du brauchst und wofür.",
+    "Frag nach den Kosten und der Karte.",
+    "Kläre, welche Unterlagen du mitbringen musst.",
+  ],
   start: "k1",
   nodes: {
     k1: {
@@ -1875,6 +1965,12 @@ const sprachkursberatung: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Frau Adam", role: "Beraterin der Volkshochschule", register: "sie" },
+  goals: [
+    "Sag, welches Niveau du hast und was du erreichen willst.",
+    "Frag nach Kurszeiten und Kosten.",
+    "Kläre, wie du dich anmeldest.",
+  ],
   start: "b1",
   nodes: {
     b1: {
@@ -1955,6 +2051,12 @@ const apotheke: Scenario = {
   level: 2,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Frau Klein", role: "Apothekerin", register: "sie" },
+  goals: [
+    "Gib dein Rezept ab und sag, worum es geht.",
+    "Frag, wie du das Medikament einnehmen sollst.",
+    "Kläre Nebenwirkungen und was du selbst bezahlst.",
+  ],
   start: "d1",
   nodes: {
     d1: {
@@ -2035,6 +2137,12 @@ const wohnungsmangel: Scenario = {
   level: 2,
   minutes: 5,
   targetRedemittel: ["clarification", "suggestions", "negotiation", "reactions"],
+  partner: { name: "Frau Peters", role: "Mitarbeiterin der Hausverwaltung", register: "sie" },
+  goals: [
+    "Melde den Mangel und sag, seit wann er besteht.",
+    "Sag, welche Folgen das für dich hat.",
+    "Vereinbare einen Termin für die Reparatur.",
+  ],
   start: "d1",
   nodes: {
     d1: {
@@ -2115,6 +2223,12 @@ const kartesperren: Scenario = {
   level: 2,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Herr Wolf", role: "Mitarbeiter der Bank", register: "sie" },
+  goals: [
+    "Sag, dass du deine Karte verloren hast, und lass sie sperren.",
+    "Frag, ob mit deinem Konto etwas passiert ist.",
+    "Kläre, wie du eine neue Karte bekommst.",
+  ],
   start: "d1",
   nodes: {
     d1: {
@@ -2195,6 +2309,12 @@ const pruefungsanmeldung: Scenario = {
   level: 2,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Frau Yildiz", role: "Mitarbeiterin im Sprachzentrum", register: "sie" },
+  goals: [
+    "Sag, für welche Prüfung du dich anmelden willst.",
+    "Frag nach Termin und Gebühr.",
+    "Kläre, welche Unterlagen du brauchst.",
+  ],
   start: "d1",
   nodes: {
     d1: {
@@ -2275,6 +2395,12 @@ const supermarkteinkauf: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "smallTalk", "reactions"],
+  partner: { name: "Herr Özdemir", role: "Mitarbeiter im Supermarkt", register: "sie" },
+  goals: [
+    "Frag höflich nach dem Produkt, das du suchst.",
+    "Reagiere auf seine Antwort und frag nach, wenn du etwas nicht verstehst.",
+    "Bezahle an der Kasse und sag, wie du zahlen willst.",
+  ],
   start: "s1",
   nodes: {
     s1: {
@@ -2355,6 +2481,12 @@ const umtauschreklamation: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["clarification", "compromise", "suggestions", "agree"],
+  partner: { name: "Frau Lorenz", role: "Verkäuferin", register: "sie" },
+  goals: [
+    "Erkläre, was mit dem Gerät nicht stimmt.",
+    "Sag, ob du Ersatz oder dein Geld zurück möchtest.",
+    "Einige dich mit ihr auf eine Lösung.",
+  ],
   start: "r1",
   nodes: {
     r1: {
@@ -2435,6 +2567,12 @@ const tischreservieren: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["telephoning", "clarification", "agree", "smallTalk"],
+  partner: { name: "Herr Falk", role: "Mitarbeiter im Restaurant", register: "sie" },
+  goals: [
+    "Sag, für wann und für wie viele Personen du reservieren willst.",
+    "Reagiere, wenn dein Wunschtermin nicht frei ist.",
+    "Bestätige die Reservierung mit deinem Namen.",
+  ],
   start: "t1",
   nodes: {
     t1: {
@@ -2515,6 +2653,12 @@ const restaurantbestellen: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["clarification", "suggestions", "agree", "reactions"],
+  partner: { name: "Herr Brandt", role: "Kellner", register: "sie" },
+  goals: [
+    "Bestelle Getränk und Essen.",
+    "Frag nach den Zutaten eines Gerichts.",
+    "Bitte am Ende um die Rechnung und sag, wie du zahlst.",
+  ],
   start: "b1",
   nodes: {
     b1: {
@@ -2595,6 +2739,12 @@ const fahrkartekaufen: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  partner: { name: "Frau Hartmann", role: "Mitarbeiterin am Bahnschalter", register: "sie" },
+  goals: [
+    "Sag, wohin du willst und wann.",
+    "Frag nach dem passenden Ticket und dem Preis.",
+    "Kläre, wo du einsteigen musst und ob du umsteigen musst.",
+  ],
   start: "f1",
   nodes: {
     f1: {
@@ -2675,6 +2825,12 @@ const nachdemwegfragen: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["clarification", "agree", "reactions", "smallTalk"],
+  partner: { name: "eine Passantin", role: "eine Frau auf der Straße", register: "sie" },
+  goals: [
+    "Sprich sie höflich an und sag, was du suchst.",
+    "Frag nach, wenn du die Beschreibung nicht verstehst.",
+    "Bedanke dich und wiederhole den Weg kurz.",
+  ],
   start: "w1",
   nodes: {
     w1: {
@@ -2755,6 +2911,12 @@ const freundeverabreden: Scenario = {
   level: 1,
   minutes: 5,
   targetRedemittel: ["suggestions", "agree", "clarification", "smallTalk"],
+  partner: { name: "Lena", role: "eine gute Freundin", register: "du" },
+  goals: [
+    "Schlage vor, was ihr unternehmen könnt.",
+    "Einigt euch auf Tag und Uhrzeit.",
+    "Klärt, wo ihr euch trefft.",
+  ],
   start: "v1",
   nodes: {
     v1: {
@@ -2835,6 +2997,12 @@ const smalltalkparty: Scenario = {
   level: 2,
   minutes: 5,
   targetRedemittel: ["smallTalk", "clarification", "agree", "reactions"],
+  partner: { name: "Jonas", role: "ein Gast auf der Feier", register: "du" },
+  goals: [
+    "Stell dich vor und komm ins Gespräch.",
+    "Stell mindestens zwei Fragen über ihn.",
+    "Finde etwas, das ihr gemeinsam habt.",
+  ],
   start: "p1",
   nodes: {
     p1: {
@@ -2915,6 +3083,12 @@ const handyvertragabschliessen: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["clarification", "suggestions", "compromise", "agree"],
+  partner: { name: "Herr Reimann", role: "Berater im Handyshop", register: "sie" },
+  goals: [
+    "Sag, was du brauchst: Datenvolumen und wie viel du telefonierst.",
+    "Frag nach Grundgebühr und Laufzeit.",
+    "Entscheide dich und begründe deine Wahl.",
+  ],
   start: "h1",
   nodes: {
     h1: {
@@ -2995,6 +3169,12 @@ const internetstoerung: Scenario = {
   level: 2,
   minutes: 6,
   targetRedemittel: ["telephoning", "clarification", "compromise", "agree"],
+  partner: { name: "Frau Engel", role: "Mitarbeiterin der Hotline", register: "sie" },
+  goals: [
+    "Beschreibe die Störung und seit wann sie besteht.",
+    "Sag, was du schon selbst versucht hast.",
+    "Vereinbare, wie es weitergeht: Techniker oder Rückruf.",
+  ],
   start: "i1",
   nodes: {
     i1: {
@@ -3084,6 +3264,12 @@ const eskalationsgespraech: Scenario = {
   level: 3,
   minutes: 8,
   targetRedemittel: ["complaints", "clarification", "negotiation", "compromise"],
+  partner: { name: "Frau Dr. Winter", role: "Geschäftsführerin des Kunden", register: "sie" },
+  goals: [
+    "Nimm die Beschwerde ernst und benenne die Ursache.",
+    "Biete eine konkrete, haltbare Lösung an.",
+    "Sag klar, was du NICHT zusagen kannst, ohne den Kunden zu verlieren.",
+  ],
   start: "e1",
   nodes: {
     e1: {
@@ -3247,6 +3433,12 @@ const scopeverhandlung: Scenario = {
   level: 3,
   minutes: 8,
   targetRedemittel: ["clarification", "negotiation", "prosCons", "compromise"],
+  partner: { name: "Frau Albrecht", role: "Auftraggeberin", register: "sie" },
+  goals: [
+    "Erkläre den Rückstand, ohne dich nur zu rechtfertigen.",
+    "Schlage vor, was zuerst geliefert wird und was später.",
+    "Einigt euch auf einen neuen, realistischen Termin.",
+  ],
   start: "s1",
   nodes: {
     s1: {
@@ -3399,6 +3591,12 @@ const beinaheunfall: Scenario = {
   level: 3,
   minutes: 8,
   targetRedemittel: ["disagree", "clarification", "compromise", "formalities"],
+  partner: { name: "Tobias", role: "Kollege im Lager", register: "du" },
+  goals: [
+    "Sag ihm klar, wie du dich entscheidest.",
+    "Begründe deine Entscheidung sachlich.",
+    "Bleib beim Nein zu einer Vertuschung, ohne ihn bloßzustellen.",
+  ],
   start: "b1",
   nodes: {
     b1: {
@@ -3546,6 +3744,12 @@ const widerspruch: Scenario = {
   level: 3,
   minutes: 8,
   targetRedemittel: ["formalities", "clarification", "disagree", "negotiation"],
+  partner: { name: "Herr Faber", role: "Sachbearbeiter im Amt", register: "sie" },
+  goals: [
+    "Frag nach, auf welcher Grundlage abgelehnt wurde.",
+    "Erkläre, dass sich dein Einkommen geändert hat.",
+    "Kläre Frist und Form für den Widerspruch.",
+  ],
   start: "w1",
   nodes: {
     w1: {
@@ -3701,6 +3905,12 @@ const mietminderung: Scenario = {
   level: 3,
   minutes: 8,
   targetRedemittel: ["complaints", "disagree", "formalities", "negotiation"],
+  partner: { name: "Herr Stein", role: "Vermieter", register: "sie" },
+  goals: [
+    "Sag, seit wann der Schimmel da ist und dass du ihn gemeldet hast.",
+    "Fordere eine Beseitigung mit einem konkreten Termin.",
+    "Sprich die Folgen für die Miete an, sachlich und höflich.",
+  ],
   start: "m1",
   nodes: {
     m1: {
@@ -3856,6 +4066,12 @@ const kostenuebernahme: Scenario = {
   level: 3,
   minutes: 8,
   targetRedemittel: ["telephoning", "clarification", "disagree", "formalities"],
+  partner: { name: "Frau Jäger", role: "Mitarbeiterin der Krankenkasse", register: "sie" },
+  goals: [
+    "Frag nach dem genauen Grund der Ablehnung.",
+    "Erkläre, warum deine Ärztin die Behandlung für nötig hält.",
+    "Kläre, wie du Widerspruch einlegen kannst.",
+  ],
   start: "k1",
   nodes: {
     k1: {
