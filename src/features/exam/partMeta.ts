@@ -38,8 +38,14 @@ export const PART_META: Record<
     bar: string;
     fillPale: string;
     fillSolid: string;
-    desc: string;
     instructions: string;
+    /**
+     * Hören only: the wording for a draw with no Notizen sheet. Only voicemails
+     * carry note fields, so a Hören drawn entirely from Durchsagen (always the
+     * case at C1) used to promise a note-taking task it could not contain
+     * (s194 audit P16). The Anleitung picks by what the plan actually drew.
+     */
+    instructionsPlain?: string;
   }
 > = {
   lesen: {
@@ -49,7 +55,6 @@ export const PART_META: Record<
     bar: "bg-emerald-500 dark:bg-emerald-400",
     fillPale: "bg-emerald-500/30 dark:bg-emerald-400/25",
     fillSolid: "bg-emerald-500 dark:bg-emerald-400",
-    desc: "3 Texte mit Aufgaben",
     instructions:
       "Sie lesen drei Texte. Wählen Sie zu jeder Aufgabe die richtige Antwort. Über die Nummernleiste können Sie Aufgaben überspringen und später zurückkommen.",
   },
@@ -60,9 +65,10 @@ export const PART_META: Record<
     bar: "bg-teal-500 dark:bg-teal-400",
     fillPale: "bg-teal-500/30 dark:bg-teal-400/25",
     fillSolid: "bg-teal-500 dark:bg-teal-400",
-    desc: "2 Ansagen · Notizen",
     instructions:
       "Sie hören zwei Ansagen. Notieren Sie beim Hören die wichtigen Angaben und lösen Sie danach die Aufgaben. Sie können jede Ansage maximal zweimal hören.",
+    instructionsPlain:
+      "Sie hören zwei Ansagen. Hören Sie genau zu und lösen Sie danach die Aufgaben. Sie können jede Ansage maximal zweimal hören.",
   },
   schreiben: {
     icon: SquarePen,
@@ -71,7 +77,6 @@ export const PART_META: Record<
     bar: "bg-primary",
     fillPale: "bg-primary/30 dark:bg-primary/25",
     fillSolid: "bg-primary",
-    desc: "1 Aufgabe · voller Brief",
     instructions:
       "Sie schreiben einen Text zu der Aufgabe. Bearbeiten Sie alle Inhaltspunkte und achten Sie auf Anrede und Länge. Am Ende bewertet eine KI Ihren Text.",
   },
@@ -82,9 +87,12 @@ export const PART_META: Record<
     bar: "bg-sky-500 dark:bg-sky-400",
     fillPale: "bg-sky-500/30 dark:bg-sky-400/25",
     fillSolid: "bg-sky-500 dark:bg-sky-400",
-    desc: "1 Gespräch mit Partner",
+    // s194 audit P20: this still told the candidate "Am Ende bewerten Sie sich
+    // selbst anhand des Prüfungsrasters", which s193 replaced with a real spoken
+    // conversation graded by the AI debrief. It is the last screen a candidate
+    // reads before Teil Sprechen, so it has to describe the part they get.
     instructions:
-      "Sie lösen eine Aufgabe im Gespräch mit einer Partnerin oder einem Partner. Reagieren Sie auf Vorschläge und finden Sie gemeinsam eine Lösung. Am Ende bewerten Sie sich selbst anhand des Prüfungsrasters.",
+      "Sie lösen eine Aufgabe im Gespräch mit einer Gesprächspartnerin oder einem Gesprächspartner. Sprechen Sie alle Punkte der Aufgabe an, reagieren Sie auf Vorschläge und finden Sie gemeinsam eine Lösung. Am Ende bekommen Sie eine Rückmeldung von einer KI.",
   },
 };
 

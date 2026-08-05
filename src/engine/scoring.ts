@@ -33,7 +33,13 @@ export const XP = {
   readingCheck: 8,
   redemittel: 12,
   simulationTurn: 8,
+  // A spoken conversation with a graded debrief. Defined since the branching
+  // era and awarded by nobody until s194 (audit P19): the most demanding thing
+  // a learner can do in the app paid nothing, while a flashcard paid 6.
   scenarioComplete: 60,
+  /** ONE exam module sat on its own (Module üben, either clock state). */
+  moduleComplete: 40,
+  /** All four modules in one sitting. */
   examComplete: 120,
   dailyGoal: 40,
 } as const;

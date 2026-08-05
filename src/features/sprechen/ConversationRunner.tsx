@@ -6,15 +6,19 @@ import {
   addLearnerTurn,
   addPartnerTurn,
   canDebrief,
+  canSpeak,
   closeConversation,
+  dropLastLearnerTurn,
   editLastLearnerTurn,
   failTurn,
   startConversation,
+  turnsLeft,
   applyHint,
   type ConversationState,
 } from "@/engine/conversation";
 import { speak, stopSpeaking } from "@/engine/speech";
 import { requestDebrief, speakTurn, type DebriefResult } from "@/lib/speaking";
+import { useDailyAllowance } from "@/lib/aiAllowance";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLiveWork } from "@/lib/liveWork";
 import { Button } from "@/components/ui/button";
@@ -69,9 +73,11 @@ export function ConversationRunner({
   const [subtitles, setSubtitles] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [hint, setHint] = useState<string | null>(null);
+  const [over, setOver] = useState(false);
   const conversationId = useRef<string>(crypto.randomUUID());
   const speech = useSpeechInput();
   const reduce = useReducedMotion();
+  const allowance = useDailyAllowance("sprechen");
 
   const speechEnabled = useSettingsStore((s) => s.speechEnabled);
   const voiceURI = useSettingsStore((s) => s.voiceURI);
@@ -110,9 +116,19 @@ export function ConversationRunner({
         utterance,
       });
       if (!res.ok || !res.reply) {
-        setState((s) =>
-          failTurn(s, res.message ?? "Deine Gesprächspartnerin ist gerade nicht erreichbar."),
-        );
+        // The turn never reached the STORED transcript, which is the one the
+        // debrief grades, so it must not stay on screen either (audit P4).
+        setState((s) => {
+          const rolled = utterance ? dropLastLearnerTurn(s) : s;
+          return failTurn(
+            rolled,
+            res.message ?? "Deine Gesprächspartnerin ist gerade nicht erreichbar.",
+          );
+        });
+        // The server refuses every further turn once the stored transcript hits
+        // its ceiling. Without this the microphone stayed live and the learner
+        // kept speaking into a transcript nobody would read.
+        if (res.conversationOver) setOver(true);
         return;
       }
       setState((s) => addPartnerTurn(s, res.reply!));
@@ -123,6 +139,7 @@ export function ConversationRunner({
 
   const start = useCallback(() => {
     setPhase("running");
+    setOver(false);
     void advance(startConversation(brief), "");
   }, [advance, brief]);
 
@@ -130,6 +147,12 @@ export function ConversationRunner({
     (text: string) => {
       const clean = text.trim();
       if (!clean) return;
+      // The ceiling is the server's to enforce (it measures the stored
+      // transcript); this is what stops the learner walking into it.
+      if (!canSpeak(state)) {
+        setOver(true);
+        return;
+      }
       stopSpeaking();
       setTyped("");
       void advance(addLearnerTurn(state, clean), clean);
@@ -163,54 +186,101 @@ export function ConversationRunner({
 
   /* ------------------------------- screens ------------------------------- */
 
+  /**
+   * The exam chrome belongs to every screen of the Teil, not just the talking
+   * one (s194 audit P25): the RunBar used to vanish on the brief and on the
+   * debrief, so "Teil 4 von 4" and the progress dots disappeared for two of the
+   * three screens. Practice passes no header and is unaffected.
+   */
+  const framed = (node: React.ReactNode) => (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      {header}
+      {node}
+    </div>
+  );
+
   if (phase === "brief") {
-    return <ConversationBriefCard brief={brief} onStart={start} />;
+    // The daily allowance is a real gate, so the button has to say so BEFORE
+    // the learner commits (audit P8). It used to be fully enabled with nothing
+    // left: they started, the partner never spoke, and the failure arrived as a
+    // grey caption under the microphone, in the exam at Teil 4 of 4.
+    const spent = allowance.known && allowance.remaining <= 0;
+    return framed(
+      <ConversationBriefCard
+        brief={brief}
+        onStart={start}
+        disabledReason={
+          spent
+            ? `Du hast heute schon ${allowance.limit} ${allowance.limit === 1 ? "Gespräch" : "Gespräche"} geführt. Komm morgen wieder!`
+            : null
+        }
+      />,
+    );
   }
 
   if (phase === "debriefing") {
-    return (
+    return framed(
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 text-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         <p className="text-sm text-muted-foreground">Deine Rückmeldung wird erstellt …</p>
-      </div>
+      </div>,
     );
   }
 
   if (phase === "debrief" && debrief) {
     if (!debrief.ok) {
-      return (
+      return framed(
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
           <p className="text-sm text-muted-foreground">{debrief.message}</p>
           <Button variant="outline" onClick={() => onExit(null)}>
             Zurück
           </Button>
-        </div>
+        </div>,
       );
     }
-    return (
+    return framed(
       <ConversationDebrief
         brief={brief}
         result={debrief}
-        onRetry={() => {
-          conversationId.current = crypto.randomUUID();
-          setDebrief(null);
-          setState(startConversation(brief));
-          setPhase("brief");
-        }}
+        // No re-sit in the Modelltest (audit P5). "Nochmal" restarted the part
+        // from its brief and threw the first score away, so a candidate could
+        // sit Teil Sprechen until the number looked good, spending one of their
+        // two daily conversations on each attempt.
+        onRetry={
+          brief.exam
+            ? undefined
+            : () => {
+                conversationId.current = crypto.randomUUID();
+                setDebrief(null);
+                setState(startConversation(brief));
+                setOver(false);
+                setPhase("brief");
+              }
+        }
         onDone={() => onExit(debrief.score ?? null)}
-      />
+      />,
     );
   }
 
   const lastPartner = [...state.turns].reverse().find((t) => t.role === "partner");
   const lastLearner = [...state.turns].reverse().find((t) => t.role === "learner");
-  const caption = state.error
-    ? state.error
-    : speech.listening
-      ? "Ich höre zu … tippe zum Stoppen"
-      : busy
-        ? `${brief.partner.name} antwortet …`
-        : speech.error;
+  const left = turnsLeft(state);
+  // Out of turns, not merely mid-round-trip: `canSpeak` is also false while the
+  // partner is thinking, which is a wait, not an ending.
+  const finished = over || left === 0;
+  const caption = finished
+    ? "Das Gespräch ist zu Ende. Schau dir jetzt deine Rückmeldung an."
+    : state.error
+      ? state.error
+      : speech.listening
+        ? "Ich höre zu … tippe zum Stoppen"
+        : busy
+          ? `${brief.partner.name} antwortet …`
+          : // The ceiling exists for cost, but a learner who runs into it
+            // without warning reads it as the app breaking (audit P4).
+            left <= 3 && state.turns.length > 0
+            ? `Noch ${left} ${left === 1 ? "Beitrag" : "Beiträge"}`
+            : speech.error;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -305,14 +375,15 @@ export function ConversationRunner({
       <MicCluster
         listening={speech.listening}
         supported={speech.supported}
-        busy={busy}
+        busy={busy || finished}
         onStart={() => {
           stopSpeaking();
           speech.start();
         }}
         onStop={() => submit(speech.stop())}
-        onHint={brief.exam ? undefined : askHint}
+        onHint={brief.exam || finished ? undefined : askHint}
         onEnd={finish}
+        highlightEnd={finished}
         endLabel={brief.stage === "anruf" ? "Auflegen" : "Beenden"}
         caption={caption}
         typed={typed}

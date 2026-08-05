@@ -655,7 +655,13 @@ function lintExamSets(examSets, scenarioIds) {
     const w = e.id ?? "?";
     for (const f of ["title", "taskSheet"]) if (!isStr(e[f])) error(ds, w, `${f} empty`);
     if (!THEME_IDS.includes(e.themeId)) error(ds, w, `invalid themeId "${e.themeId}"`);
+    // The aspects ARE the Leitpunkte the spoken debrief grades, and it returns
+    // one verdict per goal, so `examBrief` caps them at 5. Authoring a sixth
+    // used to be silently dropped there while the Anleitung still showed it
+    // (s194 audit P33), which is the substitution law in miniature.
     if (!Array.isArray(e.aspects) || e.aspects.length === 0) error(ds, w, "aspects empty");
+    else if (e.aspects.length > 5)
+      error(ds, w, `${e.aspects.length} aspects (max 5; the debrief grades one verdict per aspect)`);
     if (!isNum(e.totalMinutes) || e.totalMinutes <= 0) error(ds, w, "totalMinutes must be positive");
     if (!scenarioIds.has(e.scenarioId)) error(ds, w, `scenarioId "${e.scenarioId}" not found`);
     // Which layout the spoken task runs in (s193). Absent = "buehne", right for

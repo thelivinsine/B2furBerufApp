@@ -92,29 +92,32 @@ export function speakingBrief(scenario: Scenario): ConversationBrief {
  * ("buehne"), and a task that reading would defeat runs blind ("anruf"). An
  * exam set that says nothing gets "buehne", because every set authored so far
  * is a "discuss the aspects and agree" task whose aspects must stay readable.
+ *
+ * The LEVEL is the run's, not a constant. It was hard-coded to "B2.1" until the
+ * s194 audit (P6), which meant the partner spoke and the debrief graded at B2.1
+ * in every Modelltest while Lesen, Hören and Schreiben all honoured the chosen
+ * Niveau: a B1 candidate was scored a band too hard and a C1 one a band too
+ * easy. Callers pass `EXAM_BAND[plan.level]`.
  */
-export function examBrief(set: ExamSet, scenario?: Scenario): ConversationBrief {
+export function examBrief(
+  set: ExamSet,
+  scenario?: Scenario,
+  level: ContentCefr = "B2.1",
+): ConversationBrief {
   return {
     id: set.id,
     title: set.title.replace(/^Prüfungssimulation:\s*/, ""),
     partner: set.partner ?? scenario?.partner ?? EXAM_PARTNER,
     situation: set.taskSheet,
     // `aspects` IS the Leitpunkte list; it has always been the thing the task
-    // sheet tells the candidate to cover.
+    // sheet tells the candidate to cover. Capped at the 5 the debrief can grade
+    // (it returns one boolean per goal); `lintExamSets` gates authoring to 5,
+    // so this slice can no longer silently drop a Leitpunkt (audit P33).
     goals: set.aspects.slice(0, 5),
     targetRedemittel: scenario?.targetRedemittel ?? [],
-    level: "B2.1",
+    level,
     minutes: set.totalMinutes,
     stage: set.stage ?? "buehne",
     exam: true,
   };
-}
-
-/**
- * Whether the learner may read anything while speaking. The Anruf stage is the
- * one that says no, and the "Untertitel" escape hatch is the only way text
- * appears there (resting off, founder s193).
- */
-export function showsTextWhileSpeaking(stage: SpeakingStage): boolean {
-  return stage !== "anruf";
 }

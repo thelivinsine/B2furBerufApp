@@ -29,7 +29,7 @@ export async function buildExport(): Promise<Record<string, unknown>> {
   let cloud: Record<string, unknown> | null = null;
   if (user && (status === "signedIn" || status === "anonymous")) {
     try {
-      const [profile, progress, writing, checks, aiOps] = await Promise.all([
+      const [profile, progress, writing, checks, aiOps, conversations] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
         supabase.from("progress").select("*").eq("user_id", user.id).maybeSingle(),
         supabase
@@ -52,6 +52,16 @@ export async function buildExport(): Promise<Record<string, unknown>> {
           .select("*")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
+        // Sprechen (migration 0017): the transcript of every spoken
+        // conversation, its AI correction, which Leitpunkte were met and the
+        // exam score. This is the learner's own speech, and it was the one
+        // per-learner table the export missed (s194 audit P14). Same argument
+        // as sentence_checks: their words belong in an Art. 15/20 export.
+        supabase
+          .from("speaking_conversations")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
       ]);
       cloud = {
         profile: profile.data ?? null,
@@ -60,6 +70,7 @@ export async function buildExport(): Promise<Record<string, unknown>> {
         writingEvaluations: writing.data ?? [],
         sentenceChecks: checks.data ?? [],
         sentenceAiOps: aiOps.data ?? [],
+        speakingConversations: conversations.data ?? [],
       };
     } catch {
       // Offline or transient failure: fall back to a local-only export.

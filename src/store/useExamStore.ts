@@ -28,8 +28,20 @@ export interface MockExamRun {
   /** Index into plan.parts. */
   partIx: number;
   phase: RunPhase;
-  /** Remaining seconds of the CURRENT part while phase is "part". */
+  /**
+   * Remaining seconds of the CURRENT part while phase is "part". DERIVED from
+   * `endsAt` by `tick`; never decremented on its own since the s194 audit (P3),
+   * because a tick counter is not a clock: browsers throttle a background tab's
+   * interval to about one tick a minute, and a reload resumed from whatever was
+   * last persisted, so switching tabs or refreshing paused a timed exam.
+   */
   remainingSec: number;
+  /**
+   * Epoch ms when the current part's time is up. Undefined on a run persisted
+   * before s194, which then falls back to the old decrement so an exam in
+   * flight across the deploy still finishes.
+   */
+  endsAt?: number;
   /** MC answers: check id -> chosen option. */
   answers: Record<string, string>;
   /** Notizen inputs: note key -> learner text. */
@@ -100,15 +112,33 @@ export const useExamStore = create<ExamStore>()(
 
       beginPart: (durationSec) =>
         set((s) =>
-          s.run ? { run: { ...s.run, phase: "part", remainingSec: durationSec } } : s,
+          s.run
+            ? {
+                run: {
+                  ...s.run,
+                  phase: "part",
+                  remainingSec: durationSec,
+                  // Wall clock, armed once. Untimed runs never read it.
+                  endsAt: s.run.untimed ? undefined : Date.now() + durationSec * 1000,
+                },
+              }
+            : s,
         ),
 
       tick: () =>
-        set((s) =>
-          s.run && !s.run.untimed && s.run.phase === "part" && s.run.remainingSec > 0
-            ? { run: { ...s.run, remainingSec: s.run.remainingSec - 1 } }
-            : s,
-        ),
+        set((s) => {
+          const run = s.run;
+          if (!run || run.untimed || run.phase !== "part") return s;
+          if (run.endsAt == null) {
+            // Legacy run (persisted before s194): no deadline to measure
+            // against, so it keeps counting down the way it was started.
+            return run.remainingSec > 0
+              ? { run: { ...run, remainingSec: run.remainingSec - 1 } }
+              : s;
+          }
+          const next = Math.max(0, Math.ceil((run.endsAt - Date.now()) / 1000));
+          return next === run.remainingSec ? s : { run: { ...run, remainingSec: next } };
+        }),
 
       answer: (checkId, option) =>
         set((s) =>
@@ -152,6 +182,7 @@ export const useExamStore = create<ExamStore>()(
               // hand the next part over, because there is no clock to arm.
               phase: done ? "done" : s.run.untimed ? "part" : "intro",
               remainingSec: 0,
+              endsAt: undefined,
             },
           };
         }),

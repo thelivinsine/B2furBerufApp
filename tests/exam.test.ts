@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  EXAM_BAND,
   composeMockExam,
   mockExamAvailability,
   planWritingTask,
@@ -15,6 +16,8 @@ import {
 import { examSets } from "@/data/examSets";
 import { scenarioById } from "@/data/dialogues";
 import { levelBand } from "@/lib/writingScope";
+import { MOCK_EXAM_PART_KEYS } from "@/store/useProgressStore";
+import { lifeAreaOfTheme } from "@/lib/lifeAreas";
 
 const LEVELS: MockExamLevel[] = ["B1", "B2", "C1"];
 
@@ -132,5 +135,86 @@ describe("scoring", () => {
         sprechen: { pct: 70 },
       }),
     ).toEqual({ pct: 70, scored: 3 });
+  });
+});
+
+/**
+ * s194 audit. Each block pins a finding that shipped as a fix, so the shape it
+ * corrected cannot come back unnoticed.
+ */
+describe("s194 audit invariants", () => {
+  it("P2: the store's bank-free part keys match the engine's order", () => {
+    // Fortschritt classifies runs without importing the content banks, so the
+    // two lists exist in two places and must never drift apart.
+    expect([...MOCK_EXAM_PART_KEYS]).toEqual(MOCK_PART_ORDER);
+  });
+
+  it("P6: every level maps to a band inside its own level", () => {
+    for (const level of LEVELS) {
+      expect(levelBand(EXAM_BAND[level]), level).toBe(level);
+    }
+  });
+
+  it("P15: Lesen never serves audio material", () => {
+    for (const level of LEVELS) {
+      for (let i = 0; i < 12; i++) {
+        for (const id of composeMockExam(level, ["lesen"]).lesen) {
+          // A Durchsage read silently is a different exercise; 38% of the B2
+          // reading pool used to be one.
+          expect(["voicemail", "announcement"], `${level}/${id}`).not.toContain(
+            readingTextById(id)?.kind,
+          );
+        }
+      }
+    }
+  });
+
+  it("P16: Hören stays inside the level's own band, C1 included", () => {
+    // C1 used to top up from B2.2 because the bank held one C1 audio text.
+    for (const level of LEVELS) {
+      for (let i = 0; i < 12; i++) {
+        for (const id of composeMockExam(level, ["hoeren"]).hoeren) {
+          expect(levelBand(readingTextById(id)?.cefr), `${level}/${id}`).toBe(level);
+        }
+      }
+    }
+  });
+
+  it("P16: every level has audio that carries a Notizen sheet", () => {
+    // The Hören Anleitung offers a note-taking task; at C1 no drawable text
+    // could serve one.
+    for (const level of LEVELS) {
+      const withNotes = Array.from({ length: 24 }, () =>
+        composeMockExam(level, ["hoeren"]).hoeren,
+      )
+        .flat()
+        .some((id) => (readingTextById(id)?.notes?.length ?? 0) > 0);
+      expect(withNotes, level).toBe(true);
+    }
+  });
+
+  it("P17: every servable level can serve an Alltag speaking task", () => {
+    // Every Alltag exam set hung off a level-1 scenario, so a B2 or C1
+    // Modelltest could only ever draw a workplace task.
+    for (const level of LEVELS) {
+      const drawn = new Set(
+        Array.from({ length: 40 }, () => composeMockExam(level, ["sprechen"]).sprechen),
+      );
+      const areas = new Set(
+        [...drawn].map((id) => {
+          const set = examSets.find((e) => e.id === id);
+          return set ? lifeAreaOfTheme(set.themeId) : null;
+        }),
+      );
+      expect(areas, level).toContain("personal");
+    }
+  });
+
+  it("P33: no exam set authors more aspects than the debrief can grade", () => {
+    // `examBrief` slices to 5 and the debrief returns one verdict per goal.
+    for (const set of examSets) {
+      expect(set.aspects.length, set.id).toBeGreaterThan(0);
+      expect(set.aspects.length, set.id).toBeLessThanOrEqual(5);
+    }
   });
 });

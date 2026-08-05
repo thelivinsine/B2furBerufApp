@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check, ChevronDown, Clock, Play, TrendingUp } from "lucide-react";
@@ -10,11 +10,17 @@ import {
   PASS_PCT,
   mockExamAvailability,
   type HubLevel,
+  type MockExamAvailability,
   type MockExamLevel,
   type MockPartId,
 } from "@/engine/exam";
+import { useDailyAllowance } from "@/lib/aiAllowance";
 import { useExamStore } from "@/store/useExamStore";
-import { useProgressStore, type MockExamRecord } from "@/store/useProgressStore";
+import {
+  useProgressStore,
+  isFullMockRun,
+  type MockExamRecord,
+} from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { useStagePanel } from "@/features/shared/useStagePanel";
@@ -80,15 +86,30 @@ export interface ModulePractice {
   pct: number | null;
 }
 
-/** A run that sat every part is a Modelltest; anything shorter is practice. */
-export function isFullRun(record: MockExamRecord): boolean {
-  return MOCK_PART_ORDER.every((p) => p in record.parts);
-}
+/**
+ * A run that sat every part is a Modelltest; anything shorter is practice.
+ * The rule itself lives bank-free in the progress store so Fortschritt can
+ * apply the SAME one without importing the content banks (s194 audit P2).
+ */
+export const isFullRun = isFullMockRun;
 
-export function toPractice(record: MockExamRecord): ModulePractice | null {
-  const part = MOCK_PART_ORDER.find((p) => p in record.parts);
-  if (!part) return null;
-  return { id: record.id, date: record.date, part, pct: record.parts[part] ?? null };
+/**
+ * The practice entries a non-full run produced: ONE per module it sat.
+ *
+ * It used to return only the first (s194 audit P32). No surface can start a
+ * two-module run today, so nothing was being lost yet, but `useExamStore.start`
+ * takes an arbitrary part list and the next thing that uses it would have had
+ * its second score silently disappear from the Verlauf.
+ */
+export function toPractices(record: MockExamRecord): ModulePractice[] {
+  return MOCK_PART_ORDER.filter((p) => p in record.parts).map((part) => ({
+    // The record id is the run; a run can now contribute several rows, so the
+    // key has to name the module too.
+    id: `${record.id}|${part}`,
+    date: record.date,
+    part,
+    pct: record.parts[part] ?? null,
+  }));
 }
 
 export function PruefungHub() {
@@ -102,19 +123,47 @@ export function PruefungHub() {
   const reduce = useReducedMotion();
 
   const tab: Tab = params.get("tab") === "modelltest" ? "modelltest" : "module";
-  const [level, setLevel] = useState<HubLevel>(() =>
-    (HUB_LEVELS as readonly string[]).includes(settingsLevel) ? (settingsLevel as HubLevel) : "B2",
-  );
+  // Niveau and the clock live in the URL like the tab does (s194 audit P26).
+  // As component state they reset on every reload and could not be shared, and
+  // the Niveau had to be re-picked after every hop into a trainer and back.
+  const urlLevel = params.get("level");
+  const level: HubLevel = (HUB_LEVELS as readonly string[]).includes(urlLevel ?? "")
+    ? (urlLevel as HubLevel)
+    : (HUB_LEVELS as readonly string[]).includes(settingsLevel)
+      ? (settingsLevel as HubLevel)
+      : "B2";
   // Ohne Zeit is where a learner lands (founder s189): practising is the
   // everyday act, sitting a module against the clock is the deliberate one.
-  const [clock, setClock] = useState<ClockMode>("free");
+  const clock: ClockMode = params.get("zeit") === "mit" ? "timed" : "free";
   const [verlaufOpen, setVerlaufOpen] = useState(false);
+
+  const patchParams = (patch: Record<string, string | null>) => {
+    const p = new URLSearchParams(params);
+    for (const [k, v] of Object.entries(patch)) {
+      if (v == null) p.delete(k);
+      else p.set(k, v);
+    }
+    setParams(p, { replace: true });
+  };
+
+  // Every level's counts, once. `mockExamAvailability` walks the whole text bank
+  // twice and runs `eligibleTasks` across the 717-task writing bank, and it used
+  // to run on EVERY render: a tab switch, a clock switch, opening a Verlauf
+  // (s194 audit P28). The map is also what lets the Niveau list show honest
+  // counts instead of offering A2 as if it were servable (P23).
+  const availByLevel = useMemo(
+    () => Object.fromEntries(HUB_LEVELS.map((l) => [l, mockExamAvailability(l)])) as Record<
+      HubLevel,
+      ReturnType<typeof mockExamAvailability>
+    >,
+    [],
+  );
 
   // A running (or just finished, un-dismissed) exam takes over the route, so a
   // reload lands back inside the simulation, never on the hub.
   if (run) return <MockExamRunner />;
 
-  const avail = mockExamAvailability(level);
+  const avail = availByLevel[level];
   const servable = level !== "A2";
 
   const scoped = mockExams.filter((m) => m.level === level);
@@ -124,8 +173,7 @@ export function PruefungHub() {
   const runs = scoped.filter(isFullRun).slice().reverse();
   const practice = scoped
     .filter((m) => !isFullRun(m))
-    .map(toPractice)
-    .filter((p): p is ModulePractice => p !== null)
+    .flatMap(toPractices)
     .reverse();
 
   const partCount = (part: MockPartId) =>
@@ -139,7 +187,10 @@ export function PruefungHub() {
 
   const openModule = (part: MockPartId) => {
     if (clock === "free" && FREE_ROUTE[part]) {
-      navigate(FREE_ROUTE[part]!);
+      // The Niveau travels with the learner (s194 audit P11). Without it the
+      // trainer opened on whatever scope it was last left on, so the clock was
+      // not the only difference between practising a module and sitting it.
+      navigate(`${FREE_ROUTE[part]!}?level=${level}`);
       return;
     }
     if (!servable) return;
@@ -147,10 +198,7 @@ export function PruefungHub() {
   };
 
   const selectTab = (next: Tab) => {
-    const p = new URLSearchParams(params);
-    if (next === "module") p.delete("tab");
-    else p.set("tab", next);
-    setParams(p, { replace: true });
+    patchParams({ tab: next === "module" ? null : next });
     setVerlaufOpen(false);
   };
 
@@ -187,8 +235,17 @@ export function PruefungHub() {
         {/* Fixed height: the Modelltest tab hides the clock switch, and without
             it the row would change height and shift the page on every switch. */}
         <div className="flex h-9 items-center justify-center gap-2">
-          {tab === "module" && <ClockSwitcher mode={clock} onSelect={setClock} />}
-          <LevelSelect level={level} onSelect={setLevel} />
+          {tab === "module" && (
+            <ClockSwitcher
+              mode={clock}
+              onSelect={(m) => patchParams({ zeit: m === "timed" ? "mit" : null })}
+            />
+          )}
+          <LevelSelect
+            level={level}
+            avail={availByLevel}
+            onSelect={(l) => patchParams({ level: l })}
+          />
         </div>
       </div>
 
@@ -202,6 +259,11 @@ export function PruefungHub() {
             animate="center"
             exit="exit"
             transition={{ duration: reduce ? 0 : 0.15, ease: [0.22, 1, 0.36, 1] }}
+            // The panel half of the tablist above (s194 audit P27): the
+            // switcher announced two tabs and there was nothing they controlled.
+            role="tabpanel"
+            id={panelId(tab)}
+            aria-labelledby={tabId(tab)}
             className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5 lg:max-w-4xl"
           >
             {tab === "module" ? (
@@ -224,6 +286,7 @@ export function PruefungHub() {
               <>
                 <RunBand
                   examDate={examDate}
+                  level={level}
                   canStart={servable && avail.complete}
                   onStart={() => start(level as MockExamLevel)}
                 />
@@ -245,21 +308,51 @@ export function PruefungHub() {
 
 /* -------------------------------- switchers ------------------------------- */
 
+const tabId = (t: Tab) => `pruefung-tab-${t}`;
+const panelId = (t: Tab) => `pruefung-panel-${t}`;
+
 /**
  * The page header. Same mechanism as `LibrarySwitcher`: a recessed grey track
  * with ONE always-mounted white pill measured to the active segment, never a
  * per-segment crossfade. Two segments, so it is content-sized from lg up rather
  * than stretched across the column.
+ *
+ * It is a REAL tablist since s194 (audit P27): ids paired with the panel below,
+ * a roving tab stop and arrow keys. It used to announce two tabs to a screen
+ * reader and then behave like two unrelated buttons.
  */
 function TabSwitcher({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }) {
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(tab);
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const ix = TABS.findIndex((t) => t.id === tab);
+    const next =
+      e.key === "ArrowRight" || e.key === "ArrowDown"
+        ? (ix + 1) % TABS.length
+        : e.key === "ArrowLeft" || e.key === "ArrowUp"
+          ? (ix - 1 + TABS.length) % TABS.length
+          : e.key === "Home"
+            ? 0
+            : e.key === "End"
+              ? TABS.length - 1
+              : -1;
+    if (next === -1) return;
+    e.preventDefault();
+    onSelect(TABS[next].id);
+    // Focus follows selection, which is the automatic-activation pattern the
+    // sliding pill already implements visually.
+    (e.currentTarget as HTMLElement)
+      .querySelector<HTMLElement>(`#${tabId(TABS[next].id)}`)
+      ?.focus();
+  };
 
   return (
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="tablist"
       aria-label="Prüfung"
+      onKeyDown={onKeyDown}
       // The column is `items-center`, so from lg up the track sizes to its two
       // labels instead of stretching across the page, which is the "switcher
       // too big" shape rejected in s149. Full width on a phone.
@@ -282,7 +375,11 @@ function TabSwitcher({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }
             ref={registerItem(t.id) as React.Ref<HTMLButtonElement>}
             type="button"
             role="tab"
+            id={tabId(t.id)}
             aria-selected={active}
+            aria-controls={panelId(t.id)}
+            // One tab stop for the whole set, as ARIA's tabs pattern requires.
+            tabIndex={active ? 0 : -1}
             onClick={() => onSelect(t.id)}
             className={cn(
               "relative z-10 flex-1 rounded-md px-5 py-1.5 text-sm transition-colors lg:flex-none",
@@ -359,13 +456,17 @@ function ClockSwitcher({
  */
 function LevelSelect({
   level,
+  avail,
   onSelect,
 }: {
   level: HubLevel;
+  /** Counts per level, so a zero-yield Niveau greys out with its honest figure. */
+  avail: Record<HubLevel, MockExamAvailability>;
   onSelect: (l: HubLevel) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -373,7 +474,13 @@ function LevelSelect({
     const onDown = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      // Focus goes back where it came from, or it is left on a node that just
+      // stopped existing (s194 audit P27).
+      triggerRef.current?.focus();
+    };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
@@ -382,9 +489,25 @@ function LevelSelect({
     };
   }, [open]);
 
+  /** Up/Down walk the options; Enter and Space are the buttons' own defaults. */
+  const onListKey = (e: React.KeyboardEvent) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const items = Array.from(
+      e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="option"]'),
+    );
+    const at = items.indexOf(document.activeElement as HTMLButtonElement);
+    const next =
+      e.key === "ArrowDown"
+        ? (at + 1) % items.length
+        : (at - 1 + items.length) % items.length;
+    items[next]?.focus();
+  };
+
   return (
     <div className="relative" ref={ref}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
@@ -410,10 +533,19 @@ function LevelSelect({
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
             transition={{ duration: reduce ? 0 : 0.12, ease: "easeOut" }}
-            className="absolute right-0 top-full z-20 mt-1 w-32 rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
+            onKeyDown={onListKey}
+            className="absolute right-0 top-full z-20 mt-1 w-44 rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
           >
             {HUB_LEVELS.map((lv) => {
               const selected = lv === level;
+              const a = avail[lv];
+              // Zero-yield options grey out with their honest count (founder
+              // law). A2 used to look exactly like a servable level and killed
+              // the whole page once picked (s194 audit P23).
+              const empty = !a.complete;
+              const modules = [a.lesen, a.hoeren, a.schreiben, a.sprechen].filter(
+                (n) => n > 0,
+              ).length;
               return (
                 <button
                   key={lv}
@@ -423,13 +555,21 @@ function LevelSelect({
                   onClick={() => {
                     onSelect(lv);
                     setOpen(false);
+                    triggerRef.current?.focus();
                   }}
                   className={cn(
                     "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
-                    selected ? "bg-primary/10 font-medium text-primary" : "hover:bg-muted/60",
+                    selected
+                      ? "bg-primary/10 font-medium text-primary"
+                      : empty
+                        ? "text-muted-foreground hover:bg-muted/60"
+                        : "hover:bg-muted/60",
                   )}
                 >
                   <span className="flex-1 tabular-nums">{lv}</span>
+                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                    {modules === 0 ? "keine Inhalte" : `${modules}/4 Module`}
+                  </span>
                   {selected && <Check className="h-3.5 w-3.5 shrink-0" />}
                 </button>
               );
@@ -536,10 +676,12 @@ function ModuleGrid({
  */
 function RunBand({
   examDate,
+  level,
   canStart,
   onStart,
 }: {
   examDate: string | null;
+  level: HubLevel;
   canStart: boolean;
   onStart: () => void;
 }) {
@@ -580,8 +722,9 @@ function RunBand({
           <PartTrack />
         </div>
 
-        <div className="mt-4 flex items-center justify-center sm:mt-5 lg:mt-auto lg:justify-start lg:pt-5">
+        <div className="mt-4 flex flex-col items-center gap-2 sm:mt-5 lg:mt-auto lg:items-start lg:pt-5">
           {cta}
+          {canStart && <AiBudgetNote level={level} />}
         </div>
       </div>
 
@@ -669,6 +812,42 @@ function PartLadder() {
 }
 
 /**
+ * What a complete run costs from the learner's daily AI budget (s194 audit P9).
+ *
+ * Teil Schreiben spends one of the day's Kurz (B1) or Lang (B2/C1) evaluations
+ * and Teil Sprechen one of the day's conversations, so ONE Modelltest takes half
+ * of each. Nothing said so before: a learner who had already written twice that
+ * day discovered it as an ungraded Schreiben partway through a 52-minute exam.
+ *
+ * It states the fact when the budget is intact and warns when it is not; it
+ * never blocks the run, because Lesen and Hören are unaffected and a run without
+ * an AI grade is still worth sitting.
+ */
+function AiBudgetNote({ level }: { level: HubLevel }) {
+  const writing = useDailyAllowance(level === "B1" ? "kurz" : "lang");
+  const speaking = useDailyAllowance("sprechen");
+  if (!writing.known || !speaking.known) return null;
+
+  const short = [
+    writing.remaining <= 0 ? "Schreiben" : null,
+    speaking.remaining <= 0 ? "Sprechen" : null,
+  ].filter(Boolean) as string[];
+
+  return (
+    <p
+      className={cn(
+        "text-center text-xs leading-snug lg:text-left",
+        short.length ? "text-warning" : "text-muted-foreground",
+      )}
+    >
+      {short.length
+        ? `Heute keine KI-Bewertung mehr für ${short.join(" und ")}. Der Durchlauf zählt trotzdem, ${short.length === 1 ? "dieser Teil bleibt" : "diese Teile bleiben"} ohne Punktzahl.`
+        : `Ein Durchlauf nutzt je eine KI-Bewertung: heute noch ${writing.remaining} fürs Schreiben, ${speaking.remaining} fürs Sprechen.`}
+    </p>
+  );
+}
+
+/**
  * The countdown lives on the page it belongs to, and retires itself once the
  * date has passed, so it can never sit at "0 Tage" forever.
  */
@@ -681,7 +860,9 @@ function ExamCountdown({ examDate }: { examDate: string | null }) {
   return (
     <span className="mt-2 inline-flex items-center gap-1.5 text-sm tabular-nums text-muted-foreground lg:mt-2.5">
       <Clock className="h-3.5 w-3.5 shrink-0" />
-      {days === 0 ? "Heute ist Prüfungstag" : `Noch ${days} Tage bis zum ${label}`}
+      {days === 0
+        ? "Heute ist Prüfungstag"
+        : `Noch ${days} ${days === 1 ? "Tag" : "Tage"} bis zum ${label}`}
     </span>
   );
 }
@@ -718,6 +899,7 @@ function VerlaufCard({
   split?: boolean;
 }) {
   const panelRef = useStagePanel<HTMLDivElement>(open);
+  const listId = useId();
   const shown = open ? rows : rows.slice(0, restRows);
   const hidden = rows.length - shown.length;
   const more = hidden > 0 || open;
@@ -759,6 +941,7 @@ function VerlaufCard({
               summary plus a list does not fit one phone screen; from sm up the
               newest rows are listed too. Opening is what lets the page grow. */}
           <div
+            id={listId}
             className={cn(
               "slim-scrollbar min-h-0 divide-y divide-border border-t border-border",
               split && "lg:border-t-0",
@@ -773,6 +956,7 @@ function VerlaufCard({
               type="button"
               onClick={onToggle}
               aria-expanded={open}
+              aria-controls={listId}
               className={cn(
                 "flex flex-none items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-semibold text-primary transition-colors hover:bg-muted/60",
                 split && "lg:border-t-0",
@@ -885,7 +1069,15 @@ function ScoreChart({ series, best }: { series: number[]; best: number }) {
   const H = 68;
   return (
     <div className="flex flex-col items-start">
-      <div className="relative flex h-[68px] w-fit items-end gap-2">
+      <div
+        className="relative flex h-[68px] w-fit items-end gap-2"
+        role="img"
+        aria-label={
+          series.length
+            ? `Deine letzten ${series.length} Ergebnisse: ${series.join(" %, ")} %. Bestanden ab ${PASS_PCT} %.`
+            : "Noch keine Ergebnisse"
+        }
+      >
         <span
           aria-hidden
           className="absolute -left-1.5 -right-1.5 border-t border-dashed border-success/70"
@@ -952,7 +1144,13 @@ function RunRow({ record }: { record: MockExamRecord }) {
         {unscored ? (
           <span className="text-sm text-muted-foreground">Nicht bewertet</span>
         ) : (
-          <span className="flex min-w-0 max-w-[320px] flex-1 gap-1">
+          <span
+            className="flex min-w-0 max-w-[320px] flex-1 gap-1"
+            role="img"
+            aria-label={MOCK_PART_ORDER.map(
+              (p) => `${PART_LABEL[p]} ${record.parts[p] ?? "ohne Punktzahl"}`,
+            ).join(", ")}
+          >
             {MOCK_PART_ORDER.map((part) => {
               const pct = record.parts[part];
               return (

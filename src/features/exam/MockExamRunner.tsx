@@ -25,6 +25,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  CorrectionToggle,
+  FixTiles,
+  MarkedParagraphs,
+  MAX_FIX_TILES,
+  useCorrectionDiff,
+  type CorrectionViewMode,
+} from "@/features/writing/correction";
 import { cn, formatSeconds, todayKey } from "@/lib/utils";
 import { PART_META, examSetTitle } from "./partMeta";
 import { LesenPart, HoerenPart } from "./McParts";
@@ -86,11 +94,24 @@ export function MockExamRunner() {
   }, [running, onResult, untimed, finish, abandon, setExamExit]);
 
   const part = run ? currentPart(run) : null;
+  const ticking = !!run && !run.untimed && run.phase === "part" && part !== "sprechen";
   useEffect(() => {
-    if (!run || run.untimed || run.phase !== "part" || part === "sprechen") return;
+    if (!ticking) return;
+    // Immediately, then every second. The store measures against a deadline
+    // (s194 audit P3), so the first call is what corrects a run that resumed
+    // after a reload or after the tab was backgrounded and the interval
+    // throttled; waiting a second for it would flash the stale figure.
+    tick();
     const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [run?.phase, part, tick, run]);
+    // The same correction on the way back from a backgrounded tab, where the
+    // interval may not have fired at all.
+    const onVisible = () => document.visibilityState === "visible" && tick();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [ticking, tick]);
 
   if (!run) return null;
 
@@ -269,7 +290,12 @@ function PartIntro({ run }: { run: MockExamRun }) {
 
   const examSet =
     part === "sprechen" ? examSets.find((e) => e.id === run.plan.sprechen) : undefined;
-  const minutes = examSet ? examSet.totalMinutes : PART_MINUTES[part];
+  // ONE source for a part's minutes (s194 audit P24). Sprechen used to read the
+  // drawn set's own `totalMinutes`, which is 6 for 11 of the 15 sets, so the hub
+  // advertised "52 Min gesamt" and the exam ran 51. Sprechen carries no clock
+  // anyway (the dialogue keeps its own pace), so the figure is display only and
+  // has to be the one the hub printed.
+  const minutes = PART_MINUTES[part];
 
   const mcCount = (ids: string[]) =>
     ids.reduce((sum, id) => sum + (readingTextById(id)?.checks.length ?? 0), 0);
@@ -278,6 +304,16 @@ function PartIntro({ run }: { run: MockExamRun }) {
     facts.push(`${run.plan.lesen.length} Texte`, `${mcCount(run.plan.lesen)} Aufgaben`);
   if (part === "hoeren")
     facts.push(`${run.plan.hoeren.length} Ansagen`, `${mcCount(run.plan.hoeren)} Aufgaben`);
+
+  // Only voicemails carry note fields, so a Hören drawn entirely from Durchsagen
+  // has no Notizen sheet at all (always the case at C1). The instruction line is
+  // therefore chosen from the DRAWN plan rather than promising a task the part
+  // may not contain (s194 audit P16).
+  const hasNotes =
+    part === "hoeren" &&
+    run.plan.hoeren.some((id) => (readingTextById(id)?.notes?.length ?? 0) > 0);
+  const instructions =
+    part === "hoeren" && !hasNotes ? PART_META.hoeren.instructionsPlain : meta.instructions;
 
   return (
     // Scrolls INSIDE the stage when a long Sprechen briefing outgrows it; the
@@ -302,7 +338,7 @@ function PartIntro({ run }: { run: MockExamRun }) {
 
       <Card>
         <CardContent className="space-y-3 p-5">
-          <p className="text-sm leading-relaxed">{meta.instructions}</p>
+          <p className="text-sm leading-relaxed">{instructions}</p>
           {examSet && (
             <>
               <div className="border-t border-border pt-3">
@@ -316,6 +352,17 @@ function PartIntro({ run }: { run: MockExamRun }) {
                   </li>
                 ))}
               </ul>
+              {/* The authored rubric, back on screen (s194 audit P18). It has
+                  been required by the content linter and rendered nowhere since
+                  s193 removed the self-assessment checkboxes, yet it is exactly
+                  what the candidate should know before they start: the criteria
+                  the AI debrief weighs. One line, not a second checklist. */}
+              {examSet.rubric.length > 0 && (
+                <p className="text-xs leading-snug text-muted-foreground">
+                  <span className="font-semibold text-foreground">Bewertet wird: </span>
+                  {examSet.rubric.map((c) => c.label).join(" · ")}
+                </p>
+              )}
             </>
           )}
           <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-3">
@@ -370,7 +417,10 @@ function Ergebnis({ run }: { run: MockExamRun }) {
         run.plan.parts.map((p) => [p, run.results[p]?.pct ?? null]),
       ),
     });
-    if (run.plan.parts.length > 1) addXp(XP.examComplete);
+    // Every sitting pays, not only the full four (s194 audit P19): a single
+    // module IS the everyday act in this zone, and it used to award nothing at
+    // all while still counting for the streak.
+    addXp(run.plan.parts.length > 1 ? XP.examComplete : XP.moduleComplete);
     registerSession();
   }, [run, total.pct, mockExams, completeMockExam, addXp, registerSession]);
 
@@ -542,6 +592,44 @@ function ReviewList({ run }: { run: MockExamRun }) {
           </CardContent>
         </Card>
       )}
+      {run.plan.parts.includes("schreiben") && run.essay.trim() && (
+        <SchreibenReview essay={run.essay} corrected={schreiben?.corrected ?? null} />
+      )}
     </div>
+  );
+}
+
+/**
+ * The exam's written text, corrected (s194 audit P7).
+ *
+ * `SchreibenPart` has always put the evaluator's `corrected` on the part result
+ * and nothing ever rendered it, so the Modelltest gave strictly LESS feedback
+ * than the free trainer, whose correction card is the entire point. This is the
+ * same `features/writing/correction.tsx` the trainer, Fokus, the Verlauf and the
+ * spoken debrief use: its fifth caller, never a fifth copy.
+ */
+function SchreibenReview({ essay, corrected }: { essay: string; corrected: string | null }) {
+  const [view, setView] = useState<CorrectionViewMode>("orig");
+  const { paragraphs, changes } = useCorrectionDiff(essay, corrected ?? essay);
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold">Schreiben: dein Text</p>
+          {corrected && <CorrectionToggle view={view} onChange={setView} />}
+        </div>
+        <MarkedParagraphs paragraphs={paragraphs} view={view} />
+        {!corrected ? (
+          <p className="text-xs text-muted-foreground">
+            Für diesen Text gibt es keine Korrektur.
+          </p>
+        ) : changes.length > 0 ? (
+          <FixTiles changes={changes} max={MAX_FIX_TILES} />
+        ) : (
+          <p className="text-sm font-medium text-success">Sprachlich fehlerfrei. Stark!</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

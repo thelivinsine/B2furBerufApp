@@ -1,5 +1,13 @@
 # Prüfung hub audit — 2026-08-05 (session 194)
 
+> **Status (same session): every finding below shipped as a fix.** The founder read the report and
+> answered "fix all the issue". P1-P14, P18-P28 and P29-P35 were fixed in code; P15-P17 were fixed
+> in code AND content (six Alltag exam sets at B2/C1, two C1 audio texts, the first C1 Notizen
+> sheet). Nothing was left open. Gates after the fixes: typecheck · lint 0 errors / 75 warnings ·
+> **610 tests** (up from 592) · build · check:bundle 127.1 kB · check:contrast · lint:content ·
+> lint:migrations. The findings are kept in full below as the record of what was wrong and why;
+> `docs/areas/PRUEFUNG.md` is now the current-state law for the zone.
+
 Full audit of the Prüfung zone, front to back, at commit `c0befc4` (s193, "Sprechen: talk to an AI
 partner"). Nothing in this report has been changed; it is a findings list.
 
@@ -481,7 +489,7 @@ bank at all until a run actually starts.
 
 ---
 
-## Suggested order of work
+## The order the fixes shipped in
 
 1. **P1** — a default-path dead end that loses work. One button condition.
 2. **P2, P20, P21, P24** — the stale-copy and dead-reader cluster. Small, entirely safe, and P2 is
