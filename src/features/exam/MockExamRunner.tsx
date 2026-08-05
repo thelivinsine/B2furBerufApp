@@ -69,7 +69,7 @@ export function MockExamRunner() {
 
   const part = run ? currentPart(run) : null;
   useEffect(() => {
-    if (!run || run.phase !== "part" || part === "sprechen") return;
+    if (!run || run.untimed || run.phase !== "part" || part === "sprechen") return;
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [run?.phase, part, tick, run]);
@@ -135,6 +135,7 @@ export function MockExamRunner() {
  */
 export function RunBar({ run, showTimer = true }: { run: MockExamRun; showTimer?: boolean }) {
   const part = currentPart(run);
+  const timed = showTimer && !run.untimed;
   const many = run.plan.parts.length > 1;
   const low = run.remainingSec > 0 && run.remainingSec < 120;
 
@@ -167,7 +168,7 @@ export function RunBar({ run, showTimer = true }: { run: MockExamRun; showTimer?
             ))}
           </div>
         )}
-        {showTimer && (
+        {timed && (
           <span
             className={cn(
               "inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-2.5 py-1 text-sm font-bold tabular-nums shadow-soft",
@@ -242,7 +243,7 @@ function PartIntro({ run }: { run: MockExamRun }) {
 
   const mcCount = (ids: string[]) =>
     ids.reduce((sum, id) => sum + (readingTextById(id)?.checks.length ?? 0), 0);
-  const facts: string[] = [`${minutes} Minuten`];
+  const facts: string[] = run.untimed ? ["Ohne Uhr"] : [`${minutes} Minuten`];
   if (part === "lesen")
     facts.push(`${run.plan.lesen.length} Texte`, `${mcCount(run.plan.lesen)} Aufgaben`);
   if (part === "hoeren")
@@ -302,7 +303,9 @@ function PartIntro({ run }: { run: MockExamRun }) {
         <ChevronRight className="h-4 w-4" />
       </Button>
       <p className="text-center text-xs text-muted-foreground">
-        Der Timer läuft, sobald du startest.
+        {run.untimed
+          ? "Ohne Uhr: du bestimmst das Tempo."
+          : "Der Timer läuft, sobald du startest."}
       </p>
       </div>
     </div>

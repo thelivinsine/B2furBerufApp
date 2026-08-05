@@ -3995,3 +3995,88 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/components/layout/AppShell.tsx` · `src/features/anwenden/AnwendenHub.tsx` ·
   `src/store/useSessionStore.ts` · `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` · this log
+
+## Session 189 · 2026-08-05 · branch `claude/module-practice-model-test-redesign-ppnkf9`
+
+- **Prompt 1 (verbatim):** `[two screenshots: /anwenden and /exam] this page should be redone.
+  insert a toggle in olace of the current header - similar to Bibliothek. the toggle should have
+  Module wide practice and model test as the two options. within module wise practice, the user
+  should see four modules to practice with time. the model test doesn't need to have einzeln uben
+  section - just the complete test and verlauf should do. The current mode test page looks cheap
+  and chaotic. I want you to redesign these two pages harmonious with the rest of the app and to
+  have an exceptional quality that should resemble it's designed by senior design and front end
+  experts from billion dollar tech apps which is highly intuitive, user friendly and minimalistic.`
+  **Response:** design work, so previews first. Three named options (A "Kompakt", B
+  "Bibliothek-treu", C "Prüfungstag") drawn from the real tokens, each on a phone and a desktop, in
+  light and dark, published as an artifact and saved to `preview/pruefung-hub-redesign.html` (with
+  its generator beside it). The review page also carried the one decision the brief did not settle:
+  this hub is the ONLY entry point to the Schreib- and Sprechtrainer, and neither is a timed exam
+  module, so they needed a home.
+- **Prompt 2 (verbatim):** `there shouldn't be any page scroll by default in these pages. only when
+  the learner clicks on verlauf the section should expand and then the scroll should be enabled if
+  there's too much info within. by default the tiles or cards should fit within the screen and
+  should not overflow beyond the screen size.`
+- **Prompt 3 (verbatim):** `rename anwenden hub to prufung üben or something like that - I need
+  recommendations`
+  **Response to 2 + 3:** the preview's phone frames became the REAL content area a phone leaves
+  (668 px) with scrolling switched off, so a screen that did not fit would visibly overflow the
+  mockup; Verlauf became a closed disclosure. Four costed rename candidates were tabled, with the
+  five-slot bottom bar as the length ceiling.
+- **Prompt 4 (verbatim):** `I don't like the icons and their colors - redo them as well`
+  **Response:** two glyph sets and three colour sets, switchable from the review bar so they could
+  be judged in place. Named what was wrong with the shipped set: three of the four marks were
+  rounded objects, and Schreiben's brand blue sat one hue from Sprechen's cyan.
+- **Prompt 5 (verbatim):** `wait until i see the preview. I'll then prompt you to ask questions`
+  **Response:** stopped; no code was written.
+- **Prompt 6 (verbatim):** `go with A (but the verlauf when opened should be the default when
+  closed. If the verlauf has more entries, it should show expand button at the bottom. Also, take
+  the three KPI figures from Option C and put it in Option A), modern icons, receptive/productive
+  colors. Keep the Prufung name. Also, I want to brainstorm how to merge the freies shcreibtrainer
+  and sprechen within the sprechen and schreiben modules.`
+- **Prompt 7 (verbatim):** `The horizontal line connecting the four modules in the complete test
+  should not overlap the icons - fix it.`
+  **Response to 6 + 7:** round 2 (`preview/pruefung-hub-r2.html`) locked the picks, rebuilt Verlauf
+  as resting-open with the three figures and an expand button, redrew the connector as one segment
+  per gap, and sketched four ways to merge the trainers into the modules with the cost of each.
+- **Prompt 8 (verbatim):** `go with idea 3 for modul uben, build the whole thing.
+
+  For the model test - the verlauf section needs a lot of polishing. The header in the preview is
+  missing. And the expand button looks ugly. when there are many iems like 5-7 in verlauf, when
+  clicked on expand, it should occupy bigger screen space by pushing the above tile upwards and if
+  needed the whole sccreen with the borders of the tile always visible on the screen with internal
+  and page scroll enabled. The user can either scroll within this tile or when reached to the top of
+  the tile and further scrolls, the page scroll should be enabled. This should be the rule for the
+  whole app across even for filters. ask me if you don't understand anything`
+- **Prompt 9 (verbatim):** `for the module uben idea 3 - I want ohne zeit to be default view when
+  opened`
+- **Prompt 10 (verbatim):** `regarding polishing - see if you can center align few things like the
+  niveau dropdown or the KPI figures, etc.`
+  **Response to 8 + 9 + 10:** built. `src/features/pruefung/PruefungHub.tsx` replaces
+  `features/anwenden/AnwendenHub.tsx` and `features/exam/ExamHub.tsx` (both deleted); `/exam`
+  became a redirect and `AppShell`'s exam-chrome route gate was widened to `/anwenden`, without
+  which the running exam would have lost its one-viewport stage. Idea 3 shipped as `Mit Zeit /
+  Ohne Zeit` resting on Ohne Zeit, which needed `untimed` runs in `useExamStore` (no tick, no timer
+  pill, no auto-hand-in) so Lesen and Hören have an untimed shape at all. The expand rule became
+  two CSS utilities (`.h-page-stage`, `.max-h-panel-stage`) plus `useStagePanel`, documented as
+  app-wide law in CLAUDE.md and `docs/areas/PRAKTISCH-NAV.md`. Niveau and the KPI figures are
+  centred.
+  **Verified on the real build over CDP at 393x852**, not only in the mockup: at rest
+  `scrollHeight === innerHeight` on both tabs; with 20 runs, expanding Verlauf grows the page to
+  1240 px, scrolls the tile to top 80 / bottom 772 (the tab bar starts at 789, so both borders are
+  visible), caps it at 692 px, and its list scrolls 859/547 internally. The first attempt parked the
+  tile's lower border under the tab bar, which is what `scroll-mt-20 scroll-mb-24` fixed.
+  **Open question left for the founder, not assumed:** `FilterRail`'s mobile panel already scrolls
+  internally under a `max-h-[45dvh]` cap; whether that cap should rise to the full
+  `max-h-panel-stage` was not changed unilaterally.
+  **Gates:** typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
+- **Artifacts (session 189):** `src/features/pruefung/PruefungHub.tsx` (new) ·
+  `src/features/shared/useStagePanel.ts` (new) · `src/index.css` ·
+  `src/features/exam/partMeta.ts` · `src/features/exam/MockExamRunner.tsx` ·
+  `src/features/exam/McParts.tsx` · `src/features/exam/SchreibenPart.tsx` ·
+  `src/store/useExamStore.ts` · `src/components/layout/AppShell.tsx` ·
+  `src/components/layout/nav-items.ts` · `src/router.tsx` ·
+  `src/features/anwenden/AnwendenHub.tsx` (deleted) · `src/features/exam/ExamHub.tsx` (deleted) ·
+  `preview/pruefung-hub-redesign.html` + `preview/gen-pruefung-hub-redesign.mjs` ·
+  `preview/pruefung-hub-r2.html` + `preview/gen-pruefung-hub-r2.mjs` ·
+  `preview/gen-pruefung-shared.mjs` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
+  `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log

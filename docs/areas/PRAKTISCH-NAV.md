@@ -26,40 +26,75 @@ signpost, Bibliothek = stack of three books, Prüfung = Absolventenhut (orange c
 founder pick D s183; it replaced the target rings, the bar's ONLY outline mark among filled
 two-tone shapes, which is why it read thinner than its neighbours), Fortschritt = Pokal
 (trophy/cup); the pencil-on-the-diagonal Schreiben mark lives on inside the hub card.
-The Prüfung hub itself (`/anwenden`) is 3 cards → Sprechen / Schreiben / **Modelltest** (the
-exam card is NOT called "Prüfung": a card may not carry the name of the page it sits on). The exam
-card was renamed with its page in s188, so the entry point and the page carry ONE name.
+The Prüfung hub itself lives at `/anwenden` and is ONE page with a two-segment header switcher
+(s189, below). `/exam` redirects into it (`?tab=modelltest`) and is kept forever: it is in
+learners' history, in the dashboard recommendation and in ⌘K.
 
-### The Modelltest hub (`/exam` at rest, redesign s188)
+### The Prüfung hub (`/anwenden`, redesign s189)
 
-Founder pick "Prüfungstag" from `preview/exam-hub-redesign.html`, plus two amendments they made
-when picking. Anatomy, top to bottom:
-- **Header:** the `h1` "Modelltest" and the Niveau switcher on ONE line. No HubHero: the icon tile
-  and the "Prüfung" eyebrow went with the redesign (the eyebrow repeated the nav zone the page
-  already sits in). Niveau is the shipped sliding-pill switcher (`useSlidingPill`, one always
-  mounted pill), full width on a phone, content-sized from `sm` up.
-- **The run band:** eyebrow + countdown, then the four Teile as a connected timeline (tinted tile,
-  label, minutes), then the CTA on its own divided row. The timeline is what removed the duplicated
-  minutes the s186 layout printed twice ("4 Teile · 52 Min" above four cards each stating their
-  own). The connector is ONE absolutely-positioned line inset to the first and last tile centre
-  (`left-[12.5%] right-[12.5%]`), masked by a `border-surface` ring on each tile; per-node borders
-  would stop mid-row at the outer nodes.
-- **"Einzeln üben":** the four Teile as rows, each starting that part alone.
-- **Verlauf:** the last 5 runs for the selected Niveau. A row is date · four result segments in
-  exam order · total badge · chevron, and its disclosure holds the four per-Teil percentages as
-  stacked label-over-value cells. A single-part run leaves the other three tracks empty and prints
-  "–" in the disclosure, which is the honest picture of what was actually sat.
-- **Results appear ONLY in Verlauf** (founder s188): not on the band, not on the part rows.
-- **Zero states:** an unservable Niveau (A2) states "Noch keine Inhalte" once per control (the band
-  in its CTA slot, each row in its content line) and Verlauf simply isn't rendered. The page-level
-  "Wähle B1, B2 oder C1" sentence was dropped: the switcher that fixes it sits directly above.
+Founder brief: "insert a toggle in place of the current header, similar to Bibliothek", with
+**Module üben** and **Modelltest** as the two options. It folded two pages into one (the three-card
+`/anwenden` hub and the `/exam` Modelltest page). Layout "A · Kompakt" from
+`preview/pruefung-hub-redesign.html` + `preview/pruefung-hub-r2.html`.
+
+- **Header:** the two-segment sliding-pill switcher IS the page header (`useSlidingPill`, one
+  always-mounted pill). No HubHero, no `h1`. Full width on a phone, content-sized from `lg` up.
+- **Scope controls** sit with it: **centred** under the switcher on a phone, on its line from `lg`
+  up. Niveau is a compact `Niveau B2 ▾` button, NOT a second pill row: the switcher above already
+  owns switcher rank, and two grey tracks stacked before any content read as a heavier header than
+  the page they introduce. This replaced the s188 Niveau pill switcher.
+- **Module üben:** the four modules as identical cards, 2×2 on a phone and four across from `lg`.
+  Mark, name, what it holds, and a chip. Top aligned with the spare room trailing: stretching them
+  to fill a tall phone opened a void inside every card between description and chip, and centring
+  the block read as content that had run out. This is where "Einzeln üben" went.
+- **Mit Zeit / Ohne Zeit** (founder pick "idea 3", s189) is ONE switch beside Niveau, and
+  **Ohne Zeit is the resting state**. It is how the free trainers merged INTO the modules rather
+  than sitting beside them: Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit `/simulation`,
+  and Lesen/Hören run the same drill with `untimed` set (no tick, no timer pill, never auto-handed
+  in). The separate "Freies Üben" block the earlier rounds carried is gone with it, and those two
+  trainers have no other entry point, so the switch is load-bearing.
+- **Modelltest:** the run band and Verlauf, nothing else. The band is eyebrow + countdown, the four
+  modules as a timeline, then the CTA on its own divided row; it takes the room the page leaves, so
+  "Prüfung starten" sits in the thumb's reach.
+- **The timeline connector is ONE SEGMENT PER GAP** (founder s189), drawn from the edge of one tile
+  to the edge of the next. The single full-width line it replaced ran behind the marks and read as
+  if it crossed them; do not restore it (and the `border-surface` ring that used to mask it is gone
+  with it).
+- **Verlauf RESTS OPEN** (founder s189): three centred figures (Letzter · Bester · Bestanden), then
+  the newest runs, newest first. A row is date · four result segments in exam order · total badge ·
+  chevron, and its disclosure holds the four per-module percentages. A single-module run leaves the
+  other three tracks empty and prints "–", which is the honest picture of what was actually sat.
+- **Results appear ONLY in Verlauf** (founder s188): not on the band, not on the module cards.
+- **Zero states:** an unservable Niveau (A2) states "Noch keine Inhalte" once per control and
+  Verlauf simply isn't rendered.
 - The countdown comes from `settings.examDate` and retires itself once the date has passed, so it
   can never sit at "0 Tage" forever.
+
+### The expand rule (founder s189, app-wide)
+
+Stated for Verlauf, meant for every tile that can grow, filters included:
+
+1. **At rest a page does not scroll.** The page sizes itself with `.h-page-stage` (the room under
+   the sticky header and above the bottom bar, `main` padding included) and its elastic regions give
+   up their preferred size rather than push past one screen.
+2. **The learner opens the tile, and only then may the page grow.** The page releases its height cap
+   while a tile is expanded.
+3. **An expanded tile is never taller than one screen** (`.max-h-panel-stage`), so its own top and
+   bottom borders stay visible.
+4. **It scrolls inside, and hands the scroll on at the top.** ONE inner region carries
+   `min-h-0 flex-1 overflow-y-auto`; nothing in that path sets `overscroll-behavior`, so reaching
+   its top chains to the page and brings back whatever sits above.
+5. **It scrolls itself into view on expand** (`useStagePanel`), WITH `scroll-mt-*` / `scroll-mb-*`
+   for the header and the bottom bar: `scrollIntoView` knows about neither, so without them the
+   tile parks its lower border underneath the tab bar.
+
+`FilterRail`'s mobile panel already satisfies 3 and 4 with its own `max-h-[45dvh]` cap; raising it
+to the full `max-h-panel-stage` is an open question for the founder, not an assumed change.
 
 **Two states hide the bar, and they are NOT the same** (do not merge them):
 - **Focus mode** (`useSessionStore.focusMode`, route-gated to `/session`, `/revision`, `/welt`):
   hides EVERYTHING, header and sidebar included; the composed session is a full-screen stage.
-- **Exam chrome** (`useSessionStore.examExit`, route-gated to `/exam`, founder s186): a running
+- **Exam chrome** (`useSessionStore.examExit`, route-gated to `/anwenden` + `/exam`, founder s186): a running
   Prüfungssimulation hides the bottom bar and swaps the header's streak pill + account menu for
   ONE exit in `--danger` red (founder s187, preview options X1 + X2): a phone gets the bare
   `LogOut` mark on the same 36px box the account button had, and from `sm` up it grows the word
@@ -123,7 +158,7 @@ the nav does. `rounded-xl`, never `rounded-2xl`: `--radius + 10` is 24px, which 
 full circle, and icon tiles are squircles. Routes that are not `navItems` entries take their accent
 from `OFF_NAV_COLOR` in `route-icons.tsx` (`/writing` brand blue, `/simulation` cyan, `/exam`
 orange), otherwise all three fall back to brand blue and stop telling each other apart.
-**`/anwenden` and `/exam` deliberately share ONE mark** (`graduationCap`): the tab and the hub card
+**`/anwenden` and `/exam` share ONE mark** (`graduationCap`): the tab and the hub card
 are the same thing at two depths. The page's `HubHero` still shows the lucide `Target`, which is
 the one spot where the zone is not yet a cap.
 Remote-config overrides (admin Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults

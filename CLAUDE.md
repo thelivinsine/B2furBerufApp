@@ -58,9 +58,9 @@ after pulling.
   `graphPalette.ts`, `phase.ts`, `idRenames.ts`,
   `admin.ts` (FOUNDER_EMAILS), `appConfig.ts` (remote config; empty config == default behavior),
   hooks/icons/utils
-- `features/` — `session/` (SessionPlayer + ReadingBlock), `library/`, `vocabulary/`,
+- `features/` — `pruefung/` (the one Prüfung hub), `session/` (SessionPlayer + ReadingBlock), `library/`, `vocabulary/`,
   `collocations/`, `redemittel/`, `grammar/`, `writing/`, `dashboard/`, `welt/` (game),
-  `exam/` (mock exam: ExamHub, MockExamRunner + the four part views, ExamRunner dialogue),
+  `exam/` (mock exam: MockExamRunner + the four part views, ExamRunner dialogue),
   `collection/` (Sammlung), `help/`, `legal/`, `admin/`, `shared/` (FilterRail, LifeAreaPills,
   ViewSwitcher, DataTable, SearchField, useSlidingPill)
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
@@ -140,6 +140,12 @@ after pulling.
   resume. Any new surface holding in-memory work claims it with `useLiveWork(active, label, flush)`
   AND persists itself, so an unavoidable reload (chunk-load self-heal, manual refresh, iOS
   discarding the tab) is recoverable rather than lost work.
+- **A tile the learner EXPANDS obeys one rule, everywhere, filters included** (founder s189):
+  at rest the page does not scroll; expanding releases the page's height cap (`.h-page-stage`); the
+  expanded tile is never taller than one screen (`.max-h-panel-stage`), so its own borders stay
+  visible; ONE inner region scrolls (`min-h-0 flex-1 overflow-y-auto`) and, because nothing sets
+  `overscroll-behavior`, reaching its top hands the scroll on to the page; and it scrolls itself
+  into view via `useStagePanel` WITH `scroll-mt-*`/`scroll-mb-*` for the header and bottom bar.
 - **A freshly opened page never scrolls.** Every trainer sizes its elastic element (the writing
   field, the tile column) to the room actually left, and gives up its preferred floor rather than
   push the resting page past one viewport (`useFillEditor`, `measureMobile`). The **exam** answers
@@ -165,11 +171,16 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
   Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,
   never a heading a learner sees; a third group in any dropdown or legend is a bug (founder, s181).
-- **A result is shown in ONE place per page** (founder s188, the Modelltest hub): past scores live
-  in that page's Verlauf block, never also on the run band or the part rows. The hub leads with the
-  RUN (one band containing the four Teile as a timeline, which is what stops the minutes being
-  printed twice), then "Einzeln üben", then Verlauf; it carries NO HubHero, just the `h1` and the
-  Niveau sliding-pill switcher beside it.
+- **A result is shown in ONE place per page** (founder s188): past scores live in that page's
+  Verlauf block, never also on the run band or the module cards.
+- **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
+  **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
+  Verlauf). No HubHero, no `h1`. Niveau is a compact button, not a second pill row, and the scope
+  controls are CENTRED under the switcher on a phone. **Mit Zeit / Ohne Zeit** is one switch beside
+  it, resting on Ohne Zeit, and it is the ONLY way into the Schreib- and Sprechtrainer
+  (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,
+  never a fifth block. The run band's timeline connector is one segment per gap, drawn between the
+  tiles, never a line behind them.
 - **Every filter and Aufgabe rail carries the Lebensbereich pills** (founder, s184): one shared
   `LifeAreaPills` control in a fixed slot, directly BELOW the Branche dropdown (top of the scope
   stack on a rail without one), single-select that toggles off, `?area=` in the URL, honest counts.

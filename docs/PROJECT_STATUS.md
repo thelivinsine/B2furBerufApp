@@ -1,18 +1,33 @@
 # Project Status
 
-_Last updated: 2026-08-04 (session 188). **The Prüfungssimulation hub was re-done and renamed
-Modelltest.** Founder prompt: "re-do this page". Three options were previewed
-(`preview/exam-hub-redesign.html`) and the founder picked **B "Prüfungstag"** with two amendments,
-which is what shipped: the page **leads with the run** (one band containing the four Teile as a
-timeline, which is what removed the minutes being printed twice), then "Einzeln üben" as rows, then
-**Verlauf**, which is now the ONLY place a past result is shown (founder: not on the band, not on
-the rows). The HubHero went with it, so the page is the `h1` **"Modelltest"** plus the Niveau
-sliding-pill switcher on one line, and the `/anwenden` card that leads here was renamed to match.
-The exam countdown from Settings moved onto this page, a Verlauf row opens to the four per-Teil
-percentages, and the A2 zero state states itself once per control instead of three times per
-screen. Verified by driving the real build (desktop 1280, phone 390, narrow 360, light + dark, A2,
-Verlauf open): 0 px horizontal overflow, no console errors. Gates green: typecheck · lint 0 errors ·
-551 tests · build · check:bundle 126.0 kB · check:contrast.
+_Last updated: 2026-08-05 (session 189). **The Prüfung zone became ONE page.** Founder prompt:
+"this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
+... Module wide practice and model test as the two options". The three-card `/anwenden` hub and the
+`/exam` Modelltest page folded into a single page whose header IS a two-segment sliding-pill
+switcher: **Module üben** | **Modelltest**. `/exam` redirects into it.
+Two preview rounds settled it (`preview/pruefung-hub-redesign.html`, `-r2`); the founder picked
+layout **A "Kompakt"**, the **Modern** module marks in **Rezeptiv / Produktiv** colours, and kept
+the zone name **Prüfung**.
+**Module üben** is the four modules as identical cards, and the free Schreib- and Sprechtrainer
+merged INTO them (founder pick "idea 3"): **Mit Zeit / Ohne Zeit** is one switch beside Niveau,
+**resting on Ohne Zeit**, so Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit
+`/simulation`, and Lesen/Hören run the same drill `untimed` (no tick, no timer pill, never
+auto-handed in). The separate "Freies Üben" block is gone with it. "Einzeln üben" is gone from the
+Modelltest tab: it IS this tab now.
+**Modelltest** is the run band plus Verlauf and nothing else. Verlauf rests OPEN, leading with three
+centred figures (Letzter · Bester · Bestanden), and the timeline connector is now one segment per
+gap drawn BETWEEN the tiles (founder: "should not overlap the icons").
+**The session also set an app-wide law: the expand rule.** A page rests at zero scroll
+(`.h-page-stage`); expanding a tile releases that cap; the expanded tile is never taller than one
+screen (`.max-h-panel-stage`) so its own borders stay visible; ONE inner region scrolls and hands
+the scroll on to the page at its top; and `useStagePanel` scrolls it into view with scroll margins
+for the header and bottom bar. Verified by driving the real build over CDP at 393x852: at rest
+`scrollHeight === innerHeight`; with 20 runs expanded the tile measures 692 px inside an 852 px
+viewport, top 80 / bottom 772 (the bar starts at 789), and its list scrolls 859/547 internally.
+Gates green: typecheck · lint 0 errors · 551 tests · build · check:bundle 125.8 kB · check:contrast.
+Prior s188: the Prüfungssimulation hub was re-done and renamed **Modelltest** (founder pick
+"Prüfungstag"): the page led with the run band, then "Einzeln üben", then Verlauf as the one place
+a result is shown. s189 kept the band, the one-place rule and the countdown, and moved the rest.
 Prior s187: dark mode became near-neutral ("N3 Slate", ground `220 15% 4%`, cards `220 10% 17%`,
 page radials off in dark), the corner scale tightened (`--radius` 0.5rem → card 10px, row 8px,
 pill 6px), and the running Prüfungsteil got its polish round (no tile on the question, drag-resizable

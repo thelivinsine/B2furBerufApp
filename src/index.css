@@ -460,6 +460,47 @@ input:-webkit-autofill {
        is still a scrollbar. */
     height: calc(100dvh - 4rem - 1px - env(safe-area-inset-top));
   }
+  /* Page stage (s189, founder: "by default the tiles or cards should fit within
+     the screen and should not overflow beyond the screen size"). The room a
+     NORMAL page has under the sticky header and above the bottom tab bar,
+     including the `main` padding on both ends. A page that opts in sizes its
+     elastic element against this instead of guessing, so it rests at zero
+     scroll. Desktop drops it: there is no bottom bar and no shortage of room. */
+  .h-page-stage {
+    height: calc(
+      100dvh - 4rem - 1px - env(safe-area-inset-top) - 1.5rem - 3.9375rem -
+        env(safe-area-inset-bottom) - 1.5rem
+    );
+  }
+  @media (min-width: 640px) {
+    .h-page-stage {
+      height: calc(
+        100dvh - 4rem - 1px - env(safe-area-inset-top) - 2rem - 3.9375rem -
+          env(safe-area-inset-bottom) - 1.5rem
+      );
+    }
+  }
+  @media (min-width: 1024px) {
+    .h-page-stage {
+      height: auto;
+    }
+  }
+  /* The ceiling for a tile the learner EXPANDED (Verlauf, and every filter or
+     disclosure that adopts the rule): at most one screen, so its own top and
+     bottom borders always stay visible. Its inner region scrolls, and because
+     nothing here sets `overscroll-behavior`, reaching that region's top hands
+     the scroll on to the page, which is what reveals whatever sits above. */
+  .max-h-panel-stage {
+    max-height: calc(
+      100dvh - 4rem - 1px - env(safe-area-inset-top) - 3.9375rem -
+        env(safe-area-inset-bottom) - 2rem
+    );
+  }
+  @media (min-width: 1024px) {
+    .max-h-panel-stage {
+      max-height: calc(100dvh - 4rem - 1px - env(safe-area-inset-top) - 3rem);
+    }
+  }
   .pb-nav {
     /* Bottom bar = 63px icon rail + safe area (the old name strip was removed).
        Keep a comfortable gap so content never sits under the bar. */

@@ -69,7 +69,11 @@ export function AppShell() {
   // Route-gated like focus mode, so a stale flag can never strip the chrome
   // anywhere else.
   const examExit = useSessionStore((s) => s.examExit);
-  const exam = !!examExit && location.pathname === "/exam";
+  // The runner took the `/exam` route over until s189; it now takes over the
+  // Prüfung hub instead, and `/exam` is a redirect into that hub. Both are
+  // listed so a stale flag still cannot strip the chrome anywhere else.
+  const exam =
+    !!examExit && (location.pathname === "/anwenden" || location.pathname === "/exam");
 
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we

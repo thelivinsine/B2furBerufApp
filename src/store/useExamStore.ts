@@ -38,6 +38,12 @@ export interface MockExamRun {
   plays: Record<string, number>;
   essay: string;
   results: MockExamResults;
+  /**
+   * A module started in "Ohne Zeit" (s189). Same draw, same scoring, no clock:
+   * nothing ticks, the timer pill is hidden and the part is never auto-handed
+   * in. Optional so a run persisted before s189 resumes as timed.
+   */
+  untimed?: boolean;
 }
 
 export function currentPart(run: MockExamRun): MockPartId {
@@ -46,7 +52,7 @@ export function currentPart(run: MockExamRun): MockPartId {
 
 interface ExamStore {
   run: MockExamRun | null;
-  start: (level: MockExamLevel, parts?: MockPartId[]) => void;
+  start: (level: MockExamLevel, parts?: MockPartId[], opts?: { untimed?: boolean }) => void;
   /** Leave the exam without a result; the run is discarded. */
   abandon: () => void;
   /** Instruction page -> the part itself; arms this part's clock. */
@@ -67,9 +73,10 @@ export const useExamStore = create<ExamStore>()(
     (set) => ({
       run: null,
 
-      start: (level, parts = MOCK_PART_ORDER) =>
+      start: (level, parts = MOCK_PART_ORDER, opts) =>
         set({
           run: {
+            untimed: opts?.untimed ?? false,
             startedAt: new Date().toISOString(),
             plan: composeMockExam(level, parts),
             partIx: 0,
@@ -92,7 +99,7 @@ export const useExamStore = create<ExamStore>()(
 
       tick: () =>
         set((s) =>
-          s.run && s.run.phase === "part" && s.run.remainingSec > 0
+          s.run && !s.run.untimed && s.run.phase === "part" && s.run.remainingSec > 0
             ? { run: { ...s.run, remainingSec: s.run.remainingSec - 1 } }
             : s,
         ),

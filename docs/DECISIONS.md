@@ -1467,3 +1467,38 @@ weight). The founder picked **B**, with two amendments.
   strips the prefix wherever a title is shown (the Sprechen runner header and its RunBar were still
   printing the old page name). It lives in `partMeta`, not `engine/exam`, so a caller does not pull
   the content banks in behind one string helper.
+
+## s189 — the Prüfung zone is one page, and the expand rule
+
+**Why the zone folded into one page.** `/anwenden` was a menu of three cards whose only job was to
+send the learner one level deeper, and one of those cards led to a page that itself held four
+practice rows plus a full run. Two pages, four levels of nesting, and the same four skills named on
+both. The founder's instruction ("insert a toggle in place of the current header, similar to
+Bibliothek") removes the menu layer outright: the switcher IS the header, so the page's two states
+are the two things a learner actually wants, practising a module or sitting the whole exam.
+
+**Why Niveau stopped being a pill switcher.** s188 made it one, beside the `h1`. With the `h1`
+replaced by a switcher, keeping it would stack two grey tracks before any content and give two
+controls the same rank. It is now a compact `Niveau B2 ▾` button: the switcher navigates, the
+button narrows what is served, and the shapes say which is which. This supersedes the s188 pick.
+
+**Why the free trainers became a clock switch, not a fifth block.** Schreiben existed twice: a
+20-minute graded exam module and an untimed trainer with Fokus, Kurz and Lang. Same for Sprechen.
+Four ways to reconcile them were previewed; the founder picked "Mit Zeit / Ohne Zeit" as ONE switch
+for all four modules, resting on Ohne Zeit. The consequence is that the clock is the only difference
+the learner has to understand, and the trainers stop being separate products. The consequence to
+watch: this switch is now the ONLY entry point to `/writing` and `/simulation`, so it must never be
+removed without giving those pages another way in.
+
+**Why the timeline connector is drawn per gap.** s188 used one absolutely-positioned line inset to
+the outer tile centres, masked by a `border-surface` ring on each tile. The founder read it as
+crossing the marks. One segment per gap, edge to edge, needs no mask and cannot overlap anything.
+
+**The expand rule (app-wide).** Stated for Verlauf, meant for every tile that can grow: a page rests
+at zero scroll; the learner's tap is what allows it to grow; an expanded tile never exceeds one
+screen, so its own borders stay visible; one inner region scrolls and hands the scroll on to the
+page at its top. The last part is the browser's default scroll chaining, which is why nothing in
+that path may set `overscroll-behavior: contain`. The non-obvious failure found while building:
+`scrollIntoView` knows nothing about a sticky header or a fixed bottom bar, so without
+`scroll-mt-*`/`scroll-mb-*` the tile scrolls flush to the viewport edge and parks its own lower
+border underneath the tab bar, which is exactly the thing the rule exists to prevent.
