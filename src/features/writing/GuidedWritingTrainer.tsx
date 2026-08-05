@@ -44,7 +44,7 @@ import { UmlautKeys } from "./UmlautKeys";
 import { AllowanceNote } from "./AllowanceNote";
 import { FeedbackLangChip } from "./FeedbackLang";
 import { useDailyAllowance } from "@/lib/aiAllowance";
-import { floatingNote, floatingSlot } from "./floatingCluster";
+import { floatingNote, floatingSlot } from "@/features/shared/floatingCluster";
 import { useFillEditor } from "./useFillEditor";
 import {
   CorrectionToggle,
@@ -749,7 +749,7 @@ export function GuidedWritingTrainer({
                 disabled={submitting}
                 rows={length === "long" ? 10 : 6}
                 placeholder="Schreibe hier deinen Text auf Deutsch …"
-                className="block w-full resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+                className="block w-full resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none"
               />
               <div className="flex flex-wrap items-center gap-2">
                 {/* German special-character keys for non-German keyboards (s150). */}

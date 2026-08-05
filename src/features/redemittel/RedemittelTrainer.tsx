@@ -17,14 +17,21 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
   ScrollTopButton,
   UebenLabel,
+  BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
 } from "@/features/shared/browseScroll";
+import {
+  CLUSTER_CLEARANCE,
+  FloatingActionCluster,
+  floatingSlot,
+} from "@/features/shared/floatingCluster";
+import { ScrollRootProvider } from "@/lib/scrollRoot";
 import { cn } from "@/lib/utils";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -69,6 +76,10 @@ const REDEMITTEL_FACET_IDS = REDEMITTEL_FACETS.map((f) => f.id);
 // the repo (the session engine's redemittel pool covers the practice loop).
 export function RedemittelTrainer() {
   const [params, setParams] = useSearchParams();
+  // The desktop scroll container, handed to `usePagedList` through context so
+  // its sentinel observes THIS element rather than the viewport (s189).
+  const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
+
   const navigate = useNavigate();
   const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [search, setSearch] = useState("");
@@ -273,16 +284,26 @@ export function RedemittelTrainer() {
             {/* Content centered in the tile: every card in the grid is the same
                 height (auto-rows-fr), so a short Wendung would otherwise leave a
                 hollow half-card under it. */}
-            <CardContent className="flex h-full flex-col justify-center gap-2 p-4">
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
+            {/* Same anatomy as the Kollokationen card (founder s189: the
+                Redemittel cards "abruptly become bigger in height"): the same
+                `gap`-less stack, the same `mt-2 border-t pt-2` divider and the
+                same `text-sm` example, and the example is capped at two lines
+                so one long Beispiel cannot stretch every card in the grid
+                (`auto-rows-fr` sizes them all to the tallest). */}
+            <CardContent className="flex h-full flex-col justify-center p-4">
+              <div className="flex min-w-0 items-start gap-1.5">
+                <p className="min-w-0 flex-1 text-base font-semibold leading-snug sm:text-lg">
+                  {p.de}
+                </p>
                 <span onClick={(e) => e.stopPropagation()}>
-                  <SpeakButton text={p.de} />
+                  <SpeakButton text={p.de} className="shrink-0" />
                 </span>
               </div>
-              <p className="border-t border-border pt-2 text-xs italic text-muted-foreground">
-                „{p.example.de}"
-              </p>
+              <div className="mt-2 border-t border-border pt-2">
+                <p className="line-clamp-2 text-sm italic text-muted-foreground">
+                  „{p.example.de}"
+                </p>
+              </div>
             </CardContent>
           </Card>
         );
@@ -308,7 +329,7 @@ export function RedemittelTrainer() {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:space-y-[1.05rem]">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
@@ -316,8 +337,8 @@ export function RedemittelTrainer() {
           the tile still starts level with the first card. Mobile renders the
           SAME filter tile inline (collapsed by default; Register is a facet
           group in it now); only one FilterRail is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:min-h-0 lg:flex-1 lg:grid-rows-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
@@ -332,15 +353,15 @@ export function RedemittelTrainer() {
                 {/* Mobile filter toggle, left of the view icons (founder s92). */}
                 <Button
                   size="icon"
-                  variant={filtersOpen ? "default" : "outline"}
+                  variant="accent"
                   aria-pressed={filtersOpen}
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
+                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
                   {activeFilterCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
                       {activeFilterCount}
@@ -387,7 +408,7 @@ export function RedemittelTrainer() {
                     })
                   }
                 >
-                  <Search className="h-4 w-4" />
+                  <Search className="h-3.5 w-3.5" />
                 </Button>
               </motion.div>
             </motion.div>
@@ -429,52 +450,59 @@ export function RedemittelTrainer() {
           )}
         </AnimatePresence>
 
-        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {/* The level-band chip rides with the CONTENT, not the sticky toolbar
-              (2026-07-31): the toolbar row is transparent now, so a chip pinned
-              there would float on top of the cards scrolling underneath. */}
-          {bandActive && bandHiddenCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
-          {filtered.length > 0 &&
-            (view === "tabelle" ? (
-              <RedemittelTable items={filtered} />
-            ) : view === "liste" ? (
-              <RedemittelCompactList items={filtered} />
-            ) : (
-              cardGrid
-            ))}
-
-          {filtered.length === 0 && (
-            <div className="py-16 text-center text-muted-foreground">
-              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-            </div>
-          )}
+        <div
+          ref={setScrollRoot}
+          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+        >
+          <ScrollRootProvider value={scrollRoot}>
+            {/* The level-band chip rides with the CONTENT, not the sticky toolbar
+                (2026-07-31): the toolbar row is transparent now, so a chip pinned
+                there would float on top of the cards scrolling underneath. */}
+            {bandActive && bandHiddenCount > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <ActiveFilterChip
+                  label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                  onRemove={() => setShowAllLevels(true)}
+                />
+              </div>
+            )}
+  
+            {filtered.length > 0 &&
+              (view === "tabelle" ? (
+                <RedemittelTable items={filtered} />
+              ) : view === "liste" ? (
+                <RedemittelCompactList items={filtered} />
+              ) : (
+                cardGrid
+              ))}
+  
+            {filtered.length === 0 && (
+              <div className="py-16 text-center text-muted-foreground">
+                Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+              </div>
+            )}
+          </ScrollRootProvider>
         </div>
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
-          <FeedbackIconButton />
-          <Button
-            variant="gradient"
-            className="h-11 flex-1 rounded-xl text-base"
-            onClick={startSession}
-          >
-            <UebenLabel
-              iconClass="h-4 w-4"
-              count={filtered.length}
-              noun={filtered.length === 1 ? "Wendung" : "Wendungen"}
-            />
-          </Button>
-        </div>
+        <FloatingActionCluster note={<FeedbackNote />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
+            <Button
+              variant="gradient"
+              className="h-11 w-full rounded-xl text-base"
+              onClick={startSession}
+            >
+              <UebenLabel
+                iconClass="h-4 w-4"
+                count={filtered.length}
+                noun={filtered.length === 1 ? "Wendung" : "Wendungen"}
+              />
+            </Button>
+          </div>
+        </FloatingActionCluster>
+        <div className={CLUSTER_CLEARANCE} aria-hidden />
 
         <FilterRail
           {...filterRailProps}

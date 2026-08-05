@@ -19,12 +19,13 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
   ScrollTopButton,
   UebenLabel,
+  BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
 } from "@/features/shared/browseScroll";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
@@ -55,6 +56,12 @@ import { countLifeAreas } from "@/features/shared/LifeAreaPills";
 import type { WorkSector } from "@/types";
 import { mastery, masteryLabel } from "@/engine/srs";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
+import {
+  CLUSTER_CLEARANCE,
+  FloatingActionCluster,
+  floatingSlot,
+} from "@/features/shared/floatingCluster";
+import { ScrollRootProvider } from "@/lib/scrollRoot";
 import { cn } from "@/lib/utils";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
@@ -81,6 +88,10 @@ const WOERTER_VIEWS: LibraryView[] = ["tabelle", "graph", "karten", "liste"];
 // (`features.practiceTabs`, default false); the component reads it below.
 
 export function VocabularyTrainer() {
+  // The desktop scroll container, handed to `usePagedList` through context so
+  // its sentinel observes THIS element rather than the viewport (s189).
+  const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
+
   const showPracticeTabs = useAppConfigStore((s) => s.config.features.practiceTabs);
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -380,7 +391,7 @@ export function VocabularyTrainer() {
       className={BROWSE_TOOLBAR_BUTTON}
       onClick={toggleSaved}
     >
-      <Bookmark className={cn("h-4 w-4", savedActive && "fill-current")} />
+      <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
     </Button>
   );
 
@@ -401,7 +412,7 @@ export function VocabularyTrainer() {
         })
       }
     >
-      <Search className="h-4 w-4" />
+      <Search className="h-3.5 w-3.5" />
     </Button>
   );
 
@@ -416,15 +427,15 @@ export function VocabularyTrainer() {
   const filterButton = (
     <Button
       size="icon"
-      variant={filtersOpen ? "default" : "outline"}
+      variant="accent"
       aria-pressed={filtersOpen}
       aria-expanded={filtersOpen}
       aria-label="Filter"
       title="Filter"
-      className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
+      className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
       onClick={() => setFiltersOpen((o) => !o)}
     >
-      <SlidersHorizontal className="h-4 w-4" />
+      <SlidersHorizontal className="h-3.5 w-3.5" />
       {facetCount > 0 && (
         <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
           {facetCount}
@@ -552,7 +563,7 @@ export function VocabularyTrainer() {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:space-y-[1.05rem]">
       {/* No page header: the Bibliothek tabs (LibrarySwitcher) already say which
           section this is (founder s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
@@ -561,8 +572,8 @@ export function VocabularyTrainer() {
           the tile still starts level with the first word card. Mobile renders
           the SAME filter tile inline (collapsed by default) instead of a
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:min-h-0 lg:flex-1 lg:grid-rows-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
               Filter + view on the left, bookmark/search pushed right; Üben fills
               its row with the count at the far right. Desktop keeps Üben/count
@@ -652,68 +663,75 @@ export function VocabularyTrainer() {
           )}
         </AnimatePresence>
 
-        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
-              dropdown already shows the active theme, so the chip was redundant.
-              The silent level-band cut shows as an explicit removable chip.
-              It rides with the CONTENT, not the sticky toolbar (2026-07-31):
-              the toolbar row is transparent now, so a chip pinned there would
-              float on top of the card titles scrolling underneath. */}
-          {hiddenLabel && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
-          {/* One-time Artikel-Wesen legend (dismiss state in the settings
-              store). Teaches the three gender creatures before they appear
-              beside the words below. */}
-          <ArtikelLegend />
-
-          {/* Sub-theme drill-down now lives in the filter (the Unterthema
-              dropdown), not a separate picker page. When one or more sub-themes
-              are active this breadcrumb shows the context and jumps back to the
-              whole theme. */}
-          {hasSubThemes && subs.length > 0 && (
-            <button
-              onClick={() => setSubs([])}
-              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {activeTheme?.titleDe}
-              <span className="text-muted-foreground/60">/</span>
-              <span className="text-foreground">
-                {subs.length === 1
-                  ? (activeSub?.titleDe ?? "Gesamtes Thema")
-                  : `${subs.length} Unterthemen`}
-              </span>
-            </button>
-          )}
-
-          {listContent}
+        <div
+          ref={setScrollRoot}
+          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+        >
+          <ScrollRootProvider value={scrollRoot}>
+            {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
+                dropdown already shows the active theme, so the chip was redundant.
+                The silent level-band cut shows as an explicit removable chip.
+                It rides with the CONTENT, not the sticky toolbar (2026-07-31):
+                the toolbar row is transparent now, so a chip pinned there would
+                float on top of the card titles scrolling underneath. */}
+            {hiddenLabel && (
+              <div className="flex flex-wrap items-center gap-2">
+                <ActiveFilterChip
+                  label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                  onRemove={() => setShowAllLevels(true)}
+                />
+              </div>
+            )}
+  
+            {/* One-time Artikel-Wesen legend (dismiss state in the settings
+                store). Teaches the three gender creatures before they appear
+                beside the words below. */}
+            <ArtikelLegend />
+  
+            {/* Sub-theme drill-down now lives in the filter (the Unterthema
+                dropdown), not a separate picker page. When one or more sub-themes
+                are active this breadcrumb shows the context and jumps back to the
+                whole theme. */}
+            {hasSubThemes && subs.length > 0 && (
+              <button
+                onClick={() => setSubs([])}
+                className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {activeTheme?.titleDe}
+                <span className="text-muted-foreground/60">/</span>
+                <span className="text-foreground">
+                  {subs.length === 1
+                    ? (activeSub?.titleDe ?? "Gesamtes Thema")
+                    : `${subs.length} Unterthemen`}
+                </span>
+              </button>
+            )}
+  
+            {listContent}
+          </ScrollRootProvider>
         </div>
 
         {/* Mobile action bar: Üben (with the filtered-set count folded into the
             label) stays pinned at the bottom of the screen (above the nav) so
             the list scrolls above it. Desktop keeps Üben in the rail. */}
         <ScrollTopButton show={scrolled} />
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
-          <FeedbackIconButton />
-          <Button
-            variant="gradient"
-            className="h-11 flex-1 rounded-xl text-base"
-            onClick={startSession}
-          >
-            <UebenLabel
-              iconClass="h-4 w-4"
-              count={items.length}
-              noun={items.length === 1 ? "Wort" : "Wörtern"}
-            />
-          </Button>
-        </div>
+        <FloatingActionCluster note={<FeedbackNote />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
+            <Button
+              variant="gradient"
+              className="h-11 w-full rounded-xl text-base"
+              onClick={startSession}
+            >
+              <UebenLabel
+                iconClass="h-4 w-4"
+                count={items.length}
+                noun={items.length === 1 ? "Wort" : "Wörtern"}
+              />
+            </Button>
+          </div>
+        </FloatingActionCluster>
+        <div className={CLUSTER_CLEARANCE} aria-hidden />
 
         <FilterRail
           {...filterRailProps}

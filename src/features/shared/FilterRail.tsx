@@ -31,6 +31,13 @@ import type { PrimaryGroup, PrimaryOption } from "@/features/shared/BrowseToolba
  * Mobile keeps BrowseToolbar + FacetSheet untouched; the two surfaces are
  * alternate presentations of the same state and never render together.
  */
+/**
+ * The Himmelblau wash both filter rails wear, identical to the Schreiben
+ * "Aufgabe wählen" rail (founder s189). The border carries the fill's own
+ * colour, so the tile separates from the page by `shadow-soft` alone.
+ */
+const ACCENT = "border-accent/20 bg-accent/20 dark:border-accent/10 dark:bg-accent/10";
+
 export interface RailPrimary {
   /** Stable id for pin persistence (e.g. "primary", "secondary", "sector").
    *  Keep existing ids stable so saved pins survive; new scopes pick fresh ids. */
@@ -372,7 +379,10 @@ export function FilterRail<T>({
     <Button
       type="button"
       size="icon"
-      variant={open ? "default" : "outline"}
+      // The control that OPENS an accent rail wears that rail's fill, never
+      // brand blue, which would compete with the Üben CTA beside it (s166, and
+      // the same rule the Schreiben "Aufgabe wählen" toggle follows).
+      variant="accent"
       aria-expanded={open}
       aria-label="Filter"
       title="Filter"
@@ -629,10 +639,11 @@ export function FilterRail<T>({
         // Capped to ~45% of the viewport with the filters scrolling INSIDE
         // (founder, mobile): a flex column with a fixed header and one internal
         // scroll region, so an open panel never swallows the whole screen. The
-        // cap was trimmed from 55dvh (~3-4 fewer lines on a phone) so the open
-        // panel leaves more of the list visible.
+        // cap stays at 45dvh (founder s189, after `preview/filterrail-height.html`
+        // tested the one-screen ceiling here and its bottom border landed off the
+        // viewport).
         className={cn(
-          "flex max-h-[45dvh] flex-col rounded-xl border border-border bg-muted shadow-soft",
+          `flex max-h-[45dvh] flex-col rounded-xl border ${ACCENT} shadow-soft`,
           className,
         )}
       >
@@ -657,11 +668,13 @@ export function FilterRail<T>({
   return (
     <aside
       className={cn(
-        // Subtle-grey tile (founder follow-up s104): `bg-muted`, the same
-        // recessed grey the ViewSwitcher / page toggle track uses, so the
-        // filter tile reads as a distinct surface against the white content
-        // cards. The controls INSIDE stay white (the scope dropdowns and the
-        // unselected facet pills are `bg-surface`), so they pop off the grey.
+        // Himmelblau FILL (founder s189), the SAME wash the Schreiben
+        // "Aufgabe wählen" rail wears: the two rails do the same job, so they
+        // now speak one colour. This supersedes the grey `bg-muted` tile of
+        // s104. The controls INSIDE stay white (the scope dropdowns and the
+        // unselected facet pills are `bg-surface`), so they pop off the wash,
+        // and the border carries the fill's own colour rather than a grey edge
+        // (s169: a grey outline around a blue wash read as dirty).
         //
         // On DESKTOP (the instance className adds `lg:flex lg:flex-col` +
         // `lg:max-h-…` + `lg:overflow-hidden`) the tile is a strictly capped
@@ -671,7 +684,7 @@ export function FilterRail<T>({
         // 2026-07-13), and it auto-hides until the region is hovered. On MOBILE
         // this rail layout is never shown (the mobile panel is a separate
         // `layout="panel"` tile); the Üben footer there lives in the toolbar.
-        "rounded-xl border border-border bg-muted shadow-soft",
+        `rounded-xl border ${ACCENT} shadow-soft`,
         className,
       )}
       aria-label="Filter"
@@ -682,7 +695,7 @@ export function FilterRail<T>({
           first row). Fixed at the top of the flex column so the scroll region
           below it owns the scrollbar. */}
       {!hideHeader && (
-        <div className="z-10 flex w-full shrink-0 items-center gap-1 rounded-t-xl bg-muted px-3 py-2.5 lg:rounded-none">
+        <div className="z-10 flex w-full shrink-0 items-center gap-1 rounded-t-xl bg-accent/20 px-3 py-2.5 dark:bg-accent/10 lg:rounded-none">
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -713,7 +726,9 @@ export function FilterRail<T>({
         <div
           className={cn(
             "scrollbar-hover lg:min-h-0 lg:flex-1 lg:overflow-y-auto",
-            !hideHeader && "border-t border-border",
+            // Dividers are tinted to the tile, never neutral grey: with the
+            // outline gone a grey rule would be the only hard edge left (s169).
+            !hideHeader && "border-t border-accent-ink/10",
           )}
         >
           {open && <div className="space-y-5 p-3">{filterBody}</div>}
@@ -732,7 +747,7 @@ export function FilterRail<T>({
       {footer && (
         <div
           className={cn(
-            "z-10 flex shrink-0 items-center gap-2 rounded-b-xl border-t border-border bg-muted p-3 lg:rounded-none",
+            "z-10 flex shrink-0 items-center gap-2 rounded-b-xl border-t border-accent-ink/10 bg-accent/20 p-3 dark:bg-accent/10 lg:rounded-none",
             // Headerless + collapsed + no pinned sections: the footer is the
             // whole tile, so round its top too and drop the divider.
             hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",

@@ -26,14 +26,21 @@ import {
 } from "@/lib/facets";
 import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
   ScrollTopButton,
   UebenLabel,
+  BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
 } from "@/features/shared/browseScroll";
+import {
+  CLUSTER_CLEARANCE,
+  FloatingActionCluster,
+  floatingSlot,
+} from "@/features/shared/floatingCluster";
+import { ScrollRootProvider } from "@/lib/scrollRoot";
 import { cn } from "@/lib/utils";
 import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
@@ -115,6 +122,10 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
 
 export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
+  // The desktop scroll container, handed to `usePagedList` through context so
+  // its sentinel observes THIS element rather than the viewport (s189).
+  const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
+
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
   // Mode pre-selects which DOMAINS the grouped theme dropdown shows (founder
@@ -437,7 +448,7 @@ export function CollocationsBrowser() {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
@@ -445,8 +456,8 @@ export function CollocationsBrowser() {
           the tile still starts level with the first card. Mobile renders the
           SAME filter tile inline (collapsed by default); only one FilterRail
           is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:min-h-0 lg:flex-1 lg:grid-rows-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
@@ -461,15 +472,15 @@ export function CollocationsBrowser() {
                 {/* Mobile filter toggle, left of the view icons (founder s92). */}
                 <Button
                   size="icon"
-                  variant={filtersOpen ? "default" : "outline"}
+                  variant="accent"
                   aria-pressed={filtersOpen}
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
+                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
                   {filterCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
                       {filterCount}
@@ -516,7 +527,7 @@ export function CollocationsBrowser() {
                     })
                   }
                 >
-                  <Search className="h-4 w-4" />
+                  <Search className="h-3.5 w-3.5" />
                 </Button>
               </motion.div>
             </motion.div>
@@ -558,72 +569,83 @@ export function CollocationsBrowser() {
           )}
         </AnimatePresence>
 
-        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {/* The level-band chip rides with the CONTENT, not the sticky toolbar
-              (2026-07-31): the toolbar row is transparent now, so a chip pinned
-              there would float on top of the cards scrolling underneath. */}
-          {hiddenLabel && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
-          {/* Sub-theme drill-down now lives in the filter (the Unterthema
-              dropdown), not a separate picker page. This breadcrumb shows the
-              active sub-theme context and jumps back to the whole theme. */}
-          {hasSubThemes && subs.length > 0 && (
-            <button
-              onClick={() => setSubs([])}
-              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {activeTheme?.titleDe}
-              <span className="text-muted-foreground/60">/</span>
-              <span className="text-foreground">
-                {subs.length === 1
-                  ? (activeSub?.titleDe ?? "Gesamtes Thema")
-                  : `${subs.length} Unterthemen`}
-              </span>
-            </button>
-          )}
-
-          {filtered.length === 0 ? (
-            <div className="py-16 text-center text-muted-foreground">
-              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-            </div>
-          ) : view === "tabelle" ? (
-            <CollocationTable items={filtered} />
-          ) : view === "liste" ? (
-            <CollocationCompactList items={filtered} />
-          ) : view === "graph" ? (
-            <Suspense
-              fallback={
-                <div className="h-[62dvh] min-h-[440px] animate-pulse rounded-xl border border-border bg-surface" />
-              }
-            >
-              <CollocationGraph items={filtered} />
-            </Suspense>
-          ) : (
-            cardGrid
-          )}
+        <div
+          ref={setScrollRoot}
+          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+        >
+          <ScrollRootProvider value={scrollRoot}>
+            {/* The level-band chip rides with the CONTENT, not the sticky toolbar
+                (2026-07-31): the toolbar row is transparent now, so a chip pinned
+                there would float on top of the cards scrolling underneath. */}
+            {hiddenLabel && (
+              <div className="flex flex-wrap items-center gap-2">
+                <ActiveFilterChip
+                  label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                  onRemove={() => setShowAllLevels(true)}
+                />
+              </div>
+            )}
+  
+            {/* Sub-theme drill-down now lives in the filter (the Unterthema
+                dropdown), not a separate picker page. This breadcrumb shows the
+                active sub-theme context and jumps back to the whole theme. */}
+            {hasSubThemes && subs.length > 0 && (
+              <button
+                onClick={() => setSubs([])}
+                className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {activeTheme?.titleDe}
+                <span className="text-muted-foreground/60">/</span>
+                <span className="text-foreground">
+                  {subs.length === 1
+                    ? (activeSub?.titleDe ?? "Gesamtes Thema")
+                    : `${subs.length} Unterthemen`}
+                </span>
+              </button>
+            )}
+  
+            {filtered.length === 0 ? (
+              <div className="py-16 text-center text-muted-foreground">
+                Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+              </div>
+            ) : view === "tabelle" ? (
+              <CollocationTable items={filtered} />
+            ) : view === "liste" ? (
+              <CollocationCompactList items={filtered} />
+            ) : view === "graph" ? (
+              <Suspense
+                fallback={
+                  <div className="h-[62dvh] min-h-[440px] animate-pulse rounded-xl border border-border bg-surface" />
+                }
+              >
+                <CollocationGraph items={filtered} />
+              </Suspense>
+            ) : (
+              cardGrid
+            )}
+          </ScrollRootProvider>
         </div>
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
-          <FeedbackIconButton />
-          <Button variant="gradient" className="h-11 flex-1 rounded-xl text-base" onClick={startSession}>
-            <UebenLabel
-              iconClass="h-4 w-4"
-              count={filtered.length}
-              noun={filtered.length === 1 ? "Kollokation" : "Kollokationen"}
-            />
-          </Button>
-        </div>
+        <FloatingActionCluster note={<FeedbackNote />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
+            <Button
+              variant="gradient"
+              className="h-11 w-full rounded-xl text-base"
+              onClick={startSession}
+            >
+              <UebenLabel
+                iconClass="h-4 w-4"
+                count={filtered.length}
+                noun={filtered.length === 1 ? "Kollokation" : "Kollokationen"}
+              />
+            </Button>
+          </div>
+        </FloatingActionCluster>
+        <div className={CLUSTER_CLEARANCE} aria-hidden />
 
         <FilterRail
           {...filterRailProps}

@@ -109,8 +109,8 @@ after pulling.
 - **Locked structures** (change only on explicit founder request): the mobile bottom tab bar
   (structure, edit mode, icon rules — `docs/areas/PRAKTISCH-NAV.md`), the dialog/overlay recipe
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
-  lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the grey-tile/white-controls
-  FilterRail answer, the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
+  lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the Himmelblau-fill/white-controls
+  FilterRail answer (s189; it was grey from s104 to s189), the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
   `layoutId`), the Schreiben mobile anatomy (ONE fixed bottom-chrome geometry shared by Fokus,
   Kurz and Lang + measured tile heights + the Fokus dial tile — four preview rounds settled it,
   `docs/areas/SCHREIBEN.md`).
@@ -166,7 +166,7 @@ system, the preview-first process, the pre-flight checklist ranked by past rewor
 rejected-then-reverted landmine list. The bullets below are only the always-on summary.
 - **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
   building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
-  dropdowns, facet pills, sticky mobile action bars) and the one categorization hierarchy
+  dropdowns, facet pills, the ONE floating mobile action cluster) and the one categorization hierarchy
   (Branche → **Lebensbereich** → Thema → Unterthema). **Exactly TWO learner-facing categories,
   everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
   Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,

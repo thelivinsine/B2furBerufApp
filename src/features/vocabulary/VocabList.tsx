@@ -90,33 +90,28 @@ const VocabCard = memo(function VocabCard({
         {/* Headline (Option B card rework): creature + word on the left,
             bookmark on the right. Speak + plural moved to the card foot so the
             headline stays quiet. */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-1.5">
-            {gender && <Wesen gender={gender} size={24} />}
-            <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
-          </div>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            aria-label={saved ? "Gespeichert" : "Wort speichern"}
-            aria-pressed={saved}
-            title={saved ? "Gespeichert" : "Wort speichern"}
-            className={cn("shrink-0", saved && "text-primary")}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleSavedWord(v.id);
-            }}
-          >
-            <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
-          </Button>
+        {/* Wraps rather than truncates (three columns since s189 made the card
+            narrower, and it was cutting "die Besprechung" to "die Bespre…").
+            The creature, the article and the noun are three flex ITEMS, so a
+            noun that does not fit beside its article drops to the next line at
+            the card's left edge instead of hanging indented under the article
+            (founder s189). */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+          {gender && <Wesen gender={gender} size={24} />}
+          {v.article && (
+            <span className="text-base font-semibold leading-snug sm:text-lg">{v.article}</span>
+          )}
+          <p className="text-base font-semibold leading-snug sm:text-lg">
+            {v.article && v.de.startsWith(`${v.article} `) ? v.de.slice(v.article.length + 1) : v.de}
+          </p>
         </div>
+
         {/* The example takes the slack between the headline and the foot and
             sits centered in it (2026-07-31). Every tile in the grid is the same
             height now, so on a short card the example would otherwise cling to
             the headline with a hollow half-card under it. */}
         <div className="mt-2.5 flex flex-1 items-center">
-          <p className="text-sm italic text-muted-foreground">„{v.examples[0].de}"</p>
+          <p className="line-clamp-2 text-sm italic text-muted-foreground">„{v.examples[0].de}"</p>
         </div>
 
         {/* Parked: the cross-module "Verbunden" panel (SHOW_RELATED=false, see
@@ -143,9 +138,11 @@ const VocabCard = memo(function VocabCard({
           </div>
         )}
 
-        {/* Card foot: plural pill on the left, speak on the right (fills where
-            the Verbunden toggle sat). mt-auto pins it to the base so every card
-            in a row shares one foot line. */}
+        {/* Card foot: plural pill on the left, then speak and the BOOKMARK on
+            the right (founder s189 moved the bookmark down from the headline,
+            which leaves the headword the whole first line to wrap into).
+            mt-auto pins the row to the base so every card in a row shares one
+            foot line. */}
         <div
           className={cn(
             "mt-auto flex items-center pt-3",
@@ -161,8 +158,25 @@ const VocabCard = memo(function VocabCard({
               Perf.: {perfekt(forms)}
             </span>
           ) : null}
-          <span onClick={(e) => e.stopPropagation()}>
-            <SpeakButton text={v.de} />
+          <span className="flex items-center gap-0.5">
+            <span onClick={(e) => e.stopPropagation()}>
+              <SpeakButton text={v.de} />
+            </span>
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              aria-label={saved ? "Gespeichert" : "Wort speichern"}
+              aria-pressed={saved}
+              title={saved ? "Gespeichert" : "Wort speichern"}
+              className={cn("shrink-0", saved && "text-primary")}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSavedWord(v.id);
+              }}
+            >
+              <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
+            </Button>
           </span>
         </div>
       </CardContent>
@@ -253,7 +267,7 @@ export function VocabList({ items }: { items: VocabItem[] }) {
           auto-height grid all resolve to the tallest row, so the cards stay
           content-driven (a filtered set of short cards stays compact) without
           any fixed height that could clip a long example. */}
-      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((v) => (
           <VocabCard key={v.id} v={v} open={openId === v.id} onToggleOpen={onToggleOpen} />
         ))}

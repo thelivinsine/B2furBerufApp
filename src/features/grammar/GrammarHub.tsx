@@ -11,14 +11,21 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
   ScrollTopButton,
   UebenLabel,
+  BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
 } from "@/features/shared/browseScroll";
+import {
+  CLUSTER_CLEARANCE,
+  FloatingActionCluster,
+  floatingSlot,
+} from "@/features/shared/floatingCluster";
+import { ScrollRootProvider } from "@/lib/scrollRoot";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/store/useSessionStore";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
@@ -53,6 +60,10 @@ const FACET_IDS = GRAMMAR_FACETS.map((f) => f.id);
 
 export function GrammarHub() {
   const [params, setParams] = useSearchParams();
+  // The desktop scroll container, handed to `usePagedList` through context so
+  // its sentinel observes THIS element rather than the viewport (s189).
+  const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
+
   const navigate = useNavigate();
   const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [search, setSearch] = useState("");
@@ -150,14 +161,14 @@ export function GrammarHub() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:space-y-[1.05rem]">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1), while the content and the
           filter tile share row 2 so the tile starts level with the first card.
           Mobile renders the SAME filter tile inline as a slide-open panel. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:min-h-0 lg:flex-1 lg:grid-rows-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
           <div className="flex w-full flex-col gap-2">
             {/* Items are centered while search is closed; opening search slides
@@ -170,15 +181,15 @@ export function GrammarHub() {
               <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 <Button
                   size="icon"
-                  variant={filtersOpen ? "default" : "outline"}
+                  variant="accent"
                   aria-pressed={filtersOpen}
                   aria-expanded={filtersOpen}
                   aria-label="Filter"
                   title="Filter"
-                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON)}
+                  className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
                   {activeFacetCount(railSelection) > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
                       {activeFacetCount(railSelection)}
@@ -225,7 +236,7 @@ export function GrammarHub() {
                     })
                   }
                 >
-                  <Search className="h-4 w-4" />
+                  <Search className="h-3.5 w-3.5" />
                 </Button>
               </motion.div>
             </motion.div>
@@ -265,38 +276,45 @@ export function GrammarHub() {
           )}
         </AnimatePresence>
 
-        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {filtered.length > 0 &&
-            (view === "liste" ? (
-              <GrammarCompactList items={filtered} onOpen={openTopic} />
-            ) : (
-              <GrammarTopicCards items={filtered} onOpen={openTopic} />
-            ))}
-
-          {filtered.length === 0 && (
-            <div className="py-16 text-center text-muted-foreground">
-              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-            </div>
-          )}
+        <div
+          ref={setScrollRoot}
+          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+        >
+          <ScrollRootProvider value={scrollRoot}>
+            {filtered.length > 0 &&
+              (view === "liste" ? (
+                <GrammarCompactList items={filtered} onOpen={openTopic} />
+              ) : (
+                <GrammarTopicCards items={filtered} onOpen={openTopic} />
+              ))}
+  
+            {filtered.length === 0 && (
+              <div className="py-16 text-center text-muted-foreground">
+                Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+              </div>
+            )}
+          </ScrollRootProvider>
         </div>
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
-          <FeedbackIconButton />
-          <Button
-            variant="gradient"
-            className="h-11 flex-1 rounded-xl text-base"
-            onClick={startSession}
-          >
-            <UebenLabel
-              iconClass="h-4 w-4"
-              count={filtered.length}
-              noun={filtered.length === 1 ? "Thema" : "Themen"}
-            />
-          </Button>
-        </div>
+        <FloatingActionCluster note={<FeedbackNote />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
+            <Button
+              variant="gradient"
+              className="h-11 w-full rounded-xl text-base"
+              onClick={startSession}
+            >
+              <UebenLabel
+                iconClass="h-4 w-4"
+                count={filtered.length}
+                noun={filtered.length === 1 ? "Thema" : "Themen"}
+              />
+            </Button>
+          </div>
+        </FloatingActionCluster>
+        <div className={CLUSTER_CLEARANCE} aria-hidden />
 
         <FilterRail
           {...filterRailProps}

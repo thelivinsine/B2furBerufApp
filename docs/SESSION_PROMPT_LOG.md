@@ -4118,6 +4118,152 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   Merging `main` triggers the two deploy workflows; no migrations and no Edge Function changes are
   in this PR, so only the Pages deploy matters. The founder verifies the live result.
 - **Artifacts (prompt 14):** PR #799 · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 15 (verbatim):** `preview the filterrail with the full-height cap`
+  **Response:** `preview/filterrail-height.html` (+ generator), four caps tested on the REAL built
+  rail over CDP at 393x852 with the measured geometry printed per frame, not mockups. The finding:
+  the one-screen ceiling does not transfer. Verlauf can scroll to the top of the screen; the filter
+  panel starts 205 px down and has a fixed Üben bar beneath it, so `max-h-panel-stage` put its bottom
+  border 45 px below the viewport (option C), and adding scroll-into-view only recovered 45 px before
+  the page ran out of scroll (option D). 45dvh shows 329 of 658 px of filter body, 58dvh shows 440,
+  the full cap 638. **Founder picked option A, keep 45dvh.**
+- **Prompt 16 (verbatim):** `the blue selection rectangle here is not necessary. get rid of it. Just
+  the blinking cursor is enough to show selection. Implement direclty without any preview for this`
+  **Response:** the ring came from the global `:focus-visible` rule in `index.css`, not from the
+  field, which is why it appeared identically on every text surface. Text fields are now exempt
+  (textarea, the caret-bearing input types, contenteditable) and the 13 components that also asked
+  for the ring by hand had that utility removed. Buttons, links, toggles and check/radio inputs KEEP
+  it: they have no caret, so the ring is their only focus indicator. Verified on the built app by
+  keyboard-tabbing: a focused button still reports a ring shadow, the focused textarea reports
+  `0px 0px 0px 0px`. (The first check looked like a failure until the service worker was cleared, it
+  was serving the previous build.)
+- **Artifacts (prompts 15-16):** `preview/filterrail-height.html` +
+  `preview/gen-filterrail-height.mjs` · `src/index.css` · 10 feature files with hand-written focus
+  rings on text fields · `docs/areas/PRAKTISCH-NAV.md` · this log
+- **Prompt 17 (verbatim):** `The option a is fine for now. Can you apply the same blue shade from
+  the shcreiben aufgabe wahlen rail to the filter rails and filter button? Also, the buttons on the
+  bottom on mobile view should be in same positions and design as schreiben aufgabe walhen - they
+  should float with no background and on same position with a disclaimer below the buttons.`
+  **Response, parts 1 and 2 (shipped):** the filter cap stays at 45dvh, and both FilterRail layouts
+  (desktop tile, mobile panel), their header and Üben footer strips and all four filter toggles now
+  wear the Schreiben rail's Himmelblau fill, with dividers tinted `border-accent-ink/10` and the
+  border in the fill's own colour. This SUPERSEDES the grey `bg-muted` tile of s104, which is now
+  recorded as such in CLAUDE.md, the `/design` skill and `docs/areas/BIBLIOTHEK.md`; the surviving
+  half of s104 is that the controls inside stay white. The toggle needed a separate class constant
+  (`BROWSE_FILTER_BUTTON`) because `BROWSE_TOOLBAR_BUTTON` ends in `bg-surface`, which wins the
+  tailwind-merge against the `accent` variant.
+  **Part 3 (asked, not guessed):** the Schreiben cluster's lower line is the EU AI Act Art. 50
+  disclaimer, and the Bibliothek has no AI on that screen, so "a disclaimer below the buttons" has no
+  obvious content there. Put to the founder rather than invented.
+- **Artifacts (prompt 17):** `src/features/shared/FilterRail.tsx` ·
+  `src/features/shared/browseScroll.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `CLAUDE.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/areas/BIBLIOTHEK.md` · `docs/DECISIONS.md` · this log
+  **Part 3 (shipped after the founder answered "nothing, buttons only" + "all four Bibliothek
+  tabs"):** the four hand-copied sticky bars are gone. `floatingCluster.ts` moved to
+  `features/shared/floatingCluster.tsx` and gained `FloatingActionCluster`, the ONE geometry both
+  zones now use: fixed above the nav at Schreiben's own offset, no bar chrome, each control on its
+  opaque `floatingSlot` backing, portalled to `<body>`. That portal is not optional here either:
+  `LibraryHub` slides its tab panels with an `x` transform, and a transformed ancestor becomes the
+  containing block for a fixed descendant. Surfaces owe the flow `CLUSTER_CLEARANCE` now that the
+  bar no longer occupies it. Verified live: the Bibliothek and the Schreiben clusters sit at the same
+  height, and Schreiben still carries its Art. 50 line while the Bibliothek carries none.
+- **Artifacts (prompt 17, part 3):** `src/features/shared/floatingCluster.tsx` (moved + extended) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  the four Bibliothek tab files · `CLAUDE.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/areas/BIBLIOTHEK.md` · this log
+- **Prompt 18 (verbatim):** `while you're at it, reduce the spacing by 30% above and below the view
+  buttons row for desktop view specifically. Also, reduce the view buttons size by 25% for both
+  desktop and mobile view. \nFor desktop view - these are my observations:\nThe words cards look
+  empty and too has too much blank space. use the same three columns structure as kollokations for
+  it. For redemittel keep the cards heights consistent with kollokations as the redemittel cards
+  abruplty become bigger in height. IN the table view of redemittel, give a german example next to
+  the english translation. show a horizontal scroll wherever applicable in the views all across the
+  bibliothek to indicate there are more columns to the right for the users. finally, for all the
+  places applicable, instead of a page scrooll in desktop view, keep internal scroll`
+- **Prompt 19 (verbatim):** `move the feedback button to the bottom line with a hyperlink button
+  "feedback geben" or something like this. Spread out the blue buttons and center them. the emoji
+  should be treated as part of the text when center aligning them in the blue button.`
+  **Response, PART of prompt 18 plus all of 19.** Shipped: the ViewSwitcher is 25% smaller
+  (40 → 30 px track, 36 → 26 px buttons, 16 → 14 px marks) at both breakpoints; the desktop stack
+  around the toolbar row is 30% tighter (`lg:space-y-[1.05rem]`, `lg:gap-y-[1.05rem]`, `lg:pb-2`);
+  the Wörter card grid gained `xl:grid-cols-3` to match Kollokationen, and its headword now WRAPS
+  instead of truncating, because the narrower card was cutting "die Besprechung" to "die Bespre…".
+  From prompt 19: `UebenLabel` puts the bolt inside the centred group instead of hanging it outside
+  the flow, `FeedbackTextLink` is a new plain-text control, and `FloatingActionCluster` grew an
+  optional `note` slot so the Bibliothek's previously empty lower line carries "Feedback geben"
+  while the CTA sits centred and alone on the button row.
+  **NOT done in this pass, still open from prompt 18:** Redemittel card heights against
+  Kollokationen; a German example beside the English one in the Redemittel table; the
+  horizontal-scroll affordance across the Bibliothek views; and desktop internal scrolling instead
+  of page scrolling. The last of those is a layout change on every browse surface, not a class
+  tweak, and was left rather than half-done.
+- **Artifacts (prompts 18-19):** `src/features/shared/ViewSwitcher.tsx` ·
+  `src/features/shared/browseScroll.tsx` · `src/features/shared/floatingCluster.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/features/library/LibraryHub.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` · the four Bibliothek tab files · this log
+- **Prompt 20 (verbatim):** `feedback geben should not be a button below the uben! it should be a
+  texxt line with a hyperlinked word same like the KI gepruft and mehr lesen link!!`
+  **Response:** corrected. `FeedbackNote` is now a muted sentence carrying ONE blue word,
+  "Etwas verbessern? **Feedback geben**", with no icon and no chrome of its own, which is the exact
+  shape of Schreiben's "KI-geprüft, kann Fehler enthalten. **Mehr**". The previous version kept the
+  sparkles mark and made the whole label blue, and an icon plus a short blue label reads as a second
+  button under the CTA.
+- **Artifacts (prompt 20):** `src/components/layout/FeedbackButton.tsx` · the four Bibliothek tab
+  files · this log
+- **Prompt 21 (verbatim):** `in desktop view:\n\nthe worter cards look too long now. Shorten them and
+  move the bookmark button to the bottom right. If the word is too big that it goes to the second
+  line, make sure to keep the emoji and the article in the first line and the word to be followed
+  from the left in the second line. \n\nThe feedback button can be right aligned vertically with the
+  filter rail, and the move to top button to the left of the feedback button, aligneed to vertically
+  to left with the filter rail.`
+- **Prompt 22 (verbatim):** `Etwas verbessern? Feedback geben - this still looks like a chip with
+  some frosted background. Apply same design as from the schreiben section`
+  **Response:** the chip was the `floatingNote` plate. It is invisible on Schreiben because the page
+  ground sits behind it, but the Bibliothek's line floats over WHITE cards, where the same
+  `bg-background/90` reads as frosted glass. The cluster's note slot now renders plain text.
+  Wörter cards: the example is capped at two lines, which is what actually shortens the grid because
+  `auto-rows-fr` sizes every card to the tallest one; the bookmark moved from the headline to the
+  foot's right edge beside the speak button; and the headline became three flex ITEMS (creature,
+  article, noun) so a noun that does not fit beside its article drops to the next line at the card's
+  left edge instead of hanging indented under the article.
+  Feedback pill and the scroll-to-top button now share ONE wrapper that mirrors AppShell's `<main>`
+  (sidebar allowance, `max-w-6xl`, same padding) with a 16rem block pinned right: the pill sits at
+  that block's right edge and the scroll button at its left, i.e. exactly the filter rail's two
+  edges, at every width. Restoring the pill's remote-config route suppression was part of the same
+  edit; the first rewrite dropped it, which would have broken the `app_config` contract silently.
+- **Artifacts (prompts 21-22):** `src/features/shared/floatingCluster.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` · `src/components/layout/FeedbackButton.tsx` ·
+  `src/features/shared/browseScroll.tsx` · this log
+- **Prompt 23 (verbatim):** `I see the view buttons were decreased in size but I meant all the
+  buttons in the row to be redcued not just view buttons! decrease the size of other buttons in the
+  row as well.` + `and then carry on with other open comments`
+  **Response:** the whole toolbar row is 30px now (the size moved into
+  `BROWSE_TOOLBAR_BUTTON`, so filter, bookmark and search shrink with the switcher) and the
+  transient search field matches. Then the rest of prompt 18 closed out:
+  Redemittel cards took the Kollokationen anatomy and a two-line clamp; the Redemittel table gained
+  a **Beispiel** column beside Englisch; `HScrollArea` fades whichever edge of a scrolling table
+  still has content behind it; and **desktop now scrolls internally**.
+  The last one was the only structural change: the hub is one `h-browse-stage` tall, the tabs and
+  toolbar hold their place and the content column scrolls. `usePagedList` had to become root-aware
+  first, via `ScrollRootProvider`, because its IntersectionObserver measures against the viewport and
+  a sentinel inside a scroll container is clipped, which would have killed auto-paging silently.
+  Two things went wrong on the way and were caught by verification, not by review: a naive div-depth
+  matcher swallowed the FilterRail (self-closing `<div />` counted as a nesting level), and
+  `.h-page-stage` goes `auto` from lg up by design, so the first attempt constrained nothing.
+  **Verified at 1280x900 on all four tabs:** page 900/900, the content column scrolling internally,
+  and the card count going 60 → 120 on reaching its bottom.
+- **Artifacts (prompt 23):** `src/lib/scrollRoot.tsx` (new) · `src/lib/usePagedList.ts` ·
+  `src/index.css` · `src/features/library/LibraryHub.tsx` · `src/features/shared/browseScroll.tsx` ·
+  `src/features/shared/DataTable.tsx` · `src/features/shared/SearchField.tsx` ·
+  `src/features/redemittel/RedemittelViews.tsx` · the four Bibliothek tab files · this log
+- **Prompt 24 (verbatim):** `create the PR and merge`
+  **Response:** the post-#799 run shipped as **PR #800** (squash-merged into `main`): commits
+  `d5699c0`, `dbf15af`, `bd982aa`, `407c91a`, `bee7f60`, `cc54f94`, `5f4aea0`, `90940ad`, plus this
+  documentation pass. 36 files. No migrations and no Edge Function changes, so only the Pages deploy
+  matters; the founder verifies the live result.
+- **Artifacts (prompt 24):** PR #800 · `docs/PROJECT_STATUS.md` · this log
+
 
 ## Session 190 · 2026-08-05 · branch `claude/polish-ui-ux-design-92sbje`
 

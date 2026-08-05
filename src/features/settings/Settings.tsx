@@ -117,7 +117,7 @@ export function Settings() {
               <input
                 value={settings.name}
                 onChange={(e) => settings.setSettings({ name: e.target.value })}
-                className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
                 placeholder="Dein Name"
               />
             </div>
@@ -155,7 +155,7 @@ export function Settings() {
                 type="date"
                 value={settings.examDate ?? ""}
                 onChange={(e) => settings.setSettings({ examDate: e.target.value || null })}
-                className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
               />
             </div>
           </CardContent>

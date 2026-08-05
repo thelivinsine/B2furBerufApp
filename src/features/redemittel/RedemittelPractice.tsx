@@ -288,7 +288,7 @@ function RespondTask({ task, onResult }: { task: Task; onResult: (correct: boole
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
         placeholder="Deine Antwort (optional) …"
-        className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+        className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none"
       />
 
       {!revealed ? (

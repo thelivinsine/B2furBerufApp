@@ -141,8 +141,12 @@ Stated for Verlauf, meant for every tile that can grow, filters included:
    for the header and the bottom bar: `scrollIntoView` knows about neither, so without them the
    tile parks its lower border underneath the tab bar.
 
-`FilterRail`'s mobile panel already satisfies 3 and 4 with its own `max-h-[45dvh]` cap; raising it
-to the full `max-h-panel-stage` is an open question for the founder, not an assumed change.
+`FilterRail`'s mobile panel satisfies 3 and 4 with its own `max-h-[45dvh]` cap, and **keeps it**
+(founder s189, after `preview/filterrail-height.html` tested four caps on the real rail). The
+one-screen ceiling does NOT transfer there: Verlauf can scroll to the top of the screen, but the
+filter panel starts 205 px down and has a fixed Üben bar under it, so `max-h-panel-stage` pushed its
+bottom border 45 px BELOW the viewport. The lesson for any future adopter: the ceiling has to be the
+room left from where the tile actually sits, not a constant screen height.
 
 **Two states hide the bar, and they are NOT the same** (do not merge them):
 - **Focus mode** (`useSessionStore.focusMode`, route-gated to `/session`, `/revision`, `/welt`):
