@@ -4195,4 +4195,4 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   deploy; no migrations and no Edge Function changes are in it, so only the site deploy matters. The
   founder verifies the live result. Documentation pass across `PROJECT_STATUS.md`, `DECISIONS.md`,
   `docs/areas/PRAKTISCH-NAV.md`, `CLAUDE.md` and this log.
-- **Artifacts (prompt 4):** PR #800 · `docs/PROJECT_STATUS.md` · this log
+- **Artifacts (prompt 4):** PR #801 · `docs/PROJECT_STATUS.md` · this log

@@ -26,7 +26,7 @@ room, fixed by splitting that Verlauf into summary | rows from `lg`), the switch
 column on an 834px tablet, the run band stretched to 800px on a tall tablet (filling the stage is a
 PHONE rule now), and M3's dotted "first attempt" marker was invisible over a saturated fill.
 Gates green: build · typecheck · lint 0 errors · 558 tests · check:bundle 125.8 kB · check:contrast.
-Shipped as **PR #800**, squash-merged into `main`.
+Shipped as **PR #801**, squash-merged into `main`.
 **Resume here:** nothing is open in the Prüfung zone. The one deliberate open question from s189
 still stands (below).
 Prior s189 (2026-08-05). **The Prüfung zone became ONE page.** Founder prompt:
