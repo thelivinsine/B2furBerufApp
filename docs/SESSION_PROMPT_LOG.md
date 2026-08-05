@@ -4159,3 +4159,16 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/features/grammar/GrammarHub.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
   `src/features/redemittel/RedemittelTrainer.tsx` · `CLAUDE.md` ·
   `.claude/skills/design/SKILL.md` · `docs/areas/BIBLIOTHEK.md` · `docs/DECISIONS.md` · this log
+  **Part 3 (shipped after the founder answered "nothing, buttons only" + "all four Bibliothek
+  tabs"):** the four hand-copied sticky bars are gone. `floatingCluster.ts` moved to
+  `features/shared/floatingCluster.tsx` and gained `FloatingActionCluster`, the ONE geometry both
+  zones now use: fixed above the nav at Schreiben's own offset, no bar chrome, each control on its
+  opaque `floatingSlot` backing, portalled to `<body>`. That portal is not optional here either:
+  `LibraryHub` slides its tab panels with an `x` transform, and a transformed ancestor becomes the
+  containing block for a fixed descendant. Surfaces owe the flow `CLUSTER_CLEARANCE` now that the
+  bar no longer occupies it. Verified live: the Bibliothek and the Schreiben clusters sit at the same
+  height, and Schreiben still carries its Art. 50 line while the Bibliothek carries none.
+- **Artifacts (prompt 17, part 3):** `src/features/shared/floatingCluster.tsx` (moved + extended) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  the four Bibliothek tab files · `CLAUDE.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/areas/BIBLIOTHEK.md` · this log

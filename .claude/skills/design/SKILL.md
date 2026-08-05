@@ -77,7 +77,7 @@ Ranked by how often the founder had to correct AI output:
    (Fokus + Kurz/Lang), where the founder moved the Art. 50 note to a fixed bottom line level with
    the floating Feedback pill on desktop and a condensed line under the floating action buttons on
    mobile (s160, `docs/DECISIONS.md`; do not re-center these two). Primary actions sit in the same place
-   across sibling modes (sticky bottom bars on mobile everywhere) — and "the same place" means to
+   across sibling modes (ONE floating cluster on mobile everywhere) — and "the same place" means to
    the pixel: the three Schreiben trainers share ONE fixed-cluster offset and ONE fixed KI line,
    because a 13px difference reads as a jump on every tab switch (s169).
 7. **Motion.** One timing family: 0.12-0.18s panels/popovers, directional tab slides ~0.16s,
@@ -170,7 +170,12 @@ Ranked by how often the founder had to correct AI output:
   rows two sections below it in the same tile are exactly that. An equal-width 2-column grid was
   tried and truncated "Berufsleben" against a four-digit count in the 16rem rail. Never add it to a
   surface whose content carries no Thema (Grammatik): that is dead chrome, not a filter.
-- Sticky mobile bottom action bar for the primary action; `SearchField` transient toolbar search;
+- **`FloatingActionCluster`** (`features/shared/floatingCluster.tsx`) for the primary mobile action:
+  fixed above the nav at ONE offset, no bar chrome, every control on its own opaque backing,
+  portalled to `<body>` because both hubs slide their panels with a transform. Schreiben's three
+  trainers and all four Bibliothek tabs share it (founder s189: "same positions and design as
+  schreiben"). Sticky bars were rejected (s168) and the four hand-copied Bibliothek bars are gone.
+  `SearchField` transient toolbar search;
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).
 - Modals/sheets inherit `bg-dialog-overlay` + `shadow-elevated-soft` from the shared dialog

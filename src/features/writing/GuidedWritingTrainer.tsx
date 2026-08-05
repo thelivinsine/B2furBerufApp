@@ -44,7 +44,7 @@ import { UmlautKeys } from "./UmlautKeys";
 import { AllowanceNote } from "./AllowanceNote";
 import { FeedbackLangChip } from "./FeedbackLang";
 import { useDailyAllowance } from "@/lib/aiAllowance";
-import { floatingNote, floatingSlot } from "./floatingCluster";
+import { floatingNote, floatingSlot } from "@/features/shared/floatingCluster";
 import { useFillEditor } from "./useFillEditor";
 import {
   CorrectionToggle,

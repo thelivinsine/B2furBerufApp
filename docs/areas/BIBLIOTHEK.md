@@ -113,7 +113,13 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - **Mobile:** a toolbar Filter icon toggles a body-only `layout="panel"` tile that slides open via
   AnimatePresence (height/opacity), sits in normal flow (scrolls away, does not stick), capped
   `max-h-[45dvh]` as a flex column (fixed header + one internal scroll region). Üben + word count
-  are a sticky bottom action bar (full-bleed, `sticky bottom-[nav]`, backdrop-blur, after the
+  are the shared `FloatingActionCluster` (founder s189): fixed above the nav at the SAME offset as
+  Schreiben's, with no bar chrome at all, so the buttons float over the cards. The founder asked for
+  the two zones to be identical ("same positions and design as schreiben aufgabe wählen"), and the
+  lower line Schreiben carries is its Art. 50 note, so the Bibliothek's cluster is buttons only.
+  Every control needs its own opaque backing (`floatingSlot`), or the card behind shines through.
+  The surface owes the flow `CLUSTER_CLEARANCE`. It replaced a sticky bar (full-bleed,
+  `sticky bottom-[nav]`, backdrop-blur, after the
   content).
 - **Tile look:** the Himmelblau wash (`bg-accent/20`, dark `bg-accent/10`) with the border in the
   fill's own colour and `shadow-soft` doing the separating, i.e. byte-for-byte the Schreiben

@@ -166,7 +166,7 @@ system, the preview-first process, the pre-flight checklist ranked by past rewor
 rejected-then-reverted landmine list. The bullets below are only the always-on summary.
 - **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
   building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
-  dropdowns, facet pills, sticky mobile action bars) and the one categorization hierarchy
+  dropdowns, facet pills, the ONE floating mobile action cluster) and the one categorization hierarchy
   (Branche → **Lebensbereich** → Thema → Unterthema). **Exactly TWO learner-facing categories,
   everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
   Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,

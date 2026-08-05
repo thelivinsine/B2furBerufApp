@@ -20,7 +20,7 @@ import { GrammarRail } from "./GrammarRail";
 import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
 import { AllowanceNote, LeftCount, variantTitle } from "../AllowanceNote";
-import { floatingNote, floatingSlot } from "../floatingCluster";
+import { floatingNote, floatingSlot } from "@/features/shared/floatingCluster";
 import { CorrectionToggle, FixTiles, MarkedTokens } from "../correction";
 import { useFokusMachine, MIN_WORDS, TRANSFORM_VARIANTS } from "./useFokusMachine";
 import { useDailyAllowance } from "@/lib/aiAllowance";

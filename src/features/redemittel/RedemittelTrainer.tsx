@@ -26,6 +26,11 @@ import {
   BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
 } from "@/features/shared/browseScroll";
+import {
+  CLUSTER_CLEARANCE,
+  FloatingActionCluster,
+  floatingSlot,
+} from "@/features/shared/floatingCluster";
 import { cn } from "@/lib/utils";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -462,20 +467,23 @@ export function RedemittelTrainer() {
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+        <FloatingActionCluster>
           <FeedbackIconButton />
-          <Button
-            variant="gradient"
-            className="h-11 flex-1 rounded-xl text-base"
-            onClick={startSession}
-          >
-            <UebenLabel
-              iconClass="h-4 w-4"
-              count={filtered.length}
-              noun={filtered.length === 1 ? "Wendung" : "Wendungen"}
-            />
-          </Button>
-        </div>
+          <div className={cn(floatingSlot, "flex-1")}>
+            <Button
+              variant="gradient"
+              className="h-11 w-full rounded-xl text-base"
+              onClick={startSession}
+            >
+              <UebenLabel
+                iconClass="h-4 w-4"
+                count={filtered.length}
+                noun={filtered.length === 1 ? "Wendung" : "Wendungen"}
+              />
+            </Button>
+          </div>
+        </FloatingActionCluster>
+        <div className={CLUSTER_CLEARANCE} aria-hidden />
 
         <FilterRail
           {...filterRailProps}
