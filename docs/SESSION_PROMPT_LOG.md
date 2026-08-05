@@ -4433,3 +4433,47 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   founder verifies the live result. Documentation pass across `PROJECT_STATUS.md`, `DECISIONS.md`,
   `docs/areas/PRAKTISCH-NAV.md`, `CLAUDE.md` and this log.
 - **Artifacts (prompt 4):** PR #801 · `docs/PROJECT_STATUS.md` · this log
+
+## Session 191 · 2026-08-05 · branch `claude/sprechen-ai-speaking-redesign-oa9fu1`
+
+- **Prompt 1 (verbatim):** `the sprechen part looks quite strange as the learner never get to speak.
+  can you rethink the whole sprechen stuff and maybe determine how it would look like to insert a
+  feature where the learner gets to speak with ai llm model like in chatgpt or gemini?`
+  **Response:** analysis + preview only, no app code touched (design skill rule 1: report and preview
+  before implementing). **The audit confirmed the founder's observation and found it is worse than it
+  looks:** the Sprechtrainer (`features/simulation/`) is a branching script answered by tapping one of
+  2-4 written options, its "free speaking" node offers a text box placeholder ("Tippe deine Antwort
+  (optional)"), and `scoreDialogue` averages an author-assigned `quality` number, so it measures which
+  option was picked, never the learner's German. The mock exam's **Teil Sprechen embeds that same
+  runner and is graded by the learner ticking their own rubric checkboxes** (`ExamRunner` →
+  `submitSelfScore`), so the speaking grade in the Modelltest is a self-assessment. The one genuine
+  speaking drill in the app is the single-word STT block in the Üben session, which means
+  `engine/speech.ts` already ships a working feature-detected `listen()` wrapper that the entire
+  Sprechen area never calls.
+  **Thesis proposed:** Sprechen is Schreiben with a microphone (brief → conversation → the EXISTING
+  `features/writing/correction.tsx` card as the debrief), and explicitly NOT an open chatbot: an LLM
+  adapts down to the learner, never corrects unless asked, and produces no assessment, so the brief
+  (named partner, register, 2-4 Leitpunkte) is what makes it an exercise rather than small talk. The
+  645 authored dialogue nodes become briefs (title/task/context/targetRedemittel are already the right
+  fields); the branching trees retire; scenario ids stay.
+  **Three voice pipelines costed** (grounded in current provider pricing, not memory): A browser
+  STT + text LLM + browser TTS ≈ 2-4 cents per 12-turn conversation and ~0 while the existing free
+  Gemini Flash tier absorbs the turns; B cloud STT/TTS ≈ 10-20 cents plus an audio-retention change to
+  the privacy policy; C realtime speech-to-speech at 5-10 cents/min cached, 18-46 cents/min uncached,
+  i.e. one six-minute conversation can exceed a fifth of the $5 monthly cap. Recommended A now,
+  structured so B is a one-function swap, C reserved for a paid tier.
+  **Three named layouts previewed** for the live conversation: **Gespräch** (chat thread),
+  **Bühne** (one turn on a fixed stage), **Anruf** (no text at all, debrief is the reveal), plus the
+  shared brief and debrief screens.
+  **Verified in headless Chromium rather than eyeballed**, which caught three real bugs in the mockup:
+  a flex column without `min-width: 0` sat 21px wider than the phone frame and dragged the transcript
+  out of view; `flex: none` on the cards exposed that the debrief is genuinely taller than one screen
+  (answered with the exam's stage treatment, pinned header/actions + ONE inner scroll region + a
+  `mask-image` edge fade, per the s190 slicing rule); and a `.col` rule matching NESTED columns
+  stretched the Bühne "Du" block and shoved the stage off-centre. Final state: all five phone frames
+  rest at exactly 0 scroll with 0 overhang, light and dark.
+  **Open for the founder:** the layout by name; the pipeline; the daily allowance (proposed 2
+  conversations/day, alongside Lang); and whether Anruf's "Auflegen" may be red (drawn neutral, since
+  danger red is reserved for errors).
+- **Artifacts (prompt 1):** `preview/sprechen-ai-redesign.html` ·
+  artifact `https://claude.ai/code/artifact/acf10478-7f26-4924-b451-fb620b56e15a` · this log
