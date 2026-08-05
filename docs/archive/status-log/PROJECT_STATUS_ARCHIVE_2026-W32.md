@@ -3,6 +3,33 @@
 Handoffs moved out of `docs/PROJECT_STATUS.md` once they aged past the two most recent.
 
 
+**Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
+`claude/polish-ui-ux-design-92sbje`).**
+Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
+a billion dollar edu tech app", then "V2 and M3 ... take screenshots during the testing phase and
+optimize and polish the spacing ... without any bugs".
+**Process:** analysis in chat first (no code touched), three named options previewed
+(`preview/pruefung-polish.html`), a second round on the pick (`preview/pruefung-polish-r2.html`,
+artifact https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04, redeployed to the same
+URL), then implementation verified against the REAL app.
+**What shipped** (`src/features/pruefung/PruefungHub.tsx` rewritten; `partMeta.ts` gained
+`wash`/`fillPale`/`fillSolid` and gradient `tile`s; `index.css` gained `.mod-wash-*` + `.mod-go`):
+- One 896px frame for both tabs, a fixed-height scope row, the Bibliothek's `popLayout` tab slide.
+- The module card: mark + arrow row, title, description, the hue wash in the bottom-right corner and
+  that corner reserved by the card's bottom padding, so Ohne Zeit / Mit Zeit never resizes anything.
+- The run band: a two-column ticket from `lg`, today's stacked band below it, `flex-1` on phones only.
+- Modelltest Verlauf **V2**: display figure + delta chip, Bester/Bestanden as stats, seven bars
+  against the pass line (named in the caption, never on the chart).
+- Module üben Verlauf **M3**: four columns on one scale, pale = first attempt, solid = the gain;
+  split into summary | rows from `lg`, which is what keeps a 1280×900 laptop at zero scroll.
+- The `mockExams` split into full runs vs single-module practice (`tests/pruefungHub.test.ts`).
+**Verification tooling** lives in the session scratchpad, not the repo: a ~60-line CDP driver
+(Node 22's built-in WebSocket, no new deps) that seeds localStorage, sets a viewport, clicks by
+button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
+surface has to be checked in the real app rather than in a mockup.
+**Nothing is left open in this zone.**
+
+
 **Handoff after session 183 (2026-08-02): the Prüfung icons, and the merge question answered.**
 Founder: "D and 2", then "keep them separate".
 - **Bar mark: the orange Absolventenhut** (`graduationCap` in `route-icons.tsx`). The target rings

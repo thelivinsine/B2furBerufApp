@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { MessageSquareText, Sparkles, Send, Loader2 } from "lucide-react";
+import { MessageSquareText, Send, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,9 @@ import { cn } from "@/lib/utils";
  * even during a focus-mode session); every affordance just opens it via the
  * `feedbackOpen` session-store flag:
  *   - <FeedbackPill/>   the quiet floating pill (desktop bottom-right).
- *   - <FeedbackIconButton/> a compact labelled "Feedback" pill for the mobile Üben action bars.
+ *   - <FeedbackLink/>   the inline link, in the bottom caption line of the
+ *     Bibliothek tabs (via <FeedbackNote/>) and of the Schreiben trainers,
+ *     where it replaced the cluster's Feedback button in s192.
  *   - <FeedbackFullButton/>  the full labelled button inside a practice session.
  */
 
@@ -158,38 +160,29 @@ export function FeedbackPill() {
   );
 }
 
-export function FeedbackNote() {
-  const setOpen = useSessionStore((s) => s.setFeedbackOpen);
-  return (
-    <>
-      Etwas verbessern?{" "}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="font-medium text-primary underline-offset-2 hover:underline"
-      >
-        Feedback geben
-      </button>
-    </>
-  );
-}
-
-export function FeedbackIconButton({ className }: { className?: string }) {
+/**
+ * The bare "Feedback geben" link, styled like the privacy link beside it. Used
+ * on its own in the Schreiben bottom line (next to the KI note, s192) and with
+ * a lead-in inside `FeedbackNote` in the Bibliothek.
+ */
+export function FeedbackLink({ className }: { className?: string }) {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   return (
     <button
       type="button"
       onClick={() => setOpen(true)}
-      aria-label="Feedback geben"
-      title="Feedback geben"
-      className={cn(
-        "flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground",
-        className,
-      )}
+      className={cn("font-medium text-primary underline-offset-2 hover:underline", className)}
     >
-      <Sparkles className="h-4 w-4 text-primary" />
-      Feedback
+      Feedback geben
     </button>
+  );
+}
+
+export function FeedbackNote() {
+  return (
+    <>
+      Etwas verbessern? <FeedbackLink />
+    </>
   );
 }
 

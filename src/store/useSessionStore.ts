@@ -51,7 +51,15 @@ interface SessionState {
    * through the composer (the keep-eager-code-light invariant).
    */
   examExit: (() => void) | null;
-  setExamExit: (fn: (() => void) | null) => void;
+  /**
+   * True while the run on screen is an "Ohne Zeit" module (s192). The stage is
+   * the same, the FRAME around it is not: without a clock this is practice, so
+   * the header shows a quiet Zurück instead of the red Prüfung-verlassen exit.
+   * It travels with the handler for the same reason the handler exists at all,
+   * namely that AppShell may not read the exam store.
+   */
+  examUntimed: boolean;
+  setExamExit: (fn: (() => void) | null, opts?: { untimed?: boolean }) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -70,5 +78,6 @@ export const useSessionStore = create<SessionState>((set) => ({
   setFocusMode: (on) => set({ focusMode: on }),
 
   examExit: null,
-  setExamExit: (fn) => set({ examExit: fn }),
+  examUntimed: false,
+  setExamExit: (fn, opts) => set({ examExit: fn, examUntimed: !!fn && !!opts?.untimed }),
 }));

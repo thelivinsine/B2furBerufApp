@@ -184,6 +184,10 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
   Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,
   never a heading a learner sees; a third group in any dropdown or legend is a bug (founder, s181).
+- **A bottom-bar tab is lit by its ZONE, not by its URL** (founder s192): `navZoneOf` folds every
+  route into the tab that owns it (`/writing` is Prüfung, `/session` is Praktisch, `/sammlung` is
+  Fortschritt), and the bar and sidebar render plain `Link`s, because `NavLink` re-decides the state
+  AND swallows `aria-current`. A visible bar with nothing lit is a bug.
 - **A result is shown in ONE place per page** (founder s188): past scores live in that page's
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
@@ -192,7 +196,9 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   controls sit BELOW the switcher at EVERY width, and BOTH rows are centred, desktop included. **Mit Zeit / Ohne Zeit** is one switch beside
   it, resting on Ohne Zeit, and it is the ONLY way into the Schreib- and Sprechtrainer
   (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,
-  never a fifth block. The run band's timeline connector is one segment per gap, drawn between the
+  never a fifth block. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
+  Anleitung and opens the drill, calls its exit Zurück in neutral grey (never the red Verlassen),
+  and asks nothing when nothing has been written yet. Only the STAGE stays shared. The run band's timeline connector is one segment per gap, drawn between the
   tiles, never a line behind them.
 - **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): one `max-w-4xl` centred
   column, so switching never changes the page's width; a height-stable scope row; the module card's

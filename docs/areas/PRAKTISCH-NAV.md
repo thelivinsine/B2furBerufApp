@@ -30,6 +30,17 @@ The Prüfung hub itself lives at `/anwenden` and is ONE page with a two-segment 
 (s189, below). `/exam` redirects into it (`?tab=modelltest`) and is kept forever: it is in
 learners' history, in the dashboard recommendation and in ⌘K.
 
+**A tab is lit by its ZONE, not by its URL** (s192, founder: "the prufung bottom bar isn't selected
+here", on `/writing`). A zone owns more routes than its own path, so `navZoneOf(pathname)`
+(`nav-items.ts`) folds them: `/writing`, `/simulation`, `/exam` → Prüfung; `/quiz` and the retired
+per-tool routes → Bibliothek; `/session`, `/revision`, `/welt` → Praktisch; `/sammlung` →
+Fortschritt; everything else (`/sources`, `/hilfe`, the legal pages, `/admin`) lights nothing. The
+bar and the sidebar both read it, and both render a plain `Link`: `NavLink` would re-decide the
+state from the URL and it also SWALLOWS `aria-current` (it reads that prop as "the value to use when
+I consider myself active"), so the lit tab announced nothing to a screen reader. `NAV_ZONE_OF_ROUTE`
+is the same fold as `ROUTE_SUCCESSOR` plus the routes that never were tabs; the two answer different
+questions (pin migration vs. active state), so they stay separate.
+
 ### The Prüfung hub (`/anwenden`, redesign s189, polished s190)
 
 Founder brief: "insert a toggle in place of the current header, similar to Bibliothek", with
@@ -86,6 +97,16 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   and Lesen/Hören run the same drill with `untimed` set (no tick, no timer pill, never auto-handed
   in). The separate "Freies Üben" block the earlier rounds carried is gone with it, and those two
   trainers have no other entry point, so the switch is load-bearing.
+  **The exam FRAME belongs to Mit Zeit alone** (founder s192: "this screen mode represents exam
+  mode, this should only be shown when a user is in mit zeit mode, keep this consistent for all the
+  modules"). Ohne Zeit therefore: skips the Anleitung and opens the drill directly
+  (`useExamStore.start` sets `phase: "part"`, and `completePart` never hands the next part over
+  through an intro either); calls the way out **Zurück**, a neutral arrow in the header instead of
+  the red Verlassen (the flag rides `useSessionStore.examUntimed`, because AppShell may not import
+  the exam store); leaves with NO confirm while nothing has been answered, noted or written; and
+  names the confirm it does show "Übung verlassen?". What stays exam-shaped is the STAGE: one
+  viewport, the bottom bar out, the drill scrolling internally. Mit Zeit keeps the Anleitung
+  verbatim ("Prüfungsteil", the minutes, "der Timer läuft, sobald du startest").
 - **Modelltest:** the run band and Verlauf, nothing else. Below `lg` the band is eyebrow +
   "52 Min gesamt" + countdown, the four modules as a timeline, then the CTA, **centred and with no
   rule above it** (founder s189: the divider cut the band in two, and the run is one thing). It takes

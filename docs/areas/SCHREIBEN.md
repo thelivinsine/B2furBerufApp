@@ -271,7 +271,7 @@ card, so it cannot drift from what ships.
   count and both desktop buttons, so fixing and resubmitting still works.
 - **"Neu schreiben" rides the tile row on desktop** (`ml-auto self-end`), the Fokus "Neuer Satz" spot,
   and Auswerten drops out there while a correction is on screen: re-pressing it returns the same
-  cached verdict. On mobile nothing moves, the floating cluster keeps Feedback + Neu schreiben +
+  cached verdict. On mobile nothing moves, the floating cluster keeps Zurück + Neu schreiben +
   Auswerten at the locked geometry.
 - **`useFillEditor` no longer needs a textarea to exist.** The bottom clearance is measured first, so
   the state with no field still reserves the fixed chrome; the Aufgabe-card cap is RELEASED there,
@@ -353,7 +353,7 @@ the moved-word single word).
     stagger). Shown during the correction call (with the learner's own sentence above it, the card's
     whole idle body replaced) and again in the sentence region during a transform. Founder s169:
     the spinning dial and the button label alone did not read as "something is happening".
-  - **Feedback + Korrigieren float fixed** above the KI line until a correction exists (portalled,
+  - **Zurück + Korrigieren float fixed** above the KI line until a correction exists (portalled,
     see §Mobile floating action cluster); the KI line is locked just above the nav in every state
     and carries the Art. 50 note only (the "Noch N Wörter" hint moved into the card, s169).
 - **All AI feedback prose is written for a beginner, and carries a DE/EN switch** (founder
@@ -382,9 +382,10 @@ the moved-word single word).
   the very bottom of the viewport, level with the floating "Feedback" pill (full sentence, left;
   pill, right; no bordered bar), mirroring the pill's `lg:pl-64` + `max-w-6xl` offsets and clearing
   the pill on the right; pointer-events pass through except the link. **Mobile (s160):** condensed
-  to "KI-geprüft, kann Fehler enthalten. Mehr" under the button row. **Kurz/Lang uses the exact same
-  treatment** (`GuidedWritingTrainer.tsx`, s160): its own `aiNoteDesktop` fixed note + the Feedback
-  icon button floating beside Auswerten (and Neu schreiben after a result), condensed note beneath.
+  to "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben" under the button row (the Feedback
+  link joined it in s192, when Zurück took the button slot). **Kurz/Lang uses the exact same
+  treatment** (`GuidedWritingTrainer.tsx`, s160): its own `aiNoteDesktop` fixed note + the Zurück
+  button floating beside Auswerten (and Neu schreiben after a result), condensed note beneath.
 - **Correction card** (`FokusTrainer.tsx`; approved via `preview/schreiben-design-review.html`):
   the "Dein Satz" eyebrow shares its row with an **Original/Korrigiert view toggle** (default
   Korrigiert; resets to Korrigiert on each new correction). Original marks wrong words with
@@ -407,7 +408,8 @@ the moved-word single word).
 - The Fokus Original/Korrigiert toggle is `rounded-lg`/`rounded-md` squircle.
 
 ## Mobile floating action cluster (Fokus + Kurz/Lang)
-The bottom cluster (Feedback + Korrigieren / Auswerten, and Neu schreiben after a result) carries
+The bottom cluster (Zurück + Korrigieren / Auswerten, and Neu schreiben after a result; Zurück
+replaced the Feedback button in s192) carries
 **no bar chrome** (founder s159/s160): no border, no full-width backdrop. It therefore floats
 straight over the content cards, so nothing in it may be see-through (s164 founder report: the
 disabled Auswerten button and the card's hint line read as two labels on top of each other).
@@ -432,8 +434,18 @@ disabled Auswerten button and the card's hint line read as two labels on top of 
   is `bg-surface/50` and `disabled:` is `opacity-50`) and `floatingNote` (the caption plate,
   `bg-background/90` + `backdrop-blur-sm`, matching the other mobile bars). `--background` equals
   the page stops, so both are invisible against the page ground and only mask over a card.
+- **Zurück, not Feedback, holds the left slot** (founder s192: "replace the feedback button with
+  zurück and the user should navigate back to the prüfung hub"). `BackToPruefung`
+  (`src/features/writing/bottomChrome.tsx`) keeps the retired Feedback button's geometry exactly
+  (44px, `rounded-xl`, quiet outline, opaque `bg-surface`) and links to `/anwenden` rather than
+  going back through history, because `/writing` is entered from the hub card, the dashboard
+  recommendation and ⌘K, and "zurück" has to mean the same place from all three. Feedback moved
+  DOWN into the caption line as a plain `FeedbackLink`, the shape the Bibliothek tabs already use:
+  "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben", one line down to 320px wide.
+  Both trainers render the SAME `MobileAiNote` component now, so the two copies cannot drift apart.
 - **The caption slot carries the Art. 50 note and nothing else** (founder s169, superseding the
-  s168 rule that put transient hints there). The "Noch N Wörter schreiben …" line moved into the
+  s168 rule that put transient hints there; s192 added the Feedback link beside it, which is the
+  same fixed pair in every state, not a swap). The "Noch N Wörter schreiben …" line moved into the
   card, under the umlaut keys, in both trainers: it is a note about what the learner is typing, and
   a bottom line that swaps content between states reads as chrome that cannot be trusted. The
   original reason for the s168 placement (a card-tail line landing under the pinned cluster) is
