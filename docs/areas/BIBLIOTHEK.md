@@ -32,6 +32,15 @@ buttons need their own `uppercase`, Tailwind preflight resets it on buttons) wit
   nothing is ever clipped by a fixed height. Applies to `vocabulary/VocabList.tsx`,
   `collocations/CollocationsBrowser.tsx`, `redemittel/RedemittelTrainer.tsx`,
   `grammar/GrammarViews.tsx`.
+- **`auto-rows-fr` means the tallest card in the WHOLE grid sets every row, so what needs capping is
+  the worst case, and it is usually on the BACK.** Kollokationen and Redemittel must read as the
+  same card (founder s189, restated s190: the Redemittel cards "abruptly become bigger in height").
+  Redemittel sat at 272 px against Kollokationen's 195 and the Wendung was not the cause: the front
+  measured 165 px, while the back's unclamped translation, note and English example ran to 272, and
+  `FlipCard` gives a tile its taller face. Every back part is capped at two lines and the front
+  headline at three, which is the tallest headline the Kollokationen grid produces. Result: 188 px
+  against 195, the residue being anatomy (the Kollokationen example row carries a SpeakButton), not
+  padding. Anything clamped carries a `title`, and Liste + Tabelle always show the full text.
 - **Card content is vertically centered** in Wörter / Kollokationen / Redemittel
   (`justify-center`, and on the Wörter front the example takes the slack via `flex-1 items-center`):
   with one height for the whole grid, top-aligned content leaves a hollow lower half. Elements that
@@ -121,6 +130,13 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   The surface owes the flow `CLUSTER_CLEARANCE`. It replaced a sticky bar (full-bleed,
   `sticky bottom-[nav]`, backdrop-blur, after the
   content).
+- **The rail is sized by its CONTENT, never by the column** (founder s190). It is a grid item, and a
+  grid item defaults to `align-self: stretch`, so it used to grow to its cap in every state: a
+  collapsed rail was 564 px of Himmelblau holding a header, the Üben button and ~450 px of nothing.
+  `lg:self-start` + `lg:max-h-[calc(100%-3.5rem)]` replaces the old `lg:max-h-[calc(100vh-21rem)]`:
+  content-sized, capped against the STAGE rather than a viewport guess, and the `3.5rem` reserve
+  keeps the rail's own Üben button clear of the go-to-top button floating at its bottom-left corner.
+  Measured: open 655 px, collapsed 119 px.
 - **Desktop scrolls INSIDE, not the page** (founder s189): the hub is one
   `h-browse-stage` tall, the tabs and the toolbar row hold their place, and the CONTENT column is the
   only thing that scrolls (`lg:min-h-0 lg:overflow-y-auto`). Mobile is untouched and still scrolls
@@ -131,9 +147,27 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   1280x900: page 900/900, inner 5142/655, and the card count still goes 60 → 120 on reaching the
   inner bottom.
 - **Toolbar row:** every control is 30px since s189 (a quarter down from 40), the view switcher
-  included, and the transient search field matches.
+  included, and the transient search field matches. A toggle's ON state (search open, bookmark
+  filter active) is `BROWSE_TOOLBAR_BUTTON_ON`, appended AFTER the base class, never the Button
+  `default` variant: `BROWSE_TOOLBAR_BUTTON` ends in `bg-surface`, which wins the tailwind-merge
+  against `bg-primary` while `text-primary-foreground` survives, so the variant renders white on
+  white and the button disappears (founder s190, "search button is buggy", a blank square where the
+  magnifier should be). The same merge order is why `BROWSE_FILTER_BUTTON` exists.
+- **Scroll edges fade, they never cut** (founder s190: "the area surrounding the Wörter cards look
+  abruptly cut"). The internal scroll column slices whatever crosses its edge, so a card was chopped
+  through the middle by a hard line. `useEdgeFade` + the `mask-fade-*` utilities fade the content at
+  whichever vertical edge still has content behind it, `lg:` only, the vertical twin of
+  `HScrollArea`. It is a MASK, not a gradient overlay: the column paints no fill of its own (the
+  founder checked, "the background should be the page background"), and an overlay would need one
+  flat colour where the ground is a gradient, so it would band in light and grey out in dark.
 - **Horizontal scroll says so** (`HScrollArea`): a soft fade on whichever edge still has content
   behind it, nothing once the region fits or has been scrolled to its end.
+- **Go to top follows the SCROLLER, not the window** (founder s190: "where is the go to top
+  button?"). `useScrollDirection(root)` reads whichever element actually scrolls: the column while
+  it overflows (desktop), the window otherwise (mobile). Reading `window.scrollY` alone silently
+  killed the button on desktop after s189, because the window no longer moves there. Placement is
+  the s189 rule and is measured, not eyeballed: the button's left edge sits at the filter rail's
+  left edge and the Feedback pill's right edge at the rail's right edge (1000 / 1256 at 1280px).
 - **Tile look:** the Himmelblau wash (`bg-accent/20`, dark `bg-accent/10`) with the border in the
   fill's own colour and `shadow-soft` doing the separating, i.e. byte-for-byte the Schreiben
   "Aufgabe wählen" rail (founder s189: "apply the same blue shade from the Schreiben Aufgabe wählen

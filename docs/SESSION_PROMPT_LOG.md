@@ -4263,3 +4263,94 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   documentation pass. 36 files. No migrations and no Edge Function changes, so only the Pages deploy
   matters; the founder verifies the live result.
 - **Artifacts (prompt 24):** PR #800 · `docs/PROJECT_STATUS.md` · this log
+
+## Session 190 — 2026-08-05 — Bibliothek defects after the internal-scroll change
+
+Branch: `claude/card-transparency-go-to-top-jygye9`. Seven founder prompts, all of them defect
+reports against what PR #800 shipped the day before. No preview round: every item was a bug in an
+already-approved surface, so each was reproduced in headless Chromium against the dev server,
+measured, fixed, and re-measured.
+
+- **Prompt 1 (verbatim, screenshot of the Wörter Karten view):** `the background of the cards
+  doesn't look transparent, fix it! where is the go to top button? read my comment from previous
+  session on where to put it.`
+- **Prompt 2 (verbatim, mid-turn, screenshot of the collapsed filter rail):** `the filter button is
+  buggy!! fix it`
+- **Prompt 3 (verbatim, mid-turn, crop of the toolbar with an empty white square):** `search button
+  is buggy`
+- **Prompt 4 (verbatim, mid-turn, two crops):** `the collocations and redemittel cards are not of
+  same height as doscussed in the previous session - fix it. Also, why are there blue outlines on
+  toggle buttons and on filter button? it shouldn't be the case - fix it!`
+- **Prompt 5 (verbatim, mid-turn):** `transparent cards? I meant the bacground surrounding the cards
+  should be transparent meaning the background should be the page background. The area surrounding
+  the worter cards look abruptly cut - this needs fixing`
+- **Prompt 6 (verbatim, mid-turn):** `make sure all the comments are addressed well and tested from
+  my feedback in previous section.`
+- **Prompt 7 (verbatim, mid-turn):** `once done, push it live and document the session`
+
+**Response summary.** Five of the six defects trace to ONE change: s189 moved the desktop scroll
+from the page into the content column, and three separate things had been reading the window.
+
+1. **The go-to-top button.** `useScrollDirection` listened to `window` only. On desktop the window
+   never moves any more, so `scrolled` never flipped and the button never rendered; it still worked
+   on mobile, which is why it looked "missing" rather than broken. The hook now takes the scroll
+   container, reads whichever element actually scrolls (the column only counts while it overflows,
+   which is false below `lg`), and listens to both. `ScrollTopButton` scrolls that same element.
+   Its PLACEMENT is unchanged and is the founder's s189 rule, re-verified by measurement: the
+   button's left edge sits at the filter rail's left edge (1000 px) and the Feedback pill's right
+   edge at the rail's right edge (1256 px).
+2. **The filter rail.** A grid item defaults to `align-self: stretch`, so the rail always grew to
+   its `lg:max-h-[calc(100vh-21rem)]` cap: 564 px of Himmelblau whether it held filters or not, and
+   collapsing it left the founder's screenshot, a header, the Üben button and ~450 px of empty
+   fill. It is `lg:self-start` now, sized by content, capped against the stage
+   (`lg:max-h-[calc(100%-3.5rem)]`) rather than a hard-coded viewport guess. Measured: open 655 px,
+   collapsed **119 px**. The `3.5rem` reserve is deliberate: at `max-h-full` the rail's own Üben
+   button overlapped the go-to-top button floating at its bottom-left corner.
+3. **The search and bookmark buttons.** `BROWSE_TOOLBAR_BUTTON` (s189) ends in `bg-surface`, which
+   wins the tailwind-merge against the Button `default` variant's `bg-primary` while
+   `text-primary-foreground` survives. The ON state was therefore white-on-white: measured
+   `bg rgb(255,255,255)` / `color rgb(255,255,255)`, i.e. the empty square in the founder's crop.
+   New `BROWSE_TOOLBAR_BUTTON_ON` constant, appended after the base class so the fill wins; the ON
+   state is now `bg rgb(40,102,235)` with a white mark. This is the third time this exact merge
+   order has bitten (s189 needed `BROWSE_FILTER_BUTTON` for the same reason), so the constant
+   carries the explanation.
+4. **"The background of the cards doesn't look transparent."** Prompt 5 corrected the reading: the
+   surrounding background, not the card fill. Measured first: the column AND its parent already
+   paint `rgba(0,0,0,0)`, so nothing was covering the page ground. The real defect was the second
+   half of the sentence, the abrupt cut: a scroll container slices whatever crosses its edge, so a
+   card is chopped through the middle by a hard horizontal line. `useEdgeFade` + the
+   `mask-fade-*` utilities fade the CONTENT at whichever edge still has content behind it, which is
+   the vertical twin of `HScrollArea`'s existing fades. A mask, not a gradient overlay: an overlay
+   needs one flat colour and the ground is a gradient, so it would band in light mode and grey out
+   in dark. Desktop only (`lg:`), and never at an edge that is already at its end.
+5. **The blue outlines.** The global `:focus-visible` ring. It could not be reproduced headless
+   (Chromium reports `focusVisible: false` after a click), so it was fixed by mechanism rather than
+   by chasing one browser's heuristic: `trackInputMode()` marks `<html data-input="pointer">` on
+   pointerdown and `"keyboard"` on the keys that move or activate focus, and one CSS rule drops the
+   ring while the pointer is in charge. Keyboard navigation keeps the ring untouched, so WCAG 2.4.7
+   still holds. Verified: `pointer` after a click with no ring, `keyboard` after Tab.
+6. **Card heights (Kollokationen vs Redemittel).** Not the Wendung, as it looked. `FlipCard` gives a
+   tile its TALLER face, and the Redemittel BACK carried an unclamped translation, note and English
+   example: front 165 px, back 272 px, and `auto-rows-fr` then pushed all 193 cards to 272. Every
+   back part is capped at two lines and the front headline at three (the tallest headline the
+   Kollokationen grid produces), each with a `title` so the full text stays on hover, and in Liste
+   and Tabelle in full. Measured: Redemittel **272 → 188 px**, Kollokationen 195 px. The remaining
+   7 px is anatomy, not padding: the Kollokationen example row carries a SpeakButton.
+
+**Prompt 6 (audit of the previous session's feedback), re-measured in the browser rather than read
+off the log.** Confirmed live: the Redemittel table's **Beispiel** column beside Englisch; the
+horizontal-scroll fades; desktop internal scroll with the page not scrollable on all four tabs; the
+30 px toolbar row; the Feedback/go-to-top docking to the rail's two edges; the Wörter three-column
+grid. The one item still open from that list was the card-height parity above, now closed.
+
+**Verification:** headless Chromium at 1280x900 (all four tabs, rail open + collapsed, search open,
+mid-scroll) and 390x844 for the mobile fallback, where the page still scrolls, the button is still
+centred above the Üben bar and no mask applies.
+**Gates:** typecheck · lint 0 errors (77 warnings, identical to the pre-change baseline) ·
+test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contrast all pairings pass.
+- **Artifacts (prompts 1-6):** `src/features/shared/browseScroll.tsx` · `src/lib/inputMode.ts` (new)
+  · `src/main.tsx` · `src/index.css` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
+  `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` · `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/PROJECT_STATUS.md` · this log

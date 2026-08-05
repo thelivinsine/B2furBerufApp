@@ -29,11 +29,14 @@ import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackNote } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
+  useEdgeFade,
   browseHeaderClass,
+  browseColumnClass,
   ScrollTopButton,
   UebenLabel,
   BROWSE_FILTER_BUTTON,
   BROWSE_TOOLBAR_BUTTON,
+  BROWSE_TOOLBAR_BUTTON_ON,
 } from "@/features/shared/browseScroll";
 import {
   CLUSTER_CLEARANCE,
@@ -158,7 +161,9 @@ export function CollocationsBrowser() {
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
-  const { hidden: headerHidden, scrolled } = useScrollDirection();
+  const { hidden: headerHidden, scrolled } = useScrollDirection(scrollRoot);
+  // Soft top/bottom edges for the internal scroll column (founder s190).
+  const edge = useEdgeFade(scrollRoot);
 
   // Tier-2 travelling scope: inherit the shared library scope when arriving
   // without an explicit theme; URL params still override for deep links.
@@ -514,12 +519,15 @@ export function CollocationsBrowser() {
               <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 <Button
                   size="icon"
-                  variant={searchOpen || search.trim() ? "default" : "outline"}
+                  variant="outline"
                   aria-pressed={searchOpen}
                   aria-expanded={searchOpen}
                   aria-label="Suche"
                   title="Suche"
-                  className={BROWSE_TOOLBAR_BUTTON}
+                  className={cn(
+                    BROWSE_TOOLBAR_BUTTON,
+                    (searchOpen || search.trim()) && BROWSE_TOOLBAR_BUTTON_ON,
+                  )}
                   onClick={() =>
                     setSearchOpen((o) => {
                       if (o) setSearch("");
@@ -571,7 +579,7 @@ export function CollocationsBrowser() {
 
         <div
           ref={setScrollRoot}
-          className="slim-scrollbar min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1"
+          className={browseColumnClass(edge)}
         >
           <ScrollRootProvider value={scrollRoot}>
             {/* The level-band chip rides with the CONTENT, not the sticky toolbar
@@ -629,7 +637,7 @@ export function CollocationsBrowser() {
 
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
-        <ScrollTopButton show={scrolled} />
+        <ScrollTopButton show={scrolled} root={scrollRoot} />
         <FloatingActionCluster note={<FeedbackNote />}>
           <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
@@ -649,7 +657,7 @@ export function CollocationsBrowser() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:self-start lg:max-h-[calc(100%-3.5rem)] lg:overflow-hidden"
         />
       </div>
     </div>

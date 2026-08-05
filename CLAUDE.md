@@ -153,6 +153,19 @@ after pulling.
   RunBar/strip/actions and scrolls ONE inner region, so all ten in-exam screens rest at exactly 0
   page scroll down to 360x640. Height only, never `overflow:hidden`, or the mobile keyboard cannot
   scroll the field into view.
+- **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
+  buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
+  and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
+  keeps it, so WCAG 2.4.7 still holds. `:focus-visible` alone does not settle this: a control that
+  re-renders under the click (a switcher pill that navigates, a filter toggle that swaps its own
+  subtree) can come back focused and keep matching, and the browsers disagree on when. Never answer
+  a stray ring by deleting the indicator outright.
+- **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190).
+  s189 moved the desktop Bibliothek scroll into the content column and three separate things kept
+  reading `window.scrollY`, which silently retired the go-to-top button on desktop; a scroll
+  container also SLICES what crosses its edge, so its edges need `useEdgeFade`, and a rail beside it
+  needs `self-start` or the grid stretches it to its cap. Hooks take the scroll root
+  (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by assumption.
 - **Design landmines:** the `/design` skill §7 lists everything shipped-then-reverted; never
   reintroduce an item on that list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior

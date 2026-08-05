@@ -1,6 +1,34 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 189). **The Prüfung zone became ONE page.** Founder prompt:
+_Last updated: 2026-08-05 (session 190). **A defect session on the Bibliothek, all six items from
+the founder's own screenshots, all measured in a browser rather than guessed.** Five of them trace
+to one change: s189 moved the desktop scroll from the page into the content column.
+**Go to top** was reading `window.scrollY`, which no longer moves on desktop, so the button never
+appeared (mobile still worked, which is why it read as "missing"); `useScrollDirection(root)` now
+reads whichever element actually scrolls, and the placement is the founder's s189 rule, measured:
+button at the filter rail's left edge, Feedback pill at its right.
+**The filter rail** stretched to its cap in every state, because a grid item defaults to
+`align-self: stretch`, so a collapsed rail was 564 px of empty Himmelblau: `lg:self-start` plus a
+stage-relative cap, open 655 px / collapsed **119 px**.
+**The search and bookmark toggles** rendered white on white (`BROWSE_TOOLBAR_BUTTON` ends in
+`bg-surface` and wins the tailwind-merge against the `default` variant's `bg-primary`), i.e. the
+blank square in the founder's crop; new `BROWSE_TOOLBAR_BUTTON_ON` constant.
+**"The background surrounding the cards"** was already transparent (measured `rgba(0,0,0,0)` on the
+column and its parent); the real defect was the second half of that prompt, cards sliced by the
+scroll container's edge, answered with `useEdgeFade` + `mask-fade-*` (a mask, not an overlay: the
+ground is a gradient).
+**The blue outlines** were the global `:focus-visible` ring firing after a click; `trackInputMode()`
+marks `<html data-input="pointer|keyboard">` and the ring is now keyboard-only, which keeps
+WCAG 2.4.7.
+**Redemittel vs Kollokationen card height** was not the Wendung: `FlipCard` takes the taller face and
+the unclamped BACK ran to 272 px against a 165 px front, so `auto-rows-fr` pushed all 193 cards to
+272. Capped: **272 → 188 px**, against Kollokationen's 195.
+The founder also asked for an audit of the previous session's feedback; every item was re-verified
+live (Beispiel column, horizontal-scroll fades, internal scroll on all four tabs, the 30 px toolbar,
+the Wörter three-column grid), and the only one still open was the card-height parity above.
+Gates green: typecheck · lint 0 errors (77 warnings = the pre-change baseline) · 551 tests · build ·
+check:bundle 126.6 kB · check:contrast.
+Prior s189 (2026-08-05): **the Prüfung zone became ONE page.** Founder prompt:
 "this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
 ... Module wide practice and model test as the two options". The three-card `/anwenden` hub and the
 `/exam` Modelltest page folded into a single page whose header IS a two-segment sliding-pill
@@ -44,33 +72,12 @@ blocks, the number strip beside Zurück/Weiter, a red exit), verified over 225 i
 Prior s186: the Prüfungssimulation became a real four-part mock exam (Lesen, Hören, Schreiben,
 Sprechen) in four PRs (#791-#794), with per-Teil timers, an answer-sheet strip, the one-viewport
 exam stage and a result screen with a 60 % pass line.
-Prior s185: **The content-audit backlog is down to one open item.**
-The founder asked for every remaining action except P10 (human verification), and P9, P7, P5 and P4
-are closed outright, and so is P3 now that the founder picked and refined the Notizen step.
-P9: every noun declares `plural` or `numerus` (329 had neither), and the `pron` respelling is ONE
-documented scheme with a linter gate instead of two schemes split by authoring wave.
-P7: 108 items re-levelled off the advanced bands, so the B1 half is **36%** of the bank (was 30%)
-and verify:cefr FLAG went 10 → **0**; a linter ratchet freezes the rare-compound count at 334.
-P5: **every** grammar topic now has 10 drills with ≥3 productive (bank 195 → **320**, productive
-19% → **33%**); the 21 B2/C1 topics had zero productive drills between them.
-P4: six level-3 scenarios, three of them Alltag, so the ladder is **13/15/8** not 13/15/2.
-P3: eight exam-length B2 texts (288-333 words), chosen so every domain has ≥2; gesundheit and
-bildung had none. All 6 voicemails carry `notes` for a Notizen task, and the founder picked
-**variante A** for the learner-facing step, which shipped after three rounds of feedback (bigger
-write lines, a 40px play button instead of a tall tile, ruled lines instead of boxes, tile colours
-swapped, row heights locked so the button never jumps). **The whole audit backlog is closed except
-P10**, which the founder deferred.
-**The same session also ran a database architecture audit and shipped four of its fixes**, on a
-parallel branch (#786, #787).
-That work: Report: `docs/reports/db-architecture-audit-2026-08-04.md`. Verdict: the linear
-shape is deliberate (content lives in the repo; the DB holds only per-learner state + ops), but six
-growth/sync risks were found. Four shipped the same session: a **failed cloud write is no longer
-silent** (Settings shows "Sync pausiert" with a retry), **retention jobs** purge abandoned guest
-accounts and dead cache rows on pg_cron (migration 0015), the **day maps are capped at 400 days**
-with the lifetime figure preserved, and **`pnpm lint:migrations`** gates migration idempotency.
-Learner writing now expires after **2 years** (founder decision, asked because the privacy policy
-promised the opposite), which closes security-audit finding F11. Still open by design: the `srs`
-per-card table and the admin analytics rollups.
+Prior s185: **the content-audit backlog closed except P10** (P9 noun facts, P7 re-levelling, P5
+grammar drills, P4 scenarios, P3 exam-length texts + the Notizen step), and a parallel **database
+architecture audit** shipped four fixes (#786, #787): no silent cloud write, pg_cron retention,
+400-day day maps, `pnpm lint:migrations`. Detail in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5
+and `docs/reports/db-architecture-audit-2026-08-04.md`; the still-open items are listed under
+"Resume here" below.
 Prior s184: **Every filter and Aufgabe rail now carries the
 Lebensbereich pills, Berufsleben · Alltag, directly below Branche** (Wörter, Kollokationen,
 Redemittel, Schreiben Kurz/Lang; Grammatik is excluded on purpose, its topics carry no Thema). One
@@ -152,6 +159,39 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 190 (2026-08-05): six Bibliothek defects after the internal-scroll change
+(branch `claude/card-transparency-go-to-top-jygye9`).**
+Seven founder prompts, every one a defect report with a screenshot, against what PR #800 shipped the
+day before. No preview round: these were bugs in an already-approved surface, so each was reproduced
+in headless Chromium against the dev server, measured, fixed and re-measured.
+**What shipped:**
+- **`useScrollDirection(root)` + `ScrollTopButton root=`** (`features/shared/browseScroll.tsx`): the
+  hook reads whichever element actually scrolls, and the column only counts while it overflows,
+  which is false below `lg`. This is what brings the desktop go-to-top button back. Placement
+  unchanged and re-measured against the founder's s189 rule: button left edge 1000 px = the rail's
+  left edge, Feedback pill right edge 1256 px = the rail's right edge.
+- **`useEdgeFade` + `.mask-fade-y|-top|-bottom`**: the scroll column fades at whichever vertical edge
+  still has content, instead of slicing a card in half. A mask rather than an overlay, because the
+  page ground is a gradient and a flat overlay would band in light and grey out in dark.
+- **`BROWSE_TOOLBAR_BUTTON_ON`**: the ON state for the search and bookmark toggles, applied after
+  the base class so the fill wins the tailwind-merge. They were white-on-white, i.e. invisible.
+- **`lg:self-start` + `lg:max-h-[calc(100%-3.5rem)]` on all four rails**: content-sized, capped
+  against the stage, and clear of the floating bottom line.
+- **`src/lib/inputMode.ts` (new) + one rule in `index.css`**: the focus ring is keyboard-only.
+- **Redemittel card parity**: front headline capped at 3 lines, every BACK part at 2, each with a
+  `title`. 272 → 188 px against Kollokationen's 195.
+**Audit the founder asked for (prompt 6):** every s189 feedback item re-verified in the browser, not
+read off the log. Live and correct: the Redemittel **Beispiel** column, the horizontal-scroll fades,
+internal scroll with the page unscrollable on all four tabs, the 30 px toolbar row, the
+Feedback/go-to-top docking, the Wörter three-column grid. The only item still open from that list
+was the card-height parity, now closed.
+**Verification:** 1280x900 across all four tabs (rail open + collapsed, search open, mid-scroll) and
+390x844 for the mobile fallback, where the page still scrolls, the button stays centred above the
+Üben bar and no mask applies.
+**Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
+`3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
+moves, the reserve moves with it.
+
 **Handoff after session 188 (2026-08-04): the Modelltest hub (branch `claude/page-redesign-7md2zi`).**
 Founder: "re-do this page" (a dark screenshot of `/exam`), then "go with B" plus two amendments.
 **What shipped** (`src/features/exam/ExamHub.tsx`, rewritten; `partMeta.ts` gained a solid `bar`
@@ -186,33 +226,6 @@ Modelltest anchor), this file and the prompt log. The preview stays in
 **Next, if the founder does not redirect:** unchanged from s187 (the queued writing-quality audit,
 then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`). One item
 this session made cheaper: per-Teil exam history now has a real surface to grow into.
-
-**Handoff after session 187 (2026-08-04): the exam polish round + the app-wide dark palette.**
-Founder feedback on the shipped Prüfungsteil (7 numbered points across the session), answered with
-ONE interactive preview and then implemented from their picks. **What shipped:**
-- **Dark palette "N3 Slate", app-wide** (`src/index.css` `.dark` + `--wash-a`/`--wash-b` read by
-  `bg-page`/`bg-mesh`): near-neutral greys, no coloured page radials in dark, blue only where it
-  acts. Contrast steps are the founder-confirmed "K2" relationships (card/ground 1.38:1,
-  edge/ground 3.03:1, nested-in-card 1.20:1). `pnpm check:contrast` green.
-- **Corner scale "tighter"**: `--radius: 0.5rem` + tightened ± steps in `tailwind.config.ts`
-  (card 10px, row 8px, pill 6px, `2xl` 14px). Affects every surface, on purpose.
-- **The exam screen** (`src/features/exam/McParts.tsx`, rewritten): the question has no tile, one
-  card per screen, content-tall blocks centred in the stage, the number strip in the bottom cluster
-  with 16/12/16 px of air, drag-resize on both axes with arrow-key steps and a reset on every
-  question change, fade-out on both scroll regions, `pb-safe-4`.
-- **The exit** (`AppShell`): red `LogOut`, icon-only on a phone, icon + "Verlassen" from `sm` up.
-- **The answered number** (`AnswerStrip`): `text-foreground` on the Himmelblau tint, not
-  `text-accent-ink`.
-**Verification:** a Playwright driver walked the real build over 225 in-exam screens (1440x900,
-1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × three fresh draws): 0 px page overflow
-everywhere, question fully visible on every screen, no console errors, light and dark.
-**Docs updated in the same PR:** CLAUDE.md (dark palette + corner law, and the English rule),
-`docs/areas/BRAND.md` (tokens, radius scale), `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, the
-`max-h-full` geometry trap), `docs/DECISIONS.md` §s187, the `/design` skill (English previews, never
-mark a recommendation, the new palette + corners).
-**Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
-open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
-(synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.
 
 **Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
 shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three

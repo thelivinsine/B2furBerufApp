@@ -218,3 +218,31 @@ Supabase run needed a re-run after an `esm.sh` 522 outage, unrelated to the code
   and C1-Hören content waves (`PROJECT_REFERENCE` → CONTENT GAPS), then a Fortschritt tile reading
   `progress.mock_exams` (the data is synced but nothing plots it yet), then per-Teil exam history.
   Nothing is half-built: every part of the exam ships complete.
+
+
+**Handoff after session 187 (2026-08-04): the exam polish round + the app-wide dark palette.**
+Founder feedback on the shipped Prüfungsteil (7 numbered points across the session), answered with
+ONE interactive preview and then implemented from their picks. **What shipped:**
+- **Dark palette "N3 Slate", app-wide** (`src/index.css` `.dark` + `--wash-a`/`--wash-b` read by
+  `bg-page`/`bg-mesh`): near-neutral greys, no coloured page radials in dark, blue only where it
+  acts. Contrast steps are the founder-confirmed "K2" relationships (card/ground 1.38:1,
+  edge/ground 3.03:1, nested-in-card 1.20:1). `pnpm check:contrast` green.
+- **Corner scale "tighter"**: `--radius: 0.5rem` + tightened ± steps in `tailwind.config.ts`
+  (card 10px, row 8px, pill 6px, `2xl` 14px). Affects every surface, on purpose.
+- **The exam screen** (`src/features/exam/McParts.tsx`, rewritten): the question has no tile, one
+  card per screen, content-tall blocks centred in the stage, the number strip in the bottom cluster
+  with 16/12/16 px of air, drag-resize on both axes with arrow-key steps and a reset on every
+  question change, fade-out on both scroll regions, `pb-safe-4`.
+- **The exit** (`AppShell`): red `LogOut`, icon-only on a phone, icon + "Verlassen" from `sm` up.
+- **The answered number** (`AnswerStrip`): `text-foreground` on the Himmelblau tint, not
+  `text-accent-ink`.
+**Verification:** a Playwright driver walked the real build over 225 in-exam screens (1440x900,
+1024x768, 393x852, 375x667, 360x640 × Lesen + Hören × three fresh draws): 0 px page overflow
+everywhere, question fully visible on every screen, no console errors, light and dark.
+**Docs updated in the same PR:** CLAUDE.md (dark palette + corner law, and the English rule),
+`docs/areas/BRAND.md` (tokens, radius scale), `docs/areas/PRAKTISCH-NAV.md` (exam anatomy, the
+`max-h-full` geometry trap), `docs/DECISIONS.md` §s187, the `/design` skill (English previews, never
+mark a recommendation, the new palette + corners).
+**Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
+open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
+(synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.

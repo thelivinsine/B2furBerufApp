@@ -1515,3 +1515,32 @@ actually load-bearing: the controls inside the tile stay white, so they pop off 
 The toggle needed one extra step: `BROWSE_TOOLBAR_BUTTON` ends in `bg-surface`, which wins the
 tailwind-merge against the `accent` button variant, so the fill is a separate class constant applied
 after it (`BROWSE_FILTER_BUTTON`).
+
+## s190 — the focus ring is keyboard-only, and what happens when the scroller moves
+
+Two cross-cutting rules came out of a defect session on the Bibliothek, both worth the "why".
+
+**The focus ring.** The founder reported blue outlines around the switcher pills and the Filter row
+after a plain mouse click. The app has no bespoke focus styling: the ring is the global
+`:focus-visible` rule, which is SUPPOSED to be keyboard-only. It could not be reproduced in headless
+Chromium (`:focus-visible` reports false after a click), which is exactly why it was not fixed by
+chasing one browser: the spec leaves the heuristic to the engine, and a control that RE-RENDERS
+under the click, like a switcher pill that navigates or a filter toggle that swaps its own subtree,
+can end up focused again through a path the engine treats as "not clearly pointer". The fix records
+the input device instead of inferring it: `trackInputMode()` sets `<html data-input>` on pointerdown
+and on the keys that move or activate focus, and one CSS rule suppresses the ring while the pointer
+is in charge. Deterministic in every browser, and keyboard users keep their indicator, so this is
+not the usual "remove the outline" accessibility regression: WCAG 2.4.7 asks for a visible focus
+indicator for keyboard operation, which is untouched.
+
+**Moving the scroller is not a local change.** s189 moved the desktop Bibliothek scroll from the
+page into the content column. Three things kept reading `window.scrollY` afterwards, and the visible
+result was the go-to-top button disappearing on desktop while still working on mobile, so it read as
+"missing" rather than broken. Two more consequences surfaced in the same session: a scroll container
+CLIPS whatever crosses its edge, which the founder saw as cards "abruptly cut" (answered with
+`useEdgeFade` + `mask-fade-*`, a mask rather than an overlay because the ground is a gradient), and
+a rail sitting beside the column in the same grid row stretched to its cap in every state, because a
+grid item defaults to `align-self: stretch`, which made a collapsed filter rail 564 px of empty
+Himmelblau. The rule that came out of it: when a surface changes what scrolls, audit everything that
+reads the window, everything that sits at the container's edges, and everything that shares its grid
+row.
