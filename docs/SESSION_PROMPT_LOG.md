@@ -4257,3 +4257,9 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/index.css` · `src/features/library/LibraryHub.tsx` · `src/features/shared/browseScroll.tsx` ·
   `src/features/shared/DataTable.tsx` · `src/features/shared/SearchField.tsx` ·
   `src/features/redemittel/RedemittelViews.tsx` · the four Bibliothek tab files · this log
+- **Prompt 24 (verbatim):** `create the PR and merge`
+  **Response:** the post-#799 run shipped as **PR #800** (squash-merged into `main`): commits
+  `d5699c0`, `dbf15af`, `bd982aa`, `407c91a`, `bee7f60`, `cc54f94`, `5f4aea0`, `90940ad`, plus this
+  documentation pass. 36 files. No migrations and no Edge Function changes, so only the Pages deploy
+  matters; the founder verifies the live result.
+- **Artifacts (prompt 24):** PR #800 · `docs/PROJECT_STATUS.md` · this log
