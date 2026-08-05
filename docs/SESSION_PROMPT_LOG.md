@@ -4172,3 +4172,33 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
   the four Bibliothek tab files · `CLAUDE.md` · `.claude/skills/design/SKILL.md` ·
   `docs/areas/BIBLIOTHEK.md` · this log
+- **Prompt 18 (verbatim):** `while you're at it, reduce the spacing by 30% above and below the view
+  buttons row for desktop view specifically. Also, reduce the view buttons size by 25% for both
+  desktop and mobile view. \nFor desktop view - these are my observations:\nThe words cards look
+  empty and too has too much blank space. use the same three columns structure as kollokations for
+  it. For redemittel keep the cards heights consistent with kollokations as the redemittel cards
+  abruplty become bigger in height. IN the table view of redemittel, give a german example next to
+  the english translation. show a horizontal scroll wherever applicable in the views all across the
+  bibliothek to indicate there are more columns to the right for the users. finally, for all the
+  places applicable, instead of a page scrooll in desktop view, keep internal scroll`
+- **Prompt 19 (verbatim):** `move the feedback button to the bottom line with a hyperlink button
+  "feedback geben" or something like this. Spread out the blue buttons and center them. the emoji
+  should be treated as part of the text when center aligning them in the blue button.`
+  **Response, PART of prompt 18 plus all of 19.** Shipped: the ViewSwitcher is 25% smaller
+  (40 → 30 px track, 36 → 26 px buttons, 16 → 14 px marks) at both breakpoints; the desktop stack
+  around the toolbar row is 30% tighter (`lg:space-y-[1.05rem]`, `lg:gap-y-[1.05rem]`, `lg:pb-2`);
+  the Wörter card grid gained `xl:grid-cols-3` to match Kollokationen, and its headword now WRAPS
+  instead of truncating, because the narrower card was cutting "die Besprechung" to "die Bespre…".
+  From prompt 19: `UebenLabel` puts the bolt inside the centred group instead of hanging it outside
+  the flow, `FeedbackTextLink` is a new plain-text control, and `FloatingActionCluster` grew an
+  optional `note` slot so the Bibliothek's previously empty lower line carries "Feedback geben"
+  while the CTA sits centred and alone on the button row.
+  **NOT done in this pass, still open from prompt 18:** Redemittel card heights against
+  Kollokationen; a German example beside the English one in the Redemittel table; the
+  horizontal-scroll affordance across the Bibliothek views; and desktop internal scrolling instead
+  of page scrolling. The last of those is a layout change on every browse surface, not a class
+  tweak, and was left rather than half-done.
+- **Artifacts (prompts 18-19):** `src/features/shared/ViewSwitcher.tsx` ·
+  `src/features/shared/browseScroll.tsx` · `src/features/shared/floatingCluster.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/features/library/LibraryHub.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` · the four Bibliothek tab files · this log

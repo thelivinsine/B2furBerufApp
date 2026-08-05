@@ -49,11 +49,26 @@ export const floatingNote =
  * The surface that mounts it owes the flow the matching clearance, or its last
  * card ends up underneath the buttons.
  */
-export function FloatingActionCluster({ children }: { children: ReactNode }) {
+export function FloatingActionCluster({
+  children,
+  note,
+}: {
+  children: ReactNode;
+  /** The lower line, pinned just above the nav: a disclaimer on Schreiben, the
+   *  Feedback link in the Bibliothek. Both sit at the SAME offset. */
+  note?: ReactNode;
+}) {
   return createPortal(
-    <div className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden">
-      <div className="flex items-stretch gap-2">{children}</div>
-    </div>,
+    <>
+      <div className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden">
+        <div className="flex items-stretch justify-center gap-2">{children}</div>
+      </div>
+      {note && (
+        <p className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden">
+          <span className={floatingNote}>{note}</span>
+        </p>
+      )}
+    </>,
     document.body,
   );
 }

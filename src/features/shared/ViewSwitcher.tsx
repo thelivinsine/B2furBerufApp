@@ -62,11 +62,13 @@ export function ViewSwitcher({
       className={cn(
         // Same lifted-white-pill toggle language as the page toggle
         // (LibrarySwitcher): recessed grey track, active button on a white pill.
-        // Sized so the whole control is 40px tall, matching the icon buttons in
-        // the toolbar row. `relative` is the pill's positioning context.
+        // 30px tall since s189, a quarter down from the 40px that matched the
+        // toolbar's icon buttons (founder: "reduce the view buttons size by
+        // 25%"). The row is `items-center`, so it stays centred against the
+        // 40px buttons beside it. `relative` is the pill's positioning context.
         // `shadow-soft`: the toolbar row behind it is transparent, so the track
         // does its own lifting off the cards scrolling underneath.
-        "relative inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5 shadow-soft",
+        "relative inline-flex h-[1.875rem] shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5 shadow-soft",
         className,
       )}
     >
@@ -95,11 +97,11 @@ export function ViewSwitcher({
             aria-label={label}
             title={label}
             className={cn(
-              "relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors",
+              "relative z-10 inline-flex h-[1.625rem] w-[1.625rem] items-center justify-center rounded-md transition-colors",
               active ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-3.5 w-3.5" />
           </button>
         );
       })}

@@ -19,7 +19,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackTextLink } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
@@ -558,7 +558,7 @@ export function VocabularyTrainer() {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-[1.05rem]">
       {/* No page header: the Bibliothek tabs (LibrarySwitcher) already say which
           section this is (founder s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
@@ -567,8 +567,8 @@ export function VocabularyTrainer() {
           the tile still starts level with the first word card. Mobile renders
           the SAME filter tile inline (collapsed by default) instead of a
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
               Filter + view on the left, bookmark/search pushed right; Üben fills
               its row with the count at the far right. Desktop keeps Üben/count
@@ -706,9 +706,8 @@ export function VocabularyTrainer() {
             label) stays pinned at the bottom of the screen (above the nav) so
             the list scrolls above it. Desktop keeps Üben in the rail. */}
         <ScrollTopButton show={scrolled} />
-        <FloatingActionCluster>
-          <FeedbackIconButton />
-          <div className={cn(floatingSlot, "flex-1")}>
+        <FloatingActionCluster note={<FeedbackTextLink />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
               variant="gradient"
               className="h-11 w-full rounded-xl text-base"

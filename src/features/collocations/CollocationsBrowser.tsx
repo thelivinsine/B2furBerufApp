@@ -26,7 +26,7 @@ import {
 } from "@/lib/facets";
 import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackTextLink } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
@@ -451,8 +451,8 @@ export function CollocationsBrowser() {
           the tile still starts level with the first card. Mobile renders the
           SAME filter tile inline (collapsed by default); only one FilterRail
           is visible per breakpoint. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
@@ -620,9 +620,8 @@ export function CollocationsBrowser() {
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <FloatingActionCluster>
-          <FeedbackIconButton />
-          <div className={cn(floatingSlot, "flex-1")}>
+        <FloatingActionCluster note={<FeedbackTextLink />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
               variant="gradient"
               className="h-11 w-full rounded-xl text-base"

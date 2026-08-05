@@ -85,11 +85,11 @@ export const BROWSE_FILTER_BUTTON =
   "border-accent/35 bg-accent/35 text-accent-ink shadow-soft hover:border-accent/50 hover:bg-accent/50 dark:border-accent/[0.18] dark:bg-accent/[0.18] dark:hover:border-accent/[0.28] dark:hover:bg-accent/[0.28]";
 
 /**
- * Contents for the Bibliothek "Üben" button (founder 2026-07-13): the label is
- * centered in the button and the bolt icon floats to its left without shifting
- * the label off-center. The span is what the button's `justify-center` centers;
- * the icon is absolutely positioned at the span's left edge (`right-full`), so
- * it takes no layout space.
+ * Contents for the Bibliothek "Üben" button. The mark and the label are ONE
+ * centred group (founder s189: "the emoji should be treated as part of the text
+ * when center aligning"). It used to hang the icon outside the flow
+ * (`absolute right-full`) so the words alone sat dead centre, which left the
+ * pair looking pushed to the left in a wide button.
  *
  * When `count` + `noun` are given the label folds the filtered-set size into the
  * button ("Üben mit 47 Wörtern"), so it is always obvious that Üben practises
@@ -107,8 +107,8 @@ export function UebenLabel({
   noun?: string;
 }) {
   return (
-    <span className="relative inline-flex items-center justify-center">
-      <Zap className={`absolute right-full mr-1.5 ${iconClass}`} />
+    <span className="inline-flex items-center justify-center gap-1.5">
+      <Zap className={iconClass} />
       {count != null && noun ? `Üben mit ${count} ${noun}` : "Üben"}
     </span>
   );

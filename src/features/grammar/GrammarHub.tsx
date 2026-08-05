@@ -11,7 +11,7 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { FeedbackTextLink } from "@/components/layout/FeedbackButton";
 import {
   useScrollDirection,
   browseHeaderClass,
@@ -156,14 +156,14 @@ export function GrammarHub() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-[1.05rem]">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1), while the content and the
           filter tile share row 2 so the tile starts level with the first card.
           Mobile renders the SAME filter tile inline as a slide-open panel. */}
-      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-[1.05rem] lg:space-y-0">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-[4.75rem] lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-2`}>
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
           <div className="flex w-full flex-col gap-2">
             {/* Items are centered while search is closed; opening search slides
@@ -289,9 +289,8 @@ export function GrammarHub() {
         {/* Mobile action bar: Üben (count folded into the label) pinned at the
             bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
-        <FloatingActionCluster>
-          <FeedbackIconButton />
-          <div className={cn(floatingSlot, "flex-1")}>
+        <FloatingActionCluster note={<FeedbackTextLink />}>
+          <div className={cn(floatingSlot, "w-full max-w-sm")}>
             <Button
               variant="gradient"
               className="h-11 w-full rounded-xl text-base"

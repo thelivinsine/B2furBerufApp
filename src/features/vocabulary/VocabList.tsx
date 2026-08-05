@@ -93,7 +93,11 @@ const VocabCard = memo(function VocabCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5">
             {gender && <Wesen gender={gender} size={24} />}
-            <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
+            {/* Wraps rather than truncates: the grid went to three columns in s189,
+                and a narrower card was cutting "die Besprechung" to
+                "die Bespre…". The headword is the one thing on the card that
+                must always be readable in full. */}
+            <p className="text-base font-semibold leading-snug sm:text-lg">{v.de}</p>
           </div>
           <Button
             type="button"
@@ -253,7 +257,7 @@ export function VocabList({ items }: { items: VocabItem[] }) {
           auto-height grid all resolve to the tallest row, so the cards stay
           content-driven (a filtered set of short cards stays compact) without
           any fixed height that could clip a long example. */}
-      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((v) => (
           <VocabCard key={v.id} v={v} open={openId === v.id} onToggleOpen={onToggleOpen} />
         ))}

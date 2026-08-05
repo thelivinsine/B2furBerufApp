@@ -100,7 +100,8 @@ export function LibraryHub() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    // Desktop tightens the stack around the toolbar row by 30% (founder s189).
+    <div className="space-y-4 sm:space-y-6 lg:space-y-[1.05rem]">
       {/* Static page header. On desktop it sits at the content-column width (col
           1 of the same [1fr, 16rem] grid the trainers use for their content +
           filter rail), so the tabs line up with the cards, not the rail. */}

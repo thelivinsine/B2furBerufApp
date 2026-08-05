@@ -153,6 +153,29 @@ export function FeedbackPill() {
  * ties it to the "built with AI" disclaimer and the visible label makes the
  * purpose unambiguous.
  */
+/**
+ * Feedback as a plain text link, for the lower line of the floating mobile
+ * cluster (founder s189). The Bibliothek's cluster carries no disclaimer, so
+ * that line was empty and Feedback was taking a button slot beside the CTA;
+ * as a link it frees the row for the one action that matters.
+ */
+export function FeedbackTextLink({ className }: { className?: string }) {
+  const setOpen = useSessionStore((s) => s.setFeedbackOpen);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className={cn(
+        "inline-flex items-center gap-1 text-[11px] font-medium text-primary underline-offset-2 hover:underline",
+        className,
+      )}
+    >
+      <Sparkles className="h-3 w-3" />
+      Feedback geben
+    </button>
+  );
+}
+
 export function FeedbackIconButton({ className }: { className?: string }) {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   return (
