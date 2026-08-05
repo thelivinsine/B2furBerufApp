@@ -903,7 +903,7 @@ function SpeakingBlock({
               onChange={(e) => setTypedAnswer(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submitTyped()}
               placeholder="Deine Antwort auf Deutsch …"
-              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
+              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors"
             />
             <Button variant="gradient" className="h-11" onClick={submitTyped}>
               Prüfen
@@ -1033,7 +1033,7 @@ function TypingBlock({
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
               placeholder="Deutsches Wort tippen …"
-              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
+              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors"
             />
             <Button variant="gradient" className="h-11" onClick={submit}>
               Prüfen

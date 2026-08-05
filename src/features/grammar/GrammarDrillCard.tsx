@@ -121,7 +121,7 @@ export function GrammarDrillCard({
               disabled={checked && isCorrect}
               onKeyDown={(e) => e.key === "Enter" && checkText()}
               placeholder="Deine Antwort …"
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none"
             />
             {!checked || !isCorrect ? (
               <Button variant="outline" onClick={checkText}>Prüfen</Button>

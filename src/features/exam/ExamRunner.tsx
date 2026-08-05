@@ -328,7 +328,7 @@ export function ExamRunner({
                   onChange={(e) => setFreeText(e.target.value)}
                   aria-label="Antwort eingeben"
                   placeholder="Tippe deine Antwort …"
-                  className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
                 />
                 <Button
                   // Quiet in the simulation (founder s186): dark blue is

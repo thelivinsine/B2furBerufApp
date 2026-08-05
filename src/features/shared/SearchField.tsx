@@ -67,7 +67,7 @@ export function SearchField({
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-10 w-full rounded-lg border border-input bg-surface py-2 pl-9 pr-9 text-sm outline-none focus:ring-2 focus:ring-ring"
+        className="h-10 w-full rounded-lg border border-input bg-surface py-2 pl-9 pr-9 text-sm outline-none"
       />
       {value && (
         <button

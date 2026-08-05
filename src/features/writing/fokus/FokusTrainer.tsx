@@ -321,7 +321,7 @@ export function FokusTrainer({
               disabled={m.status === "submitting"}
               rows={3}
               placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
-              className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+              className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none"
             />
             {/* Umlaut keys share the footer row with Korrigieren (desktop);
                 mobile keeps Korrigieren in the sticky bottom bar (s150). */}
@@ -690,7 +690,7 @@ export function FokusTrainer({
                 onChange={(e) => m.setInput(e.target.value)}
                 rows={3}
                 placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
-                className="min-h-[72px] w-full flex-1 resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+                className="min-h-[72px] w-full flex-1 resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none"
               />
               <UmlautKeys textareaRef={taMobileRef} value={m.input} onChange={m.setInput} />
               {/* The "why can't I press Korrigieren yet" line sits in the card

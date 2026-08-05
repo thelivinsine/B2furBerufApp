@@ -4118,3 +4118,24 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   Merging `main` triggers the two deploy workflows; no migrations and no Edge Function changes are
   in this PR, so only the Pages deploy matters. The founder verifies the live result.
 - **Artifacts (prompt 14):** PR #799 · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 15 (verbatim):** `preview the filterrail with the full-height cap`
+  **Response:** `preview/filterrail-height.html` (+ generator), four caps tested on the REAL built
+  rail over CDP at 393x852 with the measured geometry printed per frame, not mockups. The finding:
+  the one-screen ceiling does not transfer. Verlauf can scroll to the top of the screen; the filter
+  panel starts 205 px down and has a fixed Üben bar beneath it, so `max-h-panel-stage` put its bottom
+  border 45 px below the viewport (option C), and adding scroll-into-view only recovered 45 px before
+  the page ran out of scroll (option D). 45dvh shows 329 of 658 px of filter body, 58dvh shows 440,
+  the full cap 638. **Founder picked option A, keep 45dvh.**
+- **Prompt 16 (verbatim):** `the blue selection rectangle here is not necessary. get rid of it. Just
+  the blinking cursor is enough to show selection. Implement direclty without any preview for this`
+  **Response:** the ring came from the global `:focus-visible` rule in `index.css`, not from the
+  field, which is why it appeared identically on every text surface. Text fields are now exempt
+  (textarea, the caret-bearing input types, contenteditable) and the 13 components that also asked
+  for the ring by hand had that utility removed. Buttons, links, toggles and check/radio inputs KEEP
+  it: they have no caret, so the ring is their only focus indicator. Verified on the built app by
+  keyboard-tabbing: a focused button still reports a ring shadow, the focused textarea reports
+  `0px 0px 0px 0px`. (The first check looked like a failure until the service worker was cleared, it
+  was serving the previous build.)
+- **Artifacts (prompts 15-16):** `preview/filterrail-height.html` +
+  `preview/gen-filterrail-height.mjs` · `src/index.css` · 10 feature files with hand-written focus
+  rings on text fields · `docs/areas/PRAKTISCH-NAV.md` · this log
