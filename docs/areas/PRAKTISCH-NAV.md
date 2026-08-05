@@ -30,7 +30,7 @@ The Prüfung hub itself lives at `/anwenden` and is ONE page with a two-segment 
 (s189, below). `/exam` redirects into it (`?tab=modelltest`) and is kept forever: it is in
 learners' history, in the dashboard recommendation and in ⌘K.
 
-### The Prüfung hub (`/anwenden`, redesign s189)
+### The Prüfung hub (`/anwenden`, redesign s189, polished s190)
 
 Founder brief: "insert a toggle in place of the current header, similar to Bibliothek", with
 **Module üben** and **Modelltest** as the two options. It folded two pages into one (the three-card
@@ -38,7 +38,15 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
 `preview/pruefung-hub-redesign.html` + `preview/pruefung-hub-r2.html`.
 
 - **Header:** the two-segment sliding-pill switcher IS the page header (`useSlidingPill`, one
-  always-mounted pill). No HubHero, no `h1`. Full width on a phone, content-sized from `lg` up.
+  always-mounted pill). No HubHero, no `h1`. Full width on a phone, **capped at `max-w-sm`** from
+  there (s190: at 834px the track stretched the full column, the shape rejected in s149), and
+  content-sized from `lg` up. The scope row keeps a **fixed `h-9`** so hiding the clock switch on the
+  Modelltest tab cannot shift the page (s190). Switching tabs plays the Bibliothek's own directional
+  slide (`AnimatePresence mode="popLayout"`, 0.15s), because the same gesture should feel the same
+  in both places.
+- **ONE frame for both tabs** (s190): the header and both panels share `lg:max-w-4xl mx-auto`, so
+  switching never changes the page's width. Before this the module grid capped at 896px while the
+  band and Verlauf ran the full 1152px column.
 - **Scope controls** sit BELOW the switcher at every width (founder s189): navigation first, then
   what it is scoped to. Sharing one line on a desktop gave the two the same rank. **Both rows are
   CENTRED at every width**, desktop included (founder), so the header reads as one stacked block on
@@ -54,30 +62,64 @@ Founder brief: "insert a toggle in place of the current header, similar to Bibli
   title rather than being stretched. `lg:w-full` beside `lg:max-w-4xl` is load-bearing: the grid is
   a flex child, and auto cross-axis margins make a flex item fall back to its CONTENT width, which
   collapsed the block to 411px.
-  Mark, name, what it holds, and a chip. Top aligned with the spare room trailing: stretching them
-  to fill a tall phone opened a void inside every card between description and chip, and centring
-  the block read as content that had run out. This is where "Einzeln üben" went.
+  **The card (s190, founder pick B "Prüfungstag"):** the mark top-left and a quiet arrow top-right
+  (the card is a button and has to read like one), then the title and what it holds. The module's own
+  hue is breathed into the bottom-right corner (`.mod-wash-*` in `index.css`, 13 % of an already pale
+  hue) and **that corner is RESERVED in both clock states** via the card's bottom padding, so the
+  minutes badge appears and disappears with the switch without moving a single card edge, and a
+  two-line description can never run underneath it. This is where "Einzeln üben" went.
 - **Mit Zeit / Ohne Zeit** (founder pick "idea 3", s189) is ONE switch beside Niveau, and
   **Ohne Zeit is the resting state**. It is how the free trainers merged INTO the modules rather
   than sitting beside them: Schreiben ohne Zeit opens `/writing`, Sprechen ohne Zeit `/simulation`,
   and Lesen/Hören run the same drill with `untimed` set (no tick, no timer pill, never auto-handed
   in). The separate "Freies Üben" block the earlier rounds carried is gone with it, and those two
   trainers have no other entry point, so the switch is load-bearing.
-- **Modelltest:** the run band and Verlauf, nothing else. The band is eyebrow + countdown, the four
-  modules as a timeline, then the CTA, **centred and with no rule above it** (founder s189: the
-  divider cut the band in two, and the run is one thing). It takes the room the page leaves, so
-  "Prüfung starten" sits in the thumb's reach.
+- **Modelltest:** the run band and Verlauf, nothing else. Below `lg` the band is eyebrow +
+  "52 Min gesamt" + countdown, the four modules as a timeline, then the CTA, **centred and with no
+  rule above it** (founder s189: the divider cut the band in two, and the run is one thing). It takes
+  the room the page leaves **on a phone only** (`flex-1 sm:flex-none`, s190: on a tablet the same
+  rule stretched one card to 800px and left the timeline floating in the middle of it), so
+  "Prüfung starten" still sits in the thumb's reach where that matters.
+  **From `lg` the band is a two-column ticket** (s190): the total as a display figure, the sub-line,
+  the countdown and the CTA on the left, the four Teile as a connected vertical ladder on the right.
+  The total is stated ONCE per breakpoint, never twice.
 - **The timeline connector is ONE SEGMENT PER GAP** (founder s189), drawn from the edge of one tile
   to the edge of the next. The single full-width line it replaced ran behind the marks and read as
   if it crossed them; do not restore it (and the `border-surface` ring that used to mask it is gone
   with it).
-- **Verlauf RESTS OPEN** (founder s189): three centred figures (Letzter · Bester · Bestanden), then
-  the newest runs, newest first. A row is date · four result segments in exam order · total badge ·
-  chevron, and its disclosure holds the four per-module percentages. A single-module run leaves the
-  other three tracks empty and prints "–", which is the honest picture of what was actually sat.
+- **BOTH tabs end in a Verlauf** (s190), sharing one card shell: eyebrow + count, a summary, the
+  newest rows, and one expand button. At rest a **phone shows the summary only** (a 2×2 grid plus a
+  summary plus a list does not fit one phone screen); from `sm` up the newest three rows are listed.
+- **Modelltest Verlauf = founder pick V2 "Zahl und Kurve"** (s190, replacing the three flat cells of
+  s189): "Letzter Durchlauf" as a display figure with a delta chip against the run before it, Bester
+  and Bestanden as two supporting stats, and the last seven totals as bars against a dashed 60 %
+  pass line. The pass threshold is named in the caption, never labelled on the chart, where it sat on
+  top of the early bars. A row is date · four result segments in exam order · total badge · chevron,
+  and its disclosure holds the four per-module percentages. A run that produced NO score prints
+  "Nicht bewertet" instead of four empty tracks, which read as a loading skeleton.
+- **Module üben Verlauf = founder pick M3 "Stärkeprofil"** (s190): four columns on one scale, one per
+  module, where the **pale** segment is the learner's first attempt and the **solid** cap on top is
+  what they have gained since (a dotted marker line was tried first and vanished against a saturated
+  fill). A module never practised shows "–" over a lighter track so it recedes instead of dominating.
+  Under it the practice rows: date · mark · module · score.
+  **From `lg` this card splits into two columns** (summary left, rows right): a 2×2 grid plus a
+  four-column profile plus a list stacked come to 930px, which scrolls a 900px laptop on a page that
+  is supposed to rest; side by side they come to 750px and the card stops wasting the 400px of width
+  the profile does not use. The summary centres itself vertically, so an expanded list does not leave
+  a void beside it.
+- **The two lists are disjoint** (s190): a **Modelltest** is a `mockExams` record that sat all four
+  parts, a **module practice** is one that sat a single part (`isFullRun` / `toPractice`, pinned in
+  `tests/pruefungHub.test.ts`). Before the split a single Lesen drill counted as a Modelltest result
+  and its percentage landed in "Bester". The profile therefore plots the score of a module SAT AS A
+  MODULE; the untimed Schreib- and Sprechtrainer produce a correction, not a percentage, and keep
+  their own Verlauf on their own pages.
 - **Results appear ONLY in Verlauf** (founder s188): not on the band, not on the module cards.
 - **Zero states:** an unservable Niveau (A2) states "Noch keine Inhalte" once per control and
-  Verlauf simply isn't rendered.
+  Verlauf simply isn't rendered. With runs but nothing scored, the summary says so in one line
+  ("Noch keine Bewertung") instead of printing a row of dashes (s190: three "–" cells were the
+  strongest MVP signal on the page).
+- **Marks carry a soft in-family gradient** (`PART_META.tile`, s190), not a flat 10 % tint: premium
+  in this system means a subtle gradient. Same four hues, same receptive/productive pairing.
 - The countdown comes from `settings.examDate` and retires itself once the date has passed, so it
   can never sit at "0 Tage" forever.
 

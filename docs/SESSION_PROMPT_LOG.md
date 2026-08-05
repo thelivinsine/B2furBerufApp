@@ -4354,3 +4354,82 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
   `CLAUDE.md` · `docs/areas/BIBLIOTHEK.md` · `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
   `docs/PROJECT_STATUS.md` · this log
+
+
+## Session 190 · 2026-08-05 · branch `claude/polish-ui-ux-design-92sbje`
+
+- **Prompt 1 (verbatim):** `These pages are okay at the moment but they still look cheap or like MVP.
+  I want them to look highly polished, excellent UI/UX, like a billion dollar edu tech app developed
+  by some of the best experts in the world known for front end design. Do a thorough analysis of the
+  current state and suggest improvements along with a few previews` (with two desktop screenshots of
+  `/anwenden`: the Modelltest tab and the Module üben tab)
+  **Response:** analysis first, no app code touched. Twelve findings across composition, content and
+  craft, the load-bearing ones being that the two tabs do not share a page width (Module üben caps at
+  896px, Modelltest runs the full 1152px column), that the desktop run band is a phone row stretched
+  over ~430px of hairline per gap, that "Ohne Uhr" is printed four times under a switch that already
+  says "Ohne Zeit", that the exam's total length is never stated, and that a first visit renders a
+  KPI row of three dashes. Three options previewed, each with desktop + phone frames for both tabs
+  and a light/dark and Ohne Zeit/Mit Zeit switch: **A "Verdichtet"** (mark, title and the affordance
+  on one line, no foot row, the card loses a third of its height), **B "Prüfungstag"** (the band
+  becomes a two-column ticket with the total as a display number and the four Teile as a ladder;
+  Verlauf leads with a development strip against the pass line; module cards get a corner wash in
+  their own hue) and **C "Bereit"** (a practice meter and a last-practised line per module card, a
+  recency line under the CTA). Seven fixes are shared by all three. Awaiting the founder's pick.
+- **Artifacts (prompt 1):** `preview/gen-pruefung-polish.mjs` · `preview/pruefung-polish.html` ·
+  `preview/pruefung-polish-artifact.html` (artifact
+  https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04) · this log
+- **Prompt 2 (verbatim):** `I like option B overall but in the modul uben, the mit Zeit's badges should
+  not affect the size of the cards, they should rather appear on the bottom right of the cards where
+  there is empty space. Also, the verlauf section proposed in option B should be available in module
+  uben - adapt and build it for modul uben if it requires additional stuff. In case of modelltest
+  verlauf, I like the bester, letzter KPIs but it needs better visualization. By keeping this in mind,
+  provie me new set of previews`
+  **Response:** round 2 (`preview/pruefung-polish-r2.html`, artifact redeployed to the same URL). B is
+  locked; only the three asks carry options. **The card:** the minutes badge is absolutely placed in
+  the corner the colour wash already occupies and that corner is RESERVED in both clock states, so the
+  card has one height whether the clock is on or off, and a two-line description on a phone can never
+  run under the badge. **Modelltest Verlauf, three visualisations** (all keep Letzter/Bester/Bestanden,
+  none uses the three flat cells): V1 "Im Diagramm" (the chart carries the labels), V2 "Zahl und Kurve"
+  (display figure + delta, chart beside it), V3 "Ring und Punkte" (a gradient ring with the 60 % pass
+  tick, a meter for Bester, one dot per run for Bestanden). Sample data changed so the best run (82 %)
+  is not the last (78 %). **Module üben Verlauf, three shapes:** M1 "Vier Trends" (one row per module
+  with a colour-coded spark and the last score), M2 "Chronik" (the Modelltest card's shape, bars
+  coloured per module), M3 "Stärkeprofil" (four columns, pale = first attempt, solid = the gain since).
+  The one data addition all three need is stated in the preview: a small local last-practised stamp per
+  module written by all four surfaces, because the untimed trainers' results live in the cloud writing
+  history the hub must not fetch. Every one of the nine V/M combinations was measured at exactly
+  668 of the 668px a 393x852 phone leaves, in both clock states, so no combination scrolls at rest.
+- **Artifacts (prompt 2):** `preview/gen-pruefung-polish-r2.mjs` · `preview/pruefung-polish-r2.html` ·
+  `preview/pruefung-polish-artifact.html` (same artifact URL as round 1) · this log
+- **Prompt 3 (verbatim):** `V2 and M3. while implementing take screenshots during the testing phase
+  and optimize and polish the spacing based on my taste and how I suggested in previous design
+  sessions. Make it as smooth, refined and finished as possible before finilising the design without
+  any bugs. I want the implementation to look like a final product, not an mvp or intermediate stage.`
+  **Response:** built V2 + M3 into `PruefungHub.tsx`, then drove the REAL app in headless Chromium
+  (a small CDP driver, no new deps: seeds localStorage, sets the viewport, screenshots, and reports
+  `scrollHeight` vs `innerHeight` so "rests at zero scroll" is measured rather than eyeballed).
+  Fourteen states were shot and read: both tabs × {1280×900, 1440×900, 1024×820, 834×1112, 393×852}
+  × {light, dark} plus Ohne Zeit / Mit Zeit, expanded, first visit, an unscored run and A2.
+  **What the screenshots caught that the mockups could not:** the desktop Module tab scrolled at rest
+  (930px of content against 780px of room) → the Module Verlauf splits into summary | rows from `lg`,
+  which also stops the card wasting the width the profile does not use; the switcher stretched the
+  full column on an 834px tablet → capped at `max-w-sm` between `sm` and `lg`; the run band was
+  `flex-1` up to `lg` → on a 1112px-tall tablet it stretched one card to 800px, so filling the stage
+  is a phone rule now; M3's dotted "first attempt" marker was invisible over a saturated fill → two
+  stacked segments (pale = start, solid = gain); a "–" column rode 4px higher than a scored one →
+  fixed line height; the profile columns did not centre against an expanded list → vertical centring;
+  and a run with no score printed four empty tracks that read as a skeleton → "Nicht bewertet".
+  Also shipped: one shared 896px frame for both tabs, a height-stable scope row, the Bibliothek's
+  directional tab slide, in-family gradient mark tiles, the card corner wash + reserved badge corner,
+  "52 Min gesamt" stated once per breakpoint, and the honest split of `mockExams` into full runs vs
+  module practice (`tests/pruefungHub.test.ts`, 7 new tests). Gates green: build, typecheck,
+  `lint` (0 errors), `test:unit` 558/558, `check:contrast`, `check:bundle` (125.8 kB of 400).
+- **Artifacts (prompt 3):** `src/features/pruefung/PruefungHub.tsx` · `src/features/exam/partMeta.ts` ·
+  `src/index.css` · `tests/pruefungHub.test.ts` · `docs/areas/PRAKTISCH-NAV.md` · `CLAUDE.md` ·
+  `docs/DECISIONS.md` · this log
+- **Prompt 4 (verbatim):** `once done, push it live and document the session`
+  **Response:** opened and squash-merged the PR into `main` (auto-ship), which triggers the Pages
+  deploy; no migrations and no Edge Function changes are in it, so only the site deploy matters. The
+  founder verifies the live result. Documentation pass across `PROJECT_STATUS.md`, `DECISIONS.md`,
+  `docs/areas/PRAKTISCH-NAV.md`, `CLAUDE.md` and this log.
+- **Artifacts (prompt 4):** PR #801 · `docs/PROJECT_STATUS.md` · this log

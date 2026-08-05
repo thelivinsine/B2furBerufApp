@@ -28,6 +28,35 @@ live (Beispiel column, horizontal-scroll fades, internal scroll on all four tabs
 the Wörter three-column grid), and the only one still open was the card-height parity above.
 Gates green: typecheck · lint 0 errors (77 warnings = the pre-change baseline) · 551 tests · build ·
 check:bundle 126.6 kB · check:contrast.
+**The same day, a parallel branch polished the Prüfung zone to a finished product.**
+Founder: the two tabs "still look cheap or like MVP", make them read like "a billion dollar edu tech
+app". Analysis first (twelve findings), three options previewed, then a second round on the pick:
+the founder took **B "Prüfungstag"**, **V2 "Zahl und Kurve"** for the Modelltest Verlauf and
+**M3 "Stärkeprofil"** for a NEW Module üben Verlauf.
+**What shipped.** ONE 896px frame for both tabs (they had different widths, so the page jumped on
+every switch), a height-stable scope row, the Bibliothek's directional tab slide, in-family gradient
+mark tiles, and a module card that reads as a button: mark top-left, arrow top-right, the module's
+hue washed into the bottom-right corner, and **that corner RESERVED in both clock states**, so the
+Mit Zeit badge appears without moving a card edge (the founder's first amendment). The Modelltest
+band becomes a two-column ticket from `lg` (52 Min as a display figure, countdown and CTA left, the
+four Teile as a ladder right) and states the total once per breakpoint. Modelltest's Verlauf now
+leads with the last score and its delta, with Bester/Bestanden as supporting stats and the last seven
+runs as bars against the 60 % pass line; Module üben's is a Stärkeprofil where the pale segment is
+the first attempt and the solid cap the gain since. **A Modelltest is a run that sat all four parts;
+a run that sat one is module practice** (`isFullRun`/`toPractice`, 7 new tests) — before this a
+single Lesen drill counted as a Modelltest result and its score landed in "Bester". Dash tables are
+gone: an unscored run says "Noch keine Bewertung" and its row says "Nicht bewertet".
+**Verified by driving the real build over CDP**, not by reading mockups: 14 states across
+1280×900 / 1440×900 / 1024×820 / 834×1112 / 393×852, light + dark, both clock states, expanded,
+first visit, unscored and A2, each reporting `scrollHeight` vs `innerHeight`. That is what caught the
+four bugs the mockups could not: the desktop Module tab scrolled at rest (930px against 780px of
+room, fixed by splitting that Verlauf into summary | rows from `lg`), the switcher stretched the full
+column on an 834px tablet, the run band stretched to 800px on a tall tablet (filling the stage is a
+PHONE rule now), and M3's dotted "first attempt" marker was invisible over a saturated fill.
+Gates green: build · typecheck · lint 0 errors · 558 tests · check:bundle 125.8 kB · check:contrast.
+Shipped as **PR #801**, squash-merged into `main`.
+**Resume here:** nothing is open in the Prüfung zone. The one deliberate open question from s189
+still stands (below).
 Prior s189 (2026-08-05): **the Prüfung zone became ONE page.** Founder prompt:
 "this page should be redone. insert a toggle in place of the current header, similar to Bibliothek
 ... Module wide practice and model test as the two options". The three-card `/anwenden` hub and the
@@ -59,9 +88,9 @@ four hand-copied Bibliothek action bars became ONE shared `FloatingActionCluster
 text fields lost the global focus ring (the caret is the indicator; buttons keep theirs), and the
 Bibliothek desktop scrolls INSIDE its content column instead of scrolling the page, which needed
 `usePagedList` made root-aware first.
-**Resume here:** one question is deliberately open, `FilterRail`'s mobile panel keeps its own
+One question is deliberately open from that session: `FilterRail`'s mobile panel keeps its own
 `max-h-[45dvh]` cap instead of the new one-screen `max-h-panel-stage`; ask the founder before
-changing an approved surface. Everything else in the Prüfung zone is done.
+changing an approved surface.
 Prior s188: the Prüfungssimulation hub was re-done and renamed **Modelltest** (founder pick
 "Prüfungstag"): the page led with the run band, then "Einzeln üben", then Verlauf as the one place
 a result is shown. s189 kept the band, the one-place rule and the countdown, and moved the rest.
@@ -159,6 +188,32 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 190 (2026-08-05): the Prüfung polish round (branch
+`claude/polish-ui-ux-design-92sbje`).**
+Founder: "still look cheap or like MVP ... I want them to look highly polished, excellent UI/UX, like
+a billion dollar edu tech app", then "V2 and M3 ... take screenshots during the testing phase and
+optimize and polish the spacing ... without any bugs".
+**Process:** analysis in chat first (no code touched), three named options previewed
+(`preview/pruefung-polish.html`), a second round on the pick (`preview/pruefung-polish-r2.html`,
+artifact https://claude.ai/code/artifact/fd7d867c-39e0-4f7d-9525-3d64270b6e04, redeployed to the same
+URL), then implementation verified against the REAL app.
+**What shipped** (`src/features/pruefung/PruefungHub.tsx` rewritten; `partMeta.ts` gained
+`wash`/`fillPale`/`fillSolid` and gradient `tile`s; `index.css` gained `.mod-wash-*` + `.mod-go`):
+- One 896px frame for both tabs, a fixed-height scope row, the Bibliothek's `popLayout` tab slide.
+- The module card: mark + arrow row, title, description, the hue wash in the bottom-right corner and
+  that corner reserved by the card's bottom padding, so Ohne Zeit / Mit Zeit never resizes anything.
+- The run band: a two-column ticket from `lg`, today's stacked band below it, `flex-1` on phones only.
+- Modelltest Verlauf **V2**: display figure + delta chip, Bester/Bestanden as stats, seven bars
+  against the pass line (named in the caption, never on the chart).
+- Module üben Verlauf **M3**: four columns on one scale, pale = first attempt, solid = the gain;
+  split into summary | rows from `lg`, which is what keeps a 1280×900 laptop at zero scroll.
+- The `mockExams` split into full runs vs single-module practice (`tests/pruefungHub.test.ts`).
+**Verification tooling** lives in the session scratchpad, not the repo: a ~60-line CDP driver
+(Node 22's built-in WebSocket, no new deps) that seeds localStorage, sets a viewport, clicks by
+button text, screenshots, and prints `scrollHeight`/`innerHeight`. Worth rebuilding next time a
+surface has to be checked in the real app rather than in a mockup.
+**Nothing is left open in this zone.**
+
 **Handoff after session 190 (2026-08-05): six Bibliothek defects after the internal-scroll change
 (branch `claude/card-transparency-go-to-top-jygye9`).**
 Seven founder prompts, every one a defect report with a screenshot, against what PR #800 shipped the
@@ -191,59 +246,3 @@ was the card-height parity, now closed.
 **Next, if the founder does not redirect:** unchanged from s188 below. One thing to watch: the
 `3.5rem` reserve on the rail is tied to the floating bottom line's geometry, so if that cluster ever
 moves, the reserve moves with it.
-
-**Handoff after session 188 (2026-08-04): the Modelltest hub (branch `claude/page-redesign-7md2zi`).**
-Founder: "re-do this page" (a dark screenshot of `/exam`), then "go with B" plus two amendments.
-**What shipped** (`src/features/exam/ExamHub.tsx`, rewritten; `partMeta.ts` gained a solid `bar`
-colour per Teil):
-- **The run leads.** One band: eyebrow + countdown, the four Teile as a connected timeline (one
-  absolutely-positioned line inset to the first and last tile centre, masked by a `border-surface`
-  ring), then the CTA on its own divided row. This is what removes the s186 duplication of
-  "4 Teile · 52 Min" above four cards each printing their own minutes.
-- **Results live only in Verlauf** (founder amendment): the last 5 runs for the selected Niveau, a
-  row being date · four result segments in exam order · total badge · chevron, whose disclosure
-  holds the four per-Teil percentages. A single-part run leaves three tracks empty and prints "–".
-- **"Modelltest"** replaces "Prüfungssimulation" as the page name (founder amendment), one word,
-  and the `/anwenden` entry card + the nav zone description were renamed with it. Content ids and
-  provenance labels are untouched.
-- **No HubHero** (founder amendment): `h1` + the Niveau sliding-pill switcher (`useSlidingPill`) on
-  one line, full width on a phone.
-- **The countdown** (`settings.examDate`) moved onto this page and retires itself once the date has
-  passed. The A2 zero state states itself once per control; the page-level sentence was dropped.
-**Verification:** the real build driven over a CDP script (no Playwright in this repo) at 1280x900,
-390x844 and 360x640, light + dark, A2 and B2, Verlauf open and closed: 0 px horizontal overflow, no
-console errors, the hub scrolls ~220 px on a phone, which is what a menu does.
-**Follow-up in the documentation pass:** the rename had one leftover the redesign did not touch.
-The Sprechen bank's exam sets are titled "Prüfungssimulation: <Aufgabe>" and are CONTENT (provenance
-rows, human-verified stamps), so they were not rewritten; `examSetTitle()` in
-`features/exam/partMeta.ts` strips the prefix at every render instead, which the mock-exam runner
-had been doing inline and the Sprechen runner had not been doing at all. Verified in the real app:
-the runner header now reads "Sicherheitsmängel beheben".
-**Docs updated:** CLAUDE.md (route name + the one-place-per-result law),
-`docs/areas/PRAKTISCH-NAV.md` (the hub anatomy), `docs/DECISIONS.md` §s188, the `/design` skill (the
-Modelltest anchor), this file and the prompt log. The preview stays in
-`preview/exam-hub-redesign.html` as the record of the round.
-**Next, if the founder does not redirect:** unchanged from s187 (the queued writing-quality audit,
-then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`). One item
-this session made cheaper: per-Teil exam history now has a real surface to grow into.
-
-**Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
-shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
-weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
-merely installed. The same screenshot confirms the Consent-Version card green and **im Gleichschritt
-at 2026-08-04**, so the legal-date fix is live too.
-
-**The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
-is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:
-**P10** itself (0.4% human-verified; the audit's plan is the ~320 highest-traffic items first), the
-**12 verified nouns** that need a `numerus` at their next review (`pnpm lint:content` names them
-every run, by design, see `docs/DECISIONS.md` §s185), and a live check of the **Notizen step** in a
-real listening exercise, which is the one thing that could only be verified by rendering.
-
-**Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
-**writing-task quality and filter fit**, with research from reliable sources. s181 proved COVERAGE
-(717 tasks, gated); nobody has verified that a task tagged B1 reads as B1, that its Leitpunkte are
-answerable in the word target, or that the Branche framing convinces someone who works in that
-industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
-audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
-C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**

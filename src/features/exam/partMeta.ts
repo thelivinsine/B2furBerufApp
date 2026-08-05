@@ -19,43 +19,72 @@ import type { MockPartId } from "@/engine/exam";
  *
  * `bar` is the solid version of the same hue, for the Verlauf result segments:
  * a 6 px bar needs the full colour, not the 10 % tile wash.
+ *
+ * s190 added three fields and made `tile` a gradient. Premium in this design
+ * system means a subtle gradient, never a flat tint, so the mark tile now fades
+ * within its own hue. `wash` is the card-corner radial (defined in index.css,
+ * because it needs a dark-mode pair), and `fillPale`/`fillSolid` are the two
+ * segments of a Stärkeprofil column: pale = the first attempt, solid = the gain
+ * since.
  */
 export const PART_META: Record<
   MockPartId,
-  { icon: LucideIcon; tile: string; ink: string; bar: string; desc: string; instructions: string }
+  {
+    icon: LucideIcon;
+    tile: string;
+    ink: string;
+    bar: string;
+    wash: string;
+    fillPale: string;
+    fillSolid: string;
+    desc: string;
+    instructions: string;
+  }
 > = {
   lesen: {
     icon: FileText,
-    tile: "bg-emerald-500/10 dark:bg-emerald-400/15",
+    tile: "bg-gradient-to-br from-emerald-500/20 to-emerald-500/[0.06] dark:from-emerald-400/25 dark:to-emerald-400/[0.08]",
     ink: "text-emerald-700 dark:text-emerald-300",
     bar: "bg-emerald-500 dark:bg-emerald-400",
+    wash: "mod-wash-lesen",
+    fillPale: "bg-emerald-500/30 dark:bg-emerald-400/25",
+    fillSolid: "bg-emerald-500 dark:bg-emerald-400",
     desc: "3 Texte mit Aufgaben",
     instructions:
       "Sie lesen drei Texte. Wählen Sie zu jeder Aufgabe die richtige Antwort. Über die Nummernleiste können Sie Aufgaben überspringen und später zurückkommen.",
   },
   hoeren: {
     icon: AudioLines,
-    tile: "bg-teal-500/10 dark:bg-teal-400/15",
+    tile: "bg-gradient-to-br from-teal-500/20 to-teal-500/[0.06] dark:from-teal-400/25 dark:to-teal-400/[0.08]",
     ink: "text-teal-700 dark:text-teal-300",
     bar: "bg-teal-500 dark:bg-teal-400",
+    wash: "mod-wash-hoeren",
+    fillPale: "bg-teal-500/30 dark:bg-teal-400/25",
+    fillSolid: "bg-teal-500 dark:bg-teal-400",
     desc: "2 Ansagen · Notizen",
     instructions:
       "Sie hören zwei Ansagen. Notieren Sie beim Hören die wichtigen Angaben und lösen Sie danach die Aufgaben. Sie können jede Ansage maximal zweimal hören.",
   },
   schreiben: {
     icon: SquarePen,
-    tile: "bg-primary/10 dark:bg-primary/15",
+    tile: "bg-gradient-to-br from-primary/20 to-primary/[0.05] dark:from-primary/25 dark:to-primary/[0.08]",
     ink: "text-primary",
     bar: "bg-primary",
+    wash: "mod-wash-schreiben",
+    fillPale: "bg-primary/30 dark:bg-primary/25",
+    fillSolid: "bg-primary",
     desc: "1 Aufgabe · voller Brief",
     instructions:
       "Sie schreiben einen Text zu der Aufgabe. Bearbeiten Sie alle Inhaltspunkte und achten Sie auf Anrede und Länge. Am Ende bewertet eine KI Ihren Text.",
   },
   sprechen: {
     icon: MessagesSquare,
-    tile: "bg-sky-500/10 dark:bg-sky-400/15",
+    tile: "bg-gradient-to-br from-sky-500/20 to-sky-500/[0.06] dark:from-sky-400/25 dark:to-sky-400/[0.08]",
     ink: "text-sky-700 dark:text-sky-300",
     bar: "bg-sky-500 dark:bg-sky-400",
+    wash: "mod-wash-sprechen",
+    fillPale: "bg-sky-500/30 dark:bg-sky-400/25",
+    fillSolid: "bg-sky-500 dark:bg-sky-400",
     desc: "1 Gespräch mit Partner",
     instructions:
       "Sie lösen eine Aufgabe im Gespräch mit einer Partnerin oder einem Partner. Reagieren Sie auf Vorschläge und finden Sie gemeinsam eine Lösung. Am Ende bewerten Sie sich selbst anhand des Prüfungsrasters.",

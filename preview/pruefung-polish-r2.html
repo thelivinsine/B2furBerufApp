@@ -1,0 +1,2192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prüfung hub: polish review</title>
+<style>
+  /* ---------------------------------------------------------------
+     REVIEW CHROME (deliberately not the app palette, so the mocked
+     app screens below read as separate objects).
+     --------------------------------------------------------------- */
+  :root {
+    --c-ground: #eceef1; --c-panel: #ffffff; --c-ink: #191d24;
+    --c-muted: #5c6672; --c-line: #d3d8de; --c-accent: #1f6f68; --c-chip: #e2e6ea;
+  }
+  [data-appearance="dark"] {
+    --c-ground: #0e1013; --c-panel: #16191d; --c-ink: #e6e9ec;
+    --c-muted: #98a1ab; --c-line: #292e35; --c-accent: #58bdb2; --c-chip: #212630;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--c-ground); color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55; padding: 32px 24px 96px; min-height: 100vh;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p { margin: 0; }
+  .lede { color: var(--c-muted); max-width: 72ch; }
+  .kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--c-accent); }
+  .rule { height: 1px; background: var(--c-line); border: 0; margin: 34px 0 0; }
+
+  .controls {
+    position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px;
+    padding: 12px 14px; margin: 22px 0 30px; box-shadow: 0 6px 18px -12px rgba(0,0,0,.4);
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl > span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); }
+  .seg { display: inline-flex; background: var(--c-chip); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent;
+    color: var(--c-muted); padding: 5px 12px; border-radius: 7px; cursor: pointer; transition: background .14s, color .14s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--c-panel); color: var(--c-ink); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+  .seg button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+  .panel { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px; padding: 20px 22px; }
+  .panel + .panel { margin-top: 16px; }
+  .findings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 14px; }
+  .finding { display: flex; gap: 11px; align-items: flex-start; }
+  .finding b { display: block; font-size: 14px; }
+  .finding p { font-size: 13.5px; color: var(--c-muted); }
+  .num {
+    flex: none; width: 22px; height: 22px; border-radius: 7px; background: var(--c-chip);
+    color: var(--c-accent); font-size: 12px; font-weight: 700; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); font-weight: 700; }
+  td:first-child { font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+
+  .option { margin-top: 46px; }
+  .opthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .optname {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--c-panel); background: var(--c-accent); padding: 3px 9px; border-radius: 6px;
+  }
+  .framerow { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; align-items: flex-start; }
+  .framebox.phone { flex: 0 0 auto; }
+  .framebox.desk { flex: 1 1 100%; }
+  .notecol { flex: 1 1 380px; min-width: 280px; }
+  .framelabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); margin: 0 0 7px; }
+  .frame { border: 1px solid var(--c-line); border-radius: 14px; overflow: hidden; }
+  .frame.desk .screen { padding: 26px 24px 32px; }
+  .frame.desk .inner { max-width: 1152px; margin: 0 auto; }
+  /* The phone frame is the REAL content area a 393×852 phone leaves between the
+     app header and the bottom tab bar (668 px), and it does NOT scroll: if a
+     screen did not fit, it would visibly overflow here. */
+  .frame.mob { width: 372px; }
+  .frame.mob .screen { padding: 16px 15px 20px; height: 668px; overflow: hidden; }
+  .frame.mob.scrolls .screen { overflow-y: auto; }
+  .fitnote { font-size: 12px; color: var(--c-muted); margin-top: 7px; }
+  .note { font-size: 13.5px; color: var(--c-muted); }
+  .note + .note { margin-top: 10px; }
+  .note b { color: var(--c-ink); font-weight: 650; }
+  .cost { margin-top: 12px; font-size: 13px; color: var(--c-muted); border-left: 3px solid var(--c-line); padding-left: 10px; }
+  .cost b { color: var(--c-ink); }
+
+  /* ---------------------------------------------------------------
+     APP TOKENS — verbatim from src/index.css (light + s187 "N3 Slate"
+     dark) and tailwind.config.ts.
+     --------------------------------------------------------------- */
+  .screen {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%; --elevated: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --shadow: 221 40% 22%;
+    --radius: 0.5rem;
+    --wash-a: .10; --wash-b: .09;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    color: hsl(var(--foreground)); font-size: 16px; line-height: 1.5;
+  }
+  [data-appearance="dark"] .screen {
+    --background: 220 15% 4%;
+    --page-from: 220 15% 4%; --page-mid: 220 15% 4%; --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%;
+    --surface: 220 10% 17%; --elevated: 220 9% 22%;
+    --muted: 220 9% 25%; --muted-foreground: 220 8% 72%;
+    --border: 220 10% 38%;
+    --primary: 219 90% 74%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-ink: 198 72% 72%;
+    --success: 153 50% 52%;
+    --shadow: 220 30% 2%;
+    --wash-a: 0; --wash-b: 0;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+  }
+
+
+  /* ---------------------------------------------------------------
+     MODULE MARKS — three colour sets, switched from the control bar.
+     Every hue comes from a sanctioned brand family (blue/sky/cyan,
+     emerald/teal/green, amber/orange/yellow, rose/pink).
+     --------------------------------------------------------------- */
+
+  /* C1 "Ruhig": no colour at all. The mark is a shape, the tile is the same
+     recessed grey everywhere, and colour is left to the things that act
+     (the CTA, the result bars). */
+  [data-colors="c1"] .screen {
+    --tile-lesen: hsl(var(--muted)); --ink-lesen: hsl(var(--foreground));
+    --tile-hoeren: hsl(var(--muted)); --ink-hoeren: hsl(var(--foreground));
+    --tile-schreiben: hsl(var(--muted)); --ink-schreiben: hsl(var(--foreground));
+    --tile-sprechen: hsl(var(--muted)); --ink-sprechen: hsl(var(--foreground));
+    --bar-lesen: hsl(var(--primary) / .45); --bar-hoeren: hsl(var(--primary) / .62);
+    --bar-schreiben: hsl(var(--primary) / .8); --bar-sprechen: hsl(var(--primary));
+  }
+
+  /* C2 "Rezeptiv / Produktiv": the colour carries a fact. Lesen and Hören are
+     the two receiving skills (green family), Schreiben and Sprechen the two
+     producing ones (blue family), so the pairs read as pairs. */
+  [data-colors="c2"] .screen {
+    --tile-lesen: rgba(16,185,129,.12);  --ink-lesen: #047857;  --bar-lesen: #10b981;
+    --tile-hoeren: rgba(20,184,166,.12); --ink-hoeren: #0f766e; --bar-hoeren: #14b8a6;
+    --tile-schreiben: hsl(var(--primary) / .12); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(14,165,233,.12); --ink-sprechen: #0369a1; --bar-sprechen: #0ea5e9;
+  }
+  [data-appearance="dark"][data-colors="c2"] .screen {
+    --tile-lesen: rgba(52,211,153,.16);  --ink-lesen: #6ee7b7;  --bar-lesen: #34d399;
+    --tile-hoeren: rgba(45,212,191,.16); --ink-hoeren: #5eead4; --bar-hoeren: #2dd4bf;
+    --tile-schreiben: hsl(var(--primary) / .18); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(56,189,248,.16); --ink-sprechen: #7dd3fc; --bar-sprechen: #38bdf8;
+  }
+
+  /* C3 "Vier Farben": four clearly separated hues, one per module, pushed
+     further apart than today's teal/amber/blue/cyan (where the last two read
+     as the same colour at 40 px). */
+  [data-colors="c3"] .screen {
+    --tile-lesen: rgba(16,185,129,.12);  --ink-lesen: #047857;  --bar-lesen: #10b981;
+    --tile-hoeren: rgba(245,158,11,.13); --ink-hoeren: #b45309; --bar-hoeren: #f59e0b;
+    --tile-schreiben: hsl(var(--primary) / .12); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(244,63,94,.11); --ink-sprechen: #be123c; --bar-sprechen: #f43f5e;
+  }
+  [data-appearance="dark"][data-colors="c3"] .screen {
+    --tile-lesen: rgba(52,211,153,.16);  --ink-lesen: #6ee7b7;  --bar-lesen: #34d399;
+    --tile-hoeren: rgba(251,191,36,.16); --ink-hoeren: #fbbf24; --bar-hoeren: #fbbf24;
+    --tile-schreiben: hsl(var(--primary) / .18); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(251,113,133,.16); --ink-sprechen: #fda4af; --bar-sprechen: #fb7185;
+  }
+
+  /* Glyph set switch: both sets are in the DOM, one is shown. */
+  .g { display: none; line-height: 0; }
+  [data-marks="g1"] .g1, [data-marks="g2"] .g2 { display: inline-flex; }
+
+  .markstage { border-radius: 12px; padding: 22px 18px; margin-top: 14px; }
+  .markrow { display: flex; flex-wrap: wrap; gap: 26px; justify-content: center; }
+  .markcell { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .marklab { font-size: 13.5px; font-weight: 600; color: hsl(var(--foreground)); }
+  .tile.xl { width: 56px; height: 56px; border-radius: 14px; }
+
+  .screen .col { display: flex; flex-direction: column; gap: 18px; }
+  .frame.mob .screen { display: flex; }
+  .frame.mob .screen .inner { flex: 1; min-height: 0; display: flex; }
+  .frame.mob .screen .col { gap: 14px; flex: 1; min-height: 0; }
+  .screen button { font: inherit; color: inherit; }
+
+  .card {
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+  .eyebrow.mut { color: hsl(var(--muted-foreground)); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Header ------------------------------------------------------- */
+  .hdr.row-between { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .hdr.stack2 { display: flex; flex-direction: column; gap: 10px; }
+  .row-end { display: flex; justify-content: flex-end; }
+  .frame.mob .hdr.row-between { flex-direction: column; align-items: stretch; gap: 10px; }
+  .frame.mob .hdr.row-between .scopebtn { align-self: flex-end; }
+
+  .modeswitch {
+    position: relative; display: inline-flex; gap: 4px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .modeswitch.full { display: flex; width: 100%; }
+  .modeswitch > button {
+    position: relative; z-index: 1; flex: 1; border: 0; background: transparent; cursor: pointer;
+    font-size: 15px; font-weight: 600; padding: 7px 22px; border-radius: 6px;
+    color: hsl(var(--muted-foreground)); transition: color .14s ease; white-space: nowrap;
+  }
+  .modeswitch > button[aria-pressed="true"] { color: hsl(var(--foreground)); font-weight: 700; }
+  .modeswitch > .pill {
+    position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px); border-radius: 6px;
+    background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.desk .modeswitch:not(.full) { min-width: 320px; }
+
+  .scopebtn {
+    display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 10px 0 13px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 8px; cursor: pointer;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    font-size: 14px; white-space: nowrap;
+  }
+  .scopebtn > span { color: hsl(var(--muted-foreground)); }
+  .scopebtn > b { font-weight: 700; }
+  .scopebtn svg { color: hsl(var(--muted-foreground)); }
+
+  .lvl {
+    position: relative; display: inline-flex; gap: 2px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .lvl.full { display: flex; width: 100%; }
+  .lvl.full > button { flex: 1; }
+  .lvl > button {
+    position: relative; z-index: 1; border: 0; background: transparent; cursor: pointer; width: 46px;
+    font-size: 14px; font-weight: 600; padding: 6px 0; border-radius: 6px;
+    color: hsl(var(--muted-foreground)); transition: color .14s ease;
+  }
+  .lvl > button[aria-pressed="true"] { color: hsl(var(--foreground)); }
+  .lvl > .pill {
+    position: absolute; top: 4px; bottom: 4px; border-radius: 6px; background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+
+  /* Tiles + chips ------------------------------------------------ */
+  .tile { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; }
+  .tile.lg { width: 44px; height: 44px; border-radius: 11px; }
+  .tile.lesen { background: var(--tile-lesen); color: var(--ink-lesen); }
+  .tile.hoeren { background: var(--tile-hoeren); color: var(--ink-hoeren); }
+  .tile.schreiben { background: var(--tile-schreiben); color: var(--ink-schreiben); }
+  .tile.sprechen { background: var(--tile-sprechen); color: var(--ink-sprechen); }
+
+  .timechip {
+    display: inline-flex; align-items: center; gap: 4px; flex: none;
+    font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted)); border-radius: 6px; padding: 3px 8px;
+  }
+  .chev { color: hsl(var(--muted-foreground)); display: inline-flex; flex: none; }
+
+  /* Option A module grid ----------------------------------------- */
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .frame.mob .grid4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .modcard {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; cursor: pointer;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .modcard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .modname { margin-top: 11px; font-size: 16px; font-weight: 650; }
+  .moddesc { margin-top: 3px; font-size: 12.5px; color: hsl(var(--muted-foreground)); line-height: 1.35; }
+  .modfoot { margin-top: auto; padding-top: 12px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .modtrainer {
+    margin-top: 10px; padding-top: 9px; width: 100%; border-top: 1px solid hsl(var(--border));
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; font-weight: 500; color: hsl(var(--primary));
+  }
+
+  /* Option B rows ------------------------------------------------- */
+  .rowlist { display: flex; flex-direction: column; overflow: hidden; }
+  .rowlist > * + * { border-top: 1px solid hsl(var(--border)); }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px; width: 100%;
+    background: transparent; border: 0; text-align: left; cursor: pointer; transition: background .14s ease;
+  }
+  .row:hover { background: hsl(var(--muted) / .4); }
+  .rowtext { min-width: 0; flex: 1; display: block; }
+  .rname { display: block; font-size: 15px; font-weight: 650; }
+  .rsub { display: block; margin-top: 1px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+
+  /* Option C wide cards ------------------------------------------ */
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .frame.mob .grid2 { grid-template-columns: 1fr; gap: 12px; }
+  .widecard {
+    display: flex; align-items: center; gap: 14px; text-align: left; cursor: pointer; width: 100%;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px 16px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .widecard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .widecard .rname { font-size: 16px; }
+  .wcTrainer { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12.5px; font-weight: 500; color: hsl(var(--primary)); }
+  .wcRight { flex: none; display: flex; align-items: baseline; gap: 3px; }
+  .bigmin { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .bigminlab { font-size: 12px; color: hsl(var(--muted-foreground)); }
+
+  /* Run band ------------------------------------------------------ */
+  .band { padding: 16px 18px 18px; display: flex; flex-direction: column; }
+  .trackwrap { display: flex; flex-direction: column; justify-content: center; }
+  .frame.mob:not(.scrolls) .band { flex: 1; }
+  .frame.mob:not(.scrolls) .band .trackwrap { flex: 1; }
+  .frame.mob .bandhead { flex-direction: column; align-items: flex-start; gap: 5px; }
+  .bandhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+  .totalmin { font-size: 15px; font-weight: 650; }
+  .cdown { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .cdown svg { flex: none; }
+  .track { position: relative; display: flex; justify-content: space-between; margin-top: 16px; }
+  /* One segment per gap, drawn from the edge of one tile to the edge of the
+     next, so the line never runs behind a mark. */
+  .tnode { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tnode::after {
+    content: ""; position: absolute; top: 21px; height: 2px; background: hsl(var(--border));
+    left: calc(50% + 30px); right: calc(-50% + 30px);
+  }
+  .tnode:last-child::after { content: none; }
+  .frame.mob .tnode::after { top: 19px; left: calc(50% + 28px); right: calc(-50% + 28px); }
+  .tnode .dot { width: 44px; height: 44px; border-radius: 11px; border: 3px solid hsl(var(--surface)); }
+  .tnode .lab { font-size: 13.5px; font-weight: 600; }
+  .tnode .min { font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+  .frame.mob .tnode .dot { width: 40px; height: 40px; }
+  .frame.mob .tnode .lab { font-size: 12.5px; }
+  .bandfoot { margin-top: 16px; padding-top: 16px; border-top: 1px solid hsl(var(--border)); display: flex; justify-content: flex-end; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 6px;
+    cursor: pointer; height: 42px; padding: 0 20px; font-size: 15px; font-weight: 500; white-space: nowrap;
+  }
+  .btn.grad {
+    background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.mob .btn.wide { width: 100%; }
+
+  /* Verlauf -------------------------------------------------------- */
+  .vrow { gap: 12px; }
+  .vdate { flex: none; width: 66px; font-size: 13.5px; font-weight: 650; }
+  .mini { display: flex; gap: 4px; flex: 1; min-width: 54px; max-width: 320px; }
+  .mini > span { flex: 1; height: 5px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .mini > span > i { display: block; height: 100%; border-radius: 999px; }
+  .bar-lesen { background: var(--bar-lesen); } .bar-hoeren { background: var(--bar-hoeren); }
+  .bar-schreiben { background: var(--bar-schreiben); } .bar-sprechen { background: var(--bar-sprechen); }
+  .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; white-space: nowrap; flex: none; }
+  .badge.ok { background: hsl(var(--success) / .15); color: hsl(var(--success)); }
+  .badge.mutedb { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .vopen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px 14px; border-top: 1px solid hsl(var(--border)); }
+  .vlab { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .vval { margin-top: 2px; font-size: 14px; font-weight: 650; }
+  .verlauf { overflow: hidden; }
+  .vhead {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px 14px;
+    background: transparent; border: 0; cursor: pointer; text-align: left; transition: background .14s ease;
+  }
+  .vhead:hover { background: hsl(var(--muted) / .4); }
+  .vhead > .chev { margin-left: auto; transition: transform .16s ease; }
+  .vcount { font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .verlauf > .rowlist { border-top: 1px solid hsl(var(--border)); }
+  .vsum { display: flex; align-items: center; gap: 14px; padding: 13px 15px; border-top: 1px solid hsl(var(--border)); }
+  .vsumval { margin-top: 1px; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+  .vsep { width: 1px; align-self: stretch; background: hsl(var(--border)); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .001ms !important; } }
+
+  /* ONE content frame for both tabs (round 1, kept). */
+  .frame.desk .stage { max-width: 896px; margin: 0 auto; }
+  .stage { display: flex; flex-direction: column; gap: 18px; flex: 1; min-height: 0; width: 100%; }
+  .frame.mob .stage { gap: 10px; }
+  .frame.mob .col, .frame.mob .stage, .frame.mob .card, .frame.mob .vbody { min-width: 0; }
+  /* Phone trims, measured: every combination has to rest inside the 668px a
+     393x852 phone leaves between the app header and the tab bar. */
+  .frame.mob .hdrstack { gap: 10px; }
+  .frame.mob .vtop { padding-top: 10px; }
+  .frame.mob .vbody { padding: 10px 14px 12px; }
+  .frame.mob .vmore { padding: 7px; }
+  .frame.mob .trendrow { padding: 3px 0; }
+  .frame.mob .spark { height: 22px; }
+  .frame.mob .ptrack { height: 48px; }
+  .frame.mob .pcol { gap: 5px; }
+  .frame.mob .pval { font-size: 13px; }
+  .frame.mob .plegend { margin-top: 6px; }
+  .frame.mob .v2body { gap: 10px; }
+  .frame.mob .v2fig { font-size: 34px; }
+  .frame.mob .v2stats { margin-top: 6px; }
+
+  .hdrstack { display: flex; flex-direction: column; align-items: center; gap: 12px; flex: none; }
+  .scoperow { display: flex; align-items: center; justify-content: center; gap: 8px; height: 38px; }
+  .hdrsw { display: inline-flex; width: auto; }
+  .frame.desk .hdrsw { min-width: 0; }
+  .frame.mob .hdrsw { display: flex; width: 100%; }
+  .hdrsw > button { font-size: 14px; padding: 6px 20px; }
+
+  /* Review-chrome switches: every variant is in the DOM, one is shown. */
+  [data-clock="timed"] .onfree { display: none; }
+  [data-clock="free"] .ontimed { display: none; }
+  .barcap { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 11px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .barcap b { color: hsl(var(--foreground)); font-weight: 650; }
+  .dash { display: inline-block; width: 14px; border-top: 1px dashed hsl(var(--success)); vertical-align: middle; margin-right: 5px; }
+  .lastlab { margin-top: 7px; text-align: right; font-size: 12px; font-weight: 700; color: hsl(var(--primary)); font-variant-numeric: tabular-nums; }
+
+  /* Module marks: soft in-family gradient (round 1, kept). */
+  .tile.grad.lesen { background: linear-gradient(150deg, rgba(16,185,129,.20), rgba(16,185,129,.06)); }
+  .tile.grad.hoeren { background: linear-gradient(150deg, rgba(20,184,166,.20), rgba(20,184,166,.06)); }
+  .tile.grad.schreiben { background: linear-gradient(150deg, hsl(var(--primary) / .20), hsl(var(--primary) / .05)); }
+  .tile.grad.sprechen { background: linear-gradient(150deg, rgba(14,165,233,.20), rgba(14,165,233,.06)); }
+  [data-appearance="dark"] .tile.grad.lesen { background: linear-gradient(150deg, rgba(52,211,153,.24), rgba(52,211,153,.08)); }
+  [data-appearance="dark"] .tile.grad.hoeren { background: linear-gradient(150deg, rgba(45,212,191,.24), rgba(45,212,191,.08)); }
+  [data-appearance="dark"] .tile.grad.schreiben { background: linear-gradient(150deg, hsl(var(--primary) / .26), hsl(var(--primary) / .08)); }
+  [data-appearance="dark"] .tile.grad.sprechen { background: linear-gradient(150deg, rgba(56,189,248,.24), rgba(56,189,248,.08)); }
+  .tile.xxl { width: 54px; height: 54px; border-radius: 12px; }
+  .tile.sm { width: 28px; height: 28px; border-radius: 8px; }
+
+  /* --------------------------- the module card ---------------------------- */
+  .grid2x2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex: none; }
+  .frame.mob .grid2x2 { gap: 10px; }
+  .pcard {
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    text-align: left; cursor: pointer; padding: 16px;
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .frame.desk .pcard { padding: 20px 22px; }
+  .frame.desk .b-card { padding-bottom: 46px; }
+  .pcard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .ptitle { font-size: 17px; font-weight: 700; letter-spacing: -.015em; line-height: 1.15; }
+  .frame.desk .ptitle { font-size: 20px; }
+  .pdesc { margin-top: 4px; font-size: 12.5px; line-height: 1.35; color: hsl(var(--muted-foreground)); }
+  .frame.desk .pdesc { font-size: 14px; }
+  .goarrow {
+    display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px;
+    color: hsl(var(--muted-foreground)); background: hsl(var(--muted) / .8);
+    transition: background .16s ease, color .16s ease;
+  }
+  .pcard:hover .goarrow { background: hsl(var(--primary) / .12); color: hsl(var(--primary)); }
+
+  /* The card's own hue in its bottom-right corner (founder pick B). */
+  .b-card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 110% at 100% 100%, var(--wash-hue), transparent 62%);
+  }
+  .b-card.lesen { --wash-hue: rgba(16,185,129,.13); }
+  .b-card.hoeren { --wash-hue: rgba(20,184,166,.13); }
+  .b-card.schreiben { --wash-hue: hsl(var(--primary) / .13); }
+  .b-card.sprechen { --wash-hue: rgba(14,165,233,.13); }
+  [data-appearance="dark"] .b-card.lesen { --wash-hue: rgba(52,211,153,.12); }
+  [data-appearance="dark"] .b-card.hoeren { --wash-hue: rgba(45,212,191,.12); }
+  [data-appearance="dark"] .b-card.schreiben { --wash-hue: hsl(var(--primary) / .16); }
+  [data-appearance="dark"] .b-card.sprechen { --wash-hue: rgba(56,189,248,.12); }
+  .b-card > * { position: relative; }
+  /* Fixed height in BOTH clock states (founder r2): the minutes badge is
+     absolutely placed in the corner the wash already occupies, so switching
+     Ohne Zeit / Mit Zeit cannot move a single card edge. */
+  .b-card { min-height: 132px; }
+  .frame.mob .b-card { padding: 14px 14px 30px; }
+  .frame.mob .b-card .tile.xxl { width: 44px; height: 44px; border-radius: 11px; }
+  .frame.mob .b-card .ptitle { font-size: 16px; margin-top: 9px !important; }
+  .frame.desk .b-card { min-height: 152px; }
+  .b-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .cornerchip {
+    position: absolute; right: 16px; bottom: 14px; z-index: 1;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+    color: hsl(var(--muted-foreground)); background: hsl(var(--muted) / .85);
+    border-radius: 6px; padding: 3px 8px;
+  }
+  .frame.desk .cornerchip { right: 20px; bottom: 18px; }
+
+  /* ------------------------------ ticket band ----------------------------- */
+  .b-ticket { display: grid; grid-template-columns: minmax(0,1fr) 1px 296px; }
+  .b-left { padding: 22px 24px 24px; display: flex; flex-direction: column; align-items: flex-start; }
+  .b-right { padding: 18px 20px; display: flex; flex-direction: column; justify-content: center; }
+  .b-vsep { background: hsl(var(--border)); }
+  .bigtime { font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-top: 12px; }
+  .bigtime small { font-size: 19px; font-weight: 700; letter-spacing: -.01em; margin-left: 5px; color: hsl(var(--muted-foreground)); }
+  .bigsub { margin-top: 8px; font-size: 14px; color: hsl(var(--muted-foreground)); }
+  .b-cta { margin-top: auto; padding-top: 20px; }
+  .ladder { display: flex; flex-direction: column; }
+  .lrow { position: relative; display: flex; align-items: center; gap: 11px; padding: 6px 0; }
+  .lrow::after {
+    content: ""; position: absolute; left: 17px; top: calc(50% + 19px); height: calc(100% - 38px);
+    width: 2px; border-radius: 2px; background: hsl(var(--border));
+  }
+  .lrow:last-child::after { content: none; }
+  .lname { font-size: 14.5px; font-weight: 600; }
+  .lmin { margin-left: auto; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .pband { padding: 18px 20px 20px; display: flex; flex-direction: column; }
+  .frame.mob .pband { flex: 1; }
+  .pbandhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+  .totalchip { font-size: 13.5px; color: hsl(var(--muted-foreground)); }
+  .totalchip b { color: hsl(var(--foreground)); font-weight: 700; }
+  .ctacenter { margin-top: 16px; display: flex; justify-content: center; }
+  .frame.mob .ctacenter .btn { width: 100%; }
+
+  /* -------------------------------- Verlauf ------------------------------- */
+  .vwrap { overflow: hidden; display: flex; flex-direction: column; flex: none; }
+  .vtop { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 12px 16px 0; flex: none; }
+  .vbody { padding: 12px 16px 14px; flex: none; display: flex; }
+  .vmore { width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background: transparent; border: 0; border-top: 1px solid hsl(var(--border)); cursor: pointer; font-size: 12.5px; font-weight: 650; color: hsl(var(--primary)); flex: none; }
+  .verlauflist { border-top: 1px solid hsl(var(--border)); min-height: 0; }
+  .frame.mob .verlauflist { overflow-y: auto; flex: 1; }
+
+  /* Bar chart, shared by V1/V2 and M2. */
+  .bars { position: relative; display: flex; align-items: flex-end; gap: 9px; height: 68px; width: fit-content; }
+  .bar { width: 32px; border-radius: 4px 4px 2px 2px; background: hsl(var(--primary) / .28); position: relative; }
+  .bar.now { background: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--gradient-to))); }
+  .bar.top { box-shadow: inset 0 0 0 1.5px hsl(var(--primary) / .55); background: hsl(var(--primary) / .16); }
+  .bar.lesen { background: var(--bar-lesen); } .bar.hoeren { background: var(--bar-hoeren); }
+  .bar.schreiben { background: var(--bar-schreiben); } .bar.sprechen { background: var(--bar-sprechen); }
+  .passline { position: absolute; left: -6px; right: -6px; border-top: 1px dashed hsl(var(--success) / .7); }
+  .passlab { position: absolute; left: 0; transform: translateY(-118%); font-size: 10.5px; font-weight: 650; color: hsl(var(--success)); }
+  .bartag {
+    position: absolute; left: 50%; transform: translate(-50%, -100%); top: -5px; white-space: nowrap;
+    font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .bartag.now { color: hsl(var(--primary)); }
+  .bartag.best { color: hsl(var(--muted-foreground)); font-weight: 650; }
+
+  /* V1: the chart carries the figures. */
+  .v1row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 10px 22px; }
+  .v1caps { display: flex; flex-direction: column; gap: 5px; padding-bottom: 4px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .v1caps b { color: hsl(var(--foreground)); font-weight: 650; }
+  .v1chart { flex: 1 1 240px; max-width: 360px; min-width: 0; }
+  .v1row { min-width: 0; }
+  .v1body .bars { width: 100%; }
+  .v1body .bar { flex: 1; width: auto; min-width: 0; }
+  .v1caps { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 12px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .v1caps b { color: hsl(var(--foreground)); font-weight: 650; }
+
+  /* V2: one lead figure, the rest as supporting stats. */
+  .v2body { align-items: stretch; gap: 20px; }
+  .v2lead { flex: none; display: flex; flex-direction: column; justify-content: center; min-width: 168px; }
+  .v2label { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .v2figrow { display: flex; align-items: baseline; gap: 9px; margin-top: 1px; }
+  .v2fig { font-size: 40px; font-weight: 800; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .delta { display: inline-flex; align-items: center; gap: 2px; font-size: 12.5px; font-weight: 700; border-radius: 6px; padding: 2px 7px; background: hsl(var(--success) / .14); color: hsl(var(--success)); }
+  .v2stats { display: flex; gap: 18px; margin-top: 12px; }
+  .v2stat { font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .v2stat b { display: block; font-size: 16px; font-weight: 700; color: hsl(var(--foreground)); font-variant-numeric: tabular-nums; }
+  .v2chart { flex: 1; min-width: 0; display: flex; align-items: flex-end; justify-content: flex-end; }
+  .frame.mob .v2body { flex-direction: column; gap: 14px; }
+  .frame.mob .v2chart { justify-content: flex-start; }
+
+  /* V3: a ring for the last run, dots for the pass record. */
+  .v3body { align-items: center; gap: 22px; }
+  .ring { flex: none; position: relative; width: 104px; height: 104px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ringmid { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .ringmid b { font-size: 24px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .ringmid span { font-size: 11px; color: hsl(var(--muted-foreground)); }
+  .v3facts { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .factrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .factlab { font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .factval { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .metertrack { margin-top: 6px; height: 6px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .metertrack > i { display: block; height: 100%; border-radius: 999px; background: hsl(var(--primary) / .55); }
+  .dots { display: flex; gap: 5px; margin-top: 7px; }
+  .dots i { width: 100%; height: 6px; border-radius: 999px; background: hsl(var(--muted)); }
+  .dots i.ok { background: hsl(var(--success) / .8); }
+
+  /* M1: four module trends. */
+  .m1 { flex-direction: column; width: 100%; gap: 0; }
+  .trendrow { display: flex; align-items: center; gap: 11px; padding: 7px 0; }
+  .trendrow + .trendrow { border-top: 1px solid hsl(var(--border) / .7); }
+  .trendname { font-size: 13.5px; font-weight: 650; flex: 1; min-width: 0; }
+  .spark { display: flex; align-items: flex-end; gap: 3px; height: 26px; flex: none; width: 96px; justify-content: flex-end; }
+  .spark i { width: 9px; border-radius: 2px; }
+  .spark i.ghost { background: hsl(var(--muted)); height: 4px !important; }
+  .trendpct { font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; flex: none; width: 46px; text-align: right; }
+  .trendnone { font-size: 12.5px; color: hsl(var(--muted-foreground)); flex: none; }
+
+  /* M2: one chronological chart + list. */
+  .m2 { flex-direction: column; width: 100%; gap: 0; align-items: flex-start; }
+  .m2cap { margin-top: 10px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .m2cap b { color: hsl(var(--foreground)); font-weight: 650; }
+
+  /* M3: the strength profile. */
+  .m3 { width: 100%; gap: 0; }
+  .profile { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; width: 100%; max-width: 460px; margin: 0 auto; }
+  .pcol { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .pval { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pval.none { color: hsl(var(--muted-foreground)); font-weight: 600; font-size: 12.5px; }
+  .ptrack { position: relative; width: 100%; height: 104px; border-radius: 6px; background: hsl(var(--muted) / .8); overflow: hidden; }
+  /* Two stacked segments instead of a marker line: the pale part is where the
+     learner started, the solid part on top is what they have gained since. A
+     dotted line over a saturated fill was the first attempt and was invisible. */
+  .pstack { position: absolute; inset: 0; display: flex; flex-direction: column-reverse; }
+  .pstack .seg { display: block; width: 100%; }
+  .pstack .seg.solid { border-radius: 4px 4px 0 0; }
+  .seg.pale.lesen { background: rgba(16,185,129,.32); } .seg.solid.lesen { background: var(--bar-lesen); }
+  .seg.pale.hoeren { background: rgba(20,184,166,.32); } .seg.solid.hoeren { background: var(--bar-hoeren); }
+  .seg.pale.schreiben { background: hsl(var(--primary) / .32); } .seg.solid.schreiben { background: var(--bar-schreiben); }
+  .seg.pale.sprechen { background: rgba(14,165,233,.32); } .seg.solid.sprechen { background: var(--bar-sprechen); }
+  .frame.mob .pname { flex-direction: column; gap: 4px; font-size: 11px; text-align: center; }
+  .pname { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
+  .plegend { margin-top: 12px; font-size: 12px; color: hsl(var(--muted-foreground)); text-align: center; width: 100%; }
+
+  /* Verlauf rows (shared). */
+  .vrow2 { display: flex; align-items: center; gap: 11px; padding: 9px 16px; width: 100%; background: transparent; border: 0; text-align: left; cursor: pointer; transition: background .14s ease; }
+  .vrow2:hover { background: hsl(var(--muted) / .4); }
+  .vrow2 + .vrow2 { border-top: 1px solid hsl(var(--border)); }
+  .vdate2 { font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; width: 64px; flex: none; }
+  .vname2 { font-size: 13.5px; font-weight: 600; }
+  .mini2 { display: flex; gap: 4px; flex: 1; min-width: 40px; max-width: 300px; }
+  .mini2 > span { flex: 1; height: 5px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .mini2 > span > i { display: block; height: 100%; border-radius: 999px; }
+  .bar-lesen { background: var(--bar-lesen); } .bar-hoeren { background: var(--bar-hoeren); }
+  .bar-schreiben { background: var(--bar-schreiben); } .bar-sprechen { background: var(--bar-sprechen); }
+  .badge2 { display: inline-flex; align-items: center; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; flex: none; margin-left: auto; }
+  .badge2.ok { background: hsl(var(--success) / .15); color: hsl(var(--success)); }
+  .badge2.mutedb { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+
+  /* Variant stage frames (the Verlauf card on its own, at both widths). */
+  .stagerow { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; margin-top: 16px; }
+  .cardstage { flex: 1 1 520px; min-width: 320px; }
+  .cardstage .frame .screen { padding: 20px; }
+  .cardstage.narrow { flex: 0 0 372px; }
+  .cardstage.narrow .frame .screen { padding: 16px 15px; display: block; height: auto; }
+  .cardstage.narrow .frame .inner { display: block; }
+  .cardstage .vwrap { flex: none; }
+
+  /* The review-page variant switch, stated last so it beats .vbody. */
+  .vbody.vv, .vbody.mv { display: none; }
+  [data-vv="v1"] .vbody.vv.v1body,
+  [data-vv="v2"] .vbody.vv.v2body,
+  [data-vv="v3"] .vbody.vv.v3body,
+  [data-mv="m1"] .vbody.mv.m1,
+  [data-mv="m2"] .vbody.mv.m2,
+  [data-mv="m3"] .vbody.mv.m3 { display: flex; }
+
+  /* Card-height proof block. */
+  .proof { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 14px; }
+  .proofbox { flex: 0 0 420px; }
+  .proofbox .frame .screen { padding: 18px; }
+</style>
+</head>
+<body data-appearance="light" data-clock="free" data-vv="v1" data-mv="m1" data-colors="c2" data-marks="g2">
+<div class="page"><div class="wrap">
+
+  <p class="kicker">Session 190 · round 2</p>
+  <h1>Option B, with your four changes</h1>
+  <p class="lede" style="margin-top:10px">
+    B is locked: the ticket band, the ladder, the corner wash on the module cards and the seven
+    shared fixes all carry over. This round only answers the four things you asked for, and it offers
+    choices only where you asked for one. Use the control bar to compose a combination, then look at
+    section 5, which is the whole page following whatever you picked.
+  </p>
+
+  <div class="controls">
+    <div class="ctl">
+      <span>Appearance</span>
+      <div class="seg" id="seg-appearance">
+        <button data-k="appearance" data-v="light" aria-pressed="true">Light</button>
+        <button data-k="appearance" data-v="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <span>Clock switch</span>
+      <div class="seg" id="seg-clock">
+        <button data-k="clock" data-v="free" aria-pressed="true">Ohne Zeit</button>
+        <button data-k="clock" data-v="timed" aria-pressed="false">Mit Zeit</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <span>Modelltest Verlauf</span>
+      <div class="seg" id="seg-vv">
+        <button data-k="vv" data-v="v1" aria-pressed="true">V1</button>
+        <button data-k="vv" data-v="v2" aria-pressed="false">V2</button>
+        <button data-k="vv" data-v="v3" aria-pressed="false">V3</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <span>Module Verlauf</span>
+      <div class="seg" id="seg-mv">
+        <button data-k="mv" data-v="m1" aria-pressed="true">M1</button>
+        <button data-k="mv" data-v="m2" aria-pressed="false">M2</button>
+        <button data-k="mv" data-v="m3" aria-pressed="false">M3</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="answers">
+    <h2>1 · Your four points</h2>
+    
+  <div class="panel">
+    <div class="findings">
+      <div class="finding"><span class="num">1</span><div><b>The badge no longer moves anything</b><p>The minutes chip is absolutely placed in the card's bottom-right corner, the same corner the colour wash occupies. The card has one fixed height in both clock states, so switching Ohne Zeit / Mit Zeit cannot move a single edge. Section 2 shows both states side by side.</p></div></div><div class="finding"><span class="num">2</span><div><b>Module üben gets its own Verlauf</b><p>Same card language as the Modelltest one, different content: this one is about the four modules rather than the whole run. Three shapes in section 4. All three need one addition to today's data, described under each.</p></div></div><div class="finding"><span class="num">3</span><div><b>Letzter and Bester stay, better drawn</b><p>Three visualisations in section 3. All three still state Letzter, Bester and Bestanden, none of them uses the three flat cells. The sample data now has a best (82 %) that is NOT the last run (78 %), so the difference is visible.</p></div></div><div class="finding"><span class="num">4</span><div><b>Everything else about B is unchanged</b><p>The ticket band, the ladder, the corner wash on the cards, the four hues and the seven shared fixes from round 1 all carry over untouched.</p></div></div>
+    </div>
+  </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="cardfix">
+    <h2>2 · The module card, one height in both states</h2>
+    <p class="lede">
+      Same card, photographed in both clock states. The badge sits in the corner the wash already
+      occupies, so the grid does not resize when the switch is thrown.
+    </p>
+    <div class="proof">
+      <div class="proofbox">
+        <p class="framelabel">Ohne Zeit</p>
+        <div class="frame desk" style="border-radius:12px">
+          <div class="screen"><div class="inner">
+  <button class="pcard b-card schreiben" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl schreiben"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Schreiben</span>
+    <span class="pdesc">Fokus, Kurz und Lang</span>
+    
+  </button></div></div>
+        </div>
+      </div>
+      <div class="proofbox">
+        <p class="framelabel">Mit Zeit</p>
+        <div class="frame desk" style="border-radius:12px">
+          <div class="screen"><div class="inner">
+  <button class="pcard b-card schreiben" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl schreiben"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Schreiben</span>
+    <span class="pdesc">1 Aufgabe · voller Brief</span>
+    <span class="cornerchip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>20 Min</span>
+  </button></div></div>
+        </div>
+      </div>
+      <div class="notecol">
+        <p class="note"><b>Fixed height.</b> The card reserves the badge's corner in BOTH states, so it is empty in Ohne Zeit and occupied in Mit Zeit at exactly the same card size. Reserving it also stops a two-line description on a phone from running underneath the badge.</p>
+        <p class="note"><b>Two right-hand elements.</b> The arrow stays top-right as the affordance, the badge takes bottom-right as the fact. They never share a line.</p>
+        <p class="note"><b>Description still swaps.</b> Ohne Zeit shows the trainer's own shape ("Fokus, Kurz und Lang"), Mit Zeit shows the exam module's ("1 Aufgabe · voller Brief"). That is content, not chrome, and it does not change the height.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="modelltest">
+    <h2>3 · Modelltest Verlauf: three visualisations</h2>
+    <p class="lede">
+      All three keep Letzter, Bester and Bestanden. The sample has seven runs where the best (82 %)
+      is not the last (78 %), so you can see how each one handles that.
+    </p>
+    
+  <section class="option" id="opt-v1">
+    <div class="opthead"><span class="optname">V1</span><h2>Im Diagramm (in the chart)</h2></div>
+    <div class="stagerow">
+      
+  <div class="cardstage">
+    <p class="framelabel">Desktop</p>
+    <div class="frame desk" style="border-radius:12px">
+      <div class="screen" style=""><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody v1body" style="flex-direction:column;align-items:stretch">
+    <div class="v1row">
+      <div class="v1chart">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"><span class="bartag best tnum">Bester 82 %</span></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="lastlab">Letzter 78 %</p>
+      </div>
+      <div class="v1caps">
+        <span><b class="tnum">4 von 7</b> bestanden</span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">17. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:86%"></i></span><span><i class="bar-hoeren" style="width:76%"></i></span><span><i class="bar-schreiben" style="width:84%"></i></span><span><i class="bar-sprechen" style="width:82%"></i></span></span>
+        <span class="badge2 ok">82 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      
+  <div class="cardstage narrow">
+    <p class="framelabel">Phone</p>
+    <div class="frame mob" style="">
+      <div class="screen" style="height:auto"><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody v1body" style="flex-direction:column;align-items:stretch">
+    <div class="v1row">
+      <div class="v1chart">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"><span class="bartag best tnum">Bester 82 %</span></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="lastlab">Letzter 78 %</p>
+      </div>
+      <div class="v1caps">
+        <span><b class="tnum">4 von 7</b> bestanden</span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      <div class="notecol">
+        <p class="note"><b>The idea.</b> One object, all three facts. The last bar is the gradient one and labelled "Letzter 78 %", the best bar carries a quiet outline and "Bester 82 %", and the pass count sits in a caption line under the chart.</p><p class="note"><b>Strength.</b> Nothing is stated twice, and the two figures are attached to the runs they belong to instead of floating above them.</p><p class="note"><b>Watch.</b> When the best run IS the last run, the two labels land on the same bar. The rule there is one label reading "Letzter · Bester 78 %".</p>
+      </div>
+    </div>
+  </section>
+  <section class="option" id="opt-v2">
+    <div class="opthead"><span class="optname">V2</span><h2>Zahl und Kurve (figure and curve)</h2></div>
+    <div class="stagerow">
+      
+  <div class="cardstage">
+    <p class="framelabel">Desktop</p>
+    <div class="frame desk" style="border-radius:12px">
+      <div class="screen" style=""><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody v2body">
+    <div class="v2lead">
+      <p class="v2label">Letzter Durchlauf</p>
+      <p class="v2figrow"><span class="v2fig">78 %</span><span class="delta tnum">▲ 8</span></p>
+      <div class="v2stats">
+        <p class="v2stat"><b>82 %</b>Bester</p>
+        <p class="v2stat"><b>4 von 7</b>Bestanden</p>
+      </div>
+    </div>
+    <div class="v2chart">
+      <div style="flex:none">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="barcap" style="justify-content:flex-end"><span><i class="dash"></i>bestanden ab 60 %</span></p>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">17. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:86%"></i></span><span><i class="bar-hoeren" style="width:76%"></i></span><span><i class="bar-schreiben" style="width:84%"></i></span><span><i class="bar-sprechen" style="width:82%"></i></span></span>
+        <span class="badge2 ok">82 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      
+  <div class="cardstage narrow">
+    <p class="framelabel">Phone</p>
+    <div class="frame mob" style="">
+      <div class="screen" style="height:auto"><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody v2body">
+    <div class="v2lead">
+      <p class="v2label">Letzter Durchlauf</p>
+      <p class="v2figrow"><span class="v2fig">78 %</span><span class="delta tnum">▲ 8</span></p>
+      <div class="v2stats">
+        <p class="v2stat"><b>82 %</b>Bester</p>
+        <p class="v2stat"><b>4 von 7</b>Bestanden</p>
+      </div>
+    </div>
+    <div class="v2chart">
+      <div style="flex:none">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="barcap" style="justify-content:flex-end"><span><i class="dash"></i>bestanden ab 60 %</span></p>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      <div class="notecol">
+        <p class="note"><b>The idea.</b> The last score becomes a display figure with a green delta against the run before it, Bester and Bestanden sit under it as two small stats, and the chart carries the shape of the whole history on the right.</p><p class="note"><b>Strength.</b> The most scannable of the three, and the delta answers "better or worse than last time" without the learner reading the chart at all.</p><p class="note"><b>Watch.</b> A drop shows a red-orange delta (Koralle is reserved, so the down state uses the neutral muted style rather than a warning colour).</p>
+      </div>
+    </div>
+  </section>
+  <section class="option" id="opt-v3">
+    <div class="opthead"><span class="optname">V3</span><h2>Ring und Punkte (ring and dots)</h2></div>
+    <div class="stagerow">
+      
+  <div class="cardstage">
+    <p class="framelabel">Desktop</p>
+    <div class="frame desk" style="border-radius:12px">
+      <div class="screen" style=""><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody v3body">
+    
+  <div class="ring">
+    <svg width="104" height="104" viewBox="0 0 104 104">
+      <circle cx="52" cy="52" r="46" fill="none" stroke="hsl(var(--muted))" stroke-width="9"/>
+      <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ringgrad)" stroke-width="9"
+        stroke-linecap="round" stroke-dasharray="225.4 63.6"/>
+      <line x1="52" y1="2" x2="52" y2="14" stroke="hsl(var(--success))" stroke-width="2.5"
+        stroke-linecap="round" transform="rotate(216.0 52 52)"/>
+      <defs>
+        <linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="hsl(var(--gradient-from))"/>
+          <stop offset="100%" stop-color="hsl(var(--gradient-to))"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="ringmid"><b class="tnum">78 %</b><span>Letzter</span></span>
+  </div>
+    <div class="v3facts">
+      <div>
+        <div class="factrow"><span class="factlab">Bester</span><span class="factval tnum">82 %</span></div>
+        <div class="metertrack"><i style="width:82%"></i></div>
+      </div>
+      <div>
+        <div class="factrow"><span class="factlab">Bestanden</span><span class="factval tnum">4 von 7</span></div>
+        <div class="dots"><i class=""></i><i class=""></i><i class="ok"></i><i class=""></i><i class="ok"></i><i class="ok"></i><i class="ok"></i></div>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">17. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:86%"></i></span><span><i class="bar-hoeren" style="width:76%"></i></span><span><i class="bar-schreiben" style="width:84%"></i></span><span><i class="bar-sprechen" style="width:82%"></i></span></span>
+        <span class="badge2 ok">82 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      
+  <div class="cardstage narrow">
+    <p class="framelabel">Phone</p>
+    <div class="frame mob" style="">
+      <div class="screen" style="height:auto"><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody v3body">
+    
+  <div class="ring">
+    <svg width="104" height="104" viewBox="0 0 104 104">
+      <circle cx="52" cy="52" r="46" fill="none" stroke="hsl(var(--muted))" stroke-width="9"/>
+      <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ringgrad)" stroke-width="9"
+        stroke-linecap="round" stroke-dasharray="225.4 63.6"/>
+      <line x1="52" y1="2" x2="52" y2="14" stroke="hsl(var(--success))" stroke-width="2.5"
+        stroke-linecap="round" transform="rotate(216.0 52 52)"/>
+      <defs>
+        <linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="hsl(var(--gradient-from))"/>
+          <stop offset="100%" stop-color="hsl(var(--gradient-to))"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="ringmid"><b class="tnum">78 %</b><span>Letzter</span></span>
+  </div>
+    <div class="v3facts">
+      <div>
+        <div class="factrow"><span class="factlab">Bester</span><span class="factval tnum">82 %</span></div>
+        <div class="metertrack"><i style="width:82%"></i></div>
+      </div>
+      <div>
+        <div class="factrow"><span class="factlab">Bestanden</span><span class="factval tnum">4 von 7</span></div>
+        <div class="dots"><i class=""></i><i class=""></i><i class="ok"></i><i class=""></i><i class="ok"></i><i class="ok"></i><i class="ok"></i></div>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      <div class="notecol">
+        <p class="note"><b>The idea.</b> The last run as a gradient ring with a green tick marking the 60 % pass threshold, then Bester as a slim meter and Bestanden as one dot per run, green where it passed.</p><p class="note"><b>Strength.</b> The most exam-like of the three: the ring reads as a grade and the dot row reads as a record at a glance. No chart to interpret.</p><p class="note"><b>Watch.</b> It drops the run-by-run shape, so "am I improving" is only answerable from the rows below. Pair with V1's chart only if you want both, which would make the card tall.</p>
+      </div>
+    </div>
+  </section>
+  </section>
+
+  <hr class="rule">
+
+  <section id="moduletab">
+    <h2>4 · Module üben Verlauf: three shapes</h2>
+    <p class="lede">
+      New block, same card language. The sample learner has practised Lesen four times, Hören three,
+      Schreiben five and Sprechen never, which is the honest shape of a real learner and the one that
+      breaks a badly chosen visualisation.
+    </p>
+    <div class="panel" style="margin-top:14px">
+      <div class="findings">
+        <div class="finding"><span class="num">!</span><div><b>What this needs beyond today's data</b><p>Timed module runs already write a record with a score, so Lesen, Hören, Schreiben and Sprechen all land here when they are sat against the clock. The untimed trainers are the gap: their results live in the cloud writing history, which this page must not fetch. The fix is one small local stamp per finished practice (module, date, score if there is one), written by all four surfaces, which is a few lines in each. This is the "additional stuff", and it is the same for all three shapes.</p></div></div>
+      </div>
+    </div>
+    
+  <section class="option" id="opt-m1">
+    <div class="opthead"><span class="optname">M1</span><h2>Vier Trends (four trends)</h2></div>
+    <div class="stagerow">
+      
+  <div class="cardstage">
+    <p class="framelabel">Desktop</p>
+    <div class="frame desk" style="border-radius:12px">
+      <div class="screen" style=""><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody m1">
+    
+      <div class="trendrow">
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="trendname">Lesen</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="bar-lesen" style="height:16px"></i><i class="bar-lesen" style="height:18px"></i><i class="bar-lesen" style="height:20px"></i><i class="bar-lesen" style="height:22px"></i></span>
+               <span class="trendpct tnum">84 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm hoeren"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+        <span class="trendname">Hören</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="ghost"></i><i class="bar-hoeren" style="height:12px"></i><i class="bar-hoeren" style="height:14px"></i><i class="bar-hoeren" style="height:16px"></i></span>
+               <span class="trendpct tnum">61 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="trendname">Schreiben</span>
+        <span class="spark"><i class="ghost"></i><i class="bar-schreiben" style="height:18px"></i><i class="bar-schreiben" style="height:19px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:22px"></i></span>
+               <span class="trendpct tnum">86 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm sprechen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+        <span class="trendname">Sprechen</span>
+        <span class="trendnone">Noch nicht geübt</span><span class="trendpct tnum">–</span>
+      </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">81 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      
+  <div class="cardstage narrow">
+    <p class="framelabel">Phone</p>
+    <div class="frame mob" style="">
+      <div class="screen" style="height:auto"><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody m1">
+    
+      <div class="trendrow">
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="trendname">Lesen</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="bar-lesen" style="height:16px"></i><i class="bar-lesen" style="height:18px"></i><i class="bar-lesen" style="height:20px"></i><i class="bar-lesen" style="height:22px"></i></span>
+               <span class="trendpct tnum">84 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm hoeren"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+        <span class="trendname">Hören</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="ghost"></i><i class="bar-hoeren" style="height:12px"></i><i class="bar-hoeren" style="height:14px"></i><i class="bar-hoeren" style="height:16px"></i></span>
+               <span class="trendpct tnum">61 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="trendname">Schreiben</span>
+        <span class="spark"><i class="ghost"></i><i class="bar-schreiben" style="height:18px"></i><i class="bar-schreiben" style="height:19px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:22px"></i></span>
+               <span class="trendpct tnum">86 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm sprechen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+        <span class="trendname">Sprechen</span>
+        <span class="trendnone">Noch nicht geübt</span><span class="trendpct tnum">–</span>
+      </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      <div class="notecol">
+        <p class="note"><b>The idea.</b> One row per module: the mark, the name, the last six attempts as a small bar trend in that module's own colour, and the latest score. A module never practised says so and shows an empty track.</p><p class="note"><b>Strength.</b> It answers the question the tab exists for, which module needs work, in one glance. It is also the only shape that shows all four modules whether or not they have been practised.</p><p class="note"><b>Watch.</b> Four rows is the tallest of the three on a phone. It fits, with the practice list resting behind its button (measured: 668 of 668px on a 393x852 phone).</p>
+      </div>
+    </div>
+  </section>
+  <section class="option" id="opt-m2">
+    <div class="opthead"><span class="optname">M2</span><h2>Chronik (chronicle)</h2></div>
+    <div class="stagerow">
+      
+  <div class="cardstage">
+    <p class="framelabel">Desktop</p>
+    <div class="frame desk" style="border-radius:12px">
+      <div class="screen" style=""><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody m2">
+    <div style="flex:none">
+      <div class="bars">
+        <span class="passline" style="bottom:40.8px"></span>
+        <span class="bar lesen" style="height:53.04px"></span><span class="bar hoeren" style="height:41.48px"></span><span class="bar schreiben" style="height:55.080000000000005px"></span><span class="bar lesen" style="height:57.12px"></span><span class="bar schreiben" style="height:58.48px"></span>
+      </div>
+      <p class="barcap">
+        <span>Zuletzt <b>Schreiben, 86 %</b></span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </p>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">81 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      
+  <div class="cardstage narrow">
+    <p class="framelabel">Phone</p>
+    <div class="frame mob" style="">
+      <div class="screen" style="height:auto"><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody m2">
+    <div style="flex:none">
+      <div class="bars">
+        <span class="passline" style="bottom:40.8px"></span>
+        <span class="bar lesen" style="height:53.04px"></span><span class="bar hoeren" style="height:41.48px"></span><span class="bar schreiben" style="height:55.080000000000005px"></span><span class="bar lesen" style="height:57.12px"></span><span class="bar schreiben" style="height:58.48px"></span>
+      </div>
+      <p class="barcap">
+        <span>Zuletzt <b>Schreiben, 86 %</b></span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </p>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      <div class="notecol">
+        <p class="note"><b>The idea.</b> Exactly the Modelltest Verlauf's shape: one chart of the recent practice, each bar in the colour of the module it belongs to, then the same rows underneath with the module named.</p><p class="note"><b>Strength.</b> The two tabs then carry the same object, which is the cheapest to build and the easiest to recognise.</p><p class="note"><b>Watch.</b> Colour is the only thing telling the modules apart in the chart, so a learner who practised Lesen five times in a row sees five green bars and no comparison. It shows activity better than it shows standing.</p>
+      </div>
+    </div>
+  </section>
+  <section class="option" id="opt-m3">
+    <div class="opthead"><span class="optname">M3</span><h2>Stärkeprofil (strength profile)</h2></div>
+    <div class="stagerow">
+      
+  <div class="cardstage">
+    <p class="framelabel">Desktop</p>
+    <div class="frame desk" style="border-radius:12px">
+      <div class="screen" style=""><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody m3" style="flex-direction:column;align-items:stretch">
+    <div class="profile">
+      
+        <div class="pcol">
+          <span class="pval tnum">84 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale lesen" style="height:62%"></i>
+                     <i class="seg solid lesen" style="height:22%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm lesen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>Lesen</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">61 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale hoeren" style="height:48%"></i>
+                     <i class="seg solid hoeren" style="height:13%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm hoeren" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>Hören</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">86 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale schreiben" style="height:70%"></i>
+                     <i class="seg solid schreiben" style="height:16%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm schreiben" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>Schreiben</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum none">–</span>
+          <span class="ptrack">
+            
+          </span>
+          <span class="pname"><span class="tile grad sm sprechen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>Sprechen</span>
+        </div>
+    </div>
+    <p class="plegend">Blass: dein erster Versuch · Kräftig: dein Fortschritt</p>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">81 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      
+  <div class="cardstage narrow">
+    <p class="framelabel">Phone</p>
+    <div class="frame mob" style="">
+      <div class="screen" style="height:auto"><div class="inner">
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody m3" style="flex-direction:column;align-items:stretch">
+    <div class="profile">
+      
+        <div class="pcol">
+          <span class="pval tnum">84 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale lesen" style="height:62%"></i>
+                     <i class="seg solid lesen" style="height:22%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm lesen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>Lesen</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">61 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale hoeren" style="height:48%"></i>
+                     <i class="seg solid hoeren" style="height:13%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm hoeren" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>Hören</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">86 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale schreiben" style="height:70%"></i>
+                     <i class="seg solid schreiben" style="height:16%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm schreiben" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>Schreiben</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum none">–</span>
+          <span class="ptrack">
+            
+          </span>
+          <span class="pname"><span class="tile grad sm sprechen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>Sprechen</span>
+        </div>
+    </div>
+    <p class="plegend">Blass: dein erster Versuch · Kräftig: dein Fortschritt</p>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div></div></div>
+    </div>
+  </div>
+      <div class="notecol">
+        <p class="note"><b>The idea.</b> Four columns, one per module, filled to the latest score, with a dotted line marking the first attempt, so the distance between line and fill IS the improvement. The mark and name sit under each column.</p><p class="note"><b>Strength.</b> The most product-like of the three: it reads as a skills profile rather than a log, and the four modules are directly comparable because they share one scale.</p><p class="note"><b>Watch.</b> It says nothing about when anything happened. The rows below carry that, and a module with a single attempt shows a fill with no dotted line.</p>
+      </div>
+    </div>
+  </section>
+  </section>
+
+  <hr class="rule">
+
+  <section id="whole">
+    <h2>5 · The whole page, following your picks</h2>
+    <p class="lede">
+      These four frames follow the control bar above. Change V or M there and these change with them.
+      The phone frames are the real content area of a 393 × 852 phone and do not scroll, so anything
+      that did not fit would visibly overflow.
+    </p>
+    <div class="framerow">
+  <div class="framebox desk"><p class="framelabel">Desktop · Module üben</p><div class="frame desk">
+  <div class="screen"><div class="inner"><div class="col">
+    <div class="stage">
+      
+  <div class="hdrstack">
+    
+  <div class="modeswitch hdrsw" role="tablist" aria-label="Prüfung">
+    <span class="pill" style="left:4px"></span>
+    <button role="tab" aria-pressed="true">Module üben</button>
+    <button role="tab" aria-pressed="false">Modelltest</button>
+  </div>
+    <div class="scoperow">
+  <div class="modeswitch" role="group" aria-label="Zeit" style="padding:3px">
+    <span class="pill onfree" style="left:3px;top:3px;bottom:3px;width:calc(50% - 3px)"></span>
+    <span class="pill ontimed" style="left:50%;top:3px;bottom:3px;width:calc(50% - 3px)"></span>
+    <button style="font-size:13px;padding:4px 14px">Ohne Zeit</button>
+    <button style="font-size:13px;padding:4px 14px">Mit Zeit</button>
+  </div><button class="scopebtn" type="button"><span>Niveau</span><b class="tnum">B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button></div>
+  </div>
+      <div class="grid2x2">
+  <button class="pcard b-card lesen" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl lesen"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Lesen</span>
+    <span class="pdesc">3 Texte mit Aufgaben</span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>15 Min</span>
+  </button>
+  <button class="pcard b-card hoeren" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl hoeren"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Hören</span>
+    <span class="pdesc">2 Ansagen · Notizen</span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>10 Min</span>
+  </button>
+  <button class="pcard b-card schreiben" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl schreiben"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Schreiben</span>
+    <span class="pdesc"><span class="onfree">Fokus, Kurz und Lang</span><span class="ontimed">1 Aufgabe · voller Brief</span></span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>20 Min</span>
+  </button>
+  <button class="pcard b-card sprechen" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl sprechen"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Sprechen</span>
+    <span class="pdesc"><span class="onfree">Dialoge mit Coaching</span><span class="ontimed">1 Gespräch mit Partner</span></span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>7 Min</span>
+  </button></div>
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody mv m1">
+    
+      <div class="trendrow">
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="trendname">Lesen</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="bar-lesen" style="height:16px"></i><i class="bar-lesen" style="height:18px"></i><i class="bar-lesen" style="height:20px"></i><i class="bar-lesen" style="height:22px"></i></span>
+               <span class="trendpct tnum">84 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm hoeren"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+        <span class="trendname">Hören</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="ghost"></i><i class="bar-hoeren" style="height:12px"></i><i class="bar-hoeren" style="height:14px"></i><i class="bar-hoeren" style="height:16px"></i></span>
+               <span class="trendpct tnum">61 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="trendname">Schreiben</span>
+        <span class="spark"><i class="ghost"></i><i class="bar-schreiben" style="height:18px"></i><i class="bar-schreiben" style="height:19px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:22px"></i></span>
+               <span class="trendpct tnum">86 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm sprechen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+        <span class="trendname">Sprechen</span>
+        <span class="trendnone">Noch nicht geübt</span><span class="trendpct tnum">–</span>
+      </div>
+  </div>
+  <div class="vbody mv m2">
+    <div style="flex:none">
+      <div class="bars">
+        <span class="passline" style="bottom:40.8px"></span>
+        <span class="bar lesen" style="height:53.04px"></span><span class="bar hoeren" style="height:41.48px"></span><span class="bar schreiben" style="height:55.080000000000005px"></span><span class="bar lesen" style="height:57.12px"></span><span class="bar schreiben" style="height:58.48px"></span>
+      </div>
+      <p class="barcap">
+        <span>Zuletzt <b>Schreiben, 86 %</b></span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </p>
+    </div>
+  </div>
+  <div class="vbody mv m3" style="flex-direction:column;align-items:stretch">
+    <div class="profile">
+      
+        <div class="pcol">
+          <span class="pval tnum">84 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale lesen" style="height:62%"></i>
+                     <i class="seg solid lesen" style="height:22%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm lesen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>Lesen</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">61 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale hoeren" style="height:48%"></i>
+                     <i class="seg solid hoeren" style="height:13%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm hoeren" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>Hören</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">86 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale schreiben" style="height:70%"></i>
+                     <i class="seg solid schreiben" style="height:16%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm schreiben" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>Schreiben</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum none">–</span>
+          <span class="ptrack">
+            
+          </span>
+          <span class="pname"><span class="tile grad sm sprechen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>Sprechen</span>
+        </div>
+    </div>
+    <p class="plegend">Blass: dein erster Versuch · Kräftig: dein Fortschritt</p>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">4. Aug.</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">86 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">3. Aug.</span>
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="vname2">Lesen</span>
+        <span class="badge2 ok">84 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="vname2">Schreiben</span>
+        <span class="badge2 ok">81 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div>
+    </div>
+  </div></div></div></div></div></div>
+    <div class="framerow">
+  <div class="framebox desk"><p class="framelabel">Desktop · Modelltest</p><div class="frame desk">
+  <div class="screen"><div class="inner"><div class="col">
+    <div class="stage">
+      
+  <div class="hdrstack">
+    
+  <div class="modeswitch hdrsw" role="tablist" aria-label="Prüfung">
+    <span class="pill" style="left:50%"></span>
+    <button role="tab" aria-pressed="false">Module üben</button>
+    <button role="tab" aria-pressed="true">Modelltest</button>
+  </div>
+    <div class="scoperow"><button class="scopebtn" type="button"><span>Niveau</span><b class="tnum">B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button></div>
+  </div>
+      
+  <div class="card" style="overflow:hidden;flex:none">
+    <div class="b-ticket">
+      <div class="b-left">
+        <p class="eyebrow mut">Komplette Prüfung</p>
+        <p class="bigtime tnum">52<small>Min</small></p>
+        <p class="bigsub">Vier Teile am Stück, wie am Prüfungstag</p>
+        <p class="cdown tnum" style="margin-top:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Noch 24 Tage bis zum 29. August</p>
+        <div class="b-cta"><button class="btn grad" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"/></svg> Prüfung starten</button></div>
+      </div>
+      <div class="b-vsep"></div>
+      <div class="b-right">
+        <div class="ladder">
+          
+            <div class="lrow">
+              <span class="tile grad lesen" style="width:36px;height:36px;border-radius:9px"><span class="g g1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+              <span class="lname">Lesen</span>
+              <span class="lmin tnum">15 Min</span>
+            </div>
+            <div class="lrow">
+              <span class="tile grad hoeren" style="width:36px;height:36px;border-radius:9px"><span class="g g1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+              <span class="lname">Hören</span>
+              <span class="lmin tnum">10 Min</span>
+            </div>
+            <div class="lrow">
+              <span class="tile grad schreiben" style="width:36px;height:36px;border-radius:9px"><span class="g g1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+              <span class="lname">Schreiben</span>
+              <span class="lmin tnum">20 Min</span>
+            </div>
+            <div class="lrow">
+              <span class="tile grad sprechen" style="width:36px;height:36px;border-radius:9px"><span class="g g1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+              <span class="lname">Sprechen</span>
+              <span class="lmin tnum">7 Min</span>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody vv v1body" style="flex-direction:column;align-items:stretch">
+    <div class="v1row">
+      <div class="v1chart">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"><span class="bartag best tnum">Bester 82 %</span></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="lastlab">Letzter 78 %</p>
+      </div>
+      <div class="v1caps">
+        <span><b class="tnum">4 von 7</b> bestanden</span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </div>
+    </div>
+  </div>
+  <div class="vbody vv v2body">
+    <div class="v2lead">
+      <p class="v2label">Letzter Durchlauf</p>
+      <p class="v2figrow"><span class="v2fig">78 %</span><span class="delta tnum">▲ 8</span></p>
+      <div class="v2stats">
+        <p class="v2stat"><b>82 %</b>Bester</p>
+        <p class="v2stat"><b>4 von 7</b>Bestanden</p>
+      </div>
+    </div>
+    <div class="v2chart">
+      <div style="flex:none">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="barcap" style="justify-content:flex-end"><span><i class="dash"></i>bestanden ab 60 %</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="vbody vv v3body">
+    
+  <div class="ring">
+    <svg width="104" height="104" viewBox="0 0 104 104">
+      <circle cx="52" cy="52" r="46" fill="none" stroke="hsl(var(--muted))" stroke-width="9"/>
+      <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ringgrad)" stroke-width="9"
+        stroke-linecap="round" stroke-dasharray="225.4 63.6"/>
+      <line x1="52" y1="2" x2="52" y2="14" stroke="hsl(var(--success))" stroke-width="2.5"
+        stroke-linecap="round" transform="rotate(216.0 52 52)"/>
+      <defs>
+        <linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="hsl(var(--gradient-from))"/>
+          <stop offset="100%" stop-color="hsl(var(--gradient-to))"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="ringmid"><b class="tnum">78 %</b><span>Letzter</span></span>
+  </div>
+    <div class="v3facts">
+      <div>
+        <div class="factrow"><span class="factlab">Bester</span><span class="factval tnum">82 %</span></div>
+        <div class="metertrack"><i style="width:82%"></i></div>
+      </div>
+      <div>
+        <div class="factrow"><span class="factlab">Bestanden</span><span class="factval tnum">4 von 7</span></div>
+        <div class="dots"><i class=""></i><i class=""></i><i class="ok"></i><i class=""></i><i class="ok"></i><i class="ok"></i><i class="ok"></i></div>
+      </div>
+    </div>
+  </div>
+    
+  <div class="verlauflist">
+    
+      <button class="vrow2" type="button">
+        <span class="vdate2">31. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:82%"></i></span><span><i class="bar-hoeren" style="width:71%"></i></span><span><i class="bar-schreiben" style="width:80%"></i></span><span><i class="bar-sprechen" style="width:78%"></i></span></span>
+        <span class="badge2 ok">78 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">24. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:74%"></i></span><span><i class="bar-hoeren" style="width:62%"></i></span><span><i class="bar-schreiben" style="width:72%"></i></span><span><i class="bar-sprechen" style="width:71%"></i></span></span>
+        <span class="badge2 ok">70 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <button class="vrow2" type="button">
+        <span class="vdate2">17. Juli</span>
+        <span class="mini2"><span><i class="bar-lesen" style="width:86%"></i></span><span><i class="bar-hoeren" style="width:76%"></i></span><span><i class="bar-schreiben" style="width:84%"></i></span><span><i class="bar-sprechen" style="width:82%"></i></span></span>
+        <span class="badge2 ok">82 %</span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+  </div>
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div>
+    </div>
+  </div></div></div></div></div></div>
+    <div class="framerow" id="phones">
+      
+  <div class="framebox phone"><p class="framelabel">Phone · Module üben</p><div class="frame mob">
+  <div class="screen"><div class="inner"><div class="col">
+    <div class="stage">
+      
+  <div class="hdrstack">
+    
+  <div class="modeswitch hdrsw" role="tablist" aria-label="Prüfung">
+    <span class="pill" style="left:4px"></span>
+    <button role="tab" aria-pressed="true">Module üben</button>
+    <button role="tab" aria-pressed="false">Modelltest</button>
+  </div>
+    <div class="scoperow">
+  <div class="modeswitch" role="group" aria-label="Zeit" style="padding:3px">
+    <span class="pill onfree" style="left:3px;top:3px;bottom:3px;width:calc(50% - 3px)"></span>
+    <span class="pill ontimed" style="left:50%;top:3px;bottom:3px;width:calc(50% - 3px)"></span>
+    <button style="font-size:13px;padding:4px 14px">Ohne Zeit</button>
+    <button style="font-size:13px;padding:4px 14px">Mit Zeit</button>
+  </div><button class="scopebtn" type="button"><span>Niveau</span><b class="tnum">B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button></div>
+  </div>
+      <div class="grid2x2">
+  <button class="pcard b-card lesen" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl lesen"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Lesen</span>
+    <span class="pdesc">3 Texte mit Aufgaben</span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>15 Min</span>
+  </button>
+  <button class="pcard b-card hoeren" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl hoeren"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Hören</span>
+    <span class="pdesc">2 Ansagen · Notizen</span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>10 Min</span>
+  </button>
+  <button class="pcard b-card schreiben" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl schreiben"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Schreiben</span>
+    <span class="pdesc"><span class="onfree">Fokus, Kurz und Lang</span><span class="ontimed">1 Aufgabe · voller Brief</span></span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>20 Min</span>
+  </button>
+  <button class="pcard b-card sprechen" type="button">
+    <span class="b-top">
+      <span class="tile grad xxl sprechen"><span class="g g1"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+      <span class="goarrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </span>
+    <span class="ptitle" style="margin-top:13px">Sprechen</span>
+    <span class="pdesc"><span class="onfree">Dialoge mit Coaching</span><span class="ontimed">1 Gespräch mit Partner</span></span>
+    <span class="cornerchip ontimed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>7 Min</span>
+  </button></div>
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">12 Übungen</p></div>
+    
+  <div class="vbody mv m1">
+    
+      <div class="trendrow">
+        <span class="tile grad sm lesen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="trendname">Lesen</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="bar-lesen" style="height:16px"></i><i class="bar-lesen" style="height:18px"></i><i class="bar-lesen" style="height:20px"></i><i class="bar-lesen" style="height:22px"></i></span>
+               <span class="trendpct tnum">84 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm hoeren"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+        <span class="trendname">Hören</span>
+        <span class="spark"><i class="ghost"></i><i class="ghost"></i><i class="ghost"></i><i class="bar-hoeren" style="height:12px"></i><i class="bar-hoeren" style="height:14px"></i><i class="bar-hoeren" style="height:16px"></i></span>
+               <span class="trendpct tnum">61 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm schreiben"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="trendname">Schreiben</span>
+        <span class="spark"><i class="ghost"></i><i class="bar-schreiben" style="height:18px"></i><i class="bar-schreiben" style="height:19px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:21px"></i><i class="bar-schreiben" style="height:22px"></i></span>
+               <span class="trendpct tnum">86 %</span>
+      </div>
+      <div class="trendrow">
+        <span class="tile grad sm sprechen"><span class="g g1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+        <span class="trendname">Sprechen</span>
+        <span class="trendnone">Noch nicht geübt</span><span class="trendpct tnum">–</span>
+      </div>
+  </div>
+  <div class="vbody mv m2">
+    <div style="flex:none">
+      <div class="bars">
+        <span class="passline" style="bottom:40.8px"></span>
+        <span class="bar lesen" style="height:53.04px"></span><span class="bar hoeren" style="height:41.48px"></span><span class="bar schreiben" style="height:55.080000000000005px"></span><span class="bar lesen" style="height:57.12px"></span><span class="bar schreiben" style="height:58.48px"></span>
+      </div>
+      <p class="barcap">
+        <span>Zuletzt <b>Schreiben, 86 %</b></span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </p>
+    </div>
+  </div>
+  <div class="vbody mv m3" style="flex-direction:column;align-items:stretch">
+    <div class="profile">
+      
+        <div class="pcol">
+          <span class="pval tnum">84 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale lesen" style="height:62%"></i>
+                     <i class="seg solid lesen" style="height:22%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm lesen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>Lesen</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">61 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale hoeren" style="height:48%"></i>
+                     <i class="seg solid hoeren" style="height:13%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm hoeren" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>Hören</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum">86 %</span>
+          <span class="ptrack">
+            <span class="pstack">
+                     <i class="seg pale schreiben" style="height:70%"></i>
+                     <i class="seg solid schreiben" style="height:16%"></i>
+                   </span>
+          </span>
+          <span class="pname"><span class="tile grad sm schreiben" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>Schreiben</span>
+        </div>
+        <div class="pcol">
+          <span class="pval tnum none">–</span>
+          <span class="ptrack">
+            
+          </span>
+          <span class="pname"><span class="tile grad sm sprechen" style="width:22px;height:22px;border-radius:6px"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>Sprechen</span>
+        </div>
+    </div>
+    <p class="plegend">Blass: dein erster Versuch · Kräftig: dein Fortschritt</p>
+  </div>
+    
+    <button class="vmore" type="button">Alle 12 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div>
+    </div>
+  </div></div></div></div></div>
+      
+  <div class="framebox phone"><p class="framelabel">Phone · Modelltest</p><div class="frame mob">
+  <div class="screen"><div class="inner"><div class="col">
+    <div class="stage">
+      
+  <div class="hdrstack">
+    
+  <div class="modeswitch hdrsw" role="tablist" aria-label="Prüfung">
+    <span class="pill" style="left:50%"></span>
+    <button role="tab" aria-pressed="false">Module üben</button>
+    <button role="tab" aria-pressed="true">Modelltest</button>
+  </div>
+    <div class="scoperow"><button class="scopebtn" type="button"><span>Niveau</span><b class="tnum">B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button></div>
+  </div>
+      
+  <div class="card pband">
+    <div class="pbandhead">
+      <p class="eyebrow mut">Komplette Prüfung</p>
+      <span class="totalchip tnum"><b>52 Min</b> gesamt</span>
+    </div>
+    <p class="cdown tnum" style="margin-top:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Noch 24 Tage bis zum 29. August</p>
+    <div class="trackwrap">
+  <div class="track" style="max-width:560px;margin:0 auto;width:100%">
+    
+      <div class="tnode">
+        <span class="dot tile grad lesen"><span class="g g1"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+        <span class="lab">Lesen</span>
+        <span class="min tnum">15 Min</span>
+      </div>
+      <div class="tnode">
+        <span class="dot tile grad hoeren"><span class="g g1"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>
+        <span class="lab">Hören</span>
+        <span class="min tnum">10 Min</span>
+      </div>
+      <div class="tnode">
+        <span class="dot tile grad schreiben"><span class="g g1"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>
+        <span class="lab">Schreiben</span>
+        <span class="min tnum">20 Min</span>
+      </div>
+      <div class="tnode">
+        <span class="dot tile grad sprechen"><span class="g g1"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>
+        <span class="lab">Sprechen</span>
+        <span class="min tnum">7 Min</span>
+      </div>
+  </div></div>
+    <div class="ctacenter"><button class="btn grad" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"/></svg> Prüfung starten</button></div>
+  </div>
+  <div class="card vwrap">
+    
+  <div class="vtop"><p class="eyebrow mut">Verlauf</p><p class="vcount tnum">7 Durchläufe</p></div>
+    
+  <div class="vbody vv v1body" style="flex-direction:column;align-items:stretch">
+    <div class="v1row">
+      <div class="v1chart">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"><span class="bartag best tnum">Bester 82 %</span></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="lastlab">Letzter 78 %</p>
+      </div>
+      <div class="v1caps">
+        <span><b class="tnum">4 von 7</b> bestanden</span>
+        <span><i class="dash"></i>bestanden ab 60 %</span>
+      </div>
+    </div>
+  </div>
+  <div class="vbody vv v2body">
+    <div class="v2lead">
+      <p class="v2label">Letzter Durchlauf</p>
+      <p class="v2figrow"><span class="v2fig">78 %</span><span class="delta tnum">▲ 8</span></p>
+      <div class="v2stats">
+        <p class="v2stat"><b>82 %</b>Bester</p>
+        <p class="v2stat"><b>4 von 7</b>Bestanden</p>
+      </div>
+    </div>
+    <div class="v2chart">
+      <div style="flex:none">
+        
+  <div class="bars">
+    <span class="passline" style="bottom:40.8px"></span>
+    <span class="bar" style="height:35.36px"></span><span class="bar" style="height:37.400000000000006px"></span><span class="bar" style="height:41.48px"></span><span class="bar" style="height:39.44px"></span><span class="bar top" style="height:55.76px"></span><span class="bar" style="height:47.599999999999994px"></span><span class="bar now" style="height:53.04px"></span>
+  </div>
+        <p class="barcap" style="justify-content:flex-end"><span><i class="dash"></i>bestanden ab 60 %</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="vbody vv v3body">
+    
+  <div class="ring">
+    <svg width="104" height="104" viewBox="0 0 104 104">
+      <circle cx="52" cy="52" r="46" fill="none" stroke="hsl(var(--muted))" stroke-width="9"/>
+      <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ringgrad)" stroke-width="9"
+        stroke-linecap="round" stroke-dasharray="225.4 63.6"/>
+      <line x1="52" y1="2" x2="52" y2="14" stroke="hsl(var(--success))" stroke-width="2.5"
+        stroke-linecap="round" transform="rotate(216.0 52 52)"/>
+      <defs>
+        <linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="hsl(var(--gradient-from))"/>
+          <stop offset="100%" stop-color="hsl(var(--gradient-to))"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="ringmid"><b class="tnum">78 %</b><span>Letzter</span></span>
+  </div>
+    <div class="v3facts">
+      <div>
+        <div class="factrow"><span class="factlab">Bester</span><span class="factval tnum">82 %</span></div>
+        <div class="metertrack"><i style="width:82%"></i></div>
+      </div>
+      <div>
+        <div class="factrow"><span class="factlab">Bestanden</span><span class="factval tnum">4 von 7</span></div>
+        <div class="dots"><i class=""></i><i class=""></i><i class="ok"></i><i class=""></i><i class="ok"></i><i class="ok"></i><i class="ok"></i></div>
+      </div>
+    </div>
+  </div>
+    
+    <button class="vmore" type="button">Alle 7 anzeigen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></button>
+  </div>
+    </div>
+  </div></div></div></div></div>
+      <div class="notecol">
+        <p class="note"><b>Both tabs now end in a Verlauf.</b> The page has the same rhythm whichever tab you are on: what you can do, then what you have done.</p>
+        <p class="note"><b>Still no scrolling at rest.</b> On a phone each Verlauf rests as its summary, with the run list behind its button; opening it is what lets the page grow, under the expand rule. All nine V/M combinations were measured at exactly 668 of the 668px a 393x852 phone leaves.</p>
+        <p class="note"><b>A result still appears once per tab.</b> Percentages live in the Verlauf card and nowhere else, on either tab.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="answer">
+    <h2>6 · How to answer</h2>
+    <div class="panel">
+      <p class="note">Two letters is enough, for example "V2 and M1".</p>
+      <p class="note">Mixing is fine too ("M1's rows but M3's columns"), and so is "the card fix is wrong, move the badge to X".</p>
+      <p class="note">Everything is drawn with the app's own tokens, the shipped module marks and the s187 dark palette. Check both with the Light/Dark switch.</p>
+    </div>
+  </section>
+
+</div></div>
+<script>
+  const root = document.querySelector("[data-marks]");
+  const q = new URLSearchParams(location.search);
+  ["appearance", "clock", "vv", "mv"].forEach((k) => {
+    const v = q.get(k);
+    if (v) {
+      root.dataset[k] = v;
+      const seg = document.getElementById("seg-" + k);
+      if (seg) seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+    }
+  });
+  // Screenshot support: ?only=<id> isolates any section, however deeply nested,
+  // by hiding every sibling on its way up to the page wrapper.
+  const only = q.get("only");
+  const target = only && document.getElementById(only);
+  if (target) {
+    let node = target;
+    while (node && node.parentElement && !node.parentElement.classList.contains("page")) {
+      Array.from(node.parentElement.children).forEach((el) => {
+        if (el !== node) el.style.display = "none";
+      });
+      node = node.parentElement;
+    }
+  }
+  // ?measure=1 stamps every phone frame with content-height vs screen-height,
+  // so a headless --dump-dom run can prove the "rests at zero scroll" rule
+  // instead of a screenshot being eyeballed.
+  if (q.get("measure")) {
+    document.querySelectorAll(".frame.mob .screen").forEach((sc, i) => {
+      if (!sc.clientHeight) return;
+      sc.setAttribute("data-fit", i + ":" + sc.scrollHeight + "/" + sc.clientHeight);
+    });
+  }
+  document.querySelectorAll(".seg").forEach((seg) => {
+    seg.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      root.dataset[btn.dataset.k] = btn.dataset.v;
+    });
+  });
+</script>
+</body>
+</html>

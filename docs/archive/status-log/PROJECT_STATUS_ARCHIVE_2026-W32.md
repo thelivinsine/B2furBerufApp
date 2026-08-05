@@ -246,3 +246,80 @@ mark a recommendation, the new palette + corners).
 **Next, if the founder does not redirect:** the queued writing-quality audit is still the oldest
 open item, then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`
 (synced but unplotted) and per-Teil exam history. Nothing from this session is half-built.
+
+**Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
+shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
+weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
+merely installed. The same screenshot confirms the Consent-Version card green and **im Gleichschritt
+at 2026-08-04**, so the legal-date fix is live too.
+
+**The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
+is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:
+**P10** itself (0.4% human-verified; the audit's plan is the ~320 highest-traffic items first), the
+**12 verified nouns** that need a `numerus` at their next review (`pnpm lint:content` names them
+every run, by design, see `docs/DECISIONS.md` §s185), and a live check of the **Notizen step** in a
+real listening exercise, which is the one thing that could only be verified by rendering.
+
+**Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
+**writing-task quality and filter fit**, with research from reliable sources. s181 proved COVERAGE
+(717 tasks, gated); nobody has verified that a task tagged B1 reads as B1, that its Leitpunkte are
+answerable in the word target, or that the Branche framing convinces someone who works in that
+industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
+audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
+C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
+
+**Handoff after session 188 (2026-08-04): the Modelltest hub (branch `claude/page-redesign-7md2zi`).**
+Founder: "re-do this page" (a dark screenshot of `/exam`), then "go with B" plus two amendments.
+**What shipped** (`src/features/exam/ExamHub.tsx`, rewritten; `partMeta.ts` gained a solid `bar`
+colour per Teil):
+- **The run leads.** One band: eyebrow + countdown, the four Teile as a connected timeline (one
+  absolutely-positioned line inset to the first and last tile centre, masked by a `border-surface`
+  ring), then the CTA on its own divided row. This is what removes the s186 duplication of
+  "4 Teile · 52 Min" above four cards each printing their own minutes.
+- **Results live only in Verlauf** (founder amendment): the last 5 runs for the selected Niveau, a
+  row being date · four result segments in exam order · total badge · chevron, whose disclosure
+  holds the four per-Teil percentages. A single-part run leaves three tracks empty and prints "–".
+- **"Modelltest"** replaces "Prüfungssimulation" as the page name (founder amendment), one word,
+  and the `/anwenden` entry card + the nav zone description were renamed with it. Content ids and
+  provenance labels are untouched.
+- **No HubHero** (founder amendment): `h1` + the Niveau sliding-pill switcher (`useSlidingPill`) on
+  one line, full width on a phone.
+- **The countdown** (`settings.examDate`) moved onto this page and retires itself once the date has
+  passed. The A2 zero state states itself once per control; the page-level sentence was dropped.
+**Verification:** the real build driven over a CDP script (no Playwright in this repo) at 1280x900,
+390x844 and 360x640, light + dark, A2 and B2, Verlauf open and closed: 0 px horizontal overflow, no
+console errors, the hub scrolls ~220 px on a phone, which is what a menu does.
+**Follow-up in the documentation pass:** the rename had one leftover the redesign did not touch.
+The Sprechen bank's exam sets are titled "Prüfungssimulation: <Aufgabe>" and are CONTENT (provenance
+rows, human-verified stamps), so they were not rewritten; `examSetTitle()` in
+`features/exam/partMeta.ts` strips the prefix at every render instead, which the mock-exam runner
+had been doing inline and the Sprechen runner had not been doing at all. Verified in the real app:
+the runner header now reads "Sicherheitsmängel beheben".
+**Docs updated:** CLAUDE.md (route name + the one-place-per-result law),
+`docs/areas/PRAKTISCH-NAV.md` (the hub anatomy), `docs/DECISIONS.md` §s188, the `/design` skill (the
+Modelltest anchor), this file and the prompt log. The preview stays in
+`preview/exam-hub-redesign.html` as the record of the round.
+**Next, if the founder does not redirect:** unchanged from s187 (the queued writing-quality audit,
+then the A2 / C1-Hören content waves, then a Fortschritt tile over `progress.mock_exams`). One item
+this session made cheaper: per-Teil exam history now has a real surface to grow into.
+
+**Nothing is owed from s185b any more.** The founder verified `/admin → Launch` on 2026-08-04: it
+shows the green **"Aufbewahrungs-Job (pg_cron) ist geplant"**, so pg_cron was available and all three
+weekly purges (guests 90 d · transform cache 60 d · learner text 730 d) really are scheduled, not
+merely installed. The same screenshot confirms the Consent-Version card green and **im Gleichschritt
+at 2026-08-04**, so the legal-date fix is live too.
+
+**The content audit is closed except P10.** s185a shipped P9, P7, P5, P4 and P3; the per-item record
+is in `docs/reports/CONTENT_AUDIT_2026-07-30.md` §5. Three smaller follow-ups sit behind it:
+**P10** itself (0.4% human-verified; the audit's plan is the ~320 highest-traffic items first), the
+**12 verified nouns** that need a `numerus` at their next review (`pnpm lint:content` names them
+every run, by design, see `docs/DECISIONS.md` §s185), and a live check of the **Notizen step** in a
+real listening exercise, which is the one thing that could only be verified by rendering.
+
+**Then start with the queued quality audit (founder, s181, not started):** a thorough analysis of
+**writing-task quality and filter fit**, with research from reliable sources. s181 proved COVERAGE
+(717 tasks, gated); nobody has verified that a task tagged B1 reads as B1, that its Leitpunkte are
+answerable in the word target, or that the Branche framing convinces someone who works in that
+industry. Deliverable: a report in `docs/reports/` with a prioritised fix list, like the s178 content
+audit. **Full scope, the parked exam-source items, and the locked Niveau mix (B1 307 / B2 302 /
+C1 108, do not rebalance) are all in `docs/PROJECT_REFERENCE.md` → "QUEUED (founder, s181)".**
