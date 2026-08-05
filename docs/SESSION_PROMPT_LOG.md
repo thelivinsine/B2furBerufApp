@@ -3903,7 +3903,8 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
   `src/features/exam/MockExamRunner.tsx` · `src/components/layout/AppShell.tsx` ·
   `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/areas/BRAND.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log · **PR #807**,
+  squash-merged as `78ad6b9`
 
 ## Session 188 — 2026-08-04 · branch `claude/page-redesign-7md2zi`
 
@@ -3969,7 +3970,8 @@ _Ran in parallel with the database-architecture session below; both landed 2026-
 - **Artifacts (prompt 2):** `src/features/exam/ExamHub.tsx` · `src/features/exam/partMeta.ts` ·
   `src/features/anwenden/AnwendenHub.tsx` · `src/components/layout/nav-items.ts` · `CLAUDE.md` ·
   `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log · **PR #807**,
+  squash-merged as `78ad6b9`
 - **Prompt 3 (verbatim, 2026-08-04):** `document the session`
   **Response:** the documentation for prompts 1 and 2 had already shipped inside PR #797 (merged),
   so this pass was an audit for anything the rename left stale, plus this entry.
@@ -4547,4 +4549,5 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `src/components/layout/AppShell.tsx` · `src/store/useSessionStore.ts` · `src/store/useExamStore.ts` ·
   `src/features/exam/MockExamRunner.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` ·
   `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log · **PR #807**,
+  squash-merged as `78ad6b9`

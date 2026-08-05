@@ -203,7 +203,8 @@ Two founder prompts, both from phone screenshots.
   bar, the drill scrolling internally. Verified in the real build: Ohne Zeit Lesen and Hören open on
   the question, Mit Zeit still opens on "PRÜFUNGSTEIL ... der Timer läuft, sobald du startest".
 **Gates green:** build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
-check:bundle 126.7 kB of 400 · check:contrast.
+check:bundle 127.0 kB of 400 · check:contrast. Shipped as **PR #807**, squash-merged into `main` as
+`78ad6b9`; the founder verifies the live result.
 **Open question for the founder:** the untimed drill still hides the bottom tab bar and holds the
 one-viewport stage. That is deliberate (the stage is what keeps a Teil at zero page scroll, and a
 visible tab bar would let a learner re-enter the persisted run in a loop), but say the word and it
