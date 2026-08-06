@@ -5234,3 +5234,13 @@ wanted.
   127.9 kB. **CI never fired for PR #818** at all: no check run was ever created, and the same
   window shows a `main` validate run the platform CANCELLED after 15 minutes, so this is GitHub's
   side, not the branch. Every gate `validate.yml` runs was therefore run locally before merging.
+
+- **Prompt 4 (verbatim):** `also, the go to top button seems hidden behind the blue button.. move it
+  upward and decrease its size slightly - no need of preview, implement it directly`
+  **Response:** implemented directly, no preview. The mobile `ScrollTopButton` sat at
+  `nav + 3.5rem` while the cluster puts the Üben CTA's top at `nav + 2rem + 2.75rem` (its own
+  `h-11`), so the arrow was inside the CTA's box and hidden behind it at every scroll position, on
+  every Bibliothek tab (it predates this session; it was visible as a ghost in the s197 verification
+  screenshots). Now `nav + 5.25rem`, half a rem clear of the button, and a step smaller: `p-1.5`
+  with an 18px glyph, 30px total instead of 36. Verified in the real app at 390x800 in both themes.
+  Gates: typecheck · lint 0 errors · 624 tests · build · check:bundle 127.9 kB.
