@@ -46,21 +46,40 @@ import { SprechenPart } from "./SprechenPart";
  * starts the part and turns amber under two minutes. The run lives in
  * `useExamStore` (persisted), so a reload resumes instead of losing work.
  */
+/**
+ * Is there anything in this run the exit would throw away? (founder s195: the
+ * confirm appears "only when the user has some unsaved progress".)
+ *
+ * A finished part counts, and so does having advanced past one: Teil Sprechen
+ * leaves nothing in `answers`, `notes` or `essay`, because its transcript is
+ * written server-side turn by turn, so those three alone would wave a candidate
+ * out of Teil 3 of 4 without a word.
+ */
+export function hasProgress(run: MockExamRun): boolean {
+  return (
+    run.partIx > 0 ||
+    Object.keys(run.results).length > 0 ||
+    Object.keys(run.answers).length > 0 ||
+    Object.keys(run.notes).length > 0 ||
+    run.essay.trim() !== ""
+  );
+}
+
 export function MockExamRunner() {
   const run = useExamStore((s) => s.run);
   const tick = useExamStore((s) => s.tick);
   const abandon = useExamStore((s) => s.abandon);
   const finish = useExamStore((s) => s.finish);
-  const setExamExit = useSessionStore((s) => s.setExamExit);
+  const setZoneExit = useSessionStore((s) => s.setZoneExit);
+  const setExamStage = useSessionStore((s) => s.setExamStage);
   const [exitOpen, setExitOpen] = useState(false);
 
   // A running exam is live work: never reload a deploy over it.
   useLiveWork(!!run && run.phase !== "done", "exam");
 
-  // Register the ONE exit with the shell, which renders it as a quiet X in the
-  // header and drops the bottom bar for the duration (founder s186). On the
-  // result screen the run is already recorded, so leaving is not a loss and
-  // needs no confirm; mid-exam it does.
+  // Register the ONE exit with the shell, which renders it in the top-right
+  // corner (founder s195) and drops the bottom bar for the duration (s186). On
+  // the result screen the run is already recorded, so leaving is not a loss.
   const onResult = run?.phase === "done";
   // Depends on whether a run exists, NOT on the run object: that object changes
   // on every tick and every answer, which would re-register the handler (and
@@ -73,25 +92,25 @@ export function MockExamRunner() {
   // the normal (bottom-bar, page-scrolling) layout first.
   useLayoutEffect(() => {
     if (!running) return;
-    setExamExit(
-      () => {
+    setExamStage(true);
+    setZoneExit({
+      tone: untimed ? "quiet" : "danger",
+      run: () => {
         if (onResult) return finish();
-        // Ohne Zeit, nothing written yet: there is nothing to lose, so leaving
-        // is immediate. A confirm over an empty practice drill is friction that
-        // teaches the learner to click through confirms (s192).
+        // The confirm is about LOSING WORK, not about the clock (founder s195):
+        // it appears when there is progress the exit would throw away and
+        // nowhere else. A confirm over a drill nobody has answered yet is
+        // friction that teaches the learner to click through confirms.
         const live = useExamStore.getState().run;
-        const untouched =
-          !!live &&
-          Object.keys(live.answers).length === 0 &&
-          Object.keys(live.notes).length === 0 &&
-          live.essay.trim() === "";
-        if (live?.untimed && untouched) return abandon();
+        if (live && !hasProgress(live)) return abandon();
         setExitOpen(true);
       },
-      { untimed },
-    );
-    return () => setExamExit(null);
-  }, [running, onResult, untimed, finish, abandon, setExamExit]);
+    });
+    return () => {
+      setExamStage(false);
+      setZoneExit(null);
+    };
+  }, [running, onResult, untimed, finish, abandon, setZoneExit, setExamStage]);
 
   const part = run ? currentPart(run) : null;
   const ticking = !!run && !run.untimed && run.phase === "part" && part !== "sprechen";
@@ -137,14 +156,15 @@ export function MockExamRunner() {
         <DialogContent className="gap-3">
           {/* Without a clock this is practice, not an exam, so the confirm says
               so (s192, with the Anleitung skip): the run is the same, the frame
-              around it is not. */}
+              around it is not. The body states the CONSEQUENCE in the founder's
+              own words (s195), and it only ever appears over work there is to
+              lose, so it can promise that plainly. */}
           <DialogHeader>
             <DialogTitle className="pr-8 text-base">
               {run.untimed ? "Übung verlassen?" : "Prüfung verlassen?"}
             </DialogTitle>
             <DialogDescription>
-              Deine Antworten in {run.untimed ? "dieser Übung" : "dieser Prüfung"} werden nicht
-              gespeichert.
+              Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2.5">
@@ -183,10 +203,23 @@ export function RunBar({ run, showTimer = true }: { run: MockExamRun; showTimer?
   const timed = showTimer && !run.untimed;
   const many = run.plan.parts.length > 1;
   const low = run.remainingSec > 0 && run.remainingSec < 120;
+  const meta = PART_META[part];
+  const Icon = meta.icon;
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2 shadow-soft">
-      <p className="min-w-0 truncate text-sm font-bold">
+    <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-2.5 py-1.5 shadow-soft">
+      {/* The same mark the trainers' `ModuleHeader` carries (s195), so the row
+          at the top of a Teil and the row at the top of a trainer are visibly
+          the same component rather than two lookalikes. */}
+      <span
+        className={cn(
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
+          meta.tile,
+        )}
+      >
+        <Icon className={cn("h-4 w-4", meta.ink)} />
+      </span>
+      <p className="min-w-0 flex-1 truncate text-sm font-bold">
         {PART_LABEL[part]}
         {many && (
           <span className="font-semibold text-muted-foreground">
@@ -319,12 +352,17 @@ function PartIntro({ run }: { run: MockExamRun }) {
     // Scrolls INSIDE the stage when a long Sprechen briefing outgrows it; the
     // inner wrapper keeps the short parts optically centred without clipping
     // the top of a tall one (the justify-center + overflow trap).
-    <div className="slim-scrollbar mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto">
-      <div className="flex min-h-full flex-col justify-center gap-4 py-1">
-      <div className="text-center">
+    //
+    // From lg up it is the RunBand's ticket composition (founder s195, option
+    // 2): the module and the commitment on the left, what to do on the right.
+    // A 448px column centred in the 1152px exam stage, with the sidebar and the
+    // tab bar both hidden, was the emptiest screen in the app.
+    <div className="slim-scrollbar mx-auto min-h-0 w-full max-w-md flex-1 overflow-y-auto lg:max-w-4xl">
+      <div className="flex min-h-full flex-col justify-center gap-4 py-1 lg:grid lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-center lg:gap-8">
+      <div className="text-center lg:text-left">
         <div
           className={cn(
-            "mx-auto flex h-12 w-12 items-center justify-center rounded-xl",
+            "mx-auto flex h-12 w-12 items-center justify-center rounded-xl lg:mx-0",
             meta.tile,
           )}
         >
@@ -334,6 +372,19 @@ function PartIntro({ run }: { run: MockExamRun }) {
           {many ? `Teil ${run.partIx + 1} von ${run.plan.parts.length}` : "Prüfungsteil"}
         </p>
         <h1 className="text-display text-2xl sm:text-3xl">{PART_LABEL[part]}</h1>
+        {/* Desktop keeps the commitment beside the mark; below lg the same two
+            controls are the last thing on the screen, where a thumb is. */}
+        <div className="mt-4 hidden lg:block">
+          <Button variant="gradient" className="w-full" onClick={() => beginPart(minutes * 60)}>
+            {many ? `Teil ${run.partIx + 1} starten` : "Starten"}
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            {run.untimed
+              ? "Ohne Uhr: du bestimmst das Tempo."
+              : "Der Timer läuft, sobald du startest."}
+          </p>
+        </div>
       </div>
 
       <Card>
@@ -375,15 +426,17 @@ function PartIntro({ run }: { run: MockExamRun }) {
         </CardContent>
       </Card>
 
-      <Button variant="gradient" className="w-full" onClick={() => beginPart(minutes * 60)}>
-        {many ? `Teil ${run.partIx + 1} starten` : "Starten"}
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-      <p className="text-center text-xs text-muted-foreground">
-        {run.untimed
-          ? "Ohne Uhr: du bestimmst das Tempo."
-          : "Der Timer läuft, sobald du startest."}
-      </p>
+      <div className="lg:hidden">
+        <Button variant="gradient" className="w-full" onClick={() => beginPart(minutes * 60)}>
+          {many ? `Teil ${run.partIx + 1} starten` : "Starten"}
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          {run.untimed
+            ? "Ohne Uhr: du bestimmst das Tempo."
+            : "Der Timer läuft, sobald du startest."}
+        </p>
+      </div>
       </div>
     </div>
   );
@@ -436,7 +489,14 @@ function Ergebnis({ run }: { run: MockExamRun }) {
   return (
     // The result can outgrow the stage (four bars plus an expanded answer
     // review), so it scrolls internally like every other part.
-    <div className="slim-scrollbar mx-auto min-h-0 w-full max-w-md flex-1 space-y-4 overflow-y-auto pb-1">
+    //
+    // Two columns from lg up (founder s195, option 2): the score and the four
+    // bars on the left, what to do next on the right. It used to be a 448px
+    // strip in the middle of the app's widest stage, with "Schwächster Teil"
+    // and the actions below the fold.
+    <div className="slim-scrollbar mx-auto min-h-0 w-full max-w-md flex-1 space-y-4 overflow-y-auto pb-1 lg:max-w-4xl">
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:items-start lg:gap-6 lg:space-y-0">
+      <div className="space-y-4">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -487,6 +547,9 @@ function Ergebnis({ run }: { run: MockExamRun }) {
         </CardContent>
       </Card>
 
+      </div>
+
+      <div className="space-y-4">
       {weakest && (
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
@@ -504,8 +567,6 @@ function Ergebnis({ run }: { run: MockExamRun }) {
           </CardContent>
         </Card>
       )}
-
-      {review && <ReviewList run={run} />}
 
       <div className="flex gap-3">
         {(run.plan.parts.includes("lesen") ||
@@ -527,6 +588,12 @@ function Ergebnis({ run }: { run: MockExamRun }) {
             : "Schreiben und Sprechen bewertet eine KI, ohne Gewähr."}
         </p>
       )}
+      </div>
+      </div>
+
+      {/* Full width below both columns: the review is the longest thing on this
+          screen and it reads better in one column than squeezed into a third. */}
+      {review && <ReviewList run={run} />}
     </div>
   );
 }

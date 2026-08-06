@@ -116,7 +116,7 @@ after pulling.
   `layoutId`), the Prüfung module card's anatomy (s191: no description line, the minutes badge's
   corner reserved in both clock states), the Schreiben mobile anatomy (ONE fixed bottom-chrome
   geometry shared by Fokus, Kurz and Lang + measured tile heights + the Fokus dial tile,
-  `docs/areas/SCHREIBEN.md`).
+  `docs/areas/SCHREIBEN.md`), the Prüfung zone's one frame (s195, below).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`. `mergeRemoteSettings` adopts on `settings.onboarded === true` and nothing
@@ -125,23 +125,31 @@ after pulling.
   `/start` (`docs/DECISIONS.md` §s174).
 - **Sprechen is Schreiben with a microphone** (s193): a brief, a conversation, then the EXISTING
   `features/writing/correction.tsx` card as the debrief (speaking is its fourth caller; never build
-  a fifth copy). Deliberately NOT an open chatbot: an LLM adapts down to the learner, never
-  corrects unless asked and produces no assessment, so the brief (named partner, register, 2-5
-  Leitpunkte) is what makes it an exercise. The partner never corrects mid-flow. **Which layout a
-  spoken task uses is a property of the TASK, never a setting**: practice runs the transcript
-  (`gespraech`), an exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it
-  (`anruf`). **The conversation row is written when a conversation STARTS**, so the daily limit
-  counts what costs money, and the turn ceiling is measured against the STORED transcript, never
-  the request body, AND on the client, so a learner never speaks into turns the grader will not see
-  (s194). Full detail in `docs/areas/SPRECHEN.md`.
+  a fifth copy). Deliberately NOT an open chatbot: an LLM adapts down to the learner and produces no
+  assessment, so the brief (named partner, register, 2-5 Leitpunkte) is what makes it an exercise,
+  and the partner never corrects mid-flow. **Which layout a spoken task uses is a property of the
+  TASK, never a setting**: practice runs the transcript (`gespraech`), an exam task keeps its
+  Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The conversation row is
+  written when a conversation STARTS**, so the daily limit counts what costs money, and the turn
+  ceiling is measured against the STORED transcript AND on the client, so a learner never speaks
+  into turns the grader will not see (s194). Full detail in `docs/areas/SPRECHEN.md`.
+- **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
+  right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
+  `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
+  flag and only a run sets it. **A confirm is about losing work, never about the clock:**
+  `hasProgress(run)` gates it, the Schreibtrainer never asks (its draft autosaves, so the warning
+  would be false) and a started conversation always does. **The word Zurück belongs to that exit
+  alone**, so the question stepper is a chevron. A phone carries the module row on every screen
+  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`). ONE Niveau control
+  (`LevelSelect`), ONE width at rest (`max-w-4xl`, the Sprechtrainer list included), the wide
+  `lg:max-w-6xl` stage for a RUNNING Teil alone, and the Verlauf card ships in an empty state from
+  the first visit, because both hub tabs hold a one-viewport frame.
 - **An exercise the app scores can always be handed in, and every score it produces is reachable**
-  (s194 audit). A clock is never the ONLY way a part ends: "Teil abschließen" sits on the last
-  question unconditionally, blank answers cost a confirm (Ohne Zeit has no clock, so requiring every
-  answer was a dead end on the default path), and a clock is measured against a DEADLINE, never by
-  decrementing, or a background tab pauses the exam. Every correction the evaluator returns is
+  (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
+  question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
+  by decrementing, or a background tab pauses the exam. Every correction the evaluator returns is
   rendered, and a result surfaces in exactly ONE Verlauf: **a Modelltest sat all four parts, a run
-  that sat one is module practice** (`isFullMockRun`, bank-free so Fortschritt applies the same rule
-  without pulling a bank; `examsDone` is retired). Detail in `docs/areas/PRUEFUNG.md`.
+  that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired).
 - **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
   instead of throwing, so an ignored result makes a permanently broken sync look identical to a
   working one while localStorage keeps the app running. Every push reads its error, retries with
@@ -218,12 +226,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   it, resting on Ohne Zeit, and it is the ONLY way into the Schreib- and Sprechtrainer
   (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,
   never a fifth block. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
-  Anleitung and opens the drill, calls its exit Zurück in neutral grey (never the red Verlassen),
-  and asks nothing when nothing has been written yet. Only the STAGE stays shared. The run band's timeline connector is one segment per gap, drawn between the
-  tiles, never a line behind them.
-- **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): one `max-w-4xl` centred
-  column, so switching never changes the page's width; a height-stable scope row; the module card's
-  minutes badge in a corner RESERVED in both clock states, so the clock switch cannot move a card
+  Anleitung and opens the drill. Only the STAGE stays shared; the exit and its confirm follow the
+  one-frame law above, not the clock. The run band's timeline connector is one segment per gap,
+  drawn between the tiles, never a line behind them.
+- **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): a height-stable scope
+  row, and the module card's minutes badge in a corner RESERVED in both clock states, so the clock
+  switch cannot move a card
   edge. Modelltest's Verlauf leads with the last score plus its delta (Bester and Bestanden as
   supporting stats, the last seven runs as bars against the pass line); Module üben's is a
   Stärkeprofil (pale = first attempt, solid = the gain since). **A Modelltest is a run that sat all

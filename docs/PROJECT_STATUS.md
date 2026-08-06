@@ -1,6 +1,7 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 194). **The Prüfung zone was audited end to end and every
+_Last updated: 2026-08-06 (session 195 gave the Prüfung zone ONE frame: one exit, one Niveau
+control, one width at rest; see "Resume here"). **The Prüfung zone was audited end to end and every
 finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
 the issue". The report (`docs/reports/pruefung-audit-2026-08-05.md`, 35 ranked findings) is kept in
 full as the record; `docs/areas/PRUEFUNG.md` is the new current-state law for the zone.
@@ -190,6 +191,47 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 195 (2026-08-06): the Prüfung zone got ONE frame
+(branch `claude/prufung-hub-design-consistency-193qrh`).**
+Two founder prompts. The first asked for a review of the zone's inconsistent back buttons and empty
+space; the second picked from the options it produced.
+- **Prompt 1, the review.** Six findings, all read from the code: FOUR back-button treatments in
+  THREE positions, the word `Zurück` on two controls of one screen, two screens with no exit at
+  all (desktop Schreiben, a running practice conversation), FOUR content widths, three header
+  languages, and both hub tabs holding a full-viewport frame with nothing to fill it. Delivered as
+  `preview/pruefung-frame.html` (artifact
+  <https://claude.ai/code/artifact/b04df435-61f7-4d9c-ab82-ba28b50a385e>) with a five-rule spine
+  plus A/B/C for the exit and 1/2 for the empty space.
+- **Prompt 2, the pick, and it is now law.** "B for phone, C for desktop, but Zurück (untimed) and
+  the red Verlassen (timed) should ALWAYS be top right"; the confirm should appear only when there
+  is unsaved progress; the mobile Aufgabe toggle should share the switcher's row as just "Aufgabe";
+  option A's header row should be on every mobile screen; option 2 for the empty space.
+  **Built exactly that.** `useSessionStore.zoneExit` replaces `examExit`/`examUntimed` and covers
+  `/anwenden`, `/exam`, `/writing` and `/simulation`; `examStage` is now a separate flag so the
+  trainers keep their nav. `hasProgress(run)` gates the confirm (it counts a completed part and
+  `partIx > 0` too, because Teil Sprechen leaves nothing in `answers`), the Schreibtrainer asks
+  nothing because `draftAutosave` keeps its text, and a started conversation always asks. The
+  question stepper is a chevron now: desktop puts the pair beside the number strip (option C) and
+  keeps ONE primary in the footer, a phone keeps the back step in the footer because nine numbers
+  plus two buttons do not fit 360px. New `features/pruefung/ModuleHeader.tsx` (mobile module row,
+  and the `RunBar` wears the same mark) and `features/pruefung/LevelSelect.tsx` (the one Niveau
+  control, adopted by the Sprechtrainer in place of its pill row). `GuidedWritingTrainer` portals
+  its "Aufgabe" toggle into a slot `WritingHub` owns. The Anleitung is a two-column ticket, the
+  Ergebnis is two columns, the Sprechtrainer list moved to the zone's `max-w-4xl`, and both hub
+  Verlauf cards ship in an empty state that fills the frame.
+**Verified in the real build, not in a mockup** (CDP driver, three viewports, clean store per
+screen): the exit sits at the identical top-right coordinate on all 7 zone screens at 360x640,
+393x852 and 1280x900, reads "Prüfung verlassen" only in a timed run, and is absent on the hub,
+which is the zone's home. Zero page scroll and zero horizontal overflow everywhere except
+Kurz at 360x640, which rests at 99px (down from 134px shipped; the field is at its `HARD_MIN`
+floor there, the documented give-up case) and the Sprechtrainer LIST, which is a browse list.
+Gates green: build · typecheck · lint 0 errors (75 warnings, down from 77) · 610 tests ·
+check:bundle 127.1 kB of 400 · check:contrast · lint:content.
+Shipped as **PR #811**, squash-merged into `main`; the founder verifies the live result.
+**Resume here:** nothing is open. Two judgement calls to confirm if the founder disagrees: the
+module row is `lg:hidden` (they said "in mobile view"), and Kurz at 360x640 still rests ~99px
+scrolled, which drops to 0 if that row goes on Kurz/Lang.
+
 **Handoff after session 192 (2026-08-05): the trainer's way back, and the exam frame confined to
 Mit Zeit (branch `claude/prufung-ui-bottom-bar-u0fdwf`).**
 Two founder prompts, both from phone screenshots.
@@ -224,32 +266,3 @@ check:bundle 126.7 kB of 400 · check:contrast.
 one-viewport stage. That is deliberate (the stage is what keeps a Teil at zero page scroll, and a
 visible tab bar would let a learner re-enter the persisted run in a loop), but say the word and it
 can go too.
-
-**Handoff after session 191 (2026-08-05): the Prüfung module tiles went flat (branch
-`claude/remove-tile-gradient-4fcowe`).**
-Two founder prompts against a screenshot of `/anwenden`, Module üben.
-- **"Get rid of the colored gradient from the tiles here."** The cards carried TWO coloured
-  gradients from s190: the hue radial across the whole card (`.mod-wash-*`) and a gradient fill on
-  the mark tile. Both are gone. The wash span, the `wash` field on `PART_META` and the entire
-  `.mod-wash-*` block in `index.css` are deleted, and `tile` is now a flat tint
-  (`bg-emerald-500/15 dark:bg-emerald-400/20`, and the teal / primary / sky pairs). The colour still
-  carries the receptive-vs-productive fact, it just carries it evenly. The badge corner stays
-  reserved by the card's bottom padding, so the clock switch still cannot move a card edge.
-- **"Increase the space below the toggle buttons slightly."** The hub's outer column went
-  `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap sits ONLY between the header block (switcher + scope
-  row) and the tab content, so the toggles and the tiles now read as two sections while the gaps
-  inside each block are untouched.
-**Verified in the real build**, not in a mockup: a rebuilt CDP driver (Node 22's built-in
-`WebSocket`, no new deps) reports zero page scroll, zero badge/text overlap and no `background-image`
-inside `main` at 360x640, 393x852 light and dark, and 1280x900, in BOTH clock states. Gates green:
-build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests · check:bundle · contrast.
-- **"The time badges [are] overlapping on the text ... just remove the text and just keep the
-  badges."** A real bug, and the reserve was the cause: the badge is 24px tall and sits 12px off the
-  bottom, i.e. 36px, against a 28px `pb-[1.75rem]` reserve, so with the clock ON it sat across the
-  description on all four cards. The description line is gone (`FREE_DESC` with it; `PART_META.desc`
-  stays for the Anleitung pages). What remains is mark, arrow, title, badge. The one line that can
-  still appear is the honest empty state, and it only shows on a card that has no badge.
-Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, the badge overlap),
-both squash-merged into `main`; the founder verifies the live result.
-**Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
-so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.

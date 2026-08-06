@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Maximize2, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Play } from "lucide-react";
 import { readingTextById, scoreChecks } from "@/engine/exam";
 import { MAX_PLAYS } from "@/engine/exam";
 import { useExamStore, type MockExamRun } from "@/store/useExamStore";
@@ -277,6 +277,37 @@ function QuestionBlock({
   );
 }
 
+/**
+ * One question back or forward. Quiet outline, no word: the strip beside it
+ * (desktop) or the primary button next to it (phone) already says what the row
+ * is for, and "Zurück" now belongs to the zone exit alone (founder s195).
+ */
+function StepButton({
+  dir,
+  onClick,
+  className,
+}: {
+  dir: "prev" | "next";
+  onClick: () => void;
+  className?: string;
+}) {
+  const Icon = dir === "prev" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={dir === "prev" ? "Vorherige Aufgabe" : "Nächste Aufgabe"}
+      title={dir === "prev" ? "Vorherige Aufgabe" : "Nächste Aufgabe"}
+      className={cn(
+        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-muted-foreground shadow-soft transition-colors hover:bg-muted/60 hover:text-foreground",
+        className,
+      )}
+    >
+      <Icon className="h-4 w-4" />
+    </button>
+  );
+}
+
 function PartFooter({
   run,
   ids,
@@ -311,9 +342,17 @@ function PartFooter({
   return (
     <>
       <div className="flex gap-2.5 pt-3">
-        <Button variant="outline" className="flex-1" onClick={() => go((qIx - 1 + total) % total)}>
-          Zurück
-        </Button>
+        {/* The word "Zurück" is gone from this row (founder s195): it belonged
+            to the zone's ONE exit, and printing it on the previous-question
+            button meant a running Teil had two controls saying the same word
+            300px apart, doing entirely different things. The step is a chevron
+            now, and only on a phone, where the strip above has no room for the
+            pair of steppers a desktop puts beside it. */}
+        <StepButton
+          dir="prev"
+          onClick={() => go((qIx - 1 + total) % total)}
+          className="h-10 w-14 lg:hidden"
+        />
         {last ? (
           <Button
             variant="gradient"
@@ -730,12 +769,31 @@ function SplitShell({
       </div>
 
       <div className="mx-auto w-full shrink-0 pt-4 lg:max-w-xl">
-        <AnswerStrip
-          total={questions.length}
-          answered={(ix) => !!run.answers[questions[ix].check.id]}
-          active={qIx}
-          onJump={go}
-        />
+        {/* Desktop: the two steppers flank the number strip (founder s195,
+            option C), because stepping and jumping are the same job and the
+            strip is already where it is done. That is what frees the footer to
+            be ONE primary button instead of two equal outlines, one of which
+            was the control that ends the part. A phone has no room for it: nine
+            numbers plus two 34px buttons do not fit 360px in one row, so there
+            the back step stays in the footer as an icon. */}
+        <div className="flex items-center justify-center gap-2">
+          <StepButton
+            dir="prev"
+            onClick={() => go((qIx - 1 + questions.length) % questions.length)}
+            className="hidden lg:flex"
+          />
+          <AnswerStrip
+            total={questions.length}
+            answered={(ix) => !!run.answers[questions[ix].check.id]}
+            active={qIx}
+            onJump={go}
+          />
+          <StepButton
+            dir="next"
+            onClick={() => go((qIx + 1) % questions.length)}
+            className="hidden lg:flex"
+          />
+        </div>
         <PartFooter
           run={run}
           ids={ids}

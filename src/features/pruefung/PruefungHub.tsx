@@ -1,7 +1,7 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, ChevronDown, Clock, Play, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronDown, Clock, Play, TrendingUp } from "lucide-react";
 import {
   HUB_LEVELS,
   MOCK_PART_ORDER,
@@ -24,6 +24,7 @@ import {
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { useStagePanel } from "@/features/shared/useStagePanel";
+import { LevelSelect, type LevelOption } from "./LevelSelect";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -242,8 +243,8 @@ export function PruefungHub() {
             />
           )}
           <LevelSelect
-            level={level}
-            avail={availByLevel}
+            value={level}
+            options={levelOptions(availByLevel)}
             onSelect={(l) => patchParams({ level: l })}
           />
         </div>
@@ -266,6 +267,11 @@ export function PruefungHub() {
             aria-labelledby={tabId(tab)}
             className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5 lg:max-w-4xl"
           >
+            {/* The Verlauf card is on the page from the FIRST visit (founder
+                s195, option 2): both tabs hold a one-viewport frame, and until
+                a learner had history the lower half of it was empty every time.
+                Empty, it shows the shape of what is coming, which is also the
+                only place that says what practising will earn them. */}
             {tab === "module" ? (
               <>
                 <ModuleGrid
@@ -274,13 +280,11 @@ export function PruefungHub() {
                   countFor={partCount}
                   onOpen={openModule}
                 />
-                {practice.length > 0 && (
-                  <ModuleVerlauf
-                    practice={practice}
-                    open={verlaufOpen}
-                    onToggle={() => setVerlaufOpen((v) => !v)}
-                  />
-                )}
+                <ModuleVerlauf
+                  practice={practice}
+                  open={verlaufOpen}
+                  onToggle={() => setVerlaufOpen((v) => !v)}
+                />
               </>
             ) : (
               <>
@@ -290,13 +294,11 @@ export function PruefungHub() {
                   canStart={servable && avail.complete}
                   onStart={() => start(level as MockExamLevel)}
                 />
-                {runs.length > 0 && (
-                  <RunVerlauf
-                    runs={runs}
-                    open={verlaufOpen}
-                    onToggle={() => setVerlaufOpen((v) => !v)}
-                  />
-                )}
+                <RunVerlauf
+                  runs={runs}
+                  open={verlaufOpen}
+                  onToggle={() => setVerlaufOpen((v) => !v)}
+                />
               </>
             )}
           </motion.div>
@@ -450,135 +452,21 @@ function ClockSwitcher({
 }
 
 /**
- * Niveau as a compact scope button rather than a second pill row: the switcher
- * above already owns switcher rank on this page, and two grey tracks stacked
- * before any content read as a heavier header than the page it introduces.
+ * The hub's Niveau options, with each level's honest count. Zero-yield levels
+ * grey out rather than looking servable: A2 used to look exactly like a level
+ * with content and killed the whole page once picked (s194 audit P23).
  */
-function LevelSelect({
-  level,
-  avail,
-  onSelect,
-}: {
-  level: HubLevel;
-  /** Counts per level, so a zero-yield Niveau greys out with its honest figure. */
-  avail: Record<HubLevel, MockExamAvailability>;
-  onSelect: (l: HubLevel) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const reduce = useReducedMotion();
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+function levelOptions(avail: Record<HubLevel, MockExamAvailability>): LevelOption[] {
+  return HUB_LEVELS.map((lv) => {
+    const a = avail[lv];
+    const modules = [a.lesen, a.hoeren, a.schreiben, a.sprechen].filter((n) => n > 0).length;
+    return {
+      value: lv,
+      label: lv,
+      note: modules === 0 ? "keine Inhalte" : `${modules}/4 Module`,
+      empty: !a.complete,
     };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setOpen(false);
-      // Focus goes back where it came from, or it is left on a node that just
-      // stopped existing (s194 audit P27).
-      triggerRef.current?.focus();
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  /** Up/Down walk the options; Enter and Space are the buttons' own defaults. */
-  const onListKey = (e: React.KeyboardEvent) => {
-    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-    e.preventDefault();
-    const items = Array.from(
-      e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="option"]'),
-    );
-    const at = items.indexOf(document.activeElement as HTMLButtonElement);
-    const next =
-      e.key === "ArrowDown"
-        ? (at + 1) % items.length
-        : (at - 1 + items.length) % items.length;
-    items[next]?.focus();
-  };
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-label="Niveau"
-        className="flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface pl-3 pr-2 text-sm shadow-soft transition-colors hover:border-primary/40"
-      >
-        <span className="text-muted-foreground">Niveau</span>
-        <span className="font-bold tabular-nums">{level}</span>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180",
-          )}
-        />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            role="listbox"
-            aria-label="Niveau"
-            initial={reduce ? false : { opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: reduce ? 0 : 0.12, ease: "easeOut" }}
-            onKeyDown={onListKey}
-            className="absolute right-0 top-full z-20 mt-1 w-44 rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
-          >
-            {HUB_LEVELS.map((lv) => {
-              const selected = lv === level;
-              const a = avail[lv];
-              // Zero-yield options grey out with their honest count (founder
-              // law). A2 used to look exactly like a servable level and killed
-              // the whole page once picked (s194 audit P23).
-              const empty = !a.complete;
-              const modules = [a.lesen, a.hoeren, a.schreiben, a.sprechen].filter(
-                (n) => n > 0,
-              ).length;
-              return (
-                <button
-                  key={lv}
-                  type="button"
-                  role="option"
-                  aria-selected={selected}
-                  onClick={() => {
-                    onSelect(lv);
-                    setOpen(false);
-                    triggerRef.current?.focus();
-                  }}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
-                    selected
-                      ? "bg-primary/10 font-medium text-primary"
-                      : empty
-                        ? "text-muted-foreground hover:bg-muted/60"
-                        : "hover:bg-muted/60",
-                  )}
-                >
-                  <span className="flex-1 tabular-nums">{lv}</span>
-                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                    {modules === 0 ? "keine Inhalte" : `${modules}/4 Module`}
-                  </span>
-                  {selected && <Check className="h-3.5 w-3.5 shrink-0" />}
-                </button>
-              );
-            })}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+  });
 }
 
 /* ------------------------------- Module üben ------------------------------ */
@@ -902,7 +790,12 @@ function VerlaufCard({
   const listId = useId();
   const shown = open ? rows : rows.slice(0, restRows);
   const hidden = rows.length - shown.length;
-  const more = hidden > 0 || open;
+  // An empty Verlauf has no list and nothing to expand: it is the promise of
+  // one (founder s195, option 2), so it holds the head alone and takes the room
+  // the tab has left rather than leaving the lower half of the stage bare.
+  const empty = rows.length === 0;
+  const more = !empty && (hidden > 0 || open);
+  const asSplit = split && !empty;
 
   return (
     <Card
@@ -913,7 +806,7 @@ function VerlaufCard({
         // sticky header or the fixed bottom bar, so without them the expanded
         // tile parks its lower edge underneath the tab bar.
         "flex scroll-mb-24 scroll-mt-20 flex-col overflow-hidden lg:scroll-mb-8",
-        open ? "max-h-panel-stage" : "flex-none",
+        open ? "max-h-panel-stage" : empty ? "min-h-0 flex-1" : "flex-none",
       )}
     >
       <div className="flex flex-none items-baseline justify-between gap-3 px-4 pt-3.5 sm:px-5 lg:px-6">
@@ -924,49 +817,52 @@ function VerlaufCard({
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col",
-          split && "lg:grid lg:grid-cols-[minmax(0,26rem)_1px_minmax(0,1fr)] lg:items-stretch",
+          asSplit && "lg:grid lg:grid-cols-[minmax(0,26rem)_1px_minmax(0,1fr)] lg:items-stretch",
         )}
       >
         <div className={cn(
-            "flex-none px-4 pb-3 pt-2.5 sm:px-5 sm:pb-4 lg:px-6",
-            split && "lg:flex lg:flex-col lg:justify-center lg:pb-5",
+            "px-4 pb-3 pt-2.5 sm:px-5 sm:pb-4 lg:px-6",
+            empty ? "flex min-h-0 flex-1 flex-col justify-center" : "flex-none",
+            asSplit && "lg:flex lg:flex-col lg:justify-center lg:pb-5",
           )}>
           {head}
         </div>
 
-        {split && <div aria-hidden className="hidden bg-border lg:block" />}
+        {asSplit && <div aria-hidden className="hidden bg-border lg:block" />}
 
-        <div className={cn("flex min-h-0 flex-1 flex-col", split && "lg:justify-center")}>
-          {/* At rest a phone shows the summary only, because a 2x2 grid plus a
-              summary plus a list does not fit one phone screen; from sm up the
-              newest rows are listed too. Opening is what lets the page grow. */}
-          <div
-            id={listId}
-            className={cn(
-              "slim-scrollbar min-h-0 divide-y divide-border border-t border-border",
-              split && "lg:border-t-0",
-              open ? "flex-1 overflow-y-auto" : "hidden flex-none sm:block",
-            )}
-          >
-            {shown}
-          </div>
-
-          {more && (
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-expanded={open}
-              aria-controls={listId}
+        {!empty && (
+          <div className={cn("flex min-h-0 flex-1 flex-col", asSplit && "lg:justify-center")}>
+            {/* At rest a phone shows the summary only, because a 2x2 grid plus a
+                summary plus a list does not fit one phone screen; from sm up the
+                newest rows are listed too. Opening is what lets the page grow. */}
+            <div
+              id={listId}
               className={cn(
-                "flex flex-none items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-semibold text-primary transition-colors hover:bg-muted/60",
-                split && "lg:border-t-0",
+                "slim-scrollbar min-h-0 divide-y divide-border border-t border-border",
+                asSplit && "lg:border-t-0",
+                open ? "flex-1 overflow-y-auto" : "hidden flex-none sm:block",
               )}
             >
-              {open ? "Weniger anzeigen" : moreLabel}
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
-            </button>
-          )}
-        </div>
+              {shown}
+            </div>
+
+            {more && (
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-expanded={open}
+                aria-controls={listId}
+                className={cn(
+                  "flex flex-none items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-semibold text-primary transition-colors hover:bg-muted/60",
+                  asSplit && "lg:border-t-0",
+                )}
+              >
+                {open ? "Weniger anzeigen" : moreLabel}
+                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -1000,7 +896,11 @@ function RunVerlauf({
 
   return (
     <VerlaufCard
-      count={`${runs.length} ${runs.length === 1 ? "Durchlauf" : "Durchläufe"}`}
+      count={
+        runs.length === 0
+          ? "noch kein Durchlauf"
+          : `${runs.length} ${runs.length === 1 ? "Durchlauf" : "Durchläufe"}`
+      }
       open={open}
       onToggle={onToggle}
       restRows={VERLAUF_REST_ROWS}
@@ -1255,17 +1155,22 @@ function ModuleVerlauf({
 
   return (
     <VerlaufCard
-      count={`${practice.length} ${practice.length === 1 ? "Übung" : "Übungen"}`}
+      count={
+        practice.length === 0
+          ? "noch keine Übung"
+          : `${practice.length} ${practice.length === 1 ? "Übung" : "Übungen"}`
+      }
       open={open}
       onToggle={onToggle}
       restRows={VERLAUF_REST_ROWS}
       moreLabel={`Alle ${practice.length} anzeigen`}
       split
       head={
-        scored.length === 0 ? (
-          <NoScoreYet />
-        ) : (
-          <>
+        <>
+            {/* The SAME four columns whether or not there is data (founder s195,
+                option 2): with none they stand empty at "–", which is what
+                shows a first-time learner the shape of what practising builds.
+                Only the caption below changes. */}
             <div className="mx-auto grid w-full max-w-[28.75rem] grid-cols-4 gap-3 sm:gap-3.5">
               {MOCK_PART_ORDER.map((part) => {
                 const list = byPart[part];
@@ -1315,11 +1220,20 @@ function ModuleVerlauf({
                 );
               })}
             </div>
-            <p className="mt-2.5 text-center text-xs text-muted-foreground">
-              Blass: dein erster Versuch · Kräftig: dein Fortschritt
+            <p className="mt-2.5 text-center text-xs leading-snug text-muted-foreground">
+              {scored.length === 0 ? (
+                <>
+                  <span className="block text-sm font-semibold text-foreground">
+                    Dein Stärkeprofil
+                  </span>
+                  Übe ein Modul, dann steht hier, wie du gestartet bist und was du seitdem
+                  dazugewonnen hast.
+                </>
+              ) : (
+                "Blass: dein erster Versuch · Kräftig: dein Fortschritt"
+              )}
             </p>
           </>
-        )
       }
       rows={practice.map((p) => <PracticeRow key={p.id} entry={p} />)}
     />
