@@ -1,7 +1,52 @@
 # Project Status
 
-_Last updated: 2026-08-06 (session 196 gave all four Ohne-Zeit modules ONE Aufgabe rail, fixed the
-Sprechen debrief, and finally diagnosed the recurring red Pages deploy; see "Resume here"). Founder: "sprechen ohne zeit page tiles are all a bunch
+_Last updated: 2026-08-06 (session 197 made the Umformung's AI budget visible, previewed the KI
+chip, and then re-scoped the whole task from "how much is left" to "what did the AI actually use";
+see "Resume here")._
+
+**Session 197 (2026-08-06, branch `claude/ki-usage-task-kg0vix`): the KI-usage task.** Four founder
+prompts; one shipped change, three of analysis, and a redirect that matters more than the code.
+- **Shipped (A): the Umformung is no longer a silent AI feature.** `transform-sentence` enforces its
+  own 30/day cap and was in no allowance at all, so learners hit that wall unannounced. `AiMode`
+  gains `transform`, counted against the SAME ledger the function counts (`sentence_ai_ops`,
+  `kind = 'transform'`, paid ops only, so a cached Umformung is free on both sides), the function
+  returns `dailyLimit`/`dailyRemaining` on the responses that spend a unit, and the existing
+  `AllowanceNote` renders it in the Umformung card. It keeps its OWN budget: an Umformung has never
+  cost a Korrektur, and one round can spend three. Gates: typecheck · lint 0 errors (77 warnings,
+  baseline verified) · **625 tests** · build · check:bundle 129.8 kB. Commits `457fcbd`, `1e9f3d7`
+  on the branch, **no PR opened yet**.
+- **Previewed, not built (B): the one reserved KI chip.** `preview/ki-usage-chip.html` (artifact
+  <https://claude.ai/code/artifact/749b6ec2-d56d-4f48-bd5a-cfef4efeedb4>): four chip variants in
+  three real contexts, light/dark, three allowance states, plus three candidate AI marks. The
+  founder dismissed the pick and redirected instead.
+- **The redirect.** Founder: "this one shows just the count we arbitrarily determined. I want to
+  show the actual usage of the AI", then "whenever I use AI feature, I see some cost in the control
+  center. Does that mean it's real money?" **Answer, from the code:** the count is real, the LIMIT
+  is ours. The control centre's figure is our own ledger, not a bill: **Gemini books 0.00** (true
+  only while the key stays inside Google's free tier — an assumption, not a measurement), **Claude
+  and GPT-5-in-`converse`** are real tokens times published rates (our hardcoded $3/$15 Sonnet and
+  $1/$5 Haiku match Anthropic's current rates), and **GPT-5 in the other three functions is a
+  hardcoded flat 0.004 $ per call**, which is the one genuinely arbitrary number. A non-zero cost
+  therefore means Gemini did NOT answer that call.
+- **The recommendation (documented, approved to record, not built).** Three steps, cheapest first:
+  **(1)** an `ai_calls` table storing what each provider actually reports (tokens in/out/cached,
+  model, cache hit) with prices moved into one config row — after this, usage is measured and only
+  cost is derived; **(2)** reconcile nightly against the providers themselves (Anthropic's Usage and
+  Cost Admin API — separate admin key, **organization account required, not individual**; OpenAI's
+  organization usage/cost endpoints) and show "ours vs theirs" side by side; Gemini has no clean
+  billing API, so its free-tier figure stays a self-measured count and the UI must say so; **(3)**
+  the learner-facing number stays counts, never money. Full reasoning in `docs/DECISIONS.md` §s197.
+**Resume here:** start step 1 (no accounts or keys needed, and it unblocks steps 2 and 3). Open
+alongside it: the branch has unmerged work and **no PR yet** (part A plus the preview file); part B
+is previewed and awaiting a pick, superseded in priority but not cancelled (note for whoever builds
+it: `Sparkles` is NOT available as the AI mark, Quiz/empty states/onboarding use it); and the
+five-minute `pages.yml` `timeout` raise from s196 is still untaken. Also still open from earlier
+sessions: the Prüfung hub loads ~825 kB of content banks via `engine/exam`, no exam set is `anruf`
+shaped, the authored dialogue `nodes` graphs are dead but not retired, and CLAUDE.md sits at ~372
+lines against its ~350 budget.
+
+_Session 196 (2026-08-06) gave all four Ohne-Zeit modules ONE Aufgabe rail, fixed the
+Sprechen debrief, and finally diagnosed the recurring red Pages deploy. Founder: "sprechen ohne zeit page tiles are all a bunch
 tiles as list ... it should somehow look like schreiben with a filter rail ... same should apply for
 lesen and horen ... the evaluation couldn't be done ... and the verlauf section isn't updated with
 this progress. it's basically lost."
@@ -262,47 +307,6 @@ Shipped as **PR #813**, squash-merged into `main`.
 **Resume here:** nothing is open. The greeting→title swap is scoped to `/anwenden` only; the
 founder's other example ("Bibliothek") read as illustrative of the pattern rather than a request
 to retitle that page today. `navItems` already carries every route's label if that changes.
-
-**Handoff after session 195 (2026-08-06): the Prüfung zone got ONE frame
-(branch `claude/prufung-hub-design-consistency-193qrh`).**
-Two founder prompts. The first asked for a review of the zone's inconsistent back buttons and empty
-space; the second picked from the options it produced.
-- **Prompt 1, the review.** Six findings, all read from the code: FOUR back-button treatments in
-  THREE positions, the word `Zurück` on two controls of one screen, two screens with no exit at
-  all (desktop Schreiben, a running practice conversation), FOUR content widths, three header
-  languages, and both hub tabs holding a full-viewport frame with nothing to fill it. Delivered as
-  `preview/pruefung-frame.html` (artifact
-  <https://claude.ai/code/artifact/b04df435-61f7-4d9c-ab82-ba28b50a385e>) with a five-rule spine
-  plus A/B/C for the exit and 1/2 for the empty space.
-- **Prompt 2, the pick, and it is now law.** "B for phone, C for desktop, but Zurück (untimed) and
-  the red Verlassen (timed) should ALWAYS be top right"; the confirm should appear only when there
-  is unsaved progress; the mobile Aufgabe toggle should share the switcher's row as just "Aufgabe";
-  option A's header row should be on every mobile screen; option 2 for the empty space.
-  **Built exactly that.** `useSessionStore.zoneExit` replaces `examExit`/`examUntimed` and covers
-  `/anwenden`, `/exam`, `/writing` and `/simulation`; `examStage` is now a separate flag so the
-  trainers keep their nav. `hasProgress(run)` gates the confirm (it counts a completed part and
-  `partIx > 0` too, because Teil Sprechen leaves nothing in `answers`), the Schreibtrainer asks
-  nothing because `draftAutosave` keeps its text, and a started conversation always asks. The
-  question stepper is a chevron now: desktop puts the pair beside the number strip (option C) and
-  keeps ONE primary in the footer, a phone keeps the back step in the footer because nine numbers
-  plus two buttons do not fit 360px. New `features/pruefung/ModuleHeader.tsx` (mobile module row,
-  and the `RunBar` wears the same mark) and `features/pruefung/LevelSelect.tsx` (the one Niveau
-  control, adopted by the Sprechtrainer in place of its pill row). `GuidedWritingTrainer` portals
-  its "Aufgabe" toggle into a slot `WritingHub` owns. The Anleitung is a two-column ticket, the
-  Ergebnis is two columns, the Sprechtrainer list moved to the zone's `max-w-4xl`, and both hub
-  Verlauf cards ship in an empty state that fills the frame.
-**Verified in the real build, not in a mockup** (CDP driver, three viewports, clean store per
-screen): the exit sits at the identical top-right coordinate on all 7 zone screens at 360x640,
-393x852 and 1280x900, reads "Prüfung verlassen" only in a timed run, and is absent on the hub,
-which is the zone's home. Zero page scroll and zero horizontal overflow everywhere except
-Kurz at 360x640, which rests at 99px (down from 134px shipped; the field is at its `HARD_MIN`
-floor there, the documented give-up case) and the Sprechtrainer LIST, which is a browse list.
-Gates green: build · typecheck · lint 0 errors (75 warnings, down from 77) · 610 tests ·
-check:bundle 127.1 kB of 400 · check:contrast · lint:content.
-Shipped as **PR #811**, squash-merged into `main`; the founder verifies the live result.
-**Resume here:** nothing is open. Two judgement calls to confirm if the founder disagrees: the
-module row is `lg:hidden` (they said "in mobile view"), and Kurz at 360x640 still rests ~99px
-scrolled, which drops to 0 if that row goes on Kurz/Lang.
 
 Older "Resume here" handoffs (s192 and earlier) are archived alongside their status-log entries in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
