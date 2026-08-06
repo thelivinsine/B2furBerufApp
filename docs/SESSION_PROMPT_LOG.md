@@ -4891,8 +4891,32 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   commit `bf2807d` · **PR #813**, squash-merged into `main`.
   Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
   check:bundle 129.0 kB of 400 · check:contrast.
+- **Prompt 2 (verbatim):** `there was another session ran in parallel that may have merged to main,
+  checck for such instance` (typo kept verbatim), followed by `may be it happened due to that
+  parallel session` after the first check landed.
+  **Response:** the founder had just seen run #817 ("Deploy site to GitHub Pages") show red right
+  after the merge and, reasonably, suspected a same-day parallel session (PR #812, "Ohne Zeit: one
+  Aufgabe rail for all four modules...", branch `claude/sprechen-module-bugs-qjrdca`) had collided
+  with it. Checked `list_pull_requests` and `git log origin/main`: PR #812 was still open and
+  unmerged, and `main` carried no commit past this PR's own merge. Ruled out mechanically, not just
+  asserted: `pages.yml` triggers only on a push to `main`, and there had been exactly one such push
+  in the failure window. Reported this back, and separately flagged that #812 now shows
+  `mergeable_state: "dirty"` against `main` (both PRs touched overlapping Prüfung-area docs) since
+  that is a real, if unrelated, follow-up for whoever owns that PR.
+- **Prompt 3 (verbatim):** `update me when it resolves`.
+  **Response:** re-ran the failed `deploy` job (`actions_run_trigger` `rerun_failed_jobs`) and
+  polled it via `ScheduleWakeup` rather than blocking or repeatedly reporting "still waiting":
+  checked once at +4 min (still on its first internal attempt, rescheduled silently per the
+  PR-notice convention of not messaging on no-news), then again at +14 min, where it had already
+  succeeded (completed at 12:58, ~10 min into the second full run and ~47 min after the original
+  push) on the FIRST of its 3 internal attempts, confirming the platform itself had recovered.
+- **Prompt 4 (verbatim):** `it's deployed. document the session` (founder confirmed the live site
+  directly). Documented here plus `docs/PROJECT_STATUS.md`'s s196 entries (both the top summary and
+  the fuller "Resume here" handoff) with the deploy-stall timeline, the parallel-session ruling, and
+  the PR #812 conflict flag. No code changes this round; `docs/areas/PRUEFUNG.md` and `CLAUDE.md`
+  untouched, since none of this changed a product behavior or a design law.
+- **Artifacts (prompts 2-4):** `docs/PROJECT_STATUS.md` · this log · no code changes.
 
----
 ---
 
 ## Session 196 — prompt 1 (2026-08-06)
@@ -5014,5 +5038,7 @@ wanted.
 (2-4 named variants in English in `preview/`, artifact published, pick, then implement). The
 `design` skill was loaded and the session ended there.
 
-- **Artifacts (prompt 2):** none (analysis only) · merge of `origin/main` (PR #813) into this branch,
-  commit `b33f4da`, resolving five doc conflicts by keeping BOTH sessions' facts
+- **Artifacts (prompt 2):** none (analysis only) · two merges of `origin/main` into this branch,
+  `b33f4da` (PR #813, five doc conflicts) and the PR #814 docs merge, both resolved by keeping BOTH
+  sessions' facts rather than picking a side · **PR #812**, squash-merged into `main`
+

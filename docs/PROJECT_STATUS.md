@@ -87,10 +87,22 @@ banks — the eager-bundle invariant would break otherwise. `usePruefungTab` rea
 `?tab=` param both switcher copies share, so they can never disagree.
 Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
 check:bundle 129.0 kB of 400 · check:contrast.
+**The deploy itself hit a genuine GitHub Pages platform stall after the merge**, unrelated to the
+code: `pages.yml`'s three built-in retries each sat in the Pages API's own `deployment_queued`
+state for its full 10-minute timeout and all three failed the same way, so run #817 concluded
+`failure` even though the `build` job (typecheck/build/artifact upload) had already succeeded.
+A manual re-run of just the failed `deploy` job succeeded on its first internal attempt ~47 minutes
+later once the platform recovered; nothing about the app or the workflow needed changing. Founder
+also asked whether a same-day parallel session (PR #812, still open, unmerged) could have caused
+it: ruled out, since `pages.yml` only fires on a push to `main` and there was exactly one such push
+in that window (this PR's). Worth a flag for whoever picks up PR #812 next: because this PR merged
+first, #812 showed `mergeable_state: "dirty"` against `main` (both touched overlapping
+Prüfung-area docs). RESOLVED in the #812 session by merging `main` in twice and keeping BOTH
+sessions' facts in every conflicted doc rather than picking a side.
 **Resume here:** nothing is open. The greeting-to-title swap is scoped to `/anwenden` only, per the
 founder's examples ("Prüfung or Bibliothek") reading as illustrative rather than a request to
 retitle every route today; say the word and the same pattern (via `navItems` labels) generalises
-easily.
+easily. Site confirmed live and verified by the founder at `genauly.de`.
 
 Prior s195 (2026-08-06): **The Prüfung zone was audited end to end and every
 
@@ -220,7 +232,23 @@ header like the zone's own nav label, sitting next to the toggle buttons.
   over CDP and reading the resulting URL/panel.
 Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
 check:bundle 129.0 kB of 400 · check:contrast.
-Shipped as **PR #813**, squash-merged into `main`; the founder verifies the live result.
+Shipped as **PR #813**, squash-merged into `main`.
+- **Post-merge: the Pages deploy failed, twice looked like the code but wasn't.** Founder saw a red
+  "Deploy site to GitHub Pages" run right after the merge and asked to check it. The `build` job
+  (typecheck, `pnpm build`, artifact upload) was green; only the `deploy` job's calls into GitHub's
+  Pages API failed, each of the workflow's 3 built-in retries independently stuck in
+  `deployment_queued` for the full 10-minute timeout before aborting. A platform-side stall, the same
+  class of issue this repo hit once before (2026-07-04, noted in `pages.yml`'s own comments).
+  Founder asked whether a same-day parallel session (PR #812, open, unmerged) could be the cause;
+  ruled out by checking `git log origin/main` (unchanged since this PR's merge) and confirming
+  `pages.yml` only triggers on a push to `main`, of which there was exactly one in the window.
+  Re-ran the failed `deploy` job (`rerun_failed_jobs`); it succeeded on its first internal attempt
+  ~47 minutes after the original push, once the platform recovered. **Founder confirmed the site
+  live at `genauly.de`.** Nothing in the app or the workflow needed changing.
+  **One real, unrelated finding surfaced along the way:** because this PR merged first, PR #812
+  showed `mergeable_state: "dirty"` against `main` (both sessions touched overlapping Prüfung-area
+  docs). Correctly flagged rather than fixed here; the #812 session then resolved it by merging
+  `main` in and keeping both sessions' facts in every conflicted doc.
 **Resume here:** nothing is open. The greeting→title swap is scoped to `/anwenden` only; the
 founder's other example ("Bibliothek") read as illustrative of the pattern rather than a request
 to retitle that page today. `navItems` already carries every route's label if that changes.
