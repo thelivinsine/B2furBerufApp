@@ -1,7 +1,7 @@
 # Project Status
 
-_Last updated: 2026-08-06 (session 196 gave all four Ohne-Zeit modules ONE Aufgabe rail and fixed
-the Sprechen debrief; see "Resume here"). Founder: "sprechen ohne zeit page tiles are all a bunch
+_Last updated: 2026-08-06 (session 196 gave all four Ohne-Zeit modules ONE Aufgabe rail, fixed the
+Sprechen debrief, and finally diagnosed the recurring red Pages deploy; see "Resume here"). Founder: "sprechen ohne zeit page tiles are all a bunch
 tiles as list ... it should somehow look like schreiben with a filter rail ... same should apply for
 lesen and horen ... the evaluation couldn't be done ... and the verlauf section isn't updated with
 this progress. it's basically lost."
@@ -51,15 +51,25 @@ silent, the Umformung especially. (B) ONE reserved KI chip with its count on eve
 spends a unit. The (C) "KI heute" overview panel in Settings was NOT taken. The founder-facing spend
 view already part-exists in `AdminOverview`/`AdminSystem` ("KI-Budget") if that is ever wanted
 instead.
+**The deploy round.** The merge shipped the Edge Functions fine (`converse` live at once) but
+**Deploy site to GitHub Pages** went red on #818 and #819, so the frontend lagged ~2 h. Root cause,
+finally established from run #820's full log: **a Pages deployment here takes longer than the 600 s
+the action allows**, so it self-cancels on timeout, and the leftover occasionally refuses the next
+merge. The retry chain is what rescued it (attempt 2 succeeded), so the fix is to **raise `timeout`
+(~30 min) and KEEP the retry**. This session wrote down two confident WRONG diagnoses first; both
+are left visible in `DECISIONS.md` §s196 as corrections, because generalising one run into a law is
+how this got misdiagnosed three sessions running.
 **Resume here:** start prompt 2's scope A + B. B is a new shared component, so it owes the
 preview-first round (2-4 named variants, English, `preview/`, artifact, pick, then implement); the
 `design` skill was loaded and the session ended before the previews. A is mechanical: add
-`transform` to `AiMode` in `lib/aiAllowance.ts` (count `sentence_transforms` or whatever
-`transform-sentence` writes) and wire `AllowanceNote` where it is missing. Also open, from earlier
-sessions and untouched here: the Prüfung hub still loads ~825 kB of content banks because
-`engine/exam` imports them (the real fix is precomputing availability at build time like
+`transform` to `AiMode` in `lib/aiAllowance.ts` (count whatever `transform-sentence` writes) and
+wire `AllowanceNote` where it is missing. **Also a five-minute win with its rationale already
+written: raise the `timeout` input on `actions/deploy-pages` in `pages.yml`** (it is a CI change, so
+it was deliberately left for its own review rather than riding along with a docs correction). Also
+open, from earlier sessions and untouched here: the Prüfung hub still loads ~825 kB of content banks
+because `engine/exam` imports them (the real fix is precomputing availability at build time like
 `frequency.ts`); no exam set is `anruf` shaped; the authored dialogue `nodes` graphs are dead but not
-retired; and CLAUDE.md sits at 374 lines against its ~350 budget, which the next docs pass should
+retired; and CLAUDE.md sits at ~372 lines against its ~350 budget, which the next docs pass should
 bring down._
 
 _Also in s196, from a parallel session (merged first, PR #813): **the Prüfung hub's desktop

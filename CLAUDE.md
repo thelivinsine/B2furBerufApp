@@ -168,11 +168,10 @@ after pulling.
   deletes rows, so limits, aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
   copy describing it ship in the SAME change**; never resolve a conflict between them by editing
   the copy alone.
-- **Never reload over a learner's unsaved work.** The PWA adopts deploys by reloading; every
-  automatic reload is gated on `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later
-  resume. Any new surface holding in-memory work claims it with `useLiveWork(active, label, flush)`
-  AND persists itself, so an unavoidable reload (chunk-load self-heal, manual refresh, iOS
-  discarding the tab) is recoverable rather than lost work.
+- **Never reload over a learner's unsaved work.** Every automatic reload is gated on
+  `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later resume. Any new surface holding
+  in-memory work claims it with `useLiveWork(active, label, flush)` AND persists itself, so an
+  unavoidable reload is recoverable rather than lost work.
 - **A tile the learner EXPANDS obeys one rule, everywhere, filters included** (founder s189):
   at rest the page does not scroll; expanding releases the page's height cap (`.h-page-stage`); the
   expanded tile is never taller than one screen (`.max-h-panel-stage`), so its own borders stay
@@ -197,12 +196,10 @@ after pulling.
   re-renders under the click (a switcher pill that navigates, a filter toggle that swaps its own
   subtree) can come back focused and keep matching, and the browsers disagree on when. Never answer
   a stray ring by deleting the indicator outright.
-- **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190).
-  s189 moved the desktop Bibliothek scroll into the content column and three separate things kept
-  reading `window.scrollY`, which silently retired the go-to-top button on desktop; a scroll
-  container also SLICES what crosses its edge, so its edges need `useEdgeFade`, and a rail beside it
-  needs `self-start` or the grid stretches it to its cap. Hooks take the scroll root
-  (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by assumption.
+- **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
+  hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
+  assumption. A scroll container also SLICES what crosses its edge (`useEdgeFade`), and a rail
+  beside it needs `self-start` or the grid stretches it to its cap.
 - **Design landmines:** the `/design` skill §7 lists everything shipped-then-reverted; never
   reintroduce an item on that list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior
@@ -326,19 +323,15 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   file is applied wherever its number sits. **`pnpm lint:migrations` gates this since s185** (files
   ≤ 0014 are exempt as already-applied history; never raise that baseline to silence a new file).
   Migrations run BEFORE the function deploys, so a non-idempotent statement blocks the whole
-  backend deploy.
-  The workflow also carries three dispatch-only rescue inputs (`list_only`, `probe_schema`,
-  `repair_applied`); `docs/areas/COMMANDS.md` says what each prints and when to reach for it.
+  backend deploy. Three dispatch-only rescue inputs exist (`list_only`, `probe_schema`,
+  `repair_applied`); see `docs/areas/COMMANDS.md`.
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
-- **A red Pages deploy means the 600 s timeout is too short, not that the build broke** (s196). A
-  Pages deployment for this repo currently takes LONGER than that, so the action aborts and cancels
-  its own deployment; the 3-attempt retry then usually rescues it (run #820 succeeded on attempt 2)
-  but sometimes the re-request returns cancelled, and a leftover can refuse the NEXT merge ("in
-  progress deployment. Please cancel <sha> first"). `concurrency: group: pages` does not help: that
-  lock releases with the WORKFLOW, not the deployment. **Workaround: re-run the workflow.** Fix,
-  not yet taken: RAISE `timeout` on `actions/deploy-pages` (~30 min) and keep the retry. Why →
+- **A red Pages deploy means the 600 s timeout is too short, not that the build broke** (s196): a
+  deployment here takes longer than that, so the action self-cancels, and the leftover sometimes
+  refuses the NEXT merge. The 3-attempt retry usually rescues it. **Workaround: re-run the
+  workflow.** Fix, not taken yet: RAISE `timeout` (~30 min), keep the retry. Why →
   `docs/DECISIONS.md` §s196.
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
   before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft

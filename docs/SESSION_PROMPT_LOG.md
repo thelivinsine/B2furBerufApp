@@ -5042,3 +5042,64 @@ wanted.
   `b33f4da` (PR #813, five doc conflicts) and the PR #814 docs merge, both resolved by keeping BOTH
   sessions' facts rather than picking a side · **PR #812**, squash-merged into `main`
 
+
+---
+
+## Session 196 — prompts 3-6 (2026-08-06): the deploy round
+
+**Branch:** `claude/sprechen-module-bugs-qjrdca`
+
+- **Prompt 3 (verbatim):** `merge the changes to main and document the session. we can continue in
+  another session`
+  **Response:** merged PR #812. It took two `main` merges to get there, because a parallel session
+  landed PRs #813 and #814 mid-work; every conflicted doc was resolved by keeping **both** sessions'
+  facts rather than picking a side, and the append-only prompt log kept both sessions' entries in
+  merge order. Post-merge housekeeping done (`fetch` → `reset --hard origin/main` →
+  `push --force-with-lease`). Flagged honestly that GitHub stopped queuing CI runs for the later
+  pushes, so only the first commit was verified by CI; the rest were verified locally with the full
+  gate set.
+
+- **Prompts 4 and 5 (screenshots, no text):** two screenshots of the Actions list showing **Deploy
+  site to GitHub Pages** red on #818 (`7def4d2`) and #819 (`2c541e1`).
+  **Response:** investigated rather than re-running blindly. This is where the session produced two
+  WRONG diagnoses before the right one, all recorded in `docs/DECISIONS.md` §s196:
+  1. First read (tail of the log only): "not flake, the workflow's own retry does it to itself."
+     Overstated.
+  2. Second read: "a Pages-side stall; the retry chain is structurally incapable of recovering,
+     delete it." Confident, documented as law, and **wrong** — see prompt 7.
+
+- **Prompt 6 (verbatim):** `can you do a new deploy then?`
+  **Response:** triggered a fresh `workflow_dispatch` run of `pages.yml` against `main` (run #820)
+  rather than re-running the failed one, since a fresh run rebuilds and re-creates the deployment
+  from scratch. Build green in 54 s; the deploy step then ran far past the 600 s that had killed
+  #819, which was the first sign the earlier diagnosis was off. Stopped the every-few-minutes
+  polling partway through and said so, rather than keep spending the session on it.
+
+---
+
+## Session 196 — prompts 7-8 (2026-08-06): the correction, and closing out
+
+**Branch:** `claude/sprechen-module-bugs-qjrdca`
+
+- **Prompt 7 (verbatim):** `it's done` (founder confirmed the live site).
+  **Response:** pulled the complete job log, which **disproved the diagnosis already written into
+  `CLAUDE.md` and `DECISIONS.md`**, so the first action was to correct it, not to close out.
+  What run #820 actually shows: the deployment sat at `deployment_in_progress` from 14:50:26 to
+  15:00:30 without finishing, hit the 600 s timeout, cancelled itself — and then **attempt 2
+  re-created the same deployment and reported `Reported success!` at 15:04:17**. The site went live
+  BECAUSE of the retry chain this session had recommended deleting.
+  **Root cause, finally:** a Pages deployment for this repo takes longer than the 600 s the action
+  is given. Everything else (the self-cancel, the occasional leftover that refuses the next merge
+  with "in progress deployment. Please cancel `<sha>` first") follows from that one fact.
+  **The fix therefore flips:** RAISE `timeout` on `actions/deploy-pages` (~30 min) and KEEP the
+  retry. The wrong claim is left visible in `DECISIONS.md` as an explicit correction rather than
+  quietly overwritten, because generalising one run into a law is exactly how this area got
+  misdiagnosed three sessions running. Then merged PR #815 and did the housekeeping.
+
+- **Prompt 8 (verbatim):** `document the session`
+  **Response:** this entry plus the `docs/PROJECT_STATUS.md` s196 handoff. Also checked run #821
+  (the docs merge's own Pages deploy) rather than leaving it unobserved.
+
+- **Artifacts (prompts 3-8):** `CLAUDE.md` · `docs/DECISIONS.md` §s196 · `docs/PROJECT_STATUS.md` ·
+  this log · **PR #812** (the chooser + Sprechen work) and **PR #815** (the deploy diagnosis), both
+  squash-merged into `main` · no `pages.yml` change (deliberately left for its own review)
