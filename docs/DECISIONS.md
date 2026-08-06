@@ -1777,3 +1777,52 @@ and stayed green throughout, which is why the s196 `converse` fix went live whil
 When the founder says "I don't see the change", check WHICH of the two deploys failed before
 suspecting the code.
 
+
+## s197 — the Prüfung hub's page title, and why the answer was to delete it
+
+**Founder, on the s196 result:** "it created this funny looking page ... It is looking ridiculous at
+the moment", asking for previews of the whole page before anything else was built.
+
+**What s196 had been asked for** (s196 prompt 1): "Instead of guten morgen greeting, use that space
+to show a big header like Prufung or Bibliothek **aligned to left vertically with the toggle
+buttons**".
+
+**Why the shipped answer failed.** It read "aligned to left" as the APP header's left gutter and put
+the title there, beside a second copy of the tab switcher. That gutter is a different left edge from
+every control the title was supposed to line up with. Worse, the page underneath already nested
+THREE separately centred widths — a `lg:max-w-4xl` panel column, holding a `max-w-[30rem]` module
+grid (s196's own answer to "the tiles look empty"), holding a `max-w-[26rem]` Stärkeprofil — so the
+tiles started ~220px right of the title, a narrow tile island floated over a full-width Verlauf
+card, and the empty Stärkeprofil filled half of the widest card on the page with grey slabs at "–".
+Four different left edges on one screen, of which the title was only the most visible.
+
+**The round.** `preview/pruefung-header-align.html` (artifact
+<https://claude.ai/code/artifact/77b2bdcf-aa2d-431d-a45a-cd6ea9d16c49>): the diagnosis at today's
+measured widths, then **A** title inside the page (h1 left, switcher right, one column), **B** title
+stays in the app header and the PAGE moves to its left edge, **C** no title at all, the switcher IS
+the page header, which is what the Bibliothek and Schreiben pages already do. All three collapsed
+the nested widths into one column; the page carried live Theme / Column-width / Alignment-guide
+switches so the measurement itself could be picked.
+
+**Founder picked C at "medium" (640px).** So the app keeps the part of s196 that was actually
+wanted (no greeting on this route) and drops the title that was the misreading. The nav tab is lit
+"Prüfung" already; a page title would have been the third place the word appears.
+
+**The width is measured from the TILES, not chosen for the page.** s196 locked "the module grid is
+capped narrower than the column". That lock existed because wide tiles read as empty strips, and it
+is honoured here in the only way that also lets the page have one edge: `HUB_COL` (`max-w-[40rem]`)
+IS the tile grid's width, so the grid needs no cap of its own. Flagged in the preview rather than
+overridden silently, because it re-reads a locked rule.
+
+**Two smaller findings, both from measuring rather than looking.** The practice row inside the
+Verlauf's right half had exactly 0px spare at `sm:gap-4 lg:px-6` (72+28+55+53 of content, 48 of
+gaps, 40 of padding, in 296px), so the score badge wrapped its "%" and the module name truncated to
+"Schre..."; and the Stärkeprofil's mark-beside-name label pushed "Schreiben" through the card's
+divider into the list. Both are what a narrower card exposes in a layout that was only ever tested
+at a wider one.
+
+**Known and NOT fixed here:** the hub still rests 54px scrolled at a 1023px-wide window and 43px on
+a 360×640 phone (63px before this change; measured against a build of `main`, so neither is new).
+Both come from the Verlauf card being `flex-none` at rest, so it cannot give room back on a short
+stage; fixing it means letting its collapsed list scroll inside the card, which changes s195/s196
+Verlauf behaviour and is the founder's call, not a silent side effect of a layout PR.
