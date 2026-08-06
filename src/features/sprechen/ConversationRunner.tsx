@@ -49,7 +49,8 @@ export function ConversationRunner({
   brief,
   onExit,
   onFinished,
-  /** Rendered above the stage in exam mode (the RunBar). */
+  onBusyChange,
+  /** Rendered above the stage: the exam's RunBar, or practice's ModuleHeader. */
   header,
 }: {
   brief: ConversationBrief;
@@ -63,6 +64,12 @@ export function ConversationRunner({
   onExit: (score: number | null) => void;
   /** The debrief landed. Practice uses this to mark the scenario done. */
   onFinished?: (score: number | null) => void;
+  /**
+   * True once the conversation is live, i.e. once leaving would throw a run
+   * away. The caller owns the way out (the shell's one exit, s195), so it has
+   * to know when that exit needs a confirm.
+   */
+  onBusyChange?: (talking: boolean) => void;
   header?: React.ReactNode;
 }) {
   const [phase, setPhase] = useState<Phase>("brief");
@@ -90,6 +97,12 @@ export function ConversationRunner({
   // on top of it. There is nothing to flush (the transcript of record lives
   // server-side, written turn by turn), so the reload is simply deferred.
   useLiveWork(phase === "running", "Sprechen");
+
+  // The same fact the caller's exit needs (s195): a started conversation cannot
+  // be resumed, so leaving it costs the run and has to ask first.
+  useEffect(() => {
+    onBusyChange?.(phase === "running");
+  }, [phase, onBusyChange]);
 
   // A live microphone or a speaking partner must never outlive the screen.
   useEffect(() => () => stopSpeaking(), []);

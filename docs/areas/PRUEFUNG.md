@@ -21,8 +21,42 @@ room. What may grow is a Verlauf, and only when the learner opens it (`useStageP
 **Mit Zeit / Ohne Zeit is one switch beside the Niveau**, resting on Ohne Zeit, and it is the only
 way into the free trainers: `/writing` and `/simulation` are what the SAME four modules do without
 a clock, never a fifth block. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit
-skips the Anleitung and opens the drill, calls its exit Zurück in neutral grey, and asks nothing
-when nothing has been written. Only the STAGE is shared.
+skips the Anleitung and opens the drill. Only the STAGE is shared.
+
+## One frame for the whole zone (founder s195)
+
+The zone had four different back buttons in three positions, two screens with none at all, and
+five content widths. One law now covers all eight screens.
+
+- **ONE exit, top right, always.** `useSessionStore.zoneExit` holds `{ run, tone }`; `AppShell`
+  renders it as the LAST control in the header on `/anwenden`, `/exam`, `/writing` and
+  `/simulation`, and nowhere else. `tone: "danger"` is the red **Verlassen** while a clock is
+  running; `tone: "quiet"` is the grey **Zurück** everywhere else, trainers included. It is a
+  callback because the exam owns its confirm and because `AppShell` may not import `useExamStore`
+  (the keep-eager-code-light invariant). `examStage` is a SEPARATE flag: it strips the sidebar,
+  the bottom bar and the streak, and only a run sets it.
+- **The confirm is about losing work, not about the clock.** `hasProgress(run)` decides: any
+  answer, note, essay text, recorded part result, or having advanced past Teil 1. With nothing to
+  lose the exit just leaves, timed or not; with something to lose it asks "Dein Fortschritt wird
+  nicht gespeichert. Möchtest du wirklich zurück?". The Schreibtrainer never asks, because
+  `draftAutosave` keeps its text (a warning there would be false); a started conversation always
+  does, because it cannot be resumed.
+- **The word Zurück belongs to that exit alone.** The previous-question control in Lesen/Hören is
+  a chevron now: on a desktop the pair flanks the number strip (founder pick C) and the footer is
+  ONE primary button; on a phone there is no room for that pair, so the back step stays in the
+  footer as an icon beside the primary.
+- **Mobile carries the module row on every screen** (`features/pruefung/ModuleHeader.tsx`, founder
+  pick A). In a Teil that row IS the `RunBar`, which now wears the same `PART_META` mark. It holds
+  no back button and is `lg:hidden`: on a desktop the room belongs to the task.
+- **ONE Niveau control** (`features/pruefung/LevelSelect.tsx`), shared by the hub and the
+  Sprechtrainer, which used a row of level pills before.
+- **One width at rest:** `max-w-4xl`, the Sprechtrainer list included. The wide `lg:max-w-6xl`
+  stage is a RUNNING Teil's alone, and the two screens that sat 448px wide inside it are
+  compositions for that width now: the Anleitung is a two-column ticket and the Ergebnis puts the
+  score and the bars beside what to do next.
+- **The Verlauf card is on the page from the first visit** (founder pick 2). Empty it shows the
+  shape of what is coming and takes the room the tab has left, because both tabs hold a
+  one-viewport frame whose lower half was otherwise blank until a learner had history.
 
 **The scope lives in the URL** (s194): `?tab=`, `?level=`, `?zeit=mit`. A reload, a share and the
 browser's back button all land where the learner was, and the Niveau travels into a trainer with

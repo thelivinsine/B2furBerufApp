@@ -1,16 +1,26 @@
-import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Clock, Mic, Play, RotateCw, Star } from "lucide-react";
+import { Clock, Play, RotateCw, Star } from "lucide-react";
 import { scenarios } from "@/data/dialogues";
 import { speakingBrief } from "@/engine/speaking";
 import { XP } from "@/engine/scoring";
 import type { Scenario } from "@/types";
 import { useProgressStore } from "@/store/useProgressStore";
+import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BackToPruefung } from "@/features/writing/bottomChrome";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { LevelSelect } from "@/features/pruefung/LevelSelect";
+import { ModuleHeader } from "@/features/pruefung/ModuleHeader";
+import { PART_META } from "@/features/exam/partMeta";
 import { ConversationRunner } from "./ConversationRunner";
 import { cn } from "@/lib/utils";
 
@@ -37,12 +47,20 @@ const LEVELS = [
 /** The hub's Niveau, mapped onto the scenarios' own 1-3 ladder. */
 const LEVEL_BY_BAND: Record<string, number> = { A2: 1, B1: 1, B2: 2, C1: 3 };
 
+/** The module mark, so this page's cards match the hub's Sprechen tile. */
+const SprechenMark = PART_META.sprechen.icon;
+
 export function SprechenHub() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const scenariosDone = useProgressStore((s) => s.scenariosDone);
   const completeScenario = useProgressStore((s) => s.completeScenario);
   const registerSession = useProgressStore((s) => s.registerSession);
   const addXp = useProgressStore((s) => s.addXp);
+  const setZoneExit = useSessionStore((s) => s.setZoneExit);
+  /** True once the learner is actually talking, so leaving would lose the run. */
+  const [talking, setTalking] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Both the running scenario and the scope live in the URL, so a reload, a
   // share and the browser's back button all land where the learner was.
@@ -54,12 +72,39 @@ export function SprechenHub() {
   const band = params.get("level") ?? "";
   const wanted = LEVEL_BY_BAND[band] ?? null;
 
-  const setActive = (sc: Scenario | null) => {
-    const p = new URLSearchParams(params);
-    if (sc) p.set("sz", sc.id);
-    else p.delete("sz");
-    setParams(p, { replace: !sc });
-  };
+  const setActive = useCallback(
+    (sc: Scenario | null) => {
+      const p = new URLSearchParams(params);
+      if (sc) p.set("sz", sc.id);
+      else p.delete("sz");
+      setParams(p, { replace: !sc });
+    },
+    [params, setParams],
+  );
+
+  /**
+   * The zone's one exit, in the shell's top-right corner like every other
+   * Prüfung screen (founder s195). It replaces the pill that used to sit above
+   * the list, and it covers the running conversation, which had no way out at
+   * all.
+   *
+   * From the list it leaves for the hub; from a conversation it steps back to
+   * the list, because that is the screen the learner came from. A conversation
+   * that has started asks first: unlike a writing draft it is not autosaved and
+   * cannot be resumed, so leaving really does throw the run away (founder s195:
+   * the confirm appears when there is unsaved progress, and only then).
+   */
+  useEffect(() => {
+    setZoneExit({
+      tone: "quiet",
+      run: () => {
+        if (!activeId) return navigate("/anwenden");
+        if (talking) return setConfirmOpen(true);
+        setActive(null);
+      },
+    });
+    return () => setZoneExit(null);
+  }, [activeId, talking, navigate, setActive, setZoneExit]);
 
   const setBand = (next: string) => {
     const p = new URLSearchParams(params);
@@ -76,11 +121,67 @@ export function SprechenHub() {
     [wanted],
   );
 
+  /** Honest counts per Niveau, the same contract the hub's list follows. */
+  const levelOptions = useMemo(
+    () => [
+      { value: "", label: "Alle", note: `${scenarios.length} Situationen` },
+      ...LEVELS.map((l) => {
+        const n = scenarios.filter((s) => s.level === l.level).length;
+        return {
+          value: l.band,
+          label: l.band,
+          note: n === 0 ? "keine Inhalte" : `${n} Situationen`,
+          empty: n === 0,
+        };
+      }),
+    ],
+    [],
+  );
+
+  /**
+   * Asked before a started conversation is thrown away. The exam's own confirm
+   * lives with the runner; this one belongs here because this screen owns the
+   * decision to leave (the runner is also the exam's, where leaving means
+   * something else).
+   */
+  const leaveDialog = (
+    <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <DialogContent className="gap-3">
+        <DialogHeader>
+          <DialogTitle className="pr-8 text-base">Gespräch verlassen?</DialogTitle>
+          <DialogDescription>
+            Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex gap-2.5">
+          <Button variant="outline" className="flex-1" onClick={() => setConfirmOpen(false)}>
+            Weiter sprechen
+          </Button>
+          <Button
+            variant="danger"
+            className="flex-1"
+            onClick={() => {
+              setConfirmOpen(false);
+              setActive(null);
+            }}
+          >
+            Verlassen
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (active) {
     return (
-      <div className="mx-auto flex h-page-stage w-full max-w-2xl flex-col">
+      <div className="mx-auto flex h-page-stage w-full max-w-2xl flex-col gap-3">
+        {leaveDialog}
         <ConversationRunner
           brief={speakingBrief(active)}
+          // Mobile carries the module row on every screen of the zone (founder
+          // s195); in the exam this same slot is the RunBar.
+          header={<ModuleHeader part="sprechen" />}
+          onBusyChange={setTalking}
           onExit={() => setActive(null)}
           onFinished={() => {
             // Marked done when the debrief lands, not when the learner leaves,
@@ -99,41 +200,25 @@ export function SprechenHub() {
   const recommendedId = scenarios.find((s) => !scenariosDone.includes(s.id))?.id;
 
   return (
-    <div className="space-y-5 sm:space-y-8">
-      {/* The scope row, in the Prüfung hub's shape: the Niveau it was opened
-          with, and the one way back. */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-sm text-muted-foreground">Niveau</span>
-          <button
-            type="button"
-            onClick={() => setBand("")}
-            aria-pressed={!band}
-            className={cn(
-              "rounded-md px-2.5 py-1 text-xs font-semibold transition-colors",
-              !band ? "bg-accent/30 text-accent-ink" : "bg-muted text-muted-foreground hover:text-foreground",
-            )}
-          >
-            Alle
-          </button>
-          {LEVELS.map((l) => (
-            <button
-              key={l.band}
-              type="button"
-              onClick={() => setBand(l.band)}
-              aria-pressed={band === l.band}
-              className={cn(
-                "rounded-md px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors",
-                band === l.band
-                  ? "bg-accent/30 text-accent-ink"
-                  : "bg-muted text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {l.band}
-            </button>
-          ))}
-        </div>
-        <BackToPruefung />
+    // The zone's column at rest (founder s195, shared rule 1): the same 896px
+    // the hub uses, so stepping from the hub into this list does not change the
+    // page's width. It was the full 1152px shell column before.
+    <div className="mx-auto w-full max-w-4xl space-y-5 sm:space-y-8">
+      {leaveDialog}
+      {/* Mobile: the module row every screen of the zone carries. */}
+      <ModuleHeader part="sprechen" />
+
+      {/* The scope row, in the Prüfung hub's shape: ONE Niveau control, the same
+          compact dropdown the hub uses (founder s195). A second row of level
+          pills here was the zone's third header language. */}
+      <div className="flex items-center justify-center">
+        <LevelSelect
+          // A2 has no speaking pool of its own (it shares the Einsteiger set),
+          // so the hub's A2 shows here as the band that actually serves it.
+          value={band === "A2" ? "B1" : band}
+          options={levelOptions}
+          onSelect={setBand}
+        />
       </div>
 
       {byLevel.map(({ level, label, items }) => (
@@ -165,8 +250,15 @@ export function SprechenHub() {
                   >
                     <CardContent className="flex h-full flex-col gap-3 p-5">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-300">
-                          <Mic className="h-5 w-5" />
+                        {/* The module's own mark (founder s195, shared rule 5):
+                            Sprechen was one colour on the hub and another here. */}
+                        <div
+                          className={cn(
+                            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                            PART_META.sprechen.tile,
+                          )}
+                        >
+                          <SprechenMark className={cn("h-5 w-5", PART_META.sprechen.ink)} />
                         </div>
                         <div className="flex gap-1.5">
                           {recommended && <Badge variant="accent">Empfohlen</Badge>}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
@@ -14,7 +14,9 @@ import {
   type WritingMode,
 } from "./resumeDraft";
 import { AuthDialog } from "@/features/auth/AuthDialog";
+import { ModuleHeader } from "@/features/pruefung/ModuleHeader";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useSessionStore } from "@/store/useSessionStore";
 
 const TABS: WritingTab[] = ["fokus", "kurz", "lang", "verlauf"];
 function isTab(v: string | null): v is WritingTab {
@@ -36,6 +38,36 @@ export function WritingHub() {
   const [params, setParams] = useSearchParams();
   const rawMode = params.get("mode");
   const tab: WritingTab = isTab(rawMode) ? rawMode : "fokus";
+  const navigate = useNavigate();
+  const setZoneExit = useSessionStore((s) => s.setZoneExit);
+
+  /**
+   * The zone's one exit, in the shell's top-right corner like every other
+   * Prüfung screen (founder s195). It replaces the pill that used to sit in the
+   * mobile action cluster, which had no desktop counterpart at all.
+   *
+   * No confirm here, deliberately: `draftAutosave` keeps the current text of
+   * each mode on disk while the learner types, so leaving loses nothing and a
+   * "dein Fortschritt wird nicht gespeichert" would be a false warning. The
+   * confirm belongs to the exam, where abandoning really does discard answers.
+   *
+   * It goes to `/anwenden` rather than back through history: `/writing` is
+   * reached from the hub's Schreiben card, from the dashboard recommendation
+   * and from ⌘K, and "zurück" has to mean the same place from all three.
+   */
+  useEffect(() => {
+    setZoneExit({ tone: "quiet", run: () => navigate("/anwenden") });
+    return () => setZoneExit(null);
+  }, [navigate, setZoneExit]);
+
+  /**
+   * Where the active trainer parks its scope toggle on a phone (founder s195:
+   * "put the aufgabe wahlen button and the toggle buttons on the same row by
+   * shortening it to just Aufgabe"). The trainer owns the button's open state
+   * and the panel it opens, so it portals the button up here rather than the
+   * state being lifted into this file.
+   */
+  const [toolbarSlot, setToolbarSlot] = useState<HTMLElement | null>(null);
 
   const status = useAuthStore((s) => s.status);
   const isSignedIn = status === "signedIn";
@@ -141,14 +173,26 @@ export function WritingHub() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* No page header: the switcher names the section (Bibliothek rule, s92).
-          Content-column width on desktop, level with the trainer grids below. */}
+    <div className="space-y-3 sm:space-y-6">
+      {/* The module row, mobile only (founder s195): the trainer never said
+          which module of the Prüfung zone it belongs to. No page header beyond
+          it: the switcher names the section (Bibliothek rule, s92). */}
+      <ModuleHeader part="schreiben" />
+
+      {/* Content-column width on desktop, level with the trainer grids below. */}
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
-        <div className="lg:col-start-1">
+        <div className="flex items-stretch gap-2 lg:col-start-1 lg:block">
           {/* Capped + centered on desktop (founder s149: full column width with
-              four short labels read oversized); mobile stays full width. */}
-          <WritingModeSwitcher value={tab} onChange={setTab} className="lg:mx-auto lg:max-w-xl" />
+              four short labels read oversized); mobile stays full width, minus
+              the trainer's own toggle when it has one. */}
+          <WritingModeSwitcher
+            value={tab}
+            onChange={setTab}
+            className="min-w-0 flex-1 lg:mx-auto lg:max-w-xl"
+          />
+          {/* `empty:hidden` keeps the switcher full width on the two tabs that
+              park nothing here (Fokus, Verlauf) instead of leaving a gap. */}
+          <div ref={setToolbarSlot} className="flex shrink-0 items-stretch empty:hidden lg:hidden" />
         </div>
       </div>
 
@@ -188,6 +232,7 @@ export function WritingHub() {
                 initialText={resumeText}
                 initialTheme={resumeTheme}
                 initialPromptIndex={resumePromptIndex}
+                toolbarSlot={toolbarSlot}
               />
             )}
           </motion.div>

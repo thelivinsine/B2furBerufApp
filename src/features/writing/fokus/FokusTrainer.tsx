@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { FeedbackLangChip } from "../FeedbackLang";
-import { BackToPruefung, MobileAiNote } from "../bottomChrome";
+import { MobileAiNote } from "../bottomChrome";
 import { GrammarRail } from "./GrammarRail";
 import { GrammarDials } from "./GrammarDials";
 import { UmlautKeys } from "../UmlautKeys";
@@ -795,9 +795,10 @@ export function FokusTrainer({
               className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
             >
               {/* Every control sits on its own opaque backing (see
-                  `floatingCluster`); BackToPruefung is already solid. */}
+                  `floatingCluster`). The Zurück pill that used to lead this row
+                  moved to the shell's top-right corner in s195, where it is the
+                  same control on every screen of the zone. */}
               <div className="flex items-stretch gap-2">
-                <BackToPruefung />
                 <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
                   {korrigierenButton}
                 </div>

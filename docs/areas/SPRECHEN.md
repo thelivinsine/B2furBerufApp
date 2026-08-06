@@ -127,7 +127,7 @@ never leaves the device, which is why the privacy policy can say so.
 | `features/sprechen/ConversationDebrief.tsx` | Goals, correction card, Redemittel. |
 | `features/sprechen/MicCluster.tsx` | The shared control cluster + typed fallback. |
 | `features/sprechen/useSpeechInput.ts` | The microphone, over `engine/speech.ts`. |
-| `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. Reads `?level=` and `?sz=`, and carries the same Zurück to the Prüfung hub the Schreibtrainer has. |
+| `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. Reads `?level=` and `?sz=`. Registers the zone's ONE exit (s195): from the list it leaves for the hub, from a started conversation it asks first, because a conversation cannot be resumed. Its Niveau is the shared `LevelSelect`, not a row of pills; its cards wear the Sprechen mark; the list sits in the zone's `max-w-4xl` column. |
 | `features/exam/SprechenPart.tsx` | Teil Sprechen of the Modelltest. |
 | `lib/speaking.ts` | Edge Function client. |
 | `supabase/functions/converse/` | Turns + debrief, all secrets, all guards. |

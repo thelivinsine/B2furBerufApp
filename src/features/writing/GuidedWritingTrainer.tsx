@@ -65,7 +65,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BackToPruefung, MobileAiNote } from "./bottomChrome";
+import { MobileAiNote } from "./bottomChrome";
 import { cn } from "@/lib/utils";
 
 /**
@@ -178,9 +178,16 @@ export function GuidedWritingTrainer({
   initialText = "",
   initialTheme,
   initialPromptIndex,
+  toolbarSlot = null,
 }: {
   length: WritingLength;
   isSignedIn: boolean;
+  /**
+   * The mobile row beside the mode switcher, owned by `WritingHub`. The Aufgabe
+   * toggle is portalled into it (founder s195) so the two controls share one
+   * row on a phone instead of costing two; the panel it opens stays here.
+   */
+  toolbarSlot?: HTMLElement | null;
   onRequireAuth: (payload: {
     theme: ThemeId;
     length: WritingLength;
@@ -869,23 +876,33 @@ export function GuidedWritingTrainer({
   return (
     <div ref={rootRef}>
       {/* Mobile: the Bibliothek pattern, a toolbar button toggling the
-          collapsible "Aufgabe wählen" panel (no floating chip row). */}
-      <div ref={pickerRef} className="mb-4 space-y-3 lg:hidden">
-        <div className="flex justify-center">
+          collapsible "Aufgabe wählen" panel (no floating chip row). Since s195
+          the BUTTON rides in the switcher's row (portalled into `toolbarSlot`)
+          and is labelled just "Aufgabe", so the two controls cost one row
+          instead of two; the panel it opens still belongs here, directly under
+          the row, which is what makes the toggle read as opening it. */}
+      {toolbarSlot &&
+        createPortal(
           <Button
             /* Closed = the Himmelblau tile of the rail it opens (founder s166,
                the `outline` fill was too faint against the page ground). */
             variant={pickerOpen ? "default" : "accent"}
             aria-expanded={pickerOpen}
             aria-pressed={pickerOpen}
-            className="h-10 rounded-lg font-semibold"
+            aria-label="Aufgabe wählen"
+            // No icon: at 360 the four switcher labels beside it need every
+            // pixel, and "Aufgabe" with a chevron says what it opens on its own.
+            className="h-auto shrink-0 gap-1 self-stretch rounded-lg px-2.5 text-[13px] font-semibold"
             onClick={() => setPickerOpen((o) => !o)}
           >
-            <Target className="h-4 w-4" />
-            Aufgabe wählen
-            <ChevronDown className={cn("h-4 w-4 transition-transform", pickerOpen && "rotate-180")} />
-          </Button>
-        </div>
+            Aufgabe
+            <ChevronDown
+              className={cn("h-4 w-4 shrink-0 transition-transform", pickerOpen && "rotate-180")}
+            />
+          </Button>,
+          toolbarSlot,
+        )}
+      <div ref={pickerRef} className={cn("space-y-3 lg:hidden", pickerOpen && "mb-4")}>
         <AnimatePresence initial={false}>
           {pickerOpen && (
             <motion.div
@@ -977,9 +994,11 @@ export function GuidedWritingTrainer({
             className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden"
           >
             {/* Every control sits on its own opaque backing (see
-                `floatingCluster`); BackToPruefung is already solid. */}
+                `floatingCluster`). The Zurück pill that used to lead this row
+                moved to the shell's top-right corner in s195, where it is the
+                same control on every screen of the zone; the primary action
+                takes the whole row now. */}
             <div className="flex items-stretch gap-2">
-              <BackToPruefung />
               {/* Nothing to evaluate while the scope has no Aufgabe: the cluster
                   keeps its geometry, the button that would only be disabled is
                   not printed. */}

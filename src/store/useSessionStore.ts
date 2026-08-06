@@ -38,28 +38,34 @@ interface SessionState {
   setFocusMode: (on: boolean) => void;
 
   /**
-   * Exam chrome (s186, founder): while a Modelltest run is on screen
-   * the mobile bottom bar is hidden and the header drops the streak pill and
-   * account menu, so nothing competes with the task; the header keeps the logo
-   * and gains ONE quiet exit.
+   * The Prüfung zone's ONE way out (founder s195: "the zurück button for
+   * untimed exercises and verlassen (red) button for timed exercises ... should
+   * always be on the top right corner"). Every screen in the zone registers it
+   * and AppShell renders it in that one corner, at every width: the exam parts,
+   * the Anleitung and the Ergebnis, the Schreibtrainer and the Sprechtrainer.
+   * Before s195 there were four different controls in three positions, and two
+   * screens had none at all.
    *
-   * The runner registers its own exit handler here (it owns the confirm dialog
-   * and the exam copy) and clears it on unmount, so a non-null value IS the
-   * "exam chrome" flag. A callback rather than a boolean for two reasons: the
-   * shell needs a way OUT that belongs to the exam, and AppShell is eager code
-   * that must never import `useExamStore`, which pulls the content banks in
-   * through the composer (the keep-eager-code-light invariant).
+   * A callback rather than a route for two reasons: the exam owns its confirm
+   * dialog and its copy, and AppShell is eager code that must never import
+   * `useExamStore`, which pulls the content banks in through the composer (the
+   * keep-eager-code-light invariant). `tone` travels with it for the same
+   * reason: only the runner knows whether a clock is running.
    */
-  examExit: (() => void) | null;
+  zoneExit: { run: () => void; tone: "quiet" | "danger" } | null;
+  setZoneExit: (v: { run: () => void; tone: "quiet" | "danger" } | null) => void;
+
   /**
-   * True while the run on screen is an "Ohne Zeit" module (s192). The stage is
-   * the same, the FRAME around it is not: without a clock this is practice, so
-   * the header shows a quiet Zurück instead of the red Prüfung-verlassen exit.
-   * It travels with the handler for the same reason the handler exists at all,
-   * namely that AppShell may not read the exam store.
+   * Exam chrome (s186, founder): while a Modelltest run is on screen the mobile
+   * bottom bar is hidden and the header drops the streak pill and account menu,
+   * so nothing competes with the task; the header keeps the logo and the one
+   * exit above.
+   *
+   * Separate from `zoneExit` since s195, because the trainers now register an
+   * exit too and they are ordinary pages that keep their nav.
    */
-  examUntimed: boolean;
-  setExamExit: (fn: (() => void) | null, opts?: { untimed?: boolean }) => void;
+  examStage: boolean;
+  setExamStage: (on: boolean) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -77,7 +83,9 @@ export const useSessionStore = create<SessionState>((set) => ({
   focusMode: false,
   setFocusMode: (on) => set({ focusMode: on }),
 
-  examExit: null,
-  examUntimed: false,
-  setExamExit: (fn, opts) => set({ examExit: fn, examUntimed: !!fn && !!opts?.untimed }),
+  zoneExit: null,
+  setZoneExit: (v) => set({ zoneExit: v }),
+
+  examStage: false,
+  setExamStage: (on) => set({ examStage: on }),
 }));

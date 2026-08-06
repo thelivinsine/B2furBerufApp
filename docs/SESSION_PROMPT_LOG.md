@@ -4778,3 +4778,62 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `preview/pruefung-frame.html` · `preview/pruefung-frame-artifact.html` ·
   artifact <https://claude.ai/code/artifact/b04df435-61f7-4d9c-ab82-ba28b50a385e> ·
   `docs/PROJECT_STATUS.md` · this log
+
+- **Prompt 2 (verbatim):** `B for phone, C for desktop but the zuruck button for untimed exercises
+  and verlassen (red) button for timed exercises indicating it is an exam should always be on the
+  top right corner. The pop up should always appear when closing a test asking something like "do
+  you want to leave the test" but it should only appear when the user has some unsaved progress and
+  is going back with a message saying something like "your progress will not be saved, are you sure
+  you want to leave". For the mobile view, can you put the aufgabe wahlen button and the toggle
+  buttons on the same row by shortening it to just "Aufgabe"? Also, keep the header row from option
+  A - this header row should consistently be there for all the screens in mobile view. Option 2
+  looks good.`
+  **Response:** implemented, verified in the real build, not in a mockup.
+  **The exit.** `useSessionStore.zoneExit` (`{ run, tone }`) replaces `examExit`/`examUntimed` and
+  is registered by every screen the zone owns: the runner, `WritingHub` and `SprechenHub`. AppShell
+  renders it as the LAST control in the header on `/anwenden`, `/exam`, `/writing` and
+  `/simulation`, so it sits in the corner itself at every width. `tone: "danger"` is the red
+  Verlassen while a clock runs, `quiet` the grey Zurück everywhere else. `examStage` split off as
+  its own flag, so stripping the sidebar/bottom bar/streak still belongs to a RUN and the trainers
+  keep their nav. The pick's "B for phone, C for desktop" reduced to "B's position everywhere"
+  under the founder's own override; what survives of C is its composition, which a phone has no
+  room for (see the stepper below).
+  **The confirm.** `hasProgress(run)` decides, for timed and untimed alike: any answer, note, essay
+  text, recorded part result, or `partIx > 0` (Teil Sprechen leaves nothing in the first three, so
+  without the last two a candidate would have been waved out of Teil 3 of 4 without a word). Body
+  copy is the founder's: "Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?".
+  The Schreibtrainer asks NOTHING, deliberately: `draftAutosave` keeps the text of each mode, so
+  that warning would be false there. A started conversation always asks, because it cannot be
+  resumed (`ConversationRunner` reports `onBusyChange`).
+  **Zurück belongs to the exit alone**, so the previous-question button is a chevron now. Desktop
+  puts the pair beside the number strip (option C) and leaves ONE primary in the footer; a phone
+  keeps the back step in the footer, because nine numbers plus two 34px buttons do not fit 360px.
+  **The mobile rows.** New `features/pruefung/ModuleHeader.tsx` on every zone screen below `lg`
+  (in a Teil that row IS the `RunBar`, which now wears the same `PART_META` mark), and
+  `GuidedWritingTrainer` PORTALS its Aufgabe toggle, relabelled "Aufgabe" and stripped of its icon,
+  into a slot `WritingHub` owns beside the switcher. The switcher's segments went `px-1
+  text-[13px]` below `sm` so four labels plus the toggle fit 360.
+  **Option 2** for the empty space: both Verlauf cards ship in an empty state from the first visit
+  and take the room the tab has left (`VerlaufCard` grows when `rows` is empty), the Anleitung is a
+  two-column ticket from `lg` up, the Ergebnis puts the score and bars beside what to do next, and
+  the Sprechtrainer list moved into the zone's `max-w-4xl`. Shared rules that came with the pick:
+  one Niveau control (`features/pruefung/LevelSelect.tsx`, adopted by the Sprechtrainer in place of
+  its pill row) and the Sprechen mark on that page's cards.
+  **Measured with a CDP driver over the built app**, three viewports, a clean store per screen: the
+  exit is at the identical top-right coordinate on all seven zone screens at 360x640, 393x852 and
+  1280x900; it reads "Prüfung verlassen" only in a timed run; it is absent on the hub, which is the
+  zone's home. Zero resting page scroll and zero horizontal overflow everywhere except Kurz at
+  360x640 (99px, down from 134px shipped: the field is at its `HARD_MIN` floor, the documented
+  give-up case) and the Sprechtrainer LIST, which is a browse list. Gates: build · typecheck ·
+  lint 0 errors (75 warnings, down from 77) · 610 tests · check:bundle 127.1 kB · check:contrast ·
+  lint:content.
+  **Two judgement calls flagged to the founder:** the module row is `lg:hidden` because they said
+  "in mobile view", and Kurz at 360x640 rests ~99px scrolled, which would be 0 if that row were
+  dropped on Kurz/Lang.
+- **Artifacts (prompt 2):** `src/store/useSessionStore.ts` · `src/components/layout/AppShell.tsx` ·
+  `src/features/pruefung/{PruefungHub,ModuleHeader,LevelSelect}.tsx` ·
+  `src/features/exam/{MockExamRunner,McParts}.tsx` ·
+  `src/features/writing/{WritingHub,GuidedWritingTrainer,WritingModeSwitcher,bottomChrome}.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/features/sprechen/{SprechenHub,ConversationRunner}.tsx` · `CLAUDE.md` ·
+  `docs/areas/{PRUEFUNG,SCHREIBEN,SPRECHEN}.md` · `docs/PROJECT_STATUS.md` · this log

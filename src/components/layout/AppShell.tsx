@@ -18,6 +18,52 @@ import { loadWritingDraft } from "@/features/writing/resumeDraft";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/Logo";
 
+/**
+ * The zone's one exit (founder s195). Two tones, one geometry, one position:
+ * a grey Zurück whenever leaving costs nothing but the screen, and the red
+ * Verlassen while a clock is running, where leaving really does end a Prüfung.
+ *
+ * Phone: the mark alone, on the same 36px box the account button uses.
+ * Desktop: the mark plus the word in a quiet outline (founder s187, preview
+ * options X1 + X2). No tooltip beside a visible label.
+ */
+function ZoneExit({ tone, onExit }: { tone: "quiet" | "danger"; onExit: () => void }) {
+  const danger = tone === "danger";
+  const label = danger ? "Prüfung verlassen" : "Zurück";
+  return (
+    <button
+      type="button"
+      onClick={onExit}
+      aria-label={label}
+      title={label}
+      className={cn(
+        "flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent transition-colors",
+        danger
+          ? "text-danger hover:bg-danger/12"
+          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+        "w-9 sm:w-auto sm:px-3",
+        danger ? "sm:border-danger/30" : "sm:border-border",
+      )}
+    >
+      {danger ? (
+        <LogOut className="h-[17px] w-[17px]" />
+      ) : (
+        <ArrowLeft className="h-[17px] w-[17px]" />
+      )}
+      <span className="hidden text-sm font-semibold sm:inline">
+        {danger ? "Verlassen" : "Zurück"}
+      </span>
+    </button>
+  );
+}
+
+/**
+ * Every route the Prüfung zone owns. The zone's one exit (top right, always)
+ * renders on these and nowhere else, so a handler that outlives its screen
+ * cannot leak a back button onto another page.
+ */
+const ZONE_ROUTES = new Set(["/anwenden", "/exam", "/writing", "/simulation"]);
+
 export function AppShell() {
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -68,15 +114,19 @@ export function AppShell() {
   // purpose: the header and logo stay, because an exam still needs its top bar.
   // Route-gated like focus mode, so a stale flag can never strip the chrome
   // anywhere else.
-  const examExit = useSessionStore((s) => s.examExit);
-  // Ohne Zeit: the same stage, a practice frame (s192). The flag rides the same
-  // channel as the handler, because this file may not read the exam store.
-  const examUntimed = useSessionStore((s) => s.examUntimed);
+  const zoneExit = useSessionStore((s) => s.zoneExit);
+  const examStage = useSessionStore((s) => s.examStage);
   // The runner took the `/exam` route over until s189; it now takes over the
   // Prüfung hub instead, and `/exam` is a redirect into that hub. Both are
   // listed so a stale flag still cannot strip the chrome anywhere else.
   const exam =
-    !!examExit && (location.pathname === "/anwenden" || location.pathname === "/exam");
+    examStage && (location.pathname === "/anwenden" || location.pathname === "/exam");
+  // The zone's one exit shows on every screen the zone owns, which since s195
+  // includes the two free trainers. Route-gated like the stage flag, so a
+  // handler left behind by an unmount race cannot put a back button on the
+  // dashboard.
+  const exit =
+    zoneExit && ZONE_ROUTES.has(location.pathname) ? zoneExit : null;
 
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
@@ -172,45 +222,6 @@ export function AppShell() {
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* In an exam the right side is ONE quiet exit and nothing else:
-                  muted, unfilled, same 36px box as the account button it
-                  replaces, so it is found when looked for without pulling the
-                  eye off the task. The confirm lives with the runner, which
-                  owns the exam copy. */}
-              {/* Ohne Zeit is practice, not an exam (founder s192), so the way
-                  out is the quiet Zurück the Schreibtrainer carries, in neutral
-                  grey with a back arrow. The red Verlassen stays for a run
-                  against the clock, where leaving really does end a Prüfung. */}
-              {exam && (
-                <button
-                  type="button"
-                  onClick={() => examExit?.()}
-                  aria-label={examUntimed ? "Zurück zur Prüfung" : "Prüfung verlassen"}
-                  title={examUntimed ? "Zurück zur Prüfung" : "Prüfung verlassen"}
-                  className={cn(
-                    "flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent transition-colors",
-                    examUntimed
-                      ? "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                      : "text-danger hover:bg-danger/12",
-                    // Phone: the mark alone, on the same 36px box the account
-                    // button used. Desktop: the mark plus the word in a quiet
-                    // outline (founder s187, preview options X1 + X2), where
-                    // there is room for it and no hover to rely on for the
-                    // phone. No tooltip beside a visible label.
-                    "w-9 sm:w-auto sm:px-3",
-                    examUntimed ? "sm:border-border" : "sm:border-danger/30",
-                  )}
-                >
-                  {examUntimed ? (
-                    <ArrowLeft className="h-[17px] w-[17px]" />
-                  ) : (
-                    <LogOut className="h-[17px] w-[17px]" />
-                  )}
-                  <span className="hidden text-sm font-semibold sm:inline">
-                    {examUntimed ? "Zurück" : "Verlassen"}
-                  </span>
-                </button>
-              )}
               {/* Streak chip: flame + day count. The daily-goal figure lives on
                   the dashboard ring now, so the header carries the streak alone
                   (no duplicated goal gauge). Koralle since the s133 rebrand:
@@ -231,6 +242,11 @@ export function AppShell() {
                 </div>
               )}
               {!exam && <AccountMenu />}
+              {/* The zone's one exit, LAST so it sits in the corner itself on
+                  every screen of the zone (founder s195). On an exam screen it
+                  is the only thing here, exactly as before; on a trainer it
+                  follows the streak and the account, which those pages keep. */}
+              {exit && <ZoneExit tone={exit.tone} onExit={exit.run} />}
             </div>
           </div>
         </header>

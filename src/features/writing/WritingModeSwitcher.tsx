@@ -62,7 +62,10 @@ export function WritingModeSwitcher({
             role="tab"
             aria-selected={active}
             className={cn(
-              "relative z-10 flex-1 whitespace-nowrap rounded-md px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
+              // Tighter on a phone since s195: the row is shared with the
+              // trainer's Aufgabe toggle now, so four labels have to fit ~230px
+              // at 360, not the whole content column.
+              "relative z-10 flex-1 whitespace-nowrap rounded-md px-1 py-2 text-center text-[13px] leading-none transition-colors sm:px-3 sm:py-2.5 sm:text-sm",
               active
                 ? "font-bold text-primary"
                 : "font-medium text-muted-foreground hover:text-foreground",

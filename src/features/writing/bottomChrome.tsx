@@ -1,49 +1,19 @@
 import { forwardRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { FeedbackLink } from "@/components/layout/FeedbackButton";
 import { floatingNote } from "@/features/shared/floatingCluster";
-import { cn } from "@/lib/utils";
 
 /**
- * The two pieces of mobile bottom chrome the Schreiben trainers share: the
- * Zurück button in the floating action cluster and the fixed KI line under it.
- * They live here rather than being copied per trainer, because anything
- * mode-specific in that row shows up as a jump on every tab switch (founder
- * s169) and the two hand-kept copies are exactly how that happened before.
- */
-
-/**
- * The way out of a trainer, back to the Prüfung hub (founder s192: "replace the
- * feedback button with zurück and the user should navigate back to the prüfung
- * hub"). It took the Feedback button's slot in the cluster, so it keeps that
- * button's geometry exactly: same 44px height, same squircle, same quiet
- * outline. Feedback moved to the line below, beside the KI note, which is where
- * the Bibliothek tabs already carry it.
+ * The fixed KI line the Schreiben trainers share, below their floating action
+ * cluster. It lives here rather than being copied per trainer, because anything
+ * mode-specific in that region shows up as a jump on every tab switch (founder
+ * s169) and two hand-kept copies are exactly how that happened before.
  *
- * It goes to `/anwenden` rather than back through history: `/writing` is
- * reached from the hub's Schreiben card (Ohne Zeit), from the dashboard
- * recommendation and from ⌘K, and "zurück" has to mean the same place from all
- * three.
- *
- * Opaque `bg-surface` is load-bearing: the cluster carries no bar behind it, so
- * a see-through control lets the card underneath read through it (s164).
+ * The `BackToPruefung` pill that used to sit in the cluster beside it is gone
+ * (s195): the zone's one exit is the shell's top-right corner now, on every
+ * screen and at every width, which is also the first time the desktop trainers
+ * have had a way back at all.
  */
-export function BackToPruefung({ className }: { className?: string }) {
-  return (
-    <Link
-      to="/anwenden"
-      aria-label="Zurück zur Prüfung"
-      className={cn(
-        "flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground",
-        className,
-      )}
-    >
-      <ArrowLeft className="h-4 w-4 text-primary" />
-      Zurück
-    </Link>
-  );
-}
 
 /**
  * The one bottom line, locked just above the nav in EVERY state (founder s169:
