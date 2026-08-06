@@ -5103,3 +5103,29 @@ wanted.
 - **Artifacts (prompts 3-8):** `CLAUDE.md` · `docs/DECISIONS.md` §s196 · `docs/PROJECT_STATUS.md` ·
   this log · **PR #812** (the chooser + Sprechen work) and **PR #815** (the deploy diagnosis), both
   squash-merged into `main` · no `pages.yml` change (deliberately left for its own review)
+
+---
+
+## Session 197 — prompt 1 (2026-08-06): the mobile fade behind the Üben button
+
+**Branch:** `claude/mobile-floating-text-readability-bs49dz`
+
+- **Prompt 1 (verbatim):** `[screenshot of the dark-mode Bibliothek list fading at the bottom edge of
+  the desktop scroll column] can you put similar effect even in the mobile view so that the floating
+  text below the ueben button is more readable and visible? generate a couple of previews`
+  **Response:** named the cause before designing anything. The screenshot is
+  `lg:mask-fade-bottom` (`browseColumnClass`, s190): desktop scrolls INSIDE the content column, so
+  the column masks its own bottom edge and the cards dissolve into the page ground. On a phone the
+  PAGE scrolls, so there is no such edge, and the cards run at full strength behind the fixed
+  `FloatingActionCluster` and its note line, which since s189 deliberately carries no
+  `floatingNote` plate (the plate read as a frosted chip over white cards). Built
+  `preview/mobile-cluster-fade.html` (+ the artifact copy): four phone mocks at the REAL cluster
+  offsets (nav `3.9375rem`, buttons `+2rem`, note `+0.5rem`) and the real tokens, in both themes.
+  Today (baseline, note printing over a card) · **A** short 7rem dissolve · **B** long 11rem
+  dissolve, closest to the desktop edge · **C** dissolve plus a bottom-ramped blur. All three are a
+  pointer-events-none veil in `--background` at `z-20`, under the cluster and over the cards: no
+  border, no bar, so the s168 sticky-bar and s169 blurred-band rejects stay rejected (C is flagged
+  in the preview as the one that flirts with the band). No app code touched: awaiting the pick.
+
+- **Artifacts:** `preview/mobile-cluster-fade.html` · `preview/mobile-cluster-fade-artifact.html` ·
+  artifact <https://claude.ai/code/artifact/8bbc7f2e-d581-4767-84ee-a024380d0604>
