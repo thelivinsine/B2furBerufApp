@@ -1,0 +1,1354 @@
+<title>Prüfung zone: one frame</title>
+<style>
+  /* ---------------------------------------------------------------
+     REVIEW CHROME (deliberately not the app palette, so the mocked
+     app screens below read as separate objects).
+     --------------------------------------------------------------- */
+  :root {
+    --c-ground: #eceef1; --c-panel: #ffffff; --c-ink: #191d24;
+    --c-muted: #5c6672; --c-line: #d3d8de; --c-accent: #1f6f68; --c-chip: #e2e6ea;
+  }
+  [data-appearance="dark"] {
+    --c-ground: #0e1013; --c-panel: #16191d; --c-ink: #e6e9ec;
+    --c-muted: #98a1ab; --c-line: #292e35; --c-accent: #58bdb2; --c-chip: #212630;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--c-ground); color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55; padding: 32px 24px 96px; min-height: 100vh;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p { margin: 0; }
+  .lede { color: var(--c-muted); max-width: 72ch; }
+  .kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--c-accent); }
+  .rule { height: 1px; background: var(--c-line); border: 0; margin: 34px 0 0; }
+
+  .controls {
+    position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px;
+    padding: 12px 14px; margin: 22px 0 30px; box-shadow: 0 6px 18px -12px rgba(0,0,0,.4);
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl > span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); }
+  .seg { display: inline-flex; background: var(--c-chip); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent;
+    color: var(--c-muted); padding: 5px 12px; border-radius: 7px; cursor: pointer; transition: background .14s, color .14s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--c-panel); color: var(--c-ink); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+  .seg button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+  .panel { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px; padding: 20px 22px; }
+  .panel + .panel { margin-top: 16px; }
+  .findings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 14px; }
+  .finding { display: flex; gap: 11px; align-items: flex-start; }
+  .finding b { display: block; font-size: 14px; }
+  .finding p { font-size: 13.5px; color: var(--c-muted); }
+  .num {
+    flex: none; width: 22px; height: 22px; border-radius: 7px; background: var(--c-chip);
+    color: var(--c-accent); font-size: 12px; font-weight: 700; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); font-weight: 700; }
+  td:first-child { font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+
+  .option { margin-top: 46px; }
+  .opthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .optname {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--c-panel); background: var(--c-accent); padding: 3px 9px; border-radius: 6px;
+  }
+  .framerow { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; align-items: flex-start; }
+  .framebox.phone { flex: 0 0 auto; }
+  .framebox.desk { flex: 1 1 100%; }
+  .notecol { flex: 1 1 380px; min-width: 280px; }
+  .framelabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); margin: 0 0 7px; }
+  .frame { border: 1px solid var(--c-line); border-radius: 14px; overflow: hidden; }
+  .frame.desk .screen { padding: 26px 24px 32px; }
+  .frame.desk .inner { max-width: 1152px; margin: 0 auto; }
+  /* The phone frame is the REAL content area a 393×852 phone leaves between the
+     app header and the bottom tab bar (668 px), and it does NOT scroll: if a
+     screen did not fit, it would visibly overflow here. */
+  .frame.mob { width: 372px; }
+  .frame.mob .screen { padding: 16px 15px 20px; height: 668px; overflow: hidden; }
+  .frame.mob.scrolls .screen { overflow-y: auto; }
+  .fitnote { font-size: 12px; color: var(--c-muted); margin-top: 7px; }
+  .note { font-size: 13.5px; color: var(--c-muted); }
+  .note + .note { margin-top: 10px; }
+  .note b { color: var(--c-ink); font-weight: 650; }
+  .cost { margin-top: 12px; font-size: 13px; color: var(--c-muted); border-left: 3px solid var(--c-line); padding-left: 10px; }
+  .cost b { color: var(--c-ink); }
+
+  /* ---------------------------------------------------------------
+     APP TOKENS — verbatim from src/index.css (light + s187 "N3 Slate"
+     dark) and tailwind.config.ts.
+     --------------------------------------------------------------- */
+  .screen {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%; --elevated: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --shadow: 221 40% 22%;
+    --radius: 0.5rem;
+    --wash-a: .10; --wash-b: .09;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    color: hsl(var(--foreground)); font-size: 16px; line-height: 1.5;
+  }
+  [data-appearance="dark"] .screen {
+    --background: 220 15% 4%;
+    --page-from: 220 15% 4%; --page-mid: 220 15% 4%; --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%;
+    --surface: 220 10% 17%; --elevated: 220 9% 22%;
+    --muted: 220 9% 25%; --muted-foreground: 220 8% 72%;
+    --border: 220 10% 38%;
+    --primary: 219 90% 74%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-ink: 198 72% 72%;
+    --success: 153 50% 52%;
+    --shadow: 220 30% 2%;
+    --wash-a: 0; --wash-b: 0;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+  }
+
+
+  /* ---------------------------------------------------------------
+     MODULE MARKS — three colour sets, switched from the control bar.
+     Every hue comes from a sanctioned brand family (blue/sky/cyan,
+     emerald/teal/green, amber/orange/yellow, rose/pink).
+     --------------------------------------------------------------- */
+
+  /* C1 "Ruhig": no colour at all. The mark is a shape, the tile is the same
+     recessed grey everywhere, and colour is left to the things that act
+     (the CTA, the result bars). */
+  [data-colors="c1"] .screen {
+    --tile-lesen: hsl(var(--muted)); --ink-lesen: hsl(var(--foreground));
+    --tile-hoeren: hsl(var(--muted)); --ink-hoeren: hsl(var(--foreground));
+    --tile-schreiben: hsl(var(--muted)); --ink-schreiben: hsl(var(--foreground));
+    --tile-sprechen: hsl(var(--muted)); --ink-sprechen: hsl(var(--foreground));
+    --bar-lesen: hsl(var(--primary) / .45); --bar-hoeren: hsl(var(--primary) / .62);
+    --bar-schreiben: hsl(var(--primary) / .8); --bar-sprechen: hsl(var(--primary));
+  }
+
+  /* C2 "Rezeptiv / Produktiv": the colour carries a fact. Lesen and Hören are
+     the two receiving skills (green family), Schreiben and Sprechen the two
+     producing ones (blue family), so the pairs read as pairs. */
+  [data-colors="c2"] .screen {
+    --tile-lesen: rgba(16,185,129,.12);  --ink-lesen: #047857;  --bar-lesen: #10b981;
+    --tile-hoeren: rgba(20,184,166,.12); --ink-hoeren: #0f766e; --bar-hoeren: #14b8a6;
+    --tile-schreiben: hsl(var(--primary) / .12); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(14,165,233,.12); --ink-sprechen: #0369a1; --bar-sprechen: #0ea5e9;
+  }
+  [data-appearance="dark"][data-colors="c2"] .screen {
+    --tile-lesen: rgba(52,211,153,.16);  --ink-lesen: #6ee7b7;  --bar-lesen: #34d399;
+    --tile-hoeren: rgba(45,212,191,.16); --ink-hoeren: #5eead4; --bar-hoeren: #2dd4bf;
+    --tile-schreiben: hsl(var(--primary) / .18); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(56,189,248,.16); --ink-sprechen: #7dd3fc; --bar-sprechen: #38bdf8;
+  }
+
+  /* C3 "Vier Farben": four clearly separated hues, one per module, pushed
+     further apart than today's teal/amber/blue/cyan (where the last two read
+     as the same colour at 40 px). */
+  [data-colors="c3"] .screen {
+    --tile-lesen: rgba(16,185,129,.12);  --ink-lesen: #047857;  --bar-lesen: #10b981;
+    --tile-hoeren: rgba(245,158,11,.13); --ink-hoeren: #b45309; --bar-hoeren: #f59e0b;
+    --tile-schreiben: hsl(var(--primary) / .12); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(244,63,94,.11); --ink-sprechen: #be123c; --bar-sprechen: #f43f5e;
+  }
+  [data-appearance="dark"][data-colors="c3"] .screen {
+    --tile-lesen: rgba(52,211,153,.16);  --ink-lesen: #6ee7b7;  --bar-lesen: #34d399;
+    --tile-hoeren: rgba(251,191,36,.16); --ink-hoeren: #fbbf24; --bar-hoeren: #fbbf24;
+    --tile-schreiben: hsl(var(--primary) / .18); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(251,113,133,.16); --ink-sprechen: #fda4af; --bar-sprechen: #fb7185;
+  }
+
+  /* Glyph set switch: both sets are in the DOM, one is shown. */
+  .g { display: none; line-height: 0; }
+  [data-marks="g1"] .g1, [data-marks="g2"] .g2 { display: inline-flex; }
+
+  .markstage { border-radius: 12px; padding: 22px 18px; margin-top: 14px; }
+  .markrow { display: flex; flex-wrap: wrap; gap: 26px; justify-content: center; }
+  .markcell { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .marklab { font-size: 13.5px; font-weight: 600; color: hsl(var(--foreground)); }
+  .tile.xl { width: 56px; height: 56px; border-radius: 14px; }
+
+  .screen .col { display: flex; flex-direction: column; gap: 18px; }
+  .frame.mob .screen { display: flex; }
+  .frame.mob .screen .inner { flex: 1; min-height: 0; display: flex; }
+  .frame.mob .screen .col { gap: 14px; flex: 1; min-height: 0; }
+  .screen button { font: inherit; color: inherit; }
+
+  .card {
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+  .eyebrow.mut { color: hsl(var(--muted-foreground)); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Header ------------------------------------------------------- */
+  .hdr.row-between { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .hdr.stack2 { display: flex; flex-direction: column; gap: 10px; }
+  .row-end { display: flex; justify-content: flex-end; }
+  .frame.mob .hdr.row-between { flex-direction: column; align-items: stretch; gap: 10px; }
+  .frame.mob .hdr.row-between .scopebtn { align-self: flex-end; }
+
+  .modeswitch {
+    position: relative; display: inline-flex; gap: 4px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .modeswitch.full { display: flex; width: 100%; }
+  .modeswitch > button {
+    position: relative; z-index: 1; flex: 1; border: 0; background: transparent; cursor: pointer;
+    font-size: 15px; font-weight: 600; padding: 7px 22px; border-radius: 6px;
+    color: hsl(var(--muted-foreground)); transition: color .14s ease; white-space: nowrap;
+  }
+  .modeswitch > button[aria-pressed="true"] { color: hsl(var(--foreground)); font-weight: 700; }
+  .modeswitch > .pill {
+    position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px); border-radius: 6px;
+    background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.desk .modeswitch:not(.full) { min-width: 320px; }
+
+  .scopebtn {
+    display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 10px 0 13px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 8px; cursor: pointer;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    font-size: 14px; white-space: nowrap;
+  }
+  .scopebtn > span { color: hsl(var(--muted-foreground)); }
+  .scopebtn > b { font-weight: 700; }
+  .scopebtn svg { color: hsl(var(--muted-foreground)); }
+
+  .lvl {
+    position: relative; display: inline-flex; gap: 2px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .lvl.full { display: flex; width: 100%; }
+  .lvl.full > button { flex: 1; }
+  .lvl > button {
+    position: relative; z-index: 1; border: 0; background: transparent; cursor: pointer; width: 46px;
+    font-size: 14px; font-weight: 600; padding: 6px 0; border-radius: 6px;
+    color: hsl(var(--muted-foreground)); transition: color .14s ease;
+  }
+  .lvl > button[aria-pressed="true"] { color: hsl(var(--foreground)); }
+  .lvl > .pill {
+    position: absolute; top: 4px; bottom: 4px; border-radius: 6px; background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+
+  /* Tiles + chips ------------------------------------------------ */
+  .tile { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; }
+  .tile.lg { width: 44px; height: 44px; border-radius: 11px; }
+  .tile.lesen { background: var(--tile-lesen); color: var(--ink-lesen); }
+  .tile.hoeren { background: var(--tile-hoeren); color: var(--ink-hoeren); }
+  .tile.schreiben { background: var(--tile-schreiben); color: var(--ink-schreiben); }
+  .tile.sprechen { background: var(--tile-sprechen); color: var(--ink-sprechen); }
+
+  .timechip {
+    display: inline-flex; align-items: center; gap: 4px; flex: none;
+    font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted)); border-radius: 6px; padding: 3px 8px;
+  }
+  .chev { color: hsl(var(--muted-foreground)); display: inline-flex; flex: none; }
+
+  /* Option A module grid ----------------------------------------- */
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .frame.mob .grid4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .modcard {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; cursor: pointer;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .modcard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .modname { margin-top: 11px; font-size: 16px; font-weight: 650; }
+  .moddesc { margin-top: 3px; font-size: 12.5px; color: hsl(var(--muted-foreground)); line-height: 1.35; }
+  .modfoot { margin-top: auto; padding-top: 12px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .modtrainer {
+    margin-top: 10px; padding-top: 9px; width: 100%; border-top: 1px solid hsl(var(--border));
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; font-weight: 500; color: hsl(var(--primary));
+  }
+
+  /* Option B rows ------------------------------------------------- */
+  .rowlist { display: flex; flex-direction: column; overflow: hidden; }
+  .rowlist > * + * { border-top: 1px solid hsl(var(--border)); }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px; width: 100%;
+    background: transparent; border: 0; text-align: left; cursor: pointer; transition: background .14s ease;
+  }
+  .row:hover { background: hsl(var(--muted) / .4); }
+  .rowtext { min-width: 0; flex: 1; display: block; }
+  .rname { display: block; font-size: 15px; font-weight: 650; }
+  .rsub { display: block; margin-top: 1px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+
+  /* Option C wide cards ------------------------------------------ */
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .frame.mob .grid2 { grid-template-columns: 1fr; gap: 12px; }
+  .widecard {
+    display: flex; align-items: center; gap: 14px; text-align: left; cursor: pointer; width: 100%;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px 16px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .widecard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .widecard .rname { font-size: 16px; }
+  .wcTrainer { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12.5px; font-weight: 500; color: hsl(var(--primary)); }
+  .wcRight { flex: none; display: flex; align-items: baseline; gap: 3px; }
+  .bigmin { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .bigminlab { font-size: 12px; color: hsl(var(--muted-foreground)); }
+
+  /* Run band ------------------------------------------------------ */
+  .band { padding: 16px 18px 18px; display: flex; flex-direction: column; }
+  .trackwrap { display: flex; flex-direction: column; justify-content: center; }
+  .frame.mob:not(.scrolls) .band { flex: 1; }
+  .frame.mob:not(.scrolls) .band .trackwrap { flex: 1; }
+  .frame.mob .bandhead { flex-direction: column; align-items: flex-start; gap: 5px; }
+  .bandhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+  .totalmin { font-size: 15px; font-weight: 650; }
+  .cdown { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .cdown svg { flex: none; }
+  .track { position: relative; display: flex; justify-content: space-between; margin-top: 16px; }
+  /* One segment per gap, drawn from the edge of one tile to the edge of the
+     next, so the line never runs behind a mark. */
+  .tnode { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tnode::after {
+    content: ""; position: absolute; top: 21px; height: 2px; background: hsl(var(--border));
+    left: calc(50% + 30px); right: calc(-50% + 30px);
+  }
+  .tnode:last-child::after { content: none; }
+  .frame.mob .tnode::after { top: 19px; left: calc(50% + 28px); right: calc(-50% + 28px); }
+  .tnode .dot { width: 44px; height: 44px; border-radius: 11px; border: 3px solid hsl(var(--surface)); }
+  .tnode .lab { font-size: 13.5px; font-weight: 600; }
+  .tnode .min { font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+  .frame.mob .tnode .dot { width: 40px; height: 40px; }
+  .frame.mob .tnode .lab { font-size: 12.5px; }
+  .bandfoot { margin-top: 16px; padding-top: 16px; border-top: 1px solid hsl(var(--border)); display: flex; justify-content: flex-end; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 6px;
+    cursor: pointer; height: 42px; padding: 0 20px; font-size: 15px; font-weight: 500; white-space: nowrap;
+  }
+  .btn.grad {
+    background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.mob .btn.wide { width: 100%; }
+
+  /* Verlauf -------------------------------------------------------- */
+  .vrow { gap: 12px; }
+  .vdate { flex: none; width: 66px; font-size: 13.5px; font-weight: 650; }
+  .mini { display: flex; gap: 4px; flex: 1; min-width: 54px; max-width: 320px; }
+  .mini > span { flex: 1; height: 5px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .mini > span > i { display: block; height: 100%; border-radius: 999px; }
+  .bar-lesen { background: var(--bar-lesen); } .bar-hoeren { background: var(--bar-hoeren); }
+  .bar-schreiben { background: var(--bar-schreiben); } .bar-sprechen { background: var(--bar-sprechen); }
+  .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; white-space: nowrap; flex: none; }
+  .badge.ok { background: hsl(var(--success) / .15); color: hsl(var(--success)); }
+  .badge.mutedb { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .vopen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px 14px; border-top: 1px solid hsl(var(--border)); }
+  .vlab { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .vval { margin-top: 2px; font-size: 14px; font-weight: 650; }
+  .verlauf { overflow: hidden; }
+  .vhead {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px 14px;
+    background: transparent; border: 0; cursor: pointer; text-align: left; transition: background .14s ease;
+  }
+  .vhead:hover { background: hsl(var(--muted) / .4); }
+  .vhead > .chev { margin-left: auto; transition: transform .16s ease; }
+  .vcount { font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .verlauf > .rowlist { border-top: 1px solid hsl(var(--border)); }
+  .vsum { display: flex; align-items: center; gap: 14px; padding: 13px 15px; border-top: 1px solid hsl(var(--border)); }
+  .vsumval { margin-top: 1px; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+  .vsep { width: 1px; align-self: stretch; background: hsl(var(--border)); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .001ms !important; } }
+
+  .frame.desk .screen { padding: 0; position: relative; }
+  .frame.mob .screen { padding: 0; display: block; height: 668px; position: relative; }
+  .screen .stage, .screen .hubcol, .screen .trainer { padding: 16px 22px 20px; }
+  .frame.mob .screen .stage, .frame.mob .screen .trainer { padding: 12px 14px 0; }
+
+  /* App header --------------------------------------------------- */
+  .apphdr {
+    height: 52px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px; border-bottom: 1px solid hsl(var(--border)); background: hsl(var(--surface) / .9);
+  }
+  .frame.mob .apphdr { height: 46px; padding: 0 13px; }
+  .logomark { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to))); }
+  .hdrright { display: flex; align-items: center; gap: 8px; }
+  .exit {
+    display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 11px;
+    border-radius: 8px; font-size: 13.5px; font-weight: 650;
+  }
+  .exit.danger { color: #dc2626; border: 1px solid rgb(220 38 38 / .3); }
+  [data-appearance="dark"] .exit.danger { color: #fca5a5; border-color: rgb(252 165 165 / .3); }
+  .exit.quiet { color: hsl(var(--muted-foreground)); border: 1px solid hsl(var(--border)); }
+  .frame.mob .exit b { display: none; }
+  .frame.mob .exit { padding: 0; width: 34px; justify-content: center; }
+  .streak {
+    display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 999px;
+    background: rgb(244 114 96 / .12); color: #e2593f; font-size: 13px; font-weight: 700;
+  }
+  .streak i { font-style: normal; font-weight: 500; color: hsl(var(--muted-foreground)); font-size: 11.5px; }
+  .avatar { width: 30px; height: 30px; border-radius: 999px; background: hsl(var(--muted)); display: grid; place-items: center; color: hsl(var(--muted-foreground)); }
+
+  /* Bottom tab bar ------------------------------------------------ */
+  .navbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58px; display: flex; align-items: center;
+    justify-content: space-around; border-top: 1px solid hsl(var(--border)); background: hsl(var(--surface) / .95);
+  }
+  .navtab { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .navtab i { display: block; width: 22px; height: 22px; border-radius: 7px; background: hsl(var(--border)); }
+  .navtab.on i { background: hsl(var(--primary) / .85); }
+  .navtab em { font-style: normal; font-size: 10px; font-weight: 650; color: hsl(var(--foreground)); }
+
+  /* Exam stage ---------------------------------------------------- */
+  .stage { display: flex; flex-direction: column; gap: 12px; height: 452px; }
+  .frame.mob .stage { height: 610px; gap: 10px; }
+  .runbar {
+    display: flex; align-items: center; gap: 10px; flex: none;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 8px; padding: 8px 12px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .runbar.slim { margin-bottom: 12px; }
+  .rb-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .rb-title span:not(.tile) { font-weight: 600; color: hsl(var(--muted-foreground)); }
+  .rb-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .dots { display: flex; align-items: center; gap: 5px; }
+  .dots i { width: 6px; height: 6px; border-radius: 999px; background: hsl(var(--muted)); }
+  .dots i.done { background: hsl(var(--success)); }
+  .dots i.now { width: 16px; background: hsl(var(--primary)); }
+  .timer {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700;
+    border: 1px solid hsl(var(--border)); border-radius: 6px; padding: 3px 9px; background: hsl(var(--surface));
+  }
+  .timer svg { color: hsl(var(--muted-foreground)); }
+  .inbar-back {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 650;
+    color: hsl(var(--muted-foreground));
+  }
+  .inbar-back svg { color: hsl(var(--primary)); }
+  .vdiv { width: 1px; align-self: stretch; background: hsl(var(--border)); }
+
+  .examrow { display: flex; gap: 16px; flex: 1; min-height: 0; align-items: center; }
+  .frame.mob .examrow { flex-direction: column; align-items: stretch; gap: 10px; }
+  .textcard { flex: 0 0 54%; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; max-height: 100%; overflow: hidden; }
+  .frame.mob .textcard { flex: 0 0 46%; }
+  .tc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .tc-kind { font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+  .tc-title { font-size: 14px; font-weight: 650; margin-top: 2px; }
+  .tc-body { font-size: 13.5px; line-height: 1.55; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }
+  .iconbtn { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: hsl(var(--muted-foreground)); }
+  .qblock { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+  .q { font-size: 15.5px; font-weight: 650; line-height: 1.4; }
+  .opts { display: flex; flex-direction: column; gap: 7px; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; padding: 9px 13px; border-radius: 8px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .opt.on { background: hsl(var(--accent) / .2); border-color: hsl(var(--accent) / .2); }
+  .opt i { flex: none; width: 15px; height: 15px; border-radius: 999px; border: 2px solid hsl(var(--border)); margin-top: 2px; }
+  .opt i.on { border-color: hsl(var(--accent-ink)); background: hsl(var(--accent-ink) / .9); }
+
+  .strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; flex: none; }
+  .striprow { display: flex; align-items: center; justify-content: center; gap: 10px; flex: none; }
+  .striprow .strip { flex: 0 1 auto; }
+  .num {
+    width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center;
+    font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--muted-foreground));
+  }
+  .num.done { background: hsl(var(--accent) / .25); border-color: hsl(var(--accent) / .2); color: hsl(var(--foreground)); }
+  .num.now { background: hsl(var(--primary)); border-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+  .stepbtn { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--muted-foreground)); flex: none; }
+
+  .footrow { display: flex; gap: 10px; flex: none; }
+  .btn.out { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); color: hsl(var(--foreground)); font-weight: 600; }
+  .btn.accent { background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .2); color: hsl(var(--accent-ink)); font-weight: 650; height: 38px; font-size: 14px; gap: 6px; }
+  .btn.flex { flex: 1; }
+  .btn.grow, .btn.grow2 { flex: 1; }
+  .btn.sm { height: 32px; padding: 0 14px; font-size: 13px; }
+  .btn.ghosted { flex: 0 0 84px; color: hsl(var(--muted-foreground)); }
+  .backpill {
+    display: inline-flex; align-items: center; gap: 7px; height: 42px; padding: 0 15px; flex: none;
+    border-radius: 10px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    font-size: 13px; font-weight: 500; color: hsl(var(--muted-foreground));
+  }
+  .backpill svg { color: hsl(var(--primary)); }
+  .backpill.solid { box-shadow: 0 1px 2px hsl(var(--shadow) / .06); }
+
+  /* Anleitung / Ergebnis ------------------------------------------ */
+  .introstage { justify-content: center; }
+  .voidbox {
+    flex: 1; display: grid; place-items: center; min-height: 0;
+    background-image: repeating-linear-gradient(135deg, hsl(var(--muted-foreground) / .07) 0 6px, transparent 6px 13px);
+    border-radius: 12px;
+  }
+  .introcard { width: 448px; max-width: 100%; display: flex; flex-direction: column; gap: 12px; align-items: stretch; text-align: center; }
+  .frame.mob .introcard { width: 100%; }
+  .tile.center { margin: 0 auto; }
+  .tile.xs { width: 22px; height: 22px; border-radius: 6px; }
+  .eyebrow.prim { color: hsl(var(--primary)); }
+  .display { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin-top: -6px; }
+  .bignum { font-size: 44px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+  .card.pad { padding: 15px 17px; text-align: left; }
+  .card.tight { padding: 12px 14px; }
+  .sm { font-size: 13.5px; line-height: 1.55; }
+  .cap { font-size: 12px; color: hsl(var(--muted-foreground)); text-align: center; }
+  .cap.left { text-align: left; margin-top: 2px; }
+  .facts { display: flex; gap: 16px; margin-top: 11px; padding-top: 11px; border-top: 1px solid hsl(var(--border)); font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .btn.wide { width: 100%; }
+  .barsbox { display: flex; flex-direction: column; gap: 11px; }
+  .barline { display: flex; flex-direction: column; gap: 5px; }
+  .bl-top { display: flex; justify-content: space-between; font-size: 13px; }
+  .bl-top i { font-style: normal; color: hsl(var(--muted-foreground)); }
+  .bl-track { height: 7px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; display: block; }
+  .bl-track i { display: block; height: 100%; border-radius: 999px; }
+  .ergrow { flex: 1; display: flex; gap: 20px; min-height: 0; align-items: stretch; }
+  .ergleft { flex: 1; display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
+  .ergleft .barsbox { width: 100%; margin-top: 4px; }
+  .stage.fit { height: auto; }
+  .stage.fit .voidbox { min-height: 372px; }
+  .ergright { flex: 0 0 330px; display: flex; flex-direction: column; gap: 12px; }
+  .ergright .grow2 { flex: none; }
+  .ergright .btn.wide { margin-top: auto; }
+
+  /* Hub ----------------------------------------------------------- */
+  .hubcol { display: flex; flex-direction: column; gap: 20px; height: 600px; }
+  .hubcol.fit { height: auto; padding-bottom: 26px; }
+  .hubhead { display: flex; flex-direction: column; align-items: center; gap: 11px; }
+  .scoperow { display: flex; align-items: center; gap: 9px; }
+  .modeswitch.sm > button { font-size: 12.5px; padding: 4px 11px; font-weight: 650; }
+  .modeswitch.sm { padding: 3px; }
+  .modeswitch.sm > .pill { top: 3px; bottom: 3px; width: calc(50% - 3px); }
+  .modeswitch.four > button { font-size: 14px; padding: 7px 8px; }
+  .modeswitch.four > .pill { width: calc(25% - 4px); }
+  .modeswitch.four > .pill.p2 { left: calc(25% + 1px); }
+  .grid2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .modcard2 {
+    display: flex; flex-direction: column; align-items: flex-start; min-height: 118px; padding: 17px 18px 26px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 12px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .mc-top { display: flex; width: 100%; align-items: flex-start; justify-content: space-between; }
+  .go { width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .mc-name { margin-top: 12px; font-size: 19px; font-weight: 800; letter-spacing: -.015em; }
+  .emptyhalf {
+    flex: 1; min-height: 0; display: grid; place-items: center; border-radius: 12px;
+    background-image: repeating-linear-gradient(135deg, hsl(var(--muted-foreground) / .07) 0 6px, transparent 6px 13px);
+    font-size: 12.5px; color: hsl(var(--muted-foreground));
+  }
+  .verlaufempty { flex: 1; min-height: 172px; display: flex; flex-direction: column; overflow: hidden; }
+  .ve-head { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 16px 8px; }
+  .ve-body { flex: 1; min-height: 0; display: flex; gap: 18px; padding: 4px 16px 16px; align-items: stretch; }
+  .profile { flex: 0 0 300px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .pcol { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .pval { font-size: 13px; font-weight: 650; color: hsl(var(--muted-foreground)); }
+  .pbar { flex: 1; width: 100%; border-radius: 6px; background: hsl(var(--muted) / .55); min-height: 46px; }
+  .plab { display: flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 650; }
+  .ve-note { flex: 1; font-size: 13px; line-height: 1.55; color: hsl(var(--muted-foreground)); align-self: center; }
+  .ve-note b { display: block; color: hsl(var(--foreground)); font-size: 14px; margin-bottom: 3px; }
+  .vcount { font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+
+  /* Trainer ------------------------------------------------------- */
+  .trainer { display: flex; flex-direction: column; gap: 11px; height: 546px; }
+  .pickrow { display: flex; justify-content: center; }
+  .taskeye { font-size: 12.5px; font-weight: 700; color: hsl(var(--primary)); margin-bottom: 4px; }
+  .editor { flex: 1; min-height: 0; padding: 14px; }
+  .editor .ph { font-size: 14px; color: hsl(var(--muted-foreground)); }
+  .cluster { display: flex; gap: 8px; align-items: stretch; }
+  .cluster .btn { height: 42px; border-radius: 10px; }
+  .kinote { font-size: 11px; text-align: center; color: hsl(var(--muted-foreground)); }
+  .kinote b { font-weight: 600; color: hsl(var(--primary)); }
+
+  /* Flags + notes -------------------------------------------------- */
+  .flag {
+    position: absolute; width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center;
+    background: #dc2626; color: #fff; font-size: 12px; font-weight: 800; box-shadow: 0 0 0 4px rgb(220 38 38 / .18);
+  }
+  .flaglist { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .flagitem { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; color: var(--c-muted); }
+  .flagitem b { flex: none; width: 19px; height: 19px; border-radius: 999px; background: #dc2626; color: #fff; font-size: 11px; display: grid; place-items: center; }
+  .flagitem span b { all: unset; color: var(--c-ink); font-weight: 650; }
+  .spine { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 14px; }
+  .spineitem { display: flex; gap: 10px; align-items: flex-start; }
+  .spineitem .num { all: unset; flex: none; width: 22px; height: 22px; border-radius: 7px; background: var(--c-chip); color: var(--c-accent); font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+  .spineitem b { display: block; font-size: 14px; }
+  .spineitem p { font-size: 13.5px; color: var(--c-muted); }
+  .pickbox { margin-top: 16px; border: 1px solid var(--c-line); border-radius: 10px; padding: 14px 16px; background: var(--c-chip); }
+  .pickbox p + p { margin-top: 7px; }
+</style>
+<div data-appearance="light" data-colors="c2" data-marks="g2">
+
+<div class="page"><div class="wrap">
+  <p class="kicker">Prüfung zone · design review</p>
+  <h1>One frame for the whole exam zone</h1>
+  <p class="lede" style="margin-top:10px">You said the pages in the Prüfung zone don’t feel like one product: back
+    buttons in different places and styles, and awkward empty space. Below is what the eight screens of the zone
+    actually do today, then three ways to give them one frame, and two ways to answer the empty space. Pick one
+    letter and one number and I’ll build exactly that.</p>
+
+  <div class="controls">
+    <div class="ctl"><span>Appearance</span>
+      <div class="seg" id="seg-appearance">
+        <button data-k="appearance" data-v="light" aria-pressed="true">Light</button>
+        <button data-k="appearance" data-v="dark">Dark</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================ AUDIT ============================== -->
+  <h2>1 · What the zone does today</h2>
+  <div class="panel" style="margin-top:14px">
+    <div class="findings">
+      <div class="finding"><span class="num">1</span><div><b>Four different back buttons</b><p>The zone has four visual treatments for “leave this screen”, in three different positions: a red <em>Verlassen</em> in the app header, a grey <em>Zurück</em> in the same slot, a white pill at the bottom-left of the writing trainers, and the same pill at the top-right of the speaking list.</p></div></div><div class="finding"><span class="num">2</span><div><b>Two of them say the same word on one screen</b><p>In a running Lesen or Hören part, the header exit says <em>Zurück</em> (untimed) and the footer button that steps to the previous question also says <em>Zurück</em>. One leaves the module, one moves back one question.</p></div></div><div class="finding"><span class="num">3</span><div><b>Two screens have no way out at all</b><p>The writing trainers hide their <em>Zurück</em> below <code>lg</code>, so on a desktop there is no back button in Schreiben. A running practice conversation has none at any width.</p></div></div><div class="finding"><span class="num">4</span><div><b>Four page widths in one zone</b><p>896 px on the hub, 1152 px in the writing trainer, 1152 px on the speaking list, 672 px in a conversation, and 448 px on the exam’s Anleitung and Ergebnis, which sit inside a 1152 px stage.</p></div></div><div class="finding"><span class="num">5</span><div><b>Three header languages</b><p>The hub is a sliding-pill switcher with a centred scope row. The speaking list is a left-aligned row of level pills with uppercase section headings. The exam Anleitung is the only centred <code>h1</code> in the zone.</p></div></div><div class="finding"><span class="num">6</span><div><b>The page is locked to one screen even when it has nothing to fill it</b><p>Both hub tabs hold a full-viewport frame. A learner with no history sees four cards and then roughly half a screen of nothing, every time.</p></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Every “way out” in the zone</h3>
+    <div class="tablewrap" style="margin-top:10px"><table>
+      <tr><th>Screen</th><th>Control</th><th>Where</th><th>Look</th></tr>
+      <tr><td>Prüfung hub</td><td>none (this is the zone’s home)</td><td>–</td><td>–</td></tr><tr><td>Modelltest running, Mit Zeit</td><td>Verlassen + exit icon</td><td>app header, top right</td><td>red outline</td></tr><tr><td>Module drill, Ohne Zeit</td><td>Zurück + arrow</td><td>app header, top right</td><td>grey outline</td></tr><tr><td>…inside Lesen / Hören</td><td>Zurück (means: previous question)</td><td>stage footer, bottom left</td><td>outline button, half width</td></tr><tr><td>Schreibtrainer (phone)</td><td>Zurück + arrow</td><td>floating cluster, bottom left</td><td>white pill</td></tr><tr><td>Schreibtrainer (desktop)</td><td>none</td><td>–</td><td>–</td></tr><tr><td>Sprechtrainer list</td><td>Zurück + arrow</td><td>scope row, top right</td><td>white pill</td></tr><tr><td>Sprechtrainer, in conversation</td><td>none</td><td>–</td><td>–</td></tr>
+    </table></div>
+  </div>
+
+  <div class="panel">
+    <h3>Every page width in the zone</h3>
+    <div class="tablewrap" style="margin-top:10px"><table>
+      <tr><th>Screen</th><th>Content width</th><th>Shape</th></tr>
+      <tr><td>Prüfung hub (both tabs)</td><td>896 px</td><td>centred, locked</td></tr><tr><td>Schreibtrainer</td><td>1152 px</td><td>content column + 256 px task rail</td></tr><tr><td>Sprechtrainer list</td><td>1152 px</td><td>3-column card grid</td></tr><tr><td>Sprechtrainer, in conversation</td><td>672 px</td><td>centred</td></tr><tr><td>Exam: Lesen / Hören / Schreiben</td><td>1152 px</td><td>two tiles side by side</td></tr><tr><td>Exam: Anleitung and Ergebnis</td><td>448 px</td><td>inside the same 1152 px stage</td></tr>
+    </table></div>
+    <p class="note" style="margin-top:12px">A learner going hub → Schreibtrainer → back → Modelltest → Anleitung →
+      Lesen → Ergebnis passes through five different column widths in about ninety seconds.</p>
+  </div>
+
+  <div class="option" id="today">
+    <div class="opthead"><span class="optname" style="background:#dc2626">Today</span><h2>The three screens that show it</h2></div>
+    <div class="framerow">
+      <div class="framebox desk">
+        <p class="framelabel">A running Lesen part · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="exit danger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><b>Verlassen</b></span></div>
+  </div>
+    <div class="stage">
+      
+  <div class="runbar">
+    
+    <p class="rb-title">Lesen<span> · Teil 1 von 4</span></p>
+    <div class="rb-right">
+      <span class="dots"><i class="done"></i><i class="now"></i><i></i><i></i></span>
+      <span class="timer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b class="tnum">12:40</b></span>
+    </div>
+  </div>
+      <div class="examrow">
+  <div class="card textcard">
+    <div class="tc-head">
+      <div>
+        <p class="tc-kind">Text 1 von 3 · Aushang</p>
+        <p class="tc-title">Neue Regelung für die Mittagspause</p>
+      </div>
+      <span class="iconbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></span>
+    </div>
+    <p class="tc-body">Liebe Kolleginnen und Kollegen, ab dem 1. September gilt in unserem Haus eine
+      neue Pausenregelung. Die Mittagspause kann zwischen 11:30 und 14:00 Uhr genommen werden und
+      dauert mindestens 30 Minuten. Wer länger als sechs Stunden am Stück arbeitet, muss die Pause
+      verpflichtend nehmen. Bitte tragen Sie Ihre Pausenzeiten weiterhin im Zeiterfassungssystem ein …</p>
+  </div>
+  <div class="qblock">
+    <p class="q">Wann darf die Mittagspause frühestens beginnen?</p>
+    <div class="opts">
+      <span class="opt"><i></i>Um 11:00 Uhr</span>
+      <span class="opt on"><i class="on"></i>Um 11:30 Uhr</span>
+      <span class="opt"><i></i>Um 12:00 Uhr</span>
+    </div>
+  </div></div>
+      
+  <div class="strip"><span class="num done">1</span><span class="num done">2</span><span class="num now">3</span><span class="num">4</span><span class="num">5</span><span class="num">6</span><span class="num">7</span><span class="num">8</span><span class="num">9</span></div>
+      <div class="footrow">
+        <span class="btn out flex">Zurück</span>
+        <span class="btn out flex">Weiter</span>
+      </div>
+    </div>
+    <span class="flag" style="top:15px;right:150px">1</span>
+    <span class="flag" style="bottom:58px;left:22px">2</span>
+  </div></div>
+        <div class="flaglist">
+          <div class="flagitem"><b>1</b><span><b>Leaves the exam.</b> Red, top right, in the app’s own header, with a confirm dialog.</span></div>
+          <div class="flagitem"><b>2</b><span><b>Goes back one question.</b> Same word, bottom left, quiet outline. In Ohne Zeit the header control above says “Zurück” too.</span></div>
+        </div>
+      </div>
+      <div class="framebox desk">
+        <p class="framelabel">The Anleitung before a part · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="exit danger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><b>Verlassen</b></span></div>
+  </div>
+    <div class="stage introstage">
+      <div class="voidbox">
+        <div class="introcard">
+          <span class="tile lg lesen center"><span class="g g1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>
+          <p class="eyebrow prim">Teil 1 von 4</p>
+          <p class="display">Lesen</p>
+          <div class="card pad">
+            <p class="sm">Sie lesen drei Texte. Wählen Sie zu jeder Aufgabe die richtige Antwort.
+              Über die Nummernleiste können Sie Aufgaben überspringen und später zurückkommen.</p>
+            <div class="facts"><span>15 Minuten</span><span>3 Texte</span><span>9 Aufgaben</span></div>
+          </div>
+          <span class="btn grad wide">Teil 1 starten</span>
+          <p class="cap">Der Timer läuft, sobald du startest.</p>
+        </div>
+      </div>
+    </div>
+    <span class="flag" style="top:96px;left:96px">3</span>
+  </div></div>
+        <div class="flaglist">
+          <div class="flagitem"><b>3</b><span><b>448 px of content in a 1152 px frame.</b> The sidebar and the tab bar are hidden during an exam, so this is the widest, emptiest screen in the app. The Ergebnis screen has the same shape.</span></div>
+        </div>
+      </div>
+      <div class="framebox desk">
+        <p class="framelabel">Module üben, learner with no history · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="streak"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 2 2 2 0 0-2-1-3 1-5z"/></svg><b>7</b><i>Tage</i></span><span class="avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+  </div>
+    <div class="hubcol">
+      <div class="hubhead">
+        <div class="modeswitch"><span class="pill"></span>
+          <button aria-pressed="true">Module üben</button><button>Modelltest</button></div>
+        <div class="scoperow">
+          <div class="modeswitch sm"><span class="pill"></span>
+            <button aria-pressed="true">Ohne Zeit</button><button>Mit Zeit</button></div>
+          <span class="scopebtn"><span>Niveau</span><b>B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+        </div>
+      </div>
+      <div class="grid2x2"><span class="modcard2">
+          <span class="mc-top"><span class="tile lg lesen"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Lesen</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg hoeren"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Hören</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg schreiben"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Schreiben</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg sprechen"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Sprechen</span></span></div>
+      <div class="emptyhalf"><span>rest of the viewport, empty</span></div>
+    </div>
+    <span class="flag" style="bottom:130px;left:50%">4</span>
+  </div></div>
+        <div class="flaglist">
+          <div class="flagitem"><b>4</b><span><b>The frame is locked to one screen</b> so the page never scrolls, but nothing fills the lower half until the learner has a Verlauf. Modelltest does the same below its run band.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- =============================== SPINE =============================== -->
+  <h2 style="margin-top:34px">2 · What all three options share</h2>
+  <p class="lede" style="margin-top:8px">These five rules are the actual fix. The options after them only differ in
+    <em>where the one back button lives</em>.</p>
+  <div class="panel" style="margin-top:14px">
+    <div class="spine">
+      <div class="spineitem"><span class="num">1</span><div><b>One column width</b><p>896 px for everything at rest: hub, speaking list, Anleitung, Ergebnis. The wide 1152 px stage stays, but only for a running part with two tiles side by side, so a width change means “you are inside a task now”.</p></div></div>
+      <div class="spineitem"><span class="num">2</span><div><b>One exit, one word, one place</b><p>“Zurück” everywhere, in the same slot on every screen of the zone, at every width. The only exception is a timed run in progress, which keeps the red “Prüfung verlassen”, because that one really does end something.</p></div></div>
+      <div class="spineitem"><span class="num">3</span><div><b>The question stepper stops saying “Zurück”</b><p>It becomes a chevron beside “Weiter”, so exactly one control per screen carries that word.</p></div></div>
+      <div class="spineitem"><span class="num">4</span><div><b>One scope control</b><p>The hub’s compact “Niveau B2 ▾” is the zone’s level control. The speaking list’s separate row of level pills goes; it sets the same fact with a different control.</p></div></div>
+      <div class="spineitem"><span class="num">5</span><div><b>Every screen wears its module’s mark</b><p>The four coloured marks already run through the hub cards, the timeline and the Verlauf. The trainers and the speaking list use their own generic icons today; they adopt the module mark, so Sprechen is one colour everywhere.</p></div></div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============================== OPTIONS ============================== -->
+  <h2 style="margin-top:34px">3 · Where the one back button lives</h2>
+
+  <div class="option" id="opt-a">
+    <div class="opthead"><span class="optname">Option A</span><h2>Modulkopf · a header row inside the page</h2></div>
+    <p class="lede">Every screen below the hub opens with one row: back, the module’s mark and name, and the
+      clock. The exam already has this row (the RunBar); it grows a back button and the trainers and the speaking
+      list get the same row. The app header goes back to normal (streak + account) everywhere.</p>
+    <div class="framerow">
+      <div class="framebox desk">
+        <p class="framelabel">Lesen, running · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"></div>
+  </div>
+    <div class="stage">
+      
+  <div class="runbar">
+    <span class="inbar-back"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><b>Zurück</b></span><span class="vdiv"></span>
+    <p class="rb-title">Lesen<span> · Teil 1 von 4</span></p>
+    <div class="rb-right">
+      <span class="dots"><i class="done"></i><i class="now"></i><i></i><i></i></span>
+      <span class="timer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b class="tnum">12:40</b></span>
+    </div>
+  </div>
+      <div class="examrow">
+  <div class="card textcard">
+    <div class="tc-head">
+      <div>
+        <p class="tc-kind">Text 1 von 3 · Aushang</p>
+        <p class="tc-title">Neue Regelung für die Mittagspause</p>
+      </div>
+      <span class="iconbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></span>
+    </div>
+    <p class="tc-body">Liebe Kolleginnen und Kollegen, ab dem 1. September gilt in unserem Haus eine
+      neue Pausenregelung. Die Mittagspause kann zwischen 11:30 und 14:00 Uhr genommen werden und
+      dauert mindestens 30 Minuten. Wer länger als sechs Stunden am Stück arbeitet, muss die Pause
+      verpflichtend nehmen. Bitte tragen Sie Ihre Pausenzeiten weiterhin im Zeiterfassungssystem ein …</p>
+  </div>
+  <div class="qblock">
+    <p class="q">Wann darf die Mittagspause frühestens beginnen?</p>
+    <div class="opts">
+      <span class="opt"><i></i>Um 11:00 Uhr</span>
+      <span class="opt on"><i class="on"></i>Um 11:30 Uhr</span>
+      <span class="opt"><i></i>Um 12:00 Uhr</span>
+    </div>
+  </div></div>
+      <div class="striprow">
+        
+        
+  <div class="strip"><span class="num done">1</span><span class="num done">2</span><span class="num now">3</span><span class="num">4</span><span class="num">5</span><span class="num">6</span><span class="num">7</span><span class="num">8</span><span class="num">9</span></div>
+        
+      </div>
+      <div class="footrow">
+        <span class="btn out flex ghosted"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m15 18-6-6 6-6"/></svg></span><span class="btn out flex">Weiter</span>
+      </div>
+    </div>
+  </div></div>
+      </div>
+      <div class="framebox phone">
+        <p class="framelabel">Schreibtrainer · phone 393</p>
+        <div class="frame mob">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="streak"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 2 2 2 0 0-2-1-3 1-5z"/></svg><b>7</b><i>Tage</i></span><span class="avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+  </div>
+    <div class="trainer">
+      <div class="runbar slim"><span class="inbar-back"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><b>Zurück</b></span><span class="vdiv"></span><p class="rb-title"><span class="tile xs schreiben"><span class="g g1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>Schreiben</p></div>
+      <div class="modeswitch full four"><span class="pill p2"></span>
+        <button>Fokus</button><button aria-pressed="true">Kurz</button><button>Lang</button><button>Verlauf</button></div>
+      <div class="pickrow"><span class="btn accent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Aufgabe wählen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="card pad tight">
+        <p class="taskeye">Aufgabe: Krankmeldung</p>
+        <p class="sm">Schreiben Sie eine E-Mail an Ihre Teamleiterin. Melden Sie sich krank, nennen Sie
+          die voraussichtliche Dauer und schlagen Sie eine Vertretung vor.</p>
+      </div>
+      <div class="card editor"><span class="ph">Schreibe hier deinen Text …</span></div>
+      <div class="cluster">
+        
+        <span class="btn grad grow">Auswerten</span>
+      </div>
+      <p class="kinote">KI-geprüft, kann Fehler enthalten. <b>Mehr</b> · <b>Feedback geben</b></p>
+    </div>
+    
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+  </div></div>
+      </div>
+      <div class="notecol">
+        <p class="note"><b>The way out sits next to the thing it leaves</b>, and it is the same component on all
+          eight screens, so it cannot drift again.</p>
+        <p class="note"><b>The trainers finally get a back button on desktop</b>, which they have never had.</p>
+        <p class="note"><b>The row also says where you are.</b> The trainers and the speaking list never name the
+          module they belong to today; here they carry its mark and its name like the exam parts do.</p>
+        <p class="cost"><b>Cost:</b> the trainers and the speaking list grow ~44 px of chrome they don’t have
+          today; on a phone the trainer’s Zurück leaves the thumb row you put it in in s192 and moves to the top
+          of the page; and the red “leave a timed exam” moves out of the app header into the page, where it has to
+          stay quiet enough not to compete with the task.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" id="opt-b">
+    <div class="opthead"><span class="optname">Option B</span><h2>Ecke oben rechts · the app header owns it</h2></div>
+    <p class="lede">The exam’s existing top-right slot becomes the zone’s exit slot, and every screen in the zone
+      registers it: the trainers, the speaking list and a running conversation too. Grey “Zurück” always; red
+      “Verlassen” only while a timed run is live. The bottom-left pill on the trainers goes away, and “Auswerten”
+      takes the full thumb row.</p>
+    <div class="framerow">
+      <div class="framebox desk">
+        <p class="framelabel">Lesen, running · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="exit danger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><b>Verlassen</b></span></div>
+  </div>
+    <div class="stage">
+      
+  <div class="runbar">
+    
+    <p class="rb-title">Lesen<span> · Teil 1 von 4</span></p>
+    <div class="rb-right">
+      <span class="dots"><i class="done"></i><i class="now"></i><i></i><i></i></span>
+      <span class="timer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b class="tnum">12:40</b></span>
+    </div>
+  </div>
+      <div class="examrow">
+  <div class="card textcard">
+    <div class="tc-head">
+      <div>
+        <p class="tc-kind">Text 1 von 3 · Aushang</p>
+        <p class="tc-title">Neue Regelung für die Mittagspause</p>
+      </div>
+      <span class="iconbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></span>
+    </div>
+    <p class="tc-body">Liebe Kolleginnen und Kollegen, ab dem 1. September gilt in unserem Haus eine
+      neue Pausenregelung. Die Mittagspause kann zwischen 11:30 und 14:00 Uhr genommen werden und
+      dauert mindestens 30 Minuten. Wer länger als sechs Stunden am Stück arbeitet, muss die Pause
+      verpflichtend nehmen. Bitte tragen Sie Ihre Pausenzeiten weiterhin im Zeiterfassungssystem ein …</p>
+  </div>
+  <div class="qblock">
+    <p class="q">Wann darf die Mittagspause frühestens beginnen?</p>
+    <div class="opts">
+      <span class="opt"><i></i>Um 11:00 Uhr</span>
+      <span class="opt on"><i class="on"></i>Um 11:30 Uhr</span>
+      <span class="opt"><i></i>Um 12:00 Uhr</span>
+    </div>
+  </div></div>
+      <div class="striprow">
+        
+        
+  <div class="strip"><span class="num done">1</span><span class="num done">2</span><span class="num now">3</span><span class="num">4</span><span class="num">5</span><span class="num">6</span><span class="num">7</span><span class="num">8</span><span class="num">9</span></div>
+        
+      </div>
+      <div class="footrow">
+        <span class="btn out flex ghosted"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m15 18-6-6 6-6"/></svg></span><span class="btn out flex">Weiter</span>
+      </div>
+    </div>
+  </div></div>
+      </div>
+      <div class="framebox phone">
+        <p class="framelabel">Schreibtrainer · phone 393</p>
+        <div class="frame mob">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="exit quiet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><b>Zurück</b></span></div>
+  </div>
+    <div class="trainer">
+      
+      <div class="modeswitch full four"><span class="pill p2"></span>
+        <button>Fokus</button><button aria-pressed="true">Kurz</button><button>Lang</button><button>Verlauf</button></div>
+      <div class="pickrow"><span class="btn accent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Aufgabe wählen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="card pad tight">
+        <p class="taskeye">Aufgabe: Krankmeldung</p>
+        <p class="sm">Schreiben Sie eine E-Mail an Ihre Teamleiterin. Melden Sie sich krank, nennen Sie
+          die voraussichtliche Dauer und schlagen Sie eine Vertretung vor.</p>
+      </div>
+      <div class="card editor"><span class="ph">Schreibe hier deinen Text …</span></div>
+      <div class="cluster">
+        
+        <span class="btn grad grow">Auswerten</span>
+      </div>
+      <p class="kinote">KI-geprüft, kann Fehler enthalten. <b>Mehr</b> · <b>Feedback geben</b></p>
+    </div>
+    
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+  </div></div>
+      </div>
+      <div class="notecol">
+        <p class="note"><b>No new chrome anywhere.</b> Zero height added to any screen, and the mechanism already
+          exists: the exam registers its exit with the shell, so the trainers just do the same.</p>
+        <p class="note"><b>One slot, one look, at every width.</b> This is what a native app does with a back button.</p>
+        <p class="note"><b>The primary action gets the whole thumb row</b> in the trainers.</p>
+        <p class="cost"><b>Cost:</b> this undoes part of s192. You moved the trainer’s Zurück into the thumb row on
+          purpose; here it goes back to the top-right corner of a phone, which is the hardest corner to reach.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" id="opt-c">
+    <div class="opthead"><span class="optname">Option C</span><h2>Unten links · the thumb row, everywhere</h2></div>
+    <p class="lede">The trainers’ answer becomes the zone’s law: “Zurück” at the bottom-left of the bottom chrome,
+      on every screen, at every width, desktop included. To make room in the exam, the two question steppers move
+      up to flank the number strip, which is where jumping between questions already happens. The footer is then a
+      quiet back and one primary button instead of two equal outlines.</p>
+    <div class="framerow">
+      <div class="framebox desk">
+        <p class="framelabel">Lesen, running · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"></div>
+  </div>
+    <div class="stage">
+      
+  <div class="runbar">
+    
+    <p class="rb-title">Lesen<span> · Teil 1 von 4</span></p>
+    <div class="rb-right">
+      <span class="dots"><i class="done"></i><i class="now"></i><i></i><i></i></span>
+      <span class="timer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b class="tnum">12:40</b></span>
+    </div>
+  </div>
+      <div class="examrow">
+  <div class="card textcard">
+    <div class="tc-head">
+      <div>
+        <p class="tc-kind">Text 1 von 3 · Aushang</p>
+        <p class="tc-title">Neue Regelung für die Mittagspause</p>
+      </div>
+      <span class="iconbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg></span>
+    </div>
+    <p class="tc-body">Liebe Kolleginnen und Kollegen, ab dem 1. September gilt in unserem Haus eine
+      neue Pausenregelung. Die Mittagspause kann zwischen 11:30 und 14:00 Uhr genommen werden und
+      dauert mindestens 30 Minuten. Wer länger als sechs Stunden am Stück arbeitet, muss die Pause
+      verpflichtend nehmen. Bitte tragen Sie Ihre Pausenzeiten weiterhin im Zeiterfassungssystem ein …</p>
+  </div>
+  <div class="qblock">
+    <p class="q">Wann darf die Mittagspause frühestens beginnen?</p>
+    <div class="opts">
+      <span class="opt"><i></i>Um 11:00 Uhr</span>
+      <span class="opt on"><i class="on"></i>Um 11:30 Uhr</span>
+      <span class="opt"><i></i>Um 12:00 Uhr</span>
+    </div>
+  </div></div>
+      <div class="striprow">
+        <span class="stepbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m15 18-6-6 6-6"/></svg></span>
+        
+  <div class="strip"><span class="num done">1</span><span class="num done">2</span><span class="num now">3</span><span class="num">4</span><span class="num">5</span><span class="num">6</span><span class="num">7</span><span class="num">8</span><span class="num">9</span></div>
+        <span class="stepbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m9 18 6-6-6-6"/></svg></span>
+      </div>
+      <div class="footrow">
+        <span class="backpill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Zurück</span><span class="btn out grow">Weiter</span>
+      </div>
+    </div>
+  </div></div>
+      </div>
+      <div class="framebox phone">
+        <p class="framelabel">Schreibtrainer · phone 393</p>
+        <div class="frame mob">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="streak"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 2 2 2 0 0-2-1-3 1-5z"/></svg><b>7</b><i>Tage</i></span><span class="avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+  </div>
+    <div class="trainer">
+      
+      <div class="modeswitch full four"><span class="pill p2"></span>
+        <button>Fokus</button><button aria-pressed="true">Kurz</button><button>Lang</button><button>Verlauf</button></div>
+      <div class="pickrow"><span class="btn accent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Aufgabe wählen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="card pad tight">
+        <p class="taskeye">Aufgabe: Krankmeldung</p>
+        <p class="sm">Schreiben Sie eine E-Mail an Ihre Teamleiterin. Melden Sie sich krank, nennen Sie
+          die voraussichtliche Dauer und schlagen Sie eine Vertretung vor.</p>
+      </div>
+      <div class="card editor"><span class="ph">Schreibe hier deinen Text …</span></div>
+      <div class="cluster">
+        <span class="backpill solid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Zurück</span>
+        <span class="btn grad grow">Auswerten</span>
+      </div>
+      <p class="kinote">KI-geprüft, kann Fehler enthalten. <b>Mehr</b> · <b>Feedback geben</b></p>
+    </div>
+    
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+  </div></div>
+      </div>
+      <div class="notecol">
+        <p class="note"><b>It extends what you already picked</b> in s192 rather than replacing it, and it puts the
+          exit in thumb reach on every screen of the zone.</p>
+        <p class="note"><b>The exam footer gets simpler</b>: back plus one primary, instead of two equal-weight
+          outline buttons where one of them was the thing that ends the part.</p>
+        <p class="note"><b>All navigation for the part sits in one band</b>: jump, step, leave.</p>
+        <p class="cost"><b>Cost:</b> on a 1280 × 900 desktop the way out sits at the bottom of the screen, far from
+          where the eye starts. And quitting a timed exam would live there too, in red, at the bottom-left.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============================ EMPTY SPACE ============================ -->
+  <h2 style="margin-top:34px">4 · The empty space</h2>
+  <p class="lede" style="margin-top:8px">Independent of A/B/C. Both options keep the rule that a freshly opened page
+    never scrolls.</p>
+
+  <div class="option" id="opt-e1">
+    <div class="opthead"><span class="optname">Option 1</span><h2>Natürliche Höhe · the page stops where the content stops</h2></div>
+    <p class="lede">The full-viewport lock is dropped on any screen that has nothing to fill it. The air below the
+      cards becomes ordinary page background instead of a stretched frame, and the Anleitung and the Ergebnis widen
+      from 448 px to the zone’s 896 px column so they stop looking like a strip in a void.</p>
+    <div class="framerow">
+      <div class="framebox desk">
+        <p class="framelabel">Module üben, no history · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="streak"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 2 2 2 0 0-2-1-3 1-5z"/></svg><b>7</b><i>Tage</i></span><span class="avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+  </div>
+    <div class="hubcol fit">
+      <div class="hubhead">
+        <div class="modeswitch"><span class="pill"></span>
+          <button aria-pressed="true">Module üben</button><button>Modelltest</button></div>
+        <div class="scoperow">
+          <div class="modeswitch sm"><span class="pill"></span>
+            <button aria-pressed="true">Ohne Zeit</button><button>Mit Zeit</button></div>
+          <span class="scopebtn"><span>Niveau</span><b>B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+        </div>
+      </div>
+      <div class="grid2x2"><span class="modcard2">
+          <span class="mc-top"><span class="tile lg lesen"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Lesen</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg hoeren"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Hören</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg schreiben"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Schreiben</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg sprechen"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Sprechen</span></span></div>
+      
+    </div>
+  </div></div>
+      </div>
+      <div class="framebox desk">
+        <p class="framelabel">Ergebnis · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="exit quiet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><b>Zurück</b></span></div>
+  </div>
+    <div class="stage fit">
+      <div class="voidbox">
+              <div class="introcard">
+                <p class="eyebrow prim">Ergebnis</p>
+                <p class="bignum tnum">78 %</p>
+                <span class="badge ok">Bestanden · Grenze 60 %</span>
+                <div class="card pad barsbox"><div class="barline"><span class="bl-top"><b>Lesen</b><i class="tnum">82 %</i></span>
+                    <span class="bl-track"><i class="bar-lesen" style="width:82%"></i></span></div><div class="barline"><span class="bl-top"><b>Hören</b><i class="tnum">71 %</i></span>
+                    <span class="bl-track"><i class="bar-hoeren" style="width:71%"></i></span></div><div class="barline"><span class="bl-top"><b>Schreiben</b><i class="tnum">80 %</i></span>
+                    <span class="bl-track"><i class="bar-schreiben" style="width:80%"></i></span></div><div class="barline"><span class="bl-top"><b>Sprechen</b><i class="tnum">78 %</i></span>
+                    <span class="bl-track"><i class="bar-sprechen" style="width:78%"></i></span></div></div>
+                <div class="footrow"><span class="btn out flex">Antworten ansehen</span><span class="btn grad flex">Fertig</span></div>
+              </div>
+            </div>
+    </div>
+  </div></div>
+      </div>
+      <div class="notecol">
+        <p class="note"><b>Cheapest to build</b> and impossible to get wrong: nothing new is invented, a height cap
+          is simply removed where it has nothing to hold.</p>
+        <p class="cost"><b>Cost:</b> the emptiness is still there, it is just honest about it. On a tall desktop the
+          content sits in the top half and the rest is page.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" id="opt-e2">
+    <div class="opthead"><span class="optname">Option 2</span><h2>Der leere Zustand ist Inhalt · the space gets used</h2></div>
+    <p class="lede">The Verlauf card appears from the first visit, in an empty state that shows the shape of what is
+      coming (the four columns, greyed, with one line saying what will fill them). The Ergebnis becomes a real
+      two-column screen on desktop: the score and the four bars on the left, the weakest part and the answer review
+      on the right.</p>
+    <div class="framerow">
+      <div class="framebox desk">
+        <p class="framelabel">Module üben, no history · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="streak"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 2 2 2 0 0-2-1-3 1-5z"/></svg><b>7</b><i>Tage</i></span><span class="avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+  </div>
+    <div class="hubcol">
+      <div class="hubhead">
+        <div class="modeswitch"><span class="pill"></span>
+          <button aria-pressed="true">Module üben</button><button>Modelltest</button></div>
+        <div class="scoperow">
+          <div class="modeswitch sm"><span class="pill"></span>
+            <button aria-pressed="true">Ohne Zeit</button><button>Mit Zeit</button></div>
+          <span class="scopebtn"><span>Niveau</span><b>B2</b><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+        </div>
+      </div>
+      <div class="grid2x2"><span class="modcard2">
+          <span class="mc-top"><span class="tile lg lesen"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Lesen</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg hoeren"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Hören</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg schreiben"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Schreiben</span></span><span class="modcard2">
+          <span class="mc-top"><span class="tile lg sprechen"><span class="g g1"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span><span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="mc-name">Sprechen</span></span></div>
+      <div class="card verlaufempty">
+              <div class="ve-head"><p class="eyebrow mut">Verlauf</p><p class="vcount">noch keine Übung</p></div>
+              <div class="ve-body">
+                <div class="profile"><div class="pcol"><span class="pval">–</span><span class="pbar"></span>
+                    <span class="plab"><span class="tile xs lesen"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span></span>Lesen</span></div><div class="pcol"><span class="pval">–</span><span class="pbar"></span>
+                    <span class="plab"><span class="tile xs hoeren"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span></span>Hören</span></div><div class="pcol"><span class="pval">–</span><span class="pbar"></span>
+                    <span class="plab"><span class="tile xs schreiben"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg></span></span>Schreiben</span></div><div class="pcol"><span class="pval">–</span><span class="pbar"></span>
+                    <span class="plab"><span class="tile xs sprechen"><span class="g g1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span><span class="g g2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span></span>Sprechen</span></div></div>
+                <div class="vsep"></div>
+                <p class="ve-note"><b>Dein Stärkeprofil</b>Sobald du ein Modul geübt hast, steht hier,
+                  wie du gestartet bist und was du seitdem dazugewonnen hast.</p>
+              </div>
+            </div>
+    </div>
+  </div></div>
+      </div>
+      <div class="framebox desk">
+        <p class="framelabel">Ergebnis · desktop 1280</p>
+        <div class="frame desk">
+  <div class="screen">
+    
+  <div class="apphdr">
+    <span class="logomark"></span>
+    <div class="hdrright"><span class="exit quiet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><b>Zurück</b></span></div>
+  </div>
+    <div class="stage fit">
+      <div class="ergrow">
+              <div class="ergleft">
+                <p class="eyebrow prim">Ergebnis</p>
+                <p class="bignum tnum">78 %</p>
+                <span class="badge ok">Bestanden · Grenze 60 %</span>
+                <div class="card pad barsbox"><div class="barline"><span class="bl-top"><b>Lesen</b><i class="tnum">82 %</i></span>
+                    <span class="bl-track"><i class="bar-lesen" style="width:82%"></i></span></div><div class="barline"><span class="bl-top"><b>Hören</b><i class="tnum">71 %</i></span>
+                    <span class="bl-track"><i class="bar-hoeren" style="width:71%"></i></span></div><div class="barline"><span class="bl-top"><b>Schreiben</b><i class="tnum">80 %</i></span>
+                    <span class="bl-track"><i class="bar-schreiben" style="width:80%"></i></span></div><div class="barline"><span class="bl-top"><b>Sprechen</b><i class="tnum">78 %</i></span>
+                    <span class="bl-track"><i class="bar-sprechen" style="width:78%"></i></span></div></div>
+              </div>
+              <div class="ergright">
+                <div class="card pad">
+                  <p class="sm"><b>Schwächster Teil: Hören</b></p>
+                  <p class="cap left">Gezielt wiederholen, gleicher Timer</p>
+                  <span class="btn out sm">Üben</span>
+                </div>
+                <div class="card pad grow2">
+                  <p class="sm"><b>Antworten ansehen</b></p>
+                  <p class="cap left">9 Aufgaben Lesen · 6 Aufgaben Hören · dein Text mit Korrektur</p>
+                </div>
+                <span class="btn grad wide">Fertig</span>
+              </div>
+            </div>
+    </div>
+  </div></div>
+      </div>
+      <div class="notecol">
+        <p class="note"><b>The page is full on day one</b>, and the empty Verlauf doubles as a promise: it shows a
+          new learner what practising will earn them.</p>
+        <p class="note"><b>The Ergebnis stops wasting the widest stage in the app</b> and puts “what to do next”
+          beside the score instead of below the fold.</p>
+        <p class="cost"><b>Cost:</b> more to build, and an empty-state card is chrome a returning learner never
+          sees again. It has to stay quiet enough not to read as a broken chart.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="panel" style="margin-top:26px">
+    <h3>What I need from you</h3>
+    <div class="pickbox">
+      <p><b>One letter</b> for the back button: A (row in the page), B (app header corner), C (thumb row).</p>
+      <p><b>One number</b> for the empty space: 1 (page stops where content stops) or 2 (the space gets used).</p>
+      <p>The five shared rules in section 2 ship either way, unless you want to strike one of them.</p>
+    </div>
+  </div>
+</div></div>
+</div>
+<script>
+  const host = document.querySelector("[data-appearance]") || document.body;
+  /**
+   * The in-page Light/Dark control is what the mocked APP screens answer to, so
+   * it stays authoritative. It just starts on whatever theme the reader is
+   * already viewing in (their OS, or the artifact viewer's own toggle, which
+   * stamps data-theme on <html>), and follows that toggle until they pick.
+   */
+  let picked = false;
+  const readerTheme = () => {
+    const stamped = document.documentElement.dataset.theme;
+    if (stamped === "dark" || stamped === "light") return stamped;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  };
+  const syncFromReader = () => {
+    if (picked) return;
+    const t = readerTheme();
+    host.dataset.appearance = t;
+    const seg = document.getElementById("seg-appearance");
+    if (seg) seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === t)));
+  };
+  syncFromReader();
+  if (window.matchMedia) {
+    try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncFromReader); } catch (e) {}
+  }
+  new MutationObserver(syncFromReader).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  document.querySelectorAll(".seg").forEach((seg) => {
+    seg.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      host.dataset[btn.dataset.k] = btn.dataset.v;
+      picked = true;
+    });
+  });
+  const q = new URLSearchParams(location.search);
+  const app = q.get("appearance");
+  if (app) { host.dataset.appearance = app; picked = true; }
+  const only = q.get("only");
+  const target = only && document.getElementById(only);
+  if (target) {
+    let node = target;
+    while (node && node.parentElement && !node.parentElement.classList.contains("wrap")) {
+      Array.from(node.parentElement.children).forEach((el) => { if (el !== node) el.style.display = "none"; });
+      node = node.parentElement;
+    }
+    Array.from(target.parentElement.children).forEach((el) => { if (el !== target) el.style.display = "none"; });
+  }
+</script>

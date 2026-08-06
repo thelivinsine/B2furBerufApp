@@ -1,7 +1,8 @@
 # Project Status
 
-_Last updated: 2026-08-05 (session 194). **The Prüfung zone was audited end to end and every
-finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
+_Last updated: 2026-08-06 (session 195 is a DESIGN REVIEW of the same zone with no code changes;
+its handoff and the open question are under "Resume here"). Session 194 below is the last shipped
+state. **The Prüfung zone was audited end to end and every finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
 the issue". The report (`docs/reports/pruefung-audit-2026-08-05.md`, 35 ranked findings) is kept in
 full as the record; `docs/areas/PRUEFUNG.md` is the new current-state law for the zone.
 **Three patterns explained almost all of it:** a retired feature left its readers behind, Ohne Zeit
@@ -190,6 +191,34 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 195 (2026-08-06): the Prüfung zone reviewed for one frame, options open
+(branch `claude/prufung-hub-design-consistency-193qrh`).**
+Founder: "the page layouts and design are all either inconsistent with different back buttons
+styles at different positions or with awkward empty spaces ... review this and propose some ideas."
+**Review only; no app code touched**, per the `/design` rule that analysis is reported before
+anything is edited. Six findings, all read from the code: FOUR back-button treatments in THREE
+positions (red `Verlassen` and grey `Zurück` in the app header, a white pill bottom-left in the
+writing trainers, the same pill top-right on the speaking list); the word `Zurück` on two controls
+of one screen (the header exit and the question stepper in Lesen/Hören); two screens with no exit
+at all (desktop Schreiben, because the cluster is `lg:hidden`, and a running practice
+conversation); FOUR content widths in one zone (896 hub · 1152 trainer and list · 672 conversation
+· 448 for the Anleitung and the Ergebnis inside the 1152 exam stage, which is where the empty space
+is worst); three header languages; and both hub tabs holding `h-page-stage` with nothing to fill it
+before a learner has a Verlauf.
+**Proposed:** a five-rule spine shared by every option (one 896 column at rest, the wide stage only
+for a running Teil; one exit, one word, one slot; the stepper stops saying `Zurück`; one Niveau
+control; every screen wears its `PART_META` mark), then three variants for where the exit lives
+(**A** a Modulkopf row in the page · **B** the app-header corner · **C** the thumb row everywhere,
+extending s192) and two independent answers to the empty space (**1** drop the viewport lock and
+widen Anleitung/Ergebnis · **2** ship the Verlauf in an empty state and make the Ergebnis two
+columns).
+Preview: `preview/pruefung-frame.html` (generator `preview/gen-pruefung-frame.mjs`), artifact
+<https://claude.ai/code/artifact/b04df435-61f7-4d9c-ab82-ba28b50a385e>, screenshot-verified in
+headless Chromium light and dark.
+**Resume here:** waiting on the founder for ONE LETTER (A/B/C) and ONE NUMBER (1/2). Nothing is
+implemented until that pick lands; the s191 handoff moved to
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` to keep this file short.
+
 **Handoff after session 192 (2026-08-05): the trainer's way back, and the exam frame confined to
 Mit Zeit (branch `claude/prufung-ui-bottom-bar-u0fdwf`).**
 Two founder prompts, both from phone screenshots.
@@ -224,32 +253,3 @@ check:bundle 126.7 kB of 400 · check:contrast.
 one-viewport stage. That is deliberate (the stage is what keeps a Teil at zero page scroll, and a
 visible tab bar would let a learner re-enter the persisted run in a loop), but say the word and it
 can go too.
-
-**Handoff after session 191 (2026-08-05): the Prüfung module tiles went flat (branch
-`claude/remove-tile-gradient-4fcowe`).**
-Two founder prompts against a screenshot of `/anwenden`, Module üben.
-- **"Get rid of the colored gradient from the tiles here."** The cards carried TWO coloured
-  gradients from s190: the hue radial across the whole card (`.mod-wash-*`) and a gradient fill on
-  the mark tile. Both are gone. The wash span, the `wash` field on `PART_META` and the entire
-  `.mod-wash-*` block in `index.css` are deleted, and `tile` is now a flat tint
-  (`bg-emerald-500/15 dark:bg-emerald-400/20`, and the teal / primary / sky pairs). The colour still
-  carries the receptive-vs-productive fact, it just carries it evenly. The badge corner stays
-  reserved by the card's bottom padding, so the clock switch still cannot move a card edge.
-- **"Increase the space below the toggle buttons slightly."** The hub's outer column went
-  `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap sits ONLY between the header block (switcher + scope
-  row) and the tab content, so the toggles and the tiles now read as two sections while the gaps
-  inside each block are untouched.
-**Verified in the real build**, not in a mockup: a rebuilt CDP driver (Node 22's built-in
-`WebSocket`, no new deps) reports zero page scroll, zero badge/text overlap and no `background-image`
-inside `main` at 360x640, 393x852 light and dark, and 1280x900, in BOTH clock states. Gates green:
-build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests · check:bundle · contrast.
-- **"The time badges [are] overlapping on the text ... just remove the text and just keep the
-  badges."** A real bug, and the reserve was the cause: the badge is 24px tall and sits 12px off the
-  bottom, i.e. 36px, against a 28px `pb-[1.75rem]` reserve, so with the clock ON it sat across the
-  description on all four cards. The description line is gone (`FREE_DESC` with it; `PART_META.desc`
-  stays for the Anleitung pages). What remains is mark, arrow, title, badge. The one line that can
-  still appear is the honest empty state, and it only shows on a card that has no badge.
-Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, the badge overlap),
-both squash-merged into `main`; the founder verifies the live result.
-**Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
-so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.

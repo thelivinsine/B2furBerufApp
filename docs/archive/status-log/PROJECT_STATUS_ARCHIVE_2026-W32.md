@@ -470,3 +470,31 @@ most recent into the current ISO-week chunk under `docs/archive/status-log/` (se
 session-by-session narrative — keep it to the latest session only. Keep the whole file under ~250
 lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
 
+**Handoff after session 191 (2026-08-05): the Prüfung module tiles went flat (branch
+`claude/remove-tile-gradient-4fcowe`).**
+Two founder prompts against a screenshot of `/anwenden`, Module üben.
+- **"Get rid of the colored gradient from the tiles here."** The cards carried TWO coloured
+  gradients from s190: the hue radial across the whole card (`.mod-wash-*`) and a gradient fill on
+  the mark tile. Both are gone. The wash span, the `wash` field on `PART_META` and the entire
+  `.mod-wash-*` block in `index.css` are deleted, and `tile` is now a flat tint
+  (`bg-emerald-500/15 dark:bg-emerald-400/20`, and the teal / primary / sky pairs). The colour still
+  carries the receptive-vs-productive fact, it just carries it evenly. The badge corner stays
+  reserved by the card's bottom padding, so the clock switch still cannot move a card edge.
+- **"Increase the space below the toggle buttons slightly."** The hub's outer column went
+  `gap-4 sm:gap-5` → `gap-6 sm:gap-7`. That gap sits ONLY between the header block (switcher + scope
+  row) and the tab content, so the toggles and the tiles now read as two sections while the gaps
+  inside each block are untouched.
+**Verified in the real build**, not in a mockup: a rebuilt CDP driver (Node 22's built-in
+`WebSocket`, no new deps) reports zero page scroll, zero badge/text overlap and no `background-image`
+inside `main` at 360x640, 393x852 light and dark, and 1280x900, in BOTH clock states. Gates green:
+build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests · check:bundle · contrast.
+- **"The time badges [are] overlapping on the text ... just remove the text and just keep the
+  badges."** A real bug, and the reserve was the cause: the badge is 24px tall and sits 12px off the
+  bottom, i.e. 36px, against a 28px `pb-[1.75rem]` reserve, so with the clock ON it sat across the
+  description on all four cards. The description line is gone (`FREE_DESC` with it; `PART_META.desc`
+  stays for the Anleitung pages). What remains is mark, arrow, title, badge. The one line that can
+  still appear is the honest empty state, and it only shows on a card that has no badge.
+Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, the badge overlap),
+both squash-merged into `main`; the founder verifies the live result.
+**Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
+so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
