@@ -164,6 +164,22 @@ export interface MockExamPlan {
 }
 
 /**
+ * Content the CALLER picked, which overrides the random draw for that part.
+ *
+ * The Ohne-Zeit modules are a chooser now (founder s196): Lesen and Hören open
+ * a filtered list and the learner starts the text they picked, exactly the way
+ * Schreiben has always opened on a chosen Aufgabe. A picked id is honoured
+ * verbatim, so the drill really is the thing on the card the learner tapped;
+ * everything unpicked still falls back to the random draw, which is what a
+ * Modelltest and the "zufällig" button use.
+ */
+export interface MockExamPicks {
+  lesen?: string[];
+  hoeren?: string[];
+  sprechen?: string;
+}
+
+/**
  * Compose one run. Parts default to the full exam; a single-part run passes
  * `["lesen"]` etc. Selection is random per run so retakes vary; the ids are
  * frozen into the plan so a resumed run re-renders the same exam.
@@ -171,24 +187,39 @@ export interface MockExamPlan {
 export function composeMockExam(
   level: MockExamLevel,
   parts: MockPartId[] = MOCK_PART_ORDER,
+  picks: MockExamPicks = {},
 ): MockExamPlan {
-  const hoeren = parts.includes("hoeren")
-    ? shuffle(listeningPool(level)).slice(0, LISTENING_COUNT).map((t) => t.id)
-    : [];
+  // A picked id is filtered against the bank, never trusted: a stale deep link
+  // must not compose a run over a text that no longer exists.
+  const pick = (ids: string[] | undefined) =>
+    ids?.filter((id) => textById.has(id)) ?? [];
+  const pickedHoeren = pick(picks.hoeren);
+  const pickedLesen = pick(picks.lesen);
+
+  const hoeren = !parts.includes("hoeren")
+    ? []
+    : pickedHoeren.length
+      ? pickedHoeren
+      : shuffle(listeningPool(level)).slice(0, LISTENING_COUNT).map((t) => t.id);
   const used = new Set(hoeren);
-  const lesen = parts.includes("lesen")
-    ? shuffle(readingPool(level))
-        .filter((t) => !used.has(t.id))
-        .slice(0, READING_COUNT)
-        .map((t) => t.id)
-    : [];
+  const lesen = !parts.includes("lesen")
+    ? []
+    : pickedLesen.length
+      ? pickedLesen
+      : shuffle(readingPool(level))
+          .filter((t) => !used.has(t.id))
+          .slice(0, READING_COUNT)
+          .map((t) => t.id);
   const schreiben = parts.includes("schreiben")
     ? randomTask(writingRefs(level))
     : null;
   const speaking = parts.includes("sprechen") ? speakingSets(level) : [];
-  const sprechen = speaking.length
-    ? speaking[Math.floor(Math.random() * speaking.length)].id
+  const picked = picks.sprechen && speaking.some((s) => s.id === picks.sprechen)
+    ? picks.sprechen
     : null;
+  const sprechen =
+    picked ??
+    (speaking.length ? speaking[Math.floor(Math.random() * speaking.length)].id : null);
   return { level, parts, lesen, hoeren, schreiben, sprechen };
 }
 

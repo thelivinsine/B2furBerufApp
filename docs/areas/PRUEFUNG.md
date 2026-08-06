@@ -19,9 +19,35 @@ width. Neither scrolls at rest: the page is `h-page-stage` and the elastic regio
 room. What may grow is a Verlauf, and only when the learner opens it (`useStagePanel`).
 
 **Mit Zeit / Ohne Zeit is one switch beside the Niveau**, resting on Ohne Zeit, and it is the only
-way into the free trainers: `/writing` and `/simulation` are what the SAME four modules do without
-a clock, never a fifth block. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit
-skips the Anleitung and opens the drill. Only the STAGE is shared.
+way into the four choosers: `/lesen`, `/hoeren`, `/writing` and `/simulation` are what the SAME
+four modules do without a clock, never a fifth block. **The exam FRAME is Mit Zeit's alone**
+(founder s192): Ohne Zeit skips the Anleitung and opens the module's own page. Only the STAGE is
+shared.
+
+## The four Ohne-Zeit choosers (founder s196)
+
+Founder s196, on the Sprechen list: "it should somehow look like Schreiben with a filter rail like
+Schreiben's Aufgabe wählen tile. Same should apply for Lesen and Hören." So all four now wear ONE
+frame and ONE rail.
+
+- **The frame** is `features/pruefung/ModulePicker.tsx`: Schreiben's desktop grid (content column
+  plus a sticky 16rem rail) and, on a phone, the same rail as a collapsible panel behind an
+  **Aufgabe** toggle that rides in the module row the zone already carries (`ModuleHeader`), so the
+  picker costs a phone no extra row.
+- **The rail** is `features/shared/ScopeRail.tsx`, lifted out of `WritingRail` unchanged: the
+  Himmelblau tile with no visible edge, the uppercase section eyebrows, the Bibliothek scope
+  dropdowns with honest zero-yield counts, the always-active reset. Anything visual lives there
+  now, so a change reaches all four modules at once.
+- **Lesen and Hören** used to compose a random drill and open it directly, so the clock was their
+  only difference from Mit Zeit and no text could be chosen. `/lesen` and `/hoeren` list what the
+  scope serves (Niveau, Branche, Lebensbereich, Thema, Unterthema, Textsorte) and start the picked
+  text as a single-text untimed run through the SAME `LesenPart`/`HoerenPart`, scored the same way
+  and recorded in the same Module-üben Verlauf. The old behaviour survives as **Zufällige
+  Auswahl**, which draws the module's full exam-shaped set from the current scope.
+- **A picked id reaches the run** through `MockExamPicks` (`composeMockExam(level, parts, picks)`),
+  filtered against the bank so a stale deep link cannot compose a run over a text that is gone.
+- Niveau on a chooser is the RAIL's, which is the zone's one-Niveau-control rule applied per
+  screen; the hub's `LevelSelect` hands its band over as `?level=` and the chooser honours it.
 
 ## One frame for the whole zone (founder s195)
 
@@ -138,6 +164,10 @@ rather than as a zero.
 | File | What it holds |
 |---|---|
 | `features/pruefung/PruefungHub.tsx` | the one page: switchers, module grid, run band, both Verläufe |
+| `features/pruefung/ModulePicker.tsx` | the chooser frame all four Ohne-Zeit modules share |
+| `features/pruefung/TextModuleHub.tsx` | `/lesen` + `/hoeren`: the rail, the list, the single-text run |
+| `features/shared/ScopeRail.tsx` | the ONE "Aufgabe wählen" rail + `ScopeSelect` |
+| `lib/moduleScope.ts` | the choosers' scope selectors and counters |
 | `engine/exam.ts` | the composer, the pools, availability, scoring, `EXAM_BAND` |
 | `store/useExamStore.ts` | the one running exam, persisted; the deadline clock |
 | `features/exam/MockExamRunner.tsx` | the flow shell, Anleitung, RunBar, Ergebnis, answer review |
@@ -147,3 +177,4 @@ rather than as a zero.
 | `features/exam/partMeta.ts` | the four modules' marks, colours and Anleitung copy |
 | `store/useProgressStore.ts` | `mockExams`, `isFullMockRun`, the retired `examsDone` |
 | `tests/exam.test.ts` · `tests/pruefungHub.test.ts` | the composer and the run/practice split |
+| `tests/moduleScope.test.ts` | the choosers' filter law and the picked-content override |

@@ -68,10 +68,11 @@ after pulling.
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
   `artikel/` + `city/` (see `docs/areas/COMPONENTS.md`), `ui/` primitives, `shared/Logo.tsx`
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
-- Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
+- Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/analytics`
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone
-  that holds Sprechen + Schreiben + Modelltest since s182; `/writing` keeps its route but
-  is a card in that hub, not a tab) · `/exam` **Modelltest** (the four-part mock exam, s186;
+  that holds the four modules + Modelltest since s182) · the four Ohne-Zeit choosers
+  `/lesen` · `/hoeren` · `/writing` · `/simulation` (each a card in that hub, not a tab) ·
+  `/exam` **Modelltest** (the four-part mock exam, s186;
   renamed from "Prüfungssimulation" and re-laid-out s188: hub at rest, and the running Teil takes
   the route over) ·
   `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
@@ -93,46 +94,45 @@ after pulling.
 - **A human-verified row is never edited by an AI to satisfy a new rule.** The content fingerprint
   ties the `verified` stamp to exact content, so a new content-shape check WARNS on verified rows
   and queues them for the next human pass; it never re-stamps and never flips them back to draft.
-- **A filter filters; it never substitutes.** In Schreiben's Aufgabe rail, Niveau, Textsorte and
-  Unterthema are HARD (Branche stays soft, untagged-=-universal, and is applied last so it cannot
-  hide a hard match), ONE function counts what the trainer draws, zero-yield options grey out with
-  their honest count, and an empty scope gets an empty state naming the one filter to drop. The
-  prefer-tagged-else-untagged fallback these replaced made "Forumsbeitrag" serve a Beschwerde 84% of
-  the time (s180). Related founder law: **only a task carrying the full brief is served** (Adressat,
-  du/Sie, 2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung
-  against it. The 373 bare legacy tasks that law retired were all authored up to that shape in s181
-  (waves 3 and 4), in place and keeping their ids: **717 tasks, every one servable**, with ≥2 tasks
-  per Unterthema per length, all 15 Branchen on every Beruf AND Alltag theme at both lengths, and all
-  16 Textsorten live. `tests/writingScope.test.ts` gates each of those, so they are invariants now.
+- **A filter filters; it never substitutes.** In every Aufgabe rail (all four modules since s196)
+  Niveau, Thema, Unterthema and Textsorte are HARD; Branche stays soft (untagged-=-universal) and is
+  applied last so it cannot hide a hard match; ONE function counts what the module draws; zero-yield
+  options grey out with their honest count; an empty scope gets an empty state naming the one filter
+  to drop. Related founder law: **only a task carrying the full brief is served** (Adressat, du/Sie,
+  2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung against
+  it: **717 writing tasks, every one servable**, ≥2 per Unterthema per length, all 15 Branchen on
+  every Beruf AND Alltag theme at both lengths, all 16 Textsorten live. `tests/writingScope.test.ts`
+  and `tests/moduleScope.test.ts` gate all of it, so they are invariants now. (Why → `DECISIONS.md`
+  §s180/s196.)
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments
   (plus Fokus error underlines); never general chrome, never building marks.
 - **Locked structures** (change only on explicit founder request): the mobile bottom tab bar
-  (structure, edit mode, icon rules — `docs/areas/PRAKTISCH-NAV.md`), the dialog/overlay recipe
-  (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
-  lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the Himmelblau-fill/white-controls
-  FilterRail answer (s189), the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
-  `layoutId`), the Prüfung module card's anatomy (s191: no description line, the minutes badge's
-  corner reserved in both clock states), the Schreiben mobile anatomy (ONE fixed bottom-chrome
-  geometry shared by Fokus, Kurz and Lang + measured tile heights + the Fokus dial tile,
-  `docs/areas/SCHREIBEN.md`), the Prüfung zone's one frame (s195, below).
+  (`docs/areas/PRAKTISCH-NAV.md`), the dialog/overlay recipe (`docs/areas/BRAND.md` §Dialog), the
+  in-mission pixel chrome + "failure is content, never lockout" + the ungated boss mission 1.6
+  (`docs/areas/GAME.md`), the Himmelblau-fill/white-controls FilterRail and Aufgabe-rail answer
+  (s189/s196, `features/shared/ScopeRail.tsx`), the sliding-pill switcher mechanism
+  (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card's anatomy (s191), the
+  Schreiben mobile anatomy (`docs/areas/SCHREIBEN.md`), the Prüfung zone's one frame (s195, below).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`. `mergeRemoteSettings` adopts on `settings.onboarded === true` and nothing
   else (a proxy field sent every account back through onboarding and discarded its level and goal).
   Where a not-onboarded visitor goes depends on their session: signed out → `/welcome`, signed in →
   `/start` (`docs/DECISIONS.md` §s174).
-- **Sprechen is Schreiben with a microphone** (s193): a brief, a conversation, then the EXISTING
-  `features/writing/correction.tsx` card as the debrief (speaking is its fourth caller; never build
-  a fifth copy). Deliberately NOT an open chatbot: an LLM adapts down to the learner and produces no
-  assessment, so the brief (named partner, register, 2-5 Leitpunkte) is what makes it an exercise,
-  and the partner never corrects mid-flow. **Which layout a spoken task uses is a property of the
-  TASK, never a setting**: practice runs the transcript (`gespraech`), an exam task keeps its
-  Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The conversation row is
-  written when a conversation STARTS**, so the daily limit counts what costs money, and the turn
-  ceiling is measured against the STORED transcript AND on the client, so a learner never speaks
-  into turns the grader will not see (s194). Full detail in `docs/areas/SPRECHEN.md`.
+- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief,
+  a conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (speaking is
+  its fourth caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot: an
+  LLM adapts down to the learner and produces no assessment, so the brief (named partner, register,
+  2-5 Leitpunkte) makes it an exercise, and the partner never corrects mid-flow. **Which layout a
+  spoken task uses is a property of the TASK**: practice runs the transcript (`gespraech`), an exam
+  task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
+  conversation row is written when a conversation STARTS**, so the daily limit counts what costs
+  money, the turn ceiling is measured against the STORED transcript AND on the client (s194), and
+  **the practice counts once the learner has SPOKEN, never only once the AI has graded** (s196):
+  the transcript is stored server-side, so a failed debrief is retryable and never a lost session.
+  Full detail in `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
   `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
@@ -140,28 +140,30 @@ after pulling.
   `hasProgress(run)` gates it, the Schreibtrainer never asks (its draft autosaves, so the warning
   would be false) and a started conversation always does. **The word Zurück belongs to that exit
   alone**, so the question stepper is a chevron. A phone carries the module row on every screen
-  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`). ONE Niveau control
-  (`LevelSelect`), ONE width at rest (`max-w-4xl`, the Sprechtrainer list included), the wide
-  `lg:max-w-6xl` stage for a RUNNING Teil alone, and the Verlauf card ships in an empty state from
-  the first visit, because both hub tabs hold a one-viewport frame.
+  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`, and on a chooser that row
+  carries the Aufgabe toggle). ONE Niveau control per screen: the hub's `LevelSelect`, and on a
+  chooser the rail's own Niveau. The HUB rests at `max-w-4xl`, a chooser wears Schreiben's
+  content-plus-16rem-rail grid (s196), and only a RUNNING Teil gets the wide `lg:max-w-6xl` stage.
+  The Verlauf card ships in an empty state from the first visit, because both hub tabs hold a
+  one-viewport frame.
 - **An exercise the app scores can always be handed in, and every score it produces is reachable**
   (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
   question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
   by decrementing, or a background tab pauses the exam. Every correction the evaluator returns is
   rendered, and a result surfaces in exactly ONE Verlauf: **a Modelltest sat all four parts, a run
-  that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired).
+  that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired), and a
+  trainer that produces a correction rather than a percentage keeps its own Verlauf on its own page
+  (Schreiben since s171, Sprechen since s196 — a recorded row nothing reads back is lost work).
 - **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
   instead of throwing, so an ignored result makes a permanently broken sync look identical to a
-  working one while localStorage keeps the app running. Every push reads its error, retries with
-  backoff, and after 3 consecutive failures flips `useAuthStore.syncHealth` to `"failing"`, which
-  the Settings account panel shows as "Sync pausiert" with a retry. Any new cloud write path does
-  the same; never `await` a Supabase call and drop its result.
+  working one. Every push reads its error, retries with backoff, and after 3 consecutive failures
+  flips `useAuthStore.syncHealth` to `"failing"`, shown in Settings as "Sync pausiert" with a retry.
+  Any new cloud write path does the same; never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
-  keep `RETAIN_DAYS` (400) days, folding dropped active days into `activeDaysFolded` so the
-  lifetime "N aktive Tage" figure is unchanged; migration 0015 purges abandoned guest accounts
-  (90 days), never-reused transform-cache rows (60 days) and learner TEXT (730 days, founder
-  decision s185) by `pg_cron`. The text purge NULLs columns, never deletes rows, so limits and
-  aggregates survive and Verlauf keeps the evaluation. **A retention timer and the privacy-policy
+  keep `RETAIN_DAYS` (400) days, folding dropped days into `activeDaysFolded` so the lifetime
+  figure is unchanged; migration 0015 purges abandoned guest accounts (90 days), transform-cache
+  rows (60 days) and learner TEXT (730 days) by `pg_cron`. The text purge NULLs columns, never
+  deletes rows, so limits, aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
   copy describing it ship in the SAME change**; never resolve a conflict between them by editing
   the copy alone.
 - **Never reload over a learner's unsaved work.** The PWA adopts deploys by reloading; every
@@ -221,11 +223,14 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
-  Verlauf). No HubHero, no `h1`. Niveau is a compact button, not a second pill row, and the scope
-  controls sit BELOW the switcher at EVERY width, and BOTH rows are centred, desktop included. **Mit Zeit / Ohne Zeit** is one switch beside
-  it, resting on Ohne Zeit, and it is the ONLY way into the Schreib- and Sprechtrainer
-  (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,
-  never a fifth block. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
+  Verlauf). No HubHero, no `h1`. Niveau is a compact button, and the scope controls sit BELOW the
+  switcher at EVERY width, both rows centred. **Mit Zeit / Ohne Zeit** is one switch beside
+  it, resting on Ohne Zeit, and it is the ONLY way into the four choosers (`/lesen`, `/hoeren`,
+  `/writing`, `/simulation`): they are what the same four modules do without a clock, never a fifth
+  block. **All four wear ONE "Aufgabe wählen" rail** (`features/shared/ScopeRail.tsx`, founder
+  s196): the Himmelblau tile with the Bibliothek scope dropdowns, sticky beside the content on
+  desktop and behind the module row's Aufgabe toggle on a phone. Lesen and Hören used to open a
+  random draw with no way to pick; that draw survives as their "Zufällige Auswahl" button. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
   Anleitung and opens the drill. Only the STAGE stays shared; the exit and its confirm follow the
   one-frame law above, not the clock. The run band's timeline connector is one segment per gap,
   drawn between the tiles, never a line behind them.
@@ -249,12 +254,11 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile.
 - **Controls always visibly act:** no disabled-at-default buttons; zero-yield options grey out
   with honest counts.
-- **Dark mode is near-neutral, not blue** (founder s187, "N3 Slate"): the greys carry a whisper of
-  cool (10-15% saturation, ground `220 15% 4%`, cards `220 10% 17%`) and the two coloured page
-  radials are OFF in dark (`--wash-a`/`--wash-b`). Colour survives only where it ACTS: the gradient
-  CTA, an active number, a selected answer. Three layers always separate: ground → card (1.38:1) →
-  anything nested inside a card (`--elevated`); a row that carries its card's own fill is a bug, not
-  a style. Corners are the "tighter" scale (`--radius: 0.5rem` → card 10px, row 8px, pill 6px).
+- **Dark mode is near-neutral, not blue** (founder s187, "N3 Slate"): greys carry a whisper of cool
+  (ground `220 15% 4%`, cards `220 10% 17%`), the two coloured page radials are OFF, and colour
+  survives only where it ACTS (gradient CTA, active number, selected answer). Three layers always
+  separate: ground → card (1.38:1) → anything nested in a card (`--elevated`). Corners are the
+  "tighter" scale (`--radius: 0.5rem` → card 10px, row 8px, pill 6px).
 - **Color language:** Himmelblau accent tiles for selection rails (not grey), and the accent is a
   FILL with NO visible edge: rails and the buttons that open them border in their own fill color
   and separate from the page by `shadow-soft` alone, like the Bibliothek cards (never an accent
@@ -303,21 +307,18 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   `.github/workflows/pages.yml` ships the site, and `.github/workflows/supabase.yml` deploys every
   Supabase Edge Function (and applies migrations first, when `SUPABASE_DB_PASSWORD` is set).
   `validate.yml` is the content-lint + test gate and never deploys.
-- **No CLI is needed for backend changes any more, migrations included (s179).** The Supabase
-  workflow needs `SUPABASE_ACCESS_TOKEN` (set; carries an expiry, and the run fails with an explicit
-  "regenerate it" error when it lapses) and, since 2026-07-31, `SUPABASE_DB_PASSWORD` (set), so
-  **a merge to `main` applies pending migrations and then deploys every Edge Function**. Nothing is
-  pasted into the SQL editor any more.
+- **No CLI is needed for backend changes any more, migrations included (s179).** With
+  `SUPABASE_ACCESS_TOKEN` (set; expires, and the run then fails with an explicit "regenerate it")
+  and `SUPABASE_DB_PASSWORD` (set), **a merge to `main` applies pending migrations and then deploys
+  every Edge Function**. Nothing is pasted into the SQL editor any more.
   **Keep migrations idempotent** (`add column if not exists`, `create table if not exists`,
   `drop policy if exists` before `create policy`): the push runs `--include-all`, so an unrecorded
   file is applied wherever its number sits. **`pnpm lint:migrations` gates this since s185** (files
   ≤ 0014 are exempt as already-applied history; never raise that baseline to silence a new file).
   Migrations run BEFORE the function deploys, so a non-idempotent statement blocks the whole
   backend deploy.
-  The workflow also carries three dispatch-only inputs for when something is off:
-  `list_only` (print local vs remote history), `probe_schema` (print the live tables, columns,
-  functions, policies and recorded migrations) and `repair_applied` (mark versions as applied
-  without running them). The s179 bridge from hand-pasted history used all three.
+  The workflow also carries three dispatch-only rescue inputs (`list_only`, `probe_schema`,
+  `repair_applied`); `docs/areas/COMMANDS.md` says what each prints and when to reach for it.
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.

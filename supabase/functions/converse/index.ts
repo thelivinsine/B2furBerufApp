@@ -85,6 +85,24 @@ const TURN_MODEL = Deno.env.get("SPEAKING_TURN_MODEL") ?? "claude-haiku-4-5";
 const DEBRIEF_MODEL = Deno.env.get("SPEAKING_DEBRIEF_MODEL") ?? "claude-sonnet-5";
 const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
 
+/**
+ * Output budgets, per mode. These are the s196 bug fix, and the two numbers are
+ * different for a reason.
+ *
+ * A TURN is one to three spoken sentences, so 500 tokens is generous.
+ *
+ * The DEBRIEF has to echo back EVERY sentence the learner said, corrected, plus
+ * a German tip, its English twin and the verdict arrays, as one JSON object.
+ * Both legs of the cascade ran on 1400 tokens, which a twelve-turn conversation
+ * blows straight through: the JSON came back truncated, `parseJson` failed and
+ * the learner got "Die Rückmeldung konnte nicht gelesen werden" over a
+ * conversation that had gone perfectly (founder s196). Gemini 2.5 Flash made it
+ * worse, because it spends output tokens on thinking before it writes a
+ * character. 4096 matches what every other function here already uses.
+ */
+const TURN_MAX_TOKENS = 500;
+const DEBRIEF_MAX_TOKENS = 4096;
+
 function monthKey(d = new Date()): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
@@ -247,9 +265,17 @@ function estimateCost(model: string, inTok: number, outTok: number): number {
   return (inTok / 1e6) * i + (outTok / 1e6) * o;
 }
 
+/** What a call needs beyond its prompt: how much it may write, and in what shape. */
+interface CallOpts {
+  maxTokens: number;
+  /** Ask the model for raw JSON. The debrief does; a spoken turn does not. */
+  json?: boolean;
+}
+
 async function callGemini(
   system: string,
   turns: WireTurn[],
+  opts: CallOpts,
 ): Promise<ModelOut | null> {
   const key = Deno.env.get("GEMINI_API_KEY");
   if (!key) return null;
@@ -265,7 +291,13 @@ async function callGemini(
             role: t.role === "assistant" ? "model" : "user",
             parts: [{ text: t.text }],
           })),
-          generationConfig: { maxOutputTokens: 1400 },
+          generationConfig: {
+            maxOutputTokens: opts.maxTokens,
+            // The same JSON mode every other function here uses. Without it
+            // Gemini wraps the object in prose or code fences and the parse is
+            // a gamble; `parseJson` covered the fences, not the prose.
+            ...(opts.json ? { responseMimeType: "application/json" } : {}),
+          },
         }),
       },
     );
@@ -284,6 +316,7 @@ async function callAnthropic(
   system: string,
   turns: WireTurn[],
   model: string,
+  opts: CallOpts,
 ): Promise<ModelOut | null> {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) return null;
@@ -297,7 +330,7 @@ async function callAnthropic(
       },
       body: JSON.stringify({
         model,
-        max_tokens: 1400,
+        max_tokens: opts.maxTokens,
         system,
         messages: turns.map((t) => ({ role: t.role, content: t.text })),
       }),
@@ -326,6 +359,7 @@ async function callAnthropic(
 async function callOpenAI(
   system: string,
   turns: WireTurn[],
+  opts: CallOpts,
 ): Promise<ModelOut | null> {
   const key = Deno.env.get("OPENAI_API_KEY");
   if (!key) return null;
@@ -339,7 +373,11 @@ async function callOpenAI(
           { role: "system", content: system },
           ...turns.map((t) => ({ role: t.role === "assistant" ? "assistant" : "user", content: t.text })),
         ],
-        max_completion_tokens: 1400,
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens
+        // is rejected), and leave room, because reasoning tokens are spent out
+        // of this budget before a single character of the answer is written.
+        max_completion_tokens: opts.maxTokens,
+        ...(opts.json ? { response_format: { type: "json_object" } } : {}),
       }),
     });
     if (!res.ok) return null;
@@ -360,17 +398,33 @@ async function callOpenAI(
   }
 }
 
-/** Free tier first, then the paid legs. */
+/**
+ * Free tier first, then the paid legs.
+ *
+ * `accept` is what makes the cascade a real cascade for the debrief (s196). It
+ * used to take the first leg that returned ANY text, so a Gemini answer that
+ * was truncated mid-JSON was accepted, the parse failed downstream and Claude
+ * was never asked. A leg whose output the caller cannot use is a leg that
+ * FAILED, so the next one gets its turn.
+ */
 async function cascade(
   system: string,
   turns: WireTurn[],
   paidModel: string,
+  opts: CallOpts,
+  accept: (out: ModelOut) => boolean = () => true,
 ): Promise<ModelOut | null> {
-  return (
-    (await callGemini(system, turns)) ??
-    (await callAnthropic(system, turns, paidModel)) ??
-    (await callOpenAI(system, turns))
-  );
+  const legs = [
+    () => callGemini(system, turns, opts),
+    () => callAnthropic(system, turns, paidModel, opts),
+    () => callOpenAI(system, turns, opts),
+  ];
+  for (const leg of legs) {
+    const out = await leg();
+    if (out && accept(out)) return out;
+    if (out) console.error("converse: unusable output from", out.model);
+  }
+  return null;
 }
 
 /* ------------------------------ The handler ------------------------------- */
@@ -602,7 +656,9 @@ Deno.serve(async (req) => {
     if (wire.length === 0 || wire[0].role !== "user")
       wire.unshift({ role: "user", text: "(Das Gespräch beginnt.)" });
 
-    const out = await cascade(turnSystemPrompt(brief), wire, TURN_MODEL);
+    const out = await cascade(turnSystemPrompt(brief), wire, TURN_MODEL, {
+      maxTokens: TURN_MAX_TOKENS,
+    });
     if (!out) {
       await undoEmptyStart();
       return json({
@@ -670,23 +726,24 @@ Deno.serve(async (req) => {
     .map((t) => `${t.role === "partner" ? brief.partnerName : "Lernende Person"}: ${t.text}`)
     .join("\n");
 
+  // The debrief is only usable if it PARSES, so parsing is the accept test and
+  // an unparsable leg falls through to the next model instead of failing the
+  // whole request (s196).
   const out = await cascade(
     debriefSystemPrompt(brief),
     [{ role: "user", text: `TRANSKRIPT:\n${transcript}` }],
     DEBRIEF_MODEL,
+    { maxTokens: DEBRIEF_MAX_TOKENS, json: true },
+    (o) => parseJson(o.text) !== null,
   );
-  if (!out) {
+  const parsed = out ? parseJson(out.text) : null;
+  if (!out || !parsed) {
     return json({
       ok: false,
-      message: "Die Rückmeldung ist momentan nicht verfügbar. Bitte versuche es später erneut.",
-    });
-  }
-
-  const parsed = parseJson(out.text);
-  if (!parsed) {
-    return json({
-      ok: false,
-      message: "Die Rückmeldung konnte nicht gelesen werden. Bitte versuche es später erneut.",
+      // Says what to do next, because the retry really does work: the
+      // transcript is already stored, so asking again costs no allowance.
+      message:
+        "Die Rückmeldung ist gerade nicht verfügbar. Versuche es gleich noch einmal.",
     });
   }
 

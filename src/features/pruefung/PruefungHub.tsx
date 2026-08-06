@@ -69,8 +69,18 @@ const VERLAUF_REST_ROWS = 3;
 /** How many past runs the development chart plots. */
 const CHART_RUNS = 7;
 
-/** Where a module goes when it is started without a clock. */
-const FREE_ROUTE: Partial<Record<MockPartId, string>> = {
+/**
+ * Where a module goes when it is started without a clock.
+ *
+ * All FOUR modules have an Ohne-Zeit page of their own since s196 (founder:
+ * give Lesen and Hören the same Aufgabe-wählen rail Schreiben has). Before
+ * that, Lesen and Hören composed a random drill here and opened it directly, so
+ * the clock was their only difference from Mit Zeit and no text could be
+ * chosen. The random draw still exists, as a button on each chooser.
+ */
+const FREE_ROUTE: Record<MockPartId, string> = {
+  lesen: "/lesen",
+  hoeren: "/hoeren",
   schreiben: "/writing",
   sprechen: "/simulation",
 };
@@ -187,15 +197,15 @@ export function PruefungHub() {
           : avail.sprechen;
 
   const openModule = (part: MockPartId) => {
-    if (clock === "free" && FREE_ROUTE[part]) {
+    if (clock === "free") {
       // The Niveau travels with the learner (s194 audit P11). Without it the
       // trainer opened on whatever scope it was last left on, so the clock was
       // not the only difference between practising a module and sitting it.
-      navigate(`${FREE_ROUTE[part]!}?level=${level}`);
+      navigate(`${FREE_ROUTE[part]}?level=${level}`);
       return;
     }
     if (!servable) return;
-    start(level as MockExamLevel, [part], { untimed: clock === "free" });
+    start(level as MockExamLevel, [part]);
   };
 
   const selectTab = (next: Tab) => {
@@ -489,11 +499,11 @@ function ModuleGrid({
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
-        // A free Schreiben or Sprechen opens its trainer, which needs no exam
-        // content; the other three cases need a servable level with a draw.
+        // Ohne Zeit always opens the module's own chooser, which is honest
+        // about what it can serve (its own empty state names the filter to
+        // drop); Mit Zeit still needs a servable level with a draw.
         const free = clock === "free";
-        const viaTrainer = free && !!FREE_ROUTE[part];
-        const canOpen = viaTrainer || (servable && countFor(part) > 0);
+        const canOpen = free || (servable && countFor(part) > 0);
 
         return (
           <motion.button

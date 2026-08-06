@@ -56,6 +56,15 @@ const WritingHub = lazyWithReload(() =>
 const SprechenHub = lazyWithReload(() =>
   import("@/features/sprechen/SprechenHub").then((m) => ({ default: m.SprechenHub })),
 );
+// s196: Lesen and Hören ohne Zeit are choosers now, not a random draw. Same
+// Aufgabe-wählen rail as Schreiben, over the same banks the Modelltest draws
+// from; starting one text runs the exam's own part, untimed.
+const LesenHub = lazyWithReload(() =>
+  import("@/features/pruefung/TextModuleHub").then((m) => ({ default: m.LesenHub })),
+);
+const HoerenHub = lazyWithReload(() =>
+  import("@/features/pruefung/TextModuleHub").then((m) => ({ default: m.HoerenHub })),
+);
 const QuickRevision = lazyWithReload(() =>
   import("@/features/revision/QuickRevision").then((m) => ({ default: m.QuickRevision })),
 );
@@ -347,6 +356,22 @@ export const router = createBrowserRouter([
         element: (
           <RequireOnboarding>
             <SprechenHub />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        path: "/lesen",
+        element: (
+          <RequireOnboarding>
+            <LesenHub />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        path: "/hoeren",
+        element: (
+          <RequireOnboarding>
+            <HoerenHub />
           </RequireOnboarding>
         ),
       },

@@ -1671,3 +1671,64 @@ learner read a word of their feedback; it completes on exit, carrying the score.
 **Retired.** `features/simulation/`, `features/exam/ExamRunner.tsx` and `engine/dialogue.ts`. The
 authored `nodes` graphs stay in the bank (ids are permanent and the linter still validates them)
 but are no longer read at runtime; retiring them is a separate mechanical change.
+
+---
+
+## s196 — the Ohne-Zeit choosers, and why a failed debrief was losing a whole session
+
+**The prompt.** "There are some bugs or inconsistencies with the Sprechen module. Sprechen ohne
+Zeit page tiles are all a bunch tiles as list, but it should somehow look like Schreiben with a
+filter rail like Schreiben Aufgabe wählen tile. Same should apply for Lesen and Hören ohne Zeit
+modules. The bug I found with Sprechen is that after I do the speaking exercise, the evaluation
+couldn't be done as there was some problem and the Verlauf section isn't updated with this
+progress. It's basically lost."
+
+**One rail, not four.** The founder's fix was already in the app: Schreiben's "Aufgabe wählen"
+tile. So `ScopeSelect` and the tile shell moved out of `WritingRail` into
+`features/shared/ScopeRail.tsx` verbatim, and Sprechen, Lesen and Hören compose it. Extending the
+existing design system rather than growing a second one is the standing law here; the alternative
+(three lookalike rails) is exactly the drift that produced three back buttons before s195.
+
+**Lesen and Hören had no Ohne-Zeit shape at all.** Tapping either card composed a random three-text
+(or two-Ansage) drill and dropped the learner into it, so the clock was the only difference from Mit
+Zeit and no particular text could ever be practised. They are choosers now, and starting one text
+runs the SAME `LesenPart`/`HoerenPart` over a picked id (`MockExamPicks`), untimed: same scoring,
+same Module-üben Verlauf. The random draw survives as an explicit **Zufällige Auswahl** button,
+because "give me something" is a real want and it should not require choosing first.
+
+**Why the Sprechen list stopped being sections.** The Einsteiger/Mittelstufe/Fortgeschritten
+headings were a Niveau filter wearing a heading's clothes. With Niveau in the rail they became a
+second, contradictory control, so the band moved onto each card as a badge. The rail's ladder is
+the HUB's (1→B1, 2→B2, 3→C1), deliberately NOT the finer band `engine/speaking.ts` pitches a brief
+at: folding the two would have silently dropped every Mittelstufe scenario out of a B2 scope.
+
+**No Branche or Unterthema on the Sprechen rail.** A Scenario carries neither tag, so both
+dropdowns could only ever read 0. A filter that cannot filter is dead chrome, which is the same
+reason Grammatik has no Lebensbereich pills.
+
+### The evaluation bug had three layers, and each alone was enough
+
+1. **1400 output tokens for a debrief.** `converse` used one budget for both modes. A debrief has to
+   echo back every sentence the learner said, corrected, plus a German tip, its English twin and the
+   verdict arrays, as one JSON object. A twelve-turn conversation truncates mid-JSON; `parseJson`
+   returns null; the learner reads "Die Rückmeldung konnte nicht gelesen werden" over a conversation
+   that went perfectly. Every other Edge Function in this repo had already been raised to 4096 for
+   exactly this reason. Turns now get 500, the debrief 4096.
+2. **A cascade that did not cascade.** `cascade` returned the first leg that produced *any* text, so
+   a truncated Gemini answer was accepted and Claude was never asked. Gemini also ran without
+   `responseMimeType: "application/json"` here alone, so a thinking model spent the budget before
+   writing a character. Both fixed, and `cascade` now takes an `accept` predicate: a leg whose
+   output the caller cannot use is a leg that FAILED.
+3. **The practice was credited for being GRADED, not for being spoken.** `onFinished` fired only on
+   a successful debrief, so an unreachable grader also erased the scenario completion, the XP and
+   the streak day. It fires once per conversation either way now. The failure screen offers **Erneut
+   versuchen**, which costs nothing: the allowance counts conversation ROWS and the row already
+   exists, so the stored transcript can simply be re-graded.
+
+**And the Verlauf really was missing.** `speaking_conversations` has recorded every conversation
+since s193 and *nothing ever read it back*. CLAUDE.md already said the untimed trainers "keep their
+own Verlauf on their own pages"; Schreiben had one, Sprechen never got it, so a finished
+conversation left no trace anywhere in the app. `SprechenHistory` is that half, deliberately built
+from Schreiben's row and `features/writing/correction.tsx` rather than a new one. A conversation
+whose debrief never arrived still appears, with its transcript and an "Ohne Bewertung" badge: **a
+recorded row nothing reads back is lost work**, and that is now a stated law.

@@ -5,6 +5,7 @@ import {
   MOCK_PART_ORDER,
   PART_MINUTES,
   type MockExamLevel,
+  type MockExamPicks,
   type MockExamPlan,
   type MockExamResults,
   type MockPartId,
@@ -64,7 +65,11 @@ export function currentPart(run: MockExamRun): MockPartId {
 
 interface ExamStore {
   run: MockExamRun | null;
-  start: (level: MockExamLevel, parts?: MockPartId[], opts?: { untimed?: boolean }) => void;
+  start: (
+    level: MockExamLevel,
+    parts?: MockPartId[],
+    opts?: { untimed?: boolean; picks?: MockExamPicks },
+  ) => void;
   /** Leave the exam without a result; the run is discarded. */
   abandon: () => void;
   /** Instruction page -> the part itself; arms this part's clock. */
@@ -90,7 +95,7 @@ export const useExamStore = create<ExamStore>()(
           run: {
             untimed: opts?.untimed ?? false,
             startedAt: new Date().toISOString(),
-            plan: composeMockExam(level, parts),
+            plan: composeMockExam(level, parts, opts?.picks),
             partIx: 0,
             // The Anleitung page IS the exam frame ("Prüfungsteil", the minutes,
             // "der Timer läuft, sobald du startest"), so Ohne Zeit skips it and
