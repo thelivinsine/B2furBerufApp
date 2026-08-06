@@ -1732,3 +1732,45 @@ conversation left no trace anywhere in the app. `SprechenHistory` is that half, 
 from Schreiben's row and `features/writing/correction.tsx` rather than a new one. A conversation
 whose debrief never arrived still appears, with its transcript and an "Ohne Bewertung" badge: **a
 recorded row nothing reads back is lost work**, and that is now a stated law.
+
+---
+
+## s196 — the Pages deploy chain, and why "transient flake" was the wrong diagnosis
+
+Three sessions in a row hit a red **Deploy site to GitHub Pages** run and each treated it as
+GitHub being flaky. It is not flaky. The workflow does it to itself.
+
+**The mechanism.** `pages.yml` wraps `actions/deploy-pages` in a hand-rolled three-attempt retry
+(added 2026-07-04, when the Pages service really was degraded). But that action does not "retry a
+request": each attempt **creates a deployment and then polls it**. So attempt 2 creates a SECOND
+deployment for the same commit, GitHub cancels the first as superseded, and attempt 1's poll
+reports `Deployment cancelled.` Attempt 3 does it again. The run ends red with a deployment still
+in flight, and the **next** merge fails at the first hurdle:
+
+> Deployment request failed for `<new sha>` due to in progress deployment.
+> Please cancel `<old sha>` first or wait for it to complete.
+
+**Why `concurrency` does not save it.** `pages.yml` already declares
+`concurrency: { group: pages, cancel-in-progress: false }`, which is GitHub's recommended guard and
+looks like it should serialize this. It does not: the lock is held by the WORKFLOW RUN and releases
+the moment the run ends. A run that ends while its deployment is still open hands the lock to the
+next run and the collision anyway.
+
+**The observed chain on 2026-08-06**, which is what makes this legible: run #817 (`e02890f`) went
+red and a manual full re-run fixed it, which read as "recovered" and was recorded as flake. #818
+(`7def4d2`) then self-cancelled across all three attempts. #819 (`2c541e1`, the chooser work) was
+then refused outright, naming `7def4d2` as the blocker. Each red run guarantees the next one.
+
+**Why a manual re-run always "works".** A fresh run attempt starts with no leftover deployment of
+its own to collide with, and by then the stuck one has usually aged out. That is why the fix keeps
+appearing to be "just re-run it", and why the real cause kept escaping notice.
+
+**The durable fix, deliberately NOT taken in this session** (the founder had ended it, and a
+workflow change wants its own review): delete the three-attempt chain. `actions/deploy-pages`
+already retries INSIDE a single deployment (`error_count: 10`, 600 s timeout), which is retrying
+without spawning competitors. The comment in `pages.yml` justifying the chain should go with it.
+
+**Not related to the Supabase deploy.** `supabase.yml` deploys the Edge Functions on the same merge
+and has been green throughout, which is why the s196 `converse` fix went live while the site did
+not. When the founder reports "I don't see the change", check WHICH of the two deploys failed
+before assuming the code.
