@@ -1732,3 +1732,48 @@ conversation left no trace anywhere in the app. `SprechenHistory` is that half, 
 from Schreiben's row and `features/writing/correction.tsx` rather than a new one. A conversation
 whose debrief never arrived still appears, with its transcript and an "Ohne Bewertung" badge: **a
 recorded row nothing reads back is lost work**, and that is now a stated law.
+
+---
+
+## s196 — why the Pages deploy keeps going red (the timeout is too short, that is all)
+
+Three sessions recorded a red **Deploy site to GitHub Pages** run as transient GitHub flake. It is
+not flake, and it is also not (as this file first claimed) a self-inflicted retry bug. The full job
+logs of runs #818, #819 and #820 on 2026-08-06 settle it:
+
+**A Pages deployment for this repo currently takes LONGER THAN THE 600 s TIMEOUT the action is
+given.** Run #820's deployment sat at `deployment_in_progress` from 14:50:26 to 15:00:30 without
+finishing, and every red run before it did the same. That is the whole root cause.
+
+What follows from it, in order:
+
+1. **On timeout the action cancels its own deployment**: `Timeout reached, aborting! → Canceling
+   Pages deployment... Canceled deployment with ID <sha>`. Note the ID: **a Pages deployment's ID
+   is the commit SHA**, so there is exactly one per commit and re-requesting it re-creates the same
+   one.
+2. **The retry chain then usually rescues the run, and did.** Run #820 attempt 2 re-created the
+   deployment at 15:00:46 and reported `Reported success!` at 15:04:17. The site went live because
+   of the retry, not despite it.
+3. **Sometimes the re-request comes straight back cancelled instead** (run #819 attempts 2 and 3,
+   ~5 s each), and a leftover cancelled/in-flight deployment can refuse the NEXT commit outright
+   ("due to in progress deployment. Please cancel `<sha>` first" — the #818 → #819 case).
+   `concurrency: { group: pages }` does not prevent that, because the lock is held by the WORKFLOW
+   RUN and releases when the run ends, not when the deployment does.
+
+**The fix is to RAISE THE TIMEOUT, not to remove the retry.** `actions/deploy-pages` takes
+`timeout` as an input; 600 000 ms is simply less than these deploys need. Something like 1 800 000
+(30 min) lets ONE attempt outlast a slow deploy, which removes the self-cancel, which removes the
+leftover that poisons the next merge. The three-attempt chain can stay after that as a real safety
+net; it has now demonstrably earned its place.
+
+**Correction, recorded deliberately.** An earlier version of this entry claimed the retries were
+"structurally incapable of succeeding" because they re-request an already-cancelled SHA. Run #820
+disproves that: attempt 2 re-requested exactly that SHA and succeeded. The observation was real
+(#819 attempts 2 and 3 did die in ~5 s) but it was one run generalised into a law, and it pointed
+at the wrong fix (delete the chain) — which would have made things worse.
+
+**Not related to the Supabase deploy.** `supabase.yml` ships the Edge Functions on the same merge
+and stayed green throughout, which is why the s196 `converse` fix went live while the site lagged.
+When the founder says "I don't see the change", check WHICH of the two deploys failed before
+suspecting the code.
+
