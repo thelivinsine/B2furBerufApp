@@ -4839,6 +4839,60 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `docs/areas/{PRUEFUNG,SCHREIBEN,SPRECHEN}.md` · `docs/PROJECT_STATUS.md` · this log ·
   commits `2539162` (review) + `a722f5f` (implementation) · **PR #811**, squash-merged into `main`
 
+## Session 196 · 2026-08-06 · branch `claude/prufung-hub-layout-ffco93`
+
+- **Prompt 1 (verbatim):** `the previous session shipped an update in prufung hub but it resulted
+  in page scroll. The bottom tile looks unnecessarily big. Reduce the height and make sure there is
+  never a page scroll here in this page - keep it consistent for all screens. Another modification
+  needed is that the tiles above look empty. reduce the width and make them somewhat squarer.
+  invert the positions of the arrrow and time stamps. Instead of guten morgen greeting, use that
+  space to show a big header like Prufung or Bibliothek aligned to left vertically with the toggle
+  buttons` (followed mid-turn by a bare `continue`, resuming the same task after a tool-loading
+  pause).
+  **Response:** implemented directly (no preview round: these were four concrete corrections to
+  already-shipped work, not a new design decision needing options), verified against the real dev
+  build in headless Chromium, gates run, docs updated.
+  **The scroll's root cause.** `h-page-stage` — the stage class most trainers already opt into for
+  zero resting scroll — goes `height: auto` from `lg` up, on the assumption desktop has no shortage
+  of room. True when it was written; false once this hub's Verlauf card grew tall enough to
+  overflow a real laptop height (900px minus browser chrome is often only 750-800px usable, which
+  is exactly where it reproduced). New `.h-pruefung-stage` (`src/index.css`) keeps `h-page-stage`'s
+  mobile/`sm` formula and borrows `h-browse-stage`'s desktop formula for `lg` instead of `auto`.
+  **The tiles.** `ModuleGrid`'s wrapper capped at `max-w-[26rem]`/`sm:max-w-[30rem]` (was the full
+  column), closer to square. The minutes badge (Mit Zeit) moved beside the icon in the top row; the
+  arrow moved to the bottom-right corner it vacated. This also DROPS the old clock-mode height
+  reservation: the icon alone sets the top row's height in either state now, and the arrow shows
+  whenever a module can open, in both states, so nothing needs reserving.
+  **The Verlauf tile:** Stärkeprofil bars `h-24`→`h-16` (desktop), run chart `H=68`→`52`, display
+  score `2.5rem`→`2rem`, several paddings tightened.
+  **The header.** From `lg` up, `AppShell` shows a left-aligned "Prüfung" `h1` beside the Module
+  üben/Modelltest switcher, replacing the generic greeting there; below `lg` the hub's own switcher
+  is unchanged. Split the switcher into new `features/pruefung/hubSwitcher.tsx` (the `Tab` type,
+  `TABS`, `tabId`/`panelId`, `TabSwitcher`, `usePruefungTab`) specifically so `AppShell` — mounted
+  on every route — never has to import `PruefungHub.tsx` and, behind it, `engine/exam` and the
+  content banks; that would have broken the keep-eager-code-light invariant for every page in the
+  app, not just this one. Caught by checking `pnpm check:bundle` after wiring the header, not by
+  reasoning about it up front.
+  **Verified in the real dev build** (Playwright over the global Chromium, seeded localStorage, not
+  a mockup): 1440×900, 1440×760, 1024×850, 1023×850 and 390×844, light and dark, empty/one-run/
+  four-run history, both tabs; `scrollHeight` vs `clientHeight` read back at every size (all equal);
+  clicked the header switcher's buttons and read the resulting `?tab=` URL to confirm it drives the
+  same panel as the hub's own switcher; confirmed the Dashboard's "Hallo"/"Guten Morgen" greeting is
+  unchanged on every other route.
+  **Scope call, flagged rather than assumed:** the founder's two examples for the header title were
+  "Prufung or Bibliothek". Read as illustrating the PATTERN (a route's own nav label replacing the
+  greeting) rather than a request to retitle the Bibliothek page today, since the branch and the
+  rest of the prompt are about the Prüfung hub only; `navItems` already carries every route's label
+  if that reading is wrong.
+- **Artifacts:** `src/index.css` · `src/components/layout/AppShell.tsx` ·
+  `src/features/pruefung/PruefungHub.tsx` · `src/features/pruefung/hubSwitcher.tsx` (new) ·
+  `CLAUDE.md` · `docs/areas/PRUEFUNG.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log ·
+  commit `bf2807d` · **PR #813**, squash-merged into `main`.
+  Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
+  check:bundle 129.0 kB of 400 · check:contrast.
+
+---
 ---
 
 ## Session 196 — prompt 1 (2026-08-06)
@@ -4907,3 +4961,4 @@ check:bundle 127.9 kB · lint:content · lint:migrations.
   `src/components/layout/nav-items.ts` · `supabase/functions/converse/index.ts` ·
   `tests/moduleScope.test.ts` · `CLAUDE.md` · `docs/areas/{PRUEFUNG,SPRECHEN}.md` ·
   `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+

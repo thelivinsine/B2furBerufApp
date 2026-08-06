@@ -113,8 +113,10 @@ after pulling.
   in-mission pixel chrome + "failure is content, never lockout" + the ungated boss mission 1.6
   (`docs/areas/GAME.md`), the Himmelblau-fill/white-controls FilterRail and Aufgabe-rail answer
   (s189/s196, `features/shared/ScopeRail.tsx`), the sliding-pill switcher mechanism
-  (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card's anatomy (s191), the
-  Schreiben mobile anatomy (`docs/areas/SCHREIBEN.md`), the Prüfung zone's one frame (s195, below).
+  (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card's anatomy (s191/s196: no
+  description line, icon top-left, minutes badge beside it when timed, arrow bottom-right, sizing
+  narrower-than-the-column and closer to square), the Schreiben mobile anatomy
+  (`docs/areas/SCHREIBEN.md`), the Prüfung zone's one frame (s195, below).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`. `mergeRemoteSettings` adopts on `settings.onboarded === true` and nothing
@@ -183,7 +185,11 @@ after pulling.
   this with a stage instead of measurement (s186): a running Teil is `h-exam-stage` tall, pins its
   RunBar/strip/actions and scrolls ONE inner region, so all ten in-exam screens rest at exactly 0
   page scroll down to 360x640. Height only, never `overflow:hidden`, or the mobile keyboard cannot
-  scroll the field into view.
+  scroll the field into view. **The Prüfung hub itself** uses `h-pruefung-stage` (s196), which
+  differs from the shared `h-page-stage` other trainers use by keeping a real ceiling from `lg` up
+  too: `h-page-stage` goes `auto` on desktop on the (once-true) assumption that desktop has no
+  shortage of room, and this hub's Verlauf card eventually grew tall enough to break that on a
+  real laptop height.
 - **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
   buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
   and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
@@ -223,14 +229,18 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
-  Verlauf). No HubHero, no `h1`. Niveau is a compact button, and the scope controls sit BELOW the
-  switcher at EVERY width, both rows centred. **Mit Zeit / Ohne Zeit** is one switch beside
-  it, resting on Ohne Zeit, and it is the ONLY way into the four choosers (`/lesen`, `/hoeren`,
-  `/writing`, `/simulation`): they are what the same four modules do without a clock, never a fifth
-  block. **All four wear ONE "Aufgabe wählen" rail** (`features/shared/ScopeRail.tsx`, founder
-  s196): the Himmelblau tile with the Bibliothek scope dropdowns, sticky beside the content on
-  desktop and behind the module row's Aufgabe toggle on a phone. Lesen and Hören used to open a
-  random draw with no way to pick; that draw survives as their "Zufällige Auswahl" button. **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
+  Verlauf). Below `lg` the switcher IS the header (no HubHero, no in-page `h1`); from `lg` up it
+  moves into the AppShell header beside a left-aligned "Prüfung" title, through the shared
+  `features/pruefung/hubSwitcher.tsx` (AppShell may import ONLY that file, never `PruefungHub.tsx`,
+  which would drag the content banks into the eager bundle). Niveau is a compact button, the scope
+  controls sit BELOW the switcher at EVERY width, both rows centred. **Mit Zeit / Ohne Zeit** is one
+  switch beside it, resting on Ohne Zeit, and it is the ONLY way into the four choosers (`/lesen`,
+  `/hoeren`, `/writing`, `/simulation`): they are what the same four modules do without a clock,
+  never a fifth block. **All four wear ONE "Aufgabe wählen" rail**
+  (`features/shared/ScopeRail.tsx`, s196), sticky beside the content on desktop and behind the
+  module row's Aufgabe toggle on a phone; Lesen and Hören used to open a random draw with no way to
+  pick, and that draw survives as their "Zufällige Auswahl" button.
+  **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
   Anleitung and opens the drill. Only the STAGE stays shared; the exit and its confirm follow the
   one-frame law above, not the clock. The run band's timeline connector is one segment per gap,
   drawn between the tiles, never a line behind them.

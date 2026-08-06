@@ -43,8 +43,38 @@ because `engine/exam` imports them (the real fix is precomputing availability at
 `frequency.ts`); no exam set is `anruf` shaped; the authored dialogue `nodes` graphs are dead but not
 retired; and CLAUDE.md sits at 364 lines against its ~350 budget._
 
-_Prior s195: 2026-08-06 (session 195 gave the Prüfung zone ONE frame: one exit, one Niveau
-control, one width at rest; see "Resume here"). **The Prüfung zone was audited end to end and every
+_Also in s196, from a parallel session (merged first, PR #813): **the Prüfung hub's desktop
+page-scroll regression and its page header.** **Four founder-reported problems in the hub
+shipped by s195, all fixed in one pass.** Founder: a screenshot of `/anwenden` on desktop showing
+the Verlauf tile scrolled past the fold, the four module cards reading as "empty" wide strips, the
+arrow and minutes badge in the wrong corners, and the generic "Guten Morgen" greeting sitting
+where a page title belongs.
+**Root cause of the scroll:** `h-page-stage` (the shared stage class every trainer that wants zero
+page scroll opts into) goes `height: auto` from `lg` up on the assumption desktop has "no shortage
+of room" — true when it was written, false once this hub's Verlauf card grew tall enough to
+overflow a real laptop height (900px minus browser chrome is often 750-800px usable). New
+`.h-pruefung-stage` keeps a real ceiling at every width (mobile/sm unchanged, `lg` borrows
+`h-browse-stage`'s desktop formula); verified scroll-free at 1440×760, 1440×900, 1024×850 and
+390×844, both tabs, light and dark.
+**The rest:** the module grid is now capped narrower (`max-w-[26rem]`/`[30rem]`) so each card reads
+closer to square; the minutes badge moved beside the icon (its presence never changes the row's
+height either way) and the arrow moved to the bottom-right corner it vacated; the Verlauf card's
+bars/chart/padding were trimmed down (the "unnecessarily big" tile). **The header title**: from
+`lg` up, `AppShell` now shows a big left-aligned "Prüfung" next to the Module üben/Modelltest
+switcher in the slot the generic greeting used to fill; below `lg` the hub keeps its own switcher,
+unchanged. The switcher was split into `features/pruefung/hubSwitcher.tsx` so `AppShell` (mounted
+on every route) never has to import `PruefungHub.tsx` and, behind it, the exam engine's content
+banks — the eager-bundle invariant would break otherwise. `usePruefungTab` reads/writes the same
+`?tab=` param both switcher copies share, so they can never disagree.
+Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
+check:bundle 129.0 kB of 400 · check:contrast.
+**Resume here:** nothing is open. The greeting-to-title swap is scoped to `/anwenden` only, per the
+founder's examples ("Prüfung or Bibliothek") reading as illustrative rather than a request to
+retitle every route today; say the word and the same pattern (via `navItems` labels) generalises
+easily.
+
+Prior s195 (2026-08-06): **The Prüfung zone was audited end to end and every
+
 finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
 the issue". The report (`docs/reports/pruefung-audit-2026-08-05.md`, 35 ranked findings) is kept in
 full as the record; `docs/areas/PRUEFUNG.md` is the new current-state law for the zone.
@@ -87,6 +117,9 @@ the second half of P28: the hub still loads ~825 kB of content banks because `en
 them, and the per-render re-scan is fixed (`useMemo`) but the load is not. The real fix is
 precomputing availability at build time like `frequency.ts`, which is a generator job. Still open
 from s193: no exam set is `anruf` shaped, and the authored `nodes` graphs are dead but not retired._
+
+Older handoffs (s195 and earlier, including s193's Sprechen rebuild) are archived in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
 
 ## Where things stand
 
@@ -136,6 +169,43 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 196 (2026-08-06): fixed a desktop scroll regression in the Prüfung hub
+and gave it a real page header (branch `claude/prufung-hub-layout-ffco93`).**
+Founder, from a desktop screenshot of `/anwenden`: the page scrolled, the bottom Verlauf tile
+"looks unnecessarily big", the four module tiles "look empty" (too wide), the arrow and minutes
+badge should swap corners, and the "Guten Morgen" greeting space should become a big left-aligned
+header like the zone's own nav label, sitting next to the toggle buttons.
+- **The scroll.** `h-page-stage` (every trainer's shared zero-scroll stage class) goes
+  `height: auto` from `lg` up, on the assumption desktop has no shortage of room. This hub's
+  Verlauf card had grown past that assumption: at a real laptop height (900px minus browser chrome
+  is often 750-800px usable) the page overflowed. New `.h-pruefung-stage` (`src/index.css`) keeps
+  the mobile/`sm` formula `h-page-stage` already had and borrows `h-browse-stage`'s desktop formula
+  for `lg` instead of `auto`. Verified scroll-free at 1440×760, 1440×900, 1024×850 and 390×844,
+  both tabs, light and dark, with and without run history.
+- **The tiles.** `ModuleGrid`'s wrapper is now capped at `max-w-[26rem]`/`sm:max-w-[30rem]` instead
+  of stretching to the column, so the four cards read closer to square. The minutes badge (Mit
+  Zeit only) moved from the bottom-right corner to beside the icon in the top row; the arrow moved
+  from beside the icon to the bottom-right corner it vacated. Card height no longer needs a
+  clock-mode-driven reservation: the icon alone sets the top row's height either way, and the arrow
+  shows whenever the module can open, in both clock states.
+- **The Verlauf tile.** Trimmed the elements that carried most of its height for little
+  information: the Stärkeprofil bars (`h-24`→`h-16` desktop), the run chart (`H=68`→`52`), the
+  display score (`2.5rem`→`2rem`), and several paddings.
+- **The header.** From `lg` up, `AppShell` shows a big left-aligned "Prüfung" `h1` beside the
+  Module üben/Modelltest switcher, in the slot the generic greeting used to fill; below `lg` the
+  hub keeps its own switcher unchanged. New `features/pruefung/hubSwitcher.tsx` holds the switcher,
+  the `Tab` type and `usePruefungTab` (a `?tab=` reader/writer), so both switcher copies drive the
+  same URL param and `AppShell` never has to import `PruefungHub.tsx` itself — that file pulls in
+  `engine/exam` and the content banks behind it, which would break the keep-eager-code-light
+  invariant (AppShell mounts on every route). Confirmed by clicking the header copy's tab buttons
+  over CDP and reading the resulting URL/panel.
+Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
+check:bundle 129.0 kB of 400 · check:contrast.
+Shipped as **PR #813**, squash-merged into `main`; the founder verifies the live result.
+**Resume here:** nothing is open. The greeting→title swap is scoped to `/anwenden` only; the
+founder's other example ("Bibliothek") read as illustrative of the pattern rather than a request
+to retitle that page today. `navItems` already carries every route's label if that changes.
+
 **Handoff after session 195 (2026-08-06): the Prüfung zone got ONE frame
 (branch `claude/prufung-hub-design-consistency-193qrh`).**
 Two founder prompts. The first asked for a review of the zone's inconsistent back buttons and empty
@@ -177,37 +247,5 @@ Shipped as **PR #811**, squash-merged into `main`; the founder verifies the live
 module row is `lg:hidden` (they said "in mobile view"), and Kurz at 360x640 still rests ~99px
 scrolled, which drops to 0 if that row goes on Kurz/Lang.
 
-**Handoff after session 192 (2026-08-05): the trainer's way back, and the exam frame confined to
-Mit Zeit (branch `claude/prufung-ui-bottom-bar-u0fdwf`).**
-Two founder prompts, both from phone screenshots.
-- **"Replace the feedback button with zurück ... add feedback geben right next to KI geprüft,
-  similar to Bibliothek."** The mobile floating cluster's left slot is now `BackToPruefung`
-  (`src/features/writing/bottomChrome.tsx`): the same 44px squircle geometry the Feedback button
-  had, linking to `/anwenden` rather than to history, because `/writing` is entered from three
-  places. Feedback moved down into the caption line as the Bibliothek's own `FeedbackLink`:
-  "KI-geprüft, kann Fehler enthalten. Mehr · Feedback geben", measured as ONE line down to 320px.
-  Both trainers now render the same `MobileAiNote`, so the two hand-kept copies cannot drift.
-  `FeedbackIconButton` is deleted; `FeedbackNote` is built from `FeedbackLink`.
-- **"The prufung bottom bar isn't selected here, check this for all the pages."** A tab is lit by
-  its ZONE now (`navZoneOf` in `nav-items.ts`), not by the URL: `/writing`, `/simulation`, `/exam`
-  light Prüfung; `/quiz` and the retired per-tool routes light Bibliothek; `/session`, `/revision`,
-  `/welt` light Praktisch; `/sammlung` lights Fortschritt. The bar and the sidebar render plain
-  `Link`s, because `NavLink` re-decides the state and also SWALLOWS `aria-current` (it reads that
-  prop as the value to use when it considers itself active), so the lit tab announced nothing.
-  Measured across all twelve in-shell routes: every one lights its zone, `/session` and `/revision`
-  have no bar (focus mode), none is blank.
-- **"Such screens for hören and lesen for Ohne Zeit ... this screen mode represents exam mode. This
-  should only be shown when a user is in mit zeit mode."** The Anleitung is Mit Zeit's screen now:
-  `useExamStore.start` opens an untimed module straight in `phase: "part"` (and `completePart` never
-  routes the next part through an intro either). The frame follows: the header's exit is a neutral
-  **Zurück** arrow instead of the red Verlassen (`useSessionStore.examUntimed`, since AppShell may
-  not import the exam store), leaving an untouched untimed drill asks nothing at all, and the
-  confirm it does show reads "Übung verlassen?". The STAGE is unchanged: one viewport, no bottom
-  bar, the drill scrolling internally. Verified in the real build: Ohne Zeit Lesen and Hören open on
-  the question, Mit Zeit still opens on "PRÜFUNGSTEIL ... der Timer läuft, sobald du startest".
-**Gates green:** build · typecheck · lint 0 errors (77 warnings = baseline) · 558 tests ·
-check:bundle 126.7 kB of 400 · check:contrast.
-**Open question for the founder:** the untimed drill still hides the bottom tab bar and holds the
-one-viewport stage. That is deliberate (the stage is what keeps a Teil at zero page scroll, and a
-visible tab bar would let a learner re-enter the persisted run in a loop), but say the word and it
-can go too.
+Older "Resume here" handoffs (s192 and earlier) are archived alongside their status-log entries in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
