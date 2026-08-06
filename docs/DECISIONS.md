@@ -1738,9 +1738,15 @@ recorded row nothing reads back is lost work**, and that is now a stated law.
 ## s196 — the Pages deploy chain, and why "transient flake" was the wrong diagnosis
 
 Three sessions in a row hit a red **Deploy site to GitHub Pages** run and each treated it as
-GitHub being flaky. It is not flaky. The workflow does it to itself.
+GitHub being flaky. There ARE two things here and they need separating, because calling the whole
+thing flake is what let it recur:
 
-**The mechanism.** `pages.yml` wraps `actions/deploy-pages` in a hand-rolled three-attempt retry
+- **The trigger is real and Pages-side.** A deployment can sit in a polling state far past the
+  action's own 600 s timeout (observed again 2026-08-06 13:22 UTC: attempt 1 still polling at
+  +18 min). Nothing in this repo causes that and nothing in this repo can prevent it.
+- **The AMPLIFIER is ours**, and it is what turns one stalled deploy into a run of red merges.
+
+**The amplifier.** `pages.yml` wraps `actions/deploy-pages` in a hand-rolled three-attempt retry
 (added 2026-07-04, when the Pages service really was degraded). But that action does not "retry a
 request": each attempt **creates a deployment and then polls it**. So attempt 2 creates a SECOND
 deployment for the same commit, GitHub cancels the first as superseded, and attempt 1's poll

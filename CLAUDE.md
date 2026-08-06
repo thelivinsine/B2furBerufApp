@@ -332,13 +332,15 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
-- **The Pages deploy job's 3-attempt retry CAUSES the failure it was meant to absorb** (s196):
-  each attempt creates a NEW deployment, which cancels the one the previous attempt is still
-  waiting on, and the next merge is then blocked by the leftover ("in progress deployment. Please
-  cancel <sha> first"). `concurrency: group: pages` does not help; that lock releases with the
-  WORKFLOW, not the deployment. **A clean full re-run of the failed run clears it.** Durable fix,
-  not yet taken: drop the chain, let `actions/deploy-pages` retry inside ONE deployment as it
-  already does. Why → `docs/DECISIONS.md` §s196.
+- **A stalled Pages deploy is Pages-side; the 3-attempt retry is what SPREADS it** (s196). The
+  stall is real and outside this repo (a deployment can poll past the action's own 600 s timeout).
+  The chain then makes it contagious: each attempt creates a NEW deployment, which cancels the one
+  the previous attempt is waiting on, and the next merge is refused by the leftover ("in progress
+  deployment. Please cancel <sha> first"). `concurrency: group: pages` does not help; that lock
+  releases with the WORKFLOW, not the deployment. **A clean full re-run clears it**, which is why
+  this kept getting logged as pure flake. Durable fix, not yet taken: drop the chain and let
+  `actions/deploy-pages` retry inside ONE deployment as it already does. Why →
+  `docs/DECISIONS.md` §s196.
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
   before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft
   or session is open**, so a learner mid-task adopts the new build at their next clean resume.
