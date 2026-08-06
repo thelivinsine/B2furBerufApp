@@ -7,7 +7,15 @@ Read this before touching `src/features/pruefung/`, `src/features/exam/`, `src/e
 
 ## The shape
 
-**ONE page at `/anwenden`, with a switcher as its header** (founder s189). No HubHero, no `h1`.
+**ONE page at `/anwenden`.** Below `lg` the switcher IS the page header (founder s189: no
+HubHero, no in-page `h1`). From `lg` up (founder, s196) the switcher moved into the **AppShell
+header** beside a big left-aligned **"Prüfung"** title, in the space every other route's generic
+greeting ("Guten Morgen …") occupies; the page body then opens straight on the scope row
+(Ohne Zeit/Mit Zeit + Niveau). `features/pruefung/hubSwitcher.tsx` holds the switcher, the `Tab`
+type and `usePruefungTab` (a `?tab=` reader/writer) so both copies drive the SAME URL param and
+never disagree; `AppShell` imports ONLY that tiny file, never `PruefungHub.tsx` itself, which
+pulls in `engine/exam` and the content banks behind it (the keep-eager-code-light invariant would
+break the moment AppShell — mounted on every route — imported a content bank).
 
 | Tab | What it is |
 |---|---|
@@ -15,8 +23,19 @@ Read this before touching `src/features/pruefung/`, `src/features/exam/`, `src/e
 | **Modelltest** | the complete run as a ticket band, then a Verlauf led by the last score |
 
 Both tabs live in the same `max-w-4xl` centred column, so switching never changes the page's
-width. Neither scrolls at rest: the page is `h-page-stage` and the elastic regions give up their
-room. What may grow is a Verlauf, and only when the learner opens it (`useStagePanel`).
+width. Neither scrolls at rest: the page is `h-pruefung-stage`, which — unlike the shared
+`h-page-stage` other trainers use — keeps a real height ceiling from `lg` up too, not just below
+it (s196: a taller Verlauf card had made the hub scroll on real laptop heights, ~750-800px usable
+under browser chrome, because `h-page-stage` goes `auto` on desktop on the assumption there is
+"no shortage of room"). The elastic regions give up their room; what may grow is a Verlauf, and
+only when the learner opens it (`useStagePanel`).
+
+**The module cards are capped narrower than the column** (s196, founder: they "look empty"), so
+each of the four reads closer to square instead of a wide, half-empty strip. Their top row is
+icon-left (its size sets the row's height either way, so switching Mit Zeit/Ohne Zeit never moves
+a card edge on its own) with the **minutes badge beside it** when timed, and the **arrow lives in
+the card's bottom-right corner** (founder: swap their positions from the s191/s192 shape, where
+the arrow sat top-right and the badge bottom-right).
 
 **Mit Zeit / Ohne Zeit is one switch beside the Niveau**, resting on Ohne Zeit, and it is the only
 way into the free trainers: `/writing` and `/simulation` are what the SAME four modules do without
@@ -132,12 +151,17 @@ rather than as a zero.
 - **`toPractices` returns one row per module a run sat**, not the first one it finds.
 - **The counts the hub shows come from one place.** Adding a second availability computation is how
   the Niveau list and the module cards start disagreeing.
+- **`AppShell` may import `hubSwitcher.tsx`, never `PruefungHub.tsx`.** The hub pulls in
+  `engine/exam` and, behind it, the text/dialogue/writing content banks; AppShell is mounted on
+  every route, so a static import of the hub there would drag those banks into the eager bundle
+  for every page in the app, not just this one.
 
 ## Files
 
 | File | What it holds |
 |---|---|
-| `features/pruefung/PruefungHub.tsx` | the one page: switchers, module grid, run band, both Verläufe |
+| `features/pruefung/PruefungHub.tsx` | the one page: mobile switcher, scope row, module grid, run band, both Verläufe |
+| `features/pruefung/hubSwitcher.tsx` | the Tab switcher + `usePruefungTab`; imported by `PruefungHub` AND by `AppShell`'s desktop header, so it may only carry light, route-agnostic deps |
 | `engine/exam.ts` | the composer, the pools, availability, scoring, `EXAM_BAND` |
 | `store/useExamStore.ts` | the one running exam, persisted; the deadline clock |
 | `features/exam/MockExamRunner.tsx` | the flow shell, Anleitung, RunBar, Ergebnis, answer review |
