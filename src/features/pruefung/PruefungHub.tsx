@@ -58,6 +58,21 @@ import { MockExamRunner } from "@/features/exam/MockExamRunner";
 
 type ClockMode = "free" | "timed";
 
+/**
+ * The hub's ONE column width (founder pick C at "medium", s197).
+ *
+ * Every block on the page is this wide: the switcher row, the scope row, the
+ * module grid and the Verlauf card. It replaces the three separately centred
+ * widths the page carried until s197 (a `max-w-4xl` panel column holding a
+ * `max-w-[30rem]` module grid holding a `max-w-[26rem]` Stärkeprofil), which is
+ * why nothing on the page shared an edge with anything else.
+ *
+ * 40rem is chosen from the module tiles, not the other way round: s196 capped
+ * the GRID narrower than the column to stop the tiles reading as wide empty
+ * strips, and at this column width they are that shape without a cap.
+ */
+const HUB_COL = "max-w-[40rem]";
+
 /** Runs listed before the learner asks for the rest (desktop; a phone rests at 0). */
 const VERLAUF_REST_ROWS = 3;
 
@@ -239,15 +254,14 @@ export function PruefungHub() {
         !verlaufOpen && "h-pruefung-stage min-h-0",
       )}
     >
-      {/* Mobile: the switcher IS the page header here too (no HubHero, no h1),
-          and the scope controls sit BELOW it, centred (founder s189). Desktop:
-          the switcher moved into the AppShell header next to the "Prüfung"
-          title (founder, this session), so it is `lg:hidden` below and this
-          block holds only the scope row from lg up. */}
-      <div className="mx-auto flex w-full flex-col items-center gap-3 lg:max-w-4xl">
-        <div className="lg:hidden">
-          <TabSwitcher tab={tab} onSelect={selectTab} />
-        </div>
+      {/* The switcher IS the page header, at EVERY width (founder pick C, s197;
+          no HubHero, no h1), with the scope controls centred below it. s196 had
+          moved a desktop copy into the AppShell header beside a "Prüfung"
+          title, which parked it on the app's left gutter while the page stayed
+          centred, so the title lined up with nothing. This is the same answer
+          the Bibliothek and Schreiben headers already give. */}
+      <div className={cn("mx-auto flex w-full flex-col items-center gap-3", HUB_COL)}>
+        <TabSwitcher tab={tab} onSelect={selectTab} />
         {/* Fixed height: the Modelltest tab hides the clock switch, and without
             it the row would change height and shift the page on every switch. */}
         <div className="flex h-9 items-center justify-center gap-2">
@@ -284,7 +298,7 @@ export function PruefungHub() {
             role="tabpanel"
             id={panelId(tab)}
             aria-label={TABS.find((t) => t.id === tab)?.label}
-            className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5 lg:max-w-4xl"
+            className={cn("mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5", HUB_COL)}
           >
             {/* The Verlauf card is on the page from the FIRST visit (founder
                 s195, option 2): both tabs hold a one-viewport frame, and until
@@ -417,10 +431,13 @@ function ModuleGrid({
 }) {
   return (
     // 2x2 at EVERY width (founder s189): four across a 1152px column left the
-    // cards narrow and cramped against all that empty page. Capped narrower
-    // than the 4xl column this session (founder: the tiles "look empty"), so
-    // each card reads closer to square instead of a wide, half-empty strip.
-    <div className="mx-auto grid w-full max-w-[26rem] flex-none grid-cols-2 gap-3 sm:max-w-[30rem] sm:gap-4">
+    // cards narrow and cramped against all that empty page. No cap of its own
+    // since s197: the tiles fill the hub's column, because the column came down
+    // to THEM (`HUB_COL`). s196's `max-w-[30rem]` cap answered the same
+    // complaint ("the tiles look empty") by narrowing the grid inside a much
+    // wider column, which is what left a narrow tile island floating over a
+    // full-width Verlauf card.
+    <div className="grid w-full flex-none grid-cols-2 gap-3 sm:gap-4">
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
@@ -752,7 +769,10 @@ function VerlaufCard({
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col",
-          asSplit && "lg:grid lg:grid-cols-[minmax(0,26rem)_1px_minmax(0,1fr)] lg:items-stretch",
+          // Proportional since s197, not a fixed 26rem left half: the card is
+          // the hub's 40rem column now, and a fixed half would have left the
+          // row list about 200px to fit a date, a mark, a module and a score.
+          asSplit && "lg:grid lg:grid-cols-[minmax(0,1.15fr)_1px_minmax(0,1fr)] lg:items-stretch",
         )}
       >
         <div className={cn(
@@ -1005,7 +1025,10 @@ function RunRow({ record }: { record: MockExamRecord }) {
         )}
         <span className="ml-auto flex shrink-0 items-center gap-2">
           {record.total != null && (
-            <Badge variant={record.total >= PASS_PCT ? "success" : "muted"} className="tabular-nums">
+            <Badge
+              variant={record.total >= PASS_PCT ? "success" : "muted"}
+              className="whitespace-nowrap tabular-nums"
+            >
               {record.total} %
             </Badge>
           )}
@@ -1108,7 +1131,7 @@ function ModuleVerlauf({
                 option 2): with none they stand empty at "–", which is what
                 shows a first-time learner the shape of what practising builds.
                 Only the caption below changes. */}
-            <div className="mx-auto grid w-full max-w-[26rem] grid-cols-4 gap-2.5 sm:gap-3">
+            <div className="grid w-full grid-cols-4 gap-2.5 sm:gap-3">
               {MOCK_PART_ORDER.map((part) => {
                 const list = byPart[part];
                 const first = list[0] ?? null;
@@ -1128,11 +1151,14 @@ function ModuleVerlauf({
                     </span>
                     <span
                       className={cn(
-                        // Shorter this session (founder: the Verlauf tile
-                        // "looks unnecessarily big"): the bars carried most of
-                        // the card's height for very little information.
-                        "relative h-10 w-full overflow-hidden rounded-md sm:h-16",
-                        last == null ? "bg-muted/40" : "bg-muted/80",
+                        // Shorter since s196 (founder: the Verlauf tile "looks
+                        // unnecessarily big"): the bars carried most of the
+                        // card's height for very little information. An EMPTY
+                        // column is shorter again (s197): at full height, four
+                        // grey slabs at "–" read as a chart that failed to
+                        // render rather than as the shape of what is coming.
+                        "relative w-full overflow-hidden rounded-md",
+                        last == null ? "h-6 bg-muted/40 sm:h-8" : "h-10 bg-muted/80 sm:h-16",
                       )}
                     >
                       {last != null && (
@@ -1145,7 +1171,11 @@ function ModuleVerlauf({
                         </span>
                       )}
                     </span>
-                    <span className="flex flex-col items-center gap-1 text-[11px] font-semibold sm:flex-row sm:gap-1.5 sm:text-xs">
+                    {/* Mark ABOVE the name at every width since s197: in the
+                        split card each of the four columns is ~80px wide now,
+                        and the side-by-side form pushed "Schreiben" straight
+                        through the divider into the list beside it. */}
+                    <span className="flex flex-col items-center gap-1 text-[11px] font-semibold sm:text-xs">
                       <span
                         className={cn(
                           "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md",
@@ -1166,8 +1196,7 @@ function ModuleVerlauf({
                   <span className="block text-sm font-semibold text-foreground">
                     Dein Stärkeprofil
                   </span>
-                  Übe ein Modul, dann steht hier, wie du gestartet bist und was du seitdem
-                  dazugewonnen hast.
+                  Übe ein Modul, dann siehst du hier deinen Fortschritt.
                 </>
               ) : (
                 "Blass: dein erster Versuch · Kräftig: dein Fortschritt"
@@ -1193,10 +1222,12 @@ function PracticeRow({ entry }: { entry: ModulePractice }) {
   );
 
   return (
-    <div className="flex w-full items-center gap-3 px-4 py-2 sm:gap-4 sm:px-5 lg:px-6">
-      <span className="w-[62px] shrink-0 text-sm font-semibold tabular-nums sm:w-[76px]">
-        {date}
-      </span>
+    // One padding and one gap at every width since s197: this row sits in the
+    // RIGHT half of a 40rem card now (~296px), and the old `sm:gap-4 lg:px-6`
+    // spent 24px of that on air. The row then had exactly 0px spare, so the
+    // score badge wrapped its "%" and the module name truncated to "Schre...".
+    <div className="flex w-full items-center gap-3 px-4 py-2">
+      <span className="w-[72px] shrink-0 text-sm font-semibold tabular-nums">{date}</span>
       <span
         className={cn(
           "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
@@ -1205,11 +1236,11 @@ function PracticeRow({ entry }: { entry: ModulePractice }) {
       >
         <Icon className={cn("h-[15px] w-[15px]", meta.ink)} />
       </span>
-      <span className="text-sm font-semibold">{PART_LABEL[entry.part]}</span>
+      <span className="truncate text-sm font-semibold">{PART_LABEL[entry.part]}</span>
       {entry.pct != null && (
         <Badge
           variant={entry.pct >= PASS_PCT ? "success" : "muted"}
-          className="ml-auto tabular-nums"
+          className="ml-auto shrink-0 whitespace-nowrap tabular-nums"
         >
           {entry.pct} %
         </Badge>

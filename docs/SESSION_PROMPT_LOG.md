@@ -5142,3 +5142,38 @@ wanted.
   element.
 - **Artifacts (prompt 1):** `preview/gen-pruefung-header-align.mjs` (new) ·
   `preview/pruefung-header-align.html` + `-artifact.html` (new) · this log · no `src/` change yet
+
+- **Prompt 2 (verbatim):** `C, medium`
+  **Response:** implemented option C at the 640px column, verified in the real built app, gates run,
+  docs updated.
+  **`AppShell`** no longer renders the "Prüfung" `h1` or the second switcher copy; the greeting slot
+  stays EMPTY on `/anwenden` (the part of s196 that survives) and every other route keeps its
+  greeting untouched. **`PruefungHub`** renders the switcher as its header at EVERY width (the
+  `lg:hidden` is gone), and ONE new `HUB_COL` (`max-w-[40rem]`) carries the switcher row, the scope
+  row, the module grid and the Verlauf card. The module grid and the Stärkeprofil grid lost their
+  own `max-w-[30rem]`/`max-w-[26rem]` caps: the COLUMN was measured from the tiles instead, which
+  keeps the shape s196 asked for ("the tiles look empty") without the cap that left four different
+  left edges on one page. **`hubSwitcher.tsx` stays a separate module** (the hub is its only caller
+  again) so a future header copy still has a bank-free file to import; `idPrefix` went with the
+  second copy.
+  **Three details the narrower card forced**, each found by measuring rather than by eye: the
+  Verlauf split is proportional (`1.15fr / 1px / 1fr`) instead of a fixed 26rem half; the four
+  profile labels put the mark ABOVE the name at every width, because side by side "Schreiben"
+  pushed through the divider into the list; and `PracticeRow` uses one padding and one gap at every
+  width, because at `sm:gap-4 lg:px-6` the row had exactly 0px spare (72+28+55+53 content, 48 gaps,
+  40 padding, in 296px) so the score badge wrapped its "%" and the module name truncated to
+  "Schre...". The empty Stärkeprofil is half height with a one-line caption.
+  **Verified in the real built app**, not a mockup (Playwright over the global Chromium, seeded
+  localStorage): at 1440×900, 1440×760, 1024×850, 1023×850, 390×844 and 360×640, both tabs, three
+  history states, the panel / module grid / Verlauf card report the SAME left edge and width at
+  every size. Zero resting page scroll and zero horizontal overflow everywhere except two bands that
+  scroll on `main` too, measured BEFORE and AFTER against a build of `origin/main`: 1023×850 rests
+  at 54px (unchanged) and 360×640 at 43px (63px before). Both come from the Verlauf card being
+  `flex-none` at rest; fixing that means letting its collapsed list scroll inside the card, which
+  touches the s195/s196 Verlauf behaviour, so it is reported rather than assumed.
+  Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 127.9 kB of 400
+  (down from 129.0: AppShell dropped its `hubSwitcher` import) · check:contrast.
+- **Artifacts (prompt 2):** `src/components/layout/AppShell.tsx` ·
+  `src/features/pruefung/{PruefungHub,hubSwitcher}.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (s195
+  handoff archived) · this log

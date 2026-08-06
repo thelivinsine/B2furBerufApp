@@ -1,7 +1,11 @@
 # Project Status
 
-_Last updated: 2026-08-06 (session 196 gave all four Ohne-Zeit modules ONE Aufgabe rail, fixed the
-Sprechen debrief, and finally diagnosed the recurring red Pages deploy; see "Resume here"). Founder: "sprechen ohne zeit page tiles are all a bunch
+_Last updated: 2026-08-06 (session 197 replaced the s196 Prüfung header title with founder pick C:
+the switcher as the page header and ONE 40rem column for the whole page; see "Resume here")._
+
+## Session 196 log
+
+Founder: "sprechen ohne zeit page tiles are all a bunch
 tiles as list ... it should somehow look like schreiben with a filter rail ... same should apply for
 lesen and horen ... the evaluation couldn't be done ... and the verlauf section isn't updated with
 this progress. it's basically lost."
@@ -210,6 +214,47 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 197 (2026-08-06): the Prüfung hub got ONE column and lost the s196
+header title (branch `claude/page-header-alignment-glqts5`).**
+Founder, with the same `/anwenden` screenshot: the s196 change "created this funny looking page ...
+It is looking ridiculous at the moment", and asked for previews of how the page should look overall
+before anything was built.
+- **The diagnosis.** s196 read their "aligned to left vertically with the toggle buttons" as the APP
+  header's left gutter, which is a different left edge from every control it was meant to line up
+  with. Underneath, the page nested THREE separately centred widths (`lg:max-w-4xl` panel column,
+  `max-w-[30rem]` module grid, `max-w-[26rem]` Stärkeprofil), so the tiles started ~220px right of
+  the title and a narrow tile island floated over a full-width Verlauf card.
+- **Round 1, previews only** (`preview/pruefung-header-align.html`, generator beside it, artifact
+  <https://claude.ai/code/artifact/77b2bdcf-aa2d-431d-a45a-cd6ea9d16c49>): the diagnosis at today's
+  real measurements, then A (title inside the page), B (title stays in the header, the page moves to
+  its left edge) and C (no title, the switcher as the page header). Live Theme / Column width /
+  Alignment-guide switches, light and dark, a desktop and a phone frame each.
+- **Founder picked "C, medium".** Built exactly that: `AppShell` no longer renders a title or a
+  second switcher copy (its greeting slot stays EMPTY on this route, which is the part of s196 that
+  survives), the hub's switcher is its header at every width, and ONE `HUB_COL` (`max-w-[40rem]`)
+  carries the switcher row, the scope row, the module grid and the Verlauf card. The grid and the
+  Stärkeprofil lost their own caps: the column was measured from the TILES instead, so they keep the
+  shape s196 asked for without a cap that breaks the page's edges.
+- **Three details the narrower card forced:** the Verlauf's split is proportional now
+  (`1.15fr / 1px / 1fr`, not a fixed 26rem half); its four profile labels put the mark ABOVE the
+  name at every width (side by side, "Schreiben" pushed through the divider into the list); and the
+  practice row uses one padding and one gap at every width, because at `sm:gap-4 lg:px-6` it had
+  exactly 0px spare and the score badge wrapped its "%" while the module name truncated.
+- **Empty Verlauf.** The Stärkeprofil columns are half height while empty (`h-6 sm:h-8`), with a
+  one-line caption: at full height four grey slabs at "–" read as a failed render.
+**Verified in the real built app** (Playwright over the global Chromium, seeded store, not a
+mockup): at 1440×900, 1440×760, 1024×850, 1023×850, 390×844 and 360×640, both tabs, empty / practice
+/ full history, the panel, the module grid and the Verlauf card report the SAME left edge and the
+same width at every size. Zero resting page scroll and zero horizontal overflow, except two bands
+that scroll on `main` too and were measured before and after: 1023×850 rests at 54px (unchanged) and
+360×640 at 43px (63px before this change).
+Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 127.9 kB of 400 ·
+check:contrast.
+**Resume here:** the two pre-existing resting scrolls above are the only known open thing on this
+page. Both come from the Verlauf card being `flex-none` at rest, so it cannot give room back when
+the stage is short; fixing it means letting the collapsed list scroll inside the card, which touches
+the s195/s196 Verlauf behaviour and was left for the founder to ask for rather than assumed.
+
 **Handoff after session 196 (2026-08-06): fixed a desktop scroll regression in the Prüfung hub
 and gave it a real page header (branch `claude/prufung-hub-layout-ffco93`).**
 Founder, from a desktop screenshot of `/anwenden`: the page scrolled, the bottom Verlauf tile
@@ -262,47 +307,6 @@ Shipped as **PR #813**, squash-merged into `main`.
 **Resume here:** nothing is open. The greeting→title swap is scoped to `/anwenden` only; the
 founder's other example ("Bibliothek") read as illustrative of the pattern rather than a request
 to retitle that page today. `navItems` already carries every route's label if that changes.
-
-**Handoff after session 195 (2026-08-06): the Prüfung zone got ONE frame
-(branch `claude/prufung-hub-design-consistency-193qrh`).**
-Two founder prompts. The first asked for a review of the zone's inconsistent back buttons and empty
-space; the second picked from the options it produced.
-- **Prompt 1, the review.** Six findings, all read from the code: FOUR back-button treatments in
-  THREE positions, the word `Zurück` on two controls of one screen, two screens with no exit at
-  all (desktop Schreiben, a running practice conversation), FOUR content widths, three header
-  languages, and both hub tabs holding a full-viewport frame with nothing to fill it. Delivered as
-  `preview/pruefung-frame.html` (artifact
-  <https://claude.ai/code/artifact/b04df435-61f7-4d9c-ab82-ba28b50a385e>) with a five-rule spine
-  plus A/B/C for the exit and 1/2 for the empty space.
-- **Prompt 2, the pick, and it is now law.** "B for phone, C for desktop, but Zurück (untimed) and
-  the red Verlassen (timed) should ALWAYS be top right"; the confirm should appear only when there
-  is unsaved progress; the mobile Aufgabe toggle should share the switcher's row as just "Aufgabe";
-  option A's header row should be on every mobile screen; option 2 for the empty space.
-  **Built exactly that.** `useSessionStore.zoneExit` replaces `examExit`/`examUntimed` and covers
-  `/anwenden`, `/exam`, `/writing` and `/simulation`; `examStage` is now a separate flag so the
-  trainers keep their nav. `hasProgress(run)` gates the confirm (it counts a completed part and
-  `partIx > 0` too, because Teil Sprechen leaves nothing in `answers`), the Schreibtrainer asks
-  nothing because `draftAutosave` keeps its text, and a started conversation always asks. The
-  question stepper is a chevron now: desktop puts the pair beside the number strip (option C) and
-  keeps ONE primary in the footer, a phone keeps the back step in the footer because nine numbers
-  plus two buttons do not fit 360px. New `features/pruefung/ModuleHeader.tsx` (mobile module row,
-  and the `RunBar` wears the same mark) and `features/pruefung/LevelSelect.tsx` (the one Niveau
-  control, adopted by the Sprechtrainer in place of its pill row). `GuidedWritingTrainer` portals
-  its "Aufgabe" toggle into a slot `WritingHub` owns. The Anleitung is a two-column ticket, the
-  Ergebnis is two columns, the Sprechtrainer list moved to the zone's `max-w-4xl`, and both hub
-  Verlauf cards ship in an empty state that fills the frame.
-**Verified in the real build, not in a mockup** (CDP driver, three viewports, clean store per
-screen): the exit sits at the identical top-right coordinate on all 7 zone screens at 360x640,
-393x852 and 1280x900, reads "Prüfung verlassen" only in a timed run, and is absent on the hub,
-which is the zone's home. Zero page scroll and zero horizontal overflow everywhere except
-Kurz at 360x640, which rests at 99px (down from 134px shipped; the field is at its `HARD_MIN`
-floor there, the documented give-up case) and the Sprechtrainer LIST, which is a browse list.
-Gates green: build · typecheck · lint 0 errors (75 warnings, down from 77) · 610 tests ·
-check:bundle 127.1 kB of 400 · check:contrast · lint:content.
-Shipped as **PR #811**, squash-merged into `main`; the founder verifies the live result.
-**Resume here:** nothing is open. Two judgement calls to confirm if the founder disagrees: the
-module row is `lg:hidden` (they said "in mobile view"), and Kurz at 360x640 still rests ~99px
-scrolled, which drops to 0 if that row goes on Kurz/Lang.
 
 Older "Resume here" handoffs (s192 and earlier) are archived alongside their status-log entries in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.

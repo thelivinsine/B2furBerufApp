@@ -4,17 +4,17 @@ import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { cn } from "@/lib/utils";
 
 /**
- * The Prüfung hub's tab switcher, split out of `PruefungHub.tsx` into its own
- * tiny module (founder, this session: the AppShell header's "Guten Morgen"
- * space becomes a "Prüfung" title next to the toggle buttons on desktop).
+ * The Prüfung hub's tab switcher.
  *
- * AppShell renders this DESKTOP copy eagerly (it is app-wide chrome, mounted
- * on every route), so this file may import ONLY light, route-agnostic deps.
- * `PruefungHub.tsx` pulls in `engine/exam` and, behind it, the text/dialogue/
- * writing content banks (CLAUDE.md: "the Dashboard imports NO content bank ...
- * never re-introduce a static import chain from eager code to a bank"); that
- * rule applies even harder to AppShell, which every route mounts through. Do
- * not move this back into `PruefungHub.tsx` and import it from AppShell.
+ * It lives in its own module because s196 rendered a SECOND copy of it from
+ * `AppShell` (app-wide chrome, mounted on every route) and that copy could not
+ * be allowed to reach `PruefungHub.tsx`, which pulls in `engine/exam` and,
+ * behind it, the text/dialogue/writing content banks (CLAUDE.md: "never
+ * re-introduce a static import chain from eager code to a bank"). s197 took
+ * that copy back out (founder pick C: the switcher IS the page header, at every
+ * width, and the app header's greeting slot stays empty on this route), so the
+ * hub is the only caller again. The split stays: it costs nothing, and it is
+ * what keeps the eager bundle safe if the header ever wants the switcher back.
  */
 
 export type Tab = "module" | "modelltest";
@@ -24,14 +24,10 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "modelltest", label: "Modelltest" },
 ];
 
-export const tabId = (t: Tab, scope: string) => `pruefung-tab-${scope ? `${scope}-` : ""}${t}`;
+export const tabId = (t: Tab) => `pruefung-tab-${t}`;
 export const panelId = (t: Tab) => `pruefung-panel-${t}`;
 
-/**
- * The Prüfung tab, read from the URL. Both the hub's own mobile switcher and
- * the AppShell header's desktop copy call this, so the two never disagree on
- * how `?tab=` is parsed or written.
- */
+/** The Prüfung tab, read from and written to the URL's `?tab=` param. */
 export function usePruefungTab(): [Tab, (t: Tab) => void] {
   const [params, setParams] = useSearchParams();
   const tab: Tab = params.get("tab") === "modelltest" ? "modelltest" : "module";
@@ -52,22 +48,14 @@ export function usePruefungTab(): [Tab, (t: Tab) => void] {
  *
  * A REAL tablist (s194 audit P27): ids paired with the panel it controls, a
  * roving tab stop and arrow keys.
- *
- * Two copies exist since this session: the hub's own (mobile, `lg:hidden` in
- * the page body) and the AppShell header's (desktop, beside the "Prüfung"
- * title). Both drive the SAME `tab` URL param via `usePruefungTab` above, so
- * `idPrefix` only has to keep their button ids apart; `aria-controls` still
- * names the one real panel that `PruefungHub` renders.
  */
 export function TabSwitcher({
   tab,
   onSelect,
-  idPrefix = "",
   className,
 }: {
   tab: Tab;
   onSelect: (t: Tab) => void;
-  idPrefix?: string;
   className?: string;
 }) {
   const reduce = useReducedMotion();
@@ -91,7 +79,7 @@ export function TabSwitcher({
     // Focus follows selection, which is the automatic-activation pattern the
     // sliding pill already implements visually.
     (e.currentTarget as HTMLElement)
-      .querySelector<HTMLElement>(`#${tabId(TABS[next].id, idPrefix)}`)
+      .querySelector<HTMLElement>(`#${tabId(TABS[next].id)}`)
       ?.focus();
   };
 
@@ -126,7 +114,7 @@ export function TabSwitcher({
             ref={registerItem(t.id) as React.Ref<HTMLButtonElement>}
             type="button"
             role="tab"
-            id={tabId(t.id, idPrefix)}
+            id={tabId(t.id)}
             aria-selected={active}
             aria-controls={panelId(t.id)}
             // One tab stop for the whole set, as ARIA's tabs pattern requires.
