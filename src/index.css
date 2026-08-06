@@ -617,6 +617,51 @@ input:-webkit-autofill {
     -webkit-mask-image: linear-gradient(to top, transparent 0, #000 1.25rem);
     mask-image: linear-gradient(to top, transparent 0, #000 1.25rem);
   }
+  /* The MOBILE twin of the edge fade above (founder s197, "put a similar effect
+     in the mobile view so the floating text below the Üben button is more
+     readable"). Desktop scrolls inside the content column, so the column can
+     mask its own bottom edge; a phone scrolls the PAGE, so there is no edge to
+     mask and the cards run at full strength behind the floating Üben button and
+     the feedback line under it.
+
+     So this is the one place the "mask, never an overlay" rule above does not
+     apply: there is no scroll container to mask, and the veil sits at the very
+     bottom of the viewport, where the page ground has effectively arrived at one
+     colour (identical to `--background` in dark, within a hair of it in light).
+     It carries no border and reaches full opacity only at the nav seam, so it
+     reads as the page ground, never as a bar.
+
+     Both layers are rendered by `FloatingActionCluster`, pointer-events-none. */
+  .cluster-scrim {
+    background-image: linear-gradient(
+      to top,
+      /* Full only at the nav seam, then straight to ~0.85 for the strip the note
+         sits in: the frosted band below leans on the few per cent it lets
+         through, and a scrim that reached the note at 0.99 would have made that
+         band invisible. 0.85 still clears AA for the 11px muted line in both
+         themes, because what shows through is a card that is itself within a
+         few per cent of the ground. */
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.9) 6%,
+      hsl(var(--background) / 0.84) 28%,
+      hsl(var(--background) / 0.64) 48%,
+      hsl(var(--background) / 0.37) 68%,
+      hsl(var(--background) / 0.13) 86%,
+      hsl(var(--background) / 0) 100%
+    );
+  }
+  /* The blur is a SEPARATE, much shorter band on purpose (founder s197: "soft
+     blur but not above the blue button, it should be below the blue button
+     behind the text"). It is exactly as tall as the gap between the nav and the
+     button's bottom edge, so it frosts the strip the feedback line sits in and
+     stops at the button. Masked at its own top so the frosting ends in a fade
+     rather than a line. */
+  .cluster-blur {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+  }
   /* The ceiling for a tile the learner EXPANDED (Verlauf, and every filter or
      disclosure that adopts the rule): at most one screen, so its own top and
      bottom borders always stay visible. Its inner region scrolls, and because

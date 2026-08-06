@@ -127,6 +127,20 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
   the two zones to be identical ("same positions and design as schreiben aufgabe wählen"), and the
   lower line Schreiben carries is its Art. 50 note, so the Bibliothek's cluster is buttons only.
   Every control needs its own opaque backing (`floatingSlot`), or the card behind shines through.
+  **"Nach oben" sits ABOVE that button, not inside it (s197):** the CTA's top is nav + 2rem + 2.75rem
+  and the arrow sat at nav + 3.5rem, so it was hidden behind the CTA at every scroll position; it is
+  at nav + 5.25rem now and a step smaller (30px, was 36). Moving the cluster's offset or the CTA's
+  height moves this with it.
+  **The cluster brings its own soft bottom (s197):** a 7rem scrim in the page-ground colour
+  (`.cluster-scrim`) dissolves the cards on their way down, and a 2rem frosted band
+  (`.cluster-blur`) fills the gap between the nav and the button's lower edge, which is the strip
+  the Feedback line sits in. This is the mobile answer to the desktop `mask-fade-bottom`: a phone
+  scrolls the PAGE, so there is no column edge to mask, and the founder's note about the floating
+  text being unreadable was that missing edge. Both layers are `pointer-events-none` and
+  border-free, and the blur STOPS at the button (founder: "not above the blue button, it should be
+  below the blue button behind the text"), so this is not the rejected sticky bar (s168) or blurred
+  band (s169). The scrim deliberately holds ~0.85 rather than full opacity through the note strip,
+  or the frosted band would have nothing left to frost.
   The surface owes the flow `CLUSTER_CLEARANCE`. It replaced a sticky bar (full-bleed,
   `sticky bottom-[nav]`, backdrop-blur, after the
   content).

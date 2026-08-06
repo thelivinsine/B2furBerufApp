@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mobile: fade behind the Üben button</title>
+    <style>
+      /* ---- REAL tokens, copied from src/index.css ------------------------- */
+      :root {
+        --background: 180 45% 98%;
+        --page-from: 144 45% 98%;
+        --page-mid: 150 50% 98%;
+        --page-to: 198 83% 98%;
+        --foreground: 252 16% 12%;
+        --surface: 0 0% 100%;
+        --elevated: 0 0% 100%;
+        --muted: 220 13% 88%;
+        --muted-foreground: 220 8% 36%;
+        --border: 218 13% 84%;
+        --primary: 221 83% 54%;
+        --primary-foreground: 0 0% 100%;
+        --accent: 197 93% 77%;
+        --accent-ink: 198 90% 32%;
+        --der: 226 74% 48%;
+        --die: 333 71% 51%;
+        --das: 142 76% 36%;
+        --shadow: 221 40% 22%;
+        --radius: 0.5rem;
+        --wash-a: 0.1;
+        --wash-b: 0.09;
+        --gradient-from: 226 83% 47%;
+        --gradient-to: 196 93% 38%;
+      }
+      .dark {
+        --background: 220 15% 4%;
+        --page-from: 220 15% 4%;
+        --page-mid: 220 15% 4%;
+        --page-to: 220 15% 4%;
+        --foreground: 220 12% 94%;
+        --surface: 220 10% 17%;
+        --elevated: 220 9% 22%;
+        --muted: 220 9% 25%;
+        --muted-foreground: 220 8% 72%;
+        --border: 220 10% 38%;
+        --primary: 219 90% 74%;
+        --primary-foreground: 228 30% 8%;
+        --accent: 197 93% 77%;
+        --accent-ink: 198 72% 72%;
+        --der: 226 88% 76%;
+        --die: 329 82% 72%;
+        --das: 145 50% 58%;
+        --shadow: 220 30% 2%;
+        --wash-a: 0;
+        --wash-b: 0;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system,
+          "Segoe UI", sans-serif;
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ---- review chrome (English, per the founder rule) ------------------- */
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+      h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
+      .lede { max-width: 68ch; font-size: 15px; line-height: 1.6; color: hsl(var(--muted-foreground)); margin: 0 0 8px; }
+      h2 { font-size: 18px; font-weight: 800; margin: 44px 0 10px; }
+      .bar { display: flex; gap: 10px; align-items: center; margin: 24px 0 8px; flex-wrap: wrap; }
+      .switch {
+        display: inline-flex; gap: 4px; padding: 4px; border-radius: 10px;
+        background: hsl(var(--muted)); border: 1px solid hsl(var(--border));
+      }
+      .switch button {
+        border: 0; border-radius: 6px; padding: 7px 14px; font: inherit; font-size: 13px;
+        font-weight: 600; background: transparent; color: hsl(var(--muted-foreground)); cursor: pointer;
+      }
+      .switch button[aria-pressed="true"] {
+        background: hsl(var(--surface)); color: hsl(var(--foreground));
+        box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+      }
+      .hint { font-size: 13px; color: hsl(var(--muted-foreground)); }
+
+      .grid { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+      .col { width: 260px; }
+      .cap { margin: 12px 2px 0; }
+      .cap .name { font-size: 14px; font-weight: 800; }
+      .cap .desc { font-size: 12.5px; line-height: 1.5; color: hsl(var(--muted-foreground)); margin-top: 3px; }
+      .cap .cost { font-size: 12.5px; line-height: 1.5; margin-top: 6px; }
+      .cost b { color: hsl(var(--foreground)); }
+
+      table { border-collapse: collapse; font-size: 13.5px; margin-top: 10px; width: 100%; max-width: 900px; }
+      th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid hsl(var(--border)); vertical-align: top; }
+      th { font-weight: 700; }
+      td:first-child, th:first-child { white-space: nowrap; font-weight: 600; }
+
+      /* ---- the phone mock ------------------------------------------------- */
+      .phone {
+        position: relative;
+        width: 260px;
+        height: 520px;
+        border-radius: 26px;
+        overflow: hidden;
+        border: 1px solid hsl(var(--border));
+        box-shadow: 0 2px 4px hsl(var(--shadow) / 0.05), 0 12px 32px hsl(var(--shadow) / 0.12);
+        /* the real page ground: bg-page (mint -> sky) + the two washes */
+        background-image:
+          radial-gradient(60% 45% at 15% 10%, hsl(197 93% 77% / var(--wash-a)), transparent 70%),
+          radial-gradient(55% 40% at 85% 0%, hsl(153 55% 60% / var(--wash-b)), transparent 70%),
+          linear-gradient(120deg, hsl(var(--page-from)), hsl(var(--page-mid)) 45%, hsl(var(--page-to)));
+        color: hsl(var(--foreground));
+      }
+
+      /* app header */
+      .p-header {
+        position: absolute; inset: 0 0 auto 0; height: 42px; z-index: 40;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 12px; background: hsl(var(--background) / 0.92);
+        border-bottom: 1px solid hsl(var(--border));
+        backdrop-filter: blur(6px);
+      }
+      .p-header .logo { font-size: 12.5px; font-weight: 800; letter-spacing: -0.01em; }
+      .p-header .dot { width: 20px; height: 20px; border-radius: 999px; background: hsl(var(--muted)); }
+
+      /* scrolling content */
+      .p-scroll {
+        position: absolute; inset: 42px 0 0 0; overflow-y: auto; padding: 10px 12px 150px;
+        scrollbar-width: none;
+      }
+      .p-scroll::-webkit-scrollbar { display: none; }
+
+      .toolbar { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+      .tabpill {
+        display: inline-flex; gap: 3px; padding: 3px; border-radius: 8px;
+        background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); flex: 1;
+      }
+      .tabpill span {
+        flex: 1; text-align: center; font-size: 10px; font-weight: 700; padding: 5px 0;
+        border-radius: 6px; color: hsl(var(--muted-foreground));
+      }
+      .tabpill span.on {
+        background: hsl(var(--surface)); color: hsl(var(--foreground));
+        box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+      }
+      .iconbtn {
+        width: 26px; height: 26px; border-radius: 8px; background: hsl(var(--surface));
+        box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+        display: grid; place-items: center; font-size: 12px; color: hsl(var(--muted-foreground));
+        flex: 0 0 auto;
+      }
+      .iconbtn.filter {
+        background: hsl(var(--accent) / 0.35); color: hsl(var(--accent-ink));
+      }
+      .dark .iconbtn.filter { background: hsl(var(--accent) / 0.18); }
+
+      /* Wörter cards, in the real card language */
+      .card {
+        background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+        border-radius: 10px; padding: 10px 11px; margin-bottom: 8px;
+        box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+      }
+      .card .head { display: flex; align-items: center; gap: 7px; }
+      .card .mark { font-size: 14px; line-height: 1; }
+      .card .word { font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
+      .card .ex { margin-top: 6px; font-size: 11px; line-height: 1.45; color: hsl(var(--muted-foreground)); }
+      .card .foot { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+      .chip {
+        font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+        background: hsl(var(--muted)); color: hsl(var(--muted-foreground));
+      }
+
+      /* the floating cluster: real offsets (nav 3.9375rem, +2rem / +0.5rem) */
+      .p-nav {
+        position: absolute; inset: auto 0 0 0; height: 63px; z-index: 40;
+        background: hsl(var(--background)); border-top: 1px solid hsl(var(--border));
+        display: flex; align-items: center; justify-content: space-around;
+      }
+      .p-nav i {
+        width: 30px; height: 22px; border-radius: 7px; background: hsl(var(--border) / 0.5);
+        display: block;
+      }
+      .p-nav i.on { background: hsl(var(--border)); }
+
+      .cluster {
+        position: absolute; left: 0; right: 0; bottom: calc(63px + 2rem); z-index: 30;
+        padding: 0 14px; display: flex; justify-content: center;
+      }
+      .cluster .slot { width: 100%; border-radius: 10px; background: hsl(var(--background)); }
+      .cluster .cta {
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        height: 40px; border-radius: 10px; color: #fff; font-size: 13.5px; font-weight: 800;
+        background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%);
+      }
+      .dark .cluster .cta { color: hsl(var(--primary-foreground)); }
+
+      .note {
+        position: absolute; left: 0; right: 0; bottom: calc(63px + 0.5rem); z-index: 25;
+        text-align: center; font-size: 10.5px; line-height: 1.35; color: hsl(var(--muted-foreground));
+      }
+      .note a { color: hsl(var(--primary)); font-weight: 600; text-decoration: none; }
+
+      /* ============ THE VARIANTS ============================================ */
+
+      /* the veil element, shared; each variant sets its own height + ramp */
+      .veil {
+        position: absolute; left: 0; right: 0; bottom: 63px; z-index: 20;
+        pointer-events: none; display: none;
+      }
+
+      /* A - short dissolve (7rem) */
+      .v-a .veil {
+        display: block; height: 7rem;
+        background: linear-gradient(
+          to top,
+          hsl(var(--background)) 0%,
+          hsl(var(--background) / 0.98) 30%,
+          hsl(var(--background) / 0.88) 48%,
+          hsl(var(--background) / 0.62) 66%,
+          hsl(var(--background) / 0.28) 84%,
+          hsl(var(--background) / 0) 100%
+        );
+      }
+
+      /* B - long dissolve (11rem) */
+      .v-b .veil {
+        display: block; height: 11rem;
+        background: linear-gradient(
+          to top,
+          hsl(var(--background)) 0%,
+          hsl(var(--background) / 0.99) 26%,
+          hsl(var(--background) / 0.92) 44%,
+          hsl(var(--background) / 0.72) 60%,
+          hsl(var(--background) / 0.42) 76%,
+          hsl(var(--background) / 0.16) 90%,
+          hsl(var(--background) / 0) 100%
+        );
+      }
+
+      /* C - dissolve + progressive blur (9rem) */
+      .v-c .veil {
+        display: block; height: 9rem;
+        background: linear-gradient(
+          to top,
+          hsl(var(--background)) 0%,
+          hsl(var(--background) / 0.96) 30%,
+          hsl(var(--background) / 0.78) 52%,
+          hsl(var(--background) / 0.42) 74%,
+          hsl(var(--background) / 0) 100%
+        );
+      }
+      .v-c .blur {
+        position: absolute; left: 0; right: 0; bottom: 63px; height: 9rem; z-index: 19;
+        pointer-events: none;
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+        -webkit-mask-image: linear-gradient(to top, #000 0%, #000 45%, transparent 100%);
+        mask-image: linear-gradient(to top, #000 0%, #000 45%, transparent 100%);
+      }
+
+      /* 0 - today (nothing behind the cluster) */
+      .v-0 .veil { display: none; }
+
+      /* SHIPPED - the founder's pick: A's short fade, plus C's blur cut down to
+         the strip BELOW the button ("not above the blue button, it should be
+         below the blue button behind the text"). The scrim reaches full only at
+         the nav seam and holds ~0.85 through the note strip, so the frosted band
+         has something left to frost. Values are verbatim from src/index.css. */
+      .v-s .veil {
+        display: block; height: 7rem;
+        background: linear-gradient(
+          to top,
+          hsl(var(--background)) 0%,
+          hsl(var(--background) / 0.9) 6%,
+          hsl(var(--background) / 0.84) 28%,
+          hsl(var(--background) / 0.64) 48%,
+          hsl(var(--background) / 0.37) 68%,
+          hsl(var(--background) / 0.13) 86%,
+          hsl(var(--background) / 0) 100%
+        );
+      }
+      .v-s .blur {
+        position: absolute; left: 0; right: 0; bottom: 63px; height: 2rem; z-index: 21;
+        pointer-events: none;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        -webkit-mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+        mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+      }
+      .col.shipped .cap .name { color: hsl(var(--primary)); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Mobile: fading the list behind the Üben button</h1>
+      <p class="lede">
+        On desktop the Bibliothek list scrolls inside its own column, so it fades softly into the page
+        ground at the bottom edge (the <code>mask-fade-bottom</code> effect in your screenshot). On a
+        phone the page itself scrolls, so there is no such edge: word cards run all the way down and
+        pass directly behind the floating "Üben" button and the "Etwas verbessern? Feedback geben"
+        line under it, which is why that line is hard to read.
+      </p>
+      <p class="lede">
+        Each option below adds the same kind of soft dissolve on mobile: a veil in the page-ground
+        colour, pinned above the bottom nav, sitting under the button and over the cards. It never
+        blocks taps, and it holds no border, so there is no bar strapped across the screen.
+      </p>
+
+      <p class="lede">
+        <b style="color: hsl(var(--foreground))">Picked and shipped:</b> the short fade, with the
+        blur kept out of the button's way and confined to the strip below it, behind the feedback
+        line. That is the first phone below; A, B and C are the options it was chosen from.
+      </p>
+
+      <div class="bar">
+        <div class="switch" role="group" aria-label="Theme">
+          <button type="button" data-theme="light" aria-pressed="true">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+        <span class="hint">The phones scroll. Scroll a list up to see the cards pass into the fade.</span>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <h2>What each option costs</h2>
+      <table>
+        <tr>
+          <th>Option</th><th>What you see</th><th>Trade-off</th>
+        </tr>
+        <tr>
+          <td>Shipped</td>
+          <td>The short fade dissolves the cards on their way down; a 32 px frosted strip sits
+            between the nav and the button's lower edge, so the feedback line reads against a soft
+            haze instead of a card.</td>
+          <td>None worth naming: the blur covers a strip that held nothing but the note, and it
+            stops before the button, so no content above it is touched.</td>
+        </tr>
+        <tr>
+          <td>Today</td>
+          <td>Cards run at full strength right up to the nav; the grey feedback line prints over a
+            white card.</td>
+          <td>The line is illegible whenever a card happens to sit under it.</td>
+        </tr>
+        <tr>
+          <td>A · Short fade</td>
+          <td>The last ~112 px dissolve. The button sits on clean ground, the line is clear.</td>
+          <td>Cards still read strongly right up to the button, so it is the least "premium" of the
+            three but also the least likely to hide content you wanted to see.</td>
+        </tr>
+        <tr>
+          <td>B · Long fade</td>
+          <td>The dissolve starts ~176 px up, so a card melts away gradually. Closest in feel to the
+            desktop edge in your screenshot.</td>
+          <td>A word card sitting in the fade zone is dimmed while still on screen, so the visible
+            list is effectively a little shorter.</td>
+        </tr>
+        <tr>
+          <td>C · Fade + soft blur</td>
+          <td>Same dissolve as A/B plus a blur that ramps in toward the bottom, like frosted glass.</td>
+          <td>Richest look, but it is the closest to a "blurred band", which you rejected for the
+            browse toolbar. Also the heaviest to render on older phones.</td>
+        </tr>
+      </table>
+
+      <h2>Notes</h2>
+      <p class="lede">
+        The veil is painted in <code>--background</code>, which matches the page ground almost exactly
+        in light mode and is identical to it in dark mode, so it never shows as a coloured band. It is
+        mobile only; desktop keeps the mask it already has. Whichever option you pick applies to all
+        four Bibliothek tabs at once, since they share one cluster.
+      </p>
+    </div>
+
+    <script>
+      const VARIANTS = [
+        {
+          cls: "v-s",
+          shipped: true,
+          name: "Shipped · A + blur under the button",
+          desc: "The short fade, plus the frosted strip cut down to the gap between the nav and the button, which is where the feedback line sits.",
+          cost: "<b>This is what is live</b> on the four Bibliothek tabs.",
+        },
+        {
+          cls: "v-0",
+          name: "Today",
+          desc: "No fade. Cards pass at full strength behind the button and the feedback line.",
+          cost: "<b>Baseline</b> for comparison.",
+        },
+        {
+          cls: "v-a",
+          name: "A · Short fade",
+          desc: "112 px dissolve into the page ground, starting just above the button.",
+          cost: "Lightest touch. Least content dimmed.",
+        },
+        {
+          cls: "v-b",
+          name: "B · Long fade",
+          desc: "176 px dissolve, the closest match to the desktop edge you screenshotted.",
+          cost: "Softest look. Dims a card that is still on screen.",
+        },
+        {
+          cls: "v-c",
+          name: "C · Fade + soft blur",
+          desc: "Dissolve plus a blur that ramps in toward the nav, frosted-glass style.",
+          cost: "Richest. Nearest to a blurred band, and heaviest to render.",
+        },
+      ];
+
+      const WORDS = [
+        ["der", "🔺", "der Engpass", "Bei einem Engpass in der Lieferkette informieren wir sofort den Kunden.", "die Engpässe"],
+        ["die", "🌸", "die Verspätung", "Die Verspätung der Lieferung beträgt zwei Werktage.", "die Verspätungen"],
+        ["die", "🌸", "die Route", "Wir planen die Route über die Autobahn, um Zeit zu sparen.", "die Routen"],
+        ["das", "🍀", "das Lager", "Die Ware liegt seit gestern im Lager in Hamburg.", "die Lager"],
+        ["der", "🔺", "der Auftrag", "Der Auftrag wurde am Montag schriftlich bestätigt.", "die Aufträge"],
+        ["die", "🌸", "die Zustellung", "Die Zustellung erfolgt zwischen acht und zwölf Uhr.", "die Zustellungen"],
+        ["das", "🍀", "das Frachtgut", "Das Frachtgut muss vor dem Verladen gewogen werden.", "die Frachtgüter"],
+        ["der", "🔺", "der Zwischenfall", "Nach dem Zwischenfall im Depot schreiben wir einen Bericht.", "die Zwischenfälle"],
+      ];
+
+      function cards() {
+        return WORDS.map(
+          ([g, mark, word, ex, plural]) => `
+          <div class="card">
+            <div class="head">
+              <span class="mark">${mark}</span>
+              <span class="word" style="color:hsl(var(--foreground))">${word}</span>
+            </div>
+            <div class="ex">${ex}</div>
+            <div class="foot">
+              <span class="chip">${plural}</span>
+              <span class="chip">🔊</span>
+            </div>
+          </div>`,
+        ).join("");
+      }
+
+      function phone(v) {
+        return `
+        <div class="col${v.shipped ? " shipped" : ""}">
+          <div class="phone ${v.cls}">
+            <div class="p-header"><span class="logo">Bibliothek</span><span class="dot"></span></div>
+            <div class="p-scroll">
+              <div class="toolbar">
+                <div class="tabpill">
+                  <span class="on">Wörter</span><span>Wendungen</span><span>Kollok.</span>
+                </div>
+                <div class="iconbtn filter">☰</div>
+                <div class="iconbtn">🔖</div>
+                <div class="iconbtn">🔍</div>
+              </div>
+              ${cards()}
+            </div>
+            <div class="blur"></div>
+            <div class="veil"></div>
+            <div class="note">Etwas verbessern? <a href="#">Feedback geben</a></div>
+            <div class="cluster">
+              <div class="slot"><div class="cta">⚡ Üben mit 47 Wörtern</div></div>
+            </div>
+            <div class="p-nav"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="cap">
+            <div class="name">${v.name}</div>
+            <div class="desc">${v.desc}</div>
+            <div class="cost">${v.cost}</div>
+          </div>
+        </div>`;
+      }
+
+      document.getElementById("grid").innerHTML = VARIANTS.map(phone).join("");
+
+      // scroll every phone a little so cards actually sit in the fade zone
+      document.querySelectorAll(".p-scroll").forEach((el) => (el.scrollTop = 150));
+
+      // Open in dark when ?theme=dark (the screenshot check) or when the page is
+      // being viewed in a dark reader, so the review chrome matches its host.
+      const wantsDark =
+        new URLSearchParams(location.search).get("theme") === "dark" ||
+        document.documentElement.dataset.theme === "dark" ||
+        (!document.documentElement.dataset.theme &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+      if (wantsDark) {
+        document.documentElement.classList.add("dark");
+        document.body.classList.add("dark");
+        document.querySelectorAll(".switch button").forEach((x) =>
+          x.setAttribute("aria-pressed", String(x.dataset.theme === "dark")),
+        );
+      }
+
+      document.querySelectorAll(".switch button").forEach((b) => {
+        b.addEventListener("click", () => {
+          const dark = b.dataset.theme === "dark";
+          document.documentElement.classList.toggle("dark", dark);
+          document.body.classList.toggle("dark", dark);
+          document.querySelectorAll(".switch button").forEach((x) =>
+            x.setAttribute("aria-pressed", String(x === b)),
+          );
+        });
+      });
+    </script>
+  </body>
+</html>
