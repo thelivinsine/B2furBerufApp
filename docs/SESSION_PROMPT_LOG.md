@@ -5103,3 +5103,42 @@ wanted.
 - **Artifacts (prompts 3-8):** `CLAUDE.md` · `docs/DECISIONS.md` §s196 · `docs/PROJECT_STATUS.md` ·
   this log · **PR #812** (the chooser + Sprechen work) and **PR #815** (the deploy diagnosis), both
   squash-merged into `main` · no `pages.yml` change (deliberately left for its own review)
+
+## Session 197 · 2026-08-06 · branch `claude/page-header-alignment-glqts5`
+
+- **Prompt 1 (verbatim):** `in one of the previous sessions, I asked sonnet to replace the hello
+  greeting with the page's name as a header. I wanted the header position to align vertically
+  leftwards with the page components like toggle and verlauf. Butit created this funny looking
+  page. Can you access that prompt and generate a couple of previews of how this page should look
+  overall? It is looking ridiculous at the moment` (with a screenshot of the shipped `/anwenden`
+  hub at desktop width, sidebar cropped).
+  **Response:** found the prompt they meant (s196, prompt 1, quoted back in the preview page),
+  diagnosed the shipped layout from the code, and shipped a preview round. **No app code touched**:
+  this is design work, so it owes the preview-first process a pick first.
+  **The diagnosis.** The s196 change answered "aligned to left with the toggle buttons" by putting
+  the title in the APP header at the app's left gutter, which is a different left edge from every
+  control it was supposed to line up with. Underneath it the page nests THREE separately centred
+  widths: the tab panel column (`lg:max-w-4xl`, 896 px), the module grid (`max-w-[30rem]`, 480 px)
+  and the Stärkeprofil grid (`max-w-[26rem]`, 416 px). So the tiles start ~220 px right of the
+  title, a narrow tile island floats over a full-width Verlauf card, and at first visit four
+  full-height grey bars at "–" fill half the widest card on the page.
+  **The options** (`preview/pruefung-header-align.html`, generator
+  `preview/gen-pruefung-header-align.mjs`, artifact published): **A** title back INSIDE the page
+  (h1 left, tab switcher right of the same line, controls left-aligned under it, one column for
+  everything); **B** keep the header title and move the PAGE to its left edge instead (needs the
+  header row to sit in the same centred container as `main`, or the two drift apart as the window
+  grows); **C** no title at all, the switcher IS the page header, centred, which is the
+  Bibliothek/Schreiben law. All three collapse the three nested widths into ONE column, halve the
+  empty Stärkeprofil, and leave the locked module-card anatomy untouched. The review page carries
+  live Theme / Column width (512·640·768) / Alignment guides switches, a light and dark pass, a
+  desktop and a phone frame per option, and the "today" frame drawn at the shipped measurements.
+  **One locked rule flagged, not quietly overridden:** s196 locked "tile grid narrower than the
+  column"; all three options narrow the COLUMN to the tiles instead, which keeps the reason for the
+  lock (wide tiles read as empty) and drops its side effect (mismatched edges). Called out in the
+  preview for the founder to accept or reject.
+  **Verified in headless Chromium**, not by eye: every phone frame rests inside the 668 px a
+  393×852 phone leaves between the app header and the tab bar (0 px overflow, all three), no
+  horizontal overflow in any Verlauf split, and the three control switches read back on the root
+  element.
+- **Artifacts (prompt 1):** `preview/gen-pruefung-header-align.mjs` (new) ·
+  `preview/pruefung-header-align.html` + `-artifact.html` (new) · this log · no `src/` change yet
