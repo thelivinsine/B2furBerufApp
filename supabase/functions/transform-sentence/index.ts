@@ -14,7 +14,7 @@
 //
 // Secrets: GEMINI_API_KEY (free primary), ANTHROPIC_API_KEY + OPENAI_API_KEY
 // (paid backups), GEMINI_MODEL / TRANSFORM_MODEL / OPENAI_MODEL + CLAUDE_BUDGET_USD
-// overrides, TRANSFORM_DAILY_LIMIT (default 40),
+// overrides, TRANSFORM_DAILY_LIMIT (default 30),
 // TRANSFORM_BURST_LIMIT (default 8), USER_MONTHLY_LIMIT (default 200),
 // MONTHLY_SPEND_CAP_USD (default 5), MAX_SENTENCE_LEN (default 300),
 // PROMPT_VERSION (default "1").
@@ -409,7 +409,11 @@ Deno.serve(async (req) => {
     .from("sentence_ai_ops").select("id", { count: "exact", head: true })
     .eq("user_id", user.id).eq("kind", "transform").gte("created_at", startOfDay.toISOString());
   if ((daily ?? 0) >= TRANSFORM_DAILY_LIMIT) {
-    return json({ ok: false, limitReached: true, message: "Heute keine weiteren Umformungen. Der geprüfte Satz bleibt sichtbar." });
+    return json({
+      ok: false, limitReached: true,
+      dailyLimit: TRANSFORM_DAILY_LIMIT, dailyRemaining: 0,
+      message: "Heute keine weiteren Umformungen. Der geprüfte Satz bleibt sichtbar.",
+    });
   }
   const startOfMonth = new Date();
   startOfMonth.setUTCDate(1);
@@ -478,5 +482,13 @@ Deno.serve(async (req) => {
     );
   });
 
-  return json({ ok: true, cached: false, applicable, reason, transformed, note: out.note, noteEn: out.noteEn });
+  // The allowance the learner has left AFTER this paid op, so the Umformung
+  // count in Fokus is the server's number and not the client's guess (s197).
+  // A cache hit returns earlier and reports nothing: it spends no unit, and the
+  // client's own row count already covers it.
+  return json({
+    ok: true, cached: false, applicable, reason, transformed, note: out.note, noteEn: out.noteEn,
+    dailyLimit: TRANSFORM_DAILY_LIMIT,
+    dailyRemaining: Math.max(0, TRANSFORM_DAILY_LIMIT - ((daily ?? 0) + 1)),
+  });
 });

@@ -28,9 +28,21 @@ describe("daily AI allowance", () => {
   // Sprechen joined the allowance system in s193 at 2 conversations/day
   // (founder-approved), sitting beside Lang because a spoken conversation costs
   // about what a long evaluation costs.
-  it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2 / Sprechen 2)", async () => {
+  // The Umformung joined in s197 on its OWN budget (30 = DAILY_CHECK_LIMIT 10 x
+  // TRANSFORM_VARIANTS 3): it never spends a Fokus Korrektur, and before s197 it
+  // was the one AI feature whose daily wall arrived with no warning at all.
+  it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2 / Sprechen 2 / Umformung 30)", async () => {
     const { DAILY_ALLOWANCE } = await load();
-    expect(DAILY_ALLOWANCE).toEqual({ fokus: 10, kurz: 4, lang: 2, sprechen: 2 });
+    expect(DAILY_ALLOWANCE).toEqual({ fokus: 10, kurz: 4, lang: 2, sprechen: 2, transform: 30 });
+  });
+
+  it("counts the Umformung apart from the Korrektur that preceded it", async () => {
+    const { reportServerAllowance, readAllowance } = await load();
+    reportServerAllowance("transform", 30, 27);
+    expect(readAllowance("transform")).toEqual({ limit: 30, remaining: 27 });
+    // A transform response must never move the Fokus meter: one Korrektur can
+    // be followed by three Umformungen and still cost exactly one Korrektur.
+    expect(readAllowance("fokus")).toBeUndefined();
   });
 
   it("adopts the limit the server reports, not the compiled default", async () => {

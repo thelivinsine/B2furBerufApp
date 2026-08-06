@@ -67,6 +67,9 @@ export function FokusTrainer({
   // Today's Korrektur allowance (Fokus 10/day). Follows what `check-sentence`
   // reports after every call, so the number moves the moment a unit is spent.
   const allowance = useDailyAllowance("fokus");
+  // The Umformung's own budget (`TRANSFORM_DAILY_LIMIT`), separate from the
+  // Korrektur allowance above: one round of Fokus can spend up to three of it.
+  const transformAllowance = useDailyAllowance("transform");
   const reduce = useReducedMotion();
   // The Hinweis in English. One chip for ALL AI feedback in Schreiben (s179):
   // this used to be the hold-to-peek EnPeek, which stays the pattern for
@@ -395,10 +398,21 @@ export function FokusTrainer({
       // White card like every other content card (founder s149; was a grey wash).
       className="rounded-2xl border border-border bg-surface p-5 shadow-soft"
     >
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-bold uppercase tracking-wide text-primary">
           {transformLabel}
         </span>
+        <div className="flex items-center gap-2">
+          {/* The Umformung has its OWN daily budget (it never spends a
+              Korrektur, s167), and until s197 it was the one AI feature whose
+              wall arrived with no warning. */}
+          {transformAllowance.known && (
+            <AllowanceNote
+              remaining={transformAllowance.remaining}
+              limit={transformAllowance.limit}
+              what="Umformungen"
+            />
+          )}
         {m.transform.status === "done" && m.transform.applicable && m.transform.transformed && (
           <div className="flex items-center gap-1.5">
             {/* "Nochmal": ask the AI for another phrasing of the same target form
@@ -416,6 +430,7 @@ export function FokusTrainer({
             <SpeakButton text={m.transform.transformed} />
           </div>
         )}
+        </div>
       </div>
 
       {m.transform.status === "loading" && (
@@ -630,6 +645,16 @@ export function FokusTrainer({
                   </button>
                   <SpeakButton text={m.transform.transformed} />
                 </div>
+                {/* Same fact as the desktop card's header, in the one place a
+                    phone has room for it (s197). */}
+                {transformAllowance.known && (
+                  <AllowanceNote
+                    remaining={transformAllowance.remaining}
+                    limit={transformAllowance.limit}
+                    what="Umformungen"
+                    className="text-center"
+                  />
+                )}
               </div>
             ) : showResult && diff ? (
               // Corrections as two text columns (founder r4 amendment: no
