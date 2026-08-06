@@ -5104,7 +5104,52 @@ wanted.
   this log · **PR #812** (the chooser + Sprechen work) and **PR #815** (the deploy diagnosis), both
   squash-merged into `main` · no `pages.yml` change (deliberately left for its own review)
 
-## Session 197 · 2026-08-06 · branch `claude/page-header-alignment-glqts5`
+---
+
+## Session 197 (parallel A) — the mobile fade behind the Üben button
+
+**Branch:** `claude/mobile-floating-text-readability-bs49dz`
+
+- **Prompt 1 (verbatim):** `[screenshot of the dark-mode Bibliothek list fading at the bottom edge of
+  the desktop scroll column] can you put similar effect even in the mobile view so that the floating
+  text below the ueben button is more readable and visible? generate a couple of previews`
+  **Response:** named the cause before designing anything. The screenshot is
+  `lg:mask-fade-bottom` (`browseColumnClass`, s190): desktop scrolls INSIDE the content column, so
+  the column masks its own bottom edge and the cards dissolve into the page ground. On a phone the
+  PAGE scrolls, so there is no such edge, and the cards run at full strength behind the fixed
+  `FloatingActionCluster` and its note line, which since s189 deliberately carries no
+  `floatingNote` plate (the plate read as a frosted chip over white cards). Built
+  `preview/mobile-cluster-fade.html` (+ the artifact copy): four phone mocks at the REAL cluster
+  offsets (nav `3.9375rem`, buttons `+2rem`, note `+0.5rem`) and the real tokens, in both themes.
+  Today (baseline, note printing over a card) · **A** short 7rem dissolve · **B** long 11rem
+  dissolve, closest to the desktop edge · **C** dissolve plus a bottom-ramped blur. All three are a
+  pointer-events-none veil in `--background` at `z-20`, under the cluster and over the cards: no
+  border, no bar, so the s168 sticky-bar and s169 blurred-band rejects stay rejected (C is flagged
+  in the preview as the one that flirts with the band). No app code touched: awaiting the pick.
+
+- **Artifacts:** `preview/mobile-cluster-fade.html` · `preview/mobile-cluster-fade-artifact.html` ·
+  artifact <https://claude.ai/code/artifact/8bbc7f2e-d581-4767-84ee-a024380d0604>
+
+- **Prompt 2 (verbatim):** `insert short fade but soft blur but not above the blue button, it should
+  be below the blue button behind the text.`
+  **Response:** shipped variant A's 7rem scrim plus C's blur, cut down from a 9rem band to the
+  2rem strip between the nav and the button's LOWER edge, so the frosting sits behind the note line
+  and stops before the button. Two new utilities in `src/index.css` (`.cluster-scrim`,
+  `.cluster-blur`), both rendered by `FloatingActionCluster`, `pointer-events-none`, border-free,
+  `lg:hidden`; the note moved to `z-[25]` so it stays above them. One tuning pass came out of
+  screenshotting the REAL app at 390x800 in both themes: the first scrim reached ~0.99 through the
+  note strip, which made the frosted band invisible, so the ramp now holds ~0.85 there and the blur
+  has something left to act on (still AA, because what shows through is a card within a few per
+  cent of the ground). Only the four Bibliothek tabs mount this cluster, so no writing editor is
+  dimmed. Gates: typecheck, lint, `check:contrast`, `test:unit` (624), `build`, `check:bundle` all
+  green. Preview updated with a fifth "Shipped" phone so the mockup and the live surface agree.
+
+- **Artifacts (prompt 2):** `src/index.css` · `src/features/shared/floatingCluster.tsx` ·
+  `docs/areas/BIBLIOTHEK.md` · `.claude/skills/design/SKILL.md` · `preview/mobile-cluster-fade.html`
+
+---
+
+## Session 197 (parallel B) · 2026-08-06 · branch `claude/page-header-alignment-glqts5`
 
 - **Prompt 1 (verbatim):** `in one of the previous sessions, I asked sonnet to replace the hello
   greeting with the page's name as a header. I wanted the header position to align vertically
@@ -5177,3 +5222,15 @@ wanted.
   `src/features/pruefung/{PruefungHub,hubSwitcher}.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (s195
   handoff archived) · this log
+
+- **Prompt 3 (verbatim):** `what's shipped is good. document the session and merge everything live`
+  **Response:** documented (`docs/PROJECT_STATUS.md` handoff, `docs/DECISIONS.md` §s197, this log)
+  and merged. One thing worth carrying forward: a PARALLEL s197 branch
+  (`claude/page-header-alignment-glqts5`, PR #817) landed on `main` first and restructured
+  `PROJECT_STATUS.md`, so this branch merged `main` in and resolved three doc conflicts by keeping
+  BOTH sessions' facts (their structure, this session's handoff added under "Resume here"; the
+  prompt log now labels the two branches "parallel A/B"; their s195 archive text kept over this
+  session's duplicate). Gates re-run after the merge: typecheck · 624 tests · build · check:bundle
+  127.9 kB. **CI never fired for PR #818** at all: no check run was ever created, and the same
+  window shows a `main` validate run the platform CANCELLED after 15 minutes, so this is GitHub's
+  side, not the branch. Every gate `validate.yml` runs was therefore run locally before merging.

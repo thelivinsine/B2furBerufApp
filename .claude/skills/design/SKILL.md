@@ -190,6 +190,11 @@ Ranked by how often the founder had to correct AI output:
   portalled to `<body>` because both hubs slide their panels with a transform. Schreiben's three
   trainers and all four Bibliothek tabs share it (founder s189: "same positions and design as
   schreiben"). Sticky bars were rejected (s168) and the four hand-copied Bibliothek bars are gone.
+  Since s197 it also brings its own soft bottom: a short page-ground scrim so the cards dissolve on
+  their way down (the mobile answer to the desktop `mask-fade-bottom`, which a phone cannot have
+  because it scrolls the page rather than a column), plus a frosted band in the strip BELOW the
+  button, where the note line sits. Border-free, `pointer-events-none`, and the blur never reaches
+  above the button, so neither reject comes back.
   `SearchField` transient toolbar search;
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).
