@@ -1735,48 +1735,45 @@ recorded row nothing reads back is lost work**, and that is now a stated law.
 
 ---
 
-## s196 — why the Pages deploy keeps going red (read the whole log, not the tail)
+## s196 — why the Pages deploy keeps going red (the timeout is too short, that is all)
 
-Three sessions recorded a red **Deploy site to GitHub Pages** run as transient GitHub flake and
-moved on. The full job log of run #819 attempt 2 (2026-08-06) shows the exact mechanism, and it is
-worth knowing precisely, because two of the three moving parts are ours.
+Three sessions recorded a red **Deploy site to GitHub Pages** run as transient GitHub flake. It is
+not flake, and it is also not (as this file first claimed) a self-inflicted retry bug. The full job
+logs of runs #818, #819 and #820 on 2026-08-06 settle it:
 
-**1. The trigger is Pages-side and real.** The deployment is created, then polls
-`Current status: deployment_queued` every 5 s for the FULL 600 s timeout without ever leaving the
-queue. Nothing in this repo causes that; GitHub's Pages queue was simply not draining.
+**A Pages deployment for this repo currently takes LONGER THAN THE 600 s TIMEOUT the action is
+given.** Run #820's deployment sat at `deployment_in_progress` from 14:50:26 to 15:00:30 without
+finishing, and every red run before it did the same. That is the whole root cause.
 
-**2. `actions/deploy-pages` then cancels its own deployment.** On timeout it logs
-`Timeout reached, aborting!` followed by `Canceling Pages deployment... Canceled deployment with ID
-2c541e19…`. That is the action's designed behaviour, not ours.
+What follows from it, in order:
 
-**3. Our retry chain is then STRUCTURALLY INCAPABLE of succeeding.** This is the part worth fixing.
-**The Pages deployment ID is the commit SHA** (`Created deployment for 2c541e19…, ID: 2c541e19…`).
-So once attempt 1 has timed out and cancelled that ID, attempts 2 and 3 re-request the SAME ID,
-which is already in a cancelled state, and each reports `Deployment cancelled.` about five seconds
-later. Observed exactly: attempt 2 created at 13:33:00, cancelled 13:33:05; attempt 3 created
-13:34:06, cancelled 13:34:11. The two retries cannot ever help for the same commit; they only add
-75 s and turn one honest "queue is backed up" into three red steps.
+1. **On timeout the action cancels its own deployment**: `Timeout reached, aborting! → Canceling
+   Pages deployment... Canceled deployment with ID <sha>`. Note the ID: **a Pages deployment's ID
+   is the commit SHA**, so there is exactly one per commit and re-requesting it re-creates the same
+   one.
+2. **The retry chain then usually rescues the run, and did.** Run #820 attempt 2 re-created the
+   deployment at 15:00:46 and reported `Reported success!` at 15:04:17. The site went live because
+   of the retry, not despite it.
+3. **Sometimes the re-request comes straight back cancelled instead** (run #819 attempts 2 and 3,
+   ~5 s each), and a leftover cancelled/in-flight deployment can refuse the NEXT commit outright
+   ("due to in progress deployment. Please cancel `<sha>` first" — the #818 → #819 case).
+   `concurrency: { group: pages }` does not prevent that, because the lock is held by the WORKFLOW
+   RUN and releases when the run ends, not when the deployment does.
 
-**4. And a cancelled deployment refuses the NEXT commit.** That is the #818 → #819 case: run #818
-left `7def4d2` in a cancelled/in-flight state and #819 was refused outright with *"due to in
-progress deployment. Please cancel 7def4d2 first"*. `concurrency: { group: pages }` does not
-prevent this, because that lock is held by the WORKFLOW RUN and releases when the run ends, not
-when the deployment does.
+**The fix is to RAISE THE TIMEOUT, not to remove the retry.** `actions/deploy-pages` takes
+`timeout` as an input; 600 000 ms is simply less than these deploys need. Something like 1 800 000
+(30 min) lets ONE attempt outlast a slow deploy, which removes the self-cancel, which removes the
+leftover that poisons the next merge. The three-attempt chain can stay after that as a real safety
+net; it has now demonstrably earned its place.
 
-**Why a re-run usually looks like the cure.** A fresh run attempt creates the SHA's deployment
-again from scratch, so if the Pages queue has drained in the meantime it sails through on attempt 1.
-That is what happened to #817, and it is why "just re-run it" kept passing for a fix.
-
-**The actual fix, sharper than the one first written down here.** Deleting the retry chain is
-right, but it is not sufficient on its own: the failure is a 600 s timeout against a queue that
-took longer than that. So **remove attempts 2 and 3 AND raise the single deployment's `timeout`**
-(the action takes it as an input; 20-30 min would have absorbed this incident). One deployment,
-given long enough to outlast a backlog, is strictly better than three that cancel each other.
-Deliberately not done in s196: the founder had ended the session, a CI change wants its own review,
-and merging anything while a deployment was stuck would have collided again.
+**Correction, recorded deliberately.** An earlier version of this entry claimed the retries were
+"structurally incapable of succeeding" because they re-request an already-cancelled SHA. Run #820
+disproves that: attempt 2 re-requested exactly that SHA and succeeded. The observation was real
+(#819 attempts 2 and 3 did die in ~5 s) but it was one run generalised into a law, and it pointed
+at the wrong fix (delete the chain) — which would have made things worse.
 
 **Not related to the Supabase deploy.** `supabase.yml` ships the Edge Functions on the same merge
-and stayed green throughout, which is why the s196 `converse` fix went live while the site did not.
+and stayed green throughout, which is why the s196 `converse` fix went live while the site lagged.
 When the founder says "I don't see the change", check WHICH of the two deploys failed before
 suspecting the code.
 

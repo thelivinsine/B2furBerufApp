@@ -332,15 +332,14 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
-- **The Pages deploy's 3-attempt retry CANNOT work, by construction** (s196). A backed-up Pages
-  queue leaves the deployment at `deployment_queued` for the whole 600 s timeout; the action then
-  cancels its own deployment; and because **the deployment ID IS the commit SHA**, attempts 2 and 3
-  re-request an already-cancelled ID and die in ~5 s each. A leftover cancelled deployment also
-  refuses the NEXT commit's run ("in progress deployment. Please cancel <sha> first");
-  `concurrency: group: pages` does not help, since that lock releases with the WORKFLOW, not the
-  deployment. **A fresh full re-run is the workaround** (it recreates the deployment, and succeeds
-  once the queue drains). Fix, not yet taken: delete attempts 2-3 AND raise the single deployment's
-  `timeout` past the backlog. Why → `docs/DECISIONS.md` §s196.
+- **A red Pages deploy means the 600 s timeout is too short, not that the build broke** (s196). A
+  Pages deployment for this repo currently takes LONGER than that, so the action aborts and cancels
+  its own deployment; the 3-attempt retry then usually rescues it (run #820 succeeded on attempt 2)
+  but sometimes the re-request returns cancelled, and a leftover can refuse the NEXT merge ("in
+  progress deployment. Please cancel <sha> first"). `concurrency: group: pages` does not help: that
+  lock releases with the WORKFLOW, not the deployment. **Workaround: re-run the workflow.** Fix,
+  not yet taken: RAISE `timeout` on `actions/deploy-pages` (~30 min) and keep the retry. Why →
+  `docs/DECISIONS.md` §s196.
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
   before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft
   or session is open**, so a learner mid-task adopts the new build at their next clean resume.
