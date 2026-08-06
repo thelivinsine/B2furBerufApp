@@ -1735,48 +1735,48 @@ recorded row nothing reads back is lost work**, and that is now a stated law.
 
 ---
 
-## s196 — the Pages deploy chain, and why "transient flake" was the wrong diagnosis
+## s196 — why the Pages deploy keeps going red (read the whole log, not the tail)
 
-Three sessions in a row hit a red **Deploy site to GitHub Pages** run and each treated it as
-GitHub being flaky. There ARE two things here and they need separating, because calling the whole
-thing flake is what let it recur:
+Three sessions recorded a red **Deploy site to GitHub Pages** run as transient GitHub flake and
+moved on. The full job log of run #819 attempt 2 (2026-08-06) shows the exact mechanism, and it is
+worth knowing precisely, because two of the three moving parts are ours.
 
-- **The trigger is real and Pages-side.** A deployment can sit in a polling state far past the
-  action's own 600 s timeout (observed again 2026-08-06 13:22 UTC: attempt 1 still polling at
-  +18 min). Nothing in this repo causes that and nothing in this repo can prevent it.
-- **The AMPLIFIER is ours**, and it is what turns one stalled deploy into a run of red merges.
+**1. The trigger is Pages-side and real.** The deployment is created, then polls
+`Current status: deployment_queued` every 5 s for the FULL 600 s timeout without ever leaving the
+queue. Nothing in this repo causes that; GitHub's Pages queue was simply not draining.
 
-**The amplifier.** `pages.yml` wraps `actions/deploy-pages` in a hand-rolled three-attempt retry
-(added 2026-07-04, when the Pages service really was degraded). But that action does not "retry a
-request": each attempt **creates a deployment and then polls it**. So attempt 2 creates a SECOND
-deployment for the same commit, GitHub cancels the first as superseded, and attempt 1's poll
-reports `Deployment cancelled.` Attempt 3 does it again. The run ends red with a deployment still
-in flight, and the **next** merge fails at the first hurdle:
+**2. `actions/deploy-pages` then cancels its own deployment.** On timeout it logs
+`Timeout reached, aborting!` followed by `Canceling Pages deployment... Canceled deployment with ID
+2c541e19…`. That is the action's designed behaviour, not ours.
 
-> Deployment request failed for `<new sha>` due to in progress deployment.
-> Please cancel `<old sha>` first or wait for it to complete.
+**3. Our retry chain is then STRUCTURALLY INCAPABLE of succeeding.** This is the part worth fixing.
+**The Pages deployment ID is the commit SHA** (`Created deployment for 2c541e19…, ID: 2c541e19…`).
+So once attempt 1 has timed out and cancelled that ID, attempts 2 and 3 re-request the SAME ID,
+which is already in a cancelled state, and each reports `Deployment cancelled.` about five seconds
+later. Observed exactly: attempt 2 created at 13:33:00, cancelled 13:33:05; attempt 3 created
+13:34:06, cancelled 13:34:11. The two retries cannot ever help for the same commit; they only add
+75 s and turn one honest "queue is backed up" into three red steps.
 
-**Why `concurrency` does not save it.** `pages.yml` already declares
-`concurrency: { group: pages, cancel-in-progress: false }`, which is GitHub's recommended guard and
-looks like it should serialize this. It does not: the lock is held by the WORKFLOW RUN and releases
-the moment the run ends. A run that ends while its deployment is still open hands the lock to the
-next run and the collision anyway.
+**4. And a cancelled deployment refuses the NEXT commit.** That is the #818 → #819 case: run #818
+left `7def4d2` in a cancelled/in-flight state and #819 was refused outright with *"due to in
+progress deployment. Please cancel 7def4d2 first"*. `concurrency: { group: pages }` does not
+prevent this, because that lock is held by the WORKFLOW RUN and releases when the run ends, not
+when the deployment does.
 
-**The observed chain on 2026-08-06**, which is what makes this legible: run #817 (`e02890f`) went
-red and a manual full re-run fixed it, which read as "recovered" and was recorded as flake. #818
-(`7def4d2`) then self-cancelled across all three attempts. #819 (`2c541e1`, the chooser work) was
-then refused outright, naming `7def4d2` as the blocker. Each red run guarantees the next one.
+**Why a re-run usually looks like the cure.** A fresh run attempt creates the SHA's deployment
+again from scratch, so if the Pages queue has drained in the meantime it sails through on attempt 1.
+That is what happened to #817, and it is why "just re-run it" kept passing for a fix.
 
-**Why a manual re-run always "works".** A fresh run attempt starts with no leftover deployment of
-its own to collide with, and by then the stuck one has usually aged out. That is why the fix keeps
-appearing to be "just re-run it", and why the real cause kept escaping notice.
+**The actual fix, sharper than the one first written down here.** Deleting the retry chain is
+right, but it is not sufficient on its own: the failure is a 600 s timeout against a queue that
+took longer than that. So **remove attempts 2 and 3 AND raise the single deployment's `timeout`**
+(the action takes it as an input; 20-30 min would have absorbed this incident). One deployment,
+given long enough to outlast a backlog, is strictly better than three that cancel each other.
+Deliberately not done in s196: the founder had ended the session, a CI change wants its own review,
+and merging anything while a deployment was stuck would have collided again.
 
-**The durable fix, deliberately NOT taken in this session** (the founder had ended it, and a
-workflow change wants its own review): delete the three-attempt chain. `actions/deploy-pages`
-already retries INSIDE a single deployment (`error_count: 10`, 600 s timeout), which is retrying
-without spawning competitors. The comment in `pages.yml` justifying the chain should go with it.
+**Not related to the Supabase deploy.** `supabase.yml` ships the Edge Functions on the same merge
+and stayed green throughout, which is why the s196 `converse` fix went live while the site did not.
+When the founder says "I don't see the change", check WHICH of the two deploys failed before
+suspecting the code.
 
-**Not related to the Supabase deploy.** `supabase.yml` deploys the Edge Functions on the same merge
-and has been green throughout, which is why the s196 `converse` fix went live while the site did
-not. When the founder reports "I don't see the change", check WHICH of the two deploys failed
-before assuming the code.

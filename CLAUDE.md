@@ -332,15 +332,15 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
-- **A stalled Pages deploy is Pages-side; the 3-attempt retry is what SPREADS it** (s196). The
-  stall is real and outside this repo (a deployment can poll past the action's own 600 s timeout).
-  The chain then makes it contagious: each attempt creates a NEW deployment, which cancels the one
-  the previous attempt is waiting on, and the next merge is refused by the leftover ("in progress
-  deployment. Please cancel <sha> first"). `concurrency: group: pages` does not help; that lock
-  releases with the WORKFLOW, not the deployment. **A clean full re-run clears it**, which is why
-  this kept getting logged as pure flake. Durable fix, not yet taken: drop the chain and let
-  `actions/deploy-pages` retry inside ONE deployment as it already does. Why →
-  `docs/DECISIONS.md` §s196.
+- **The Pages deploy's 3-attempt retry CANNOT work, by construction** (s196). A backed-up Pages
+  queue leaves the deployment at `deployment_queued` for the whole 600 s timeout; the action then
+  cancels its own deployment; and because **the deployment ID IS the commit SHA**, attempts 2 and 3
+  re-request an already-cancelled ID and die in ~5 s each. A leftover cancelled deployment also
+  refuses the NEXT commit's run ("in progress deployment. Please cancel <sha> first");
+  `concurrency: group: pages` does not help, since that lock releases with the WORKFLOW, not the
+  deployment. **A fresh full re-run is the workaround** (it recreates the deployment, and succeeds
+  once the queue drains). Fix, not yet taken: delete attempts 2-3 AND raise the single deployment's
+  `timeout` past the backlog. Why → `docs/DECISIONS.md` §s196.
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
   before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft
   or session is open**, so a learner mid-task adopts the new build at their next clean resume.
