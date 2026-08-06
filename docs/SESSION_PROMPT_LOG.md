@@ -4836,4 +4836,5 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   `src/features/writing/{WritingHub,GuidedWritingTrainer,WritingModeSwitcher,bottomChrome}.tsx` ·
   `src/features/writing/fokus/FokusTrainer.tsx` ·
   `src/features/sprechen/{SprechenHub,ConversationRunner}.tsx` · `CLAUDE.md` ·
-  `docs/areas/{PRUEFUNG,SCHREIBEN,SPRECHEN}.md` · `docs/PROJECT_STATUS.md` · this log
+  `docs/areas/{PRUEFUNG,SCHREIBEN,SPRECHEN}.md` · `docs/PROJECT_STATUS.md` · this log ·
+  commits `2539162` (review) + `a722f5f` (implementation) · **PR #811**, squash-merged into `main`

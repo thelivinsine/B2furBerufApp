@@ -227,6 +227,7 @@ Kurz at 360x640, which rests at 99px (down from 134px shipped; the field is at i
 floor there, the documented give-up case) and the Sprechtrainer LIST, which is a browse list.
 Gates green: build · typecheck · lint 0 errors (75 warnings, down from 77) · 610 tests ·
 check:bundle 127.1 kB of 400 · check:contrast · lint:content.
+Shipped as **PR #811**, squash-merged into `main`; the founder verifies the live result.
 **Resume here:** nothing is open. Two judgement calls to confirm if the founder disagrees: the
 module row is `lg:hidden` (they said "in mobile view"), and Kurz at 360x640 still rests ~99px
 scrolled, which drops to 0 if that row goes on Kurz/Lang.
