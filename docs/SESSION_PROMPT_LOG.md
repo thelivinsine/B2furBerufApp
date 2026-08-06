@@ -5103,3 +5103,77 @@ wanted.
 - **Artifacts (prompts 3-8):** `CLAUDE.md` · `docs/DECISIONS.md` §s196 · `docs/PROJECT_STATUS.md` ·
   this log · **PR #812** (the chooser + Sprechen work) and **PR #815** (the deploy diagnosis), both
   squash-merged into `main` · no `pages.yml` change (deliberately left for its own review)
+
+## Session 197 · 2026-08-06 · branch `claude/page-header-alignment-glqts5`
+
+- **Prompt 1 (verbatim):** `in one of the previous sessions, I asked sonnet to replace the hello
+  greeting with the page's name as a header. I wanted the header position to align vertically
+  leftwards with the page components like toggle and verlauf. Butit created this funny looking
+  page. Can you access that prompt and generate a couple of previews of how this page should look
+  overall? It is looking ridiculous at the moment` (with a screenshot of the shipped `/anwenden`
+  hub at desktop width, sidebar cropped).
+  **Response:** found the prompt they meant (s196, prompt 1, quoted back in the preview page),
+  diagnosed the shipped layout from the code, and shipped a preview round. **No app code touched**:
+  this is design work, so it owes the preview-first process a pick first.
+  **The diagnosis.** The s196 change answered "aligned to left with the toggle buttons" by putting
+  the title in the APP header at the app's left gutter, which is a different left edge from every
+  control it was supposed to line up with. Underneath it the page nests THREE separately centred
+  widths: the tab panel column (`lg:max-w-4xl`, 896 px), the module grid (`max-w-[30rem]`, 480 px)
+  and the Stärkeprofil grid (`max-w-[26rem]`, 416 px). So the tiles start ~220 px right of the
+  title, a narrow tile island floats over a full-width Verlauf card, and at first visit four
+  full-height grey bars at "–" fill half the widest card on the page.
+  **The options** (`preview/pruefung-header-align.html`, generator
+  `preview/gen-pruefung-header-align.mjs`, artifact published): **A** title back INSIDE the page
+  (h1 left, tab switcher right of the same line, controls left-aligned under it, one column for
+  everything); **B** keep the header title and move the PAGE to its left edge instead (needs the
+  header row to sit in the same centred container as `main`, or the two drift apart as the window
+  grows); **C** no title at all, the switcher IS the page header, centred, which is the
+  Bibliothek/Schreiben law. All three collapse the three nested widths into ONE column, halve the
+  empty Stärkeprofil, and leave the locked module-card anatomy untouched. The review page carries
+  live Theme / Column width (512·640·768) / Alignment guides switches, a light and dark pass, a
+  desktop and a phone frame per option, and the "today" frame drawn at the shipped measurements.
+  **One locked rule flagged, not quietly overridden:** s196 locked "tile grid narrower than the
+  column"; all three options narrow the COLUMN to the tiles instead, which keeps the reason for the
+  lock (wide tiles read as empty) and drops its side effect (mismatched edges). Called out in the
+  preview for the founder to accept or reject.
+  **Verified in headless Chromium**, not by eye: every phone frame rests inside the 668 px a
+  393×852 phone leaves between the app header and the tab bar (0 px overflow, all three), no
+  horizontal overflow in any Verlauf split, and the three control switches read back on the root
+  element.
+- **Artifacts (prompt 1):** `preview/gen-pruefung-header-align.mjs` (new) ·
+  `preview/pruefung-header-align.html` + `-artifact.html` (new) · this log · no `src/` change yet
+
+- **Prompt 2 (verbatim):** `C, medium`
+  **Response:** implemented option C at the 640px column, verified in the real built app, gates run,
+  docs updated.
+  **`AppShell`** no longer renders the "Prüfung" `h1` or the second switcher copy; the greeting slot
+  stays EMPTY on `/anwenden` (the part of s196 that survives) and every other route keeps its
+  greeting untouched. **`PruefungHub`** renders the switcher as its header at EVERY width (the
+  `lg:hidden` is gone), and ONE new `HUB_COL` (`max-w-[40rem]`) carries the switcher row, the scope
+  row, the module grid and the Verlauf card. The module grid and the Stärkeprofil grid lost their
+  own `max-w-[30rem]`/`max-w-[26rem]` caps: the COLUMN was measured from the tiles instead, which
+  keeps the shape s196 asked for ("the tiles look empty") without the cap that left four different
+  left edges on one page. **`hubSwitcher.tsx` stays a separate module** (the hub is its only caller
+  again) so a future header copy still has a bank-free file to import; `idPrefix` went with the
+  second copy.
+  **Three details the narrower card forced**, each found by measuring rather than by eye: the
+  Verlauf split is proportional (`1.15fr / 1px / 1fr`) instead of a fixed 26rem half; the four
+  profile labels put the mark ABOVE the name at every width, because side by side "Schreiben"
+  pushed through the divider into the list; and `PracticeRow` uses one padding and one gap at every
+  width, because at `sm:gap-4 lg:px-6` the row had exactly 0px spare (72+28+55+53 content, 48 gaps,
+  40 padding, in 296px) so the score badge wrapped its "%" and the module name truncated to
+  "Schre...". The empty Stärkeprofil is half height with a one-line caption.
+  **Verified in the real built app**, not a mockup (Playwright over the global Chromium, seeded
+  localStorage): at 1440×900, 1440×760, 1024×850, 1023×850, 390×844 and 360×640, both tabs, three
+  history states, the panel / module grid / Verlauf card report the SAME left edge and width at
+  every size. Zero resting page scroll and zero horizontal overflow everywhere except two bands that
+  scroll on `main` too, measured BEFORE and AFTER against a build of `origin/main`: 1023×850 rests
+  at 54px (unchanged) and 360×640 at 43px (63px before). Both come from the Verlauf card being
+  `flex-none` at rest; fixing that means letting its collapsed list scroll inside the card, which
+  touches the s195/s196 Verlauf behaviour, so it is reported rather than assumed.
+  Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 127.9 kB of 400
+  (down from 129.0: AppShell dropped its `hubSwitcher` import) · check:contrast.
+- **Artifacts (prompt 2):** `src/components/layout/AppShell.tsx` ·
+  `src/features/pruefung/{PruefungHub,hubSwitcher}.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (s195
+  handoff archived) · this log
