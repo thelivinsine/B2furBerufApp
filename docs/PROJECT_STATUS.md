@@ -157,6 +157,7 @@ header like the zone's own nav label, sitting next to the toggle buttons.
   over CDP and reading the resulting URL/panel.
 Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
 check:bundle 129.0 kB of 400 · check:contrast.
+Shipped as **PR #813**, squash-merged into `main`; the founder verifies the live result.
 **Resume here:** nothing is open. The greeting→title swap is scoped to `/anwenden` only; the
 founder's other example ("Bibliothek") read as illustrative of the pattern rather than a request
 to retitle that page today. `navItems` already carries every route's label if that changes.

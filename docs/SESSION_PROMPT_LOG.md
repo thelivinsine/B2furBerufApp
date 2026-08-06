@@ -4887,6 +4887,7 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
 - **Artifacts:** `src/index.css` · `src/components/layout/AppShell.tsx` ·
   `src/features/pruefung/PruefungHub.tsx` · `src/features/pruefung/hubSwitcher.tsx` (new) ·
   `CLAUDE.md` · `docs/areas/PRUEFUNG.md` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log.
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log ·
+  commit `bf2807d` · **PR #813**, squash-merged into `main`.
   Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
   check:bundle 129.0 kB of 400 · check:contrast.
