@@ -5222,3 +5222,15 @@ wanted.
   `src/features/pruefung/{PruefungHub,hubSwitcher}.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (s195
   handoff archived) · this log
+
+- **Prompt 3 (verbatim):** `what's shipped is good. document the session and merge everything live`
+  **Response:** documented (`docs/PROJECT_STATUS.md` handoff, `docs/DECISIONS.md` §s197, this log)
+  and merged. One thing worth carrying forward: a PARALLEL s197 branch
+  (`claude/page-header-alignment-glqts5`, PR #817) landed on `main` first and restructured
+  `PROJECT_STATUS.md`, so this branch merged `main` in and resolved three doc conflicts by keeping
+  BOTH sessions' facts (their structure, this session's handoff added under "Resume here"; the
+  prompt log now labels the two branches "parallel A/B"; their s195 archive text kept over this
+  session's duplicate). Gates re-run after the merge: typecheck · 624 tests · build · check:bundle
+  127.9 kB. **CI never fired for PR #818** at all: no check run was ever created, and the same
+  window shows a `main` validate run the platform CANCELLED after 15 minutes, so this is GitHub's
+  side, not the branch. Every gate `validate.yml` runs was therefore run locally before merging.

@@ -1826,3 +1826,39 @@ a 360×640 phone (63px before this change; measured against a build of `main`, s
 Both come from the Verlauf card being `flex-none` at rest, so it cannot give room back on a short
 stage; fixing it means letting its collapsed list scroll inside the card, which changes s195/s196
 Verlauf behaviour and is the founder's call, not a silent side effect of a layout PR.
+
+## s197 — the mobile list needed a bottom edge, not a plate
+
+**Founder:** a screenshot of the dark desktop Bibliothek list dissolving at the bottom of its
+column, then "can you put similar effect even in the mobile view so that the floating text below the
+ueben button is more readable and visible?", and after the previews, "insert short fade but soft
+blur but not above the blue button, it should be below the blue button behind the text."
+
+**Why the text was unreadable, precisely.** Two earlier decisions met. s189 moved the desktop browse
+scroll INSIDE the content column, which is what let `browseColumnClass` mask the column's own bottom
+edge so cards fade into the page ground rather than ending at a cut. The same session removed the
+`floatingNote` plate from the Bibliothek's note line, because over WHITE cards the
+`bg-background/90` plate read as a frosted chip rather than as page ground. Neither was wrong. But a
+phone scrolls the PAGE, so it never got the s189 edge, and it had just lost the only backing that
+line had. The founder's "floating text" is that gap.
+
+**Why a veil here, when the desktop answer is explicitly a MASK and not an overlay.** The desktop
+rule exists because the fade sits in the middle of a page whose ground is a gradient, so one flat
+colour would show as a band. This veil sits at the very BOTTOM of the viewport, against the nav,
+where the ground has arrived at effectively one colour (identical to `--background` in dark, within
+a hair of it in light) and where there is no scroll container to mask in the first place. Same
+intent, different mechanism, for a reason that does not generalise upward: do not answer a
+mid-page cut with an overlay.
+
+**Why the blur is a separate, much shorter layer.** The preview's option C blurred the whole 9rem,
+which frosts the cards behind the button as well. The founder cut it to the strip below the button,
+which is the only place the frosting has a job: the note line. So `.cluster-blur` is exactly as tall
+as the gap between the nav and the button's lower edge, masked at its own top so it ends in a fade
+rather than a line. It is not the s169 blurred band, which was a full-width bar strapped across a
+scrolling page; this is 32px of frosting under a control, with no chrome of its own.
+
+**Why the scrim deliberately stops short of full opacity.** The first build ramped to ~0.99 by the
+time it reached the note, which made the frosted band invisible, i.e. it silently implemented option
+A and called it the founder's pick. It holds ~0.85 through that strip now so the blur has something
+to act on. Contrast survives because what shows through is a card that is itself within a few per
+cent of the ground in both themes.
