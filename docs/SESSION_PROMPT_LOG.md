@@ -5223,6 +5223,37 @@ wanted.
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (s195
   handoff archived) · this log
 
+- **Prompt 3 (verbatim):** `document the session`
+  **Response:** this entry, plus the s197 handoff in `docs/PROJECT_STATUS.md` and the "why" in
+  `docs/DECISIONS.md` §s197 (written before the merge, not after).
+  **How the merge went, since the CI story matters more than usual this time.** GitHub Actions
+  scheduled NOTHING for this repository across the whole window: no check ever registered on PR
+  #817, no `Validate content` run was created for the branch or the PR, and the `Validate content`
+  run for the PREVIOUS merge (#816, on `main`) was cancelled after sitting 15 minutes without ever
+  starting. So every gate `validate.yml` runs was run locally first, in its own order
+  (`lint:content` · `lint:migrations` · `check:contrast` · `verify:facts` · `test:srs` ·
+  `test:pronounce` · `lint` · `test:unit`), plus typecheck, build and `check:bundle`, and the merge
+  went ahead on that evidence rather than on a green tick that was never going to appear.
+  `verify:facts` rewrites `docs/reports/verify-facts-report.json` with today's date on every run;
+  that timestamp-only diff was reverted rather than committed as noise.
+  **The Pages deploy, third session running.** #816's deploy job self-cancelled at exactly 15
+  minutes (`build` green in 60 s, `deploy` 16:24:20 → 16:39:26), which is the 600 s timeout already
+  diagnosed in s196, and its leftover is the likeliest reason no deploy run was created for this
+  merge at all. Used the documented workaround: dispatched `pages.yml` on `main` manually
+  (`workflow_dispatch`), which built `a2ad467` and **succeeded** (run 31128920435), so the change is
+  live without the founder having to do anything. The real fix (RAISE `timeout` to ~30 min, keep the
+  retry) is still not taken, and it has now cost a third session; it is offered as its own small PR.
+- **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` §s197 · this log ·
+  merge commit `a2ad467` (**PR #817**, squash-merged into `main`) · Pages run 31128920435 green
+
+---
+
+## Session 197 (parallel A, continued) · 2026-08-06 · branch `claude/mobile-bibliothek-fade-*`
+
+_Prompts 3-4 of the parallel A session. They landed under parallel B's header when that
+session merged `main` in; the entries are theirs, unedited, and are re-headed here so the
+two branches stay legible. Their prompt 3 says the s197 layout work was already good._
+
 - **Prompt 3 (verbatim):** `what's shipped is good. document the session and merge everything live`
   **Response:** documented (`docs/PROJECT_STATUS.md` handoff, `docs/DECISIONS.md` §s197, this log)
   and merged. One thing worth carrying forward: a PARALLEL s197 branch
