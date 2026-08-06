@@ -144,9 +144,9 @@ after pulling.
   alone**, so the question stepper is a chevron. A phone carries the module row on every screen
   (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`, and on a chooser that row
   carries the Aufgabe toggle). ONE Niveau control per screen: the hub's `LevelSelect`, and on a
-  chooser the rail's own Niveau. The HUB rests at `max-w-[40rem]` (`HUB_COL`, s197: ONE width for
-  the switcher row, the scope row, the module grid AND the Verlauf card, so every block shares two
-  edges), a chooser wears Schreiben's
+  chooser the rail's own Niveau. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: ONE width for
+  its switcher row, scope row, module grid AND Verlauf card, so every block shares two edges), a
+  chooser wears Schreiben's
   content-plus-16rem-rail grid (s196), and only a RUNNING Teil gets the wide `lg:max-w-6xl` stage.
   The Verlauf card ships in an empty state from the first visit, because both hub tabs hold a
   one-viewport frame.
@@ -229,13 +229,9 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
   Verlauf). The switcher IS the header at EVERY width (no HubHero, no in-page `h1`, no page title),
-  and the AppShell header's greeting slot stays EMPTY on this route. s196 had put a big "Prüfung"
-  title plus a second switcher copy in that slot from `lg` up; the founder asked for a title
-  "aligned to left with the toggle buttons" and got one on the app's left gutter instead, a
-  different edge from every control on the page (founder pick C, s197). If a header copy is ever
-  wanted again it goes through `features/pruefung/hubSwitcher.tsx`, which AppShell may import
-  INSTEAD of `PruefungHub.tsx` (that would drag the content banks into the eager bundle).
-  Niveau is a compact button, the scope
+  and the AppShell header's greeting slot stays EMPTY here (founder pick C, s197; a header copy, if
+  ever wanted again, imports `features/pruefung/hubSwitcher.tsx`, never `PruefungHub.tsx`, which
+  would drag the content banks into the eager bundle). Niveau is a compact button, the scope
   controls sit BELOW the switcher at EVERY width, both rows centred. **Mit Zeit / Ohne Zeit** is one
   switch beside it, resting on Ohne Zeit, and it is the ONLY way into the four choosers (`/lesen`,
   `/hoeren`, `/writing`, `/simulation`): they are what the same four modules do without a clock,
