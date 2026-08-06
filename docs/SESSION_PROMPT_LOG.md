@@ -5275,3 +5275,18 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   screenshots). Now `nav + 5.25rem`, half a rem clear of the button, and a step smaller: `p-1.5`
   with an 18px glyph, 30px total instead of 36. Verified in the real app at 390x800 in both themes.
   Gates: typecheck · lint 0 errors · 624 tests · build · check:bundle 127.9 kB.
+
+- **Prompt 4 (verbatim):** `go ahead`
+  **Response:** took the `pages.yml` timeout fix that s196 wrote down and s197 kept paying for.
+  Attempt 1 of `actions/deploy-pages` now runs with `timeout: 1800000` (30 min); attempts 2 and 3
+  keep the 600000 default **on purpose**, because two different failures share that step. The
+  timeout failure needs a LONGER deadline (a deploy here outruns 10 minutes, the action cancels
+  itself, and the leftover can refuse the next merge); the transient "Deployment failed, try again
+  later" fails FAST, so giving all three attempts 30 minutes would hold a genuinely broken deploy
+  for ~90 minutes before it went red. One long attempt plus two fast retries caps the worst case at
+  ~51 minutes and removes the self-cancel in the normal case. YAML parsed and the three steps'
+  inputs read back before pushing; nothing else in the workflow moved (same pinned action SHAs, same
+  retry chain, same hard-fail on attempt 3).
+- **Artifacts (prompt 4):** `.github/workflows/pages.yml` · `CLAUDE.md` (the deploy bullet now
+  states the fix, not the workaround) · `docs/DECISIONS.md` §s197 (why the three attempts differ,
+  and what this does NOT fix) · this log

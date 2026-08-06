@@ -330,10 +330,11 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
   change", the likely cause is unmerged work on the session branch.
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
-- **A red Pages deploy means the 600 s timeout is too short, not that the build broke** (s196): a
-  deployment here takes longer than that, so the action self-cancels, and the leftover sometimes
-  refuses the NEXT merge. The 3-attempt retry usually rescues it. **Workaround: re-run the
-  workflow.** Fix, not taken yet: RAISE `timeout` (~30 min), keep the retry. Why →
+- **A Pages deploy here outlasts the action's 10-minute default** (s196), so it used to self-cancel
+  and the leftover sometimes refused the NEXT merge. **Fixed s197:** attempt 1 gets
+  `timeout: 1800000` (30 min) so one attempt can outlast a slow deploy; the two retries keep 600000,
+  because the OTHER failure (the transient "try again later") fails fast and should surface fast.
+  If a deploy still goes red, re-run the workflow before suspecting the build. Why →
   `docs/DECISIONS.md` §s196.
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
   before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft

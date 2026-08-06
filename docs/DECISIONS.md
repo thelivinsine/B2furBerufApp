@@ -1862,3 +1862,30 @@ time it reached the note, which made the frosted band invisible, i.e. it silentl
 A and called it the founder's pick. It holds ~0.85 through that strip now so the blur has something
 to act on. Contrast survives because what shows through is a card that is itself within a few per
 cent of the ground in both themes.
+
+## s197 — the Pages timeout is raised (the s196 fix, finally taken)
+
+**Taken:** attempt 1 of `actions/deploy-pages` now runs with `timeout: 1800000` (30 min); attempts 2
+and 3 keep the 600000 default. Founder said "go ahead" after it had cost a third session.
+
+**Why the three attempts are not all the same.** Two different failures share this step and want
+opposite deadlines. The TIMEOUT failure needs a longer one: a deployment for this repo regularly
+runs past 10 minutes, the action cancels itself when its `timeout` expires, and the cancelled
+leftover can refuse the next merge outright ("in progress deployment. Please cancel `<sha>` first"),
+which is how a green build ends with no deploy run at all. The transient PLATFORM failure
+("Deployment failed, try again later") wants a shorter one: it fails fast, so giving all three
+attempts 30 minutes would hold a genuinely broken deploy for an hour and a half before it went red.
+One long first attempt plus two fast retries answers both: worst case ~51 minutes, and in the normal
+case there is no self-cancel and nothing left over.
+
+**Evidence it was the timeout, not the code** (collected across s196 and s197): #820's deploy sat in
+`deployment_in_progress` for the full 10 minutes, self-cancelled, and went live only because attempt
+2 re-created it; #816's deploy job ran 16:24:20 → 16:39:26 and was cancelled with the `build` job
+green in 60 s; and the merge after it (`a2ad467`) got no deploy run created at all until
+`pages.yml` was dispatched by hand, which then succeeded.
+
+**What this does NOT fix.** The leftover-deployment case can still happen if a deploy exceeds 30
+minutes, and GitHub occasionally schedules no runs for the repo at all (s197 saw `Validate content`
+cancelled after 15 minutes without starting, and no check ever registered on PR #817). Neither is
+something the workflow can settle; the manual `workflow_dispatch` of `pages.yml` on `main` stays the
+documented rescue.
