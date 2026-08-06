@@ -37,11 +37,30 @@ on leaving the debrief. `SprechenHistory` is that half, built from Schreiben's r
 with its transcript and an "Ohne Bewertung" badge.
 Gates: typecheck · lint 0 errors (76 warnings) · **624 tests** (up from 610) · build ·
 check:bundle 127.9 kB · lint:content · lint:migrations.
-**Resume here:** the founder verifies the live result (feature-branch pushes do not deploy). Open
-from earlier sessions and untouched here: the Prüfung hub still loads ~825 kB of content banks
-because `engine/exam` imports them (the real fix is precomputing availability at build time like
+**Prompt 2 answered, not built: a learner-facing KI-usage indicator.** Founder: "is it possible to
+have a KI usage similar to how claude code shows wherever a feature uses ai is in the app?" Yes, and
+`lib/aiAllowance.ts` already does the hard half (server-authoritative `{limit, remaining, known}`,
+rendered as "Heute noch 7 von 10" in four places). Four gaps: nothing shows all of it at once
+(Settings has no AI section); `transform-sentence` (Fokus's Umformung, limits 30/day and 8 burst) is
+not in `AiMode` at all, so that wall arrives unannounced; the KI marker appears on RESULTS, after the
+unit is spent, and `Sparkles` is not reserved for AI (Quiz, empty states and onboarding use it), so
+there is no AI icon to build on; and the monthly ceilings are invisible. Pushed back on showing
+money: Claude Code shows cost because the user pays, Genauly's learners do not.
+**Founder picked: learner-facing, scope A + B.** (A) fill the missing counts so no AI feature is
+silent, the Umformung especially. (B) ONE reserved KI chip with its count on every entry point that
+spends a unit. The (C) "KI heute" overview panel in Settings was NOT taken. The founder-facing spend
+view already part-exists in `AdminOverview`/`AdminSystem` ("KI-Budget") if that is ever wanted
+instead.
+**Resume here:** start prompt 2's scope A + B. B is a new shared component, so it owes the
+preview-first round (2-4 named variants, English, `preview/`, artifact, pick, then implement); the
+`design` skill was loaded and the session ended before the previews. A is mechanical: add
+`transform` to `AiMode` in `lib/aiAllowance.ts` (count `sentence_transforms` or whatever
+`transform-sentence` writes) and wire `AllowanceNote` where it is missing. Also open, from earlier
+sessions and untouched here: the Prüfung hub still loads ~825 kB of content banks because
+`engine/exam` imports them (the real fix is precomputing availability at build time like
 `frequency.ts`); no exam set is `anruf` shaped; the authored dialogue `nodes` graphs are dead but not
-retired; and CLAUDE.md sits at 364 lines against its ~350 budget._
+retired; and CLAUDE.md sits at 374 lines against its ~350 budget, which the next docs pass should
+bring down._
 
 _Also in s196, from a parallel session (merged first, PR #813): **the Prüfung hub's desktop
 page-scroll regression and its page header.** **Four founder-reported problems in the hub

@@ -4962,3 +4962,57 @@ check:bundle 127.9 kB · lint:content · lint:migrations.
   `tests/moduleScope.test.ts` · `CLAUDE.md` · `docs/areas/{PRUEFUNG,SPRECHEN}.md` ·
   `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
 
+
+---
+
+## Session 196 — prompt 2 (2026-08-06)
+
+**Branch:** `claude/sprechen-module-bugs-qjrdca`
+
+**Prompt (verbatim):**
+
+> is it possible to have a KI usage similar to how claude code shows wherever a feature uses ai is
+> in the app?
+
+**Response summary.** Answered as a question (no code written), then the founder ended the session
+before the design round: "merge the changes to main and document the session. we can continue in
+another session."
+
+**The state of play, as reported.** Yes, and most of the plumbing exists. `src/lib/aiAllowance.ts`
+is already a real usage layer: `useDailyAllowance(mode)` returns `{ limit, remaining, known }`,
+takes the SERVER's number as authority (every Edge Function response carries
+`dailyLimit`/`dailyRemaining` through `reportServerAllowance`) and falls back to counting the
+learner's own rows; when it cannot know, it renders nothing rather than a guess. `AllowanceNote`
+prints it as "Heute noch 7 von 10" in four places: Fokus, Kurz/Lang, the Sprechen brief card and the
+Modelltest run band.
+
+**The four gaps found.**
+1. **You can only see the meter you are standing on.** No surface shows all of it; Settings has no
+   AI section. Claude Code's whole trick is that the readout is always visible.
+2. **Two AI features have NO readout at all.** `transform-sentence` (Fokus's "Nochmal" Umformung)
+   has its own limits (`TRANSFORM_DAILY_LIMIT` 30, `TRANSFORM_BURST_LIMIT` 8) and is not in
+   `AiMode`, so nothing counts it and a learner hits that wall with no warning.
+3. **No "this will use AI" marker before the fact.** The KI-generiert line appears on RESULTS, after
+   the unit is spent. And `Sparkles` is NOT an AI marker in this app (it is used for Quiz, empty
+   states, onboarding), so there is no reserved AI icon to build on yet.
+4. **The monthly ceilings are invisible** (50 evaluations, 40 conversations, 200 sentence checks,
+   plus the global `MONTHLY_SPEND_CAP_USD` fuse).
+
+**One thing pushed back on.** Claude Code shows cost and tokens because the user pays. Genauly's
+learners do not, so a money figure would be alarming and meaningless; the learner-facing number
+stays "how many free AI helps do I have left today". The founder-facing spend view already exists in
+part (`AdminOverview` / `AdminSystem` "KI-Budget") and is the place to extend if that is what is
+wanted.
+
+**Founder decisions (via the question tool, both taken):**
+- **Audience: learner-facing.** Not the admin spend view.
+- **Scope: A + B.** (A) fill the missing counts so no AI feature is silent, the Umformung
+  especially; (B) ONE reserved KI chip carrying its count on every entry point that spends a unit.
+  The (C) "KI heute" overview panel in Settings was NOT taken.
+
+**Not started.** B is new shared-component design, so it owes the founder the preview-first round
+(2-4 named variants in English in `preview/`, artifact published, pick, then implement). The
+`design` skill was loaded and the session ended there.
+
+- **Artifacts (prompt 2):** none (analysis only) · merge of `origin/main` (PR #813) into this branch,
+  commit `b33f4da`, resolving five doc conflicts by keeping BOTH sessions' facts
