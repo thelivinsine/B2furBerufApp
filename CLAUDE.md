@@ -113,8 +113,9 @@ after pulling.
   (`docs/areas/BRAND.md` §Dialog), the in-mission pixel chrome + "failure is content, never
   lockout" (`docs/areas/GAME.md`), the ungated boss mission 1.6, the Himmelblau-fill/white-controls
   FilterRail answer (s189), the sliding-pill switcher mechanism (`useSlidingPill`, no per-segment
-  `layoutId`), the Prüfung module card's anatomy (s191: no description line, the minutes badge's
-  corner reserved in both clock states), the Schreiben mobile anatomy (ONE fixed bottom-chrome
+  `layoutId`), the Prüfung module card's anatomy (s191/s196: no description line, icon top-left,
+  minutes badge beside it when timed, arrow bottom-right; sizing stays narrower-than-the-column
+  and closer to square), the Schreiben mobile anatomy (ONE fixed bottom-chrome
   geometry shared by Fokus, Kurz and Lang + measured tile heights + the Fokus dial tile,
   `docs/areas/SCHREIBEN.md`), the Prüfung zone's one frame (s195, below).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
@@ -181,7 +182,11 @@ after pulling.
   this with a stage instead of measurement (s186): a running Teil is `h-exam-stage` tall, pins its
   RunBar/strip/actions and scrolls ONE inner region, so all ten in-exam screens rest at exactly 0
   page scroll down to 360x640. Height only, never `overflow:hidden`, or the mobile keyboard cannot
-  scroll the field into view.
+  scroll the field into view. **The Prüfung hub itself** uses `h-pruefung-stage` (s196), which
+  differs from the shared `h-page-stage` other trainers use by keeping a real ceiling from `lg` up
+  too: `h-page-stage` goes `auto` on desktop on the (once-true) assumption that desktop has no
+  shortage of room, and this hub's Verlauf card eventually grew tall enough to break that on a
+  real laptop height.
 - **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
   buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
   and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
@@ -221,7 +226,12 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
-  Verlauf). No HubHero, no `h1`. Niveau is a compact button, not a second pill row, and the scope
+  Verlauf). Below `lg` no HubHero, no in-page `h1` (the switcher IS the header). From `lg` up
+  (founder s196) the switcher moved into the AppShell header beside a big left-aligned "Prüfung"
+  title, in the slot every other route's generic greeting fills; `features/pruefung/
+  hubSwitcher.tsx` is the tiny shared module both copies read/write `?tab=` through (AppShell may
+  import ONLY that file, never `PruefungHub.tsx`, which would drag the content banks into the
+  eager bundle). Niveau is a compact button, not a second pill row, and the scope
   controls sit BELOW the switcher at EVERY width, and BOTH rows are centred, desktop included. **Mit Zeit / Ohne Zeit** is one switch beside
   it, resting on Ohne Zeit, and it is the ONLY way into the Schreib- and Sprechtrainer
   (`/writing`, `/simulation`): the free trainers are what the same four modules do without a clock,

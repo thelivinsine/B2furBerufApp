@@ -17,6 +17,7 @@ import { AccountMenu } from "@/features/auth/AccountMenu";
 import { loadWritingDraft } from "@/features/writing/resumeDraft";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/Logo";
+import { usePruefungTab, TabSwitcher } from "@/features/pruefung/hubSwitcher";
 
 /**
  * The zone's one exit (founder s195). Two tones, one geometry, one position:
@@ -95,6 +96,17 @@ export function AppShell() {
   const name = useSettingsStore((s) => s.name);
   const hour = new Date().getHours();
   const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
+
+  // The Prüfung hub's desktop header (founder, this session): the greeting
+  // space becomes a big left-aligned "Prüfung" title next to the Module
+  // üben/Modelltest toggle, instead of the generic greeting every other route
+  // keeps. `usePruefungTab` reads the SAME `?tab=` param the hub itself reads,
+  // so the two switcher copies (this one, and the hub's own mobile-only one)
+  // never disagree; `hubSwitcher.tsx` is a tiny module with no content-bank
+  // imports, unlike `PruefungHub.tsx` itself, which AppShell must never pull
+  // in (it would drag the whole exam engine into the eager app-shell bundle).
+  const [pruefungTab, selectPruefungTab] = usePruefungTab();
+  const onPruefungHub = location.pathname === "/anwenden";
 
   // Focus mode (Phase 2.1): the SessionPlayer flags an active composed session,
   // and we hide all chrome (header, bottom bar, sidebar) so it plays as a
@@ -211,7 +223,22 @@ export function AppShell() {
                   <Logo className="h-8 w-8" />
                 </Link>
               )}
-              {!exam && (
+              {!exam && onPruefungHub && (
+                // Desktop only, like the greeting it replaces here: a phone
+                // has no room beside the logo, and keeps the hub's own
+                // mobile-only switcher in the page body instead.
+                <div className="hidden items-center gap-4 lg:flex">
+                  <h1 className="text-display text-xl font-extrabold tracking-tight">
+                    Prüfung
+                  </h1>
+                  <TabSwitcher
+                    tab={pruefungTab}
+                    onSelect={selectPruefungTab}
+                    idPrefix="header"
+                  />
+                </div>
+              )}
+              {!exam && !onPruefungHub && (
                 <div className="hidden leading-tight lg:block">
                   <p className="text-sm font-semibold">
                     {greeting}

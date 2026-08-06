@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown, Clock, Play, TrendingUp } from "lucide-react";
@@ -25,6 +25,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { useStagePanel } from "@/features/shared/useStagePanel";
 import { LevelSelect, type LevelOption } from "./LevelSelect";
+import { TabSwitcher, TABS, panelId, type Tab } from "./hubSwitcher";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,13 +56,7 @@ import { MockExamRunner } from "@/features/exam/MockExamRunner";
  * app-wide expand rule).
  */
 
-type Tab = "module" | "modelltest";
 type ClockMode = "free" | "timed";
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: "module", label: "Module üben" },
-  { id: "modelltest", label: "Modelltest" },
-];
 
 /** Runs listed before the learner asks for the rest (desktop; a phone rests at 0). */
 const VERLAUF_REST_ROWS = 3;
@@ -137,6 +132,10 @@ export function PruefungHub() {
   // everyday act, sitting a module against the clock is the deliberate one.
   const clock: ClockMode = params.get("zeit") === "mit" ? "timed" : "free";
   const [verlaufOpen, setVerlaufOpen] = useState(false);
+  // Closes an open Verlauf on every tab change, including one made from the
+  // AppShell header's desktop copy of the switcher, which has no access to
+  // this component's own `selectTab` handler below.
+  useEffect(() => setVerlaufOpen(false), [tab]);
 
   const patchParams = (patch: Record<string, string | null>) => {
     const p = new URLSearchParams(params);
@@ -223,16 +222,22 @@ export function PruefungHub() {
         "flex flex-col gap-6 sm:gap-7",
         // Released while a Verlauf is open: an expanded tile needs the page to
         // be able to scroll, which a fixed stage height would forbid.
-        !verlaufOpen && "h-page-stage min-h-0",
+        // `h-pruefung-stage`, not the shared `h-page-stage`: that class drops
+        // its ceiling from lg up on the assumption desktop has no shortage of
+        // room, which this hub's Verlauf card grew tall enough to break on a
+        // real laptop height (session: founder saw a page scroll on desktop).
+        !verlaufOpen && "h-pruefung-stage min-h-0",
       )}
     >
-      {/* The switcher IS the page header (no HubHero, no h1), and the scope
-          controls sit BELOW it at every width (founder s189): navigation first,
-          then what it is scoped to. Both are CENTRED at every width, desktop
-          included, so the header reads as one stacked block on its own axis
-          rather than two controls pushed to opposite edges. */}
+      {/* Mobile: the switcher IS the page header here too (no HubHero, no h1),
+          and the scope controls sit BELOW it, centred (founder s189). Desktop:
+          the switcher moved into the AppShell header next to the "Prüfung"
+          title (founder, this session), so it is `lg:hidden` below and this
+          block holds only the scope row from lg up. */}
       <div className="mx-auto flex w-full flex-col items-center gap-3 lg:max-w-4xl">
-        <TabSwitcher tab={tab} onSelect={selectTab} />
+        <div className="lg:hidden">
+          <TabSwitcher tab={tab} onSelect={selectTab} />
+        </div>
         {/* Fixed height: the Modelltest tab hides the clock switch, and without
             it the row would change height and shift the page on every switch. */}
         <div className="flex h-9 items-center justify-center gap-2">
@@ -262,9 +267,13 @@ export function PruefungHub() {
             transition={{ duration: reduce ? 0 : 0.15, ease: [0.22, 1, 0.36, 1] }}
             // The panel half of the tablist above (s194 audit P27): the
             // switcher announced two tabs and there was nothing they controlled.
+            // Named by its own `aria-label` rather than `aria-labelledby` a tab
+            // button: since this session there are TWO switcher copies (mobile
+            // in-page, desktop header) and which one is on screen is a CSS
+            // breakpoint, not something this component can point at reliably.
             role="tabpanel"
             id={panelId(tab)}
-            aria-labelledby={tabId(tab)}
+            aria-label={TABS.find((t) => t.id === tab)?.label}
             className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5 lg:max-w-4xl"
           >
             {/* The Verlauf card is on the page from the FIRST visit (founder
@@ -309,92 +318,6 @@ export function PruefungHub() {
 }
 
 /* -------------------------------- switchers ------------------------------- */
-
-const tabId = (t: Tab) => `pruefung-tab-${t}`;
-const panelId = (t: Tab) => `pruefung-panel-${t}`;
-
-/**
- * The page header. Same mechanism as `LibrarySwitcher`: a recessed grey track
- * with ONE always-mounted white pill measured to the active segment, never a
- * per-segment crossfade. Two segments, so it is content-sized from lg up rather
- * than stretched across the column.
- *
- * It is a REAL tablist since s194 (audit P27): ids paired with the panel below,
- * a roving tab stop and arrow keys. It used to announce two tabs to a screen
- * reader and then behave like two unrelated buttons.
- */
-function TabSwitcher({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }) {
-  const reduce = useReducedMotion();
-  const { trackRef, registerItem, rect } = useSlidingPill(tab);
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    const ix = TABS.findIndex((t) => t.id === tab);
-    const next =
-      e.key === "ArrowRight" || e.key === "ArrowDown"
-        ? (ix + 1) % TABS.length
-        : e.key === "ArrowLeft" || e.key === "ArrowUp"
-          ? (ix - 1 + TABS.length) % TABS.length
-          : e.key === "Home"
-            ? 0
-            : e.key === "End"
-              ? TABS.length - 1
-              : -1;
-    if (next === -1) return;
-    e.preventDefault();
-    onSelect(TABS[next].id);
-    // Focus follows selection, which is the automatic-activation pattern the
-    // sliding pill already implements visually.
-    (e.currentTarget as HTMLElement)
-      .querySelector<HTMLElement>(`#${tabId(TABS[next].id)}`)
-      ?.focus();
-  };
-
-  return (
-    <div
-      ref={trackRef as React.RefObject<HTMLDivElement>}
-      role="tablist"
-      aria-label="Prüfung"
-      onKeyDown={onKeyDown}
-      // The column is `items-center`, so from lg up the track sizes to its two
-      // labels instead of stretching across the page, which is the "switcher
-      // too big" shape rejected in s149. Full width on a phone.
-      className="relative flex w-full max-w-sm items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft lg:w-auto lg:max-w-none"
-    >
-      {rect && (
-        <motion.span
-          aria-hidden
-          className="absolute bottom-1 left-0 top-1 rounded-md bg-surface shadow-soft"
-          initial={false}
-          animate={{ x: rect.left, width: rect.width }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }}
-        />
-      )}
-      {TABS.map((t) => {
-        const active = tab === t.id;
-        return (
-          <button
-            key={t.id}
-            ref={registerItem(t.id) as React.Ref<HTMLButtonElement>}
-            type="button"
-            role="tab"
-            id={tabId(t.id)}
-            aria-selected={active}
-            aria-controls={panelId(t.id)}
-            // One tab stop for the whole set, as ARIA's tabs pattern requires.
-            tabIndex={active ? 0 : -1}
-            onClick={() => onSelect(t.id)}
-            className={cn(
-              "relative z-10 flex-1 rounded-md px-5 py-1.5 text-sm transition-colors lg:flex-none",
-              active ? "font-bold text-foreground" : "font-semibold text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 /**
  * The clock, as ONE control for all four modules (founder pick, idea 3). Ohne
@@ -484,8 +407,10 @@ function ModuleGrid({
 }) {
   return (
     // 2x2 at EVERY width (founder s189): four across a 1152px column left the
-    // cards narrow and cramped against all that empty page.
-    <div className="grid flex-none grid-cols-2 gap-3 sm:gap-4">
+    // cards narrow and cramped against all that empty page. Capped narrower
+    // than the 4xl column this session (founder: the tiles "look empty"), so
+    // each card reads closer to square instead of a wide, half-empty strip.
+    <div className="mx-auto grid w-full max-w-[26rem] flex-none grid-cols-2 gap-3 sm:max-w-[30rem] sm:gap-4">
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
@@ -505,46 +430,46 @@ function ModuleGrid({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.16), duration: 0.16 }}
             className={cn(
-              // The bottom padding RESERVES the minutes badge's corner in both
-              // clock states, so throwing the switch cannot move a card edge.
-              "relative flex min-h-[8rem] flex-col items-start overflow-hidden rounded-xl border border-border bg-surface p-4 pb-[1.75rem] text-left shadow-soft transition-transform sm:min-h-[9rem] sm:p-5 sm:pb-9",
+              // The bottom padding reserves the arrow's corner: it shows
+              // whenever the module can open, in EITHER clock state, so a
+              // fixed reservation (not the badge-driven one this replaced)
+              // already keeps the switch from moving a card edge.
+              "relative flex min-h-[6.5rem] flex-col items-start overflow-hidden rounded-xl border border-border bg-surface p-3.5 pb-8 text-left shadow-soft transition-transform sm:min-h-[7.5rem] sm:p-4 sm:pb-9",
               canOpen ? "card-hover" : "cursor-not-allowed opacity-60",
             )}
           >
             <span className="relative flex w-full items-start justify-between gap-2">
               <span
                 className={cn(
-                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12",
+                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11",
                   meta.tile,
                 )}
               >
-                <Icon className={cn("h-5 w-5 sm:h-[1.375rem] sm:w-[1.375rem]", meta.ink)} />
+                <Icon className={cn("h-[1.125rem] w-[1.125rem] sm:h-5 sm:w-5", meta.ink)} />
               </span>
-              {canOpen && (
-                <span className="mod-go">
-                  <ArrowRight className="h-[0.9375rem] w-[0.9375rem]" />
+              {/* The minutes badge and the arrow swapped corners this session
+                  (founder). The badge now sits beside the icon, where its
+                  presence or absence (Ohne Zeit / Mit Zeit) never changes the
+                  row's height, since the icon alone already sets it. */}
+              {canOpen && !free && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-muted/85 px-2 py-[3px] text-xs font-semibold tabular-nums text-muted-foreground">
+                  <Clock className="h-3 w-3" /> {PART_MINUTES[part]} Min
                 </span>
               )}
             </span>
 
-            <span className="relative mt-2.5 text-base font-bold leading-tight tracking-[-0.015em] sm:mt-3 sm:text-xl">
+            <span className="relative mt-2 text-base font-bold leading-tight tracking-[-0.015em] sm:mt-2.5 sm:text-lg">
               {PART_LABEL[part]}
             </span>
-            {/* No description line (founder s191): with the clock on, the badge
-                sat ON that line, because a 24px badge 12px off the bottom needs
-                more room than the reserved padding gave it. The card says what
-                the module is, the badge says how long it takes, and nothing
-                else has to fit. The one line that stays is the honest empty
-                state, which never shares the card with a badge. */}
             {!canOpen && (
               <span className="relative mt-1 text-[12.5px] leading-snug text-muted-foreground sm:text-sm">
                 Noch keine Inhalte
               </span>
             )}
 
-            {canOpen && !free && (
-              <span className="absolute bottom-3 right-4 z-[1] inline-flex items-center gap-1 rounded-md bg-muted/85 px-2 py-[3px] text-xs font-semibold tabular-nums text-muted-foreground sm:bottom-4 sm:right-5">
-                <Clock className="h-3 w-3" /> {PART_MINUTES[part]} Min
+            {canOpen && (
+              <span className="mod-go absolute bottom-3 right-3.5 z-[1] sm:bottom-3.5 sm:right-4">
+                <ArrowRight className="h-[0.9375rem] w-[0.9375rem]" />
               </span>
             )}
           </motion.button>
@@ -809,7 +734,7 @@ function VerlaufCard({
         open ? "max-h-panel-stage" : empty ? "min-h-0 flex-1" : "flex-none",
       )}
     >
-      <div className="flex flex-none items-baseline justify-between gap-3 px-4 pt-3.5 sm:px-5 lg:px-6">
+      <div className="flex flex-none items-baseline justify-between gap-3 px-4 pt-3 sm:px-5 lg:px-6">
         <p className="text-eyebrow text-muted-foreground">Verlauf</p>
         <p className="text-xs tabular-nums text-muted-foreground">{count}</p>
       </div>
@@ -821,9 +746,11 @@ function VerlaufCard({
         )}
       >
         <div className={cn(
-            "px-4 pb-3 pt-2.5 sm:px-5 sm:pb-4 lg:px-6",
+            // Tightened this session (founder: the tile "looks unnecessarily
+            // big"): the head no longer carries the card's tallest padding.
+            "px-4 pb-2.5 pt-2 sm:px-5 sm:pb-3 lg:px-6",
             empty ? "flex min-h-0 flex-1 flex-col justify-center" : "flex-none",
-            asSplit && "lg:flex lg:flex-col lg:justify-center lg:pb-5",
+            asSplit && "lg:flex lg:flex-col lg:justify-center lg:pb-3.5",
           )}>
           {head}
         </div>
@@ -913,7 +840,7 @@ function RunVerlauf({
             <div className="flex flex-none flex-col justify-center">
               <p className="text-xs text-muted-foreground">Letzter Durchlauf</p>
               <p className="mt-0.5 flex items-baseline gap-2">
-                <span className="text-display text-[2.5rem] leading-none tabular-nums">
+                <span className="text-display text-[2rem] leading-none tabular-nums">
                   {last} %
                 </span>
                 {delta != null && delta !== 0 && (
@@ -933,7 +860,7 @@ function RunVerlauf({
                   </span>
                 )}
               </p>
-              <div className="mt-2.5 flex gap-5">
+              <div className="mt-2 flex gap-5">
                 <p className="text-xs text-muted-foreground">
                   <span className="block text-base font-bold tabular-nums text-foreground">
                     {best} %
@@ -966,11 +893,11 @@ function RunVerlauf({
  * the chart, where the label sat on top of the early bars.
  */
 function ScoreChart({ series, best }: { series: number[]; best: number }) {
-  const H = 68;
+  const H = 52;
   return (
     <div className="flex flex-col items-start">
       <div
-        className="relative flex h-[68px] w-fit items-end gap-2"
+        className="relative flex h-[52px] w-fit items-end gap-2"
         role="img"
         aria-label={
           series.length
@@ -1033,7 +960,7 @@ function RunRow({ record }: { record: MockExamRecord }) {
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/40 sm:gap-4 sm:px-5 lg:px-6"
+        className="flex w-full items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-muted/40 sm:gap-4 sm:px-5 lg:px-6"
       >
         <span className="w-[62px] shrink-0 text-sm font-semibold tabular-nums sm:w-[76px]">
           {date}
@@ -1171,7 +1098,7 @@ function ModuleVerlauf({
                 option 2): with none they stand empty at "–", which is what
                 shows a first-time learner the shape of what practising builds.
                 Only the caption below changes. */}
-            <div className="mx-auto grid w-full max-w-[28.75rem] grid-cols-4 gap-3 sm:gap-3.5">
+            <div className="mx-auto grid w-full max-w-[26rem] grid-cols-4 gap-2.5 sm:gap-3">
               {MOCK_PART_ORDER.map((part) => {
                 const list = byPart[part];
                 const first = list[0] ?? null;
@@ -1191,7 +1118,10 @@ function ModuleVerlauf({
                     </span>
                     <span
                       className={cn(
-                        "relative h-12 w-full overflow-hidden rounded-md sm:h-24",
+                        // Shorter this session (founder: the Verlauf tile
+                        // "looks unnecessarily big"): the bars carried most of
+                        // the card's height for very little information.
+                        "relative h-10 w-full overflow-hidden rounded-md sm:h-16",
                         last == null ? "bg-muted/40" : "bg-muted/80",
                       )}
                     >
@@ -1220,7 +1150,7 @@ function ModuleVerlauf({
                 );
               })}
             </div>
-            <p className="mt-2.5 text-center text-xs leading-snug text-muted-foreground">
+            <p className="mt-2 text-center text-xs leading-snug text-muted-foreground">
               {scored.length === 0 ? (
                 <>
                   <span className="block text-sm font-semibold text-foreground">
@@ -1253,7 +1183,7 @@ function PracticeRow({ entry }: { entry: ModulePractice }) {
   );
 
   return (
-    <div className="flex w-full items-center gap-3 px-4 py-2.5 sm:gap-4 sm:px-5 lg:px-6">
+    <div className="flex w-full items-center gap-3 px-4 py-2 sm:gap-4 sm:px-5 lg:px-6">
       <span className="w-[62px] shrink-0 text-sm font-semibold tabular-nums sm:w-[76px]">
         {date}
       </span>
