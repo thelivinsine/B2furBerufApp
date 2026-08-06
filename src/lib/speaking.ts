@@ -116,6 +116,74 @@ export async function speakTurn(input: {
   }
 }
 
+/* --------------------------------- Verlauf -------------------------------- */
+
+/** One recorded conversation, as the Sprechen Verlauf reads it. */
+export interface SpeakingHistoryEntry {
+  id: string;
+  created_at: string;
+  brief_id: string | null;
+  exam: boolean;
+  /** The learner's own production, joined. Null once retention has purged it. */
+  learner_text: string | null;
+  /** The AI's correction of it; the Verlauf diffs the two. */
+  corrected_text: string | null;
+  /** One boolean per brief goal, in the brief's order. */
+  goals_met: boolean[] | null;
+  tip: string | null;
+  tip_en: string | null;
+  /** 0-100, exam runs only. */
+  score: number | null;
+}
+
+/**
+ * The learner's spoken conversations, newest first (s196).
+ *
+ * The row has existed since s193 and NOTHING read it back, so a practice
+ * conversation left no trace anywhere in the app: the founder's "the Verlauf
+ * isn't updated with this progress, it's basically lost". It is also why a
+ * failed debrief felt total, when in fact the transcript was safely stored.
+ *
+ * Returns null on failure so the caller can say "could not load" rather than
+ * show an empty history, exactly like `getWritingHistory`.
+ */
+export async function getSpeakingHistory(
+  limit = 30,
+): Promise<SpeakingHistoryEntry[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from("speaking_conversations")
+      .select(
+        "id, created_at, brief_id, exam, learner_text, corrected_text, goals_met, tip, tip_en, score",
+      )
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error || !data) return null;
+    return data as SpeakingHistoryEntry[];
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Delete one recorded conversation (GDPR per-item erasure). True only when a
+ * row was actually removed; policy `speaking_delete_own` (migration 0017)
+ * restricts it to the caller's own rows, and a missing policy deletes nothing,
+ * which surfaces as a loud failure rather than a silent no-op.
+ */
+export async function deleteSpeakingConversation(id: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("speaking_conversations")
+      .delete()
+      .eq("id", id)
+      .select("id");
+    return !error && !!data?.length;
+  } catch {
+    return false;
+  }
+}
+
 /** Close the conversation and grade it. One call, at the end. */
 export async function requestDebrief(input: {
   conversationId: string;

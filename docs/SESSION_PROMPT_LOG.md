@@ -4916,3 +4916,129 @@ test:unit **551/551** · build · check:bundle 126.6 kB of 400 kB · check:contr
   the PR #812 conflict flag. No code changes this round; `docs/areas/PRUEFUNG.md` and `CLAUDE.md`
   untouched, since none of this changed a product behavior or a design law.
 - **Artifacts (prompts 2-4):** `docs/PROJECT_STATUS.md` · this log · no code changes.
+
+---
+
+## Session 196 — prompt 1 (2026-08-06)
+
+**Branch:** `claude/sprechen-module-bugs-qjrdca`
+
+**Prompt (verbatim):**
+
+> there are some bugs or inconsistencies with sprechen module. sprechen ohne zeit page tiles are
+> all a bunch tiles as list. but it should somehow look like shcreiben with a filter rail like
+> schreiben aufgabe wahlen tile. Same should apply for lesen and horen ohne zeit modules. the bug I
+> found with sprechen is that after I do the speaking exercise, the evaluation couldn't be done as
+> there was some problem and the verlauf section isn't updated with this progress. it's basically
+> lost. fix these things
+
+**Response summary.**
+
+**One rail for all four Ohne-Zeit modules.** `ScopeSelect` and the "Aufgabe wählen" tile moved out
+of `WritingRail` into `features/shared/ScopeRail.tsx` unchanged (Himmelblau fill, no visible edge,
+section eyebrows, honest zero-yield counts, always-active reset), and
+`features/pruefung/ModulePicker.tsx` is the frame all four share: Schreiben's content-plus-16rem
+sticky rail on desktop, the same rail as a panel behind an **Aufgabe** toggle in the mobile module
+row. Schreiben re-renders through the extracted pieces with no visual change.
+
+**Sprechen (`/simulation`)** is now Schreiben's page: an **Üben | Verlauf** sliding-pill switcher as
+the header, the rail (Niveau, Lebensbereich, Thema — a Scenario carries no Branche or Unterthema, so
+those dropdowns would be dead chrome), and the scenario grid. The three level SECTIONS were a Niveau
+filter wearing a heading's clothes, so they are gone and the band is a card badge; the ladder is the
+hub's (1→B1, 2→B2, 3→C1), not the finer one `engine/speaking.ts` pitches a brief at.
+
+**Lesen and Hören had no Ohne-Zeit shape at all** — the card composed a random drill and opened it,
+so no text could ever be chosen. `/lesen` and `/hoeren` list what the scope serves (Niveau, Branche,
+Lebensbereich, Thema, Unterthema, Textsorte) and start the picked text as a single-text untimed run
+through the SAME `LesenPart`/`HoerenPart`, scored the same way, recorded in the same Module-üben
+Verlauf. `composeMockExam` takes `MockExamPicks` (filtered against the bank, so a stale link cannot
+compose over a missing text). The old behaviour survives as **Zufällige Auswahl**.
+
+**The evaluation bug had three layers, all fixed.** (1) `converse` ran BOTH modes on 1400 output
+tokens; a debrief must echo every learner sentence corrected plus two tips and the verdict arrays as
+one JSON object, so a twelve-turn conversation truncated mid-JSON and the parse failed. Turns get
+500 now, the debrief 4096 — what every other Edge Function here already used. (2) `cascade` returned
+the first leg producing ANY text, so a truncated Gemini answer was accepted and Claude was never
+asked; the Gemini leg also lacked `responseMimeType: "application/json"` here alone, so a thinking
+model spent the budget before writing a character. Both fixed, and `cascade` now takes an `accept`
+predicate: a leg whose output the caller cannot use is a leg that failed. (3) `onFinished` fired
+only on a SUCCESSFUL debrief, so an unreachable grader erased the scenario completion, the XP and
+the streak day; it fires once per conversation either way, and the failure screen offers **Erneut
+versuchen**, which costs no allowance because the allowance counts conversation rows and the row
+already exists.
+
+**The Verlauf really was missing.** `speaking_conversations` has recorded every conversation since
+s193 and nothing ever read it back, so the free Sprechtrainer was the one trainer whose work
+vanished on leaving the debrief. `getSpeakingHistory`/`deleteSpeakingConversation` +
+`features/sprechen/SprechenHistory.tsx` are that half, built from Schreiben's row and
+`features/writing/correction.tsx` rather than a new one. A conversation whose debrief never arrived
+still appears, with its transcript and an "Ohne Bewertung" badge.
+
+**Gates:** typecheck · lint 0 errors (76 warnings) · **624 tests** (up from 610, new
+`tests/moduleScope.test.ts` gates the filter law and the picked-content override) · build ·
+check:bundle 127.9 kB · lint:content · lint:migrations.
+
+- **Artifacts:** `src/features/shared/ScopeRail.tsx` · `src/features/pruefung/{ModulePicker,TextModuleHub}.tsx` ·
+  `src/lib/moduleScope.ts` · `src/features/sprechen/{SprechenHub,SprechenHistory,ConversationRunner}.tsx` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/pruefung/PruefungHub.tsx` ·
+  `src/engine/exam.ts` · `src/store/useExamStore.ts` · `src/lib/speaking.ts` · `src/router.tsx` ·
+  `src/components/layout/nav-items.ts` · `supabase/functions/converse/index.ts` ·
+  `tests/moduleScope.test.ts` · `CLAUDE.md` · `docs/areas/{PRUEFUNG,SPRECHEN}.md` ·
+  `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log
+
+
+---
+
+## Session 196 — prompt 2 (2026-08-06)
+
+**Branch:** `claude/sprechen-module-bugs-qjrdca`
+
+**Prompt (verbatim):**
+
+> is it possible to have a KI usage similar to how claude code shows wherever a feature uses ai is
+> in the app?
+
+**Response summary.** Answered as a question (no code written), then the founder ended the session
+before the design round: "merge the changes to main and document the session. we can continue in
+another session."
+
+**The state of play, as reported.** Yes, and most of the plumbing exists. `src/lib/aiAllowance.ts`
+is already a real usage layer: `useDailyAllowance(mode)` returns `{ limit, remaining, known }`,
+takes the SERVER's number as authority (every Edge Function response carries
+`dailyLimit`/`dailyRemaining` through `reportServerAllowance`) and falls back to counting the
+learner's own rows; when it cannot know, it renders nothing rather than a guess. `AllowanceNote`
+prints it as "Heute noch 7 von 10" in four places: Fokus, Kurz/Lang, the Sprechen brief card and the
+Modelltest run band.
+
+**The four gaps found.**
+1. **You can only see the meter you are standing on.** No surface shows all of it; Settings has no
+   AI section. Claude Code's whole trick is that the readout is always visible.
+2. **Two AI features have NO readout at all.** `transform-sentence` (Fokus's "Nochmal" Umformung)
+   has its own limits (`TRANSFORM_DAILY_LIMIT` 30, `TRANSFORM_BURST_LIMIT` 8) and is not in
+   `AiMode`, so nothing counts it and a learner hits that wall with no warning.
+3. **No "this will use AI" marker before the fact.** The KI-generiert line appears on RESULTS, after
+   the unit is spent. And `Sparkles` is NOT an AI marker in this app (it is used for Quiz, empty
+   states, onboarding), so there is no reserved AI icon to build on yet.
+4. **The monthly ceilings are invisible** (50 evaluations, 40 conversations, 200 sentence checks,
+   plus the global `MONTHLY_SPEND_CAP_USD` fuse).
+
+**One thing pushed back on.** Claude Code shows cost and tokens because the user pays. Genauly's
+learners do not, so a money figure would be alarming and meaningless; the learner-facing number
+stays "how many free AI helps do I have left today". The founder-facing spend view already exists in
+part (`AdminOverview` / `AdminSystem` "KI-Budget") and is the place to extend if that is what is
+wanted.
+
+**Founder decisions (via the question tool, both taken):**
+- **Audience: learner-facing.** Not the admin spend view.
+- **Scope: A + B.** (A) fill the missing counts so no AI feature is silent, the Umformung
+  especially; (B) ONE reserved KI chip carrying its count on every entry point that spends a unit.
+  The (C) "KI heute" overview panel in Settings was NOT taken.
+
+**Not started.** B is new shared-component design, so it owes the founder the preview-first round
+(2-4 named variants in English in `preview/`, artifact published, pick, then implement). The
+`design` skill was loaded and the session ended there.
+
+- **Artifacts (prompt 2):** none (analysis only) · two merges of `origin/main` into this branch,
+  `b33f4da` (PR #813, five doc conflicts) and the PR #814 docs merge, both resolved by keeping BOTH
+  sessions' facts rather than picking a side · **PR #812**, squash-merged into `main`
+

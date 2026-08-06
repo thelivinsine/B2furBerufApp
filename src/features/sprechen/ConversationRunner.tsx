@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, Pencil, Volume2 } from "lucide-react";
+import { ChevronDown, Pencil, RotateCcw, Volume2 } from "lucide-react";
 import type { ConversationBrief } from "@/types";
 import {
   addLearnerTurn,
@@ -62,7 +62,13 @@ export function ConversationRunner({
    * read their feedback.
    */
   onExit: (score: number | null) => void;
-  /** The debrief landed. Practice uses this to mark the scenario done. */
+  /**
+   * The conversation is OVER with enough said to count, and the debrief round
+   * trip has come back (with a grade, or with a failure). Practice uses this to
+   * mark the scenario done and pay for it. Fired at most once per conversation;
+   * it deliberately does not wait for a successful grade, because the learner
+   * did the speaking either way (s196).
+   */
   onFinished?: (score: number | null) => void;
   /**
    * True once the conversation is live, i.e. once leaving would throw a run
@@ -82,6 +88,8 @@ export function ConversationRunner({
   const [hint, setHint] = useState<string | null>(null);
   const [over, setOver] = useState(false);
   const conversationId = useRef<string>(crypto.randomUUID());
+  /** This conversation has already been counted as practice; see `runDebrief`. */
+  const counted = useRef(false);
   const speech = useSpeechInput();
   const reduce = useReducedMotion();
   const allowance = useDailyAllowance("sprechen");
@@ -173,6 +181,29 @@ export function ConversationRunner({
     [advance, state],
   );
 
+  /**
+   * Ask for the debrief. Separate from `finish` because it is RETRYABLE (s196):
+   * the transcript of record lives server-side, written turn by turn, so a
+   * grader that was briefly unreachable can simply be asked again. It costs no
+   * further daily allowance either, because the allowance counts conversation
+   * ROWS and this conversation's row already exists.
+   *
+   * The conversation is counted as practice exactly ONCE, whether or not a
+   * grade came back (`counted`). Tying the credit to the AI meant an
+   * unreachable grader also erased the speaking the learner had just done,
+   * which is the founder's "it's basically lost" (s196).
+   */
+  const runDebrief = useCallback(async () => {
+    setPhase("debriefing");
+    const res = await requestDebrief({ conversationId: conversationId.current, brief });
+    setDebrief(res);
+    setPhase("debrief");
+    if (!counted.current) {
+      counted.current = true;
+      onFinished?.(res.ok ? res.score ?? null : null);
+    }
+  }, [brief, onFinished]);
+
   const finish = useCallback(async () => {
     stopSpeaking();
     speech.reset();
@@ -183,12 +214,8 @@ export function ConversationRunner({
       return;
     }
     setState((s) => closeConversation(s));
-    setPhase("debriefing");
-    const res = await requestDebrief({ conversationId: conversationId.current, brief });
-    setDebrief(res);
-    setPhase("debrief");
-    if (res.ok) onFinished?.(res.score ?? null);
-  }, [brief, onExit, onFinished, speech, state]);
+    await runDebrief();
+  }, [onExit, runDebrief, speech, state]);
 
   const askHint = useCallback(() => {
     setState((s) => applyHint(s));
@@ -242,12 +269,27 @@ export function ConversationRunner({
 
   if (phase === "debrief" && debrief) {
     if (!debrief.ok) {
+      // The grade failed, the CONVERSATION did not (s196). It is stored
+      // server-side turn by turn, so this screen says so, offers the retry that
+      // costs nothing, and never presents the run as thrown away. Before this
+      // the only control here was "Zurück", and the whole session vanished.
       return framed(
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
-          <p className="text-sm text-muted-foreground">{debrief.message}</p>
-          <Button variant="outline" onClick={() => onExit(null)}>
-            Zurück
-          </Button>
+          <div className="space-y-1.5">
+            <p className="text-sm font-semibold">Die Rückmeldung hat nicht geklappt</p>
+            <p className="text-sm text-muted-foreground">{debrief.message}</p>
+            <p className="text-xs text-muted-foreground">
+              Dein Gespräch ist gespeichert und steht in deinem Verlauf.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2.5">
+            <Button variant="gradient" onClick={() => void runDebrief()}>
+              <RotateCcw className="h-4 w-4" /> Erneut versuchen
+            </Button>
+            <Button variant="outline" onClick={() => onExit(null)}>
+              Zurück
+            </Button>
+          </div>
         </div>,
       );
     }

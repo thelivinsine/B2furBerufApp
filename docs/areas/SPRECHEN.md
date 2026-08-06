@@ -7,8 +7,26 @@ Current state only. History → `docs/DECISIONS.md`, blow-by-blow →
 
 ## The one-sentence law
 
-**Sprechen is Schreiben with a microphone:** a brief, a conversation, and then the *existing*
-correction card as the debrief. It is deliberately **not** an open chatbot.
+**Sprechen is Schreiben with a microphone:** an Aufgabe chooser, a brief, a conversation, the
+*existing* correction card as the debrief, and a Verlauf. It is deliberately **not** an open
+chatbot.
+
+## The page (s196)
+
+`/simulation` is Schreiben's frame, because the founder asked for exactly that ("it should somehow
+look like Schreiben with a filter rail like Schreiben's Aufgabe wählen tile"):
+
+- a two-segment sliding-pill switcher as the page header, **Üben | Verlauf** (no HubHero, no `h1`);
+- **Üben** = the shared `ScopeRail` beside a grid of the Situationen the scope serves. The rail
+  carries Niveau, Lebensbereich and Thema and nothing else: a Scenario carries no Branche and no
+  Unterthema tags, and a dropdown that can only ever read 0 is dead chrome, not a filter. Niveau
+  replaced the old Einsteiger/Mittelstufe/Fortgeschritten section headings, so the band moved onto
+  each card as a badge. `SCENARIO_BAND` is the HUB's ladder (1→B1, 2→B2, 3→C1), deliberately not
+  the finer band `engine/speaking.ts` pitches the brief at;
+- **Verlauf** = `SprechenHistory`, reading `speaking_conversations` (see below).
+
+Both live in the URL (`?tab=`, `?level=`, `?area=`, `?theme=`, `?sz=`), so a reload, a share and the
+back button all land where the learner was.
 
 ## Why not a chatbot
 
@@ -83,6 +101,9 @@ never leaves the device, which is why the privacy policy can say so.
   transcript, so anything not in it must not be on screen either.
 - **The daily allowance gates the START button**, not a caption after the fact: with nothing left,
   the brief card says so and cannot be started (s194).
+- **A debrief is RETRYABLE and costs nothing extra** (s196). The allowance counts conversation
+  ROWS, and the row already exists by the time the debrief is asked for, so "Erneut versuchen" on
+  the failure screen re-asks the grader without touching the daily budget.
 - **A conversation whose very first turn fails gives its unit back.** The row is still inserted
   before the model call, so an abandoned run cannot farm free turns, but a transient upstream
   failure no longer costs half of a two-per-day allowance for a conversation that never happened.
@@ -91,6 +112,41 @@ never leaves the device, which is why the privacy policy can say so.
   transcripts cannot disagree.
 - Per-user monthly ceiling, plus the shared `MONTHLY_SPEND_CAP_USD` fuse every AI feature sits
   behind.
+
+## The debrief, and what a failed one must never cost (s196)
+
+The founder hit "the evaluation couldn't be done ... and the Verlauf isn't updated with this
+progress, it's basically lost." Three separate things had to be true for that, and all three are
+fixed:
+
+1. **Token budget.** `converse` ran BOTH modes on 1400 output tokens. A debrief has to echo back
+   every sentence the learner said, corrected, plus the German tip, its English twin and the
+   verdict arrays, as one JSON object; a twelve-turn conversation truncates mid-JSON, the parse
+   fails, and the learner reads "Die Rückmeldung konnte nicht gelesen werden" over a conversation
+   that went fine. Turns now get `TURN_MAX_TOKENS` (500), the debrief `DEBRIEF_MAX_TOKENS` (4096),
+   which is what every other Edge Function here already used.
+2. **JSON mode, and a cascade that actually cascades.** The Gemini leg asked for free-form text, so
+   a thinking model spent the budget before writing a character and wrapped what was left in prose.
+   Worse, `cascade` took the FIRST leg that returned any text, so an unparsable Gemini answer was
+   accepted and Claude was never asked. The debrief leg now sets `responseMimeType:
+   "application/json"`, and `cascade` takes an `accept` predicate: **a leg whose output the caller
+   cannot use is a leg that failed**, and the next model gets its turn.
+3. **The practice is credited for SPEAKING, not for being graded.** `onFinished` used to fire only
+   on a successful debrief, so an unreachable grader also erased the scenario completion, the XP
+   and the streak day. It now fires once per conversation either way, and the failure screen says
+   the conversation is stored and offers the retry instead of one lone "Zurück".
+
+## The Verlauf (s196)
+
+`speaking_conversations` had recorded every conversation since s193 and **nothing read it back**,
+so the free Sprechtrainer was the only trainer whose work vanished when the learner left the
+debrief. `getSpeakingHistory` + `SprechenHistory` are the missing half.
+
+It is deliberately Schreiben's Verlauf row, not a new one: the same compact disclosure, the same
+`features/writing/correction.tsx` Original/Korrigiert card, the same tip block with its DE/EN chip.
+A conversation whose debrief never arrived **still appears**, with its transcript and an "Ohne
+Bewertung" badge. That is the point: the work is on record even when the grader was not reachable.
+Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
 
 ## Rules that are easy to break
 
@@ -127,7 +183,11 @@ never leaves the device, which is why the privacy policy can say so.
 | `features/sprechen/ConversationDebrief.tsx` | Goals, correction card, Redemittel. |
 | `features/sprechen/MicCluster.tsx` | The shared control cluster + typed fallback. |
 | `features/sprechen/useSpeechInput.ts` | The microphone, over `engine/speech.ts`. |
-| `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. Reads `?level=` and `?sz=`. Registers the zone's ONE exit (s195): from the list it leaves for the hub, from a started conversation it asks first, because a conversation cannot be resumed. Its Niveau is the shared `LevelSelect`, not a row of pills; its cards wear the Sprechen mark; the list sits in the zone's `max-w-4xl` column. |
+| `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. Üben \| Verlauf switcher, the shared `ScopeRail` in Schreiben's frame (s196), the scenario grid. Registers the zone's ONE exit (s195): from the list it leaves for the hub, from a started conversation it asks first, because a conversation cannot be resumed. |
+| `features/sprechen/SprechenHistory.tsx` | The Verlauf: recorded conversations, correction card, goals met, delete. |
+| `features/shared/ScopeRail.tsx` | The ONE "Aufgabe wählen" rail + `ScopeSelect`, shared with Schreiben, Lesen and Hören. |
+| `features/pruefung/ModulePicker.tsx` | The chooser frame all four Ohne-Zeit modules share. |
+| `lib/moduleScope.ts` | Scope selectors + counters for the Sprechen and the receptive choosers. |
 | `features/exam/SprechenPart.tsx` | Teil Sprechen of the Modelltest. |
 | `lib/speaking.ts` | Edge Function client. |
 | `supabase/functions/converse/` | Turns + debrief, all secrets, all guards. |

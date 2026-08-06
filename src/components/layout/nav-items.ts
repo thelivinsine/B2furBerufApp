@@ -105,6 +105,8 @@ export const NAV_ZONE_OF_ROUTE: Record<string, string> = {
   // Prüfung: the four modules and the two free trainers all sit under the hub.
   "/writing": "/anwenden",
   "/simulation": "/anwenden",
+  "/lesen": "/anwenden",
+  "/hoeren": "/anwenden",
   "/exam": "/anwenden",
   // Praktisch: everything the dashboard starts (Üben, Spielen).
   "/session": "/",
