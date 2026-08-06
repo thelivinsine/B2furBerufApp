@@ -5129,3 +5129,20 @@ wanted.
 
 - **Artifacts:** `preview/mobile-cluster-fade.html` · `preview/mobile-cluster-fade-artifact.html` ·
   artifact <https://claude.ai/code/artifact/8bbc7f2e-d581-4767-84ee-a024380d0604>
+
+- **Prompt 2 (verbatim):** `insert short fade but soft blur but not above the blue button, it should
+  be below the blue button behind the text.`
+  **Response:** shipped variant A's 7rem scrim plus C's blur, cut down from a 9rem band to the
+  2rem strip between the nav and the button's LOWER edge, so the frosting sits behind the note line
+  and stops before the button. Two new utilities in `src/index.css` (`.cluster-scrim`,
+  `.cluster-blur`), both rendered by `FloatingActionCluster`, `pointer-events-none`, border-free,
+  `lg:hidden`; the note moved to `z-[25]` so it stays above them. One tuning pass came out of
+  screenshotting the REAL app at 390x800 in both themes: the first scrim reached ~0.99 through the
+  note strip, which made the frosted band invisible, so the ramp now holds ~0.85 there and the blur
+  has something left to act on (still AA, because what shows through is a card within a few per
+  cent of the ground). Only the four Bibliothek tabs mount this cluster, so no writing editor is
+  dimmed. Gates: typecheck, lint, `check:contrast`, `test:unit` (624), `build`, `check:bundle` all
+  green. Preview updated with a fifth "Shipped" phone so the mockup and the live surface agree.
+
+- **Artifacts (prompt 2):** `src/index.css` · `src/features/shared/floatingCluster.tsx` ·
+  `docs/areas/BIBLIOTHEK.md` · `.claude/skills/design/SKILL.md` · `preview/mobile-cluster-fade.html`

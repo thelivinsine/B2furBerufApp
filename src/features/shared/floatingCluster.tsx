@@ -48,6 +48,17 @@ export const floatingNote =
  *
  * The surface that mounts it owes the flow the matching clearance, or its last
  * card ends up underneath the buttons.
+ *
+ * Since s197 the cluster also brings its own SOFT BOTTOM: a short scrim in the
+ * page-ground colour (7rem, `.cluster-scrim`) that dissolves the cards on their
+ * way down, plus a 2rem frosted band (`.cluster-blur`) in the strip between the
+ * nav and the button's bottom edge, which is where the note line sits. Together
+ * they are the mobile answer to the desktop `mask-fade-bottom`: the founder's
+ * screenshot was that desktop edge, and a phone had nothing equivalent because
+ * it scrolls the page rather than a column. Both layers are
+ * `pointer-events-none` and neither carries a border, so the s168 sticky-bar and
+ * the s169 blurred-band rejects stay rejected: there is no bar here, only the
+ * ground reasserting itself under the controls.
  */
 export function FloatingActionCluster({
   children,
@@ -60,6 +71,17 @@ export function FloatingActionCluster({
 }) {
   return createPortal(
     <>
+      {/* The soft bottom, under everything else in the cluster: the scrim first,
+          then the frosted strip on top of it, so the frosting acts on whatever
+          the scrim still lets through. Both stop at the nav's top edge. */}
+      <div
+        aria-hidden
+        className="cluster-scrim pointer-events-none fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-20 h-28 lg:hidden"
+      />
+      <div
+        aria-hidden
+        className="cluster-blur pointer-events-none fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-20 h-8 lg:hidden"
+      />
       <div className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_2rem)] z-30 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:hidden">
         <div className="flex items-stretch justify-center gap-2">{children}</div>
       </div>
@@ -68,9 +90,11 @@ export function FloatingActionCluster({
         // is invisible because the page ground sits behind it, but the
         // Bibliothek's line floats over WHITE cards, where the same
         // `bg-background/90` reads as a frosted chip. Plain text is what the
-        // founder is matching. The cost is that the line has no backing where
-        // it happens to cross a card.
-        <p className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-20 text-center text-[11px] leading-snug text-muted-foreground lg:hidden">
+        // founder is matching. The line used to have no backing at all where it
+        // crossed a card, which is what made it hard to read; the scrim + frosted
+        // strip above answer that WITHOUT giving the text its own chip, because
+        // they belong to the whole bottom of the screen rather than to the line.
+        <p className="fixed inset-x-0 bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom)_+_0.5rem)] z-[25] text-center text-[11px] leading-snug text-muted-foreground lg:hidden">
           {note}
         </p>
       )}

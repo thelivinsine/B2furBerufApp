@@ -1,7 +1,34 @@
 # Project Status
 
-_Last updated: 2026-08-06 (session 196 gave all four Ohne-Zeit modules ONE Aufgabe rail, fixed the
-Sprechen debrief, and finally diagnosed the recurring red Pages deploy; see "Resume here"). Founder: "sprechen ohne zeit page tiles are all a bunch
+_Last updated: 2026-08-06 (session 197 gave the mobile Bibliothek the soft bottom the desktop list
+already had; see "Resume here"). Founder: "can you put similar effect even in the mobile view so
+that the floating text below the ueben button is more readable and visible?", then "insert short
+fade but soft blur but not above the blue button, it should be below the blue button behind the
+text."
+**The screenshot was the desktop edge, and a phone had no equivalent.** Since s189 the browse list
+scrolls INSIDE the content column on desktop, so `browseColumnClass` masks the column's bottom edge
+and the cards dissolve into the page ground (`mask-fade-bottom`). A phone scrolls the PAGE, so there
+is no edge to mask: the cards ran at full strength behind the floating Üben button and the "Etwas
+verbessern? Feedback geben" line, which since s189 deliberately carries no plate of its own (a plate
+read as a frosted chip over white cards). That missing edge IS the founder's unreadable text.
+**Four phone mockups, in both themes, at the real cluster offsets** (`preview/mobile-cluster-fade.html`,
+artifact redeployed with the pick): today's baseline, a short fade, a long fade, and a fade plus
+blur. The founder took the short fade AND the blur, with the blur cut to the strip BELOW the button.
+**Shipped:** two utilities in `src/index.css` (`.cluster-scrim`, a 7rem page-ground ramp;
+`.cluster-blur`, a 2rem frosted band masked at its own top), both rendered by
+`FloatingActionCluster`, `pointer-events-none`, border-free, `lg:hidden`, with the note at `z-[25]`
+above them. The band is exactly the gap between the nav and the button's lower edge, so it frosts the
+note strip and STOPS at the button. Neither reject comes back: no bar (s168), no band across the
+page (s169). One tuning pass came out of screenshotting the real app at 390x800: the first ramp
+reached ~0.99 through the note strip and made the blur invisible, so it holds ~0.85 there instead.
+Only the four Bibliothek tabs mount this cluster, so no writing editor is dimmed.
+Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 129.8 kB ·
+check:contrast.
+**Resume here:** nothing is open from this change. Unchanged from s196: raising the `pages.yml`
+`timeout` (~30 min) is the known deploy fix and has not been taken yet.
+
+Prior s196 (2026-08-06): all four Ohne-Zeit modules got ONE Aufgabe rail, the Sprechen debrief was
+fixed, and the recurring red Pages deploy was finally diagnosed. Founder: "sprechen ohne zeit page tiles are all a bunch
 tiles as list ... it should somehow look like schreiben with a filter rail ... same should apply for
 lesen and horen ... the evaluation couldn't be done ... and the verlauf section isn't updated with
 this progress. it's basically lost."
@@ -113,51 +140,6 @@ sessions' facts in every conflicted doc rather than picking a side.
 founder's examples ("Prüfung or Bibliothek") reading as illustrative rather than a request to
 retitle every route today; say the word and the same pattern (via `navItems` labels) generalises
 easily. Site confirmed live and verified by the founder at `genauly.de`.
-
-Prior s195 (2026-08-06): **The Prüfung zone was audited end to end and every
-
-finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
-the issue". The report (`docs/reports/pruefung-audit-2026-08-05.md`, 35 ranked findings) is kept in
-full as the record; `docs/areas/PRUEFUNG.md` is the new current-state law for the zone.
-**Three patterns explained almost all of it:** a retired feature left its readers behind, Ohne Zeit
-was bolted onto a flow whose only exit was the clock, and the server enforced limits the client
-never displayed.
-**The six blocking ones.** An untimed Lesen or Hören module could not be finished with a single
-answer blank, and Ohne Zeit is where a learner lands, so the default path dead-ended and abandoning
-lost the work; "Teil abschließen" is now unconditional on the last question and blanks cost a
-confirm naming the count. Nothing had written `examsDone` since the branching runner retired in
-s186, so Fortschritt reported "noch keine Simulation" and "0 Prüfungen" however many Modelltests a
-learner sat; it reads `mockExams` now through a bank-free `isFullMockRun`, and `examsDone` is
-retired (kept and synced, because it is real pre-s186 history). The exam clock counted ticks, so a
-background tab or a reload paused it; it measures a DEADLINE now and re-syncs on
-`visibilitychange`. The 14-turn speaking ceiling was enforced only server-side while
-`canSpeak`/`turnsLeft`/`conversationOver` sat unread, so a learner could talk into turns the grader
-never saw; the client enforces it, counts down from three, and rolls a failed turn back off the
-transcript. Teil Sprechen offered "Nochmal", so a candidate could re-sit it (gone in exam mode).
-And `examBrief` hard-coded `level: "B2.1"`, so every Modelltest's speaking part was pitched and
-graded at B2.1 whatever Niveau was chosen; it takes `EXAM_BAND[plan.level]` now.
-**Feature gaps closed:** the exam's Schreiben correction was computed and never rendered (it is
-`correction.tsx`'s fifth caller now); the brief card's allowance-aware disabled state was dead code
-(wired); one Modelltest silently spends half the daily writing AND speaking budget (the run band
-says so and warns when either is out); the Sprechtrainer had no way back to the hub and dropped the
-Niveau on the way in (both fixed, and its scope lives in the URL); Hören could consume both plays
-and produce silence (TTS guard, a text fallback, no double-tap, playback stops when the Ansage
-changes); the recogniser ending on its own wiped the transcript (it re-opens and keeps it); and
-spoken transcripts were missing from the GDPR export.
-**Content, not just code:** Durchsagen were 38% of the B2 *reading* pool (excluded now, pools stay
-9/16/5); a C1 Hören was mostly B2.2 and could never carry the Notizen task its own Anleitung
-promised (two C1 audio texts authored, one with the first C1 Notizen sheet, so C1 no longer tops up
-at all); and every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only
-ever serve a WORKPLACE speaking task (six authored across Behörde, Wohnen, Arzt and Digitales,
-three at B2 and three at C1). The zone also awarded almost no XP: a graded conversation and a
-single module sitting both paid zero. Both pay now.
-Gates: typecheck · lint 0 errors (75 warnings, unchanged) · **610 tests** (up from 592) · build ·
-check:bundle 127.1 kB · check:contrast · lint:content · lint:migrations.
-**Resume here:** nothing from the audit is left open. The one item deliberately NOT taken further is
-the second half of P28: the hub still loads ~825 kB of content banks because `engine/exam` imports
-them, and the per-render re-scan is fixed (`useMemo`) but the load is not. The real fix is
-precomputing availability at build time like `frequency.ts`, which is a generator job. Still open
-from s193: no exam set is `anruf` shaped, and the authored `nodes` graphs are dead but not retired._
 
 Older handoffs (s195 and earlier, including s193's Sprechen rebuild) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.

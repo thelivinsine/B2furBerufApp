@@ -257,6 +257,34 @@
 
       /* 0 - today (nothing behind the cluster) */
       .v-0 .veil { display: none; }
+
+      /* SHIPPED - the founder's pick: A's short fade, plus C's blur cut down to
+         the strip BELOW the button ("not above the blue button, it should be
+         below the blue button behind the text"). The scrim reaches full only at
+         the nav seam and holds ~0.85 through the note strip, so the frosted band
+         has something left to frost. Values are verbatim from src/index.css. */
+      .v-s .veil {
+        display: block; height: 7rem;
+        background: linear-gradient(
+          to top,
+          hsl(var(--background)) 0%,
+          hsl(var(--background) / 0.9) 6%,
+          hsl(var(--background) / 0.84) 28%,
+          hsl(var(--background) / 0.64) 48%,
+          hsl(var(--background) / 0.37) 68%,
+          hsl(var(--background) / 0.13) 86%,
+          hsl(var(--background) / 0) 100%
+        );
+      }
+      .v-s .blur {
+        position: absolute; left: 0; right: 0; bottom: 63px; height: 2rem; z-index: 21;
+        pointer-events: none;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        -webkit-mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+        mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+      }
+      .col.shipped .cap .name { color: hsl(var(--primary)); }
     </style>
 <div class="wrap">
       <h1>Mobile: fading the list behind the Üben button</h1>
@@ -273,6 +301,12 @@
         blocks taps, and it holds no border, so there is no bar strapped across the screen.
       </p>
 
+      <p class="lede">
+        <b style="color: hsl(var(--foreground))">Picked and shipped:</b> the short fade, with the
+        blur kept out of the button's way and confined to the strip below it, behind the feedback
+        line. That is the first phone below; A, B and C are the options it was chosen from.
+      </p>
+
       <div class="bar">
         <div class="switch" role="group" aria-label="Theme">
           <button type="button" data-theme="light" aria-pressed="true">Light</button>
@@ -287,6 +321,14 @@
       <table>
         <tr>
           <th>Option</th><th>What you see</th><th>Trade-off</th>
+        </tr>
+        <tr>
+          <td>Shipped</td>
+          <td>The short fade dissolves the cards on their way down; a 32 px frosted strip sits
+            between the nav and the button's lower edge, so the feedback line reads against a soft
+            haze instead of a card.</td>
+          <td>None worth naming: the blur covers a strip that held nothing but the note, and it
+            stops before the button, so no content above it is touched.</td>
         </tr>
         <tr>
           <td>Today</td>
@@ -326,6 +368,13 @@
 
     <script>
       const VARIANTS = [
+        {
+          cls: "v-s",
+          shipped: true,
+          name: "Shipped · A + blur under the button",
+          desc: "The short fade, plus the frosted strip cut down to the gap between the nav and the button, which is where the feedback line sits.",
+          cost: "<b>This is what is live</b> on the four Bibliothek tabs.",
+        },
         {
           cls: "v-0",
           name: "Today",
@@ -382,7 +431,7 @@
 
       function phone(v) {
         return `
-        <div class="col">
+        <div class="col${v.shipped ? " shipped" : ""}">
           <div class="phone ${v.cls}">
             <div class="p-header"><span class="logo">Bibliothek</span><span class="dot"></span></div>
             <div class="p-scroll">

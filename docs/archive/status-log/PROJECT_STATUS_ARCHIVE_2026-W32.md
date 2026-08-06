@@ -766,3 +766,53 @@ Shipped as **PR #803** (`f0fa0b7`, the first two) and **PR #805** (`68b500c`, th
 both squash-merged into `main`; the founder verifies the live result.
 **Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
 so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
+
+
+---
+
+## s195 (2026-08-06) — moved out of PROJECT_STATUS.md in s197
+
+Prior s195 (2026-08-06): **The Prüfung zone was audited end to end and every
+
+finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
+the issue". The report (`docs/reports/pruefung-audit-2026-08-05.md`, 35 ranked findings) is kept in
+full as the record; `docs/areas/PRUEFUNG.md` is the new current-state law for the zone.
+**Three patterns explained almost all of it:** a retired feature left its readers behind, Ohne Zeit
+was bolted onto a flow whose only exit was the clock, and the server enforced limits the client
+never displayed.
+**The six blocking ones.** An untimed Lesen or Hören module could not be finished with a single
+answer blank, and Ohne Zeit is where a learner lands, so the default path dead-ended and abandoning
+lost the work; "Teil abschließen" is now unconditional on the last question and blanks cost a
+confirm naming the count. Nothing had written `examsDone` since the branching runner retired in
+s186, so Fortschritt reported "noch keine Simulation" and "0 Prüfungen" however many Modelltests a
+learner sat; it reads `mockExams` now through a bank-free `isFullMockRun`, and `examsDone` is
+retired (kept and synced, because it is real pre-s186 history). The exam clock counted ticks, so a
+background tab or a reload paused it; it measures a DEADLINE now and re-syncs on
+`visibilitychange`. The 14-turn speaking ceiling was enforced only server-side while
+`canSpeak`/`turnsLeft`/`conversationOver` sat unread, so a learner could talk into turns the grader
+never saw; the client enforces it, counts down from three, and rolls a failed turn back off the
+transcript. Teil Sprechen offered "Nochmal", so a candidate could re-sit it (gone in exam mode).
+And `examBrief` hard-coded `level: "B2.1"`, so every Modelltest's speaking part was pitched and
+graded at B2.1 whatever Niveau was chosen; it takes `EXAM_BAND[plan.level]` now.
+**Feature gaps closed:** the exam's Schreiben correction was computed and never rendered (it is
+`correction.tsx`'s fifth caller now); the brief card's allowance-aware disabled state was dead code
+(wired); one Modelltest silently spends half the daily writing AND speaking budget (the run band
+says so and warns when either is out); the Sprechtrainer had no way back to the hub and dropped the
+Niveau on the way in (both fixed, and its scope lives in the URL); Hören could consume both plays
+and produce silence (TTS guard, a text fallback, no double-tap, playback stops when the Ansage
+changes); the recogniser ending on its own wiped the transcript (it re-opens and keeps it); and
+spoken transcripts were missing from the GDPR export.
+**Content, not just code:** Durchsagen were 38% of the B2 *reading* pool (excluded now, pools stay
+9/16/5); a C1 Hören was mostly B2.2 and could never carry the Notizen task its own Anleitung
+promised (two C1 audio texts authored, one with the first C1 Notizen sheet, so C1 no longer tops up
+at all); and every Alltag exam set hung off a level-1 scenario, so a B2 or C1 Modelltest could only
+ever serve a WORKPLACE speaking task (six authored across Behörde, Wohnen, Arzt and Digitales,
+three at B2 and three at C1). The zone also awarded almost no XP: a graded conversation and a
+single module sitting both paid zero. Both pay now.
+Gates: typecheck · lint 0 errors (75 warnings, unchanged) · **610 tests** (up from 592) · build ·
+check:bundle 127.1 kB · check:contrast · lint:content · lint:migrations.
+**Resume here:** nothing from the audit is left open. The one item deliberately NOT taken further is
+the second half of P28: the hub still loads ~825 kB of content banks because `engine/exam` imports
+them, and the per-render re-scan is fixed (`useMemo`) but the load is not. The real fix is
+precomputing availability at build time like `frequency.ts`, which is a generator job. Still open
+from s193: no exam set is `anruf` shaped, and the authored `nodes` graphs are dead but not retired._
