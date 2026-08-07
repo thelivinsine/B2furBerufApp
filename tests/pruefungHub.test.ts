@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { isFullRun, toPractices } from "@/features/pruefung/PruefungHub";
+import { moduleRuns } from "@/features/pruefung/verlauf";
 import type { MockExamRecord } from "@/store/useProgressStore";
 
 /**
@@ -62,5 +63,39 @@ describe("toPractices", () => {
       { id: "r|lesen", date: "2026-08-04", part: "lesen", pct: 84 },
       { id: "r|hoeren", date: "2026-08-04", part: "hoeren", pct: 61 },
     ]);
+  });
+});
+
+/**
+ * The per-module Verlauf (s200, founder: "go with verlauf on all four"). Each
+ * module page lists ITS OWN sittings, and a Modelltest is never one of them:
+ * the full run belongs to the Modelltest Verlauf alone, which is the same rule
+ * `isFullRun` pins above, applied one level down.
+ */
+describe("moduleRuns", () => {
+  const at = (date: string, parts: Record<string, number | null>, level = "B2") => ({
+    ...rec(parts),
+    id: date,
+    date,
+    level,
+  });
+
+  it("keeps only this module's practice, newest first", () => {
+    const runs = moduleRuns(
+      [at("2026-08-01", { lesen: 55 }), at("2026-08-02", { hoeren: 61 }), at("2026-08-03", { lesen: 72 })],
+      "lesen",
+    );
+    expect(runs.map((r) => r.pct)).toEqual([72, 55]);
+    expect(runs[0]).toMatchObject({ id: "2026-08-03|lesen", date: "2026-08-03", level: "B2" });
+  });
+
+  it("never lists a Modelltest, which belongs to the run history", () => {
+    expect(
+      moduleRuns([at("2026-08-04", { lesen: 80, hoeren: 70, schreiben: 75, sprechen: 72 })], "lesen"),
+    ).toEqual([]);
+  });
+
+  it("keeps a sitting the grader could not score, with a null percentage", () => {
+    expect(moduleRuns([at("2026-08-05", { lesen: null })], "lesen")[0]?.pct).toBeNull();
   });
 });

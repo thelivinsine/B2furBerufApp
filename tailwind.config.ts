@@ -3,6 +3,21 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  future: {
+    /**
+     * `hover:` compiles to `@media (hover: hover)` (s200, founder: the shuffle
+     * button "doesn't deactivate when tapped again, it deactivates when tapped
+     * on empty spaces").
+     *
+     * A touch browser keeps :hover on the last element tapped until the next
+     * tap somewhere else, so every `hover:` fill in the app read as a STUCK ON
+     * STATE on a phone. That is the same complaint as s190's stray focus rings,
+     * one input mode further: a hover style answers a pointer that a phone does
+     * not have. Toggles keep their own explicit on-state classes, which is what
+     * a state should be shown with.
+     */
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     container: {
       center: true,

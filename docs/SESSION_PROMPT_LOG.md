@@ -5417,3 +5417,62 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   or code was changed:** the deliverable is the report, and P1 opens with a founder decision.
   **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/PROJECT_REFERENCE.md` · this log.
+
+## Session 200 — 2026-08-07 — branch `claude/ui-polish-consistency-56ja1y`
+
+- **Prompt 1 (verbatim):** `[four phone screenshots: /lesen, /hoeren, /simulation, /writing]` `i want
+  you to make these pages consistent and highly polished. Review the exit buttons, toggles, layouts,
+  tile shapes, transition animations, etc - leave no stone unturned. Make it a finished product which
+  is presentable to thousands of audience and investors. I want the highest quality possible like
+  from senior experts of the industry developing billion dollar edutech app. some of the observed
+  bugs:` `- the header bar shouldn't have the aufgabe button - place it somewhere else.` `- shuffle
+  button has a bug where taping it again doesn't deactivate it instead it deactivates when tapped on
+  empty spaces - fix it.` `also make sure to keep the design language consistent with the rest of the
+  app and use the color palette from the brand kit wherever relevant.`
+  **Response:** reproduced every screen in headless Chromium at 360x640 first, which turned the
+  second reported bug into a much bigger finding: **Lesen and Hören were dead pages.** Starting a
+  text or the random draw only wrote the run into `useExamStore`, and the Prüfung hub was the ONLY
+  screen that rendered a run, so nothing happened on `/lesen` and `/hoeren`; what the founder saw as
+  "the shuffle doesn't deactivate" was a stuck touch-`:hover` on a button whose tap led nowhere.
+  Fixes, in the order they matter:
+  1. **The two choosers work.** `TextModuleHub` renders `<MockExamRunner />` while a run exists (the
+     hub's own pattern), `AppShell` gained `STAGE_ROUTES`, and the chooser's `zoneExit` steps aside
+     while the runner owns the exit and only clears an exit that is still its own. Finishing a drill
+     lands back on the list it was picked from. Verified end to end: pick → answer 3 → Teil
+     abschließen → 100 % → Fertig → back on `/lesen`, run cleared, nav restored.
+  2. **The zone's exit was missing on `/lesen` and `/hoeren`**: they were never in `ZONE_ROUTES`, so
+     those two were the only screens in the zone with no way back in the header. Now all four have
+     it, in the same corner.
+  3. **The Aufgabe toggle left the module row** and sits at the right end of the chooser's own
+     toolbar row, level with the count it changes and directly above the panel it opens.
+  4. **Sticky touch-hover is gone app-wide:** `future.hoverOnlyWhenSupported` compiles every
+     `hover:` into `@media (hover: hover)`, so a tapped control no longer stays lit until the next
+     tap somewhere else. (Verified in the minified production CSS, not just in dev.)
+  5. **One chooser, three modules:** `ModulePicker` now owns the toolbar row, `ChooserCard` is the
+     one card anatomy (Sprechen had put the Niveau in the head, rendered a `div onClick` a keyboard
+     could not reach, nested a "Starten" button inside its own click target and wore a
+     `shadow-glow`, a landmine since s136), `ModuleTabs` is the one switcher, and both list
+     animations share one 0.16s stagger. Sprechen's module row moved ABOVE its switcher, so all four
+     pages read module row → switcher → content. Sprechen also gained the random draw the other two
+     always had.
+  **Artifacts:** `src/features/pruefung/{ModulePicker,ChooserCard,ModuleTabs,TextModuleHub}.tsx` ·
+  `src/features/sprechen/SprechenHub.tsx` · `src/components/layout/AppShell.tsx` ·
+  `tailwind.config.ts` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md`.
+
+- **Prompt 2 (verbatim):** `either keep verlauf in every module or remove it from all of the
+  individual modules and just in the prufung hub page`
+  **Prompt 3 (verbatim):** `go with verlauf on all four`
+  **Response:** flagged the cost of the other option before building (removing them would delete the
+  writing corrections and the spoken transcripts from the app, since nothing else renders either),
+  then added the Verlauf tab to Lesen and Hören. The Verlauf card, chart, empty state and delta chip
+  were EXTRACTED from `PruefungHub` into `features/pruefung/verlauf.tsx` rather than rebuilt, and the
+  chooser must not import the hub: that would drag `mockExamAvailability` and the writing-prompt bank
+  into the `/lesen` chunk. The new per-module history (`moduleRuns`) is the Modelltest Verlauf's
+  composition at module scale (last score + delta, Bester, Bestanden, seven bars against the pass
+  line), with the Niveau on each row instead of the module name the page already says, and a
+  Modelltest is never listed there (`isFullMockRun`). The hub keeps the cross-module views only.
+  `ModulePage` gives the Verlauf tab the same columns the Üben tab has, so switching tabs moves no
+  edge sideways.
+  **Artifacts:** `src/features/pruefung/verlauf.tsx` (new) · `PruefungHub.tsx` (now imports it) ·
+  `TextModuleHub.tsx` · `SprechenHub.tsx` · `ModulePicker.tsx` · `tests/pruefungHub.test.ts` ·
+  `docs/PROJECT_STATUS.md` · this log.

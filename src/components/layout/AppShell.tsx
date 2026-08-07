@@ -61,8 +61,21 @@ function ZoneExit({ tone, onExit }: { tone: "quiet" | "danger"; onExit: () => vo
  * Every route the Prüfung zone owns. The zone's one exit (top right, always)
  * renders on these and nowhere else, so a handler that outlives its screen
  * cannot leak a back button onto another page.
+ *
+ * `/lesen` and `/hoeren` were missing until s200, which is why those two
+ * choosers were the only screens in the zone with no way back in the header
+ * while Schreiben and Sprechen had one.
  */
-const ZONE_ROUTES = new Set(["/anwenden", "/exam", "/writing", "/simulation"]);
+const ZONE_ROUTES = new Set(["/anwenden", "/exam", "/writing", "/simulation", "/lesen", "/hoeren"]);
+
+/**
+ * The routes a Teil can actually run on, and therefore the routes allowed to
+ * switch the shell into the one-viewport exam stage. `/lesen` and `/hoeren`
+ * joined in s200, when starting a drill from those two choosers began rendering
+ * the runner on the chooser's own route instead of writing a run nothing
+ * displayed.
+ */
+const STAGE_ROUTES = new Set(["/anwenden", "/exam", "/lesen", "/hoeren"]);
 
 export function AppShell() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -125,10 +138,9 @@ export function AppShell() {
   const zoneExit = useSessionStore((s) => s.zoneExit);
   const examStage = useSessionStore((s) => s.examStage);
   // The runner took the `/exam` route over until s189; it now takes over the
-  // Prüfung hub instead, and `/exam` is a redirect into that hub. Both are
-  // listed so a stale flag still cannot strip the chrome anywhere else.
-  const exam =
-    examStage && (location.pathname === "/anwenden" || location.pathname === "/exam");
+  // Prüfung hub, and since s200 the Lesen/Hören chooser it was started from.
+  // Route-gated so a stale flag still cannot strip the chrome anywhere else.
+  const exam = examStage && STAGE_ROUTES.has(location.pathname);
   // The zone's one exit shows on every screen the zone owns, which since s195
   // includes the two free trainers. Route-gated like the stage flag, so a
   // handler left behind by an unmount race cannot put a back button on the

@@ -1,8 +1,29 @@
 # Project Status
 
-_Last updated: 2026-08-07 (session 199 ran the s181-queued writing-task QUALITY audit and shipped
-`docs/reports/writing-tasks-audit-2026-08-07.md`. Report only, no content or code changed: the top
-fix opens with a founder decision. Handoff under "Resume here")._
+_Last updated: 2026-08-07 (session 200 made the four Ohne-Zeit module pages one product and fixed
+the two dead ones: Lesen and Hören started runs nothing rendered. Handoff under "Resume here")._
+
+## Session 200 log
+
+Founder: four phone screenshots (`/lesen`, `/hoeren`, `/simulation`, `/writing`) with "make these
+pages consistent and highly polished ... leave no stone unturned", two named bugs, then "go with
+verlauf on all four".
+**The headline is a bug the screenshots only hinted at: `/lesen` and `/hoeren` were dead pages.**
+Tapping a text or "Zufällige Auswahl" wrote a run into `useExamStore`, and the Prüfung hub was the
+only screen in the app that rendered a run, so nothing happened. What the founder reported as "the
+shuffle button doesn't deactivate" was a stuck touch-`:hover` on a button whose tap led nowhere.
+- **Both choosers work now.** `TextModuleHub` renders `<MockExamRunner />` while a run exists, the
+  shell knows the two routes (`ZONE_ROUTES` + the new `STAGE_ROUTES`), and finishing or leaving a
+  drill lands back on the list it was picked from. Verified end to end in a real browser.
+- **The zone's ONE exit was missing on those same two pages** (they were never in `ZONE_ROUTES`),
+  which is the visible difference in the founder's first two screenshots.
+- **The Aufgabe toggle left the module row** for the chooser's own toolbar row (founder's bug 1).
+- **Sticky touch-hover is gone app-wide:** `future.hoverOnlyWhenSupported` (founder's bug 2, the
+  same law as s190's focus rings one input mode further).
+- **One chooser for three modules:** `ModulePicker` owns the toolbar, `ChooserCard` is the one card,
+  `ModuleTabs` the one switcher, and all four pages read module row → switcher → content.
+- **A Verlauf on all four** (founder pick): the hub's Verlauf card was extracted to
+  `features/pruefung/verlauf.tsx` and Lesen/Hören list their own sittings from it.
 
 ## Session 199 log
 
@@ -201,15 +222,22 @@ commit: Validate content, Deploy site to GitHub Pages and Deploy Supabase functi
 migrations" step ran and passed, so **migration 0018 is live on the database**. The Pages deploy did
 NOT self-cancel, which is the s197 `timeout: 1800000` fix holding on its first real run.
 
-**Resume here:**
-1. **P10 is the only open audit item** and it is the founder's: `pnpm review:queue` →
-   decisions → `pnpm apply:reviews` → `pnpm stamp:verified`. Start with the ~166 core-frequency
-   words and the Redemittel bank, the high-traffic surface.
-2. **Not scheduled, deliberately:** §2.1's inverted sub-theme structure (eight workplace themes have
-   no sub-themes, 59 % of words carry no `subThemeId`). Every new Unterthema drags the writing-task
-   invariant behind it (≥2 tasks per Unterthema per length), so it is a session of its own.
-3. CLAUDE.md is **380 lines** by the linter's count, still over its ~350 budget (377 before this
-   session; two invariants in, four history paragraphs compressed out).
+**Resume here (s200):**
+1. **Verify the four module pages live** (`/lesen`, `/hoeren`, `/simulation`, `/writing`): pick a
+   text, finish the drill, check the score lands in the module's new Verlauf tab AND in the hub's
+   Stärkeprofil. The sandbox cannot reach the deployed site.
+2. **`/lesen` and `/hoeren` had NEVER worked since s196.** Nothing caught it because no test drives
+   a chooser to a running drill. A route-level smoke test (start a run from each of the four
+   choosers, assert something renders) is the cheap guard and is not written yet.
+3. **The writing-task audit's P1 still needs a founder decision** (`docs/reports/
+   writing-tasks-audit-2026-08-07.md`): drop the dishonest Branche tags, which means relaxing the
+   all-15-Branchen invariant in `tests/moduleScope.test.ts`.
+4. **P10 (human content review) is still the only open content-audit item** and it is the founder's:
+   `pnpm review:queue` → decisions → `pnpm apply:reviews` → `pnpm stamp:verified`.
+5. **Not scheduled, deliberately:** §2.1's inverted sub-theme structure. Every new Unterthema drags
+   the writing-task invariant behind it, so it is a session of its own.
+6. CLAUDE.md is ~**389** lines against its ~350 budget. It grew again this session (two invariants
+   in); worth a compression pass.
 
 Older handoffs (s197 and earlier) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.

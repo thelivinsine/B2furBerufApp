@@ -150,8 +150,10 @@ after pulling.
   `hasProgress(run)` gates it, the Schreibtrainer never asks (its draft autosaves, so the warning
   would be false) and a started conversation always does. **The word Zurück belongs to that exit
   alone**, so the question stepper is a chevron. A phone carries the module row on every screen
-  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`, and on a chooser that row
-  carries the Aufgabe toggle). ONE Niveau control per screen: the hub's `LevelSelect`, and on a
+  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`). **That row NAMES the module and
+  carries no control** (founder s200): the Aufgabe toggle moved to the chooser's own toolbar row,
+  level with the count it changes and directly above the panel it opens.
+  ONE Niveau control per screen: the hub's `LevelSelect`, and on a
   chooser the rail's own Niveau. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: ONE width for
   its switcher row, scope row, module grid AND Verlauf card, so every block shares two edges), a
   chooser wears Schreiben's
@@ -162,20 +164,23 @@ after pulling.
   (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
   question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
   by decrementing, or a background tab pauses the exam. Every correction the evaluator returns is
-  rendered, and a result surfaces in exactly ONE Verlauf: **a Modelltest sat all four parts, a run
-  that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired), and a
-  trainer that produces a correction rather than a percentage keeps its own Verlauf on its own page
-  (Schreiben since s171, Sprechen since s196 — a recorded row nothing reads back is lost work).
+  rendered, and **a Modelltest sat all four parts, a run that sat one is module practice**
+  (`isFullMockRun`, bank-free; `examsDone` is retired): the two lists never mix, wherever they are
+  shown. **Every module page has a Verlauf tab** (founder s200: "either keep verlauf in every module
+  or remove it from all of the individual modules"), so a learner finds their history where they
+  practise: Schreiben's and Sprechen's are corrections (s171/s196), Lesen's and Hören's are that
+  module's own sittings (`moduleRuns`, `features/pruefung/verlauf.tsx`, which is also the hub's
+  card). The hub keeps the CROSS-module view, never a second copy of a module's list: Modelltest the
+  full runs, Module üben the four-column Stärkeprofil.
 - **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
   instead of throwing, so an ignored result makes a permanently broken sync look identical to a
   working one. Every push reads its error, retries with backoff, and after 3 consecutive failures
   flips `useAuthStore.syncHealth` to `"failing"`, shown in Settings as "Sync pausiert" with a retry.
   Any new cloud write path does the same; never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
-  keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded` so the lifetime figure is unchanged;
-  migration 0015 purges abandoned guest accounts (90 days), transform-cache rows (60 days) and
-  learner TEXT (730 days) by `pg_cron`, NULLing columns rather than deleting rows so limits,
-  aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
+  keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded`; migration 0015 purges abandoned
+  guest accounts (90 days), transform-cache rows (60 days) and learner TEXT (730 days) by `pg_cron`,
+  NULLing columns rather than deleting rows so limits, aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
   copy describing it ship in the SAME change**; never resolve a conflict between them by editing
   the copy alone.
 - **Never reload over a learner's unsaved work.** Every automatic reload is gated on
@@ -194,18 +199,20 @@ after pulling.
   this with a stage instead of measurement (s186): a running Teil is `h-exam-stage` tall, pins its
   RunBar/strip/actions and scrolls ONE inner region, so all ten in-exam screens rest at exactly 0
   page scroll down to 360x640. Height only, never `overflow:hidden`, or the mobile keyboard cannot
-  scroll the field into view. **The Prüfung hub itself** uses `h-pruefung-stage` (s196), which
-  differs from the shared `h-page-stage` other trainers use by keeping a real ceiling from `lg` up
-  too: `h-page-stage` goes `auto` on desktop on the (once-true) assumption that desktop has no
-  shortage of room, and this hub's Verlauf card eventually grew tall enough to break that on a
+  scroll the field into view. **The Prüfung hub** uses `h-pruefung-stage` (s196): unlike the shared
+  `h-page-stage`, it keeps a real ceiling from `lg` up too, because a tall Verlauf card scrolls a
   real laptop height.
 - **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
   buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
   and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
-  keeps it, so WCAG 2.4.7 still holds. `:focus-visible` alone does not settle this: a control that
-  re-renders under the click (a switcher pill that navigates, a filter toggle that swaps its own
-  subtree) can come back focused and keep matching, and the browsers disagree on when. Never answer
-  a stray ring by deleting the indicator outright.
+  keeps it, so WCAG 2.4.7 still holds. `:focus-visible` alone does not settle it: a control that
+  re-renders under the click comes back focused and keeps matching. Never answer a stray ring by
+  deleting the indicator outright.
+- **A hover style answers a POINTER only** (founder s200, the same law one input mode further):
+  `future.hoverOnlyWhenSupported` in `tailwind.config.ts` compiles every `hover:` into
+  `@media (hover: hover)`. A touch browser keeps `:hover` on the last element tapped until the next
+  tap somewhere else, so a tapped button stayed lit and "deactivated when tapped on empty spaces".
+  A control's ON state is therefore always its own class, never a hover fill.
 - **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
   hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
   assumption. A scroll container also SLICES what crosses its edge (`useEdgeFade`), and a rail
@@ -245,8 +252,11 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   `/hoeren`, `/writing`, `/simulation`): they are what the same four modules do without a clock,
   never a fifth block. **All four wear ONE "Aufgabe wählen" rail**
   (`features/shared/ScopeRail.tsx`, s196), sticky beside the content on desktop and behind the
-  module row's Aufgabe toggle on a phone; Lesen and Hören used to open a random draw with no way to
-  pick, and that draw survives as their "Zufällige Auswahl" button.
+  toolbar row's Aufgabe toggle on a phone; Lesen and Hören used to open a random draw with no way to
+  pick, and that draw survives as their "Zufällige Auswahl" button. **The three list choosers are
+  ONE component** (`ModulePicker` + `ChooserCard` + `ModuleTabs`, s200): Üben/Verlauf switcher, one
+  toolbar row (count · Aufgabe · Zufällige Auswahl), one card anatomy (mark + title + context line +
+  chevron, facts on a bottom-aligned foot row), one 0.16s stagger.
   **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
   Anleitung and opens the drill. Only the STAGE stays shared; the exit and its confirm follow the
   one-frame law above, not the clock. The run band's timeline connector is one segment per gap,
