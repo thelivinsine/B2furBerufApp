@@ -5417,3 +5417,65 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   or code was changed:** the deliverable is the report, and P1 opens with a founder decision.
   **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/PROJECT_REFERENCE.md` · this log.
+
+- **Prompt 3 (verbatim):** `go with your recommendation reg branche. I prefer to have Berufsleben and
+  Alltag as the first filter and then themen and only then Branchen filter as the heirarchy of the
+  filter rail all across. When a user selects a thema where there is no branche specific content,
+  just show the options within Branche as locked.`
+  **Response:** took P1 option (a) and then the two rail changes.
+  1. **A Branche tag is EARNED or it is not there.** `scripts/sector-markers.mjs` is the ONE marker
+     lexicon, read by `lint:content` AND `tests/writingScope.test.ts` so the gate and the test cannot
+     drift. **331 unearned tag instances stripped, 220 tasks universal again**, no id changed, no pool
+     renumbered, no task text touched. The two "every Thema serves every Branche" coverage tests are
+     replaced by the property they proxied for, plus a floor keeping Berufsleben real (≥8 of 15
+     sectors per pool) and a test asserting every Branche still draws everywhere, which is why the
+     strip costs no reach. Measured after: Beruf 13.4 of 15 sectors earned on average, Alltag 3.0.
+     A first cut of the lexicon withheld shared words like `charge`, `schicht` and `objekt` to be
+     "strict" and wrongly stripped `wt_safety_s09` ("An Anlage 2 sitzt die Schutzabdeckung locker.
+     Melden Sie das dem Schichtleiter.") from `production`; the shipped lexicon shares a marker
+     wherever the word really is shared, and the mistake is recorded in the file so it is not remade.
+  2. **The hierarchy inverts in all 8 rails:** Lebensbereich → Thema → Unterthema → Branche, then
+     Niveau and Textsorte. Niveau was the one open question (it is not part of the stated hierarchy
+     yet led every rail); "as the first filter" was read literally, so Lebensbereich leads and Niveau
+     follows. The order is applied INSIDE the rails, never by a caller.
+  3. **Branche LOCKS instead of greying**, via a second counting function
+     (`countDedicatedTasks`/`countDedicatedTexts`): the old count could never be zero because the soft
+     fallback serves the universal pool, so the rail printed a healthy number beside an option that
+     changed nothing. A zero now renders a padlock, and when EVERY option is locked one line replaces
+     the control (the normal state on Lesen/Hören, where 4 of 52 texts carry a tag). The engine's
+     fallback is untouched, so nothing became unreachable and deep links still work.
+  **Artifacts:** `scripts/sector-markers.mjs` (new) · `src/data/writingPrompts.ts` ·
+  `scripts/lint-content.mjs` · `tests/writingScope.test.ts` · `src/lib/writingScope.ts` ·
+  `src/lib/moduleScope.ts` · `src/features/shared/ScopeRail.tsx` · `src/features/shared/FilterRail.tsx` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/pruefung/TextModuleHub.tsx` ·
+  `src/features/sprechen/SprechenHub.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx`. Commits `acb21f7`, `7f5c464`.
+
+- **Prompt 4 (verbatim):** `no need of design preview for the above mention rail changes`
+  **Response:** deleted the half-written `preview/filter-hierarchy.html` (two order variants plus
+  three locked-state treatments) and implemented directly. The two sub-decisions the preview existed
+  to settle were made in-session and written into `docs/DECISIONS.md` §s199 so they can be revisited:
+  Niveau moves below the hierarchy, and "locked" is a padlocked row that collapses to one line when
+  every option is locked. Noted in the handoff that the lock lives in ONE place, so restyling it later
+  is a single-file change rather than an eight-rail one.
+
+- **Prompt 5 (verbatim):** `while you're at it, the header and footer of the filter rail seems to look
+  like separate pieces attached to the main body. remove the separator lines and make all the filter
+  rail same shade to look like one piece`
+  **Response:** the cause was compositing, not a colour choice: the tile wears `bg-accent/20` and the
+  header and Üben footer each painted `bg-accent/20` AGAIN on top of it, so both strips resolved to
+  roughly double the wash of the body between them, with a tinted `border-t` underlining each seam.
+  The second fills existed to keep the fixed header/footer opaque while the middle scrolled, and were
+  unnecessary: the rail is a flex column with `overflow-hidden` and the scroll region is `flex-1`, so
+  it already clips its own content. The mobile `layout="panel"` variant had been built without them
+  and was already seamless, which is the proof. Both fills and both rules removed, in `FilterRail` AND
+  in `ScopeRail`, so the two rails stay identical as s189 established. This supersedes the s169 note
+  that such a divider must be tinted rather than grey.
+  **Verified in the real app** (headless Chromium over the built bundle, 1440x1100, light and dark):
+  the new order, the locked line on Freizeit in both Schreiben and the Bibliothek, and no seams in
+  either theme.
+  Gates: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) · 649 tests · build ·
+  check:bundle 128.2 kB · check:contrast.
+  **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/features/shared/ScopeRail.tsx` ·
+  `CLAUDE.md` · `docs/DECISIONS.md` §s199 (three entries) · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/areas/CONTENT.md` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log.
