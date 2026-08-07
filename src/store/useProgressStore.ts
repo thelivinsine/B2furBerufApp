@@ -67,6 +67,12 @@ interface ProgressState {
   redemittelSeen: Record<string, number>; // phraseId -> times practised
   scenariosDone: string[];
   /**
+   * Lese-/Hörtexte the learner has finished (content audit §2.2 "Reuse", s198).
+   * The composer prefers a text that is NOT in here, so a scoped learner stops
+   * seeing the same one alternate. Bounded by the size of the text bank.
+   */
+  textsDone: string[];
+  /**
    * RETIRED (s194 audit P2). Written by the branching exam runner that s186
    * replaced; a finished exam has been a `mockExams` row ever since. Kept, and
    * still synced, because it is real history for learners who used the app
@@ -118,6 +124,7 @@ interface ProgressState {
   toggleSavedWord: (vocabId: string) => void;
   practiceRedemittel: (phraseId: string) => void;
   completeScenario: (scenarioId: string) => void;
+  completeText: (textId: string) => void;
   completeMockExam: (record: MockExamRecord) => void;
   registerSession: () => void;
   completeMission: (missionId: string) => void;
@@ -190,6 +197,7 @@ const defaults = {
   srs: {} as Record<string, SrsCard>,
   redemittelSeen: {} as Record<string, number>,
   scenariosDone: [] as string[],
+  textsDone: [] as string[],
   examsDone: [] as { id: string; score: number; date: string }[],
   mockExams: [] as MockExamRecord[],
   totalSessions: 0,
@@ -267,6 +275,11 @@ export const useProgressStore = create<ProgressState>()(
           scenariosDone: s.scenariosDone.includes(scenarioId)
             ? s.scenariosDone
             : [...s.scenariosDone, scenarioId],
+        })),
+
+      completeText: (textId) =>
+        set((s) => ({
+          textsDone: s.textsDone.includes(textId) ? s.textsDone : [...s.textsDone, textId],
         })),
 
       completeMockExam: (record) =>

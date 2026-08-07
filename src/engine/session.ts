@@ -431,6 +431,14 @@ export interface BuildSessionOpts {
    * `ttsSupported()`. Reading texts render regardless of this flag.
    */
   listening?: boolean;
+  /**
+   * Texts the learner has already finished (`useProgressStore.textsDone`).
+   * The composer prefers one they have not read yet, and falls back to the
+   * whole pool once they have read them all, so the block never disappears
+   * (content audit §2.2 "Reuse": with a theme scope the pool is 1 to 3 texts,
+   * so a random draw with no memory kept alternating the same one).
+   */
+  textsDone?: string[];
 }
 
 /** Interleave several ordered pools round-robin so kinds alternate, not block. */
@@ -588,7 +596,11 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
     : readingLensPool.length
       ? readingLensPool
       : texts;
-  const readingText = sample(readingSource, 1)[0];
+  // Freshness: draw from the unread ones, and only fall back to the full pool
+  // once every text in scope has been read (never an empty pool).
+  const readTexts = new Set(opts.textsDone ?? []);
+  const unread = readingSource.filter((t) => !readTexts.has(t.id));
+  const readingText = sample(unread.length ? unread : readingSource, 1)[0];
   const readingBlocks: SessionBlock[] = readingText
     ? [
         {

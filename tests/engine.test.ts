@@ -143,6 +143,35 @@ describe("session composer", () => {
     expect(reading.length).toBe(1);
   });
 
+  it("prefers a text the learner has not read yet (audit §2.2 Reuse)", () => {
+    // A scoped pool is 1 to 3 texts, so a draw with no memory kept alternating
+    // the same one. Scope to a theme with several texts and mark all but one.
+    const counts = new Map<string, string[]>();
+    for (const t of texts) counts.set(t.themeId, [...(counts.get(t.themeId) ?? []), t.id]);
+    const [scope, ids] = [...counts.entries()].sort((a, b) => b[1].length - a[1].length)[0];
+    expect(ids.length).toBeGreaterThan(1);
+    const unread = ids[0];
+    const textsDone = ids.slice(1);
+
+    for (let i = 0; i < 25; i++) {
+      const plan = buildSession({ srs: {}, mode: "both", minutes: 15, scope: scope as never, textsDone });
+      const block = plan.blocks.find((b) => b.kind === "reading") as
+        | Extract<(typeof plan.blocks)[number], { kind: "reading" }>
+        | undefined;
+      if (block) expect(block.textId).toBe(unread);
+    }
+  });
+
+  it("still serves a reading block once every text in scope has been read", () => {
+    const plan = buildSession({
+      srs: {},
+      mode: "both",
+      minutes: 15,
+      textsDone: texts.map((t) => t.id),
+    });
+    expect(plan.blocks.filter((b) => b.kind === "reading").length).toBe(1);
+  });
+
   it("plays a voicemail as listening only when the caller reports TTS (4.4)", () => {
     // The rule is `listening: kind === "voicemail" && caller has TTS`, so assert
     // it over many draws rather than by scoping to a theme with one text: the
