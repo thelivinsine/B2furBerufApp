@@ -239,29 +239,10 @@ export function SprechenHub() {
       onReset={resetScope}
       resetLabel="Auswahl zurücksetzen"
     >
-      {/* Niveau -> Lebensbereich -> Thema: the Bibliothek hierarchy, minus the
-          two axes a Scenario carries no tags for (Branche, Unterthema). A
-          dropdown that could only ever read 0 is dead chrome, not a filter. */}
-      <ScopeSection label="Niveau">
-        <ScopeSelect
-          ariaLabel="Niveau"
-          triggerLabel={scope.level || "Alle Niveaus"}
-          value={scope.level}
-          onChange={(level) => patch({ level })}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
-                ...MODULE_LEVELS.map((l) => {
-                  const count = countWith({ level: l.value });
-                  return { value: l.value, label: l.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
+      {/* Lebensbereich -> Thema -> Niveau (founder s199), the ONE app-wide
+          hierarchy, minus the two axes a Scenario carries no tags for (Branche,
+          Unterthema): a dropdown that could only ever read 0 is dead chrome, not
+          a filter. It used to lead with Niveau. */}
 
       <ScopeSection label="Lebensbereich">
         <LifeAreaPills
@@ -290,6 +271,27 @@ export function SprechenHub() {
               include: (id) => matchesLifeArea(id, scope.area) || id === scope.theme,
               disableZero: true,
             }),
+          ]}
+        />
+      </ScopeSection>
+
+      <ScopeSection label="Niveau">
+        <ScopeSelect
+          ariaLabel="Niveau"
+          triggerLabel={scope.level || "Alle Niveaus"}
+          value={scope.level}
+          onChange={(level) => patch({ level })}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
+                ...MODULE_LEVELS.map((l) => {
+                  const count = countWith({ level: l.value });
+                  return { value: l.value, label: l.label, count, disabled: count === 0 };
+                }),
+              ],
+            },
           ]}
         />
       </ScopeSection>

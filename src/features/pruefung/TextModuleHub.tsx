@@ -8,6 +8,7 @@ import {
   EMPTY_TEXT_SCOPE,
   MODULE_LEVELS,
   TEXT_KIND_LABEL,
+  countDedicatedTexts,
   countTexts,
   kindsInPart,
   levelOfText,
@@ -19,7 +20,7 @@ import { normalizeLevelScope } from "@/lib/writingScope";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { matchesLifeArea, normalizeLifeArea, themeGroupsByArea } from "@/lib/lifeAreas";
 import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
-import { ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
+import { ScopeLocked, ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
 import { useExamStore } from "@/store/useExamStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Badge } from "@/components/ui/badge";
@@ -99,6 +100,23 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
     [part, scope],
   );
 
+  // Branche options carry the DEDICATED count and lock at zero (s199). Built
+  // once so the dropdown and the "is everything locked" test read one list.
+  const sectorOptions = useMemo(
+    () =>
+      SECTOR_OPTIONS.map((o) => {
+        const count = countDedicatedTexts(part, { ...scope, sector: "" }, o.value);
+        // The active Branche never locks: it is the way back out.
+        return {
+          value: o.value,
+          label: o.label,
+          count,
+          locked: count === 0 && o.value !== scope.sector,
+        };
+      }),
+    [part, scope],
+  );
+
   const kinds = useMemo(() => kindsInPart(part), [part]);
   const theme = themeById(scope.theme);
   const subThemes = theme?.subThemes ?? [];
@@ -163,54 +181,12 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
     >
       {/* Niveau -> Branche -> Lebensbereich -> Thema -> Unterthema -> Textsorte:
           the ONE Bibliothek hierarchy, in the order the Schreiben rail uses. */}
-      <ScopeSection label="Niveau">
-        <ScopeSelect
-          ariaLabel="Niveau"
-          triggerLabel={scope.level || "Alle Niveaus"}
-          value={scope.level}
-          onChange={(level) => patch({ level })}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
-                ...MODULE_LEVELS.map((l) => {
-                  const count = countWith({ level: l.value });
-                  return { value: l.value, label: l.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
 
-      <ScopeSection label="Branche">
-        <ScopeSelect
-          ariaLabel="Branche"
-          triggerLabel={
-            scope.sector
-              ? SECTOR_OPTIONS.find((o) => o.value === scope.sector)?.label ?? scope.sector
-              : "Alle Branchen"
-          }
-          value={scope.sector}
-          onChange={(sector) => patch({ sector })}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
-                // Soft axis: untagged texts are universal, so a Branche narrows
-                // the pool and can never empty it on its own.
-                ...SECTOR_OPTIONS.map((o) => {
-                  const count = countWith({ sector: o.value });
-                  return { value: o.value, label: o.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
 
+
+      {/* Lebensbereich -> Thema -> Unterthema -> Branche -> Niveau -> Textsorte
+          (founder s199), the ONE app-wide hierarchy, same order as every other
+          rail. It used to lead with Niveau and put Branche second. */}
       <ScopeSection label="Lebensbereich">
         <LifeAreaPills
           value={scope.area}
@@ -270,6 +246,59 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
           />
         </ScopeSection>
       )}
+
+      <ScopeSection label="Branche">
+        {/* LOCKED, not greyed (founder s199): the count is the DEDICATED one, so
+            a zero means no text is written for that industry on this Thema.
+            Only 4 of 52 texts carry a Branche tag, so here the whole control is
+            usually the one-line locked state, which is the honest picture. */}
+        {sectorOptions.every((o) => o.locked) ? (
+          <ScopeLocked>
+            Für dieses Thema gibt es keine Texte nach Branche. Du übst hier alle.
+          </ScopeLocked>
+        ) : (
+          <ScopeSelect
+            ariaLabel="Branche"
+            triggerLabel={
+              scope.sector
+                ? SECTOR_OPTIONS.find((o) => o.value === scope.sector)?.label ?? scope.sector
+                : "Alle Branchen"
+            }
+            value={scope.sector}
+            onChange={(sector) => patch({ sector })}
+            groups={[
+              {
+                label: "",
+                options: [
+                  { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
+                  ...sectorOptions,
+                ],
+              },
+            ]}
+          />
+        )}
+      </ScopeSection>
+
+      <ScopeSection label="Niveau">
+        <ScopeSelect
+          ariaLabel="Niveau"
+          triggerLabel={scope.level || "Alle Niveaus"}
+          value={scope.level}
+          onChange={(level) => patch({ level })}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
+                ...MODULE_LEVELS.map((l) => {
+                  const count = countWith({ level: l.value });
+                  return { value: l.value, label: l.label, count, disabled: count === 0 };
+                }),
+              ],
+            },
+          ]}
+        />
+      </ScopeSection>
 
       {kinds.length > 1 && (
         <ScopeSection label="Textsorte">

@@ -2,9 +2,9 @@ import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
 import { matchesLifeArea, themeGroupsByArea, type LifeAreaId } from "@/lib/lifeAreas";
 import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
-import { ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
+import { ScopeLocked, ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
 import { SECTOR_OPTIONS } from "@/lib/facets";
-import { countTasks } from "@/lib/writingScope";
+import { countDedicatedTasks, countTasks } from "@/lib/writingScope";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 
@@ -12,15 +12,22 @@ import type { WritingLength } from "@/lib/writing";
  * "Aufgabe wählen" rail for the guided Kurz/Lang writing tasks (Bibliothek-
  * extension redesign, s148/s149). The FilterRail scope language on a light
  * HIMMELBLAU tile: uppercase eyebrow section labels over Bibliothek-style
- * scope DROPDOWNS in the Bibliothek hierarchy order **Branche → Lebensbereich →
- * Thema → Unterthema** (s149 harmonization round; the Lebensbereich pills are
- * the s184 addition, the one control shared with the Bibliothek rails). Prompts
- * carry optional `sub` +
- * `sectors` tags: the Unterthema dropdown appears only for themes with
- * sub-themes, options grey out at zero yield (live counts per current
- * length), and Branche follows the untagged-=-universal rule (choosing a
- * Branche prefers its tagged tasks and never empties the pool). **Gesundheit
- * folds into Alltag** in the Thema grouping (founder rule).
+ * scope DROPDOWNS in the app-wide hierarchy order **Lebensbereich → Thema →
+ * Unterthema → Branche**, then Niveau and Textsorte (founder s199: "Berufsleben
+ * and Alltag as the first filter and then themen and only then Branchen filter
+ * as the hierarchy of the filter rail all across"). It used to lead with Niveau
+ * and put Branche second, above the Lebensbereich pills (s149/s184). Prompts
+ * carry optional `sub` + `sectors` tags: the Unterthema dropdown appears only
+ * for themes with sub-themes, and options grey out at zero yield (live counts
+ * per current length).
+ *
+ * **Branche is the exception, and LOCKS rather than greys** (founder s199): its
+ * count is the DEDICATED one (tasks tagged with that industry), so a zero means
+ * the app has nothing written for that industry on this Thema. The engine keeps
+ * its untagged-=-universal fallback, so nothing becomes unreachable and a deep
+ * link still works; the rail simply stops advertising a choice that would change
+ * nothing. Where no industry has anything, one line replaces the whole dropdown.
+ * **Gesundheit folds into Alltag** in the Thema grouping (founder rule).
  */
 
 /**
@@ -184,62 +191,37 @@ export function WritingRail({
     }>,
   ) => countTasks({ area: lifeArea, theme: value, sub, sector, level, format, length, ...over });
 
+  // Branche options carry the DEDICATED count and lock at zero (s199). Built
+  // once here because the "is everything locked" test needs the same list the
+  // dropdown renders, and two passes would be two chances to disagree.
+  const sectorOptions = SECTOR_OPTIONS.map((o) => {
+    const count = countDedicatedTasks(
+      { area: lifeArea, theme: value, sub, sector: "", level, format, length },
+      o.value,
+    );
+    // The active Branche never locks: it is the way back out.
+    return { value: o.value, label: o.label, count, locked: count === 0 && o.value !== sector };
+  });
+
   const body = (
     <>
       {/* Niveau -> Branche -> Lebensbereich -> Thema -> Unterthema -> Textsorte
           (s167, Lebensbereich added s184): the Bibliothek hierarchy with the
           level axis in front (it is the coarsest scope) and Textsorte last (it
           narrows within everything else). */}
-      <ScopeSection label="Niveau">
-        <ScopeSelect
-          ariaLabel="Niveau"
-          triggerLabel={
-            level ? WRITING_LEVELS.find((l) => l.value === level)?.label ?? level : "Alle Niveaus"
-          }
-          value={level}
-          onChange={onLevelChange}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
-                ...WRITING_LEVELS.map((l) => {
-                  const count = countWith({ level: l.value });
-                  return { value: l.value, label: l.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
 
-      <ScopeSection label="Branche">
-        <ScopeSelect
-          ariaLabel="Branche"
-          triggerLabel={
-            sector ? SECTOR_OPTIONS.find((o) => o.value === sector)?.label ?? sector : "Alle Branchen"
-          }
-          value={sector}
-          onChange={onSectorChange}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
-                // Branche is the soft axis, so its count is zero only when the
-                // Niveau/Textsorte above already left nothing: it cannot empty
-                // a pool by itself, and it still never disables on its own.
-                ...SECTOR_OPTIONS.map((o) => {
-                  const count = countWith({ sector: o.value });
-                  return { value: o.value, label: o.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
 
-      {/* Lebensbereich, directly below Branche and above Thema (founder s184).
+
+      {/* Lebensbereich -> Thema -> Unterthema -> Branche -> Niveau -> Textsorte
+          (founder s199). The categorization hierarchy leads and narrows in one
+          direction: life area, then topic, then the industry inside that topic.
+          Branche moved from second to fourth, because it is the FINEST cut of
+          the three and the one most often locked; Niveau follows the hierarchy
+          rather than heading it, and Textsorte stays last (it narrows within
+          everything else). This order is the same in every rail in the app. */}
+      {/* Lebensbereich FIRST (founder s199: "Berufsleben and Alltag as the
+          first filter and then themen and only then Branchen"). It used to sit
+          below Branche (s184).
           The same `LifeAreaPills` the Bibliothek rails render, so the control
           the learner meets here is the one they already know from there. The
           counts ignore the Thema/Unterthema below (the pills supersede those),
@@ -309,6 +291,64 @@ export function WritingRail({
           />
         </ScopeSection>
       )}
+
+      <ScopeSection label="Branche">
+        {/* LOCKED, not greyed (founder s199). The count beside a Branche is now
+            the DEDICATED one: tasks actually tagged with that industry, not what
+            the soft fallback would serve. A zero means "we have nothing written
+            for your industry on this Thema", so the option locks instead of
+            quietly handing over the universal pool, which is what made Branche
+            feel like a working filter while it changed nothing. When no industry
+            has anything here, one line says so instead of fifteen padlocks. */}
+        {sectorOptions.every((o) => o.locked) ? (
+          <ScopeLocked>
+            Für dieses Thema gibt es keine Aufgaben nach Branche. Du übst hier alle.
+          </ScopeLocked>
+        ) : (
+          <ScopeSelect
+            ariaLabel="Branche"
+            triggerLabel={
+              sector
+                ? SECTOR_OPTIONS.find((o) => o.value === sector)?.label ?? sector
+                : "Alle Branchen"
+            }
+            value={sector}
+            onChange={onSectorChange}
+            groups={[
+              {
+                label: "",
+                options: [
+                  { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
+                  ...sectorOptions,
+                ],
+              },
+            ]}
+          />
+        )}
+      </ScopeSection>
+
+      <ScopeSection label="Niveau">
+        <ScopeSelect
+          ariaLabel="Niveau"
+          triggerLabel={
+            level ? WRITING_LEVELS.find((l) => l.value === level)?.label ?? level : "Alle Niveaus"
+          }
+          value={level}
+          onChange={onLevelChange}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
+                ...WRITING_LEVELS.map((l) => {
+                  const count = countWith({ level: l.value });
+                  return { value: l.value, label: l.label, count, disabled: count === 0 };
+                }),
+              ],
+            },
+          ]}
+        />
+      </ScopeSection>
 
       <ScopeSection label="Textsorte">
         <ScopeSelect

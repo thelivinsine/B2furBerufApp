@@ -141,7 +141,8 @@ founder-picked s171).
   `border-border` edge) is retired: a grey rule around a blue wash read as dirty. Inner dividers are
   tinted to match (`border-accent-ink/10`), so no hard grey line survives on the tile. Header reset
   icon and the
-  scope hierarchy Niveau → Branche → **Lebensbereich** → Thema → Unterthema → Textsorte, all
+  scope hierarchy **Lebensbereich** → Thema → Unterthema → Branche → Niveau → Textsorte (founder
+  s199; it was Niveau → Branche → Lebensbereich → Thema until then), all
   single-select dropdowns except Lebensbereich, which is the shared `LifeAreaPills` pill pair
   (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
   Beschwerde & Antrag) (grouped listbox
