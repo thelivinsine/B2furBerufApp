@@ -1,9 +1,10 @@
 # Project Status
 
 _Last updated: 2026-08-07 (session 199 ran the s181-queued writing-task QUALITY audit, then acted on
-its top finding: the Branche tags are earned or gone, the filter hierarchy inverts to
+its top finding: Branche tags are earned or gone, the filter hierarchy inverts to
 Lebensbereich → Thema → Branche in every rail, Branche locks where it has nothing, and the rails lost
-their seams. Handoff under "Resume here")._
+their seams. Shipped as PR #824 / `66061c3` and PR #825 / `bf9db0b`, both deploys green. **P2 is the
+next session's work**, spelled out under "Resume here")._
 
 ## Session 199 log
 
@@ -61,31 +62,6 @@ them live and document the session".
 - **Reading texts stop repeating** (`progress.textsDone`, migration 0018).
 Full detail in "Resume here"; the "why" is in `docs/DECISIONS.md` §s198.
 
-## Session 197 log
-
-Founder: "in one of the previous sessions, I asked sonnet to replace the hello greeting with the
-page's name as a header ... But it created this funny looking page ... It is looking ridiculous at
-the moment", then "C, medium".
-**The Prüfung hub has ONE column now and no page title.** s196 had read "aligned to left vertically
-with the toggle buttons" as the APP header's left gutter, which is a different left edge from every
-control it was meant to line up with; the page under it nested three separately centred widths, so
-nothing shared an edge with anything. A preview round
-(`preview/pruefung-header-align.html`, artifact
-<https://claude.ai/code/artifact/77b2bdcf-aa2d-431d-a45a-cd6ea9d16c49>) offered A (title in the
-page), B (title in the header, page moves to its edge) and C (no title, the switcher IS the page
-header, as in the Bibliothek). The founder picked **C at 640px**: the app header's greeting slot
-stays empty on this route, and one `HUB_COL` (`max-w-[40rem]`) carries the switcher row, the scope
-row, the module grid and the Verlauf card. The tile grid and the Stärkeprofil dropped their own
-caps, because the column was measured from the TILES rather than the page.
-**Full detail in "Resume here" below**, including the two resting scrolls this deliberately did not
-fix and the CI/Pages situation around the merge. The "why" is in `docs/DECISIONS.md` §s197.
-
-**A PARALLEL s197 branch ran at the same time** and shipped the mobile Bibliothek's soft bottom edge
-plus the "Nach oben" button that was sitting behind the Üben CTA (PRs #818 and #820). Its handoff is
-the first block under "Resume here"; the two branches touched no common source file, only the shared
-docs, and every conflict was resolved by keeping BOTH sessions' facts. The prompt log labels them
-**parallel A** (Bibliothek) and **parallel B** (Prüfung).
-
 ## Where things stand
 
 The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the four-zone nav
@@ -140,51 +116,70 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 199 (2026-08-07): the audit shipped, and so did its top fix
-(branch `claude/task-list-priorities-3f50ad`).**
-Founder: "what's next in the task list?" → "go ahead" → "go with your recommendation reg branche. I
-prefer to have Berufsleben and Alltag as the first filter and then themen and only then Branchen
-filter as the heirarchy of the filter rail all across. When a user selects a thema where there is no
-branche specific content, just show the options within Branche as locked." → "no need of design
-preview for the above mention rail changes" → "the header and footer of the filter rail seems to look
-like separate pieces attached to the main body. remove the separator lines and make all the filter
-rail same shade to look like one piece."
+**Handoff after session 199 (2026-08-07): the audit shipped, its top fix shipped, and P2 is the
+next session's work (founder: "I'll continue with the p2 and others in next session").**
+Founder prompts: "what's next in the task list?" → "go ahead" → "go with your recommendation reg
+branche. I prefer to have Berufsleben and Alltag as the first filter and then themen and only then
+Branchen filter as the heirarchy of the filter rail all across. When a user selects a thema where
+there is no branche specific content, just show the options within Branche as locked." → "no need of
+design preview for the above mention rail changes" → "the header and footer of the filter rail seems
+to look like separate pieces attached to the main body. remove the separator lines and make all the
+filter rail same shade to look like one piece." → "document the session."
 
-- **Shipped in three commits.** The audit report (PR #824, merged `66061c3`), then the Branche tag
-  cleanup, then the rail changes. The last two are on the branch, unmerged at handoff time.
-- **The audit's P1 is CLOSED** (option a). What replaced the coverage floor is a property gate:
-  `scripts/sector-markers.mjs` holds the ONE marker lexicon and both `lint:content` and
-  `tests/writingScope.test.ts` read it, so the CI gate and the unit test cannot drift apart.
-  **Authoring rule for every future session:** when a genuinely sector-specific word is missing from
-  that lexicon, ADD IT; otherwise drop the tag. Dropping costs no reach (Branche is soft,
-  untagged = universal) and a test asserts every Branche still draws everywhere.
-- **The rail order lives inside the rails**, never in a caller (`FilterRail` reorders its own `scopes`
-  array). Do not re-introduce per-surface ordering; that is what s184 centralised and s199 kept.
-- **The lock is in ONE place** (`ScopeSelect`'s row renderer + `ScopeLocked` in `ScopeRail.tsx`, plus
-  `lockZero` on the Bibliothek's `ScopeMultiSelect`). Restyling it is a single-file change, which
-  matters because it shipped without a preview round at the founder's explicit waiver.
-- **Verified in the real app**, not only in tests: headless Chromium over the built bundle at
-  1440×1100, light and dark, checking the new order, the locked line on Freizeit in both Schreiben
-  and the Bibliothek, and the seamless tile.
+**Shipped:** PR **#824** (the audit report) → **`66061c3`**; PR **#825** (three commits: `acb21f7`
+Branche cleanup, `7f5c464` rails, `40176d1` docs) → **`bf9db0b`**. Validate content and Deploy site
+to GitHub Pages green on `main` for both. **Deploy Supabase functions did not run on `bf9db0b`, and
+that is correct**: it is path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its
+own file, none of which this session touched. Housekeeping done after both merges.
 
-**Still open from the audit, in priority order (P2 first, and all AI-shippable):**
-1. **P2:** add one justification Leitpunkt to the six C1 Stellungnahmen (`wt_conflict_l01/l05/l15/
-   l17/l25`, `wt_bildung_l10`) by REPLACING the weakest descriptive point, never adding a fifth; then
-   sweep the 20 `beschwerde` and 9 `stellungnahme` tasks; then gate it (a `stellungnahme`,
-   `forumsbeitrag` or `widerspruch` at B2+ carries ≥1 justification point).
-2. **P3:** retire `exam` from the schema (nothing reads it; the shipped-ids law protects ids, not
-   fields) or fix its 69 out-of-band tags, and correct the `words` doc comment, which claims the
-   target follows the exam shape when it follows (Niveau, Länge).
-3. **P4:** add `source` to the 71 reaction tasks, AFTER P2, because a quoted position is what makes a
-   justification Leitpunkt answerable.
-4. **P5:** the 19-item tail (5 Textsorte re-tags, 14 Adressat/register fixes where `du` meets
-   "Frau <Nachname>"). About an hour.
-5. **Not from the audit:** `verify:grammar` has still not run over the s198 sentences (no LanguageTool
-   toolchain in this sandbox), and CLAUDE.md is **378 lines** against its ~350 budget (down from 380
-   despite three new rules; the compression pass is worth finishing).
+### START HERE next session: audit P2
 
-Gates on the branch: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) · **649 tests** ·
-build · check:bundle 128.2 kB · check:contrast.
+The one where the app currently punishes a learner for doing exactly what the brief asked.
+**Six C1 Stellungnahmen at a 200-word target carry only descriptive Leitpunkte**, while `level` is
+what tells `evaluate-writing` to "bewerte streng auf C1-Niveau":
+`wt_conflict_l01`, `wt_conflict_l05`, `wt_conflict_l15`, `wt_conflict_l17`, `wt_conflict_l25`,
+`wt_bildung_l10`.
+1. **REPLACE the weakest descriptive point with a justification one; never add a fifth.** Four
+   Leitpunkte in 200 words is already the exam shape, and `wt_conflict_l05` shows the pattern:
+   "Beschreiben Sie das Problem / Zeigen Sie Verständnis / Schlagen Sie eine Regel vor / Sagen Sie,
+   wer beschließen soll" has no point that forces an argument.
+2. Then sweep the wider set: **20 of 35 `beschwerde`** and **9 of 54 `stellungnahme`** tasks carry no
+   justification point either.
+3. Then **gate it**, so it cannot come back: a `stellungnahme`, `forumsbeitrag` or `widerspruch` at
+   B2 or above must carry ≥1 justification Leitpunkt. Anchor the check on the same phrase-level
+   classifier the audit used, and **read §9 of the report first**: an opening-verb classifier is
+   WRONG for German, because a separable prefix carries the meaning ("**Legen** Sie dar, warum …"
+   scored as unargumentative and is exactly the opposite). Getting this wrong cost a re-run in s199.
+4. Load `/content` before editing `writingPrompts.ts`; ids are permanent, so this edits fields only.
+
+**Then, in priority order (all AI-shippable):**
+- **P3:** retire `exam` from the schema (nothing reads it: not the trainer, not the evaluator, not a
+  filter; the shipped-ids law protects ids, not fields), or fix its 69 out-of-band tags. Either way
+  correct the `words` doc comment, which claims the target follows the exam shape when it is fully
+  determined by (Niveau, Länge).
+- **P4:** add `source` to the 71 reaction tasks (54 Stellungnahmen, 17 Forumsbeiträge), AFTER P2,
+  because a quoted position is what makes a justification Leitpunkt answerable. No schema change.
+- **P5:** the 19-item tail. 5 Textsorte re-tags (`wt_meetings_s05`, `wt_meetings_l17`,
+  `wt_logistics_s13`, `wt_bildung_l03`, `wt_wohnen_l05`) and 14 Adressat/register fixes where `du`
+  meets "Frau <Nachname>". About an hour.
+
+**Two things to know before touching the rails again:**
+- **The rail order lives INSIDE the rails** (`FilterRail` reorders its own `scopes` array), never in
+  a caller. That is what s184 centralised and s199 kept; do not re-introduce per-surface ordering.
+- **The lock lives in ONE place** (`ScopeSelect`'s row renderer + `ScopeLocked` in `ScopeRail.tsx`,
+  plus `lockZero` on the Bibliothek's `ScopeMultiSelect`). It shipped WITHOUT a preview round at the
+  founder's explicit waiver, so if they dislike the look it is a single-file change, not an
+  eight-rail one. **Niveau moved below the hierarchy** on a literal reading of "Berufsleben and
+  Alltag as the first filter"; flipping it back is one move per rail.
+
+**Standing debt, unchanged:** P10 human content verification is still the only open s178 audit item
+and is founder-owned (`pnpm review:queue` → decisions → `pnpm apply:reviews` → `pnpm stamp:verified`).
+`verify:grammar` has still never run over the s198 sentences (no LanguageTool toolchain in this
+sandbox). CLAUDE.md is **378 lines** against its ~350 budget, down from 380 despite three new rules;
+the compression pass is worth finishing.
+
+Gates on the merged work: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) ·
+**649 tests** · build · check:bundle 128.2 kB · check:contrast.
 
 **Handoff after session 198 (2026-08-07): the content audit is closed except P10
 (branch `claude/content-audit-plan-mbiout`).**
