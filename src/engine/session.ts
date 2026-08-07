@@ -23,6 +23,7 @@ import {
   buildOddOneOutQuiz,
 } from "@/engine/quiz";
 import { targetBlocks, weakestBand, buildPreview } from "@/engine/sessionPreview";
+import { findVocabBlank } from "@/engine/blank";
 import { sample } from "@/lib/utils";
 
 // The light preview half lives in engine/sessionPreview.ts (imported directly
@@ -159,8 +160,8 @@ const CONTENT_SCOPE_LABEL: Record<ContentScope, string> = {
 };
 
 /** The headword of a display form (strip article/`sich`, take the first token),
- *  used to resolve collocations whose noun is a word in a vocab set. Mirrors the
- *  cloze blanking rule in `engine/quiz.ts`. */
+ *  used to resolve collocations whose noun is a word in a vocab set. Lowercased
+ *  variant of `headOf` in `engine/blank.ts`. */
 const headword = (s: string) =>
   s.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0].toLowerCase();
 
@@ -180,28 +181,24 @@ function vocabCardBlock(v: VocabItem, srs: Record<string, SrsCard>): SessionBloc
       };
 }
 
-const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 /**
- * Typed-cloze data (2b) for a graduated vocab word: find an example sentence
- * containing the headword, blank the exact surface token, and accept both that
- * surface form and the base head when they differ. Null when no example contains
- * a blankable headword. Mirrors the MCQ cloze blanking in `engine/quiz.ts`.
+ * Typed-cloze data (2b) for a graduated vocab word. The gap itself comes from
+ * `engine/blank.ts` (the one rule, shared with the MCQ and listening clozes).
+ *
+ * The accept-list is the one thing that differs per surface: a gap cut on the
+ * headword stays lenient about inflection (type "Besprechung" for
+ * "Besprechungen"), while a gap cut on a Partizip II or a plural accepts only
+ * that form, because the sentence around it takes nothing else.
  */
 function typedClozeData(v: VocabItem): { prompt: string; full: string; answers: string[] } | null {
-  const head = v.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
-  if (head.length < 3) return null;
-  for (const ex of v.examples) {
-    const m = ex.de.match(new RegExp(`\\b${escapeRe(head)}\\w*`, "i"));
-    if (!m) continue;
-    const surface = m[0];
-    const prompt = ex.de.replace(surface, "___");
-    if (!prompt.includes("___")) continue;
-    const answers =
-      surface.toLowerCase() === head.toLowerCase() ? [surface] : [surface, head];
-    return { prompt, full: ex.de, answers };
-  }
-  return null;
+  const blank = findVocabBlank(v);
+  if (!blank) return null;
+  const lenient = blank.form === "head" || blank.form === "part";
+  const answers =
+    lenient && blank.surface.toLowerCase() !== blank.head.toLowerCase()
+      ? [blank.surface, blank.head]
+      : [blank.surface];
+  return { prompt: blank.prompt, full: blank.example.de, answers };
 }
 
 /** A typed-cloze block for a graduated word, or null when no cloze can be built

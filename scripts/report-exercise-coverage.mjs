@@ -96,8 +96,6 @@ function kindsFor(buildScopedSession, type, ids, srsStates, opts = {}) {
 
 /* --- Simple content-health checks, for the "cheap fix" notes. --- */
 const ART_RE = /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines)\s+/i;
-const headOf = (s) => s.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
-const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const normForm = (s) =>
   s
     .toLowerCase()
@@ -107,11 +105,12 @@ const normForm = (s) =>
     .replace(/\s+/g, " ")
     .trim();
 
+// Whether a word can produce a gap from its own examples. The rule itself lives
+// in src/engine/blank.ts (one rule for the MCQ cloze, the listening cloze and the
+// typed cloze), and is injected here so this report can never drift from it.
+let findVocabBlank = null;
 function selfExample(v) {
-  const head = headOf(v.de);
-  if (head.length < 3) return false;
-  const re = new RegExp(`\\b${escapeRe(head)}`, "i");
-  return (v.examples ?? []).some((e) => re.test(e.de));
+  return !!findVocabBlank(v);
 }
 
 /* --- Rendering helpers --- */
@@ -130,8 +129,9 @@ async function main() {
 
   try {
     const load = (p) => server.ssrLoadModule(p);
-    const [sessionMod, vocabMod, colMod, redeMod, gramMod, themeMod] = await Promise.all([
+    const [sessionMod, blankMod, vocabMod, colMod, redeMod, gramMod, themeMod] = await Promise.all([
       load("/src/engine/session.ts"),
+      load("/src/engine/blank.ts"),
       load("/src/data/vocabulary.ts"),
       load("/src/data/collocations.ts"),
       load("/src/data/redemittel.ts"),
@@ -139,6 +139,7 @@ async function main() {
       load("/src/data/themes.ts"),
     ]);
     const { buildScopedSession } = sessionMod;
+    findVocabBlank = blankMod.findVocabBlank;
     const vocabulary = vocabMod.vocabulary;
     const collocations = colMod.collocations;
     const redemittel = redeMod.redemittel;
