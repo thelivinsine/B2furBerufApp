@@ -2329,7 +2329,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Beschreiben Sie den Engpass mit Zahlen.",
           "Nennen Sie mögliche Ursachen.",
           "Schlagen Sie Maßnahmen zur Versorgung vor.",
-          "Sagen Sie, was Sie den Filialen kommunizieren.",
+          "Empfehlen Sie eine der Maßnahmen und begründen Sie Ihre Wahl.",
         ],
         addressee: "Bereichsleitung Warensteuerung",
         register: "sie",
@@ -3195,7 +3195,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Bedanken Sie sich sachlich für die Rückmeldung.",
           "Gehen Sie auf die Kritikpunkte einzeln ein.",
-          "Stellen Sie einen falschen Punkt richtig, ohne anzugreifen.",
+          "Widerlegen Sie einen falschen Punkt sachlich und begründen Sie Ihre Darstellung.",
           "Bieten Sie eine Klärung im direkten Kontakt an.",
         ],
         addressee: "die Öffentlichkeit im Bewertungsportal",
@@ -4196,7 +4196,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sectors: ["pharma"],
         points: [
           "Beschreiben Sie, was nach der Meldung nicht passiert.",
-          "Nennen Sie eine Abweichung als Beispiel.",
+          "Nennen Sie eine Abweichung als Beispiel und benennen Sie das Risiko für die Freigabe.",
           "Schlagen Sie eine Nachverfolgung mit Verantwortlichen vor.",
           "Bitten Sie um eine Entscheidung vor dem Audit.",
         ],
@@ -4213,7 +4213,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sectors: ["cleaning"],
         points: [
           "Beschreiben Sie, welche Bereiche betroffen sind.",
-          "Nennen Sie, wie oft das vorkam.",
+          "Nennen Sie, wie oft das vorkam und was es für Ihre Arbeitszeit bedeutet.",
           "Schlagen Sie eine klare Zuteilung im Reinigungsplan vor.",
           "Bitten Sie um ein Gespräch.",
         ],
@@ -4250,7 +4250,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Schildern Sie die Situation sachlich.",
           "Zeigen Sie Verständnis für beide Seiten.",
           "Schlagen Sie einen Kompromiss vor.",
-          "Sagen Sie, wann die Regel überprüft werden soll.",
+          "Sagen Sie, welche Lösung Sie für die bessere halten, und begründen Sie das.",
         ],
         addressee: "die Teamrunde",
         register: "sie",
@@ -4315,7 +4315,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Beschreiben Sie das Problem.",
           "Zeigen Sie Verständnis für beide Seiten.",
           "Schlagen Sie eine klare Regel für die Zukunft vor.",
-          "Sagen Sie, wer die Regel beschließen soll.",
+          "Begründen Sie, warum Ihre Regel gerechter ist als die bisherige Praxis.",
         ],
         addressee: "die Teamleitung und das Team",
         register: "sie",
@@ -4481,7 +4481,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie den Konflikt ohne Partei zu ergreifen.",
           "Nennen Sie, an welchen Abenden die Wartezeiten am längsten sind.",
-          "Erklären Sie, was Gäste zurückmelden.",
+          "Sagen Sie, wo aus Ihrer Sicht die Hauptursache liegt, und begründen Sie das.",
           "Schlagen Sie ein gemeinsames Vorgehen vor und bitten Sie um ein moderiertes Gespräch.",
         ],
         addressee: "Restaurantleitung, Frau Costa",
@@ -4498,7 +4498,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Konflikt neutral dar.",
           "Beschreiben Sie, welche Arbeiten sich gegenseitig behindern.",
-          "Räumen Sie ein, wo Ihr eigenes Gewerk beteiligt ist.",
+          "Wägen Sie ab, welche Reihenfolge technisch sinnvoller ist, und begründen Sie das.",
           "Schlagen Sie eine Reihenfolge mit Terminen vor und bitten Sie um Entscheidung.",
         ],
         addressee: "Bauleitung",
@@ -4515,7 +4515,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie den Konflikt sachlich.",
           "Nennen Sie typische Wartezeiten und ihre Folge für die Lenkzeiten.",
-          "Erklären Sie die Sicht des Lagers.",
+          "Erklären Sie die Sicht des Lagers und sagen Sie, welche Lösung Sie empfehlen.",
           "Schlagen Sie feste Ladefenster vor und bitten Sie um eine Entscheidung.",
         ],
         addressee: "Betriebsleitung",
@@ -4566,7 +4566,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Streitpunkt neutral dar.",
           "Beschreiben Sie die Abweichungen und ihre Häufigkeit.",
-          "Erklären Sie beide Erklärungsansätze fair.",
+          "Erklären Sie beide Erklärungsansätze fair und begründen Sie, welcher Ihnen plausibler erscheint.",
           "Schlagen Sie eine gemeinsame Messreihe vor und bitten Sie um Freigabe.",
         ],
         addressee: "Werksleitung",
@@ -4583,7 +4583,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Konflikt neutral dar.",
           "Beschreiben Sie die derzeitige Verteilung.",
-          "Räumen Sie ein, wo Erfahrung eine Rolle spielt.",
+          "Nehmen Sie Stellung dazu, welche Rolle Erfahrung bei der Verteilung spielen darf.",
           "Schlagen Sie eine transparente Regelung vor und bitten Sie um ein Teamgespräch.",
         ],
         addressee: "Salonleitung",
@@ -4599,7 +4599,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sectors: ["sports"],
         points: [
           "Schildern Sie sachlich, was vorgefallen ist.",
-          "Beschreiben Sie, wie Mitglieder reagiert haben.",
+          "Bewerten Sie, wie der Auftritt auf die Mitglieder gewirkt hat.",
           "Räumen Sie ein, dass die Ursache eine Planungsfrage ist.",
           "Schlagen Sie eine Klärung außerhalb der Kurszeiten vor und bitten Sie um Moderation.",
         ],
@@ -4617,7 +4617,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Streitpunkt neutral dar.",
           "Beschreiben Sie die Abweichung mit Chargennummer.",
-          "Erklären Sie beide Erklärungsansätze sachlich.",
+          "Erklären Sie beide Erklärungsansätze sachlich und begründen Sie, welcher zuerst geprüft werden sollte.",
           "Schlagen Sie eine gemeinsame Untersuchung vor und bitten Sie um Entscheidung.",
         ],
         addressee: "Betriebsleitung",
@@ -4634,7 +4634,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Streitpunkt neutral dar.",
           "Beschreiben Sie die Position der Qualitätssicherung.",
-          "Beschreiben Sie die Position der Produktion fair.",
+          "Wägen Sie beide Positionen ab und sagen Sie, welcher Position Sie folgen.",
           "Schlagen Sie ein Vorgehen vor und bitten Sie um eine dokumentierte Entscheidung.",
         ],
         addressee: "Betriebsleitung",
@@ -4651,7 +4651,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Schildern Sie die Beschwerde des Kunden sachlich.",
           "Beschreiben Sie die Sicht des Reinigungsteams.",
-          "Erklären Sie, wo die Erwartungen auseinandergehen.",
+          "Bewerten Sie, welche Erwartung berechtigt ist, und begründen Sie das.",
           "Schlagen Sie eine gemeinsame Begehung vor und bitten Sie um einen Termin.",
         ],
         addressee: "Objektleitung",
@@ -4668,7 +4668,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Ablauf neutral dar.",
           "Beschreiben Sie, wann die Meldung hätte erfolgen müssen.",
-          "Räumen Sie ein, wo die Übergabe unklar war.",
+          "Sagen Sie, warum eine Schuldzuweisung hier nicht weiterhilft.",
           "Schlagen Sie eine verbindliche Meldekette vor und bitten Sie um Entscheidung.",
         ],
         addressee: "Einsatzleitung",
@@ -6955,7 +6955,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie sachlich, was passiert ist.",
           "Benennen Sie die Ursachen.",
-          "Nennen Sie die Maßnahmen, die jetzt nötig sind.",
+          "Begründen Sie, welche Maßnahme jetzt Vorrang hat.",
           "Erklären Sie, wie sich der Vorfall künftig vermeiden lässt.",
         ],
         addressee: "Geschäftsleitung und Sicherheitsausschuss",
@@ -8422,7 +8422,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie Betreff, Aktenzeichen und das Datum des Bescheids.",
           "Stellen Sie dar, wann und wie Sie die Unterlage eingereicht haben.",
-          "Bitten Sie um Überprüfung der Entscheidung.",
+          "Begründen Sie, warum die Ablehnung damit unbegründet ist, und bitten Sie um Überprüfung.",
           "Kündigen Sie an, die Unterlage erneut beizufügen, und bitten Sie um eine Eingangsbestätigung.",
         ],
         addressee: "Sachbearbeitung des Amtes",
@@ -9074,7 +9074,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie im Betreff Ihre Adresse und den Mangel.",
           "Beschreiben Sie den Mangel und seit wann er besteht.",
-          "Nehmen Sie auf Ihre erste Meldung mit Datum Bezug.",
+          "Nehmen Sie auf Ihre erste Meldung Bezug und erklären Sie, was die kalte Wohnung für Sie bedeutet.",
           "Fordern Sie die Beseitigung bis zu einem von Ihnen gesetzten Datum.",
         ],
         addressee: "Vermieterin, Frau Schuster",
@@ -9110,7 +9110,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sub: "wohnen.probleme",
         points: [
           "Beschreiben Sie den Mangel mit Ort und Ausmaß.",
-          "Nennen Sie, wann Sie ihn zuerst gemeldet haben.",
+          "Nennen Sie, wann Sie ihn gemeldet haben, und erklären Sie die Folgen für Ihre Gesundheit.",
           "Bitten Sie um Reparatur mit Frist.",
           "Weisen Sie höflich auf Ihre Rechte als Mieter hin.",
         ],
@@ -9264,7 +9264,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sub: "wohnen.probleme",
         points: [
           "Nennen Sie Ihre Wohnung und die betroffene Nachbarwohnung.",
-          "Beschreiben Sie den Lärm mit Uhrzeiten und Häufigkeit.",
+          "Beschreiben Sie den Lärm mit Uhrzeiten und erklären Sie, was der Schlafmangel für Ihren Arbeitsalltag bedeutet.",
           "Schildern Sie, was Sie bereits selbst unternommen haben.",
           "Bitten Sie um ein Einschreiten und um eine Rückmeldung.",
         ],
@@ -10110,7 +10110,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sub: "bildung.sprachkurs",
         sectors: ["sports"],
         points: [
-          "Äußern Sie Ihre Meinung.",
+          "Äußern Sie Ihre Meinung und begründen Sie sie.",
           "Beschreiben Sie, wie Sie Arbeit und Lernen verbinden.",
           "Nennen Sie die größte Schwierigkeit.",
           "Geben Sie zwei konkrete Tipps. Denken Sie an Einleitung und Schluss.",
@@ -10404,7 +10404,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie im Betreff Bestellnummer und Bestelldatum.",
           "Erklären Sie ausdrücklich, dass Sie den Kauf widerrufen.",
-          "Nehmen Sie auf Ihre bisherigen erfolglosen Kontaktversuche Bezug.",
+          "Begründen Sie Ihren Widerruf mit der Frist und Ihren bisherigen erfolglosen Kontaktversuchen.",
           "Fordern Sie die Rückzahlung bis zu einem konkreten Datum.",
           "Bitten Sie um eine Bestätigung des Widerrufs.",
         ],
@@ -10459,7 +10459,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie die Situation sachlich.",
           "Nennen Sie Datum und Uhrzeit.",
-          "Erklären Sie, was Sie gestört hat.",
+          "Begründen Sie, warum Sie das Verhalten an der Kasse nicht akzeptieren.",
           "Formulieren Sie, was Sie erwarten.",
         ],
         addressee: "Supermarkt, Marktleitung",
@@ -10800,7 +10800,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie Datum und Anlass Ihres Besuchs.",
           "Beschreiben Sie sachlich, was nicht wie vereinbart war.",
-          "Erklären Sie, wie Sie vor Ort reagiert haben.",
+          "Begründen Sie, warum die Feier dadurch beeinträchtigt wurde.",
           "Formulieren Sie, welche Lösung Sie erwarten.",
         ],
         addressee: "Restaurantleitung",
@@ -10872,7 +10872,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Beschreiben Sie den Abend sachlich.",
           "Nennen Sie Datum und Uhrzeit.",
           "Erklären Sie, was mit dem Gericht nicht stimmte.",
-          "Formulieren Sie Ihre Erwartung.",
+          "Begründen Sie, welche Wiedergutmachung Sie für angemessen halten.",
         ],
         addressee: "Restaurantleitung",
         register: "sie",
@@ -11606,7 +11606,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie im Betreff Veranstaltung, Datum und Buchungsnummer.",
           "Stellen Sie den Ablauf der Absage sachlich dar.",
-          "Nehmen Sie auf Ihre bisherigen Anfragen Bezug.",
+          "Begründen Sie Ihren Erstattungsanspruch und nehmen Sie auf Ihre bisherigen Anfragen Bezug.",
           "Fordern Sie die Erstattung bis zu einem konkreten Datum.",
           "Bitten Sie um eine schriftliche Bestätigung.",
         ],
@@ -12001,7 +12001,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie Kundennummer und Tarif.",
           "Beschreiben Sie die tatsächliche Leistung im Vergleich zur vereinbarten.",
-          "Nehmen Sie auf frühere Störungsmeldungen Bezug.",
+          "Nehmen Sie auf frühere Störungsmeldungen Bezug und erklären Sie die Folgen für Ihren Alltag.",
           "Fordern Sie eine Behebung bis zu einem konkreten Datum.",
         ],
         addressee: "Kundenservice des Anbieters",
@@ -12040,7 +12040,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Erklären Sie, seit wann und wie oft die Störung auftritt.",
           "Beschreiben Sie, was Sie schon versucht haben.",
           "Nennen Sie Ihre Kundennummer.",
-          "Fordern Sie eine Lösung oder eine Minderung mit klarer Frist.",
+          "Begründen Sie Ihre Forderung nach einer Minderung und setzen Sie eine klare Frist.",
         ],
         addressee: "Anbieter, Kundenservice",
         register: "sie",
@@ -12073,7 +12073,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie die beanstandete Position.",
           "Nennen Sie Rechnungsnummer und Betrag.",
-          "Verlangen Sie eine Korrektur.",
+          "Begründen Sie, warum Sie diese Position nicht schulden, und verlangen Sie eine Korrektur.",
           "Bitten Sie um eine Erklärung, wie es dazu kam.",
         ],
         addressee: "Anbieter, Rechnungsabteilung",

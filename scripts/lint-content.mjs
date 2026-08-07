@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { HASH_SIDECAR, buildContentIndex, contentHash } from "./content-hash.mjs";
 import { isSectorEarned } from "./sector-markers.mjs";
+import { meetsJustificationRule } from "./justification-markers.mjs";
 import {
   worthLearningFindings,
   cefrPlausibilityFindings,
@@ -780,6 +781,20 @@ function checkWritingTask(ds, w, t, themeId, code, seenIds) {
   // Kurz/Lang word target only means something with content points to fill it.
   if (t.register !== undefined && t.addressee === undefined)
     error(ds, w, "register set without an addressee");
+  // An argumentative Textsorte at B2+ must ASK for the argumentation it is
+  // graded on (s200, audit §4). `level` tells `evaluate-writing` to mark
+  // strictly at B2/C1 and Aufgabenerfüllung is scored against the Leitpunkte,
+  // so a Stellungnahme whose points only describe punishes a learner for doing
+  // exactly what the brief said. Replace the weakest descriptive point rather
+  // than adding a fifth: four Leitpunkte in 200 words is already the exam shape.
+  if (!meetsJustificationRule(t))
+    error(
+      ds,
+      w,
+      `${t.format} at ${t.level} has no Leitpunkt demanding a reason, a consequence or a ` +
+        `stance (see scripts/justification-markers.mjs). The AI grades it strictly at that ` +
+        `Niveau, so the brief has to ask for the argument.`,
+    );
 }
 
 function lintWritingPrompts(writingPrompts, subThemeIndex) {
