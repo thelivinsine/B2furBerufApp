@@ -50,9 +50,18 @@ evidence; human-persona (moustache-man) imagery teaches a false rule on `das Mä
 
 ## Backlog — founder ideas (not yet scoped, added 2026-06-07)
 
-### QUEUED (founder, s181): audit the writing-task bank for QUALITY and filter fit
+### DONE (s199): audit the writing-task bank for QUALITY and filter fit
 
-**Not started, deliberately.** The founder asked for it as a next task, not this session: "I want you
+**Delivered as `docs/reports/writing-tasks-audit-2026-08-07.md`** (session 199, 2026-08-07). Verdict:
+the tasks are well written, the tags on them are not. Repetition, Leitpunkt answerability and
+register are healthy; the defects are in the metadata layer (Branche tags are a coverage artifact on
+33% of tagged tasks, the Niveau tag scales the word target and the AI grader's strictness but not the
+task demand, `exam` is dead metadata, `source` is unused everywhere). The prioritised P1–P5 fix list
+lives at the end of that report, and **P1 opens with a founder decision** (relax the all-15-Branchen
+floor for Alltag, or author ~199 sector-specific variants). The scoping notes below are kept because
+they are what the audit was built against.
+
+_Original queue entry (founder, s181):_ "I want you
 to do a thorough analysis of the quality of these tasks and how they go with the filter - do the
 required research from reliable sources - this is one of the next todos for later."
 

@@ -5364,3 +5364,56 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   green `main` workflows, migration 0018 applied) and the same facts in the status handoff, whose
   "resume" list no longer tells the next session to expect the migration on a future merge.
   **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md`.
+
+## Session 199 — 2026-08-07 — branch `claude/task-list-priorities-3f50ad`
+
+- **Prompt 1 (verbatim):** `what's next in the task list?`
+  **Response:** read `docs/PROJECT_STATUS.md` and the `PROJECT_REFERENCE.md` backlog and reported the
+  state: nothing mid-flight (s198 shipped clean as `03ea3dc`, all three `main` workflows green,
+  migration 0018 live), P10 the only open content-audit item and founder-owned, then the four queued
+  items in priority order: the s181 writing-task **quality** audit, the s186 exam content gaps (A2
+  has zero exam content, C1 Hören has one audio text), the §2.1 sub-theme restructure (deliberately
+  unscheduled, it drags the writing-task invariant behind it), and the housekeeping tail (CLAUDE.md
+  380 lines against a ~350 budget; `verify:grammar` skipped in s198). Recommended the writing-task
+  quality audit as this session's work and asked whether to start.
+  **Artifacts:** none (read-only).
+
+- **Prompt 2 (verbatim):** `go ahead`
+  **Response:** ran the s181-queued audit and shipped
+  **`docs/reports/writing-tasks-audit-2026-08-07.md`**. Headline: **the tasks are well written, the
+  tags on them are not.** What is healthy was measured first so the founder does not over-react: only
+  **6** near-duplicate instruction pairs across all 256,686 comparisons (all same-theme, zero
+  cross-theme), 2,355 distinct Leitpunkte of 2,691, **zero** Leitpunkte demanding a non-written act,
+  5 within-task overlaps that are all deliberate parallel pairs, and a demand ladder that does rise
+  (86% → 69% → 27% of tasks carry no justification Leitpunkt at B1 → B2 → C1). Five findings:
+  1. **Branche is a coverage artifact.** All **40** theme×length pools carry exactly **15** distinct
+     sectors, the exact size of the `WorkSector` enum, in pools as small as 11 tasks; the tags run in
+     enum order down the pool index. **199 of 600** tagged tasks (33%) contain no marker of the
+     sector they claim, and in Alltag ~65 briefs name no work-shaped constraint at all, against the
+     founder's own s181 rule (`wt_freizeit_s08` [pharma] is "Sie haben auf einer Feier eine Bekannte
+     wiedergetroffen"). Cause: `tests/moduleScope.test.ts` demands all 15 Branchen on every theme at
+     both lengths, which 11-task Alltag pools cannot satisfy by authoring. Cheap to fix because
+     Branche is SOFT: untagged = universal, so deleting a dishonest tag costs no availability.
+  2. **The Niveau tag scales the word count and the grader's strictness, not the language.** `level`
+     is what builds "Bewerte streng auf X-Niveau" in `evaluate-writing`, yet the brief's specialized
+     vocabulary share runs 2.7% → 2.3% → **1.6%** (inverted), instruction length is flat at 14–16
+     words in every band, and 81/307 B1 tasks outscore the C1 median. Marked SOFT on its own and
+     deliberately not scheduled: the rubric must stay readable.
+  3. **236 tasks are graded for argumentation their brief never asks for** (207 B2, 29 C1). Sharpest:
+     **6 C1 Stellungnahmen at 200 words** whose Leitpunkte are purely descriptive.
+  4. **`exam` is dead metadata that contradicts `words`.** `words` is fully determined by (level,
+     length) though its doc says it follows the exam shape; 61 `goethe_b1`-shaped tasks carry a
+     150-word target, 69 tasks sit outside their shape's band, and nothing reads the field.
+  5. **`source` is unused on all 717 tasks**, so 54 Stellungnahmen and 17 Forumsbeiträge paraphrase
+     the position they react to instead of quoting it.
+  Plus a 19-item tail (5 Textsorte contradictions, 14 Adressat/register mismatches where `du` meets
+  "Frau <Nachname>"). **Two heuristics were corrected mid-audit rather than published:** an
+  opening-verb demand classifier scored 9 of 11 `widerspruch` tasks as unargumentative until hand-
+  reading showed "**Legen** Sie dar, warum …" is exactly the argumentative move (corrected: 1 of 11),
+  and a thin Branche lexicon returned 40% bare until it was widened with `QS`, `Baugruppe`,
+  `Validierung` and similar (corrected: 33%, and generous by construction). Both corrections are
+  recorded in the report's §9 Method so the next session does not re-make them. Prioritised fix list
+  P1–P5 at the end, with the two `lint:content` checks worth keeping named in P1 and P2. **No content
+  or code was changed:** the deliverable is the report, and P1 opens with a founder decision.
+  **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/PROJECT_REFERENCE.md` · this log.

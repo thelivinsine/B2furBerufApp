@@ -1,8 +1,28 @@
 # Project Status
 
-_Last updated: 2026-08-07 (session 198 closed the content audit except P10: the one blanking rule,
-the three pedagogical-shape gates, 25 authored verbs/adjectives, and reading-text freshness. Shipped
-as PR #822 / `03ea3dc`, all three deploys green. Handoff under "Resume here")._
+_Last updated: 2026-08-07 (session 199 ran the s181-queued writing-task QUALITY audit and shipped
+`docs/reports/writing-tasks-audit-2026-08-07.md`. Report only, no content or code changed: the top
+fix opens with a founder decision. Handoff under "Resume here")._
+
+## Session 199 log
+
+Founder: "what's next in the task list?", then "go ahead".
+**The writing-task quality audit is done, and its headline is: the tasks are well written, the tags
+on them are not.** s181 closed the COVERAGE backlog (717 tasks, every Unterthema, Textsorte and
+Branche represented); this audit asked whether the tags are EARNED.
+- **The good news, measured first:** only 6 near-duplicate instruction pairs across 256,686
+  comparisons (all same-theme, zero cross-theme), 2,355 distinct Leitpunkte of 2,691, zero Leitpunkte
+  demanding a non-written act, and a demand ladder that genuinely rises with the Niveau tag.
+- **Branche is a coverage artifact.** All 40 theme×length pools carry exactly 15 distinct sectors,
+  the size of the `WorkSector` enum, assigned in enum order down the pool index, in pools as small as
+  11 tasks. 199 of 600 tagged tasks (33%) carry no marker of the sector they claim.
+  `tests/moduleScope.test.ts` forced this and 11-task Alltag pools cannot satisfy it by authoring.
+- **The Niveau tag scales the word target and the AI grader's strictness, but not the task**: 236
+  tasks (207 B2, 29 C1) ask for no justification, sharpest in 6 C1 Stellungnahmen at 200 words.
+- **`exam` is dead metadata** (read by nothing) that contradicts `words`, and **`source` is unused on
+  all 717 tasks**.
+Full detail, the 19-item tail and the P1–P5 fix list are in the report; "Resume here" has the
+decision P1 needs from the founder.
 
 ## Session 198 log
 
@@ -78,7 +98,10 @@ Standing governance debt: **3,444 of 3,457 provenance rows are AI-drafted `draft
 human-verified (13 vocabulary rows signed off 2026-07-24, after the 2026-07-22 reset to restart the
 review pass; see `strategy/DATA_GOVERNANCE.md`). The full picture of what the banks do and do not
 cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178), whose backlog is **closed
-except P10** since s198.
+except P10** since s198. The writing bank has its own quality audit since s199,
+`docs/reports/writing-tasks-audit-2026-08-07.md`: the tasks read well, but a third of the Branche
+tags are unearned and the Niveau tag scales the word target without scaling the task. Its P1–P5 fix
+list is open and starts with a founder decision.
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`, and the ones that were ticked off
@@ -100,6 +123,37 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 199 (2026-08-07): the writing-task quality audit is done and needs ONE
+founder decision (branch `claude/task-list-priorities-3f50ad`).**
+Founder: "what's next in the task list?", then "go ahead".
+
+- **The deliverable is `docs/reports/writing-tasks-audit-2026-08-07.md`.** No content and no code
+  changed, deliberately: the top finding's fix starts with a decision that is the founder's.
+- **The decision P1 needs.** The Branche tags are dishonest on a third of the bank because
+  `tests/moduleScope.test.ts` requires all 15 Branchen on every theme at both lengths, and an
+  11-task Alltag pool cannot represent 15 industries. Two options: **(a)** relax the floor for Alltag
+  and delete the tags no brief earns (recommended: Branche is SOFT, untagged = universal, so nothing
+  becomes unavailable and the surviving tags start meaning something), or **(b)** keep the floor and
+  author ~199 sector-specific variants, which is a real authoring wave. Everything else in the fix
+  list is AI-shippable without asking.
+- **P2 is the one to ship first once P1 is answered** and it is small: add one justification
+  Leitpunkt to `wt_conflict_l01/l05/l15/l17/l25` and `wt_bildung_l10` (replace the weakest
+  descriptive point, never add a fifth), then sweep the 20 `beschwerde` and 9 `stellungnahme` tasks,
+  then gate it (`stellungnahme`/`forumsbeitrag`/`widerspruch` at B2+ must carry ≥1 justification
+  point). This removes the case where the grader punishes a learner for obeying the brief.
+- **P3/P4/P5:** retire `exam` from the schema (nothing reads it; the shipped-ids law protects ids,
+  not fields) or fix its 69 out-of-band tags and correct the `words` doc comment · add `source` to
+  the 71 reaction tasks, AFTER P2, because a quoted position is what makes a justification Leitpunkt
+  answerable · the 19-item tail (5 Textsorte re-tags, 14 Adressat/register fixes), about an hour.
+- **Two heuristic corrections are recorded in the report's §9** so they are not re-made: an
+  opening-verb demand classifier is wrong for German (it scored 9 of 11 `widerspruch` tasks as
+  unargumentative because "**Legen** Sie dar, warum …" puts the verb's meaning in the separable
+  prefix), and a thin Branche lexicon overstates the problem by 7 points.
+- **Content edits from this report must load `/content` first** and will touch `writingPrompts.ts`
+  plus the provenance rows; ids are permanent, so a re-tag edits fields and never renumbers a pool.
+Gates: none run, and none needed. No source, content or migration file was touched, so
+`lint:content` and the test suite are unchanged from `03ea3dc`.
 
 **Handoff after session 198 (2026-08-07): the content audit is closed except P10
 (branch `claude/content-audit-plan-mbiout`).**
@@ -157,36 +211,5 @@ NOT self-cancel, which is the s197 `timeout: 1800000` fix holding on its first r
 3. CLAUDE.md is **380 lines** by the linter's count, still over its ~350 budget (377 before this
    session; two invariants in, four history paragraphs compressed out).
 
-
-**Handoff after session 197 (2026-08-06): the mobile Bibliothek list dissolves behind the Üben
-button (branch `claude/mobile-floating-text-readability-bs49dz`).**
-Founder, with a screenshot of the dark desktop list fading at its bottom edge: "can you put similar
-effect even in the mobile view so that the floating text below the ueben button is more readable and
-visible? generate a couple of previews", then "insert short fade but soft blur but not above the
-blue button, it should be below the blue button behind the text."
-- **The diagnosis.** That screenshot is a DESKTOP-only effect. Since s189 the browse list scrolls
-  inside the content column, so `browseColumnClass` masks the column's bottom edge
-  (`mask-fade-bottom`) and the cards dissolve into the page ground. A phone scrolls the PAGE, so
-  there is no edge to mask: the cards ran at full strength behind the floating Üben button and the
-  "Etwas verbessern? Feedback geben" line, which since s189 deliberately carries no plate of its own
-  (a plate read as a frosted chip over white cards). The missing edge IS the unreadable text.
-- **Round 1, previews only** (`preview/mobile-cluster-fade.html`, artifact
-  <https://claude.ai/code/artifact/8bbc7f2e-d581-4767-84ee-a024380d0604>): four phone frames at the
-  REAL cluster offsets and tokens, in both themes: today's baseline, a short fade, a long fade, and
-  a fade plus blur, each with its cost stated.
-- **Founder took the short fade AND the blur, with the blur kept below the button.** Two utilities
-  in `src/index.css` (`.cluster-scrim`, a 7rem page-ground ramp; `.cluster-blur`, a 2rem frosted
-  band masked at its own top), both rendered by `FloatingActionCluster`, `pointer-events-none`,
-  border-free, `lg:hidden`, with the note raised to `z-[25]` above them. The band is exactly the gap
-  between the nav and the button's lower edge, so it frosts the note strip and STOPS at the button.
-  Neither reject comes back: no bar (s168), no band across the page (s169).
-- **One tuning pass, from the real app** (Playwright over the global Chromium at 390x800, seeded
-  store, both themes): the first ramp reached ~0.99 through the note strip and made the frosted band
-  invisible, so it holds ~0.85 there instead, which is still AA because what shows through is a card
-  within a few per cent of the ground. Only the four Bibliothek tabs mount this cluster, so no
-  writing editor is dimmed. The preview gained a fifth "Shipped" phone so mockup and live agree.
-Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 129.8 kB ·
-check:contrast · lint:content.
-**Resume here:** nothing is open from this change. **CI never fired for PR #818** (no check run was
-created minutes after opening, and the 16:22 `main` validate run was cancelled by the platform), so
-every gate validate.yml runs was run locally instead; worth a glance at the post-merge run.
+Older handoffs (s197 and earlier) are archived in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
