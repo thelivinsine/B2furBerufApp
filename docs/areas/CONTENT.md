@@ -267,9 +267,15 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
     (`scripts/justification-markers.mjs`, same shared-lexicon arrangement). `level` is what makes
     `evaluate-writing` mark strictly, so a brief that only describes gets the learner marked down for
     obeying it. Fix by REPLACING the weakest descriptive point, never by adding a fifth. B1 is exempt.
-  - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` +
-    `weiterbildung`), B1/B2/C1 at both lengths. **One deliberate zero: C1 + E-Mail (privat)**, which
-    has no exam analogue; the rail greys it with an honest count.
+  - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` + `weiterbildung`)
+    and, since s200, under Wohnen (a Wohnungsbewerbung). **One deliberate zero: C1 + E-Mail
+    (privat)**, which has no exam analogue; the rail greys it with an honest count.
+    **The tag follows the REQUESTED OUTPUT, not the situation** (s200): "Sie führen das Protokoll …
+    Halten Sie die Ergebnisse fest" is a `protokoll` however the situation is framed, while an
+    incoming Reklamation the learner answers with a Nachricht is a `nachricht`.
+  - **Register:** a `du` brief never names a title + surname. The Adressat drives the Anrede, so
+    "Kollegin, Frau Bauer" with register `du` instructs "Hallo Frau Bauer, … kannst du …", which a
+    German reader marks as wrong. Gated in `lint:content` since s200; use a first name, or `sie`.
   - **Niveau:** B1 307 / B2 302 / C1 108. Kurz stays B1-heavy on purpose (a 40-word task with three
     Leitpunkte is B1 work); promotion to B2 is limited to Lang tasks in demanding genres.
   Word targets are determined by (Niveau, Länge), and nothing else: B1 40/80, B2 100/150, C1 120/200

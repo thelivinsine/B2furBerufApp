@@ -789,6 +789,18 @@ function checkWritingTask(ds, w, t, themeId, code, seenIds) {
   // Kurz/Lang word target only means something with content points to fill it.
   if (t.register !== undefined && t.addressee === undefined)
     error(ds, w, "register set without an addressee");
+  // A `du` brief may not name a title + surname (s200, audit §7). The Adressat
+  // drives the Anrede, so "Kollegin, Frau Bauer" plus register "du" instructs
+  // the learner to write "Hallo Frau Bauer, ... kannst du ...", a hybrid a
+  // German reader marks as wrong. Fix the Adressat (a first name) or the
+  // register, whichever the situation really is.
+  if (t.register === "du" && isStr(t.addressee) && /\b(Herr|Frau)\b/.test(t.addressee))
+    error(
+      ds,
+      w,
+      `register "du" with addressee "${t.addressee}": a title plus surname demands Sie. ` +
+        `Use a first name, or set register: "sie".`,
+    );
   // An argumentative Textsorte at B2+ must ASK for the argumentation it is
   // graded on (s200, audit §4). `level` tells `evaluate-writing` to mark
   // strictly at B2/C1 and Aufgabenerfüllung is scored against the Leitpunkte,
