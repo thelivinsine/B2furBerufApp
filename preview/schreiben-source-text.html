@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Schreiben: the text a learner reacts to</title>
+    <style>
+      /* Tokens copied verbatim from src/index.css (light + dark, N3 Slate). */
+      :root {
+        --page-from: 144 45% 98%;
+        --page-mid: 150 50% 98%;
+        --page-to: 198 83% 98%;
+        --foreground: 252 16% 12%;
+        --surface: 0 0% 100%;
+        --elevated: 0 0% 100%;
+        --muted: 220 13% 88%;
+        --muted-foreground: 220 8% 36%;
+        --border: 218 13% 84%;
+        --primary: 221 83% 54%;
+        --accent: 197 93% 77%;
+        --accent-ink: 198 90% 32%;
+        --shadow: 221 40% 22%;
+        --radius: 0.5rem;
+        --wash: 0.1;
+      }
+      .dark {
+        --page-from: 220 15% 4%;
+        --page-mid: 220 15% 4%;
+        --page-to: 220 15% 4%;
+        --foreground: 220 12% 94%;
+        --surface: 220 10% 17%;
+        --elevated: 220 9% 22%;
+        --muted: 220 9% 25%;
+        --muted-foreground: 220 8% 72%;
+        --border: 220 10% 38%;
+        --primary: 221 83% 66%;
+        --accent: 197 93% 77%;
+        --accent-ink: 197 80% 72%;
+        --shadow: 220 40% 2%;
+        --wash: 0;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: hsl(var(--foreground));
+        background: linear-gradient(120deg, hsl(var(--page-from)), hsl(var(--page-mid)), hsl(var(--page-to)));
+        -webkit-font-smoothing: antialiased;
+      }
+      .page { max-width: 1300px; margin: 0 auto; padding: 40px 24px 80px; }
+      h1 { font-size: 26px; letter-spacing: -0.01em; margin: 0 0 6px; }
+      .lede { color: hsl(var(--muted-foreground)); font-size: 14px; line-height: 1.6; max-width: 74ch; margin: 0 0 4px; }
+      h2 { font-size: 17px; margin: 40px 0 4px; }
+      .sub { color: hsl(var(--muted-foreground)); font-size: 13px; line-height: 1.6; max-width: 78ch; margin: 0 0 16px; }
+      .row { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+      .col-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: hsl(var(--muted-foreground)); margin: 0 0 8px; }
+
+      /* --- real component geometry ------------------------------------ */
+      .card {
+        background: hsl(var(--surface));
+        border: 1px solid hsl(var(--border));
+        border-radius: calc(var(--radius) + 2px);
+        box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+      }
+      .card-content { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+      .desktop { width: 560px; }
+      .phone { width: 360px; }
+      .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+      .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: hsl(var(--primary)); margin: 0; }
+      .meta { font-size: 12px; color: hsl(var(--muted-foreground)); margin: 2px 0 0; }
+      .icons { display: flex; flex-shrink: 0; }
+      .icon-btn {
+        width: 40px; height: 40px; display: grid; place-items: center;
+        border: 0; background: transparent; color: hsl(var(--muted-foreground)); cursor: pointer;
+        border-radius: calc(var(--radius) - 2px);
+      }
+      .icon-btn svg { width: 16px; height: 16px; }
+      .body { display: flex; flex-direction: column; gap: 12px; }
+      .prompt { font-size: 14px; line-height: 1.625; margin: 0; }
+      .an { font-size: 12px; color: hsl(var(--muted-foreground)); margin: 0; }
+      .an b { color: hsl(var(--accent-ink)); font-weight: 600; }
+      ul.points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+      ul.points li { display: flex; gap: 8px; font-size: 14px; line-height: 1.625; }
+      ul.points li::before {
+        content: ""; margin-top: 0.45rem; width: 4px; height: 4px; flex: none;
+        border-radius: 999px; background: hsl(var(--accent-ink));
+      }
+
+      /* The source tile: Himmelblau fill, bordered in its OWN fill colour, no
+         visible edge, exactly like the Aufgabe rails (design system §3). */
+      .source {
+        background: hsl(var(--accent) / 0.2);
+        border: 1px solid hsl(var(--accent) / 0.2);
+        border-radius: calc(var(--radius) - 2px);
+        padding: 12px 14px;
+        display: flex; flex-direction: column; gap: 6px;
+      }
+      .dark .source { background: hsl(var(--accent) / 0.1); border-color: hsl(var(--accent) / 0.1); }
+      .source-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: hsl(var(--muted-foreground)); margin: 0; }
+      .source-text { font-size: 13.5px; line-height: 1.6; margin: 0; }
+      .source-text .who { font-weight: 600; }
+
+      /* Variant C's disclosure control */
+      .disclosure {
+        display: flex; align-items: center; gap: 8px; width: fit-content;
+        background: hsl(var(--accent) / 0.2); border: 1px solid hsl(var(--accent) / 0.2);
+        color: hsl(var(--accent-ink)); font-size: 12.5px; font-weight: 600;
+        border-radius: calc(var(--radius) - 2px); padding: 7px 12px; cursor: pointer;
+      }
+      .dark .disclosure { background: hsl(var(--accent) / 0.1); border-color: hsl(var(--accent) / 0.1); }
+      .disclosure svg { width: 14px; height: 14px; }
+
+      .editor {
+        border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+        border-radius: var(--radius); padding: 12px; font-size: 14px; color: hsl(var(--muted-foreground));
+        min-height: 96px;
+      }
+      .stack { display: flex; flex-direction: column; gap: 12px; }
+      .note { font-size: 12.5px; color: hsl(var(--muted-foreground)); line-height: 1.6; max-width: 72ch; }
+      .badge { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 999px; background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+      table { border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+      th, td { text-align: left; padding: 7px 14px 7px 0; border-bottom: 1px solid hsl(var(--border)); vertical-align: top; }
+      th { font-weight: 600; color: hsl(var(--muted-foreground)); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+      .themes { display: grid; grid-template-columns: 1fr; gap: 34px; }
+      .panel { padding: 26px; border-radius: 14px; }
+      .panel.light { background: linear-gradient(120deg, hsl(144 45% 98%), hsl(198 83% 98%)); }
+      .panel.dark { background: hsl(220 15% 4%); color: hsl(var(--foreground)); }
+      .panel.dark .prompt, .panel.dark ul.points li { color: hsl(var(--foreground)); }
+      hr { border: 0; border-top: 1px solid hsl(var(--border)); margin: 36px 0 0; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>Schreiben: the text a learner reacts to</h1>
+      <p class="lede">
+        Audit P4. 71 tasks (54 Stellungnahmen, 17 Forumsbeiträge) ask the learner to react to a position that the
+        instruction only <em>describes</em>. Reacting to a described position is vaguer and easier than reacting to a
+        stated one: there is no wording to pick up, no claim to quote back, nothing concrete to refute. It is also
+        where the bank diverges most from the exam shape it is modelled on, where the writing task is a reaction to a
+        supplied text.
+      </p>
+      <p class="lede">
+        The schema already has the field (<code>source</code>), set on 0 of 717 tasks and read by nothing. Below are
+        three ways the supplied text can sit on the Aufgabe card. Everything else on the card is unchanged: same
+        eyebrow, same shuffle and expand buttons, same Leitpunkte, same editor underneath. Pick A, B or C.
+      </p>
+
+      <h2>The example used in all three</h2>
+      <p class="sub">
+        Task <code>wt_bildung_l10</code>, a C1 Forumsbeitrag. Today the learner sees only the instruction: "In einem
+        Forum wird gefragt, ob Sprachkurse neben der Arbeit realistisch sind." With a source, they see the actual post,
+        with a claim in it worth disagreeing with.
+      </p>
+
+      <div class="themes">
+        <!-- ============================ LIGHT ============================ -->
+        <div class="panel light">
+          <p class="col-label">Light mode · desktop width</p>
+          <div class="row">
+            <!-- ---------------- A ---------------- -->
+            <div>
+              <p class="col-label"><span class="badge">A</span>&nbsp; Text first, then the task</p>
+              <div class="card desktop">
+                <div class="card-content">
+                  <div class="head">
+                    <div>
+                      <p class="eyebrow">Aufgabe: Bildung</p>
+                      <p class="meta">Lang · C1 · Forumsbeitrag · ca. 200 Wörter</p>
+                    </div>
+                    <div class="icons">
+                      <button class="icon-btn" aria-label="Neue Aufgabe">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+                      </button>
+                      <button class="icon-btn" aria-label="Aufgabe vergrößern">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="body">
+                    <div class="source">
+                      <p class="source-label">Text zur Aufgabe</p>
+                      <p class="source-text">
+                        <span class="who">Kati_87 schreibt:</span> Ich arbeite Vollzeit im Schichtdienst und überlege
+                        seit Monaten, einen Abendkurs zu belegen. Ehrlich gesagt glaube ich nicht mehr daran. Nach acht
+                        Stunden bin ich zu müde zum Lernen, und die Kurse fangen genau dann an, wenn meine Schicht
+                        endet. Schafft das wirklich jemand von euch?
+                      </p>
+                    </div>
+                    <p class="prompt">
+                      In einem Forum wird gefragt, ob Sprachkurse neben der Arbeit realistisch sind. Schreiben Sie
+                      einen Beitrag.
+                    </p>
+                    <p class="an"><b>An:</b> die Forumsöffentlichkeit (Sie)</p>
+                    <ul class="points">
+                      <li>Äußern Sie Ihre Meinung und begründen Sie sie.</li>
+                      <li>Beschreiben Sie, wie Sie Arbeit und Lernen verbinden.</li>
+                      <li>Nennen Sie die größte Schwierigkeit.</li>
+                      <li>Geben Sie zwei konkrete Tipps. Denken Sie an Einleitung und Schluss.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ---------------- B ---------------- -->
+            <div>
+              <p class="col-label"><span class="badge">B</span>&nbsp; Task first, text before the Leitpunkte</p>
+              <div class="card desktop">
+                <div class="card-content">
+                  <div class="head">
+                    <div>
+                      <p class="eyebrow">Aufgabe: Bildung</p>
+                      <p class="meta">Lang · C1 · Forumsbeitrag · ca. 200 Wörter</p>
+                    </div>
+                    <div class="icons">
+                      <button class="icon-btn" aria-label="Neue Aufgabe">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+                      </button>
+                      <button class="icon-btn" aria-label="Aufgabe vergrößern">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="body">
+                    <p class="prompt">
+                      In einem Forum wird gefragt, ob Sprachkurse neben der Arbeit realistisch sind. Schreiben Sie
+                      einen Beitrag.
+                    </p>
+                    <div class="source">
+                      <p class="source-label">Text zur Aufgabe</p>
+                      <p class="source-text">
+                        <span class="who">Kati_87 schreibt:</span> Ich arbeite Vollzeit im Schichtdienst und überlege
+                        seit Monaten, einen Abendkurs zu belegen. Ehrlich gesagt glaube ich nicht mehr daran. Nach acht
+                        Stunden bin ich zu müde zum Lernen, und die Kurse fangen genau dann an, wenn meine Schicht
+                        endet. Schafft das wirklich jemand von euch?
+                      </p>
+                    </div>
+                    <p class="an"><b>An:</b> die Forumsöffentlichkeit (Sie)</p>
+                    <ul class="points">
+                      <li>Äußern Sie Ihre Meinung und begründen Sie sie.</li>
+                      <li>Beschreiben Sie, wie Sie Arbeit und Lernen verbinden.</li>
+                      <li>Nennen Sie die größte Schwierigkeit.</li>
+                      <li>Geben Sie zwei konkrete Tipps. Denken Sie an Einleitung und Schluss.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================ C + PHONE ============================ -->
+        <div class="panel light">
+          <p class="col-label">Light mode · phone width (360px), the width that decides this</p>
+          <div class="row">
+            <div>
+              <p class="col-label"><span class="badge">A</span>&nbsp; on a phone</p>
+              <div class="card phone">
+                <div class="card-content">
+                  <div class="head">
+                    <div>
+                      <p class="eyebrow">Aufgabe: Bildung</p>
+                      <p class="meta">Lang · C1 · Forumsbeitrag</p>
+                    </div>
+                    <div class="icons">
+                      <button class="icon-btn" aria-label="Neue Aufgabe">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+                      </button>
+                      <button class="icon-btn" aria-label="Aufgabe vergrößern">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="body">
+                    <div class="source">
+                      <p class="source-label">Text zur Aufgabe</p>
+                      <p class="source-text">
+                        <span class="who">Kati_87 schreibt:</span> Ich arbeite Vollzeit im Schichtdienst und überlege
+                        seit Monaten, einen Abendkurs zu belegen. Ehrlich gesagt glaube ich nicht mehr daran. Nach acht
+                        Stunden bin ich zu müde zum Lernen, und die Kurse fangen genau dann an, wenn meine Schicht
+                        endet.
+                      </p>
+                    </div>
+                    <p class="prompt">
+                      In einem Forum wird gefragt, ob Sprachkurse neben der Arbeit realistisch sind. Schreiben Sie
+                      einen Beitrag.
+                    </p>
+                    <p class="an"><b>An:</b> die Forumsöffentlichkeit (Sie)</p>
+                    <ul class="points">
+                      <li>Äußern Sie Ihre Meinung und begründen Sie sie.</li>
+                      <li>Beschreiben Sie, wie Sie Arbeit und Lernen verbinden.</li>
+                      <li>Nennen Sie die größte Schwierigkeit.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <p class="note" style="margin-top: 10px">
+                The card keeps its cap: on a phone the task region already scrolls inside itself so the writing field
+                never drops below its floor, and the expand button opens the whole thing full length. The source is
+                simply more content in that same region.
+              </p>
+            </div>
+
+            <div>
+              <p class="col-label"><span class="badge">C</span>&nbsp; Text folded behind one line</p>
+              <div class="card phone">
+                <div class="card-content">
+                  <div class="head">
+                    <div>
+                      <p class="eyebrow">Aufgabe: Bildung</p>
+                      <p class="meta">Lang · C1 · Forumsbeitrag</p>
+                    </div>
+                    <div class="icons">
+                      <button class="icon-btn" aria-label="Neue Aufgabe">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+                      </button>
+                      <button class="icon-btn" aria-label="Aufgabe vergrößern">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="body">
+                    <p class="prompt">
+                      In einem Forum wird gefragt, ob Sprachkurse neben der Arbeit realistisch sind. Schreiben Sie
+                      einen Beitrag.
+                    </p>
+                    <button class="disclosure">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                      Text zur Aufgabe lesen
+                    </button>
+                    <p class="an"><b>An:</b> die Forumsöffentlichkeit (Sie)</p>
+                    <ul class="points">
+                      <li>Äußern Sie Ihre Meinung und begründen Sie sie.</li>
+                      <li>Beschreiben Sie, wie Sie Arbeit und Lernen verbinden.</li>
+                      <li>Nennen Sie die größte Schwierigkeit.</li>
+                      <li>Geben Sie zwei konkrete Tipps.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <p class="note" style="margin-top: 10px">
+                Tapping the line expands the same Himmelblau tile in place. The card rests at its current height, so
+                nothing about the writing field moves, but the learner can start writing without ever having read the
+                text they are supposed to be answering.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================ DARK ============================ -->
+        <div class="panel dark">
+          <p class="col-label">Dark mode (N3 Slate) · variant A</p>
+          <div class="row">
+            <div class="card desktop">
+              <div class="card-content">
+                <div class="head">
+                  <div>
+                    <p class="eyebrow">Aufgabe: Nachhaltigkeit</p>
+                    <p class="meta">Lang · B2 · Stellungnahme · ca. 150 Wörter</p>
+                  </div>
+                  <div class="icons">
+                    <button class="icon-btn" aria-label="Neue Aufgabe">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+                    </button>
+                    <button class="icon-btn" aria-label="Aufgabe vergrößern">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="body">
+                  <div class="source">
+                    <p class="source-label">Text zur Aufgabe</p>
+                    <p class="source-text">
+                      <span class="who">Aus dem Rundschreiben der Hausleitung:</span> Ab Oktober stellen wir die
+                      Stationsküche auf Mehrweggeschirr um. Wir rechnen mit höheren Anschaffungskosten, aber mit
+                      deutlich weniger Abfall. Rückmeldungen aus den Teams nehmen wir bis Ende des Monats entgegen.
+                    </p>
+                  </div>
+                  <p class="prompt">
+                    Für die Stationsküche soll Mehrweggeschirr angeschafft werden. Verfassen Sie eine Stellungnahme.
+                  </p>
+                  <p class="an"><b>An:</b> die Hausleitung (Sie)</p>
+                  <ul class="points">
+                    <li>Vergleichen Sie die Kosten mit dem Einwegverbrauch.</li>
+                    <li>Beschreiben Sie die Umweltwirkung.</li>
+                    <li>Benennen Sie den Mehraufwand für das Team.</li>
+                    <li>Geben Sie eine Empfehlung.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>What each option costs</h2>
+      <table>
+        <tr>
+          <th>Option</th>
+          <th>What the learner meets first</th>
+          <th>Cost</th>
+        </tr>
+        <tr>
+          <td><b>A</b> Text first</td>
+          <td>The forum post or the mail, then what to do with it. This is the order a real exam paper uses, and the
+            order the situation has: something arrives, then you answer it.</td>
+          <td>The card opens with content that is not an instruction, so the eyebrow no longer sits directly above the
+            task sentence.</td>
+        </tr>
+        <tr>
+          <td><b>B</b> Task first</td>
+          <td>The instruction, then the text it refers to, then the Leitpunkte.</td>
+          <td>Reads slightly backwards ("write a reply" before there is anything to reply to), but keeps the card's
+            current opening line exactly where it is today.</td>
+        </tr>
+        <tr>
+          <td><b>C</b> Folded</td>
+          <td>The instruction, a one-line "Text zur Aufgabe lesen", then the Leitpunkte.</td>
+          <td>Shortest resting card, but the text becomes optional in practice, and an exam text is not optional. Adds
+            a control to a card that today has exactly two.</td>
+        </tr>
+      </table>
+
+      <h2>The same tile in the Modelltest</h2>
+      <p class="sub">
+        Whichever option you pick, the exam's Schreiben part renders the identical tile above its brief, so a task
+        looks the same whether it is practised or sat under a clock. Nothing else about the exam stage changes.
+      </p>
+
+      <h2>What ships with it</h2>
+      <p class="sub">
+        71 short German texts, one per Stellungnahme and Forumsbeitrag, each stating a position in three or four
+        sentences that the Leitpunkte can actually argue against. The text also goes to the AI evaluator, so
+        "Aufgabenerfüllung" can finally check whether the learner responded to what was said, instead of to a
+        paraphrase. No ids change; no other task is touched.
+      </p>
+
+      <hr />
+      <p class="note" style="margin-top: 18px">
+        Preview only. Tokens, radii, shadows, icon sizes and text sizes are copied from the live app
+        (<code>src/index.css</code>, <code>tailwind.config.ts</code>, <code>GuidedWritingTrainer.tsx</code>).
+      </p>
+    </div>
+  </body>
+</html>

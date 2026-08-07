@@ -85,16 +85,15 @@ after pulling.
 - **Closed-enum rule:** every union added to `src/types/index.ts` is mirrored by an array +
   validate-when-present check in `scripts/lint-content.mjs`.
 - **Every content_id has a provenance row**, added in the same edit.
-- **Content facts are stated, never left blank** (audit P9/P5/P7, s185; all four are gates):
-  every noun carries `plural` XOR `numerus` (`uncountable`/`pluralOnly`); `pron` follows the ONE
-  documented respelling scheme (`docs/areas/CONTENT.md` §Pronunciation); every grammar topic has 10
-  drills with ≥3 productive (`tests/grammar.test.ts`); and the count of B2.2/C1 items that are
+- **Content facts are stated, never left blank** (s185, all gates): every noun carries `plural` XOR
+  `numerus`; `pron` follows the ONE respelling scheme (`docs/areas/CONTENT.md` §Pronunciation); every
+  grammar topic has 10 drills with ≥3 productive; the count of B2.2/C1 items that are
   specialized-or-rarer is ratcheted at 334, because a rare compound is not an advanced word.
-- **Pedagogical shape is gated too** (audit §5, s198; `scripts/content-shape.mjs` +
+- **Pedagogical shape is gated too** (s198; `scripts/content-shape.mjs` +
   `tests/contentShape.test.ts`): a `core`-frequency word is never labelled B2.2/C1, every theme
-  carries ≥3 verbs AND ≥3 adjectives, and three ratchets pin the measured bank (rare share 53.87%,
-  no-corpus-evidence 100, noun share 77.59%). Raising a ceiling is a deliberate edit there with a
-  reason, never the way to land a word.
+  carries ≥3 verbs AND ≥3 adjectives, and three ratchets pin the measured bank (rare 53.87%,
+  no-corpus-evidence 100, noun 77.59%). Raising a ceiling is a deliberate edit there with a reason,
+  never the way to land a word.
 - **A gap in an example sentence comes from ONE rule** (`src/engine/blank.ts`, s198), used by the
   MCQ/listening/typed clozes and the coverage report; it reports WHICH form it blanked so
   distractors match. Never re-copy it into a call site: four copies is how an ASCII `\b` silently
@@ -109,15 +108,25 @@ after pulling.
   to drop. Related founder law: **only a task carrying the full brief is served** (Adressat, du/Sie,
   2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung against
   it: **717 writing tasks, every one servable**, ≥2 per Unterthema per length, all 16 Textsorten
-  live. `tests/writingScope.test.ts` and `tests/moduleScope.test.ts` gate it. (Why →
-  `DECISIONS.md` §s180/s196.)
-- **A Branche tag is EARNED: the brief must name that workplace** (founder s199,
-  `scripts/sector-markers.mjs` is the ONE lexicon, shared by `lint:content` and
-  `tests/writingScope.test.ts` so gate and test cannot drift). The old all-15-Branchen-per-Thema
-  floor is GONE: it was satisfiable by tagging, and 199 of 600 tags named an industry their brief
-  never entered. Beruf pools keep ≥8 of 15 sectors earned; Alltag has few, honestly. Removing a tag
-  costs no reach (Branche is soft), so add a missing word to the lexicon or drop the tag.
-  (Why → `DECISIONS.md` §s199.)
+  live. A `du` brief never names a title + surname (s200): the Adressat drives the Anrede.
+  `tests/writingScope.test.ts` and `tests/moduleScope.test.ts` gate it. (Why → `DECISIONS.md`
+  §s180/s196.)
+- **A TAG IS EARNED, and a brief ASKS for what it is graded on.** Two rules, one arrangement: ONE
+  lexicon per rule in `scripts/`, shared by `lint:content` AND `tests/writingScope.test.ts`, so gate
+  and test cannot drift.
+  - **Branche** (`sector-markers.mjs`, founder s199): the brief must name that workplace. The
+    all-15-per-Thema floor is GONE (satisfiable by tagging; 199 of 600 tags named an industry the
+    brief never entered). Beruf keeps ≥8 of 15 earned, Alltag few and honestly. Dropping a false tag
+    costs no reach (Branche is soft), so add the missing word to the lexicon or drop the tag.
+  - **Argumentation** (`justification-markers.mjs`, s200): a `stellungnahme`, `forumsbeitrag`,
+    `widerspruch` or `beschwerde` at B2+ carries ≥1 Leitpunkt demanding a **reason, a consequence or
+    a stance**, because `level` is what tells `evaluate-writing` to mark strictly. Fix by REPLACING
+    the weakest descriptive point, never a fifth. Matching is phrase-level over the whole clause,
+    never the opening verb ("**Legen** Sie dar, warum …" IS the argumentative move). B1 exempt.
+  - **A supplied `source` text belongs to the REPLY genre, never to an opinion task** (s200): no
+    exam supplies a text for a Forumsbeitrag or a Stellungnahme (Goethe B2 Teil 1, DTB B2 Teil 2),
+    while DTB B2 Teil 1 prints the customer mail you answer. `source` is currently read by nothing.
+  (Why → `DECISIONS.md` §s199/§s200.)
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments

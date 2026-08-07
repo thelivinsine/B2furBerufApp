@@ -2049,3 +2049,54 @@ Both extra fills and both rules are gone, in `FilterRail` and in `ScopeRail` (th
 divider went with them), so the two rails stay identical, as s189 established. This supersedes the s169
 note that a divider on such a tile must be tinted rather than grey: the note was right that a grey rule
 was wrong, and the answer turned out to be no rule at all.
+
+## s200 — a brief has to ASK for the argument it is graded on
+
+**Decision:** an argumentative Textsorte (`stellungnahme`, `forumsbeitrag`, `widerspruch`,
+`beschwerde`) at B2 or above must carry at least one Leitpunkt that forces a **reason, a consequence
+or a stance**, gated by `lint:content` and `tests/writingScope.test.ts` through the one classifier in
+`scripts/justification-markers.mjs`.
+
+**Why.** `level` is what tells `evaluate-writing` to "bewerte streng auf C1-Niveau", and
+Aufgabenerfüllung is graded against the Leitpunkte. Six C1 Stellungnahmen at a 200-word target
+carried only descriptive points, so a learner who covered all four exactly had described, empathised,
+proposed and delegated, and was then marked down for not arguing. That is the one failure mode a
+Leitpunkt-based brief exists to prevent. 30 tasks were fixed by REPLACING their weakest descriptive
+point: four Leitpunkte in 200 words is already the exam shape, so a fifth would have made the task
+harder rather than clearer.
+
+**Two design mistakes worth keeping, both from building the classifier:**
+1. **Two tiers were wrong.** A first cut demanded a STANCE marker specifically from every
+   Stellungnahme and a reason from every Beschwerde. It failed `wt_safety_l04`, whose points are
+   "Begründen Sie, warum das Training nötig ist", "Legen Sie dar …", "Entkräften Sie den Einwand der
+   Ausfallzeit". A gate that fails the most argumentative task in the pool is measuring the wrong
+   thing. One demand, three ways to satisfy it.
+2. **The classifier must not be tuned to make tasks pass.** Consequence points ("Erklären Sie, was
+   das für den Kassenabschluss bedeutet") were admitted because naming what something costs IS the
+   argument a complaint runs on, not because it shrank the fix list. The line stays at pure
+   description: `begründ` is a marker, bare `grund` is not.
+
+## s200 — the reaction text belongs to the reply genre, and the audit was wrong about it
+
+**Decision:** P4 of the s199 writing-task audit is NOT implemented. The 54 Stellungnahmen and 17
+Forumsbeiträge do not get a supplied `source` text, and the report carries a correction saying so.
+
+**Why.** The founder challenged the finding from their own exam: "in my B2 für Beruf exam they just
+gave the topic overview and asked to write a forumsbeitrag. The additional text wasn't provided."
+The published material agrees with them:
+- **Goethe-Zertifikat B2, Schreiben Teil 1** is a Forumsbeitrag from a topic sentence plus four
+  Inhaltspunkte, nothing supplied. Teil 2 (a Nachricht to a supervisor) is the same shape.
+- **Deutsch-Test für den Beruf B2** has two writing parts and prints a text in ONE of them: Teil 1
+  forwards a customer complaint to answer, Teil 2 is a choice of two topics, one a Forumsbeitrag.
+
+**The supplied text belongs to a GENRE, answering incoming workplace mail, not to an exam.** The
+audit had selected precisely the opinion tasks that never get one, so implementing P4 would have
+moved 71 tasks AWAY from the exam shape and added reading the real task does not have. The honest
+target is the **47 reply-shaped tasks** ("Ein Kunde beschwert sich … Antworten Sie ihm"), which show
+nothing of what came in. `source` stays in the schema for that wave (unlike `exam`, which was retired
+the same session, it has a real use ahead of it) and is still read by nothing today.
+
+**Method rule this produces:** the audit's §9 compared the bank against exam shapes from memory of
+the format rather than against the published task descriptions. Where a claim turns on "this is what
+the exam does", fetch the Modellsatz. A wrong premise survived three sessions and was caught only
+because the founder had sat the exam.

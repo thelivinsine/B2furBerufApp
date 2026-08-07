@@ -1145,3 +1145,61 @@ plus the "Nach oben" button that was sitting behind the Üben CTA (PRs #818 and 
 the first block under "Resume here"; the two branches touched no common source file, only the shared
 docs, and every conflict was resolved by keeping BOTH sessions' facts. The prompt log labels them
 **parallel A** (Bibliothek) and **parallel B** (Prüfung).
+
+---
+
+**Handoff after session 198 (2026-08-07): the content audit is closed except P10
+(branch `claude/content-audit-plan-mbiout`).**
+Founder: "what's next in the content audit plan?", then "build the frequency and part-of-speech
+linter gates", then "except human review task, complete all the recommendations from this plan, push
+them live and document the session".
+
+- **What was actually open.** P1–P9 were closed across s178/s181/s182/s185. What remained was P10
+  (human verification, founder-gated and deferred), the §4 word-level residuals (116 words that
+  could never produce a cloze/typed gap/listening item, 67 with no resolving related term), the §5
+  closing observation that pedagogical shape has no gates, and §2.2's "Reuse" defect. The four §3.2
+  LanguageTool defects were checked and are already fixed in the bank.
+- **The 116 were a regex bug, and fixing the content would have been the wrong fix.** 25 of them
+  start with an umlaut and JavaScript's `\b` is defined on ASCII `\w`, so `\bÜberweisung` can never
+  match; 85 are verbs whose examples use a Perfekt or a finite form rather than the infinitive.
+  Bending 85 natural German sentences into infinitives to satisfy a broken search would have made
+  the content worse to make a report greener. `src/engine/blank.ts` is now the ONE rule (previously
+  four copies: MCQ cloze, listening cloze, typed cloze, coverage report, every one carrying both
+  defects) and it looks for the forms the sentences actually use, including the Partizip II /
+  Präteritum / zu-infinitive from `verbForms.ts`. The blank REPORTS which form it took, so
+  distractors are drawn in that same form ("gebucht" against "verschoben"/"abgesagt", never against
+  a list of infinitives that gives the answer away). Only 15 separable verbs kept a genuine gap and
+  got one example rewritten into a Perfekt or modal construction.
+- **The three gates** (`scripts/content-shape.mjs`, run from `lint:content`): worth-learning (rare
+  share **53.87 %**, no-corpus-evidence **100**), CEFR plausibility (hard: no `core`-frequency word
+  at B2.2/C1; beginner-rare ratchet **32**), part-of-speech mix (**≥3 verbs AND ≥3 adjectives** per
+  theme, noun share **77.59 %**). Every number is the measured bank on the day it landed, so nothing
+  shipped is retroactively illegal, and raising one is a deliberate edit there with a reason.
+  `tests/contentShape.test.ts` asserts each in both directions.
+- **25 authored items** cleared the floors (digitales had 0 verbs and 0 adjectives; freizeit,
+  behoerde, mobilitaet had 0 adjectives), all core-or-common frequency, which also serves P7's
+  standing authoring rule. `verbForms.ts` and `frequency.ts` were regenerated for them
+  (`build:verbs-subset` needs the npm registry, `build:frequency-subset` needs `pip install wordfreq`).
+- **Reading freshness:** `progress.textsDone` + migration **0018**, unioned across devices like
+  `scenariosDone`; the composer draws from unread texts and falls back to the full pool when all are
+  read, so the block never disappears.
+Gates: lint:content · lint:migrations · typecheck · lint 0 errors (77 warnings) · **647 tests** ·
+build · check:bundle 128.2 kB · verify:facts 0 errors · verify:cefr FLAG 0.
+`verify:grammar` was SKIPPED (the LanguageTool toolchain is not built in this sandbox; warn-only by
+design), so the 40 new/edited German sentences have not been through Layer 3. Worth a run in a
+session that has `pnpm build:languagetool` available.
+
+**Shipped:** PR **#822**, squash-merged as **`03ea3dc`**. All three `main` workflows green on that
+commit: Validate content, Deploy site to GitHub Pages and Deploy Supabase functions, whose "Apply
+migrations" step ran and passed, so **migration 0018 is live on the database**. The Pages deploy did
+NOT self-cancel, which is the s197 `timeout: 1800000` fix holding on its first real run.
+
+**Resume here:**
+1. **P10 is the only open audit item** and it is the founder's: `pnpm review:queue` →
+   decisions → `pnpm apply:reviews` → `pnpm stamp:verified`. Start with the ~166 core-frequency
+   words and the Redemittel bank, the high-traffic surface.
+2. **Not scheduled, deliberately:** §2.1's inverted sub-theme structure (eight workplace themes have
+   no sub-themes, 59 % of words carry no `subThemeId`). Every new Unterthema drags the writing-task
+   invariant behind it (≥2 tasks per Unterthema per length), so it is a session of its own.
+3. CLAUDE.md is **380 lines** by the linter's count, still over its ~350 budget (377 before this
+   session; two invariants in, four history paragraphs compressed out).
