@@ -5479,3 +5479,28 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/features/shared/ScopeRail.tsx` ·
   `CLAUDE.md` · `docs/DECISIONS.md` §s199 (three entries) · `docs/areas/BIBLIOTHEK.md` ·
   `docs/areas/CONTENT.md` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 6 (verbatim):** `document the session. I'll continue with the p2 and others in next session`
+  **Response:** the substance had already shipped inside PR #825 (the session-199 log and handoff in
+  `PROJECT_STATUS.md`, prompts 3-5 in this log, three `DECISIONS.md` §s199 entries, the three
+  replaced `CLAUDE.md` rules, and the three area docs). This pass added only what was not knowable
+  before the merge: the shipping record below, and a handoff rewritten around the founder taking P2
+  themselves next session rather than around a decision they had already made.
+  **How session 199 shipped, end to end:**
+  - **PR #824** (the audit report) → squash-merged **`66061c3`**. Validate content and Deploy site to
+    GitHub Pages both green.
+  - **PR #825** (three commits: `acb21f7` the Branche tag cleanup, `7f5c464` the rail changes,
+    `40176d1` the docs) → squash-merged **`bf9db0b`**. Validate content green on the PR head and
+    again on `main`; Deploy site to GitHub Pages green on `main`, with no self-cancel, so the s197
+    `timeout: 1800000` fix has now held on three consecutive Pages deploys.
+  - **Deploy Supabase functions did NOT run on `bf9db0b`, and that is correct, not a failure**: it is
+    path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its own workflow file, and
+    this session touched none of them. Checked rather than assumed, because "a workflow is missing
+    from the commit" and "a workflow failed" look identical in a run list.
+  - Post-merge housekeeping done after both merges (fetch → reset --hard origin/main →
+    force-with-lease, tree clean).
+  **The founder takes P2 next session**, so the handoff now leads with what a P2 session needs (the
+  six task ids, the replace-don't-append rule for their Leitpunkte, and the gate to add afterwards)
+  instead of the P1 decision that is now closed.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
