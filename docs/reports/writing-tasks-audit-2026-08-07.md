@@ -245,6 +245,34 @@ This is the cheapest of the five to fix incrementally — one `source` field per
 change, no id churn — and it is the one that most directly raises Finding 3's ceiling, because a
 quoted position gives a Leitpunkt something to argue against.
 
+> **CORRECTION (s200, 2026-08-07). This finding is WRONG about which tasks need a supplied text,
+> and P4 below was not implemented because of it.** The founder challenged it from their own B2
+> Beruf exam ("they just gave the topic overview and asked to write a Forumsbeitrag, the additional
+> text wasn't provided"), and the published format descriptions say they are right:
+>
+> - **Goethe-Zertifikat B2, Schreiben Teil 1** is a Forumsbeitrag built from a topic sentence plus
+>   four Inhaltspunkte, with NO supplied text ("Sie schreiben einen Forumsbeitrag zur Verschmutzung
+>   der Umwelt. Äußern Sie Ihre Meinung zu Plastikverpackungen im Alltag. …", official Modellsatz).
+>   Teil 2, a Nachricht to a supervisor, is the same shape: situation, four points, no text.
+> - **Deutsch-Test für den Beruf B2** has TWO writing parts, and only one prints a text. Teil 1 does
+>   ("Ihre Teamleitung leitet Ihnen diese E-Mail von einem Kunden weiter und bittet Sie zu
+>   antworten", followed by the customer's full complaint). Teil 2 is a choice of two topics, one of
+>   them a Forumsbeitrag, with nothing supplied.
+>
+> **The supplied text belongs to a GENRE, not to an exam: answering incoming workplace mail.** This
+> finding selected the 54 Stellungnahmen and 17 Forumsbeiträge, which are exactly the opinion tasks
+> that get no text in either exam. Adding one to each would have made them less exam-realistic and
+> added reading the real task does not have.
+>
+> **Where `source` does belong:** the **47 reply-shaped tasks** in the bank ("Ein Kunde beschwert
+> sich … Antworten Sie ihm"), none of which show what came in. That is the DTB B2 Teil 1 shape and
+> the honest version of this finding. Mockup of the card with a supplied text:
+> `preview/schreiben-source-text.html`.
+>
+> Method note for the next audit: §9 compared the bank against exam *shapes* from memory of the
+> format rather than against the published task descriptions. Where a claim turns on "this is what
+> the exam does", fetch the Modellsatz.
+
 ---
 
 ## 7. The tail — 19 individually fixable defects
@@ -311,6 +339,12 @@ out-of-band tags and correct the `words` doc comment to say what is true — the
 **P4 — Add `source` to the 71 reaction tasks.** One short quoted forum post or incoming mail per
 Stellungnahme/Forumsbeitrag. No schema change; the field and its rendering slot already exist. Do
 this *after* P2, because a quoted position is what makes a justification Leitpunkt answerable.
+
+> **NOT DONE, and it should not be done as written (s200).** See the correction under §6: neither
+> exam supplies a text for a Forumsbeitrag or a Stellungnahme, so this would move the 71 tasks away
+> from the exam shape. The real candidates are the 47 reply tasks. Two claims here were also false:
+> there is no rendering slot (`source` is read by nothing, not the Aufgabe card, not the exam's
+> Schreiben part, not `evaluate-writing`), so it is a UI plus edge-function change, not a data edit.
 
 **P5 — The 19 tail items.** Five Textsorte re-tags, fourteen Adressat/register fixes. An hour.
 

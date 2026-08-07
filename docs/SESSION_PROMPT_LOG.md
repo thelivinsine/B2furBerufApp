@@ -5504,3 +5504,62 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   instead of the P1 decision that is now closed.
   **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
 
+
+## Session 200 (2026-08-07) · branch `claude/whats-next-q992fo`
+
+- **Prompt 1 (verbatim):** `what's next?`
+  **Response:** read the s199 handoff and reported the queue in plain language: audit **P2** (the six
+  C1 Stellungnahmen that punish a learner for following the brief) as the next item, then P3
+  (`exam`), P4 (`source`), P5 (the 19-item tail), with P10 human verification and the Resend/Google
+  items flagged as founder-owned. Recommended running P2 through P5 in one session, since they touch
+  one file and one gate run and P4 depends on P2 landing first.
+  **Artifacts:** none (report only).
+
+- **Prompt 2 (verbatim):** `go ahead`
+  **Response:** shipped P2, P3 and P5; P4 stopped on the founder's challenge (prompt 3).
+  - **P2 (commit `663f993`).** `scripts/justification-markers.mjs` is the ONE classifier, shared by
+    `lint:content` and `tests/writingScope.test.ts` (the s199 `sector-markers.mjs` arrangement). A
+    Leitpunkt counts when it forces a **reason, a consequence or a stance**; matching is phrase-level
+    over the whole clause, never the opening verb. **30 tasks fixed**, each REPLACING its weakest
+    descriptive point (22 Stellungnahmen, 11 Beschwerden, 3 Widersprüche, 1 Forumsbeitrag, including
+    all six acute C1 cases). Gate: an argumentative Textsorte at B2+ must carry such a point; 110
+    tasks gated, all passing, B1 exempt on purpose.
+    - **A design mistake worth keeping:** the first cut demanded a STANCE marker specifically from
+      every Stellungnahme, which failed `wt_safety_l04`, whose points are "Begründen Sie …", "Legen
+      Sie dar …", "Entkräften Sie den Einwand …". A gate that fails the most argumentative task in
+      the pool is measuring the wrong thing, so the two tiers collapsed into one demand.
+  - **P3 (commit `a7dd57a`).** `exam` retired from all 717 tasks, from the `WritingTask` interface
+    and from `src/types/index.ts`; `lint:content` now ERRORS if it reappears (the retired-`sector`
+    guard pattern). The `words` comment states the real rule: the target follows (Niveau, Länge).
+  - **P5 (commit `f9a1e78`).** Five Textsorte re-tags (the tag follows the requested OUTPUT, not the
+    situation) and the 14 du/Sie hybrids, fixed on the Adressat side with first names, because all 14
+    are informal messages and switching them to Sie would thin the bank's scarce du practice.
+    `lint:content` now errors on register `du` with a title-plus-surname Adressat.
+  - Gates on all three: lint:content 0 errors · typecheck · **651 tests** (+2).
+
+- **Prompt 3 (verbatim):** `is Text zur Aufgabe really necessary? in my B2 für Beruf exam  they just gave the topic overview and asked to write a forumsbeitrag. The additional text wasn't provided. can you research what is more realistic and then report to me the findings with recommendations?`
+  **Response:** stopped P4 before a single `source` text reached the bank, fetched the published
+  material, and reported that **the founder is right and the audit's Finding 5 is wrong**:
+  - **Goethe B2 Schreiben Teil 1** is a Forumsbeitrag from a topic sentence plus four Inhaltspunkte,
+    no supplied text; Teil 2 (Nachricht to a supervisor) is the same shape.
+  - **Deutsch-Test für den Beruf B2** has two writing parts: Teil 1 prints a forwarded customer
+    complaint to answer, Teil 2 is a choice of two topics, one a Forumsbeitrag, nothing supplied.
+  - **The supplied text belongs to a GENRE (answering incoming workplace mail), not to an exam.** The
+    audit selected the 54 Stellungnahmen and 17 Forumsbeiträge, precisely the opinion tasks that get
+    no text in either exam. The honest target is the **47 reply-shaped tasks** ("Ein Kunde beschwert
+    sich … Antworten Sie ihm"), which is the DTB B2 Teil 1 shape.
+  - Two further audit claims were false: `source` has **no rendering slot** (read by nothing, not the
+    Aufgabe card, not the exam's Schreiben part, not `evaluate-writing`), so P4 was never a data-only
+    edit. Recommended parking P4 and doing the reply wave as its own session.
+  **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (correction blocks under §6 and
+  §8-P4) · `preview/schreiben-source-text.html` + artifact (the A/B/C placement mockup, built before
+  the research and kept for the reply wave) · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `i agree with your assessment on p4 and a gap with Beschwerde. I'd go with your recommendation on this. document the session at this point, push everything live and we pick it up in a new session`
+  **Response:** P4 is closed as "not a defect", the reply wave is queued as the next session's work,
+  and the branch shipped to `main`. The handoff now opens with what that session needs in order: 47
+  authored incoming texts, the rendering slot that does not exist yet (the Aufgabe card, the exam's
+  `SchreibenPart` and the `evaluate-writing` payload all ignore `source`), the two height laws to
+  respect while adding a block to a locked mobile anatomy, and the gate to add afterwards. The A/B/C
+  placement mockup is built and unpicked, so that session starts by asking which one.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log · PR into `main` (see the shipping record).

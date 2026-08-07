@@ -85,16 +85,15 @@ after pulling.
 - **Closed-enum rule:** every union added to `src/types/index.ts` is mirrored by an array +
   validate-when-present check in `scripts/lint-content.mjs`.
 - **Every content_id has a provenance row**, added in the same edit.
-- **Content facts are stated, never left blank** (audit P9/P5/P7, s185; all four are gates):
-  every noun carries `plural` XOR `numerus` (`uncountable`/`pluralOnly`); `pron` follows the ONE
-  documented respelling scheme (`docs/areas/CONTENT.md` §Pronunciation); every grammar topic has 10
-  drills with ≥3 productive (`tests/grammar.test.ts`); and the count of B2.2/C1 items that are
+- **Content facts are stated, never left blank** (s185, all gates): every noun carries `plural` XOR
+  `numerus`; `pron` follows the ONE respelling scheme (`docs/areas/CONTENT.md` §Pronunciation); every
+  grammar topic has 10 drills with ≥3 productive; the count of B2.2/C1 items that are
   specialized-or-rarer is ratcheted at 334, because a rare compound is not an advanced word.
-- **Pedagogical shape is gated too** (audit §5, s198; `scripts/content-shape.mjs` +
+- **Pedagogical shape is gated too** (s198; `scripts/content-shape.mjs` +
   `tests/contentShape.test.ts`): a `core`-frequency word is never labelled B2.2/C1, every theme
-  carries ≥3 verbs AND ≥3 adjectives, and three ratchets pin the measured bank (rare share 53.87%,
-  no-corpus-evidence 100, noun share 77.59%). Raising a ceiling is a deliberate edit there with a
-  reason, never the way to land a word.
+  carries ≥3 verbs AND ≥3 adjectives, and three ratchets pin the measured bank (rare 53.87%,
+  no-corpus-evidence 100, noun 77.59%). Raising a ceiling is a deliberate edit there with a reason,
+  never the way to land a word.
 - **A gap in an example sentence comes from ONE rule** (`src/engine/blank.ts`, s198), used by the
   MCQ/listening/typed clozes and the coverage report; it reports WHICH form it blanked so
   distractors match. Never re-copy it into a call site: four copies is how an ASCII `\b` silently
@@ -109,15 +108,25 @@ after pulling.
   to drop. Related founder law: **only a task carrying the full brief is served** (Adressat, du/Sie,
   2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung against
   it: **717 writing tasks, every one servable**, ≥2 per Unterthema per length, all 16 Textsorten
-  live. `tests/writingScope.test.ts` and `tests/moduleScope.test.ts` gate it. (Why →
-  `DECISIONS.md` §s180/s196.)
-- **A Branche tag is EARNED: the brief must name that workplace** (founder s199,
-  `scripts/sector-markers.mjs` is the ONE lexicon, shared by `lint:content` and
-  `tests/writingScope.test.ts` so gate and test cannot drift). The old all-15-Branchen-per-Thema
-  floor is GONE: it was satisfiable by tagging, and 199 of 600 tags named an industry their brief
-  never entered. Beruf pools keep ≥8 of 15 sectors earned; Alltag has few, honestly. Removing a tag
-  costs no reach (Branche is soft), so add a missing word to the lexicon or drop the tag.
-  (Why → `DECISIONS.md` §s199.)
+  live. A `du` brief never names a title + surname (s200): the Adressat drives the Anrede.
+  `tests/writingScope.test.ts` and `tests/moduleScope.test.ts` gate it. (Why → `DECISIONS.md`
+  §s180/s196.)
+- **A TAG IS EARNED, and a brief ASKS for what it is graded on.** Two rules, one arrangement: ONE
+  lexicon per rule in `scripts/`, shared by `lint:content` AND `tests/writingScope.test.ts`, so gate
+  and test cannot drift.
+  - **Branche** (`sector-markers.mjs`, founder s199): the brief must name that workplace. The
+    all-15-per-Thema floor is GONE (satisfiable by tagging; 199 of 600 tags named an industry the
+    brief never entered). Beruf keeps ≥8 of 15 earned, Alltag few and honestly. Dropping a false tag
+    costs no reach (Branche is soft), so add the missing word to the lexicon or drop the tag.
+  - **Argumentation** (`justification-markers.mjs`, s200): a `stellungnahme`, `forumsbeitrag`,
+    `widerspruch` or `beschwerde` at B2+ carries ≥1 Leitpunkt demanding a **reason, a consequence or
+    a stance**, because `level` is what tells `evaluate-writing` to mark strictly. Fix by REPLACING
+    the weakest descriptive point, never a fifth. Matching is phrase-level over the whole clause,
+    never the opening verb ("**Legen** Sie dar, warum …" IS the argumentative move). B1 exempt.
+  - **A supplied `source` text belongs to the REPLY genre, never to an opinion task** (s200): no
+    exam supplies a text for a Forumsbeitrag or a Stellungnahme (Goethe B2 Teil 1, DTB B2 Teil 2),
+    while DTB B2 Teil 1 prints the customer mail you answer. `source` is currently read by nothing.
+  (Why → `DECISIONS.md` §s199/§s200.)
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments
@@ -137,16 +146,16 @@ after pulling.
   else (a proxy field sent every account back through onboarding and discarded its level and goal).
   Where a not-onboarded visitor goes depends on their session: signed out → `/welcome`, signed in →
   `/start` (`docs/DECISIONS.md` §s174).
-- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief,
-  a conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (its fourth
+- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief, a
+  conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (its fourth
   caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot (an LLM adapts
-  down and assesses nothing): the brief makes it an exercise, and the partner never corrects
-  mid-flow. **Layout is a property of the TASK**: practice runs the transcript (`gespraech`), an
-  exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
-  conversation row is written when a conversation STARTS**, so the daily limit counts what costs
-  money and the turn ceiling is measured against the STORED transcript AND on the client (s194).
-  **The practice counts once the learner has SPOKEN, not once the AI has graded** (s196): the
-  transcript is stored server-side, so a failed debrief is retryable. Detail: `docs/areas/SPRECHEN.md`.
+  down and assesses nothing): the brief makes it an exercise, the partner never corrects mid-flow.
+  **Layout is a property of the TASK**: practice runs the transcript (`gespraech`), an exam task
+  keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The row is
+  written when a conversation STARTS** (s194), so the daily limit counts what costs money and the
+  turn ceiling is measured against the STORED transcript AND on the client; **the practice counts
+  once the learner has SPOKEN, not once the AI has graded** (s196), so a failed debrief is
+  retryable. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
   `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
@@ -167,11 +176,11 @@ after pulling.
   that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired), and a
   trainer that produces a correction rather than a percentage keeps its own Verlauf on its own page
   (Schreiben since s171, Sprechen since s196 — a recorded row nothing reads back is lost work).
-- **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
-  instead of throwing, so an ignored result makes a permanently broken sync look identical to a
-  working one. Every push reads its error, retries with backoff, and after 3 consecutive failures
-  flips `useAuthStore.syncHealth` to `"failing"`, shown in Settings as "Sync pausiert" with a retry.
-  Any new cloud write path does the same; never `await` a Supabase call and drop its result.
+- **A failed cloud write is never silent** (s185). supabase-js returns `{ error }` instead of
+  throwing, so an ignored result makes a permanently broken sync look identical to a working one.
+  Every push reads its error, retries with backoff, and after 3 consecutive failures flips
+  `useAuthStore.syncHealth` to `"failing"` ("Sync pausiert" in Settings, with a retry). Any new
+  cloud write does the same; never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
   keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded` so the lifetime figure is unchanged;
   migration 0015 purges abandoned guest accounts (90 days), transform-cache rows (60 days) and
@@ -198,13 +207,11 @@ after pulling.
   scroll the field into view. **The Prüfung hub** uses `h-pruefung-stage` (s196), which unlike the
   shared `h-page-stage` keeps a real ceiling from `lg` up too (`h-page-stage` goes `auto` on desktop
   on the once-true assumption that desktop has room to spare).
-- **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
-  buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
-  and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
-  keeps it, so WCAG 2.4.7 still holds. `:focus-visible` alone does not settle this: a control that
-  re-renders under the click (a switcher pill that navigates, a filter toggle that swaps its own
-  subtree) can come back focused and keep matching, and the browsers disagree on when. Never answer
-  a stray ring by deleting the indicator outright.
+- **A focus ring answers the KEYBOARD only** (founder s190). `trackInputMode()` marks
+  `<html data-input="pointer|keyboard">` and one rule in `index.css` drops the ring while the pointer
+  is in charge; keyboard navigation keeps it, so WCAG 2.4.7 holds. `:focus-visible` alone does not
+  settle it: a control that re-renders under the click can come back focused and keep matching, and
+  browsers disagree on when. Never answer a stray ring by deleting the indicator outright.
 - **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
   hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
   assumption. A scroll container also SLICES what crosses its edge (`useEdgeFade`), and a rail
