@@ -139,6 +139,12 @@ text in Teil 1 (a forwarded customer complaint to answer) but not in Teil 2, whi
 topics, one a Forumsbeitrag. **The supplied text belongs to a GENRE, answering incoming workplace
 mail, not to an exam.** The audit had selected the 54 Stellungnahmen and 17 Forumsbeiträge, exactly
 the opinion tasks that never get one.
+**Shipped:** PR **#828** (four commits: `663f993` P2, `a7dd57a` P3, `f9a1e78` P5, `74828a9` +
+`c96c650` the P4 correction and docs) → squash-merged **`df101d7`**. Validate content and Deploy site
+to GitHub Pages both green on `main`. **Deploy Supabase functions did not run, and that is correct**:
+it is path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its own file, none of
+which this session touched. Post-merge housekeeping done, tree clean.
+
 **START HERE next session: the reply wave** (founder: "i agree with your assessment on p4 and a gap
 with Beschwerde. I'd go with your recommendation"). The **47 reply-shaped tasks** ("Ein Kunde
 beschwert sich … Antworten Sie ihm") show nothing of what came in, which IS the DTB B2 Schreiben
