@@ -5554,3 +5554,12 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (correction blocks under §6 and
   §8-P4) · `preview/schreiben-source-text.html` + artifact (the A/B/C placement mockup, built before
   the research and kept for the reply wave) · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `i agree with your assessment on p4 and a gap with Beschwerde. I'd go with your recommendation on this. document the session at this point, push everything live and we pick it up in a new session`
+  **Response:** P4 is closed as "not a defect", the reply wave is queued as the next session's work,
+  and the branch shipped to `main`. The handoff now opens with what that session needs in order: 47
+  authored incoming texts, the rendering slot that does not exist yet (the Aufgabe card, the exam's
+  `SchreibenPart` and the `evaluate-writing` payload all ignore `source`), the two height laws to
+  respect while adding a block to a locked mobile anatomy, and the gate to add afterwards. The A/B/C
+  placement mockup is built and unpicked, so that session starts by asking which one.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log · PR into `main` (see the shipping record).

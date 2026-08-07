@@ -146,16 +146,16 @@ after pulling.
   else (a proxy field sent every account back through onboarding and discarded its level and goal).
   Where a not-onboarded visitor goes depends on their session: signed out → `/welcome`, signed in →
   `/start` (`docs/DECISIONS.md` §s174).
-- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief,
-  a conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (its fourth
+- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief, a
+  conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (its fourth
   caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot (an LLM adapts
-  down and assesses nothing): the brief makes it an exercise, and the partner never corrects
-  mid-flow. **Layout is a property of the TASK**: practice runs the transcript (`gespraech`), an
-  exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
-  conversation row is written when a conversation STARTS**, so the daily limit counts what costs
-  money and the turn ceiling is measured against the STORED transcript AND on the client (s194).
-  **The practice counts once the learner has SPOKEN, not once the AI has graded** (s196): the
-  transcript is stored server-side, so a failed debrief is retryable. Detail: `docs/areas/SPRECHEN.md`.
+  down and assesses nothing): the brief makes it an exercise, the partner never corrects mid-flow.
+  **Layout is a property of the TASK**: practice runs the transcript (`gespraech`), an exam task
+  keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The row is
+  written when a conversation STARTS** (s194), so the daily limit counts what costs money and the
+  turn ceiling is measured against the STORED transcript AND on the client; **the practice counts
+  once the learner has SPOKEN, not once the AI has graded** (s196), so a failed debrief is
+  retryable. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
   `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
@@ -176,11 +176,11 @@ after pulling.
   that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired), and a
   trainer that produces a correction rather than a percentage keeps its own Verlauf on its own page
   (Schreiben since s171, Sprechen since s196 — a recorded row nothing reads back is lost work).
-- **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
-  instead of throwing, so an ignored result makes a permanently broken sync look identical to a
-  working one. Every push reads its error, retries with backoff, and after 3 consecutive failures
-  flips `useAuthStore.syncHealth` to `"failing"`, shown in Settings as "Sync pausiert" with a retry.
-  Any new cloud write path does the same; never `await` a Supabase call and drop its result.
+- **A failed cloud write is never silent** (s185). supabase-js returns `{ error }` instead of
+  throwing, so an ignored result makes a permanently broken sync look identical to a working one.
+  Every push reads its error, retries with backoff, and after 3 consecutive failures flips
+  `useAuthStore.syncHealth` to `"failing"` ("Sync pausiert" in Settings, with a retry). Any new
+  cloud write does the same; never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
   keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded` so the lifetime figure is unchanged;
   migration 0015 purges abandoned guest accounts (90 days), transform-cache rows (60 days) and
@@ -207,13 +207,11 @@ after pulling.
   scroll the field into view. **The Prüfung hub** uses `h-pruefung-stage` (s196), which unlike the
   shared `h-page-stage` keeps a real ceiling from `lg` up too (`h-page-stage` goes `auto` on desktop
   on the once-true assumption that desktop has room to spare).
-- **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
-  buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
-  and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
-  keeps it, so WCAG 2.4.7 still holds. `:focus-visible` alone does not settle this: a control that
-  re-renders under the click (a switcher pill that navigates, a filter toggle that swaps its own
-  subtree) can come back focused and keep matching, and the browsers disagree on when. Never answer
-  a stray ring by deleting the indicator outright.
+- **A focus ring answers the KEYBOARD only** (founder s190). `trackInputMode()` marks
+  `<html data-input="pointer|keyboard">` and one rule in `index.css` drops the ring while the pointer
+  is in charge; keyboard navigation keeps it, so WCAG 2.4.7 holds. `:focus-visible` alone does not
+  settle it: a control that re-renders under the click can come back focused and keep matching, and
+  browsers disagree on when. Never answer a stray ring by deleting the indicator outright.
 - **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
   hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
   assumption. A scroll container also SLICES what crosses its edge (`useEdgeFade`), and a rail

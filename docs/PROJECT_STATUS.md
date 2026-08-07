@@ -16,9 +16,10 @@ more realistic".
   one shared classifier for gate and test (`scripts/justification-markers.mjs`).
 - **P3:** `exam` gone from 717 tasks, the interface and the types, with a guard against its return.
 - **P5:** five Textsorte re-tags and the 14 du/Sie hybrids, both now gated.
-- **P4 stopped.** The founder's own exam contradicted the audit, the published Modellsätze back the
-  founder, and the report carries a correction. The supplied text belongs to the reply genre, so the
-  honest target is the 47 "Antworten Sie" tasks, not the 71 opinion tasks. Nothing was changed.
+- **P4 stopped, then closed.** The founder's own exam contradicted the audit, the published
+  Modellsätze back the founder, and the report carries a correction. The supplied text belongs to the
+  reply genre, so the honest target is the 47 "Antworten Sie" tasks, not the 71 opinion tasks.
+  Nothing was changed, and the founder agreed: the reply wave is the next session's work.
 
 ## Session 199 log
 
@@ -138,9 +139,24 @@ text in Teil 1 (a forwarded customer complaint to answer) but not in Teil 2, whi
 topics, one a Forumsbeitrag. **The supplied text belongs to a GENRE, answering incoming workplace
 mail, not to an exam.** The audit had selected the 54 Stellungnahmen and 17 Forumsbeiträge, exactly
 the opinion tasks that never get one.
-1. **The honest version, if the founder wants it: the 47 reply tasks** ("Ein Kunde beschwert sich …
-   Antworten Sie ihm") show nothing of what came in, which IS the DTB B2 Teil 1 shape. That is a
-   session of its own: 47 authored incoming mails, a rendering slot, and an evaluator change.
+**START HERE next session: the reply wave** (founder: "i agree with your assessment on p4 and a gap
+with Beschwerde. I'd go with your recommendation"). The **47 reply-shaped tasks** ("Ein Kunde
+beschwert sich … Antworten Sie ihm") show nothing of what came in, which IS the DTB B2 Schreiben
+Teil 1 shape, and it is the one place `source` earns its keep. What that session needs, in order:
+1. **47 authored incoming texts** (customer mail, guest complaint, relative's message), each stating
+   the facts the Leitpunkte answer: dates, order numbers, what was promised, what arrived. `/content`
+   first; ids and instructions do not change, this is a new field only.
+2. **A rendering slot, which does not exist yet.** The Aufgabe card (`GuidedWritingTrainer`), the
+   exam's `SchreibenPart`, and the payload `evaluate-writing` grades against all ignore `source`
+   today. The A/B/C placement mockup is already built and still applies:
+   `preview/schreiben-source-text.html` (A text first / B task first / C folded behind one line);
+   the founder has not picked yet, so start by asking.
+3. **Watch the two height laws** while adding a block to that card: a freshly opened trainer never
+   rests scrolled, and the Schreiben mobile anatomy is locked (`docs/areas/SCHREIBEN.md`). The card
+   already caps and scrolls its task region internally, so the text is more content in that region,
+   not new chrome.
+4. **Gate it** the way s199 and s200 gated their rules: a reply-shaped brief without a `source` is
+   the defect to catch, and the lexicon lives in `scripts/` shared by `lint:content` and the test.
 2. **`source` has NO rendering slot** (read by nothing: not the Aufgabe card, not `SchreibenPart`,
    not `evaluate-writing`), so P4 was never the data-only edit the audit assumed. Either build it for
    the reply wave or retire the field like `exam`. Awaiting the founder's pick; nothing was changed.
