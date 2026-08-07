@@ -17,6 +17,12 @@ import { lifeAreaOf } from "@/lib/lifeAreas";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { WRITING_FORMATS } from "@/features/writing/WritingRail";
 import type { ThemeId } from "@/types";
+// The SAME lexicon `lint:content` gates with, so the unit test and the CI gate
+// can never drift into disagreeing about what an earned Branche tag is. It
+// lives in scripts/ deliberately: 15 marker lists are authoring tooling and
+// have no business in the learner's bundle.
+// @ts-expect-error - plain-JS tooling module, no .d.ts by design
+import { isSectorEarned } from "../scripts/sector-markers.mjs";
 
 const LENGTHS = ["short", "long"] as const;
 const THEME_IDS: ThemeId[] = themes.map((t) => t.id);
@@ -359,47 +365,74 @@ describe("Niveau and Textsorte axes (s167, hard since 2026-07-31)", () => {
     expect(normalizeLevelScope("nonsense")).toBe("");
   });
 
-  it("waves 2 and 4: EVERY Beruf Thema serves EVERY Branche a dedicated task", () => {
-    // The founder report behind wave 2: picking a Branche redrew a task that had
-    // nothing to do with that Branche, because only 11.8% of theme x Länge x
-    // Branche slots carried a tagged task. Wave 2 filled the five universal
-    // Themen; wave 4 filled the remaining five (logistics, project, technology,
-    // sustainability, travel), so all 10 x 15 x 2 slots now carry one.
-    const BERUF = themes.filter((t) => t.domain === "beruf").map((t) => t.id);
-    expect(BERUF.length).toBe(10);
-    for (const id of BERUF) {
+  it("a Branche tag is EARNED by the brief, never handed out to close a set", () => {
+    // s199 REPLACES the two "every Thema serves every Branche" coverage tests
+    // (waves 2-4). That floor was satisfiable by tagging, and tagging is what
+    // happened: all 40 theme x length pools carried exactly 15 distinct sectors,
+    // the exact size of the enum, handed out in enum order down the pool index,
+    // in pools as small as 11 tasks. 199 of 600 tagged tasks named an industry
+    // their brief never entered, so a Pharma learner was preferentially served
+    // "Sie haben auf einer Feier eine Bekannte wiedergetroffen".
+    //
+    // The replacement asserts the property the old floor only proxied for: a tag
+    // means the brief is about that workplace. `lint:content` enforces the same
+    // rule through the same lexicon, so this is the unit-level twin of the gate.
+    for (const id of THEME_IDS) {
       for (const length of LENGTHS) {
-        for (const sector of SECTOR_OPTIONS) {
-          const tagged = writingPrompts[id][length].filter((t) =>
-            t.sectors?.includes(sector.value as never),
-          );
-          expect(tagged.length, `${id}/${length}/${sector.value}`).toBeGreaterThan(0);
-          // And the draw must actually serve them, not fall back past them.
-          for (const ref of eligibleTasks({ theme: id, sub: "", sector: sector.value, length })) {
-            expect(writingPrompts[ref.theme][length][ref.ix].sectors).toContain(sector.value);
+        for (const t of writingPrompts[id][length]) {
+          for (const sector of t.sectors ?? []) {
+            expect(isSectorEarned(t, sector), `${t.id} claims "${sector}" but its brief has no marker`).toBe(
+              true,
+            );
           }
         }
       }
     }
   });
 
-  it("wave 3: every Alltag task carries Branche tags, and every Branche is reachable", () => {
-    // Founder decision (wave 3): Alltag is tagged too, not left universal. Each
-    // task names the work context that makes the everyday situation hard
-    // (Schichtdienst gegen Öffnungszeiten, Montage ohne Wochentage), so the tag
-    // does work instead of name-dropping an industry.
-    const ALLTAG = themes.filter((t) => t.domain !== "beruf").map((t) => t.id);
-    for (const id of ALLTAG) {
-      for (const length of LENGTHS) {
-        for (const t of writingPrompts[id][length]) {
-          expect(t.sectors?.length, `${t.id} untagged`).toBeTruthy();
-        }
+  it("Branche still PREFERS its tagged tasks where a Thema has them", () => {
+    // The soft-axis contract survives the strip: where earned tags exist, a
+    // Branche draws only those. `meetings` keeps all 15 sectors after s199.
+    const pool = writingPrompts.meetings.long;
+    const tasks = eligibleTasks({ theme: "meetings", sub: "", sector: "it", length: "long" });
+    expect(tasks.length).toBeGreaterThan(0);
+    expect(tasks.every((t) => pool[t.ix].sectors?.includes("it"))).toBe(true);
+  });
+
+  it("stripping the unearned tags cost NO reach: every Branche still draws everywhere", () => {
+    // The whole reason option (a) was cheap. Branche is soft and untagged =
+    // universal, so deleting a dishonest tag changes which task is PREFERRED,
+    // never whether the learner can practise. If this ever fails, the strip went
+    // past the soft-fallback rule and a scope really did go empty.
+    for (const length of LENGTHS) {
+      for (const id of THEME_IDS) {
         for (const sector of SECTOR_OPTIONS) {
-          const tagged = writingPrompts[id][length].filter((t) =>
-            t.sectors?.includes(sector.value as never),
-          );
-          expect(tagged.length, `${id}/${length}/${sector.value}`).toBeGreaterThan(0);
+          expect(
+            countTasks({ theme: id, sub: "", sector: sector.value, length }),
+            `${id}/${length}/${sector.value}`,
+          ).toBeGreaterThan(0);
         }
+      }
+    }
+  });
+
+  it("Beruf keeps Branche as a REAL axis; Alltag honestly has little", () => {
+    // The measured shape after the s199 strip, asserted as a floor so a future
+    // authoring wave cannot quietly hollow Berufsleben out, and as a ceiling-free
+    // fact about Alltag: an everyday task about a leaking tap is not an industry
+    // task, and the rail LOCKS those options rather than pretending (founder).
+    const earnedSectors = (id: ThemeId, length: (typeof LENGTHS)[number]) => {
+      const found = new Set<string>();
+      for (const t of writingPrompts[id][length]) for (const s of t.sectors ?? []) found.add(s);
+      return found.size;
+    };
+    const BERUF = themes.filter((t) => t.domain === "beruf").map((t) => t.id);
+    expect(BERUF.length).toBe(10);
+    for (const id of BERUF) {
+      for (const length of LENGTHS) {
+        // `travel` is the floor at 8: a Dienstreise is genuinely the same job in
+        // every industry, which is a fact about the world, not a content gap.
+        expect(earnedSectors(id, length), `${id}/${length}`).toBeGreaterThanOrEqual(8);
       }
     }
   });
