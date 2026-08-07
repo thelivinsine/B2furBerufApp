@@ -5563,3 +5563,6 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   respect while adding a block to a locked mobile anatomy, and the gate to add afterwards. The A/B/C
   placement mockup is built and unpicked, so that session starts by asking which one.
   **Artifacts:** `docs/PROJECT_STATUS.md` · this log · PR into `main` (see the shipping record).
+  **How session 200 shipped:** PR **#828** → squash-merged **`df101d7`**; Validate content and Deploy
+  site to GitHub Pages green on `main`; Deploy Supabase functions correctly did not run (path-filtered
+  to `supabase/**`, untouched this session). Housekeeping done after the merge.
