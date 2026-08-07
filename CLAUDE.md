@@ -72,9 +72,8 @@ after pulling.
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone
   that holds the four modules + Modelltest since s182) · the four Ohne-Zeit choosers
   `/lesen` · `/hoeren` · `/writing` · `/simulation` (each a card in that hub, not a tab) ·
-  `/exam` **Modelltest** (the four-part mock exam, s186;
-  renamed from "Prüfungssimulation" and re-laid-out s188: hub at rest, and the running Teil takes
-  the route over) ·
+  `/exam` **Modelltest** (the four-part mock exam: hub at rest, the running Teil takes the route
+  over) ·
   `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
   `/auth/confirm` (email-confirmation landing, ungated on purpose) · `/hilfe`,
   `/privacy`,
@@ -91,6 +90,15 @@ after pulling.
   documented respelling scheme (`docs/areas/CONTENT.md` §Pronunciation); every grammar topic has 10
   drills with ≥3 productive (`tests/grammar.test.ts`); and the count of B2.2/C1 items that are
   specialized-or-rarer is ratcheted at 334, because a rare compound is not an advanced word.
+- **Pedagogical shape is gated too** (audit §5, s198; `scripts/content-shape.mjs` +
+  `tests/contentShape.test.ts`): a `core`-frequency word is never labelled B2.2/C1, every theme
+  carries ≥3 verbs AND ≥3 adjectives, and three ratchets pin the measured bank (rare share 53.87%,
+  no-corpus-evidence 100, noun share 77.59%). Raising a ceiling is a deliberate edit there with a
+  reason, never the way to land a word.
+- **A gap in an example sentence comes from ONE rule** (`src/engine/blank.ts`, s198), used by the
+  MCQ/listening/typed clozes and the coverage report; it reports WHICH form it blanked so
+  distractors match. Never re-copy it into a call site: four copies is how an ASCII `\b` silently
+  disabled every umlaut-initial word.
 - **A human-verified row is never edited by an AI to satisfy a new rule.** The content fingerprint
   ties the `verified` stamp to exact content, so a new content-shape check WARNS on verified rows
   and queues them for the next human pass; it never re-stamps and never flips them back to draft.
@@ -125,9 +133,9 @@ after pulling.
   `/start` (`docs/DECISIONS.md` §s174).
 - **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief,
   a conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (speaking is
-  its fourth caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot: an
-  LLM adapts down to the learner and produces no assessment, so the brief (named partner, register,
-  2-5 Leitpunkte) makes it an exercise, and the partner never corrects mid-flow. **Which layout a
+  its fourth caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot (an
+  LLM adapts down and assesses nothing): the brief (named partner, register, 2-5 Leitpunkte) makes
+  it an exercise, and the partner never corrects mid-flow. **Which layout a
   spoken task uses is a property of the TASK**: practice runs the transcript (`gespraech`), an exam
   task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
   conversation row is written when a conversation STARTS**, so the daily limit counts what costs
@@ -164,10 +172,10 @@ after pulling.
   flips `useAuthStore.syncHealth` to `"failing"`, shown in Settings as "Sync pausiert" with a retry.
   Any new cloud write path does the same; never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
-  keep `RETAIN_DAYS` (400) days, folding dropped days into `activeDaysFolded` so the lifetime
-  figure is unchanged; migration 0015 purges abandoned guest accounts (90 days), transform-cache
-  rows (60 days) and learner TEXT (730 days) by `pg_cron`. The text purge NULLs columns, never
-  deletes rows, so limits, aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
+  keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded` so the lifetime figure is unchanged;
+  migration 0015 purges abandoned guest accounts (90 days), transform-cache rows (60 days) and
+  learner TEXT (730 days) by `pg_cron`, NULLing columns rather than deleting rows so limits,
+  aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
   copy describing it ship in the SAME change**; never resolve a conflict between them by editing
   the copy alone.
 - **Never reload over a learner's unsaved work.** Every automatic reload is gated on
@@ -327,15 +335,11 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   Migrations run BEFORE the function deploys, so a non-idempotent statement blocks the whole
   backend deploy. Three dispatch-only rescue inputs exist (`list_only`, `probe_schema`,
   `repair_applied`); see `docs/areas/COMMANDS.md`.
-- **Feature-branch pushes do NOT update the live site.** If the founder says "I don't see the
-  change", the likely cause is unmerged work on the session branch.
+- **Feature-branch pushes do NOT update the live site** ("I don't see the change" = unmerged work).
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
-- **A Pages deploy here outlasts the action's 10-minute default** (s196), so it used to self-cancel
-  and the leftover sometimes refused the NEXT merge. **Fixed s197:** attempt 1 gets
-  `timeout: 1800000` (30 min) so one attempt can outlast a slow deploy; the two retries keep 600000,
-  because the OTHER failure (the transient "try again later") fails fast and should surface fast.
-  If a deploy still goes red, re-run the workflow before suspecting the build. Why →
-  `docs/DECISIONS.md` §s196.
+- **A Pages deploy outlasts the action's 10-minute default:** attempt 1 gets `timeout: 1800000`
+  (30 min), the two retries keep 600000 (the transient "try again later" should fail fast). A red
+  deploy is re-run before the build is suspected. Why → `docs/DECISIONS.md` §s196.
 - The app is a PWA: after a deploy, a stale service worker can serve the old build; hard-refresh
   before diagnosing "missing" changes. Since s173 the auto-update reload also **defers while a draft
   or session is open**, so a learner mid-task adopts the new build at their next clean resume.

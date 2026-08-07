@@ -13,6 +13,17 @@ Bibliothek · Fortschritt + hidden Anwenden). History: `docs/DECISIONS.md`,
   (Lesen/Hören authentic input: Pool 6 emits ~1 per session,
   `features/session/ReadingBlock.tsx` renders a text + its comprehension MCQs, voicemails play
   via TTS when `ttsSupported()`; feeds XP + the session tally, **never vocab FSRS**).
+- **A reading block never repeats a text the learner has finished (s198).** Pool 6 draws from the
+  texts NOT in `useProgressStore.textsDone` and falls back to the whole scoped pool once they are
+  all read, so the block never disappears. `SessionPlayer` records the id when the block completes,
+  passed or not, and the field syncs (migration 0018, unioned like `scenariosDone`). Before this the
+  draw had no memory at all, and with a theme scope the pool is 1 to 3 texts, so the same text kept
+  coming back (content audit §2.2 "Reuse").
+- **A gap comes from `engine/blank.ts` (s198),** the one rule shared with the MCQ and listening
+  clozes: it matches the headword, the verb forms in `verbForms.ts`, the plural or the content token
+  of a multi-word headword, so a natural sentence no longer has to spell the bare infinitive. The
+  typed cloze stays lenient about inflection only for a headword gap; a Partizip II or plural gap
+  accepts just that form, because the sentence around it takes nothing else.
 - The speaking block has an "Anzeigen" give-up (calls `evaluate("")`: reveals the answer, grades
   FSRS 0, unlocks Weiter), mirroring the typed block.
 - **Pool 4 (Redemittel recall) is theme-aware since s182.** The bank now carries `themeId` on the

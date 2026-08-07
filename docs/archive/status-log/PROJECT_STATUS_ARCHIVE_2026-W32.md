@@ -967,3 +967,119 @@ the second half of P28: the hub still loads ~825 kB of content banks because `en
 them, and the per-render re-scan is fixed (`useMemo`) but the load is not. The real fix is
 precomputing availability at build time like `frequency.ts`, which is a generator job. Still open
 from s193: no exam set is `anruf` shaped, and the authored `nodes` graphs are dead but not retired._
+
+**Handoff after session 197 (2026-08-06): the Prüfung hub got ONE column and lost the s196
+header title (branch `claude/page-header-alignment-glqts5`).**
+Founder, with the same `/anwenden` screenshot: the s196 change "created this funny looking page ...
+It is looking ridiculous at the moment", and asked for previews of how the page should look overall
+before anything was built.
+- **The diagnosis.** s196 read their "aligned to left vertically with the toggle buttons" as the APP
+  header's left gutter, which is a different left edge from every control it was meant to line up
+  with. Underneath, the page nested THREE separately centred widths (`lg:max-w-4xl` panel column,
+  `max-w-[30rem]` module grid, `max-w-[26rem]` Stärkeprofil), so the tiles started ~220px right of
+  the title and a narrow tile island floated over a full-width Verlauf card.
+- **Round 1, previews only** (`preview/pruefung-header-align.html`, generator beside it, artifact
+  <https://claude.ai/code/artifact/77b2bdcf-aa2d-431d-a45a-cd6ea9d16c49>): the diagnosis at today's
+  real measurements, then A (title inside the page), B (title stays in the header, the page moves to
+  its left edge) and C (no title, the switcher as the page header). Live Theme / Column width /
+  Alignment-guide switches, light and dark, a desktop and a phone frame each.
+- **Founder picked "C, medium".** Built exactly that: `AppShell` no longer renders a title or a
+  second switcher copy (its greeting slot stays EMPTY on this route, which is the part of s196 that
+  survives), the hub's switcher is its header at every width, and ONE `HUB_COL` (`max-w-[40rem]`)
+  carries the switcher row, the scope row, the module grid and the Verlauf card. The grid and the
+  Stärkeprofil lost their own caps: the column was measured from the TILES instead, so they keep the
+  shape s196 asked for without a cap that breaks the page's edges.
+- **Three details the narrower card forced:** the Verlauf's split is proportional now
+  (`1.15fr / 1px / 1fr`, not a fixed 26rem half); its four profile labels put the mark ABOVE the
+  name at every width (side by side, "Schreiben" pushed through the divider into the list); and the
+  practice row uses one padding and one gap at every width, because at `sm:gap-4 lg:px-6` it had
+  exactly 0px spare and the score badge wrapped its "%" while the module name truncated.
+- **Empty Verlauf.** The Stärkeprofil columns are half height while empty (`h-6 sm:h-8`), with a
+  one-line caption: at full height four grey slabs at "–" read as a failed render.
+**Verified in the real built app** (Playwright over the global Chromium, seeded store, not a
+mockup): at 1440×900, 1440×760, 1024×850, 1023×850, 390×844 and 360×640, both tabs, empty / practice
+/ full history, the panel, the module grid and the Verlauf card report the SAME left edge and the
+same width at every size. Zero resting page scroll and zero horizontal overflow, except two bands
+that scroll on `main` too and were measured before and after: 1023×850 rests at 54px (unchanged) and
+360×640 at 43px (63px before this change).
+Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 127.9 kB of 400
+(down from 129.0: AppShell dropped its `hubSwitcher` import) · check:contrast.
+Shipped as **PR #817**, squash-merged into `main` as `a2ad467`.
+- **CI never ran, so every gate was run locally instead.** GitHub Actions scheduled nothing for this
+  repo across the whole window: no check registered on PR #817, no `Validate content` run was
+  created for the branch, and the `Validate content` run for the previous merge (#816, on `main`)
+  was **cancelled after 15 minutes without ever starting**. Before merging, `validate.yml`'s full
+  list was run here in its own order (`lint:content` · `lint:migrations` · `check:contrast` ·
+  `verify:facts` · `test:srs` · `test:pronounce` · `lint` · `test:unit`), all green. Note
+  `verify:facts` rewrites `docs/reports/verify-facts-report.json` with today's date every run; that
+  timestamp-only diff was reverted, not committed.
+- **The Pages deploy needed the documented workaround.** #816's deploy job self-cancelled at exactly
+  15 minutes (`build` green in 60 s, `deploy` 16:24:20 → 16:39:26) — the 600 s timeout diagnosed in
+  s196 — and its leftover is the likeliest reason no deploy run was created for this merge at all.
+  Dispatched `pages.yml` on `main` manually; it built `a2ad467` and **succeeded** (run
+  31128920435), so the change is live.
+**Resume here:** three known-open things, none of them blocking.
+1. The two pre-existing resting scrolls above (1023×850 at 54px, 360×640 at 43px). Both come from
+   the Verlauf card being `flex-none` at rest, so it cannot give room back when the stage is short;
+   fixing it means letting the collapsed list scroll inside the card, which touches the s195/s196
+   Verlauf behaviour and was left for the founder to ask for rather than assumed.
+2. The Modelltest tab's EMPTY Verlauf is a tall card with a small empty state in it (the s195 "fills
+   the frame" rule), and the narrower s197 column makes that more visible. Offered, not changed.
+3. **`pages.yml`'s `timeout` is still 600 s** and has now cost three sessions. The fix agreed in
+   s196 (raise to ~30 min, keep the 3-attempt retry) is a one-line change waiting for a go-ahead.
+
+**Handoff after session 196 (2026-08-06): fixed a desktop scroll regression in the Prüfung hub
+and gave it a real page header (branch `claude/prufung-hub-layout-ffco93`).**
+Founder, from a desktop screenshot of `/anwenden`: the page scrolled, the bottom Verlauf tile
+"looks unnecessarily big", the four module tiles "look empty" (too wide), the arrow and minutes
+badge should swap corners, and the "Guten Morgen" greeting space should become a big left-aligned
+header like the zone's own nav label, sitting next to the toggle buttons.
+- **The scroll.** `h-page-stage` (every trainer's shared zero-scroll stage class) goes
+  `height: auto` from `lg` up, on the assumption desktop has no shortage of room. This hub's
+  Verlauf card had grown past that assumption: at a real laptop height (900px minus browser chrome
+  is often 750-800px usable) the page overflowed. New `.h-pruefung-stage` (`src/index.css`) keeps
+  the mobile/`sm` formula `h-page-stage` already had and borrows `h-browse-stage`'s desktop formula
+  for `lg` instead of `auto`. Verified scroll-free at 1440×760, 1440×900, 1024×850 and 390×844,
+  both tabs, light and dark, with and without run history.
+- **The tiles.** `ModuleGrid`'s wrapper is now capped at `max-w-[26rem]`/`sm:max-w-[30rem]` instead
+  of stretching to the column, so the four cards read closer to square. The minutes badge (Mit
+  Zeit only) moved from the bottom-right corner to beside the icon in the top row; the arrow moved
+  from beside the icon to the bottom-right corner it vacated. Card height no longer needs a
+  clock-mode-driven reservation: the icon alone sets the top row's height either way, and the arrow
+  shows whenever the module can open, in both clock states.
+- **The Verlauf tile.** Trimmed the elements that carried most of its height for little
+  information: the Stärkeprofil bars (`h-24`→`h-16` desktop), the run chart (`H=68`→`52`), the
+  display score (`2.5rem`→`2rem`), and several paddings.
+- **The header.** From `lg` up, `AppShell` shows a big left-aligned "Prüfung" `h1` beside the
+  Module üben/Modelltest switcher, in the slot the generic greeting used to fill; below `lg` the
+  hub keeps its own switcher unchanged. New `features/pruefung/hubSwitcher.tsx` holds the switcher,
+  the `Tab` type and `usePruefungTab` (a `?tab=` reader/writer), so both switcher copies drive the
+  same URL param and `AppShell` never has to import `PruefungHub.tsx` itself — that file pulls in
+  `engine/exam` and the content banks behind it, which would break the keep-eager-code-light
+  invariant (AppShell mounts on every route). Confirmed by clicking the header copy's tab buttons
+  over CDP and reading the resulting URL/panel.
+Gates: typecheck · lint 0 errors (unchanged warning count) · 610 tests (unchanged) · build ·
+check:bundle 129.0 kB of 400 · check:contrast.
+Shipped as **PR #813**, squash-merged into `main`.
+- **Post-merge: the Pages deploy failed, twice looked like the code but wasn't.** Founder saw a red
+  "Deploy site to GitHub Pages" run right after the merge and asked to check it. The `build` job
+  (typecheck, `pnpm build`, artifact upload) was green; only the `deploy` job's calls into GitHub's
+  Pages API failed, each of the workflow's 3 built-in retries independently stuck in
+  `deployment_queued` for the full 10-minute timeout before aborting. A platform-side stall, the same
+  class of issue this repo hit once before (2026-07-04, noted in `pages.yml`'s own comments).
+  Founder asked whether a same-day parallel session (PR #812, open, unmerged) could be the cause;
+  ruled out by checking `git log origin/main` (unchanged since this PR's merge) and confirming
+  `pages.yml` only triggers on a push to `main`, of which there was exactly one in the window.
+  Re-ran the failed `deploy` job (`rerun_failed_jobs`); it succeeded on its first internal attempt
+  ~47 minutes after the original push, once the platform recovered. **Founder confirmed the site
+  live at `genauly.de`.** Nothing in the app or the workflow needed changing.
+  **One real, unrelated finding surfaced along the way:** because this PR merged first, PR #812
+  showed `mergeable_state: "dirty"` against `main` (both sessions touched overlapping Prüfung-area
+  docs). Correctly flagged rather than fixed here; the #812 session then resolved it by merging
+  `main` in and keeping both sessions' facts in every conflicted doc.
+**Resume here:** nothing is open. The greeting→title swap is scoped to `/anwenden` only; the
+founder's other example ("Bibliothek") read as illustrative of the pattern rather than a request
+to retitle that page today. `navItems` already carries every route's label if that changes.
+
+Older "Resume here" handoffs (s195 and earlier) are archived alongside their status-log entries in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.

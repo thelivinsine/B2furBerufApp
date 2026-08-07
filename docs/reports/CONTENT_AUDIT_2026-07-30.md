@@ -405,7 +405,31 @@ the progress store tracks text or dialogue completion, so nothing can guarantee 
   domain has ≥2 exam-length texts; gesundheit and bildung had none), all 6 voicemails carrying
   `notes`, and the learner-facing **Notizen step shipped as founder-picked variant A**, refined over
   three feedback rounds (`preview/notizen-a-r2.html`).
-- **Open:** P10 only, deferred by the founder.
+- **Closed in s198, the follow-up session that took everything except P10:**
+  the §4 word-level residuals (116 words that could never produce a cloze/typed gap/listening item,
+  67 with no resolving related term) are both **0**. The 116 turned out not to be a content gap at
+  all: three call sites each carried their own copy of the blanking rule, and every copy had the
+  same two defects (JavaScript's ASCII-only `\b`, which no umlaut-initial headword can match, and an
+  infinitive-only search that missed every Perfekt sentence). `src/engine/blank.ts` is now the one
+  rule and reads the verb forms `verbForms.ts` already ships, which did not exist when this audit
+  was written. Bending 85 natural German sentences into infinitives would have been the wrong fix;
+  15 separable verbs that kept a genuine gap did get an example rewritten, and 67 words gained a
+  related term that resolves.
+  The §5 closing observation ("there is no gate for is this word worth learning, is this band
+  plausible, does this theme have a balanced part-of-speech mix") is now three gates in
+  `scripts/content-shape.mjs`, each a ratchet or floor anchored on the measured bank
+  (`docs/areas/CONTENT.md` §The three pedagogical-shape gates). Clearing the part-of-speech floor
+  took **25 authored everyday verbs and adjectives**: `digitales` had no verb and no adjective at
+  all, and `freizeit`, `behoerde` and `mobilitaet` had no adjective, so those themes could only ever
+  drill nouns. That also serves P7's third clause. Bank shape moved from 78.7 % / 13.5 % / 5.1 %
+  noun/verb/adjective to **77.6 % / 13.6 % / 6.1 %**.
+  §2.2's "Reuse" finding is closed too: `progress.textsDone` (migration 0018) makes the composer
+  prefer a text the learner has not read, so a scoped learner stops seeing the same one alternate.
+- **Open:** P10 only, deferred by the founder. The one finding in the body that is NOT scheduled is
+  §2.1's inverted sub-theme structure (eight workplace themes carry no sub-themes, so 59 % of words
+  have no `subThemeId`). It is a taxonomy project rather than a content fix, because every new
+  Unterthema drags the writing-task invariant with it (≥ 2 tasks per Unterthema per length,
+  `tests/writingScope.test.ts`).
 - **Deliberately not done:** the 12 human-verified rows that P9's two new rules touch. Editing one
   would break the content fingerprint its `verified` stamp is tied to, and only a human may
   re-verify, so the linter WARNS on them instead of erroring and they are queued for the next
