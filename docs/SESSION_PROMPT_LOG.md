@@ -5418,6 +5418,92 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/PROJECT_REFERENCE.md` · this log.
 
+- **Prompt 3 (verbatim):** `go with your recommendation reg branche. I prefer to have Berufsleben and
+  Alltag as the first filter and then themen and only then Branchen filter as the heirarchy of the
+  filter rail all across. When a user selects a thema where there is no branche specific content,
+  just show the options within Branche as locked.`
+  **Response:** took P1 option (a) and then the two rail changes.
+  1. **A Branche tag is EARNED or it is not there.** `scripts/sector-markers.mjs` is the ONE marker
+     lexicon, read by `lint:content` AND `tests/writingScope.test.ts` so the gate and the test cannot
+     drift. **331 unearned tag instances stripped, 220 tasks universal again**, no id changed, no pool
+     renumbered, no task text touched. The two "every Thema serves every Branche" coverage tests are
+     replaced by the property they proxied for, plus a floor keeping Berufsleben real (≥8 of 15
+     sectors per pool) and a test asserting every Branche still draws everywhere, which is why the
+     strip costs no reach. Measured after: Beruf 13.4 of 15 sectors earned on average, Alltag 3.0.
+     A first cut of the lexicon withheld shared words like `charge`, `schicht` and `objekt` to be
+     "strict" and wrongly stripped `wt_safety_s09` ("An Anlage 2 sitzt die Schutzabdeckung locker.
+     Melden Sie das dem Schichtleiter.") from `production`; the shipped lexicon shares a marker
+     wherever the word really is shared, and the mistake is recorded in the file so it is not remade.
+  2. **The hierarchy inverts in all 8 rails:** Lebensbereich → Thema → Unterthema → Branche, then
+     Niveau and Textsorte. Niveau was the one open question (it is not part of the stated hierarchy
+     yet led every rail); "as the first filter" was read literally, so Lebensbereich leads and Niveau
+     follows. The order is applied INSIDE the rails, never by a caller.
+  3. **Branche LOCKS instead of greying**, via a second counting function
+     (`countDedicatedTasks`/`countDedicatedTexts`): the old count could never be zero because the soft
+     fallback serves the universal pool, so the rail printed a healthy number beside an option that
+     changed nothing. A zero now renders a padlock, and when EVERY option is locked one line replaces
+     the control (the normal state on Lesen/Hören, where 4 of 52 texts carry a tag). The engine's
+     fallback is untouched, so nothing became unreachable and deep links still work.
+  **Artifacts:** `scripts/sector-markers.mjs` (new) · `src/data/writingPrompts.ts` ·
+  `scripts/lint-content.mjs` · `tests/writingScope.test.ts` · `src/lib/writingScope.ts` ·
+  `src/lib/moduleScope.ts` · `src/features/shared/ScopeRail.tsx` · `src/features/shared/FilterRail.tsx` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/pruefung/TextModuleHub.tsx` ·
+  `src/features/sprechen/SprechenHub.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx`. Commits `acb21f7`, `7f5c464`.
+
+- **Prompt 4 (verbatim):** `no need of design preview for the above mention rail changes`
+  **Response:** deleted the half-written `preview/filter-hierarchy.html` (two order variants plus
+  three locked-state treatments) and implemented directly. The two sub-decisions the preview existed
+  to settle were made in-session and written into `docs/DECISIONS.md` §s199 so they can be revisited:
+  Niveau moves below the hierarchy, and "locked" is a padlocked row that collapses to one line when
+  every option is locked. Noted in the handoff that the lock lives in ONE place, so restyling it later
+  is a single-file change rather than an eight-rail one.
+
+- **Prompt 5 (verbatim):** `while you're at it, the header and footer of the filter rail seems to look
+  like separate pieces attached to the main body. remove the separator lines and make all the filter
+  rail same shade to look like one piece`
+  **Response:** the cause was compositing, not a colour choice: the tile wears `bg-accent/20` and the
+  header and Üben footer each painted `bg-accent/20` AGAIN on top of it, so both strips resolved to
+  roughly double the wash of the body between them, with a tinted `border-t` underlining each seam.
+  The second fills existed to keep the fixed header/footer opaque while the middle scrolled, and were
+  unnecessary: the rail is a flex column with `overflow-hidden` and the scroll region is `flex-1`, so
+  it already clips its own content. The mobile `layout="panel"` variant had been built without them
+  and was already seamless, which is the proof. Both fills and both rules removed, in `FilterRail` AND
+  in `ScopeRail`, so the two rails stay identical as s189 established. This supersedes the s169 note
+  that such a divider must be tinted rather than grey.
+  **Verified in the real app** (headless Chromium over the built bundle, 1440x1100, light and dark):
+  the new order, the locked line on Freizeit in both Schreiben and the Bibliothek, and no seams in
+  either theme.
+  Gates: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) · 649 tests · build ·
+  check:bundle 128.2 kB · check:contrast.
+  **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/features/shared/ScopeRail.tsx` ·
+  `CLAUDE.md` · `docs/DECISIONS.md` §s199 (three entries) · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/areas/CONTENT.md` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 6 (verbatim):** `document the session. I'll continue with the p2 and others in next session`
+  **Response:** the substance had already shipped inside PR #825 (the session-199 log and handoff in
+  `PROJECT_STATUS.md`, prompts 3-5 in this log, three `DECISIONS.md` §s199 entries, the three
+  replaced `CLAUDE.md` rules, and the three area docs). This pass added only what was not knowable
+  before the merge: the shipping record below, and a handoff rewritten around the founder taking P2
+  themselves next session rather than around a decision they had already made.
+  **How session 199 shipped, end to end:**
+  - **PR #824** (the audit report) → squash-merged **`66061c3`**. Validate content and Deploy site to
+    GitHub Pages both green.
+  - **PR #825** (three commits: `acb21f7` the Branche tag cleanup, `7f5c464` the rail changes,
+    `40176d1` the docs) → squash-merged **`bf9db0b`**. Validate content green on the PR head and
+    again on `main`; Deploy site to GitHub Pages green on `main`, with no self-cancel, so the s197
+    `timeout: 1800000` fix has now held on three consecutive Pages deploys.
+  - **Deploy Supabase functions did NOT run on `bf9db0b`, and that is correct, not a failure**: it is
+    path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its own workflow file, and
+    this session touched none of them. Checked rather than assumed, because "a workflow is missing
+    from the commit" and "a workflow failed" look identical in a run list.
+  - Post-merge housekeeping done after both merges (fetch → reset --hard origin/main →
+    force-with-lease, tree clean).
+  **The founder takes P2 next session**, so the handoff now leads with what a P2 session needs (the
+  six task ids, the replace-don't-append rule for their Leitpunkte, and the gate to add afterwards)
+  instead of the P1 decision that is now closed.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
 ## Session 200 — 2026-08-07 — branch `claude/ui-polish-consistency-56ja1y`
 
 - **Prompt 1 (verbatim):** `[four phone screenshots: /lesen, /hoeren, /simulation, /writing]` `i want

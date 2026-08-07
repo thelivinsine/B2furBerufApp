@@ -56,12 +56,25 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`): `sectors?: WorkSector[]` multi-tag with
   **untagged = universal** (`matchesSector` in `lib/facets.ts`: untagged items show under EVERY
   Branche; tagged items hide only under other Branchen). 15 values, each with a starter pack;
-  `transport` is labeled "Transport & Logistik". Branche renders as the FIRST dropdown in the rail
-  hierarchy Branche → Thema → Unterthema; `?sector=` is a single-value scope param; sector-tagged
+  `transport` is labeled "Transport & Logistik". Branche renders LAST in the rail hierarchy
+  Lebensbereich → Thema → Unterthema → Branche (founder s199; it used to lead), and locks where no
+  item carries the tag; `?sector=` is a single-value scope param; sector-tagged
   items sort first when a Branche is selected. As a scope it escapes the ≤12-option facet cap AND
   the coverage floor. The singular `sector` field is retired (linter errors); `office` stays
   deleted as a category error; `workSituation`/`counterpart`/`taskType` stay retired (linter errors
   on reintroduction). Retag-audit report: `docs/reports/sector-audit-report.md`.
+  **On WRITING TASKS a Branche tag must be EARNED (s199):** the brief (instruction + Leitpunkte +
+  Adressat) has to contain a marker of that workplace, defined once in `scripts/sector-markers.mjs`
+  and enforced by `lint:content` plus `tests/writingScope.test.ts` (one lexicon, so gate and test
+  cannot drift). This replaced the "all 15 Branchen on every Thema at both lengths" coverage floor,
+  which was satisfiable by tagging and duly was: all 40 pools carried exactly 15 sectors, the size
+  of the enum, in pools as small as 11 tasks, and 199 of 600 tagged tasks named an industry their
+  brief never entered. 331 unearned tag instances were stripped; 220 tasks became universal again.
+  Authoring rule: when a real sector term is missing from the lexicon ADD IT; otherwise drop the
+  tag, which costs no reach because Branche is soft and untagged = universal. Measured after the
+  strip: Beruf pools average 13.4 of 15 sectors with earned content (floor 8, `travel`, because a
+  Dienstreise is genuinely industry-neutral), Alltag 3.0. Full audit:
+  `docs/reports/writing-tasks-audit-2026-08-07.md`.
   **Axis rule: Branche = where you work, Thema = what you are doing; never reuse a label across
   axes.** Situation = the sub-theme grain of Thema, never a separate axis.
 - **`mode`** (`LearningMode` in `useSettingsStore`, default `both`) is a top-level lens chosen at

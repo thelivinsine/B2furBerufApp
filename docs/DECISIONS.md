@@ -1948,3 +1948,104 @@ adjectives and connectors" rule.
 themes carry no sub-themes, so 59 % of words have no `subThemeId`). It is a taxonomy project, not a
 content fix, because each new Unterthema drags the writing-task invariant behind it (≥2 tasks per
 Unterthema per length, gated by `tests/writingScope.test.ts`), so it is a session of its own.
+
+---
+
+## s199 — Branche was a coverage artifact, and the fix was to delete tags, not add content
+
+**The audit finding.** The s181 writing-task backlog closed on COVERAGE: 717 tasks, every Unterthema,
+every Textsorte, and "all 15 Branchen on every Beruf AND Alltag theme at both lengths", gated by two
+tests in `tests/writingScope.test.ts`. The s199 quality audit
+(`docs/reports/writing-tasks-audit-2026-08-07.md`) asked the question coverage cannot answer, which is
+whether the tags are EARNED, and the answer was visible in one table: **every one of the 40
+theme×length pools carried exactly 15 distinct sectors**, the exact size of the `WorkSector` enum,
+handed out in enum order down the pool index, in pools as small as 11 tasks. 199 of 600 tagged tasks
+contained no marker of the industry they claimed. `wt_freizeit_s08` was tagged `pharma` for "Sie haben
+auf einer Feier eine Bekannte wiedergetroffen".
+
+**Why it happened.** The invariant was arithmetically unsatisfiable by authoring: eleven everyday tasks
+cannot honestly represent fifteen industries. It was met the only other way available. The gate did
+exactly what it was written to do, which is the lesson: a coverage floor over a soft axis measures
+tagging, not content, and will be paid in tags.
+
+**The founder's choice (option a).** Presented as (a) relax the floor for Alltag and strip the tags no
+brief earns, or (b) keep the floor and author ~199 sector-specific variants. Founder: "go with your
+recommendation reg branche." Option (a) was recommended because **Branche is SOFT**: untagged means
+universal, and the axis is applied last precisely so it can never empty a pool. Deleting a dishonest
+tag therefore costs a learner nothing at all. It does not remove a task from anyone's reach; it only
+stops the app preferring a party anecdote for a Pharma learner over tasks that actually fit.
+
+**What replaced the floor.** `scripts/sector-markers.mjs`: one lexicon of per-sector markers, used by
+`lint:content` AND by the test, so the gate and the unit test cannot drift into disagreeing about what
+an earned tag is. Markers are deliberately SHARED where the word really is shared (`charge` belongs to
+production, chemicals and pharma; `objekt` to cleaning and security), because the job is to reject the
+tag with NO connection, not to be strict for its own sake. A first cut withheld the shared words and
+stripped `wt_safety_s09` ("An Anlage 2 sitzt die Schutzabdeckung locker. Melden Sie das dem
+Schichtleiter.") from `production`, which is as production-shaped as a brief gets: strictness in the
+wrong place is just a different wrong answer.
+
+Result: 331 tag instances stripped, 220 tasks universal again, no id changed and no task text touched.
+Beruf pools average 13.4 of 15 sectors with earned content (floor 8, `travel`, because a Dienstreise is
+genuinely the same job in every industry, which is a fact about the world rather than a content gap);
+Alltag averages 3.0.
+
+---
+
+## s199 — the filter hierarchy inverts, and Branche locks instead of pretending
+
+**The order.** Founder: "I prefer to have Berufsleben and Alltag as the first filter and then themen
+and only then Branchen filter as the heirarchy of the filter rail all across." Every rail ran
+Niveau → Branche → Lebensbereich → Thema → Unterthema → Textsorte (s149, with the pills pinned under
+Branche by s184). It now runs **Lebensbereich → Thema → Unterthema → Branche → Niveau → Textsorte**.
+
+Niveau was the one open question, because it is not part of the Berufsleben/Thema/Branche hierarchy
+yet led every rail. "As the first filter" was read literally: Lebensbereich leads, Niveau follows the
+hierarchy, Textsorte stays last. Moving Branche from second to fourth also fixed a smaller thing: after
+the tag cleanup it is the axis most often empty, and a filter that frequently has nothing to offer
+should not be the first control a learner meets.
+
+The order is applied INSIDE the rails (`FilterRail` reorders the `scopes` array itself), never by the
+callers, so no surface can drift. That is the same reasoning s184 used to place the pills centrally.
+
+**The lock.** Founder, same message: "When a user selects a thema where there is no branche specific
+content, just show the options within Branche as locked." This required a second counting function.
+`countTasks`/`countTexts` answer "what will I get", and for Branche that is never zero, because the
+soft fallback serves the universal pool. Right for the draw, wrong for the rail: it printed a healthy
+number beside every industry while choosing one changed nothing, which is the same rail-vs-engine
+disagreement s167 fixed for the other axes. `countDedicatedTasks`/`countDedicatedTexts` answer "what is
+written FOR this industry", and a zero there locks the option with a padlock.
+
+**Why a whole-control state exists too.** Fifteen padlocked rows say the same thing fifteen times,
+which is exactly what the redundancy rule targets, and on Lesen/Hören it would be the normal sight:
+only 4 of 52 texts carry a Branche tag. So when every option is locked, one line replaces the control.
+The engine's fallback is untouched, so nothing became unreachable and a deep link naming a locked
+Branche still serves the universal pool rather than breaking.
+
+**Deliberately no preview round.** The design law is previews-first; the founder waived it here ("no
+need of design preview for the above mention rail changes"). The two open sub-decisions (where Niveau
+lands, what "locked" looks like) were therefore decided in-session and are recorded above so they can
+be flipped cheaply: the lock lives in ONE place (`ScopeSelect`'s row renderer plus `ScopeLocked`), so
+restyling it is a single-file change rather than an eight-rail one.
+
+---
+
+## s199 — the rail is one piece (why the header looked bolted on)
+
+Founder: "the header and footer of the filter rail seems to look like separate pieces attached to the
+main body. remove the separator lines and make all the filter rail same shade to look like one piece."
+
+The cause was compositing, not a colour choice. The tile wears `bg-accent/20`, and the header and the
+Üben footer each painted `bg-accent/20` **again on top of it**, so both strips resolved to roughly
+double the wash of the body between them. A tinted `border-t` under the header and above the footer
+then underlined each seam. Two strips a visibly different shade from the middle, each with a rule at
+its boundary, is a picture of three parts bolted together, which is what the founder saw.
+
+The second fills existed to keep the fixed header and footer opaque while the middle scrolled. They
+were unnecessary: the rail is a flex column with `overflow-hidden` and the scroll region is `flex-1`,
+so the region already clips its own content and can never render into them. The mobile `layout="panel"`
+variant had been built without them from the start and was already seamless, which is the proof.
+
+Both extra fills and both rules are gone, in `FilterRail` and in `ScopeRail` (the Aufgabe rails' header
+divider went with them), so the two rails stay identical, as s189 established. This supersedes the s169
+note that a divider on such a tile must be tinted rather than grey: the note was right that a grey rule
+was wrong, and the answer turned out to be no rule at all.

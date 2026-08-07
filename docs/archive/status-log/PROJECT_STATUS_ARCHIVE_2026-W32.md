@@ -1118,3 +1118,30 @@ check:contrast · lint:content.
 **Resume here:** nothing is open from this change. **CI never fired for PR #818** (no check run was
 created minutes after opening, and the 16:22 `main` validate run was cancelled by the platform), so
 every gate validate.yml runs was run locally instead; worth a glance at the post-merge run.
+
+---
+
+## Session 197 log
+
+Founder: "in one of the previous sessions, I asked sonnet to replace the hello greeting with the
+page's name as a header ... But it created this funny looking page ... It is looking ridiculous at
+the moment", then "C, medium".
+**The Prüfung hub has ONE column now and no page title.** s196 had read "aligned to left vertically
+with the toggle buttons" as the APP header's left gutter, which is a different left edge from every
+control it was meant to line up with; the page under it nested three separately centred widths, so
+nothing shared an edge with anything. A preview round
+(`preview/pruefung-header-align.html`, artifact
+<https://claude.ai/code/artifact/77b2bdcf-aa2d-431d-a45a-cd6ea9d16c49>) offered A (title in the
+page), B (title in the header, page moves to its edge) and C (no title, the switcher IS the page
+header, as in the Bibliothek). The founder picked **C at 640px**: the app header's greeting slot
+stays empty on this route, and one `HUB_COL` (`max-w-[40rem]`) carries the switcher row, the scope
+row, the module grid and the Verlauf card. The tile grid and the Stärkeprofil dropped their own
+caps, because the column was measured from the TILES rather than the page.
+**Full detail in "Resume here" below**, including the two resting scrolls this deliberately did not
+fix and the CI/Pages situation around the merge. The "why" is in `docs/DECISIONS.md` §s197.
+
+**A PARALLEL s197 branch ran at the same time** and shipped the mobile Bibliothek's soft bottom edge
+plus the "Nach oben" button that was sitting behind the Üben CTA (PRs #818 and #820). Its handoff is
+the first block under "Resume here"; the two branches touched no common source file, only the shared
+docs, and every conflict was resolved by keeping BOTH sessions' facts. The prompt log labels them
+**parallel A** (Bibliothek) and **parallel B** (Prüfung).

@@ -108,10 +108,16 @@ after pulling.
   options grey out with their honest count; an empty scope gets an empty state naming the one filter
   to drop. Related founder law: **only a task carrying the full brief is served** (Adressat, du/Sie,
   2-5 Leitpunkte, Niveau, Textsorte, word target), because the AI grades Aufgabenerfüllung against
-  it: **717 writing tasks, every one servable**, ≥2 per Unterthema per length, all 15 Branchen on
-  every Beruf AND Alltag theme at both lengths, all 16 Textsorten live. `tests/writingScope.test.ts`
-  and `tests/moduleScope.test.ts` gate all of it, so they are invariants now. (Why → `DECISIONS.md`
-  §s180/s196.)
+  it: **717 writing tasks, every one servable**, ≥2 per Unterthema per length, all 16 Textsorten
+  live. `tests/writingScope.test.ts` and `tests/moduleScope.test.ts` gate it. (Why →
+  `DECISIONS.md` §s180/s196.)
+- **A Branche tag is EARNED: the brief must name that workplace** (founder s199,
+  `scripts/sector-markers.mjs` is the ONE lexicon, shared by `lint:content` and
+  `tests/writingScope.test.ts` so gate and test cannot drift). The old all-15-Branchen-per-Thema
+  floor is GONE: it was satisfiable by tagging, and 199 of 600 tags named an industry their brief
+  never entered. Beruf pools keep ≥8 of 15 sectors earned; Alltag has few, honestly. Removing a tag
+  costs no reach (Branche is soft), so add a missing word to the lexicon or drop the tag.
+  (Why → `DECISIONS.md` §s199.)
 - **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
   elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments
@@ -132,17 +138,15 @@ after pulling.
   Where a not-onboarded visitor goes depends on their session: signed out → `/welcome`, signed in →
   `/start` (`docs/DECISIONS.md` §s174).
 - **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief,
-  a conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (speaking is
-  its fourth caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot (an
-  LLM adapts down and assesses nothing): the brief (named partner, register, 2-5 Leitpunkte) makes
-  it an exercise, and the partner never corrects mid-flow. **Which layout a
-  spoken task uses is a property of the TASK**: practice runs the transcript (`gespraech`), an exam
-  task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
+  a conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (its fourth
+  caller; never a fifth copy), and its own Verlauf. Deliberately NOT an open chatbot (an LLM adapts
+  down and assesses nothing): the brief makes it an exercise, and the partner never corrects
+  mid-flow. **Layout is a property of the TASK**: practice runs the transcript (`gespraech`), an
+  exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
   conversation row is written when a conversation STARTS**, so the daily limit counts what costs
-  money, the turn ceiling is measured against the STORED transcript AND on the client (s194), and
-  **the practice counts once the learner has SPOKEN, never only once the AI has graded** (s196):
-  the transcript is stored server-side, so a failed debrief is retryable and never a lost session.
-  Full detail in `docs/areas/SPRECHEN.md`.
+  money and the turn ceiling is measured against the STORED transcript AND on the client (s194).
+  **The practice counts once the learner has SPOKEN, not once the AI has graded** (s196): the
+  transcript is stored server-side, so a failed debrief is retryable. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
   `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
@@ -152,14 +156,11 @@ after pulling.
   alone**, so the question stepper is a chevron. A phone carries the module row on every screen
   (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`). **That row NAMES the module and
   carries no control** (founder s200): the Aufgabe toggle moved to the chooser's own toolbar row,
-  level with the count it changes and directly above the panel it opens.
-  ONE Niveau control per screen: the hub's `LevelSelect`, and on a
-  chooser the rail's own Niveau. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: ONE width for
-  its switcher row, scope row, module grid AND Verlauf card, so every block shares two edges), a
-  chooser wears Schreiben's
+  level with the count it changes and directly above the panel it opens. ONE Niveau control per
+  screen. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: one width for switcher, scope row,
+  module grid AND Verlauf, so every block shares two edges), a chooser wears Schreiben's
   content-plus-16rem-rail grid (s196), and only a RUNNING Teil gets the wide `lg:max-w-6xl` stage.
-  The Verlauf card ships in an empty state from the first visit, because both hub tabs hold a
-  one-viewport frame.
+  The Verlauf card ships in an empty state from the first visit.
 - **An exercise the app scores can always be handed in, and every score it produces is reachable**
   (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
   question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
@@ -199,9 +200,9 @@ after pulling.
   this with a stage instead of measurement (s186): a running Teil is `h-exam-stage` tall, pins its
   RunBar/strip/actions and scrolls ONE inner region, so all ten in-exam screens rest at exactly 0
   page scroll down to 360x640. Height only, never `overflow:hidden`, or the mobile keyboard cannot
-  scroll the field into view. **The Prüfung hub** uses `h-pruefung-stage` (s196): unlike the shared
-  `h-page-stage`, it keeps a real ceiling from `lg` up too, because a tall Verlauf card scrolls a
-  real laptop height.
+  scroll the field into view. **The Prüfung hub** uses `h-pruefung-stage` (s196), which unlike the
+  shared `h-page-stage` keeps a real ceiling from `lg` up too (`h-page-stage` goes `auto` on desktop
+  on the once-true assumption that desktop has room to spare).
 - **A focus ring answers the KEYBOARD only** (founder s190: "why are there blue outlines on toggle
   buttons and on filter button?"). `trackInputMode()` marks `<html data-input="pointer|keyboard">`
   and one rule in `index.css` drops the ring while the pointer is in charge; keyboard navigation
@@ -230,8 +231,9 @@ system, the preview-first process, the pre-flight checklist ranked by past rewor
 rejected-then-reverted landmine list. The bullets below are only the always-on summary.
 - **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
   building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
-  dropdowns, facet pills, the ONE floating mobile action cluster) and the one categorization hierarchy
-  (Branche → **Lebensbereich** → Thema → Unterthema). **Exactly TWO learner-facing categories,
+  dropdowns, facet pills, the ONE floating mobile action cluster) and the one categorization
+  hierarchy, **Lebensbereich → Thema → Unterthema → Branche** (founder s199; it was
+  Branche-first until then). **Exactly TWO learner-facing categories,
   everywhere: Berufsleben and Alltag** (`src/lib/lifeAreas.ts` is the one fold; only `beruf` is
   Berufsleben, every other domain is Alltag). The five content domains stay the authoring grain,
   never a heading a learner sees; a third group in any dropdown or legend is a bug (founder, s181).
@@ -242,25 +244,21 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **A result is shown in ONE place per page** (founder s188): past scores live in that page's
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
-  **Module üben** (the four modules as identical cards) | **Modelltest** (the run band, then
-  Verlauf). The switcher IS the header at EVERY width (no HubHero, no in-page `h1`, no page title),
-  and the AppShell header's greeting slot stays EMPTY here (founder pick C, s197; a header copy, if
-  ever wanted again, imports `features/pruefung/hubSwitcher.tsx`, never `PruefungHub.tsx`, which
-  would drag the content banks into the eager bundle). Niveau is a compact button, the scope
-  controls sit BELOW the switcher at EVERY width, both rows centred. **Mit Zeit / Ohne Zeit** is one
-  switch beside it, resting on Ohne Zeit, and it is the ONLY way into the four choosers (`/lesen`,
-  `/hoeren`, `/writing`, `/simulation`): they are what the same four modules do without a clock,
-  never a fifth block. **All four wear ONE "Aufgabe wählen" rail**
-  (`features/shared/ScopeRail.tsx`, s196), sticky beside the content on desktop and behind the
-  toolbar row's Aufgabe toggle on a phone; Lesen and Hören used to open a random draw with no way to
-  pick, and that draw survives as their "Zufällige Auswahl" button. **The three list choosers are
-  ONE component** (`ModulePicker` + `ChooserCard` + `ModuleTabs`, s200): Üben/Verlauf switcher, one
-  toolbar row (count · Aufgabe · Zufällige Auswahl), one card anatomy (mark + title + context line +
-  chevron, facts on a bottom-aligned foot row), one 0.16s stagger.
-  **The exam FRAME is Mit Zeit's alone** (founder s192): Ohne Zeit skips the
-  Anleitung and opens the drill. Only the STAGE stays shared; the exit and its confirm follow the
-  one-frame law above, not the clock. The run band's timeline connector is one segment per gap,
-  drawn between the tiles, never a line behind them.
+  **Module üben** | **Modelltest**. The switcher IS the header at every width (no HubHero, no `h1`,
+  no page title) and the AppShell greeting slot stays EMPTY here (pick C, s197; a header copy would
+  import `features/pruefung/hubSwitcher.tsx`, never `PruefungHub.tsx`, which drags the banks eager).
+  Niveau is a compact button; scope controls sit BELOW the switcher, both rows centred.
+  **Mit Zeit / Ohne Zeit** rests on Ohne Zeit and is the ONLY way into the four choosers (`/lesen`,
+  `/hoeren`, `/writing`, `/simulation`), which are the same four modules without a clock, never a
+  fifth block. All four wear ONE "Aufgabe wählen" rail (`features/shared/ScopeRail.tsx`, s196),
+  sticky on desktop, behind the TOOLBAR row's Aufgabe toggle on a phone; Lesen/Hören keep their old
+  random draw as a "Zufällige Auswahl" button. **The three list choosers are ONE component**
+  (`ModulePicker` + `ChooserCard` + `ModuleTabs`, s200): Üben/Verlauf switcher, one toolbar row
+  (count · Aufgabe · Zufällige Auswahl), one card anatomy (mark + title + context line + chevron,
+  facts on a bottom-aligned foot row), one 0.16s stagger. **The exam FRAME is Mit Zeit's alone**
+  (s192): Ohne Zeit skips the Anleitung and opens the drill; only the STAGE is shared, and the exit
+  follows the one-frame law, not the clock. The run band's connector is one segment per gap, between
+  the tiles.
 - **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): a height-stable scope
   row, and the module card's minutes badge in a corner RESERVED in both clock states, so the clock
   switch cannot move a card
@@ -268,12 +266,19 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   supporting stats, the last seven runs as bars against the pass line); Module üben's is a
   Stärkeprofil (pale = first attempt, solid = the gain since). **A Modelltest is a run that sat all
   four parts; a run that sat one is module practice**, and the two lists never mix.
-- **Every filter and Aufgabe rail carries the Lebensbereich pills** (founder, s184): one shared
-  `LifeAreaPills` control in a fixed slot, directly BELOW the Branche dropdown (top of the scope
-  stack on a rail without one), single-select that toggles off, `?area=` in the URL, honest counts.
-  Picking one narrows the Thema dropdown to that area and drops a Thema from the other one, so pill,
-  dropdown and list can never disagree. The one exception is Grammatik, whose topics carry no Thema:
-  a life-area filter there would be dead chrome, not a filter.
+- **Every rail runs ONE order, Lebensbereich FIRST** (founder s184, reordered s199):
+  `LifeAreaPills` lead, then Thema, Unterthema, Branche, then Niveau and Textsorte. Single-select
+  that toggles off, `?area=` in the URL, honest counts; picking one narrows the Thema dropdown to
+  that area, so pill, dropdown and list can never disagree. The order lives INSIDE the rails, never
+  in a caller, so it cannot drift. Grammatik is the one exception (no Thema, so no life-area pills).
+- **Branche LOCKS where it has nothing; it never merely greys** (founder s199). Its count is the
+  DEDICATED one, not what the soft fallback would serve, because a healthy number beside an option
+  that changes nothing is the rail lying about the engine. Zero renders a padlock; when EVERY option
+  is zero, ONE line replaces the control (the normal state on Lesen/Hören, 4 of 52 texts tagged).
+  The engine keeps its untagged-=-universal fallback, so nothing is unreachable.
+- **A rail is ONE piece** (founder s199): no separator rules, no second fill on header or footer.
+  They painted the accent wash ON TOP of the tile's own, composited darker, and read as bolted-on
+  parts. They need no opaque backing: the flex column already clips the scroll region away.
 - **Previews first for design work:** founder-reviewable `preview/*.html` mockups from the real
   tokens, iterate on the feedback list, then implement.
 - **No redundancy:** each fact appears once, no explanatory filler lines, compact chrome
@@ -334,17 +339,14 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   `.github/workflows/pages.yml` ships the site, and `.github/workflows/supabase.yml` deploys every
   Supabase Edge Function (and applies migrations first, when `SUPABASE_DB_PASSWORD` is set).
   `validate.yml` is the content-lint + test gate and never deploys.
-- **No CLI is needed for backend changes any more, migrations included (s179).** With
-  `SUPABASE_ACCESS_TOKEN` (set; expires, and the run then fails with an explicit "regenerate it")
-  and `SUPABASE_DB_PASSWORD` (set), **a merge to `main` applies pending migrations and then deploys
-  every Edge Function**. Nothing is pasted into the SQL editor any more.
-  **Keep migrations idempotent** (`add column if not exists`, `create table if not exists`,
-  `drop policy if exists` before `create policy`): the push runs `--include-all`, so an unrecorded
-  file is applied wherever its number sits. **`pnpm lint:migrations` gates this since s185** (files
-  ≤ 0014 are exempt as already-applied history; never raise that baseline to silence a new file).
-  Migrations run BEFORE the function deploys, so a non-idempotent statement blocks the whole
-  backend deploy. Three dispatch-only rescue inputs exist (`list_only`, `probe_schema`,
-  `repair_applied`); see `docs/areas/COMMANDS.md`.
+- **No CLI is needed for backend changes, migrations included (s179).** With
+  `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` (both set; the token expires and the run then
+  says so), **a merge to `main` applies pending migrations, then deploys every Edge Function**.
+  **Keep migrations idempotent** (`… if not exists`, `drop policy if exists` before `create`): the
+  push runs `--include-all`, so an unrecorded file is applied wherever its number sits, and
+  migrations run BEFORE the functions, so a non-idempotent statement blocks the whole backend
+  deploy. `pnpm lint:migrations` gates this since s185 (files ≤ 0014 exempt as applied history;
+  never raise that baseline). Rescue inputs + detail: `docs/areas/COMMANDS.md`.
 - **Feature-branch pushes do NOT update the live site** ("I don't see the change" = unmerged work).
 - The sandbox cannot reach the live `*.github.io` site; the founder verifies live results.
 - **A Pages deploy outlasts the action's 10-minute default:** attempt 1 gets `timeout: 1800000`

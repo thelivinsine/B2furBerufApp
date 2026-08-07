@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, Pin, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { Check, ChevronDown, Lock, Pin, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   matchesFacets,
@@ -55,6 +55,14 @@ export interface RailPrimary {
   options?: PrimaryOption[];
   /** Grouped rows with group headings (the Domain-grouped themes). */
   groups?: PrimaryGroup[];
+  /**
+   * LOCK a zero-count option instead of leaving it selectable (founder s199).
+   * Set on the Branche scope, whose count is the DEDICATED-content signal: a
+   * zero there means the app has nothing written for that industry in the
+   * current Thema, and picking it could only serve the universal pool behind
+   * it. Not set on Thema, where a zero is an ordinary empty filter.
+   */
+  lockZero?: boolean;
 }
 
 /**
@@ -130,28 +138,41 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
 
   const row = (opt: PrimaryOption) => {
     const checked = p.values.includes(opt.value);
+    // Locked: no dedicated content behind this option. Never locks what is
+    // already checked, which is the way back out.
+    const locked = !!p.lockZero && opt.count === 0 && !checked;
     return (
       <button
         key={opt.value}
         type="button"
         role="option"
         aria-selected={checked}
-        onClick={() => toggleValue(opt.value)}
+        aria-disabled={locked || undefined}
+        disabled={locked}
+        onClick={() => !locked && toggleValue(opt.value)}
         className={cn(
           "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
-          checked ? "bg-primary/10 text-primary" : "hover:bg-muted/60",
+          checked
+            ? "bg-primary/10 text-primary"
+            : locked
+              ? "cursor-not-allowed text-muted-foreground/40"
+              : "hover:bg-muted/60",
         )}
       >
-        <span
-          className={cn(
-            "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
-            checked ? "border-primary bg-primary text-primary-foreground" : "border-border",
-          )}
-        >
-          {checked && <Check className="h-3 w-3" />}
-        </span>
+        {locked ? (
+          <Lock className="h-3 w-3 shrink-0" aria-hidden />
+        ) : (
+          <span
+            className={cn(
+              "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
+              checked ? "border-primary bg-primary text-primary-foreground" : "border-border",
+            )}
+          >
+            {checked && <Check className="h-3 w-3" />}
+          </span>
+        )}
         <span className="min-w-0 flex-1 truncate">{opt.label}</span>
-        {opt.count != null && <CountBadge value={opt.count} />}
+        {opt.count != null && <CountBadge value={opt.count} muted={locked} />}
       </button>
     );
   };
@@ -245,8 +266,17 @@ function writePins(scope: string, pins: string[]) {
 
 /** A muted count chip in the same visual language as the facet pills below
  *  (a small tabular number after the label, no parentheses). */
-function CountBadge({ value }: { value: number }) {
-  return <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{value}</span>;
+function CountBadge({ value, muted }: { value: number; muted?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "shrink-0 text-xs tabular-nums",
+        muted ? "text-muted-foreground/40" : "text-muted-foreground",
+      )}
+    >
+      {value}
+    </span>
+  );
 }
 
 /** Section heading row with the pin toggle. */
@@ -489,20 +519,35 @@ export function FilterRail<T>({
   // (s104): a checkbox popover, not a single-value Select, so the facet
   // groups below stay close to the top and picking several values (e.g. two
   // Branchen) does not require repeated re-opening.
-  const scopeSelect = (p: RailPrimary) => (
-    <section key={p.pinId}>
-      <SectionHeader
-        label={p.label}
-        eyebrow
-        pinned={pins.includes(p.pinId)}
-        onTogglePin={() => togglePin(p.pinId)}
-        pinnable={!panel}
-      />
-      <ScopeMultiSelect p={p} />
-    </section>
-  );
+  const scopeSelect = (p: RailPrimary) => {
+    // Every option locked means the whole control has nothing to offer: one
+    // line says so instead of a list of padlocks (founder s199, same rule the
+    // Aufgabe rails' `ScopeLocked` follows).
+    const opts = [...(p.options ?? []), ...(p.groups ?? []).flatMap((g) => g.options)];
+    const allLocked =
+      !!p.lockZero && opts.length > 0 && opts.every((o) => o.count === 0 && !p.values.includes(o.value));
+    return (
+      <section key={p.pinId}>
+        <SectionHeader
+          label={p.label}
+          eyebrow
+          pinned={pins.includes(p.pinId)}
+          onTogglePin={() => togglePin(p.pinId)}
+          pinnable={!panel}
+        />
+        {allLocked ? (
+          <p className="flex items-start gap-2 rounded-lg border border-dashed border-border px-2.5 py-2 text-xs leading-relaxed text-muted-foreground">
+            <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+            <span>Für dieses Thema gibt es nichts nach Branche. Du übst hier alles.</span>
+          </p>
+        ) : (
+          <ScopeMultiSelect p={p} />
+        )}
+      </section>
+    );
+  };
 
-  // The Lebensbereich pills (s184). One fixed slot: directly under Branche.
+  // The Lebensbereich pills (s184). Since s199 they LEAD the rail.
   const areaSection = area ? (
     <section key="area">
       <SectionHeader
@@ -521,20 +566,30 @@ export function FilterRail<T>({
     </section>
   ) : null;
 
-  // Ordered scope sections (Branche → Lebensbereich → Thema → Unterthema on
-  // Wörter/Kollokationen); the sub-theme entry only exists when the active theme
-  // has sub-themes, so drilling in is part of the filter, not a separate page.
+  // Ordered scope sections: **Lebensbereich → Thema → Unterthema → Branche**
+  // (founder s199: "Berufsleben and Alltag as the first filter and then themen
+  // and only then Branchen filter as the hierarchy of the filter rail all
+  // across"). The sub-theme entry only exists when the active theme has
+  // sub-themes, so drilling in is part of the filter, not a separate page.
   //
-  // The Lebensbereich slot is placed HERE rather than by the caller so it cannot
-  // drift per surface: it always follows the Branche dropdown, and on a rail
-  // without one (Redemittel) it leads, which is the same spot in the hierarchy
-  // (coarser than Thema, finer than nothing).
+  // Branche used to LEAD this rail with the Lebensbereich pills pinned directly
+  // under it (s184). It moves last because it is the finest cut of the three,
+  // and because after the s199 tag cleanup it is the axis most often empty: a
+  // filter that frequently has nothing to offer should not be the first thing
+  // the learner meets.
+  //
+  // The order is applied HERE rather than by the callers so it cannot drift per
+  // surface: every caller keeps passing its scopes in any order, and this rail
+  // is the one place that decides where Lebensbereich and Branche sit.
   const scopeSections = (() => {
-    const out = (scopes ?? []).map(scopeSelect);
-    if (!areaSection) return out;
-    const afterSector = (scopes ?? []).findIndex((s) => s.pinId === "sector");
-    const at = afterSector === -1 ? 0 : afterSector + 1;
-    return [...out.slice(0, at), areaSection, ...out.slice(at)];
+    const list = scopes ?? [];
+    const sector = list.filter((s) => s.pinId === "sector");
+    const rest = list.filter((s) => s.pinId !== "sector");
+    return [
+      ...(areaSection ? [areaSection] : []),
+      ...rest.map(scopeSelect),
+      ...sector.map(scopeSelect),
+    ];
   })();
 
   const facetSection = (facet: FacetDef<T>) => (
@@ -608,14 +663,16 @@ export function FilterRail<T>({
   const pinnedFacets = facets.filter((f) => pins.includes(f.id));
   const pinnedScopes = (scopes ?? []).filter((p) => pins.includes(p.pinId));
   const areaPinned = !!areaSection && pins.includes(AREA_PIN_ID);
-  // Same slot rule as the open body: pinned Lebensbereich follows a pinned
-  // Branche and otherwise leads, so collapsing never reshuffles the tile.
+  // Same order rule as the open body (s199): Lebensbereich leads, Branche
+  // trails, so collapsing the rail never reshuffles the tile.
   const pinnedSections = (() => {
-    const out = pinnedScopes.map(scopeSelect);
-    if (!areaPinned) return out;
-    const afterSector = pinnedScopes.findIndex((s) => s.pinId === "sector");
-    const at = afterSector === -1 ? 0 : afterSector + 1;
-    return [...out.slice(0, at), areaSection, ...out.slice(at)];
+    const sector = pinnedScopes.filter((s) => s.pinId === "sector");
+    const rest = pinnedScopes.filter((s) => s.pinId !== "sector");
+    return [
+      ...(areaPinned && areaSection ? [areaSection] : []),
+      ...rest.map(scopeSelect),
+      ...sector.map(scopeSelect),
+    ];
   })();
   const showPinnedBody =
     !open && (pinnedSections.length > 0 || pinnedFacets.length > 0);
@@ -695,7 +752,7 @@ export function FilterRail<T>({
           first row). Fixed at the top of the flex column so the scroll region
           below it owns the scrollbar. */}
       {!hideHeader && (
-        <div className="z-10 flex w-full shrink-0 items-center gap-1 rounded-t-xl bg-accent/20 px-3 py-2.5 dark:bg-accent/10 lg:rounded-none">
+        <div className="flex w-full shrink-0 items-center gap-1 px-3 py-2.5">
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -716,25 +773,22 @@ export function FilterRail<T>({
         </div>
       )}
 
-      {/* Scroll region: the ONLY part that scrolls, so the auto-hiding
-          scrollbar sits below the header separator and clear of the footer.
-          `border-t` here is the fixed separator line under the header (it is on
-          the scroll container, not the scrolling content, so it stays put).
-          Only mounted when there is body content, so a collapsed tile is just
-          header + footer. */}
+      {/* Scroll region: the ONLY part that scrolls, so the auto-hiding scrollbar
+          stays clear of the header and the footer. Only mounted when there is
+          body content, so a collapsed tile is just header + footer.
+          NO separator and no second fill (founder s199: header and footer "look
+          like separate pieces attached to the main body"). They were painting
+          `bg-accent/20` ON TOP of the tile's own `bg-accent/20`, so the two
+          strips composited to a visibly darker shade than the body between them,
+          and a tinted rule underlined the seam. One wash, no rules, one piece.
+          They no longer need to be opaque: the flex column clips this region, so
+          scrolling content can never reach them. */}
       {(open || showPinnedBody) && (
-        <div
-          className={cn(
-            "scrollbar-hover lg:min-h-0 lg:flex-1 lg:overflow-y-auto",
-            // Dividers are tinted to the tile, never neutral grey: with the
-            // outline gone a grey rule would be the only hard edge left (s169).
-            !hideHeader && "border-t border-accent-ink/10",
-          )}
-        >
-          {open && <div className="space-y-5 p-3">{filterBody}</div>}
+        <div className="scrollbar-hover lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+          {open && <div className="space-y-5 px-3 pb-3 pt-0.5">{filterBody}</div>}
           {/* Collapsed: pinned sections stay visible. */}
           {!open && showPinnedBody && (
-            <div className="space-y-5 p-3">
+            <div className="space-y-5 px-3 pb-3 pt-0.5">
               {pinnedSections}
               {pinnedFacets.map(facetSection)}
             </div>
@@ -745,14 +799,7 @@ export function FilterRail<T>({
       {/* Footer (the Üben button), fixed at the bottom of the flex column so it
           stays visible while the region above scrolls. */}
       {footer && (
-        <div
-          className={cn(
-            "z-10 flex shrink-0 items-center gap-2 rounded-b-xl border-t border-accent-ink/10 bg-accent/20 p-3 dark:bg-accent/10 lg:rounded-none",
-            // Headerless + collapsed + no pinned sections: the footer is the
-            // whole tile, so round its top too and drop the divider.
-            hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",
-          )}
-        >
+        <div className="flex shrink-0 items-center gap-2 p-3">
           {/* Collapsed headerless (mobile) tile: the Filter toggle sits to the
               left of the Üben button. When expanded it moves up into the first
               row of the panel instead (so it is not duplicated here). Desktop

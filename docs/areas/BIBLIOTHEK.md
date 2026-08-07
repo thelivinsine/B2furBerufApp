@@ -195,8 +195,12 @@ and are PWA-cached: if a change doesn't show after deploy, hard-refresh (stale s
 - **Header:** "Filter" label (brand accent) + active-count badge + chevron toggle, plus a
   permanent reset icon (RotateCcw) and a close X (mobile panel only). Reset clears facets AND
   scope dropdowns; the badge counts both. The result count sits beside Üben in EVERY state.
-- **Scopes:** primary dropdowns in the hierarchy Branche → **Lebensbereich** → Thema → Unterthema
-  (Kategorie on Grammatik = Gruppe). **Scope dropdowns are MULTI-select** via the hand-built checkbox popover
+- **Scopes:** dropdowns in the ONE app-wide hierarchy **Lebensbereich → Thema → Unterthema →
+  Branche** (founder s199; it was Branche-first with the Lebensbereich pills pinned under it until
+  then). The order is applied INSIDE `FilterRail`, not by callers, so it cannot drift per tab
+  (Kategorie on Grammatik = Gruppe). **Branche LOCKS at zero** (`lockZero`): its count is the
+  DEDICATED-content signal, so a padlocked option means nothing is written for that industry in this
+  Thema, and when every option is zero one line replaces the control. **Scope dropdowns are MULTI-select** via the hand-built checkbox popover
   `ScopeMultiSelect` (Radix Select is single-value only); each rides a comma-list URL param
   (empty = everything), OR-within. "Alle X" shows the OPTION count in the muted pill-number
   format. Sub-theme drill-down + the travelling `useLibraryScope` apply only when EXACTLY ONE

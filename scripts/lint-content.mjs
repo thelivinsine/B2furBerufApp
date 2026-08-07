@@ -17,6 +17,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { HASH_SIDECAR, buildContentIndex, contentHash } from "./content-hash.mjs";
+import { isSectorEarned } from "./sector-markers.mjs";
 import {
   worthLearningFindings,
   cefrPlausibilityFindings,
@@ -806,8 +807,26 @@ function lintWritingPrompts(writingPrompts, subThemeIndex) {
         if (!isStr(t?.text)) error(ds, w, "empty prompt text");
         if (t?.sub != null && !(declared && declared.has(t.sub)))
           error(ds, w, `sub "${t.sub}" not declared on theme "${id}"`);
-        for (const s of t?.sectors ?? [])
-          if (!WORK_SECTORS.includes(s)) error(ds, w, `unknown sector "${s}"`);
+        for (const s of t?.sectors ?? []) {
+          if (!WORK_SECTORS.includes(s)) {
+            error(ds, w, `unknown sector "${s}"`);
+            continue;
+          }
+          // A Branche tag must be EARNED by the brief (s199 audit). Coverage
+          // alone used to be the only gate, and coverage is satisfiable by
+          // tagging: 199 of 600 tagged tasks named an industry their brief
+          // never entered. Add the missing word to `scripts/sector-markers.mjs`
+          // when a real sector term is not listed yet; drop the tag when the
+          // brief genuinely is not about that workplace (untagged = universal,
+          // so the task still serves every Branche).
+          if (!isSectorEarned(t, s))
+            error(
+              ds,
+              w,
+              `sector "${s}" is not earned: the brief contains no ${s} marker ` +
+                `(see scripts/sector-markers.mjs). Untagged = universal, so dropping the tag costs no reach.`,
+            );
+        }
         checkWritingTask(ds, w, t, id, len === "long" ? "l" : "s", taskIds);
       });
     }
