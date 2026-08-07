@@ -7,9 +7,9 @@ word graph drops the edge, by design). Fix a typo to restore a lost
 connection, add the word to the bank, or leave it (a plain association
 that is not a bank entry is fine).
 
-- Related terms total: 3628
-- Resolve to a bank entry: 3121
-- Unresolved (edge dropped): 507
+- Related terms total: 3770
+- Resolve to a bank entry: 3268
+- Unresolved (edge dropped): 502
 
 ## arzt (20)
 
@@ -48,7 +48,7 @@ that is not a bank entry is fine).
 - `v_sparkasse`: "die Bank"
 - `v_sparkonto`: "sparen"
 
-## behoerde (13)
+## behoerde (12)
 
 - `v_aufenthaltstitel`: "verlängern"
 - `v_ausfuellen`: "unterschreiben"
@@ -57,7 +57,6 @@ that is not a bank entry is fine).
 - `v_heiratsurkunde`: "das Standesamt"
 - `v_nachweis`: "erbringen"
 - `v_pflegegrad`: "die Versicherung"
-- `v_sachbearbeiter`: "zuständig"
 - `v_steuernummer`: "das Finanzamt"
 - `v_verlaengerung`: "verlängern"
 - `v_vollmacht`: "unterschreiben"
@@ -128,7 +127,7 @@ that is not a bank entry is fine).
 - `v_zuhoeren`: "aufmerksam"
 - `v_zuhoeren`: "verstehen"
 
-## customer (60)
+## customer (59)
 
 - `v_anfrage`: "der Bedarf"
 - `v_angebot`: "anbieten"
@@ -136,7 +135,6 @@ that is not a bank entry is fine).
 - `v_angehoeriger`: "der Betreute"
 - `v_anliegen`: "der Wunsch"
 - `v_anliegen`: "die Frage"
-- `v_ansprechpartner`: "zuständig"
 - `v_aufrechterhalten`: "beibehalten"
 - `v_ausbauen`: "erweitern"
 - `v_bauherr`: "der Auftrag"
@@ -324,7 +322,7 @@ that is not a bank entry is fine).
 - `v_tarif`: "die Zone"
 - `v_zebrastreifen`: "die Straße"
 
-## project (44)
+## project (43)
 
 - `v_abnahme`: "abnehmen"
 - `v_abschluss`: "das Ende"
@@ -363,7 +361,6 @@ that is not a bank entry is fine).
 - `v_ueberblick`: "die Zusammenfassung"
 - `v_umsetzen`: "die Umsetzung"
 - `v_veranlassen`: "beauftragen"
-- `v_verantwortlich`: "zuständig"
 - `v_verbessern`: "überarbeiten"
 - `v_ziel`: "erreichen"
 - `v_zielsetzung`: "die Vorgabe"
@@ -411,12 +408,11 @@ that is not a bank entry is fine).
 - `v_vorsicht`: "vorsichtig"
 - `v_warnschild`: "der Hinweis"
 
-## scheduling (38)
+## scheduling (36)
 
 - `v_ablauf`: "der Prozess"
 - `v_anlaufphase`: "die Phase"
 - `v_anlaufphase`: "der Start"
-- `v_aufgabenverteilung`: "zuständig"
 - `v_dringend`: "eilig"
 - `v_erinnerung`: "erinnern"
 - `v_erinnerung`: "der Hinweis"
@@ -427,7 +423,6 @@ that is not a bank entry is fine).
 - `v_kurzfristig`: "spontan"
 - `v_kurzfristig`: "schnell"
 - `v_langfristig`: "die Strategie"
-- `v_passen`: "günstig"
 - `v_passen`: "es geht"
 - `v_planung`: "der Plan"
 - `v_planung_revidieren`: "anpassen"

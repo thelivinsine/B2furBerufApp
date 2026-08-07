@@ -310,6 +310,42 @@ pass instead of being edited through the gate.
 It also writes `docs/reports/related-terms-report.md` (unresolvable `related` terms = dropped
 word-graph edges, by design; visible, not a gate).
 
+### The three pedagogical-shape gates (`scripts/content-shape.mjs`, s198)
+The audit's closing observation was that structural quality is systematised and pedagogical shape is
+not: a linter for every enum, a gate for every fact, and **no** gate for "is this word worth
+learning", "is this band plausible" or "does this theme have a balanced part-of-speech mix". These
+three are those gates, run from `lint:content` over the BROWSABLE bank (retired ids excluded) and
+skipped wholesale when the generated frequency map is missing. Every threshold is the MEASURED state
+on the day it landed, so none of them makes today's content illegal; raising one is a deliberate
+edit in `content-shape.mjs`, with a reason.
+
+| Gate | Rule | Anchor |
+|---|---|---|
+| Worth learning | share of specialized-or-unattested items may not grow | **53.87 %** |
+| Worth learning | items with no corpus evidence at all may not grow | **100** |
+| Band plausible | a `core`-frequency word may NOT be labelled B2.2/C1 | hard 0 |
+| Band plausible | specialized-or-unattested items at A2/B1.1 may not grow | **32** |
+| Part-of-speech | every theme carries ≥ 3 verbs AND ≥ 3 adjectives | floor |
+| Part-of-speech | noun share of the bank may not grow | **77.59 %** |
+
+A SHARE rather than a count wherever adding good content should buy room for a rare-but-necessary
+item: the way past the rare-share ceiling is to add common words, which is the behaviour the audit
+wanted. `tests/contentShape.test.ts` asserts each gate in both directions, because a ratchet that
+cannot fire is decoration.
+
+### One blanking rule (`src/engine/blank.ts`, s198)
+Which word of an example sentence can become a gap is ONE function, shared by the MCQ cloze, the
+listening cloze (`engine/quiz.ts`), the typed cloze (`engine/session.ts`) and
+`report-exercise-coverage.mjs`. It used to be four copies carrying the same two defects: JavaScript's
+`\b` is ASCII-only, so no umlaut-initial headword could ever match its own examples (25 words), and
+only the infinitive was searched for, so every Perfekt sentence hid its verb (85 words). The rule now
+looks for the headword, the Partizip II / Präteritum / zu-infinitive from `verbForms.ts`, the plural,
+and the content token of a multi-word headword, and it REPORTS which form it found so distractors can
+match the gap's shape (a Partizip II gap is answered against other Partizip II forms, never against a
+list of infinitives that gives the answer away). Where an item has a choice it prefers the example
+that does not leak its own answer inside a compound. **Authoring consequence:** an example no longer
+has to contain the bare headword, so write the sentence that sounds natural.
+
 ## Provenance register (`src/data/provenance.ts`)
 One `ProvenanceEntry` row per content_id: `origin` (authored/sourced/adapted), `reference`
 (Wiktionary/DWDS/Tatoeba URL), `license` (SPDX from the allowlist), `review_status`

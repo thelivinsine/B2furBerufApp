@@ -1889,3 +1889,62 @@ minutes, and GitHub occasionally schedules no runs for the repo at all (s197 saw
 cancelled after 15 minutes without starting, and no check ever registered on PR #817). Neither is
 something the workflow can settle; the manual `workflow_dispatch` of `pages.yml` on `main` stays the
 documented rescue.
+
+## s198 — the 116 words that "needed content" were a regex bug, and the three gates the audit asked for
+
+The last content-audit session (`docs/reports/CONTENT_AUDIT_2026-07-30.md`) left three things open
+besides P10 (human review, founder-deferred): 116 words that could never appear as a cloze, typed
+gap or listening item, 67 with no resolving related term, and the closing observation that there is
+"no gate for is this word worth learning, is this band plausible, or does this theme have a balanced
+part-of-speech mix". The founder asked for all of it except the human review.
+
+**The 116 were not a content gap.** The audit read the coverage report's framing ("Fix: adjust one
+of the example sentences so the word appears in it") and priced them as cheap content fixes. Reading
+the actual list said otherwise: 25 of them start with an umlaut and 85 are verbs. JavaScript's `\b`
+is defined on `\w`, which is ASCII, so `\bÜberweisung` can never match: there is no boundary between
+a space and "Ü", and every umlaut-initial headword was unblankable no matter how many of its
+examples used it. The verbs failed for a different reason: only the infinitive was searched for, so
+"Ich habe den Flug gebucht" did not count as an example of `buchen`.
+
+**So the fix is the matcher, not the sentences.** Bending 85 natural German sentences into
+infinitives to satisfy a broken search would have made the content worse to make a report greener.
+`src/engine/blank.ts` is now the ONE rule (the MCQ cloze, the listening cloze, the typed cloze and
+`report-exercise-coverage.mjs` all call it) and it looks for the forms the sentences actually use:
+the headword, the Partizip II / Präteritum / zu-infinitive from `verbForms.ts`, the plural, and the
+content token of a multi-word headword. `verbForms.ts` did not exist when the audit was written,
+which is why the audit could not have prescribed this.
+
+The interesting consequence is the distractors. A gap holding "gebucht" answered against a list of
+infinitives gives itself away by shape, so the blank REPORTS which form it took and the builder
+draws same-form distractors ("verschoben", "abgesagt", "bestätigt"). That turns the fix into a
+better exercise than the one the audit was asking to restore. 15 separable verbs whose particle
+detaches in a main clause ("löste den Ausfall aus") kept a genuine gap and got one example rewritten
+into a Perfekt or modal construction; 67 words gained a related term that resolves to a bank entry.
+Both residuals in the coverage report are 0.
+
+**Why four copies of the rule existed at all** is the lesson worth keeping: each call site was
+written when it was needed, each copied the two-line regex, and no single place owned the rule, so
+one wrong character disabled a whole class of words in three surfaces at once and no test noticed.
+
+**The three gates are ratchets, not targets.** Every threshold in `scripts/content-shape.mjs` is the
+measured state of the bank on the day it landed (rare share 53.87 %, no-corpus-evidence 100,
+beginner-rare 32, noun share 77.59 %, plus the hard rule that a `core`-frequency word is never
+B2.2/C1 and the floor of ≥3 verbs and ≥3 adjectives per theme). A target invented from pedagogy
+would have made today's content illegal on the day it shipped, which is how a gate gets disabled
+instead of obeyed. Shares rather than counts wherever adding good content should buy room: the way
+past the rare-share ceiling is to add common words, which is the behaviour the audit wanted anyway.
+`tests/contentShape.test.ts` asserts each gate in both directions, because a ratchet that cannot
+fire is decoration.
+
+**The floors demanded content, which is the point.** `digitales` had no verb and no adjective at
+all; `freizeit`, `behoerde` and `mobilitaet` had no adjective. Those themes could only ever drill
+nouns, which is exactly the "noun museum" the audit named. 25 everyday verbs and adjectives were
+authored to clear the floors (aufladen, verbinden, löschen, einladen, unternehmen, gemütlich,
+zuständig, gültig, überfüllt, günstig, haltbar, gebührenfrei, chronisch, einverstanden, lieferbar …),
+all core-or-common frequency, which also serves P7's standing "spend the next slots on core verbs,
+adjectives and connectors" rule.
+
+**One finding is deliberately NOT scheduled:** §2.1's inverted sub-theme structure (eight workplace
+themes carry no sub-themes, so 59 % of words have no `subThemeId`). It is a taxonomy project, not a
+content fix, because each new Unterthema drags the writing-task invariant behind it (≥2 tasks per
+Unterthema per length, gated by `tests/writingScope.test.ts`), so it is a session of its own.

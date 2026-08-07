@@ -5290,3 +5290,61 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
 - **Artifacts (prompt 4):** `.github/workflows/pages.yml` · `CLAUDE.md` (the deploy bullet now
   states the fix, not the workaround) · `docs/DECISIONS.md` §s197 (why the three attempts differ,
   and what this does NOT fix) · this log
+
+## Session 198 — 2026-08-07 — branch `claude/content-audit-plan-mbiout`
+
+- **Prompt 1 (verbatim):** `what's next in the content audit plan?`
+  **Response:** read `docs/reports/CONTENT_AUDIT_2026-07-30.md` and reported the state: P1–P9 all
+  closed across s178/s181/s182/s185, **P10 (human verification) the only open item and
+  founder-deferred**, and it is a founder task by law (only a human flips `review_status`, and a
+  verified row is never edited by an AI). Flagged the two carried-over tails (12 verified rows the
+  s185 rules WARN on, three s178 founder rejections still `draft`) and offered the AI-shippable
+  alternative from the audit's §5 closing observation: the missing "is this word worth learning" and
+  "does this theme have a balanced part-of-speech mix" gates, whose data already ships in
+  `frequency.ts`.
+  **Artifacts:** none (research answer).
+
+- **Prompt 2 (verbatim):** `build the frequency and part-of-speech linter gates`
+- **Prompt 3 (verbatim, mid-turn):** `except human review task, complete all the recommendations
+  from this plan, push them live and document the session`
+  **Response:** took the whole remaining audit except P10, in one session.
+  1. **The 116 "words needing an example" were a matcher bug, not a content gap.** 25 of them start
+     with an umlaut (JavaScript's `\b` is ASCII-only, so `\bÜberweisung` can never match) and 85 are
+     verbs whose examples use a real verb form rather than the infinitive. Extracted the ONE blanking
+     rule to `src/engine/blank.ts` (previously four copies: MCQ cloze, listening cloze, typed cloze,
+     coverage report, all with the same two defects), now reading the Partizip II / Präteritum /
+     zu-infinitive from `verbForms.ts` (which did not exist when the audit was written) plus plurals
+     and multi-word headwords. The blank reports WHICH form it took so distractors match the gap's
+     shape. 15 separable verbs kept a genuine gap and got one example rewritten; 67 words gained a
+     related term that resolves. Both word-level residuals in the coverage report: **116 → 0** and
+     **67 → 0**.
+  2. **The three gates the audit asked for** live in `scripts/content-shape.mjs`, each anchored on
+     the measured bank: worth-learning (rare share 53.87 %, no-corpus-evidence 100), CEFR
+     plausibility (hard rule: no `core`-frequency word at B2.2/C1; beginner-rare ratchet 32),
+     part-of-speech mix (≥3 verbs AND ≥3 adjectives per theme, noun share 77.59 %).
+     `tests/contentShape.test.ts` asserts each in both directions.
+  3. **25 everyday verbs and adjectives authored** to clear the part-of-speech floors (`digitales`
+     had no verb and no adjective at all; `freizeit`, `behoerde`, `mobilitaet` had no adjective), all
+     core-or-common frequency, which also serves P7's standing authoring rule. Bank shape
+     78.7/13.5/5.1 → **77.6/13.6/6.1** noun/verb/adjective.
+  4. **§2.2 "Reuse" closed:** `progress.textsDone` (migration 0018, synced and unioned like
+     `scenariosDone`) makes the composer prefer a text the learner has not read, so a scoped learner
+     stops seeing the same one alternate.
+  Verified along the way that the four §3.2 LanguageTool defects are already fixed in the bank. The
+  one finding deliberately left open besides P10 is §2.1's inverted sub-theme structure: it drags the
+  writing-task invariant (≥2 tasks per Unterthema per length) behind it, so it is a session of its
+  own.
+  Gates: `lint:content` · `lint:migrations` · typecheck · lint (0 errors, 77 warnings) ·
+  **647 tests** (21 new) · build · `check:bundle` 128.2 kB · `verify:facts` 0 errors ·
+  `verify:cefr` FLAG 0 · regenerated `verbForms.ts`, `frequency.ts`, `verification.ts`, the review
+  queue and the coverage report. `verify:grammar` skipped: the LanguageTool toolchain is not built in
+  this sandbox (warn-only by design).
+  **Artifacts:** `src/engine/blank.ts` (new) · `scripts/content-shape.mjs` (new) ·
+  `tests/blank.test.ts` + `tests/contentShape.test.ts` (new) · `supabase/migrations/0018_texts_done.sql`
+  (new) · `src/engine/quiz.ts` · `src/engine/session.ts` · `src/features/session/SessionPlayer.tsx` ·
+  `src/store/useProgressStore.ts` · `src/lib/cloudSync.ts` · `src/lib/idRenames.ts` ·
+  `src/data/vocabulary.ts` + `provenance.ts` (+25 items, 82 rows edited) ·
+  `scripts/lint-content.mjs` · `scripts/report-exercise-coverage.mjs` · `tests/engine.test.ts` ·
+  `CLAUDE.md` · `docs/areas/CONTENT.md` · `docs/areas/COMMANDS.md` · `docs/areas/SESSION.md` ·
+  `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/DECISIONS.md` §s198 · `docs/PROJECT_STATUS.md` ·
+  this log.

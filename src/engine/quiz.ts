@@ -14,6 +14,7 @@ import type {
 import { vocabByTheme, vocabulary } from "@/data/vocabulary";
 import { collocationsByTheme, collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
+import { findVocabBlank, formOf, headOf, type BlankForm } from "@/engine/blank";
 import { sample, shuffle } from "@/lib/utils";
 import { XP } from "@/engine/scoring";
 
@@ -165,10 +166,10 @@ const daWordBank: { prompt: string; answer: string; distractors: string[]; gloss
  * Callers that require a full set check `options.length`.
  */
 /** The blankable first token of a headword: "die Besprechung" -> "Besprechung",
- *  "sich abstimmen" -> "abstimmen". Shared by the cloze and listening builders so
- *  the blank and its distractors are derived the same way. */
+ *  "sich abstimmen" -> "abstimmen". The blank itself comes from `engine/blank.ts`,
+ *  which owns the one rule; this is its distractor-side shorthand. */
 function headword(item: VocabItem): string {
-  return item.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
+  return headOf(item.de);
 }
 
 function mcqOptions(answer: string, candidates: readonly string[], size = 4): string[] {
@@ -319,26 +320,29 @@ function pluralTypeQ(item: VocabItem, difficulty: Difficulty): TypedQuestion {
   };
 }
 
+/** Distractors that match the gap's own form (a Partizip II gap is answered
+ *  against other Partizip II forms), topped up with plain headwords when too few
+ *  pool items carry that form. */
+function blankDistractors(item: VocabItem, pool: VocabItem[], form: BlankForm): string[] {
+  const others = shuffle(pool.filter((v) => v.id !== item.id));
+  const sameForm = others.map((v) => formOf(v, form)).filter((s): s is string => !!s);
+  return form === "head" || form === "part" ? sameForm : [...sameForm, ...others.map(headword)];
+}
+
 function clozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQQuestion | null {
-  // Blank the headword inside one of its example sentences.
-  const head = item.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
-  const ex = item.examples.find((e) => new RegExp(`\\b${escapeReg(head)}`, "i").test(e.de));
-  if (!ex || head.length < 3) return null;
-  const blanked = ex.de.replace(new RegExp(`\\b${escapeReg(head)}\\w*`, "i"), "___");
-  if (!blanked.includes("___")) return null;
+  // Blank one of the item's own forms inside one of its example sentences.
+  const blank = findVocabBlank(item);
+  if (!blank) return null;
   return {
     id: qid("cloze"),
     kind: "cloze",
     difficulty,
     themeId: item.themeId,
-    prompt: blanked,
-    answer: head,
-    options: mcqOptions(
-      head,
-      shuffle(pool.filter((v) => v.id !== item.id)).map(headword),
-    ),
+    prompt: blank.prompt,
+    answer: blank.surface,
+    options: mcqOptions(blank.surface, blankDistractors(item, pool, blank.form)),
     sourceId: item.id,
-    hint: ex.en,
+    hint: blank.example.en,
   };
 }
 
@@ -558,28 +562,21 @@ function redemittelClozeQ(
  *  distractors; no `hint` (the English gloss would reveal the answer by ear).
  *  Null when no example contains the headword. */
 function listeningClozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQQuestion | null {
-  const head = item.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
-  if (head.length < 3) return null;
-  const ex = item.examples.find((e) => new RegExp(`\\b${escapeReg(head)}`, "i").test(e.de));
-  if (!ex) return null;
-  const blanked = ex.de.replace(new RegExp(`\\b${escapeReg(head)}\\w*`, "i"), "___");
-  if (!blanked.includes("___")) return null;
-  const options = mcqOptions(
-    head,
-    shuffle(pool.filter((v) => v.id !== item.id)).map(headword),
-  );
+  const blank = findVocabBlank(item);
+  if (!blank) return null;
+  const options = mcqOptions(blank.surface, blankDistractors(item, pool, blank.form));
   if (options.length < 4) return null;
   return {
     id: qid("listeningCloze"),
     kind: "listeningCloze",
     difficulty,
     themeId: item.themeId,
-    prompt: blanked,
-    audioPrompt: ex.de,
-    answer: head,
+    prompt: blank.prompt,
+    audioPrompt: blank.example.de,
+    answer: blank.surface,
     options,
     sourceId: item.id,
-    explain: `${ex.de} – ${ex.en}`,
+    explain: `${blank.example.de} – ${blank.example.en}`,
   };
 }
 

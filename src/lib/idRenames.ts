@@ -86,6 +86,7 @@ export interface IdKeyedProgress {
   redemittelSeen: Record<string, number>;
   savedWords: string[];
   scenariosDone: string[];
+  textsDone: string[];
   missionsDone: string[];
   keyItems: string[];
 }
@@ -107,6 +108,7 @@ export function remapProgressIds<S extends Partial<IdKeyedProgress>>(
     next.redemittelSeen = remapRecordIds(state.redemittelSeen, renames, Math.max);
   if (state.savedWords) next.savedWords = remapIdArray(state.savedWords, renames);
   if (state.scenariosDone) next.scenariosDone = remapIdArray(state.scenariosDone, renames);
+  if (state.textsDone) next.textsDone = remapIdArray(state.textsDone, renames);
   if (state.missionsDone) next.missionsDone = remapIdArray(state.missionsDone, renames);
   if (state.keyItems) next.keyItems = remapIdArray(state.keyItems, renames);
   return next;

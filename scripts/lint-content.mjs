@@ -17,6 +17,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { HASH_SIDECAR, buildContentIndex, contentHash } from "./content-hash.mjs";
+import {
+  worthLearningFindings,
+  cefrPlausibilityFindings,
+  posMixFindings,
+} from "./content-shape.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -1677,6 +1682,23 @@ async function main() {
   }
 
   lintAdvancedRareRatchet(data.vocabulary, data.frequency);
+
+  /* The three pedagogical-shape gates (audit §5). They measure the BROWSABLE
+   * bank, because a retired id is no longer content the learner can meet, and
+   * they are skipped outright when the generated frequency map is absent, so a
+   * missing (optional) generated file reports itself once above rather than as
+   * a thousand phantom findings here. */
+  const browsable = data.vocabulary.filter((v) => !data.retiredVocabIds.has(v.id));
+  const shapeFindings = [
+    ...(Object.keys(data.frequency).length
+      ? [
+          ...worthLearningFindings(browsable, data.frequency),
+          ...cefrPlausibilityFindings(browsable, data.frequency),
+        ]
+      : []),
+    ...posMixFindings(browsable),
+  ];
+  for (const f of shapeFindings) error(f.dataset, f.where, f.msg);
 
   /* Generated verb-morphology integrity (pnpm build:verb-forms).
    *

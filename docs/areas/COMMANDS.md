@@ -18,7 +18,11 @@ npm/yarn. Run `pnpm install` after pulling.
 - `pnpm lint:content` — validates every `src/data/*` bank; full checklist in
   `docs/areas/CONTENT.md` §Linter. Run after ANY content edit (TypeScript does not catch
   duplicate ids, which silently drop React-keyed cards). Errors block CI
-  (`.github/workflows/validate.yml`).
+  (`.github/workflows/validate.yml`). Since s198 it also runs the three **pedagogical-shape
+  gates** in `scripts/content-shape.mjs` (worth-learning, CEFR plausibility, part-of-speech mix);
+  each is a ratchet anchored on the measured bank, so raising a ceiling is a deliberate edit there
+  with a reason, never a way to land content. Detail + the numbers: `CONTENT.md` §The three
+  pedagogical-shape gates.
 - `pnpm verify:facts` — Layer 2 fact gate: every noun's der/die/das + plural against two
   independent morphology oracles (LanguageTool + German Wiktionary); fails CI only when BOTH agree
   a form is wrong. Runs offline against the committed subsets in `scripts/vendor/`. **After adding

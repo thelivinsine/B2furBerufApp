@@ -195,6 +195,7 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
     redemittelSeen: (remote.redemittel_seen as Record<string, number>) ?? {},
     savedWords: (remote.saved_words as string[]) ?? [],
     scenariosDone: (remote.scenarios_done as string[]) ?? [],
+    textsDone: (remote.texts_done as string[]) ?? [],
   });
   const examsLocal = s.examsDone;
   const examsRemote = (remote.exams_done as typeof examsLocal) ?? [];
@@ -242,6 +243,7 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
     srs: mergeSrs(s.srs, r.srs ?? {}),
     redemittelSeen: mergeNumberMax(s.redemittelSeen, r.redemittelSeen ?? {}),
     scenariosDone: unionStrings(s.scenariosDone, r.scenariosDone ?? []),
+    textsDone: unionStrings(s.textsDone, r.textsDone ?? []),
     examsDone: Array.from(examsMap.values()),
     mockExams,
     totalSessions: Math.max(s.totalSessions, (remote.total_sessions as number) ?? 0),
@@ -298,6 +300,7 @@ function progressRow(s: ProgressSnapshot) {
     srs: s.srs,
     redemittel_seen: s.redemittelSeen,
     scenarios_done: s.scenariosDone,
+    texts_done: s.textsDone,
     exams_done: s.examsDone,
     mock_exams: s.mockExams,
     total_sessions: s.totalSessions,
