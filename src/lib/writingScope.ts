@@ -205,6 +205,26 @@ export function countTasks(scope: WritingScope): number {
   return eligibleTasks(scope).length;
 }
 
+/**
+ * How many tasks in this scope are actually TAGGED with `sector`, ignoring the
+ * soft fallback (founder s199).
+ *
+ * `countTasks` answers "what will I get", and for Branche that is never zero,
+ * because an untagged task is universal. That is right for the draw and wrong
+ * for the rail: it printed a healthy number next to every industry while the
+ * chosen one changed nothing, which is the same rail-vs-engine disagreement
+ * s167 fixed for the other axes. This is the DEDICATED count, and a zero here
+ * is what locks the option. The engine keeps its fallback untouched, so a deep
+ * link naming a locked Branche still serves the universal pool rather than
+ * breaking.
+ */
+export function countDedicatedTasks(scope: WritingScope, sector: string): number {
+  return eligibleTasks({ ...scope, sector: "" }).filter((ref) => {
+    const task = writingPrompts[ref.theme]?.[scope.length]?.[ref.ix];
+    return !!task?.sectors?.includes(sector as WorkSector);
+  }).length;
+}
+
 /** The scope axes a learner can relax, hardest first. */
 export type ScopeAxis = "format" | "level" | "sub" | "area";
 

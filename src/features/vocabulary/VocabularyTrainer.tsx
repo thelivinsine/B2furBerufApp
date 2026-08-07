@@ -459,6 +459,11 @@ export function VocabularyTrainer() {
       {
         pinId: "sector",
         label: "Branche",
+        // Its count is the DEDICATED-content signal, so a zero LOCKS rather
+        // than merely reads 0 (founder s199): picking it could only serve the
+        // universal pool behind it, which is what made Branche feel like a
+        // working filter while it changed nothing.
+        lockZero: true,
         values: sectors,
         onChange: setSectors,
         // The count is the DEDICATED-content signal (sector-tagged items in the
