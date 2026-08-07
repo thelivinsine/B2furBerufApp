@@ -1083,3 +1083,38 @@ to retitle that page today. `navItems` already carries every route's label if th
 
 Older "Resume here" handoffs (s195 and earlier) are archived alongside their status-log entries in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
+
+---
+
+**Handoff after session 197 (2026-08-06): the mobile Bibliothek list dissolves behind the Üben
+button (branch `claude/mobile-floating-text-readability-bs49dz`).**
+Founder, with a screenshot of the dark desktop list fading at its bottom edge: "can you put similar
+effect even in the mobile view so that the floating text below the ueben button is more readable and
+visible? generate a couple of previews", then "insert short fade but soft blur but not above the
+blue button, it should be below the blue button behind the text."
+- **The diagnosis.** That screenshot is a DESKTOP-only effect. Since s189 the browse list scrolls
+  inside the content column, so `browseColumnClass` masks the column's bottom edge
+  (`mask-fade-bottom`) and the cards dissolve into the page ground. A phone scrolls the PAGE, so
+  there is no edge to mask: the cards ran at full strength behind the floating Üben button and the
+  "Etwas verbessern? Feedback geben" line, which since s189 deliberately carries no plate of its own
+  (a plate read as a frosted chip over white cards). The missing edge IS the unreadable text.
+- **Round 1, previews only** (`preview/mobile-cluster-fade.html`, artifact
+  <https://claude.ai/code/artifact/8bbc7f2e-d581-4767-84ee-a024380d0604>): four phone frames at the
+  REAL cluster offsets and tokens, in both themes: today's baseline, a short fade, a long fade, and
+  a fade plus blur, each with its cost stated.
+- **Founder took the short fade AND the blur, with the blur kept below the button.** Two utilities
+  in `src/index.css` (`.cluster-scrim`, a 7rem page-ground ramp; `.cluster-blur`, a 2rem frosted
+  band masked at its own top), both rendered by `FloatingActionCluster`, `pointer-events-none`,
+  border-free, `lg:hidden`, with the note raised to `z-[25]` above them. The band is exactly the gap
+  between the nav and the button's lower edge, so it frosts the note strip and STOPS at the button.
+  Neither reject comes back: no bar (s168), no band across the page (s169).
+- **One tuning pass, from the real app** (Playwright over the global Chromium at 390x800, seeded
+  store, both themes): the first ramp reached ~0.99 through the note strip and made the frosted band
+  invisible, so it holds ~0.85 there instead, which is still AA because what shows through is a card
+  within a few per cent of the ground. Only the four Bibliothek tabs mount this cluster, so no
+  writing editor is dimmed. The preview gained a fifth "Shipped" phone so mockup and live agree.
+Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 129.8 kB ·
+check:contrast · lint:content.
+**Resume here:** nothing is open from this change. **CI never fired for PR #818** (no check run was
+created minutes after opening, and the 16:22 `main` validate run was cancelled by the platform), so
+every gate validate.yml runs was run locally instead; worth a glance at the post-merge run.
