@@ -1,8 +1,8 @@
 # Project Status
 
 _Last updated: 2026-08-07 (session 198 closed the content audit except P10: the one blanking rule,
-the three pedagogical-shape gates, 25 authored verbs/adjectives, and reading-text freshness. Handoff
-under "Resume here")._
+the three pedagogical-shape gates, 25 authored verbs/adjectives, and reading-text freshness. Shipped
+as PR #822 / `03ea3dc`, all three deploys green. Handoff under "Resume here")._
 
 ## Session 198 log
 
@@ -142,16 +142,19 @@ build · check:bundle 128.2 kB · verify:facts 0 errors · verify:cefr FLAG 0.
 design), so the 40 new/edited German sentences have not been through Layer 3. Worth a run in a
 session that has `pnpm build:languagetool` available.
 
+**Shipped:** PR **#822**, squash-merged as **`03ea3dc`**. All three `main` workflows green on that
+commit: Validate content, Deploy site to GitHub Pages and Deploy Supabase functions, whose "Apply
+migrations" step ran and passed, so **migration 0018 is live on the database**. The Pages deploy did
+NOT self-cancel, which is the s197 `timeout: 1800000` fix holding on its first real run.
+
 **Resume here:**
 1. **P10 is the only open audit item** and it is the founder's: `pnpm review:queue` →
    decisions → `pnpm apply:reviews` → `pnpm stamp:verified`. Start with the ~166 core-frequency
    words and the Redemittel bank, the high-traffic surface.
-2. **Migration 0018 applies on the next merge to `main`** (the supabase workflow runs migrations
-   before the function deploy). It is `add column if not exists`, so re-running is safe.
-3. **Not scheduled, deliberately:** §2.1's inverted sub-theme structure (eight workplace themes have
+2. **Not scheduled, deliberately:** §2.1's inverted sub-theme structure (eight workplace themes have
    no sub-themes, 59 % of words carry no `subThemeId`). Every new Unterthema drags the writing-task
    invariant behind it (≥2 tasks per Unterthema per length), so it is a session of its own.
-4. CLAUDE.md is **380 lines** by the linter's count, still over its ~350 budget (377 before this
+3. CLAUDE.md is **380 lines** by the linter's count, still over its ~350 budget (377 before this
    session; two invariants in, four history paragraphs compressed out).
 
 

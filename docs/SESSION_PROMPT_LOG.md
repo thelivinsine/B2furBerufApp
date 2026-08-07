@@ -5348,3 +5348,19 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   `CLAUDE.md` · `docs/areas/CONTENT.md` · `docs/areas/COMMANDS.md` · `docs/areas/SESSION.md` ·
   `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/DECISIONS.md` §s198 · `docs/PROJECT_STATUS.md` ·
   this log.
+  **Shipped:** three commits (`752bfce` the blanking rule + the gates + the 25 words, `8006e2d`
+  reading freshness, `fcea41d` docs) → **PR #822**, CI green (the single `lint-content` job runs
+  every gate), squash-merged as **`03ea3dc`**. All three `main` workflows green on that commit:
+  Validate content, Deploy site to GitHub Pages (**no self-cancel: the s197 timeout fix held on its
+  first real run**) and Deploy Supabase functions, whose "Apply migrations" step ran and passed, so
+  **migration 0018 is applied on the live database**. Post-merge housekeeping done (fetch → reset
+  --hard origin/main → force-with-lease, tree clean).
+
+- **Prompt 4 (verbatim):** `document the session`
+  **Response:** the session documentation had already shipped inside PR #822 (`PROJECT_STATUS.md`
+  session-198 log + handoff, this log, `DECISIONS.md` §s198, `CLAUDE.md`, three `docs/areas/*` files
+  and the audit report's backlog status), so this pass added only what was not knowable before the
+  merge: the shipping record above (PR number, the three commit SHAs, the squash SHA, the three
+  green `main` workflows, migration 0018 applied) and the same facts in the status handoff, whose
+  "resume" list no longer tells the next session to expect the migration on a future merge.
+  **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md`.
