@@ -2,7 +2,6 @@ import type {
   ContentCefr,
   ThemeId,
   WorkSector,
-  WritingExam,
   WritingFormat,
   WritingRegister,
 } from "@/types";
@@ -95,12 +94,15 @@ export interface WritingTask {
   /** CEFR band this task targets. Absent = shows at every Niveau. */
   level?: ContentCefr;
   format?: WritingFormat;
-  /** Which exam task shape this is modelled on (reference, not reproduction). */
-  exam?: WritingExam;
   /**
-   * Word target for THIS task, taken from the exam shape it follows. Absent
-   * falls back to the mode default. Real exams do not share one number:
-   * Goethe B1 runs 40 to 80, B2 100 to 150, C1 120 to 200.
+   * Word target for THIS task, determined by (Niveau, Länge): B1 40/80, B2
+   * 100/150, C1 120/200. That is Genauly's own convention and a good rule, and
+   * it is what the bank actually does. Absent falls back to the mode default.
+   *
+   * (The former `exam` field claimed the target came from the exam shape the
+   * task follows. It never did: `words` was fully determined by the two tags
+   * above, 61 `goethe_b1` tasks carried a 150-word target, and the field
+   * reached no learner, no filter and no grader. Retired in s200, audit P3.)
    */
   words?: number;
   /** A short text the learner must react to (forum post, incoming mail). */
@@ -132,7 +134,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -148,7 +149,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -164,7 +164,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -179,7 +178,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -195,7 +193,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -211,7 +208,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -228,7 +224,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "notiz",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -244,7 +239,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "uebergabe",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -260,7 +254,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -277,7 +270,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "goethe_b2",
         words: 100,
       },
       {
@@ -294,7 +286,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -311,7 +302,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -328,7 +318,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -345,7 +334,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -362,7 +350,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -379,7 +366,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -396,7 +382,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -413,7 +398,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -430,7 +414,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -447,7 +430,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -464,7 +446,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -481,7 +462,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -498,7 +478,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -515,7 +494,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -532,7 +510,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -549,7 +526,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -568,7 +544,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -585,7 +560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "protokoll",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -601,7 +575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -618,7 +591,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -635,7 +607,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -652,7 +623,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -669,7 +639,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -686,7 +655,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -704,7 +672,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_halbformell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -720,7 +687,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -736,7 +702,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "protokoll",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -753,7 +718,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -769,7 +733,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -786,7 +749,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -803,7 +765,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -820,7 +781,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -837,7 +797,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -854,7 +813,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -871,7 +829,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -888,7 +845,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "uebergabe",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -905,7 +861,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -922,7 +877,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -939,7 +893,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -956,7 +909,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -973,7 +925,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -990,7 +941,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1007,7 +957,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1024,7 +973,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1041,7 +989,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "uebergabe",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -1061,7 +1008,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1076,7 +1022,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1091,7 +1036,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1106,7 +1050,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1121,7 +1064,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1137,7 +1079,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1153,7 +1094,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1169,7 +1109,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1185,7 +1124,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1201,7 +1139,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1217,7 +1154,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1233,7 +1169,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1249,7 +1184,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1265,7 +1199,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1281,7 +1214,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1296,7 +1228,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1312,7 +1243,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1328,7 +1258,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -1345,7 +1274,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1362,7 +1290,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1379,7 +1306,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1396,7 +1322,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1413,7 +1338,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1430,7 +1354,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1447,7 +1370,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1464,7 +1386,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1481,7 +1402,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1498,7 +1418,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1515,7 +1434,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1532,7 +1450,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1549,7 +1466,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1566,7 +1482,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1583,7 +1498,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -1601,7 +1515,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1617,7 +1530,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -1633,7 +1545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -1649,7 +1560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "stellungnahme",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -1665,7 +1575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1683,7 +1592,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -1700,7 +1608,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -1717,7 +1624,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -1733,7 +1639,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -1749,7 +1654,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -1766,7 +1670,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -1783,7 +1686,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1800,7 +1702,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1817,7 +1718,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1834,7 +1734,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1851,7 +1750,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1868,7 +1766,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1885,7 +1782,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1902,7 +1798,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1919,7 +1814,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1936,7 +1830,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1953,7 +1846,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1970,7 +1862,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1987,7 +1878,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2004,7 +1894,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2021,7 +1910,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -2042,7 +1930,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2058,7 +1945,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2074,7 +1960,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2090,7 +1975,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2106,7 +1990,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2122,7 +2005,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2138,7 +2020,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2154,7 +2035,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2170,7 +2050,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2186,7 +2065,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2203,7 +2081,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2219,7 +2096,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2234,7 +2110,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "telc_b2_beruf",
         words: 40,
       },
       {
@@ -2251,7 +2126,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2268,7 +2142,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -2284,7 +2157,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2300,7 +2172,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2316,7 +2187,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -2335,7 +2205,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2352,7 +2221,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -2369,7 +2237,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2386,7 +2253,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2404,7 +2270,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -2421,7 +2286,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2438,7 +2302,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2455,7 +2318,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2472,7 +2334,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "uebergabe",
-        exam: "dtb",
         words: 80,
       },
       {
@@ -2489,7 +2350,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2506,7 +2366,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -2523,7 +2382,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2540,7 +2398,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2557,7 +2414,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "reklamation",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2574,7 +2430,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2591,7 +2446,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -2609,7 +2463,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -2626,7 +2479,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
     ],
@@ -2647,7 +2499,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2663,7 +2514,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2679,7 +2529,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2696,7 +2545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2712,7 +2560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2728,7 +2575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2744,7 +2590,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2761,7 +2606,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2778,7 +2622,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2795,7 +2638,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2812,7 +2654,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2829,7 +2670,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2845,7 +2685,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2862,7 +2701,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2879,7 +2717,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -2897,7 +2734,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2915,7 +2751,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2933,7 +2768,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2951,7 +2785,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2969,7 +2802,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2987,7 +2819,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3005,7 +2836,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3023,7 +2853,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3041,7 +2870,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3059,7 +2887,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3077,7 +2904,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3095,7 +2921,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3113,7 +2938,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3131,7 +2955,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3149,7 +2972,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -3168,7 +2990,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3185,7 +3006,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3202,7 +3022,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "forumsbeitrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3219,7 +3038,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3236,7 +3054,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3253,7 +3070,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3270,7 +3086,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3288,7 +3103,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3306,7 +3120,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3324,7 +3137,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3342,7 +3154,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3360,7 +3171,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3378,7 +3188,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3396,7 +3205,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3414,7 +3222,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3433,7 +3240,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3451,7 +3257,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3470,7 +3275,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3489,7 +3293,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3506,7 +3309,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3523,7 +3325,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3541,7 +3342,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3559,7 +3359,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3577,7 +3376,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3595,7 +3393,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3613,7 +3410,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3631,7 +3427,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3649,7 +3444,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3666,7 +3460,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3684,7 +3477,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3702,7 +3494,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3720,7 +3511,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3738,7 +3528,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3756,7 +3545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3774,7 +3562,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3792,7 +3579,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3810,7 +3596,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -3830,7 +3615,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3845,7 +3629,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3860,7 +3643,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3875,7 +3657,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3890,7 +3671,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3905,7 +3685,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3921,7 +3700,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "nachricht",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -3936,7 +3714,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3951,7 +3728,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3967,7 +3743,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3983,7 +3758,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4000,7 +3774,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4017,7 +3790,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4034,7 +3806,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4051,7 +3822,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4068,7 +3838,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4085,7 +3854,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4102,7 +3870,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4119,7 +3886,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4136,7 +3902,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4153,7 +3918,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4170,7 +3934,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4187,7 +3950,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4204,7 +3966,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4221,7 +3982,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4238,7 +3998,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -4256,7 +4015,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4272,7 +4030,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -4289,7 +4046,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4305,7 +4061,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -4321,7 +4076,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4338,7 +4092,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4354,7 +4107,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -4371,7 +4123,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4387,7 +4138,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -4403,7 +4153,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4420,7 +4169,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4437,7 +4185,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4454,7 +4201,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4471,7 +4217,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4488,7 +4233,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4505,7 +4249,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4522,7 +4265,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4539,7 +4281,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4556,7 +4297,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4573,7 +4313,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4590,7 +4329,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4607,7 +4345,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4624,7 +4361,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4641,7 +4377,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4658,7 +4393,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4675,7 +4409,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -4695,7 +4428,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4711,7 +4443,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4726,7 +4457,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4742,7 +4472,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4757,7 +4486,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4773,7 +4501,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4789,7 +4516,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4805,7 +4531,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4820,7 +4545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4836,7 +4560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4852,7 +4575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -4868,7 +4590,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4884,7 +4605,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4900,7 +4620,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4916,7 +4635,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4932,7 +4650,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4948,7 +4665,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4964,7 +4680,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -4982,7 +4697,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -4998,7 +4712,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -5015,7 +4728,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5031,7 +4743,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -5047,7 +4758,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5064,7 +4774,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "protokoll",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5081,7 +4790,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5099,7 +4807,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5115,7 +4822,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5131,7 +4837,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5148,7 +4853,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5165,7 +4869,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5182,7 +4885,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5199,7 +4901,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "uebergabe",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5216,7 +4917,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5234,7 +4934,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "uebergabe",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5251,7 +4950,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -5268,7 +4966,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -5289,7 +4986,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5305,7 +5001,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5321,7 +5016,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5337,7 +5031,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5353,7 +5046,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5369,7 +5061,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5385,7 +5076,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5402,7 +5092,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -5417,7 +5106,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5434,7 +5122,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -5450,7 +5137,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -5466,7 +5152,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5482,7 +5167,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5498,7 +5182,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5514,7 +5197,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5530,7 +5212,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5546,7 +5227,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5562,7 +5242,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -5580,7 +5259,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5597,7 +5275,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5614,7 +5291,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -5631,7 +5307,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5648,7 +5323,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -5665,7 +5339,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5682,7 +5355,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5699,7 +5371,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5715,7 +5386,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5731,7 +5401,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -5749,7 +5418,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5766,7 +5434,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5783,7 +5450,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5800,7 +5466,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5818,7 +5483,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5835,7 +5499,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5852,7 +5515,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5869,7 +5531,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "stellungnahme",
-        exam: "goethe_b1",
         words: 80,
       },
     ],
@@ -5890,7 +5551,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5906,7 +5566,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5922,7 +5581,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5937,7 +5595,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5953,7 +5610,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5969,7 +5625,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5984,7 +5639,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6000,7 +5654,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6015,7 +5668,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6031,7 +5683,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -6047,7 +5698,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -6063,7 +5713,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6079,7 +5728,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6095,7 +5743,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6111,7 +5758,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6127,7 +5773,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6143,7 +5788,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6159,7 +5803,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -6177,7 +5820,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6193,7 +5835,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6209,7 +5850,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -6226,7 +5866,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6242,7 +5881,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -6259,7 +5897,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6276,7 +5913,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -6293,7 +5929,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6309,7 +5944,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -6325,7 +5959,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -6342,7 +5975,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -6359,7 +5991,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6376,7 +6007,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -6394,7 +6024,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -6411,7 +6040,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6428,7 +6056,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6445,7 +6072,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6462,7 +6088,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
     ],
@@ -6482,7 +6107,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6497,7 +6121,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6512,7 +6135,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6527,7 +6149,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6542,7 +6163,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6558,7 +6178,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6574,7 +6193,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6590,7 +6208,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6606,7 +6223,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6623,7 +6239,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -6640,7 +6255,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -6655,7 +6269,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "dtb",
         words: 40,
       },
       {
@@ -6672,7 +6285,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6689,7 +6301,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -6706,7 +6317,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6723,7 +6333,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6740,7 +6349,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6757,7 +6365,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6774,7 +6381,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6791,7 +6397,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6808,7 +6413,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6825,7 +6429,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6842,7 +6445,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6859,7 +6461,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6876,7 +6477,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6893,7 +6493,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6910,7 +6509,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6927,7 +6525,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6944,7 +6541,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
     ],
@@ -6962,7 +6558,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6978,7 +6573,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -6994,7 +6588,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7011,7 +6604,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7027,7 +6619,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7044,7 +6635,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -7061,7 +6651,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7077,7 +6666,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7094,7 +6682,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7111,7 +6698,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7129,7 +6715,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7147,7 +6732,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "notiz",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7163,7 +6747,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7179,7 +6762,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7196,7 +6778,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7213,7 +6794,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7230,7 +6810,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7247,7 +6826,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7264,7 +6842,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7281,7 +6858,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7297,7 +6873,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7314,7 +6889,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7331,7 +6905,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7348,7 +6921,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7365,7 +6937,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7382,7 +6953,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7399,7 +6969,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7416,7 +6985,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7433,7 +7001,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7450,7 +7017,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
     ],
@@ -7470,7 +7036,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7485,7 +7050,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7500,7 +7064,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7516,7 +7079,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7531,7 +7093,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7547,7 +7108,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7562,7 +7122,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7577,7 +7136,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7592,7 +7150,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7608,7 +7165,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -7624,7 +7180,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -7640,7 +7195,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7655,7 +7209,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7671,7 +7224,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7687,7 +7239,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7703,7 +7254,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7719,7 +7269,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7735,7 +7284,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -7753,7 +7301,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7769,7 +7316,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7785,7 +7331,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -7803,7 +7348,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7819,7 +7363,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7835,7 +7378,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7852,7 +7394,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -7868,7 +7409,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7884,7 +7424,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7900,7 +7439,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7917,7 +7455,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7934,7 +7471,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7951,7 +7487,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7968,7 +7503,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7985,7 +7519,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -8002,7 +7535,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -8019,7 +7551,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -8036,7 +7567,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 80,
       },
     ],
@@ -8058,7 +7588,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8074,7 +7603,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8090,7 +7618,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8106,7 +7633,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8122,7 +7648,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8138,7 +7663,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8155,7 +7679,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8171,7 +7694,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8187,7 +7709,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8203,7 +7724,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8219,7 +7739,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8236,7 +7755,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -8254,7 +7772,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -8274,7 +7791,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8291,7 +7807,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "widerspruch",
-        exam: "alltag",
         words: 80,
       },
       {
@@ -8308,7 +7823,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -8326,7 +7840,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8343,7 +7856,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8360,7 +7872,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8377,7 +7888,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -8395,7 +7905,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "alltag",
         words: 200,
       },
       {
@@ -8412,7 +7921,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -8429,7 +7937,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 200,
       },
       {
@@ -8447,7 +7954,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "alltag",
         words: 200,
       },
     ],
@@ -8469,7 +7975,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8486,7 +7991,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8503,7 +8007,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8520,7 +8023,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8537,7 +8039,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8553,7 +8054,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8569,7 +8069,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8585,7 +8084,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8601,7 +8099,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8617,7 +8114,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
@@ -8634,7 +8130,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -8652,7 +8147,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -8671,7 +8165,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -8688,7 +8181,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8705,7 +8197,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -8722,7 +8213,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -8740,7 +8230,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "reklamation",
-        exam: "alltag",
         words: 200,
       },
       {
@@ -8757,7 +8246,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8774,7 +8262,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -8792,7 +8279,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -8809,7 +8295,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -8826,7 +8311,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -8843,7 +8327,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -8861,7 +8344,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -8882,7 +8364,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8899,7 +8380,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8916,7 +8396,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8933,7 +8412,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8949,7 +8427,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8965,7 +8442,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8982,7 +8458,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8999,7 +8474,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9016,7 +8490,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9032,7 +8505,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9048,7 +8520,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9064,7 +8535,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
@@ -9081,7 +8551,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -9099,7 +8568,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -9118,7 +8586,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -9135,7 +8602,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "widerspruch",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -9152,7 +8618,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "kuendigung",
-        exam: "alltag",
         words: 80,
       },
       {
@@ -9170,7 +8635,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -9187,7 +8651,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9204,7 +8667,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9221,7 +8683,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -9238,7 +8699,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -9255,7 +8715,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9272,7 +8731,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -9291,7 +8749,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "kuendigung",
-        exam: "alltag",
         words: 200,
       },
     ],
@@ -9313,7 +8770,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9330,7 +8786,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9346,7 +8801,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9362,7 +8816,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9379,7 +8832,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9395,7 +8847,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9412,7 +8863,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9428,7 +8878,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9444,7 +8893,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
@@ -9461,7 +8909,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -9479,7 +8926,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -9498,7 +8944,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9516,7 +8961,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -9533,7 +8977,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "kuendigung",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -9551,7 +8994,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -9568,7 +9010,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9585,7 +9026,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9602,7 +9042,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -9619,7 +9058,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -9637,7 +9075,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "alltag",
         words: 200,
       },
       {
@@ -9654,7 +9091,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -9672,7 +9108,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "kuendigung",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -9690,7 +9125,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -9712,7 +9146,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9728,7 +9161,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9744,7 +9176,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9760,7 +9191,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9777,7 +9207,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9793,7 +9222,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9809,7 +9237,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9825,7 +9252,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9841,7 +9267,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9858,7 +9283,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9875,7 +9299,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -9893,7 +9316,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
       {
@@ -9910,7 +9332,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bewerbung",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9927,7 +9348,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bewerbung",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -9945,7 +9365,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bewerbung",
-        exam: "goethe_c1",
         words: 120,
       },
     ],
@@ -9964,7 +9383,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -9981,7 +9399,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -9998,7 +9415,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10015,7 +9431,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10032,7 +9447,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10050,7 +9464,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10067,7 +9480,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10084,7 +9496,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10101,7 +9512,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -10119,7 +9529,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10137,7 +9546,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10156,7 +9564,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bewerbung",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -10175,7 +9582,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bewerbung",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -10193,7 +9599,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bewerbung",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -10214,7 +9619,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10231,7 +9635,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10247,7 +9650,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10263,7 +9665,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10279,7 +9680,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10296,7 +9696,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10312,7 +9711,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10328,7 +9726,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10344,7 +9741,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10360,7 +9756,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10377,7 +9772,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10394,7 +9788,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -10412,7 +9805,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -10431,7 +9823,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10448,7 +9839,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -10466,7 +9856,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10482,7 +9871,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10499,7 +9887,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -10517,7 +9904,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10535,7 +9921,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10552,7 +9937,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -10569,7 +9953,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -10586,7 +9969,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -10603,7 +9985,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -10621,7 +10002,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -10643,7 +10023,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10660,7 +10039,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10677,7 +10055,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10693,7 +10070,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10709,7 +10085,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10725,7 +10100,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10741,7 +10115,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10757,7 +10130,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10773,7 +10145,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10790,7 +10161,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10807,7 +10177,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -10824,7 +10193,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -10843,7 +10211,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10860,7 +10227,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10878,7 +10244,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10895,7 +10260,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B2.1",
         format: "email_informell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -10912,7 +10276,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10929,7 +10292,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10946,7 +10308,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -10963,7 +10324,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -10980,7 +10340,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10997,7 +10356,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11014,7 +10372,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -11033,7 +10390,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -11055,7 +10411,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11072,7 +10427,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11089,7 +10443,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11105,7 +10458,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11121,7 +10473,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11138,7 +10489,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11154,7 +10504,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11170,7 +10519,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11186,7 +10534,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11203,7 +10550,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -11221,7 +10567,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -11241,7 +10586,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11258,7 +10602,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -11276,7 +10619,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11294,7 +10636,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -11311,7 +10652,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -11328,7 +10668,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "widerspruch",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -11345,7 +10684,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11362,7 +10700,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11379,7 +10716,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11396,7 +10732,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -11414,7 +10749,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -11435,7 +10769,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11451,7 +10784,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11467,7 +10799,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11483,7 +10814,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11499,7 +10829,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11515,7 +10844,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11531,7 +10859,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11547,7 +10874,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11563,7 +10889,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11579,7 +10904,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11596,7 +10920,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -11614,7 +10937,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -11633,7 +10955,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11650,7 +10971,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "kuendigung",
-        exam: "alltag",
         words: 80,
       },
       {
@@ -11667,7 +10987,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11683,7 +11002,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -11700,7 +11018,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11717,7 +11034,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11734,7 +11050,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11751,7 +11066,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11768,7 +11082,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11785,7 +11098,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -11802,7 +11114,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -11821,7 +11132,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -11838,7 +11148,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "forumsbeitrag",
-        exam: "goethe_b1",
         words: 80,
       },
     ],
@@ -11859,7 +11168,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11876,7 +11184,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11892,7 +11199,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11908,7 +11214,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11924,7 +11229,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11941,7 +11245,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11958,7 +11261,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11974,7 +11276,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -11990,7 +11291,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
@@ -12008,7 +11308,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 100,
       },
       {
@@ -12026,7 +11325,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "kuendigung",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -12046,7 +11344,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -12063,7 +11360,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "kuendigung",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -12080,7 +11376,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "widerspruch",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -12097,7 +11392,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -12115,7 +11409,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "alltag",
         words: 200,
       },
       {
@@ -12132,7 +11425,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -12149,7 +11441,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -12166,7 +11457,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -12183,7 +11473,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -12200,7 +11489,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -12217,7 +11505,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -12236,7 +11523,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -12253,7 +11539,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "forumsbeitrag",
-        exam: "goethe_b1",
         words: 80,
       },
     ],

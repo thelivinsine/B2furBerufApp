@@ -255,17 +255,27 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
   in place: same ids, same pool positions, only text and tags changed. Gated in
   `tests/writingScope.test.ts`, so these are invariants now, not aspirations:
   - **Unterthema:** every declared sub-theme has ≥2 short + ≥2 long servable tasks.
-  - **Branche:** all 10 Beruf Themen x 15 Branchen x both Längen carry a dedicated task (wave 2 did
-    5 Themen, wave 4 the rest). **Alltag is tagged too** (founder decision): every Alltag task
-    carries Branchen, and each names the work context that makes the everyday situation hard
-    (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage, Spätdienst) rather than
-    name-dropping an industry. All 15 are reachable per Alltag theme x length.
+  - **Branche: a tag is EARNED, and the old all-15-per-Thema floor is GONE (s199).** The floor was
+    satisfiable by tagging, and tagging is what happened (199 of 600 tagged tasks named an industry
+    their brief never entered). A `sectors` tag now requires a marker of that workplace in the brief,
+    checked by `scripts/sector-markers.mjs`, the ONE lexicon shared by `lint:content` and
+    `tests/writingScope.test.ts`. Beruf pools keep ≥8 of 15 sectors earned; Alltag has few, honestly.
+    Add a missing word to the lexicon rather than dropping a true tag; dropping a false one costs no
+    reach, because Branche is soft.
+  - **Argumentation (s200):** a `stellungnahme`, `forumsbeitrag`, `widerspruch` or `beschwerde` at
+    B2 or above carries ≥1 Leitpunkt demanding a reason, a consequence or a stance
+    (`scripts/justification-markers.mjs`, same shared-lexicon arrangement). `level` is what makes
+    `evaluate-writing` mark strictly, so a brief that only describes gets the learner marked down for
+    obeying it. Fix by REPLACING the weakest descriptive point, never by adding a fifth. B1 is exempt.
   - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` +
     `weiterbildung`), B1/B2/C1 at both lengths. **One deliberate zero: C1 + E-Mail (privat)**, which
     has no exam analogue; the rail greys it with an honest count.
   - **Niveau:** B1 307 / B2 302 / C1 108. Kurz stays B1-heavy on purpose (a 40-word task with three
     Leitpunkte is B1 work); promotion to B2 is limited to Lang tasks in demanding genres.
-  Word targets by band, keep them consistent: B1 40/80, B2 100/150, C1 120/200 (short/long).
+  Word targets are determined by (Niveau, Länge), and nothing else: B1 40/80, B2 100/150, C1 120/200
+  (short/long). The `exam` field that claimed to set them was RETIRED in s200 (audit P3): no surface,
+  filter or grader read it, so it drifted (69 tasks out of band, 61 `goethe_b1` tasks at 150 words).
+  `lint:content` errors if it reappears.
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
 - **Sprech-Szenarien** (`dialogues.ts`, 30): `id` (`sc_`), `themeId`, `title`, `task`, `context`,

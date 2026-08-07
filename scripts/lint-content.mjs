@@ -102,7 +102,10 @@ const WRITING_FORMATS = [
   "beschwerde", "reklamation",
   "antrag", "widerspruch", "kuendigung", "bewerbung",
 ];
-const WRITING_EXAMS = ["goethe_b1", "goethe_b2", "goethe_c1", "telc_b2_beruf", "dtb", "alltag"];
+// `exam` was RETIRED in s200 (audit P3): dead authoring metadata no surface,
+// filter or grader read, which is exactly why it drifted out of band on 69
+// tasks. The guard below errors if it comes back, the same pattern as the
+// retired singular `sector`.
 const WRITING_REGISTERS = ["du", "sie"];
 
 /** Validate an optional `sectors` array: non-empty, unique, enum values only.
@@ -762,8 +765,13 @@ function checkWritingTask(ds, w, t, themeId, code, seenIds) {
     error(ds, w, `invalid level "${t.level}"`);
   if (t.format !== undefined && !WRITING_FORMATS.includes(t.format))
     error(ds, w, `invalid format "${t.format}"`);
-  if (t.exam !== undefined && !WRITING_EXAMS.includes(t.exam))
-    error(ds, w, `invalid exam "${t.exam}"`);
+  if (t.exam !== undefined)
+    error(
+      ds,
+      w,
+      `"exam" was retired (s200, audit P3): nothing read it and it contradicted "words", ` +
+        `which follows (Niveau, Länge). Drop the field.`,
+    );
   if (t.register !== undefined && !WRITING_REGISTERS.includes(t.register))
     error(ds, w, `invalid register "${t.register}"`);
   if (t.addressee !== undefined && !isStr(t.addressee))
