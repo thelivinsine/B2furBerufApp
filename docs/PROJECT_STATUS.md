@@ -166,7 +166,10 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 202 (2026-08-08): a practice conversation now carries its Redemittel while
-the learner speaks.** Branch `claude/sprechen-filter-rail-practice-70gydw`.
+the learner speaks.** Branch `claude/sprechen-filter-rail-practice-70gydw`, PR **#830** →
+squash-merged **`9c4ca3b`**. Validate content and Deploy site to GitHub Pages both green on `main`;
+Deploy Supabase functions correctly did not run (path-filtered, nothing under `supabase/` changed).
+Post-merge housekeeping done, tree clean.
 Founder prompts: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
 redemittle even in the practice sessions" → "option a's layout for desktop and option c for mobile
 and also desktop's content".
