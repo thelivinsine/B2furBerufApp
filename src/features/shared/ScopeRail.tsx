@@ -224,16 +224,26 @@ export function ScopeRail({
   onClose,
   layout = "rail",
   title = "Aufgabe wählen",
+  icon: Icon = Target,
   resetLabel = "Zurücksetzen und neue Aufgabe ziehen",
   className,
 }: {
   children: React.ReactNode;
-  /** Full reset (always active): clears every scope AND redraws. */
-  onReset: () => void;
+  /**
+   * Full reset (always active): clears every scope AND redraws.
+   *
+   * Optional since s202, for the ONE rail that filters nothing: the Sprechen
+   * Redemittel rail browses phrases rather than narrowing a list, so a reset
+   * there would sit at its default doing nothing, which is the founder's
+   * dead-control rule. Absent = no reset icon, never a disabled one.
+   */
+  onReset?: () => void;
   /** Close handler for the panel's X icon (mobile). */
   onClose?: () => void;
   layout?: "rail" | "panel";
   title?: string;
+  /** The mark beside the title. Defaults to the Aufgabe rail's target. */
+  icon?: typeof Target;
   resetLabel?: string;
   className?: string;
 }) {
@@ -257,20 +267,22 @@ export function ScopeRail({
     >
       <div className="flex items-center gap-1 px-3 py-2.5">
         <span className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary">
-          <Target className="h-4 w-4" />
+          <Icon className="h-4 w-4" />
           {title}
         </span>
         {/* Always active (founder s149 P2): clears every scope AND draws a
             fresh random Aufgabe, so the button always visibly does something. */}
-        <button
-          type="button"
-          onClick={onReset}
-          aria-label={resetLabel}
-          title={resetLabel}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
+        {onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            aria-label={resetLabel}
+            title={resetLabel}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
+        )}
         {panel && onClose && (
           <button
             type="button"

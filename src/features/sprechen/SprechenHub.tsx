@@ -33,6 +33,7 @@ import { ModuleTabs } from "@/features/pruefung/ModuleTabs";
 import { ChooserCard, ChooserGrid } from "@/features/pruefung/ChooserCard";
 import { ModulePage, ModulePicker, ScopeEmpty } from "@/features/pruefung/ModulePicker";
 import { ConversationRunner } from "./ConversationRunner";
+import { RedemittelHelp } from "./RedemittelHelp";
 
 /**
  * The free Sprechtrainer (s193), rebuilt as a chooser in s196.
@@ -176,14 +177,22 @@ export function SprechenHub() {
   );
 
   if (active) {
+    const brief = speakingBrief(active);
     return (
-      <div className="mx-auto flex h-page-stage w-full max-w-2xl flex-col gap-3">
+      // The conversation column is unchanged at 2xl; the extra width from `lg`
+      // up is the Redemittel rail's (s202), so the transcript sits where it
+      // always has and the rail lands in the space beside it.
+      <div className="mx-auto flex h-page-stage w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
         {leaveDialog}
         <ConversationRunner
-          brief={speakingBrief(active)}
+          brief={brief}
           // Mobile carries the module row on every screen of the zone (founder
           // s195); in the exam this same slot is the RunBar.
           header={<ModuleHeader part="sprechen" />}
+          // Practice only, by construction: the Modelltest renders the same
+          // runner and passes nothing, so it neither shows the phrases it
+          // grades nor pulls the phrase bank into its chunk.
+          help={(layout) => <RedemittelHelp brief={brief} layout={layout} />}
           onBusyChange={setTalking}
           onExit={() => setActive(null)}
           onFinished={() => {

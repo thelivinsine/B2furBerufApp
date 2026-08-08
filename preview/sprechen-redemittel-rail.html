@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprechen: phrases while you speak</title>
+<style>
+  /* ---------------------------------------------------------------
+     REVIEW CHROME (deliberately not the app palette, so the mocked
+     app screens below read as separate objects).
+     --------------------------------------------------------------- */
+  :root {
+    --c-ground: #eceef1; --c-panel: #ffffff; --c-ink: #191d24;
+    --c-muted: #5c6672; --c-line: #d3d8de; --c-accent: #1f6f68; --c-chip: #e2e6ea;
+  }
+  [data-appearance="dark"] {
+    --c-ground: #0e1013; --c-panel: #16191d; --c-ink: #e6e9ec;
+    --c-muted: #98a1ab; --c-line: #292e35; --c-accent: #58bdb2; --c-chip: #212630;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--c-ground); color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55; padding: 32px 24px 96px; min-height: 100vh;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p { margin: 0; }
+  .lede { color: var(--c-muted); max-width: 72ch; }
+  .kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--c-accent); }
+  .rule { height: 1px; background: var(--c-line); border: 0; margin: 34px 0 0; }
+
+  .controls {
+    position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px;
+    padding: 12px 14px; margin: 22px 0 30px; box-shadow: 0 6px 18px -12px rgba(0,0,0,.4);
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl > span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); }
+  .seg { display: inline-flex; background: var(--c-chip); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent;
+    color: var(--c-muted); padding: 5px 12px; border-radius: 7px; cursor: pointer; transition: background .14s, color .14s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--c-panel); color: var(--c-ink); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+  .seg button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+  .panel { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px; padding: 20px 22px; }
+  .panel + .panel { margin-top: 16px; }
+  .findings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 14px; }
+  .finding { display: flex; gap: 11px; align-items: flex-start; }
+  .finding b { display: block; font-size: 14px; }
+  .finding p { font-size: 13.5px; color: var(--c-muted); }
+  .num {
+    flex: none; width: 22px; height: 22px; border-radius: 7px; background: var(--c-chip);
+    color: var(--c-accent); font-size: 12px; font-weight: 700; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); font-weight: 700; }
+  td:first-child { font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+
+  .option { margin-top: 46px; }
+  .opthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .optname {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--c-panel); background: var(--c-accent); padding: 3px 9px; border-radius: 6px;
+  }
+  .framerow { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; align-items: flex-start; }
+  .framebox.phone { flex: 0 0 auto; }
+  .framebox.desk { flex: 1 1 100%; }
+  .notecol { flex: 1 1 380px; min-width: 280px; }
+  .framelabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); margin: 0 0 7px; }
+  .frame { border: 1px solid var(--c-line); border-radius: 14px; overflow: hidden; }
+  .frame.desk .screen { padding: 26px 24px 32px; }
+  .frame.desk .inner { max-width: 1152px; margin: 0 auto; }
+  /* The phone frame is the REAL content area a 393×852 phone leaves between the
+     app header and the bottom tab bar (668 px), and it does NOT scroll: if a
+     screen did not fit, it would visibly overflow here. */
+  .frame.mob { width: 372px; }
+  .frame.mob .screen { padding: 16px 15px 20px; height: 668px; overflow: hidden; }
+  .frame.mob.scrolls .screen { overflow-y: auto; }
+  .fitnote { font-size: 12px; color: var(--c-muted); margin-top: 7px; }
+  .note { font-size: 13.5px; color: var(--c-muted); }
+  .note + .note { margin-top: 10px; }
+  .note b { color: var(--c-ink); font-weight: 650; }
+  .cost { margin-top: 12px; font-size: 13px; color: var(--c-muted); border-left: 3px solid var(--c-line); padding-left: 10px; }
+  .cost b { color: var(--c-ink); }
+
+  /* ---------------------------------------------------------------
+     APP TOKENS — verbatim from src/index.css (light + s187 "N3 Slate"
+     dark) and tailwind.config.ts.
+     --------------------------------------------------------------- */
+  .screen {
+    --background: 180 45% 98%;
+    --page-from: 144 45% 98%; --page-mid: 150 50% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%; --elevated: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --shadow: 221 40% 22%;
+    --radius: 0.5rem;
+    --wash-a: .10; --wash-b: .09;
+    --gradient-from: 226 83% 47%; --gradient-to: 196 93% 38%;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / var(--wash-a)) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / var(--wash-b)) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    color: hsl(var(--foreground)); font-size: 16px; line-height: 1.5;
+  }
+  [data-appearance="dark"] .screen {
+    --background: 220 15% 4%;
+    --page-from: 220 15% 4%; --page-mid: 220 15% 4%; --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%;
+    --surface: 220 10% 17%; --elevated: 220 9% 22%;
+    --muted: 220 9% 25%; --muted-foreground: 220 8% 72%;
+    --border: 220 10% 38%;
+    --primary: 219 90% 74%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-ink: 198 72% 72%;
+    --success: 153 50% 52%;
+    --shadow: 220 30% 2%;
+    --wash-a: 0; --wash-b: 0;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+  }
+
+
+  /* ---------------------------------------------------------------
+     MODULE MARKS — three colour sets, switched from the control bar.
+     Every hue comes from a sanctioned brand family (blue/sky/cyan,
+     emerald/teal/green, amber/orange/yellow, rose/pink).
+     --------------------------------------------------------------- */
+
+  /* C1 "Ruhig": no colour at all. The mark is a shape, the tile is the same
+     recessed grey everywhere, and colour is left to the things that act
+     (the CTA, the result bars). */
+  [data-colors="c1"] .screen {
+    --tile-lesen: hsl(var(--muted)); --ink-lesen: hsl(var(--foreground));
+    --tile-hoeren: hsl(var(--muted)); --ink-hoeren: hsl(var(--foreground));
+    --tile-schreiben: hsl(var(--muted)); --ink-schreiben: hsl(var(--foreground));
+    --tile-sprechen: hsl(var(--muted)); --ink-sprechen: hsl(var(--foreground));
+    --bar-lesen: hsl(var(--primary) / .45); --bar-hoeren: hsl(var(--primary) / .62);
+    --bar-schreiben: hsl(var(--primary) / .8); --bar-sprechen: hsl(var(--primary));
+  }
+
+  /* C2 "Rezeptiv / Produktiv": the colour carries a fact. Lesen and Hören are
+     the two receiving skills (green family), Schreiben and Sprechen the two
+     producing ones (blue family), so the pairs read as pairs. */
+  [data-colors="c2"] .screen {
+    --tile-lesen: rgba(16,185,129,.12);  --ink-lesen: #047857;  --bar-lesen: #10b981;
+    --tile-hoeren: rgba(20,184,166,.12); --ink-hoeren: #0f766e; --bar-hoeren: #14b8a6;
+    --tile-schreiben: hsl(var(--primary) / .12); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(14,165,233,.12); --ink-sprechen: #0369a1; --bar-sprechen: #0ea5e9;
+  }
+  [data-appearance="dark"][data-colors="c2"] .screen {
+    --tile-lesen: rgba(52,211,153,.16);  --ink-lesen: #6ee7b7;  --bar-lesen: #34d399;
+    --tile-hoeren: rgba(45,212,191,.16); --ink-hoeren: #5eead4; --bar-hoeren: #2dd4bf;
+    --tile-schreiben: hsl(var(--primary) / .18); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(56,189,248,.16); --ink-sprechen: #7dd3fc; --bar-sprechen: #38bdf8;
+  }
+
+  /* C3 "Vier Farben": four clearly separated hues, one per module, pushed
+     further apart than today's teal/amber/blue/cyan (where the last two read
+     as the same colour at 40 px). */
+  [data-colors="c3"] .screen {
+    --tile-lesen: rgba(16,185,129,.12);  --ink-lesen: #047857;  --bar-lesen: #10b981;
+    --tile-hoeren: rgba(245,158,11,.13); --ink-hoeren: #b45309; --bar-hoeren: #f59e0b;
+    --tile-schreiben: hsl(var(--primary) / .12); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(244,63,94,.11); --ink-sprechen: #be123c; --bar-sprechen: #f43f5e;
+  }
+  [data-appearance="dark"][data-colors="c3"] .screen {
+    --tile-lesen: rgba(52,211,153,.16);  --ink-lesen: #6ee7b7;  --bar-lesen: #34d399;
+    --tile-hoeren: rgba(251,191,36,.16); --ink-hoeren: #fbbf24; --bar-hoeren: #fbbf24;
+    --tile-schreiben: hsl(var(--primary) / .18); --ink-schreiben: hsl(var(--primary)); --bar-schreiben: hsl(var(--primary));
+    --tile-sprechen: rgba(251,113,133,.16); --ink-sprechen: #fda4af; --bar-sprechen: #fb7185;
+  }
+
+  /* Glyph set switch: both sets are in the DOM, one is shown. */
+  .g { display: none; line-height: 0; }
+  [data-marks="g1"] .g1, [data-marks="g2"] .g2 { display: inline-flex; }
+
+  .markstage { border-radius: 12px; padding: 22px 18px; margin-top: 14px; }
+  .markrow { display: flex; flex-wrap: wrap; gap: 26px; justify-content: center; }
+  .markcell { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .marklab { font-size: 13.5px; font-weight: 600; color: hsl(var(--foreground)); }
+  .tile.xl { width: 56px; height: 56px; border-radius: 14px; }
+
+  .screen .col { display: flex; flex-direction: column; gap: 18px; }
+  .frame.mob .screen { display: flex; }
+  .frame.mob .screen .inner { flex: 1; min-height: 0; display: flex; }
+  .frame.mob .screen .col { gap: 14px; flex: 1; min-height: 0; }
+  .screen button { font: inherit; color: inherit; }
+
+  .card {
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+  .eyebrow.mut { color: hsl(var(--muted-foreground)); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Header ------------------------------------------------------- */
+  .hdr.row-between { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .hdr.stack2 { display: flex; flex-direction: column; gap: 10px; }
+  .row-end { display: flex; justify-content: flex-end; }
+  .frame.mob .hdr.row-between { flex-direction: column; align-items: stretch; gap: 10px; }
+  .frame.mob .hdr.row-between .scopebtn { align-self: flex-end; }
+
+  .modeswitch {
+    position: relative; display: inline-flex; gap: 4px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .modeswitch.full { display: flex; width: 100%; }
+  .modeswitch > button {
+    position: relative; z-index: 1; flex: 1; border: 0; background: transparent; cursor: pointer;
+    font-size: 15px; font-weight: 600; padding: 7px 22px; border-radius: 6px;
+    color: hsl(var(--muted-foreground)); transition: color .14s ease; white-space: nowrap;
+  }
+  .modeswitch > button[aria-pressed="true"] { color: hsl(var(--foreground)); font-weight: 700; }
+  .modeswitch > .pill {
+    position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px); border-radius: 6px;
+    background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.desk .modeswitch:not(.full) { min-width: 320px; }
+
+  .scopebtn {
+    display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 10px 0 13px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 8px; cursor: pointer;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    font-size: 14px; white-space: nowrap;
+  }
+  .scopebtn > span { color: hsl(var(--muted-foreground)); }
+  .scopebtn > b { font-weight: 700; }
+  .scopebtn svg { color: hsl(var(--muted-foreground)); }
+
+  .lvl {
+    position: relative; display: inline-flex; gap: 2px; padding: 4px;
+    background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: 8px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .lvl.full { display: flex; width: 100%; }
+  .lvl.full > button { flex: 1; }
+  .lvl > button {
+    position: relative; z-index: 1; border: 0; background: transparent; cursor: pointer; width: 46px;
+    font-size: 14px; font-weight: 600; padding: 6px 0; border-radius: 6px;
+    color: hsl(var(--muted-foreground)); transition: color .14s ease;
+  }
+  .lvl > button[aria-pressed="true"] { color: hsl(var(--foreground)); }
+  .lvl > .pill {
+    position: absolute; top: 4px; bottom: 4px; border-radius: 6px; background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+
+  /* Tiles + chips ------------------------------------------------ */
+  .tile { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; }
+  .tile.lg { width: 44px; height: 44px; border-radius: 11px; }
+  .tile.lesen { background: var(--tile-lesen); color: var(--ink-lesen); }
+  .tile.hoeren { background: var(--tile-hoeren); color: var(--ink-hoeren); }
+  .tile.schreiben { background: var(--tile-schreiben); color: var(--ink-schreiben); }
+  .tile.sprechen { background: var(--tile-sprechen); color: var(--ink-sprechen); }
+
+  .timechip {
+    display: inline-flex; align-items: center; gap: 4px; flex: none;
+    font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted)); border-radius: 6px; padding: 3px 8px;
+  }
+  .chev { color: hsl(var(--muted-foreground)); display: inline-flex; flex: none; }
+
+  /* Option A module grid ----------------------------------------- */
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .frame.mob .grid4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .modcard {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; cursor: pointer;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .modcard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .modname { margin-top: 11px; font-size: 16px; font-weight: 650; }
+  .moddesc { margin-top: 3px; font-size: 12.5px; color: hsl(var(--muted-foreground)); line-height: 1.35; }
+  .modfoot { margin-top: auto; padding-top: 12px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .modtrainer {
+    margin-top: 10px; padding-top: 9px; width: 100%; border-top: 1px solid hsl(var(--border));
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; font-weight: 500; color: hsl(var(--primary));
+  }
+
+  /* Option B rows ------------------------------------------------- */
+  .rowlist { display: flex; flex-direction: column; overflow: hidden; }
+  .rowlist > * + * { border-top: 1px solid hsl(var(--border)); }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px; width: 100%;
+    background: transparent; border: 0; text-align: left; cursor: pointer; transition: background .14s ease;
+  }
+  .row:hover { background: hsl(var(--muted) / .4); }
+  .rowtext { min-width: 0; flex: 1; display: block; }
+  .rname { display: block; font-size: 15px; font-weight: 650; }
+  .rsub { display: block; margin-top: 1px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+
+  /* Option C wide cards ------------------------------------------ */
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .frame.mob .grid2 { grid-template-columns: 1fr; gap: 12px; }
+  .widecard {
+    display: flex; align-items: center; gap: 14px; text-align: left; cursor: pointer; width: 100%;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px 16px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .widecard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px hsl(var(--shadow) / .08), 0 12px 24px -6px hsl(var(--shadow) / .16); }
+  .widecard .rname { font-size: 16px; }
+  .wcTrainer { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12.5px; font-weight: 500; color: hsl(var(--primary)); }
+  .wcRight { flex: none; display: flex; align-items: baseline; gap: 3px; }
+  .bigmin { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .bigminlab { font-size: 12px; color: hsl(var(--muted-foreground)); }
+
+  /* Run band ------------------------------------------------------ */
+  .band { padding: 16px 18px 18px; display: flex; flex-direction: column; }
+  .trackwrap { display: flex; flex-direction: column; justify-content: center; }
+  .frame.mob:not(.scrolls) .band { flex: 1; }
+  .frame.mob:not(.scrolls) .band .trackwrap { flex: 1; }
+  .frame.mob .bandhead { flex-direction: column; align-items: flex-start; gap: 5px; }
+  .bandhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+  .totalmin { font-size: 15px; font-weight: 650; }
+  .cdown { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .cdown svg { flex: none; }
+  .track { position: relative; display: flex; justify-content: space-between; margin-top: 16px; }
+  /* One segment per gap, drawn from the edge of one tile to the edge of the
+     next, so the line never runs behind a mark. */
+  .tnode { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tnode::after {
+    content: ""; position: absolute; top: 21px; height: 2px; background: hsl(var(--border));
+    left: calc(50% + 30px); right: calc(-50% + 30px);
+  }
+  .tnode:last-child::after { content: none; }
+  .frame.mob .tnode::after { top: 19px; left: calc(50% + 28px); right: calc(-50% + 28px); }
+  .tnode .dot { width: 44px; height: 44px; border-radius: 11px; border: 3px solid hsl(var(--surface)); }
+  .tnode .lab { font-size: 13.5px; font-weight: 600; }
+  .tnode .min { font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+  .frame.mob .tnode .dot { width: 40px; height: 40px; }
+  .frame.mob .tnode .lab { font-size: 12.5px; }
+  .bandfoot { margin-top: 16px; padding-top: 16px; border-top: 1px solid hsl(var(--border)); display: flex; justify-content: flex-end; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 6px;
+    cursor: pointer; height: 42px; padding: 0 20px; font-size: 15px; font-weight: 500; white-space: nowrap;
+  }
+  .btn.grad {
+    background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .12);
+  }
+  .frame.mob .btn.wide { width: 100%; }
+
+  /* Verlauf -------------------------------------------------------- */
+  .vrow { gap: 12px; }
+  .vdate { flex: none; width: 66px; font-size: 13.5px; font-weight: 650; }
+  .mini { display: flex; gap: 4px; flex: 1; min-width: 54px; max-width: 320px; }
+  .mini > span { flex: 1; height: 5px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .mini > span > i { display: block; height: 100%; border-radius: 999px; }
+  .bar-lesen { background: var(--bar-lesen); } .bar-hoeren { background: var(--bar-hoeren); }
+  .bar-schreiben { background: var(--bar-schreiben); } .bar-sprechen { background: var(--bar-sprechen); }
+  .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; white-space: nowrap; flex: none; }
+  .badge.ok { background: hsl(var(--success) / .15); color: hsl(var(--success)); }
+  .badge.mutedb { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .vopen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px 14px; border-top: 1px solid hsl(var(--border)); }
+  .vlab { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .vval { margin-top: 2px; font-size: 14px; font-weight: 650; }
+  .verlauf { overflow: hidden; }
+  .vhead {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 13px 14px;
+    background: transparent; border: 0; cursor: pointer; text-align: left; transition: background .14s ease;
+  }
+  .vhead:hover { background: hsl(var(--muted) / .4); }
+  .vhead > .chev { margin-left: auto; transition: transform .16s ease; }
+  .vcount { font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .verlauf > .rowlist { border-top: 1px solid hsl(var(--border)); }
+  .vsum { display: flex; align-items: center; gap: 14px; padding: 13px 15px; border-top: 1px solid hsl(var(--border)); }
+  .vsumval { margin-top: 1px; font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+  .vsep { width: 1px; align-self: stretch; background: hsl(var(--border)); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .001ms !important; } }
+
+  .wrap { max-width: 1300px; }
+  .framebox.desk { overflow-x: auto; }
+  .frame.desk { min-width: 1120px; }
+  .frame.desk .screen { padding: 0; }
+  .frame.mob { width: 372px; }
+  .frame.mob .screen { padding: 0; height: 778px; overflow: hidden; position: relative; display: block; }
+
+  /* Shell ---------------------------------------------------------- */
+  .shell { display: flex; align-items: stretch; min-height: 660px; }
+  .side {
+    flex: none; width: 232px; border-right: 1px solid hsl(var(--border));
+    background: hsl(var(--surface) / .6); padding: 14px 12px; display: flex; flex-direction: column; gap: 18px;
+  }
+  .sidebrand { display: flex; align-items: center; gap: 9px; padding: 4px 8px; font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+  .logomark { width: 28px; height: 28px; border-radius: 9px; background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to))); flex: none; }
+  .logomark.sm { width: 24px; height: 24px; border-radius: 8px; }
+  .sidenav { display: flex; flex-direction: column; gap: 2px; }
+  .sideitem { display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 8px; color: hsl(var(--muted-foreground)); font-size: 14.5px; }
+  .sideitem em { font-style: normal; font-weight: 600; }
+  .sideitem.on { background: hsl(var(--primary) / .1); color: hsl(var(--primary)); }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  .apphdr {
+    height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px; border-bottom: 1px solid hsl(var(--border)); background: hsl(var(--surface) / .75);
+  }
+  .frame.mob .apphdr { height: 50px; padding: 0 14px; }
+  .hdrright { display: flex; align-items: center; gap: 8px; }
+  .exitbtn {
+    display: inline-flex; align-items: center; height: 32px; padding: 0 13px; border-radius: 8px;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    font-size: 13px; font-weight: 650; color: hsl(var(--muted-foreground));
+  }
+  .exitbtn.sm { height: 28px; font-size: 12.5px; padding: 0 11px; }
+
+  .navbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center;
+    justify-content: space-around; border-top: 1px solid hsl(var(--border)); background: hsl(var(--surface) / .95);
+  }
+  .navtab { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .navtab i { display: block; width: 22px; height: 22px; border-radius: 7px; background: hsl(var(--border)); }
+  .navtab.on i { background: hsl(var(--primary) / .85); }
+  .navtab em { font-style: normal; font-size: 10px; font-weight: 650; }
+
+  .pagearea { flex: 1; padding: 20px 22px 26px; display: flex; justify-content: center; }
+  .phonebody { padding: 10px 12px 0; height: 672px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+
+  /* The conversation stage ---------------------------------------- */
+  .stage { display: flex; gap: 26px; width: 100%; max-width: 672px; }
+  .stage.wide { max-width: 968px; }
+  .convcol { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; height: 560px; }
+  .railcol { flex: none; width: 256px; align-self: flex-start; }
+
+  .modrow { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; }
+  .briefrow { display: flex; align-items: center; gap: 8px; flex: none; }
+  .briefbtn {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); border-radius: 8px;
+    padding: 8px 10px; font-size: 13px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .10);
+  }
+  .briefbtn b { font-weight: 700; }
+  .briefbtn i { font-style: normal; font-weight: 500; color: hsl(var(--muted-foreground)); }
+  .briefbtn .chev { margin-left: auto; color: hsl(var(--muted-foreground)); display: flex; }
+  .railtoggle {
+    flex: none; display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 10px;
+    border-radius: 8px; font-size: 12.5px; font-weight: 700;
+    background: hsl(var(--accent) / .35); color: hsl(var(--accent-ink));
+  }
+  [data-appearance="dark"] .railtoggle { background: hsl(var(--accent) / .18); color: hsl(var(--accent)); }
+  .railtoggle.on { background: hsl(var(--primary)); color: #fff; }
+
+  /* Thread --------------------------------------------------------- */
+  .thread { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+  .mobstage { flex: 1; min-height: 0; position: relative; display: flex; }
+  .bubblewrap { display: flex; max-width: 88%; }
+  .bubblewrap.mine { align-self: flex-end; }
+  .bubble { min-width: 0; border-radius: 10px; padding: 10px 12px; }
+  .bubble p { font-size: 14.5px; line-height: 1.35; }
+  .bubble.partner { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .1); }
+  .bubble.learner { background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .2); }
+  [data-appearance="dark"] .bubble.learner { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .1); }
+  .replay { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 11px; font-weight: 650; color: hsl(var(--muted-foreground)); }
+  .replay.right { justify-content: flex-end; width: 100%; }
+
+  /* Mic cluster ---------------------------------------------------- */
+  .mics { flex: none; padding-top: 6px; }
+  .microw { display: flex; align-items: center; justify-content: center; gap: 20px; }
+  .clbtn { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: hsl(var(--muted-foreground)); }
+  .clcircle { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); box-shadow: 0 1px 2px hsl(var(--shadow) / .06); }
+  .micbtn {
+    display: grid; place-items: center; width: 68px; height: 68px; border-radius: 999px; color: #fff;
+    background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .14);
+  }
+  .miccap { margin-top: 9px; text-align: center; font-size: 12px; color: hsl(var(--muted-foreground)); }
+
+  /* The Redemittel tile (ScopeRail language) ----------------------- */
+  .scoperail {
+    border-radius: 12px; background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .2);
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .1);
+  }
+  [data-appearance="dark"] .scoperail { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .1); }
+  .railhead { display: flex; align-items: center; gap: 4px; padding: 8px 10px 6px; }
+  .railtitle { flex: 1; display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; color: hsl(var(--primary)); }
+  .railicon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; color: hsl(var(--muted-foreground)); }
+  .railbody { padding: 2px 10px 11px; display: flex; flex-direction: column; gap: 12px; }
+  .scopelab { font-size: 11.5px; font-weight: 700; letter-spacing: .045em; text-transform: uppercase; color: hsl(var(--muted-foreground)); margin-bottom: 6px; }
+  .scopesel {
+    display: flex; align-items: center; gap: 7px; width: 100%; padding: 6px 9px; border-radius: 8px;
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); font-size: 12.5px;
+  }
+  .scopesel b { flex: 1; min-width: 0; font-weight: 650; }
+  .scopesel i { font-style: normal; font-size: 11.5px; color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+  .scopesel svg { color: hsl(var(--muted-foreground)); }
+
+  .phraselist { display: flex; flex-direction: column; gap: 6px; }
+  .phrase {
+    display: block; border-radius: 8px; background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    padding: 7px 9px;
+  }
+  .phrase b { display: block; font-size: 13px; font-weight: 650; line-height: 1.3; }
+  .phrase i { display: block; margin-top: 2px; font-style: normal; font-size: 11.5px; line-height: 1.3; color: hsl(var(--muted-foreground)); }
+  .phrase.compact b { font-size: 12.5px; }
+  /* "Show English inline" is a switch on this page; the app itself would use the
+     hold-to-peek pattern, so the English line is hidden by default. */
+  [data-en="peek"] .phrase i { display: none; }
+  /* The du/Sie switch: this task's partner says Sie, so du phrases drop out. */
+  [data-form="match"] .phrase.duform { display: none; }
+  [data-form="match"] .chip.duform { display: none; }
+  /* Depth: curated shows 3 per intent, full shows all 8. */
+  [data-depth="curated"] .phraselist .phrase:nth-child(n + 4) { display: none; }
+
+  .catpills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .catpill {
+    display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; padding: 4px 8px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); font-size: 11.5px; font-weight: 650;
+  }
+  .catpill i { font-style: normal; color: hsl(var(--muted-foreground)); font-variant-numeric: tabular-nums; }
+  .catpill.plain { background: hsl(var(--muted)); border-color: transparent; color: hsl(var(--muted-foreground)); }
+  .catpills.flat { margin-bottom: 14px; }
+
+  /* Option A, phone: the panel covers the thread inside the stage. It needs an
+     OPAQUE backing of its own: the tile is a translucent wash, so without one
+     the transcript reads straight through it (the s166 "nothing see-through"
+     rule, one surface further). */
+  .paneloverlay { position: absolute; inset: 0; display: flex; background: hsl(var(--background)); }
+  .railpanel { width: 100%; align-self: stretch; overflow: hidden; }
+
+  /* Option B: the strip above the microphone ----------------------- */
+  .strip { flex: none; display: flex; flex-direction: column; gap: 6px; }
+  .stripcats { display: flex; gap: 5px; overflow: hidden; }
+  .stripcat {
+    flex: none; border-radius: 6px; padding: 3px 8px; font-size: 11.5px; font-weight: 650;
+    background: hsl(var(--muted)); color: hsl(var(--muted-foreground));
+  }
+  .stripcat.on { background: hsl(var(--accent) / .35); color: hsl(var(--accent-ink)); }
+  [data-appearance="dark"] .stripcat.on { background: hsl(var(--accent) / .18); color: hsl(var(--accent)); }
+  .stripchips { display: flex; align-items: center; gap: 6px; overflow: hidden; }
+  .chip {
+    flex: none; max-width: 210px; border-radius: 8px; padding: 6px 9px; font-size: 12.5px; font-weight: 600;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .chip.open { white-space: normal; max-width: 260px; border-color: hsl(var(--accent) / .5); background: hsl(var(--accent) / .18); }
+  [data-appearance="dark"] .chip.open { background: hsl(var(--accent) / .1); }
+  .chip i { display: block; font-style: normal; font-size: 11px; font-weight: 500; color: hsl(var(--muted-foreground)); margin-top: 2px; }
+  [data-en="peek"] .chip i { display: none; }
+  .chipmore { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); flex: none; }
+
+  /* Option C: the two-tab drawer ----------------------------------- */
+  .drawer {
+    flex: none; border-radius: 10px; background: hsl(var(--accent) / .2); border: 1px solid hsl(var(--accent) / .2);
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .06), 0 6px 16px -3px hsl(var(--shadow) / .1); overflow: hidden;
+  }
+  [data-appearance="dark"] .drawer { background: hsl(var(--accent) / .1); border-color: hsl(var(--accent) / .1); }
+  .drawertabs { display: flex; align-items: center; gap: 6px; padding: 7px 9px; }
+  .dtab { border-radius: 6px; padding: 4px 9px; font-size: 12px; font-weight: 700; color: hsl(var(--muted-foreground)); }
+  .dtab.on { background: hsl(var(--surface)); color: hsl(var(--primary)); box-shadow: 0 1px 2px hsl(var(--shadow) / .08); }
+  .dtitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 650; text-align: right; }
+  .dtitle i { font-style: normal; font-weight: 500; color: hsl(var(--muted-foreground)); }
+  .drawertabs .chev { display: flex; color: hsl(var(--muted-foreground)); }
+  .drawertabs .chev.up { transform: rotate(180deg); }
+  .drawerbody { padding: 0 9px 10px; }
+  .drawercats { display: flex; gap: 5px; margin-bottom: 7px; flex-wrap: wrap; }
+  .drawerphrases { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .frame.mob .drawerphrases { grid-template-columns: 1fr; }
+  [data-depth="curated"] .drawerphrases .phrase:nth-child(n + 4) { display: none; }
+
+  .goals { display: flex; flex-direction: column; gap: 6px; counter-reset: g; }
+  .goals li { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.35; counter-increment: g; }
+  .goals li i::before { content: counter(g) "."; }
+  .goals li i { font-style: normal; font-weight: 700; font-size: 11.5px; color: hsl(var(--accent-ink)); }
+  [data-appearance="dark"] .goals li i { color: hsl(var(--accent)); }
+
+  /* Brief card (today's frame) ------------------------------------- */
+  .briefcard { padding: 14px; display: flex; flex-direction: column; }
+  .brieftitle { font-size: 17px; font-weight: 800; letter-spacing: -.015em; margin: 2px 0 6px; }
+  .briefsit { font-size: 13px; line-height: 1.4; color: hsl(var(--muted-foreground)); margin-bottom: 14px; }
+  .briefcard .scopelab { margin-top: 4px; }
+  .briefcard .goals { margin-bottom: 14px; }
+  .btn.wide { width: 100%; justify-content: center; text-align: center; }
+
+  /* Review chrome extras ------------------------------------------- */
+  .flag { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; }
+  blockquote {
+    margin: 14px 0 0; padding: 12px 16px; border-left: 3px solid var(--c-accent);
+    background: var(--c-chip); border-radius: 0 8px 8px 0; font-size: 14px;
+  }
+  .twocol { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+</style>
+</head>
+<body>
+<div id="root" data-appearance="light" data-depth="curated" data-form="match" data-en="peek">
+<div class="page">
+  <div class="wrap">
+    <p class="kicker">Sprechen · practice conversation</p>
+    <h1>Phrases while you speak</h1>
+    <p class="lede">You asked for a filter-rail-style rail with useful Redemittel in the practice
+      conversations. Right now the app names the four Redemittel <b>categories</b> before the
+      conversation and ticks them off after it, but never shows a single actual phrase while the
+      learner is talking, which is the only moment they need one. Below: today's screens, then three
+      places the phrases could live. Two switches at the top change what the rail holds in every
+      option, so you can answer layout and content in one reply.</p>
+
+    <blockquote>“for the sprechen part, I'd want you to add a filter rail kind of rail with useful
+      redemittle even in the practice sessions.”
+      <br><span style="color:var(--c-muted)">(your prompt, this session)</span></blockquote>
+
+    <div class="controls">
+      <div class="ctl"><span>Theme</span>
+        <div class="seg" id="seg-appearance">
+          <button data-v="light" aria-pressed="true">Light</button>
+          <button data-v="dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
+      <div class="ctl"><span>How many phrases</span>
+        <div class="seg" id="seg-depth">
+          <button data-v="curated" aria-pressed="true">3 per intent</button>
+          <button data-v="full" aria-pressed="false">All 8 per intent</button>
+        </div>
+      </div>
+      <div class="ctl"><span>du / Sie</span>
+        <div class="seg" id="seg-form">
+          <button data-v="match" aria-pressed="true">Match the partner</button>
+          <button data-v="all" aria-pressed="false">Show everything</button>
+        </div>
+      </div>
+      <div class="ctl"><span>English line</span>
+        <div class="seg" id="seg-en">
+          <button data-v="peek" aria-pressed="true">Hold to peek</button>
+          <button data-v="inline" aria-pressed="false">Always visible</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------ TODAY ------------------------------ -->
+    <div class="panel">
+      <h2>What a learner sees today</h2>
+      <p class="lede" style="margin-top:6px">The brief card lists the four Redemittel categories as
+        grey labels. Then the conversation starts, the brief collapses to one line, and the phrases
+        are gone. The bank has eight phrases behind each of those four labels, in the Bibliothek,
+        in another zone.</p>
+      <div class="findings">
+        <div class="finding"><span class="num">1</span><div><b>Category names are not language</b>
+          <p>“Vorschläge machen” tells a B1 learner what to do, not how to say it. The eight phrases
+          that would let them do it are one page away and two taps out of reach mid-conversation.</p></div></div>
+        <div class="finding"><span class="num">2</span><div><b>The one moment they matter is the one moment they are missing</b>
+          <p>The words are on screen before the conversation and after it, never during. The debrief
+          then grades whether those Redemittel were used.</p></div></div>
+        <div class="finding"><span class="num">3</span><div><b>Nothing on the running screen is a rail</b>
+          <p>The conversation is a single 672 px column: collapsed brief, transcript, microphone.
+          There is empty space beside it on a desktop and none at all on a phone.</p></div></div>
+      </div>
+      <div class="framerow" style="margin-top:18px">
+        <div class="framebox desk">
+          <p class="framelabel">Desktop, mid-conversation (today)</p>
+          
+  <div class="frame desk">
+    <div class="screen shell">
+      
+  <div class="side">
+    <div class="sidebrand"><span class="logomark"></span><b>Genauly</b></div>
+    <div class="sidenav">
+      <span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><em>Praktisch</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 4h6v16H4z"/><path d="M14 4h6v16h-6z"/></svg><em>Bibliothek</em></span><span class="sideitem on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><em>Prüfung</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><em>Fortschritt</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><em>Einstellungen</em></span>
+    </div>
+  </div>
+      <div class="main">
+        
+  <div class="apphdr">
+    <div class="hdrleft"></div>
+    <div class="hdrright"><span class="exitbtn">Zurück</span></div>
+  </div>
+        <div class="pagearea"><div class="stage ">
+    <div class="convcol">
+      
+  <div class="briefrow">
+    <span class="briefbtn">
+      <b>Schichtplanung im Team</b><i>· Sabine Berger</i>
+      <span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </span>
+    
+  </div>
+      
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div><div class="bubblewrap mine"><div class="bubble learner">
+              <p>Ich würde vorschlagen, dass wir zuerst die Wünsche im Team sammeln und dann den Plan daraus bauen.</p>
+              <span class="replay right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg> Falsch gehört?</span>
+            </div></div><div class="bubblewrap"><div class="bubble partner">
+              <p>Das klingt vernünftig. Nur steht der Plan bis Freitag, und drei Kolleginnen sind diese Woche im Urlaub. Wie lösen wir das?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div>
+  </div>
+      
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div>
+    </div></div></div>
+      </div>
+    </div>
+  </div>
+        </div>
+        <div class="framebox phone">
+          <p class="framelabel">Phone, the brief before starting (today)</p>
+          
+  <div class="frame mob">
+    <div class="screen">
+      
+  <div class="apphdr">
+    <div class="hdrleft"><span class="logomark sm"></span></div>
+    <div class="hdrright"><span class="exitbtn sm">Zurück</span></div>
+  </div>
+      <div class="phonebody">
+        
+  <div class="modrow"><span class="tile sm sprechen"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span><b>Sprechen</b></div>
+        <div class="card briefcard">
+          <p class="eyebrow mut">Aufgabe</p>
+          <p class="brieftitle">Schichtplanung im Team</p>
+          <p class="briefsit">Ihre Teamleiterin möchte den Schichtplan für den Herbst mit Ihnen festlegen.</p>
+          <p class="scopelab">Das sollst du schaffen</p>
+          <ol class="goals"><li><i></i>Schlage ein Verfahren für die neue Schichtplanung vor.</li><li><i></i>Reagiere auf mindestens einen Einwand deiner Teamleiterin.</li><li><i></i>Einigt euch am Ende auf einen konkreten nächsten Schritt.</li></ol>
+          <p class="scopelab">Redemittel</p>
+          <div class="catpills flat"><span class="catpill plain">Vorschläge machen</span><span class="catpill plain">Zustimmen</span><span class="catpill plain">Kompromisse finden</span><span class="catpill plain">Verhandeln</span></div>
+          <span class="btn grad wide">Gespräch starten</span>
+        </div>
+      </div>
+      
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+    </div>
+  </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <!-- ------------------------------ SHARED ----------------------------- -->
+    <div class="panel" style="margin-top:26px">
+      <h2>True in all three options</h2>
+      <div class="findings">
+        <div class="finding"><span class="num">A</span><div><b>Practice only, never the Modelltest</b>
+          <p>The exam grades whether the candidate reached for these phrases. Handing them the list
+          during Teil Sprechen would grade the reading, not the speaking. Say the word if you want it
+          in the exam too.</p></div></div>
+        <div class="finding"><span class="num">B</span><div><b>The phrases are the task's own</b>
+          <p>Each scenario already names four Redemittel categories, and the debrief already grades
+          against exactly those. No new content is authored: the rail reads the existing bank.</p></div></div>
+        <div class="finding"><span class="num">C</span><div><b>Reading a phrase is never a tick</b>
+          <p>Whether a Redemittel was used stays a question for the model, judged from what was
+          actually said. Tapping one in the rail proves nothing and marks nothing.</p></div></div>
+        <div class="finding"><span class="num">D</span><div><b>The tile is the rail you already approved</b>
+          <p>Same Himmelblau fill, same uppercase section labels, same dropdown, same reset icon as
+          “Aufgabe wählen”. Nothing new is invented.</p></div></div>
+      </div>
+    </div>
+
+    <!-- ------------------------------ OPTION A --------------------------- -->
+    <div class="option" id="optA">
+      <div class="opthead"><span class="optname">Option A</span><h2>A rail beside the conversation</h2></div>
+      <p class="lede">The literal answer to your prompt. On a desktop the conversation keeps its
+        column and a 256 px <b>Redemittel</b> rail appears beside it, in the same Himmelblau tile as
+        “Aufgabe wählen”: a dropdown that picks the speech intent, the phrases for it as white cards,
+        and the task's other three intents as pills below. On a phone the same tile opens as a panel
+        over the transcript, behind one toggle next to the collapsed brief.</p>
+      <div class="framerow">
+        <div class="framebox desk">
+          <p class="framelabel">Desktop</p>
+          
+  <div class="frame desk">
+    <div class="screen shell">
+      
+  <div class="side">
+    <div class="sidebrand"><span class="logomark"></span><b>Genauly</b></div>
+    <div class="sidenav">
+      <span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><em>Praktisch</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 4h6v16H4z"/><path d="M14 4h6v16h-6z"/></svg><em>Bibliothek</em></span><span class="sideitem on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><em>Prüfung</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><em>Fortschritt</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><em>Einstellungen</em></span>
+    </div>
+  </div>
+      <div class="main">
+        
+  <div class="apphdr">
+    <div class="hdrleft"></div>
+    <div class="hdrright"><span class="exitbtn">Zurück</span></div>
+  </div>
+        <div class="pagearea"><div class="stage wide"><div class="convcol">
+      
+  <div class="briefrow">
+    <span class="briefbtn">
+      <b>Schichtplanung im Team</b><i>· Sabine Berger</i>
+      <span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </span>
+    
+  </div>
+      
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div><div class="bubblewrap mine"><div class="bubble learner">
+              <p>Ich würde vorschlagen, dass wir zuerst die Wünsche im Team sammeln und dann den Plan daraus bauen.</p>
+              <span class="replay right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg> Falsch gehört?</span>
+            </div></div><div class="bubblewrap"><div class="bubble partner">
+              <p>Das klingt vernünftig. Nur steht der Plan bis Freitag, und drei Kolleginnen sind diese Woche im Urlaub. Wie lösen wir das?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div>
+  </div>
+      
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div>
+    </div>
+    
+  <aside class="scoperail railcol">
+    <div class="railhead">
+      <span class="railtitle"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg> Redemittel</span>
+      <span class="railicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></span>
+      
+    </div>
+    <div class="railbody">
+      <section>
+        <p class="scopelab">Sprechabsicht</p>
+        <span class="scopesel"><b>Vorschläge machen</b><i>8</i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </section>
+      <section class="phraselist curated">
+        
+  <span class="phrase">
+    <b>Ich würde vorschlagen, dass wir …</b>
+    <i>I would suggest that we …</i>
+  </span>
+  <span class="phrase">
+    <b>Mein Vorschlag wäre, …</b>
+    <i>My suggestion would be …</i>
+  </span>
+  <span class="phrase">
+    <b>Wie wäre es, wenn wir … würden?</b>
+    <i>How about we … ?</i>
+  </span>
+  <span class="phrase">
+    <b>Wir könnten doch …</b>
+    <i>We could …</i>
+  </span>
+  <span class="phrase">
+    <b>Sollten wir nicht lieber …?</b>
+    <i>Shouldn't we rather … ?</i>
+  </span>
+  <span class="phrase duform">
+    <b>Was hältst du davon, wenn …?</b>
+    <i>What do you think about … ?</i>
+  </span>
+  <span class="phrase">
+    <b>Eine Möglichkeit wäre, …</b>
+    <i>One option would be to …</i>
+  </span>
+  <span class="phrase">
+    <b>Ich schlage vor, dass wir zunächst …</b>
+    <i>I suggest that we first …</i>
+  </span>
+      </section>
+      <section class="othercats">
+        <p class="scopelab">Auch im Gespräch</p>
+        <div class="catpills">
+          <span class="catpill">Zustimmen<i>8</i></span><span class="catpill">Kompromisse finden<i>8</i></span><span class="catpill">Verhandeln<i>8</i></span>
+        </div>
+      </section>
+    </div>
+  </aside></div></div>
+      </div>
+    </div>
+  </div>
+        </div>
+        <div class="framebox phone">
+          <p class="framelabel">Phone, rail open</p>
+          
+  <div class="frame mob">
+    <div class="screen">
+      
+  <div class="apphdr">
+    <div class="hdrleft"><span class="logomark sm"></span></div>
+    <div class="hdrright"><span class="exitbtn sm">Zurück</span></div>
+  </div>
+      <div class="phonebody">
+    
+  <div class="modrow"><span class="tile sm sprechen"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span><b>Sprechen</b></div>
+    
+  <div class="briefrow">
+    <span class="briefbtn">
+      <b>Schichtplanung im Team</b><i>· Sabine Berger</i>
+      <span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </span>
+    <span class="railtoggle on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg> Redemittel</span>
+  </div>
+    <div class="mobstage">
+      
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div><div class="bubblewrap mine"><div class="bubble learner">
+              <p>Ich würde vorschlagen, dass wir zuerst die Wünsche im Team sammeln und dann den Plan daraus bauen.</p>
+              <span class="replay right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg> Falsch gehört?</span>
+            </div></div>
+  </div>
+      <div class="paneloverlay">
+  <aside class="scoperail railpanel">
+    <div class="railhead">
+      <span class="railtitle"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg> Redemittel</span>
+      <span class="railicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></span>
+      <span class="railicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+    </div>
+    <div class="railbody">
+      <section>
+        <p class="scopelab">Sprechabsicht</p>
+        <span class="scopesel"><b>Vorschläge machen</b><i>8</i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+      </section>
+      <section class="phraselist curated">
+        
+  <span class="phrase">
+    <b>Ich würde vorschlagen, dass wir …</b>
+    <i>I would suggest that we …</i>
+  </span>
+  <span class="phrase">
+    <b>Mein Vorschlag wäre, …</b>
+    <i>My suggestion would be …</i>
+  </span>
+  <span class="phrase">
+    <b>Wie wäre es, wenn wir … würden?</b>
+    <i>How about we … ?</i>
+  </span>
+  <span class="phrase">
+    <b>Wir könnten doch …</b>
+    <i>We could …</i>
+  </span>
+  <span class="phrase">
+    <b>Sollten wir nicht lieber …?</b>
+    <i>Shouldn't we rather … ?</i>
+  </span>
+  <span class="phrase duform">
+    <b>Was hältst du davon, wenn …?</b>
+    <i>What do you think about … ?</i>
+  </span>
+  <span class="phrase">
+    <b>Eine Möglichkeit wäre, …</b>
+    <i>One option would be to …</i>
+  </span>
+  <span class="phrase">
+    <b>Ich schlage vor, dass wir zunächst …</b>
+    <i>I suggest that we first …</i>
+  </span>
+      </section>
+      <section class="othercats">
+        <p class="scopelab">Auch im Gespräch</p>
+        <div class="catpills">
+          <span class="catpill">Zustimmen<i>8</i></span><span class="catpill">Kompromisse finden<i>8</i></span><span class="catpill">Verhandeln<i>8</i></span>
+        </div>
+      </section>
+    </div>
+  </aside></div>
+    </div>
+    
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div></div>
+      
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+    </div>
+  </div>
+        </div>
+        <div class="notecol">
+          <p class="note"><b>Most phrases visible at once.</b> Three to eight, with room for the
+            English line, and it can be browsed while the partner is talking.</p>
+          <p class="note"><b>It is the rail language, so it reads as part of the app</b> rather than
+            as a feature bolted onto the speaking screen.</p>
+          <p class="note"><b>Desktop gets it for free</b>: the space beside the conversation is
+            currently empty.</p>
+          <p class="cost"><b>Cost:</b> on a phone it covers the transcript while open, so the learner
+            reads either their conversation or their phrases, not both. The stage cannot grow, and
+            the rule that a running screen never scrolls the page holds.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------ OPTION B --------------------------- -->
+    <div class="option" id="optB">
+      <div class="opthead"><span class="optname">Option B</span><h2>A phrase strip above the microphone</h2></div>
+      <p class="lede">One row of phrase chips directly above the mic, with the four intents as small
+        pills over it. Tapping a chip opens it to the full phrase (and its English). Identical on
+        desktop and phone, and it sits where the learner's eyes already are in the second before they
+        speak.</p>
+      <div class="framerow">
+        <div class="framebox desk">
+          <p class="framelabel">Desktop</p>
+          
+  <div class="frame desk">
+    <div class="screen shell">
+      
+  <div class="side">
+    <div class="sidebrand"><span class="logomark"></span><b>Genauly</b></div>
+    <div class="sidenav">
+      <span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><em>Praktisch</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 4h6v16H4z"/><path d="M14 4h6v16h-6z"/></svg><em>Bibliothek</em></span><span class="sideitem on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><em>Prüfung</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><em>Fortschritt</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><em>Einstellungen</em></span>
+    </div>
+  </div>
+      <div class="main">
+        
+  <div class="apphdr">
+    <div class="hdrleft"></div>
+    <div class="hdrright"><span class="exitbtn">Zurück</span></div>
+  </div>
+        <div class="pagearea"><div class="stage ">
+    <div class="convcol">
+      
+  <div class="briefrow">
+    <span class="briefbtn">
+      <b>Schichtplanung im Team</b><i>· Sabine Berger</i>
+      <span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </span>
+    
+  </div>
+      
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div><div class="bubblewrap mine"><div class="bubble learner">
+              <p>Ich würde vorschlagen, dass wir zuerst die Wünsche im Team sammeln und dann den Plan daraus bauen.</p>
+              <span class="replay right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg> Falsch gehört?</span>
+            </div></div><div class="bubblewrap"><div class="bubble partner">
+              <p>Das klingt vernünftig. Nur steht der Plan bis Freitag, und drei Kolleginnen sind diese Woche im Urlaub. Wie lösen wir das?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div>
+  </div>
+      
+  <div class="strip">
+    <div class="stripcats">
+      <span class="stripcat on">Vorschläge machen</span><span class="stripcat">Zustimmen</span><span class="stripcat">Kompromisse finden</span><span class="stripcat">Verhandeln</span>
+    </div>
+    <div class="stripchips">
+      <span class="chip open">Ich würde vorschlagen, dass wir …<i>I would suggest that we …</i></span><span class="chip">Mein Vorschlag wäre, …</span><span class="chip">Wie wäre es, wenn wir … würden?</span><span class="chip">Wir könnten doch …</span>
+      <span class="chipmore"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m9 18 6-6-6-6"/></svg></span>
+    </div>
+  </div>
+      
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div>
+    </div></div></div>
+      </div>
+    </div>
+  </div>
+        </div>
+        <div class="framebox phone">
+          <p class="framelabel">Phone</p>
+          
+  <div class="frame mob">
+    <div class="screen">
+      
+  <div class="apphdr">
+    <div class="hdrleft"><span class="logomark sm"></span></div>
+    <div class="hdrright"><span class="exitbtn sm">Zurück</span></div>
+  </div>
+      <div class="phonebody">
+    
+  <div class="modrow"><span class="tile sm sprechen"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span><b>Sprechen</b></div>
+    
+  <div class="briefrow">
+    <span class="briefbtn">
+      <b>Schichtplanung im Team</b><i>· Sabine Berger</i>
+      <span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </span>
+    
+  </div>
+    <div class="mobstage">
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div><div class="bubblewrap mine"><div class="bubble learner">
+              <p>Ich würde vorschlagen, dass wir zuerst die Wünsche im Team sammeln und dann den Plan daraus bauen.</p>
+              <span class="replay right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg> Falsch gehört?</span>
+            </div></div>
+  </div></div>
+    
+  <div class="strip">
+    <div class="stripcats">
+      <span class="stripcat on">Vorschläge machen</span><span class="stripcat">Zustimmen</span><span class="stripcat">Kompromisse finden</span><span class="stripcat">Verhandeln</span>
+    </div>
+    <div class="stripchips">
+      <span class="chip open">Ich würde vorschlagen, dass wir …<i>I would suggest that we …</i></span><span class="chip">Mein Vorschlag wäre, …</span><span class="chip">Wie wäre es, wenn wir … würden?</span><span class="chip">Wir könnten doch …</span>
+      <span class="chipmore"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m9 18 6-6-6-6"/></svg></span>
+    </div>
+  </div>
+    
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div></div>
+      
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+    </div>
+  </div>
+        </div>
+        <div class="notecol">
+          <p class="note"><b>Nothing is ever covered.</b> The transcript stays, the phrases sit under
+            it, both are readable at the same time.</p>
+          <p class="note"><b>One layout for both widths</b>, in the thumb zone on a phone.</p>
+          <p class="note"><b>Cheapest in height</b>: about 60 px, so the transcript loses one bubble
+            and nothing else moves.</p>
+          <p class="cost"><b>Cost:</b> it is not a rail. Two or three phrases are readable at a time
+            and the rest are a sideways scroll, so it prompts rather than teaches. It also adds a
+            second horizontal scroller to a screen that already scrolls vertically.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------ OPTION C --------------------------- -->
+    <div class="option" id="optC">
+      <div class="opthead"><span class="optname">Option C</span><h2>Two tabs on the brief drawer</h2></div>
+      <p class="lede">The collapsed brief that already sits above every conversation grows a second
+        tab. <b>Aufgabe</b> is today's goal list; <b>Redemittel</b> is the phrase list, in the same
+        accent panel. One place holds everything about the task, and no new chrome appears anywhere
+        on the screen.</p>
+      <div class="framerow">
+        <div class="framebox desk">
+          <p class="framelabel">Desktop</p>
+          
+  <div class="frame desk">
+    <div class="screen shell">
+      
+  <div class="side">
+    <div class="sidebrand"><span class="logomark"></span><b>Genauly</b></div>
+    <div class="sidenav">
+      <span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><em>Praktisch</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 4h6v16H4z"/><path d="M14 4h6v16h-6z"/></svg><em>Bibliothek</em></span><span class="sideitem on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><em>Prüfung</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><em>Fortschritt</em></span><span class="sideitem"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><em>Einstellungen</em></span>
+    </div>
+  </div>
+      <div class="main">
+        
+  <div class="apphdr">
+    <div class="hdrleft"></div>
+    <div class="hdrright"><span class="exitbtn">Zurück</span></div>
+  </div>
+        <div class="pagearea"><div class="stage ">
+    <div class="convcol">
+      
+  <div class="drawer">
+    <div class="drawertabs">
+      <span class="dtab">Aufgabe</span>
+      <span class="dtab on">Redemittel</span>
+      <span class="dtitle">Schichtplanung im Team <i>· Sabine Berger</i></span>
+      <span class="chev up"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </div>
+    <div class="drawerbody">
+      <div class="drawerlist">
+              <div class="drawercats">
+                <span class="stripcat on">Vorschläge machen</span><span class="stripcat">Zustimmen</span><span class="stripcat">Kompromisse finden</span><span class="stripcat">Verhandeln</span>
+              </div>
+              <div class="drawerphrases">
+                
+  <span class="phrase compact">
+    <b>Ich würde vorschlagen, dass wir …</b>
+    <i>I would suggest that we …</i>
+  </span>
+  <span class="phrase compact">
+    <b>Mein Vorschlag wäre, …</b>
+    <i>My suggestion would be …</i>
+  </span>
+  <span class="phrase compact">
+    <b>Wie wäre es, wenn wir … würden?</b>
+    <i>How about we … ?</i>
+  </span>
+  <span class="phrase compact">
+    <b>Wir könnten doch …</b>
+    <i>We could …</i>
+  </span>
+  <span class="phrase compact">
+    <b>Sollten wir nicht lieber …?</b>
+    <i>Shouldn't we rather … ?</i>
+  </span>
+  <span class="phrase duform compact">
+    <b>Was hältst du davon, wenn …?</b>
+    <i>What do you think about … ?</i>
+  </span>
+              </div>
+            </div>
+    </div>
+  </div>
+      
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div><div class="bubblewrap mine"><div class="bubble learner">
+              <p>Ich würde vorschlagen, dass wir zuerst die Wünsche im Team sammeln und dann den Plan daraus bauen.</p>
+              <span class="replay right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg> Falsch gehört?</span>
+            </div></div>
+  </div>
+      
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div>
+    </div></div></div>
+      </div>
+    </div>
+  </div>
+        </div>
+        <div class="framebox phone">
+          <p class="framelabel">Phone</p>
+          
+  <div class="frame mob">
+    <div class="screen">
+      
+  <div class="apphdr">
+    <div class="hdrleft"><span class="logomark sm"></span></div>
+    <div class="hdrright"><span class="exitbtn sm">Zurück</span></div>
+  </div>
+      <div class="phonebody">
+    
+  <div class="modrow"><span class="tile sm sprechen"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg></span><b>Sprechen</b></div>
+    
+  <div class="drawer">
+    <div class="drawertabs">
+      <span class="dtab">Aufgabe</span>
+      <span class="dtab on">Redemittel</span>
+      <span class="dtitle">Schichtplanung im Team <i>· Sabine Berger</i></span>
+      <span class="chev up"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m6 9 6 6 6-6"/></svg></span>
+    </div>
+    <div class="drawerbody">
+      <div class="drawerlist">
+              <div class="drawercats">
+                <span class="stripcat on">Vorschläge machen</span><span class="stripcat">Zustimmen</span><span class="stripcat">Kompromisse finden</span><span class="stripcat">Verhandeln</span>
+              </div>
+              <div class="drawerphrases">
+                
+  <span class="phrase compact">
+    <b>Ich würde vorschlagen, dass wir …</b>
+    <i>I would suggest that we …</i>
+  </span>
+  <span class="phrase compact">
+    <b>Mein Vorschlag wäre, …</b>
+    <i>My suggestion would be …</i>
+  </span>
+  <span class="phrase compact">
+    <b>Wie wäre es, wenn wir … würden?</b>
+    <i>How about we … ?</i>
+  </span>
+  <span class="phrase compact">
+    <b>Wir könnten doch …</b>
+    <i>We could …</i>
+  </span>
+  <span class="phrase compact">
+    <b>Sollten wir nicht lieber …?</b>
+    <i>Shouldn't we rather … ?</i>
+  </span>
+  <span class="phrase duform compact">
+    <b>Was hältst du davon, wenn …?</b>
+    <i>What do you think about … ?</i>
+  </span>
+              </div>
+            </div>
+    </div>
+  </div>
+    <div class="mobstage">
+  <div class="thread">
+    <div class="bubblewrap"><div class="bubble partner">
+              <p>Guten Morgen! Schön, dass Sie sich Zeit nehmen. Wir müssen den Schichtplan für den Herbst festlegen, und das Team ist unruhig. Wie würden Sie da vorgehen?</p>
+              <span class="replay"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg> Nochmal hören</span>
+            </div></div>
+  </div></div>
+    
+  <div class="mics">
+    <div class="microw">
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.7.8 1 1.5 1 2.5h6c0-1 .3-1.7 1-2.5A6 6 0 0 0 12 2z"/></svg></span>Hilfe</span>
+      <span class="micbtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="11" rx="3"/></svg></span>
+      <span class="clbtn"><span class="clcircle"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m5 13 4 4L19 7"/></svg></span>Beenden</span>
+    </div>
+    <p class="miccap">Noch 9 Beiträge</p>
+  </div></div>
+      
+  <div class="navbar">
+    <span class="navtab"><i></i></span><span class="navtab"><i></i></span><span class="navtab on"><i></i><em>Prüfung</em></span><span class="navtab"><i></i></span><span class="navtab"><i></i></span>
+  </div>
+    </div>
+  </div>
+        </div>
+        <div class="notecol">
+          <p class="note"><b>No new element on the screen.</b> The disclosure the learner already
+            uses simply holds one more thing.</p>
+          <p class="note"><b>Desktop and phone are the same layout</b>, which keeps one thing to
+            build and one thing to maintain.</p>
+          <p class="note"><b>Two columns of phrases on a desktop</b>, one on a phone.</p>
+          <p class="cost"><b>Cost:</b> open, it eats the top third of the transcript, and the goals
+            and the phrases are mutually exclusive. It also does not look like a rail, which is what
+            you asked for.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <!-- ------------------------------ DECISIONS -------------------------- -->
+    <div class="panel" style="margin-top:26px">
+      <h2>The two content switches</h2>
+      <div class="findings">
+        <div class="finding"><span class="num">1</span><div><b>Three phrases per intent, or all eight</b>
+          <p>Eight is everything the bank holds, and on a phone it is a list to read instead of a
+          conversation to have. Three is the strongest three, with the rest one tap away in the
+          dropdown. The switch at the top of this page shows both.</p></div></div>
+        <div class="finding"><span class="num">2</span><div><b>du / Sie</b>
+          <p>Sabine Berger says Sie, so “Was hältst du davon, wenn …?” is the wrong phrase in this
+          conversation. Filtering it out is the one thing here that genuinely earns the word
+          “filter”. The catch: the bank tags phrases neutral / formal, not du / Sie, so this needs a
+          small derived rule reading the phrase text. It goes in one place, like the gap rule in the
+          writing clozes, never copied per call site.</p></div></div>
+        <div class="finding"><span class="num">3</span><div><b>The English line</b>
+          <p>Hold-to-peek is the app's pattern everywhere else, and it keeps the rail short. Always
+          visible doubles the height of every row but never needs a press mid-conversation.</p></div></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h2>How to reply</h2>
+      <p class="lede" style="margin-top:6px">Name the option and the two switches, for example
+        “A, 3 per intent, match the partner, hold to peek”. If you want the rail in the Modelltest as
+        well, or a different name than “Redemittel” on the tile, say it in the same reply and it goes
+        into this round.</p>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+  for (const [id, attr] of [["seg-appearance", "appearance"], ["seg-depth", "depth"], ["seg-form", "form"], ["seg-en", "en"]]) {
+    const seg = document.getElementById(id);
+    if (!seg) continue;
+    seg.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      for (const other of seg.querySelectorAll("button")) other.setAttribute("aria-pressed", String(other === b));
+      document.getElementById("root").setAttribute("data-" + attr, b.dataset.v);
+    });
+  }
+</script>
+</body>
+</html>
