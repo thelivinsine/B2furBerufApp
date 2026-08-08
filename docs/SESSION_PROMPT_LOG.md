@@ -5713,6 +5713,27 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   shipped-line on the s202 handoff close the paper trail. Nothing is left unmerged.
   **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
 
+- **Prompt 4 (verbatim):** `[five phone screenshots of the shipped rail]` `for some reason.. the
+  aufgabe text is being cut off.. it's better if that text is below the toggles. Also, the Redemittel
+  pills at the bottom should be at the top of that tile and the selected pill should also be shown
+  which is not the case at the moment. adapt the same heirarchy for Redemittel in desktop view as
+  well.`
+  **Response:** all three, one hierarchy in both shells. (1) The drawer bar is two lines now: tabs +
+  chevron, then the task title and partner on their own full-width line, so "Projekt termingerecht
+  abschließen · Daniel Krause" reads in full. Without tabs (desktop, the Modelltest) the bar stays
+  the single row it always was. (2) The pills moved from under the phrase list ("Auch im Gespräch",
+  which showed only the OTHER three) to the top of the tile, all four, with the current one lit in
+  brand fill and its honest count. (3) The dropdown went with them: a lit pill states the selection,
+  so keeping it would print the same fact twice, and four options is pill territory by the app's own
+  rule. Same tile, same order, on desktop. Verified in a real browser at 393x852 and 1440x900, both
+  drawer tabs, page scroll 0 everywhere. Shipped as PR **#834**, which merged `origin/main` first:
+  session 203 had landed the documentation-maintenance pass (#832, #833) mid-flight, and its trim of
+  `CLAUDE.md` had already condensed this session's Sprechen law, so the only conflict was this
+  append-only file (prompt 4 belongs above the session 203 heading).
+  **Artifacts:** `src/features/sprechen/RedemittelHelp.tsx` ·
+  `src/features/sprechen/ConversationRunner.tsx` · `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log.
+
 ## Session 203 — 2026-08-08 — branch `claude/documentation-maintenance-0w4ywg`
 
 - **Prompt 1 (verbatim):** `do the documentation maintenance`

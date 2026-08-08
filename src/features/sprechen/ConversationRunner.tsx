@@ -389,62 +389,79 @@ export function ConversationRunner({
    * find. Everywhere else (desktop, and the whole Modelltest) it stays the one
    * button it has always been, and the phrases live in the rail beside it.
    */
+  const titleLine = (
+    <>
+      {brief.title}
+      <span className="font-medium text-muted-foreground"> · {brief.partner.name}</span>
+    </>
+  );
+
   const briefBar = (
     <div className="shrink-0">
       <div
         className={cn(
-          "flex w-full items-center gap-1.5 rounded-lg border text-left text-[13px] shadow-soft",
+          "w-full rounded-lg border text-left text-[13px] shadow-soft",
           drawerTabs
             ? "border-accent/20 bg-accent/20 px-1.5 py-1.5 dark:border-accent/10 dark:bg-accent/10"
             : "border-border bg-surface px-2.5 py-2",
         )}
       >
-        {drawerTabs &&
-          BRIEF_TABS.map((t) => {
-            const on = briefOpen && briefTab === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                aria-expanded={on}
-                onClick={() => {
-                  if (briefOpen && briefTab === t.id) return setBriefOpen(false);
-                  setBriefTab(t.id);
-                  setBriefOpen(true);
-                }}
-                className={cn(
-                  "shrink-0 rounded-md px-2.5 py-1 text-xs font-bold transition-colors",
-                  // The ON state is its own class, never a hover fill (s201).
-                  on ? "bg-surface text-primary shadow-soft" : "text-muted-foreground",
-                )}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        <button
-          type="button"
-          onClick={() => setBriefOpen((v) => !v)}
-          aria-expanded={briefOpen}
-          aria-label={briefOpen ? "Aufgabe schließen" : "Aufgabe öffnen"}
-          className="flex min-w-0 flex-1 items-center gap-2"
-        >
-          <span
-            className={cn(
-              "min-w-0 flex-1 truncate font-semibold",
-              drawerTabs && "text-right text-[12.5px]",
-            )}
+        <div className="flex w-full items-center gap-1.5">
+          {drawerTabs &&
+            BRIEF_TABS.map((t) => {
+              const on = briefOpen && briefTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  aria-expanded={on}
+                  onClick={() => {
+                    if (briefOpen && briefTab === t.id) return setBriefOpen(false);
+                    setBriefTab(t.id);
+                    setBriefOpen(true);
+                  }}
+                  className={cn(
+                    "shrink-0 rounded-md px-2.5 py-1 text-xs font-bold transition-colors",
+                    // The ON state is its own class, never a hover fill (s201).
+                    on ? "bg-surface text-primary shadow-soft" : "text-muted-foreground",
+                  )}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          <button
+            type="button"
+            onClick={() => setBriefOpen((v) => !v)}
+            aria-expanded={briefOpen}
+            aria-label={briefOpen ? "Aufgabe schließen" : "Aufgabe öffnen"}
+            className="flex min-w-0 flex-1 items-center gap-2"
           >
-            {brief.title}
-            <span className="font-medium text-muted-foreground"> · {brief.partner.name}</span>
-          </span>
-          <ChevronDown
-            className={cn(
-              "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
-              briefOpen && "rotate-180",
-            )}
-          />
-        </button>
+            {/* With the tabs beside it the title had a third of the row and was
+                cut off after four words (founder). It gets its own full-width
+                line below them instead; without tabs the row is the title's, so
+                it stays where it always was. */}
+            {!drawerTabs && <span className="min-w-0 flex-1 truncate font-semibold">{titleLine}</span>}
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                drawerTabs && "ml-auto",
+                briefOpen && "rotate-180",
+              )}
+            />
+          </button>
+        </div>
+        {drawerTabs && (
+          <button
+            type="button"
+            onClick={() => setBriefOpen((v) => !v)}
+            aria-hidden
+            tabIndex={-1}
+            className="mt-1 block w-full truncate px-1 pb-0.5 text-left text-[12.5px] font-semibold"
+          >
+            {titleLine}
+          </button>
+        )}
       </div>
       <AnimatePresence initial={false}>
         {briefOpen && (

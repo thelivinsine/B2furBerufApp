@@ -35,7 +35,9 @@ Founder: "do the documentation maintenance". No app code was touched.
 
 Founder: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
 redemittle even in the practice sessions", then the pick: "option a's layout for desktop and option
-c for mobile and also desktop's content".
+c for mobile and also desktop's content" → "the aufgabe text is being cut off ... the Redemittel pills at the
+bottom should be at the top of that tile and the selected pill should also be shown ... adapt the
+same heirarchy for Redemittel in desktop view as well".
 
 **The gap:** a spoken task named its four Redemittel CATEGORIES on the brief card and ticked them in
 the debrief, while the eight phrases behind each name lived only in the Bibliothek. The learner had
@@ -176,8 +178,14 @@ Deploy Supabase functions correctly did not run (path-filtered, nothing under `s
 Post-merge housekeeping done, tree clean.
 Founder prompts: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
 redemittle even in the practice sessions" → "option a's layout for desktop and option c for mobile
-and also desktop's content".
+and also desktop's content" → "the aufgabe text is being cut off ... the Redemittel pills at the
+bottom should be at the top of that tile and the selected pill should also be shown ... adapt the
+same heirarchy for Redemittel in desktop view as well".
 
+- **The tile's hierarchy is the founder's second pass** (same session, PR **#834**): intent pills at the TOP,
+  all four, the current one lit, no dropdown (a lit pill states the selection, so a dropdown would
+  say it twice), and the phone drawer's task title on its own line below the tabs instead of beside
+  them, where it was cut off. Desktop and phone run the same order.
 - **What to check first:** the founder answered layout only, so three content defaults are stated
   and one-line reversible (`docs/DECISIONS.md` §s202): all eight phrases per intent, Anrede matched
   to the partner, English hold-to-peek. Ask if they want any flipped.

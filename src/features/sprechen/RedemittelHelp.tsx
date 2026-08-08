@@ -4,7 +4,7 @@ import type { ConversationBrief, RedemittelCategory, RedemittelPhrase } from "@/
 import { redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { matchesAnrede } from "@/lib/anrede";
 import { EnPeek } from "@/features/grammar/EnPeek";
-import { ScopeRail, ScopeSelect, scopeSectionLabel } from "@/features/shared/ScopeRail";
+import { ScopeRail, scopeSectionLabel } from "@/features/shared/ScopeRail";
 import { cn } from "@/lib/utils";
 
 /**
@@ -87,6 +87,13 @@ export function RedemittelHelp({
 
   const body = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
+      {/*
+        The intent picker, at the TOP of the tile, with the CURRENT intent shown
+        lit among the others (founder s202 follow-up). It replaces the dropdown
+        that used to sit here: a lit pill states the selection, so keeping a
+        dropdown above it would print the same fact twice, and four options is
+        pill territory anyway (dropdowns are for the long scope lists).
+      */}
       <section className="flex-none">
         <div className="mb-2 flex items-center gap-2">
           <p className={cn("flex-1", scopeSectionLabel)}>Sprechabsicht</p>
@@ -94,30 +101,46 @@ export function RedemittelHelp({
               the same fact repeated eight times, and the rows stay readable. */}
           <EnPeek active={peek} onChange={setPeek} />
         </div>
-        <ScopeSelect
-          ariaLabel="Sprechabsicht"
-          triggerLabel={LABEL_DE.get(current) ?? current}
-          value={current}
-          onChange={(id) => setActive(id as RedemittelCategory)}
-          groups={[
-            {
-              label: "",
-              options: categories.map((c) => ({
-                value: c,
-                label: LABEL_DE.get(c) ?? c,
-                count: counts.get(c),
-              })),
-            },
-          ]}
-        />
+        {/* The FilterRail facet-pill recipe, same as LifeAreaPills: white so it
+            pops off the Himmelblau tile, brand fill when active, honest count,
+            content-sized and wrapping. NOT a toggle-off: a conversation always
+            has one intent in view, so there is no "none" state to return to. */}
+        <div className="flex flex-wrap gap-1.5">
+          {categories.map((c) => {
+            const selected = c === current;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setActive(c)}
+                aria-pressed={selected}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
+                  selected
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-surface/70",
+                )}
+              >
+                {LABEL_DE.get(c) ?? c}
+                <span
+                  className={cn(
+                    "text-xs tabular-nums lg:text-[11px]",
+                    selected ? "text-primary-foreground/80" : "text-muted-foreground",
+                  )}
+                >
+                  {counts.get(c)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {/* The ONE region that scrolls, in both shells, and the only elastic one:
-          every other section is `flex-none`. The rail bounds it outright (a rail
+          the picker above it is `flex-none`. The rail bounds it outright (a rail
           inside a stage must never push the page into a scroll); the drawer lets
-          it take the room its own cap leaves, which is what keeps the intent
-          pills on screen. They are the way to the other three intents, so they
-          are worth more than the eighth phrase. */}
+          it take the room its own cap leaves, so the picker is never the part
+          that gets pushed off screen. */}
       <div
         className={cn(
           "slim-scrollbar mask-fade-y flex min-h-0 flex-col gap-1.5 overflow-y-auto",
@@ -139,30 +162,6 @@ export function RedemittelHelp({
         ))}
       </div>
 
-      {categories.length > 1 && (
-        <section className="flex-none">
-          <p className={cn("mb-2", scopeSectionLabel)}>Auch im Gespräch</p>
-          {/* The FilterRail facet-pill recipe, same as LifeAreaPills: white so
-              it pops off the Himmelblau tile, honest count, content-sized. */}
-          <div className="flex flex-wrap gap-1.5">
-            {categories
-              .filter((c) => c !== current)
-              .map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setActive(c)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-2.5 py-1 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-surface/70 lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs"
-                >
-                  {LABEL_DE.get(c) ?? c}
-                  <span className="text-xs tabular-nums text-muted-foreground lg:text-[11px]">
-                    {counts.get(c)}
-                  </span>
-                </button>
-              ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 

@@ -2139,3 +2139,22 @@ any of them flips):**
 **No reset on this rail.** `ScopeRail.onReset` became optional for it. The rail browses phrases, it
 does not narrow a list, so a reset would sit at its default doing nothing, which is the
 dead-control rule.
+
+## s202 follow-up — the intent picker IS the pills, and a title needs its own line
+
+Three founder corrections from the shipped screens, one hierarchy for both shells:
+
+1. **The task title was cut off** ("Projekt termingerecht absc…"). Beside the two drawer tabs it had
+   a third of the row. It now has its **own full-width line below the tabs**, which is also where a
+   phone can actually read it. The one-row bar survives everywhere without tabs (desktop, the whole
+   Modelltest), because there the row is the title's already.
+2. **The intent pills moved to the TOP of the tile** and **the selected intent is shown among
+   them**, lit. They used to sit under the phrase list as "Auch im Gespräch", holding only the
+   other three: the tile said which intent was showing in a dropdown at the top and which ones were
+   not at the bottom, so the selection lived in two places and the pills could never carry state.
+3. **The dropdown is gone with them.** A lit pill states the selection, so keeping the dropdown
+   would print the same fact twice, which is the redundancy rule's exact target; and four options is
+   pill territory (dropdowns are for the long scope lists, ≤12 options are pills).
+
+The pills deliberately do NOT toggle off, unlike `LifeAreaPills`: there is no "no intent" state to
+return to, because the list below always shows one.
