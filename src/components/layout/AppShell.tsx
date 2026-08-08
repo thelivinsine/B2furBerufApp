@@ -61,8 +61,21 @@ function ZoneExit({ tone, onExit }: { tone: "quiet" | "danger"; onExit: () => vo
  * Every route the Prüfung zone owns. The zone's one exit (top right, always)
  * renders on these and nowhere else, so a handler that outlives its screen
  * cannot leak a back button onto another page.
+ *
+ * `/lesen` and `/hoeren` were missing until s201, which is why those two
+ * choosers were the only screens in the zone with no way back in the header
+ * while Schreiben and Sprechen had one.
  */
-const ZONE_ROUTES = new Set(["/anwenden", "/exam", "/writing", "/simulation"]);
+const ZONE_ROUTES = new Set(["/anwenden", "/exam", "/writing", "/simulation", "/lesen", "/hoeren"]);
+
+/**
+ * The routes a Teil can actually run on, and therefore the routes allowed to
+ * switch the shell into the one-viewport exam stage. `/lesen` and `/hoeren`
+ * joined in s201, when starting a drill from those two choosers began rendering
+ * the runner on the chooser's own route instead of writing a run nothing
+ * displayed.
+ */
+const STAGE_ROUTES = new Set(["/anwenden", "/exam", "/lesen", "/hoeren"]);
 
 export function AppShell() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -125,16 +138,28 @@ export function AppShell() {
   const zoneExit = useSessionStore((s) => s.zoneExit);
   const examStage = useSessionStore((s) => s.examStage);
   // The runner took the `/exam` route over until s189; it now takes over the
-  // Prüfung hub instead, and `/exam` is a redirect into that hub. Both are
-  // listed so a stale flag still cannot strip the chrome anywhere else.
-  const exam =
-    examStage && (location.pathname === "/anwenden" || location.pathname === "/exam");
+  // Prüfung hub, and since s201 the Lesen/Hören chooser it was started from.
+  // Route-gated so a stale flag still cannot strip the chrome anywhere else.
+  const exam = examStage && STAGE_ROUTES.has(location.pathname);
   // The zone's one exit shows on every screen the zone owns, which since s195
   // includes the two free trainers. Route-gated like the stage flag, so a
   // handler left behind by an unmount race cannot put a back button on the
   // dashboard.
   const exit =
     zoneExit && ZONE_ROUTES.has(location.pathname) ? zoneExit : null;
+
+  /**
+   * The header's right side belongs to ONE control whenever there is a way out
+   * of the screen (founder s201: "get rid of the streak and account settings
+   * wherever the exit or back button is shown").
+   *
+   * The exam already did this (s186); the trainers and choosers kept the streak
+   * pill and the account menu beside their exit, so the same corner held three
+   * things on one screen and one thing on the next. A screen you are meant to
+   * leave by one control should not offer two more that leave it differently.
+   * Both live on every other screen and in Einstellungen, so nothing is lost.
+   */
+  const quietHeader = exam || !!exit;
 
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
@@ -236,7 +261,7 @@ export function AppShell() {
                   streak/celebration rides the reward tokens, warning stays a
                   semantic state color. */}
               {/* Steuerung H7: the streak pill can be hidden from remote config. */}
-              {!exam && streakPillOn && (
+              {!quietHeader && streakPillOn && (
                 <div
                   className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
                   role="img"
@@ -249,11 +274,11 @@ export function AppShell() {
                   </span>
                 </div>
               )}
-              {!exam && <AccountMenu />}
+              {!quietHeader && <AccountMenu />}
               {/* The zone's one exit, LAST so it sits in the corner itself on
-                  every screen of the zone (founder s195). On an exam screen it
-                  is the only thing here, exactly as before; on a trainer it
-                  follows the streak and the account, which those pages keep. */}
+                  every screen of the zone (founder s195), and since s201 the
+                  ONLY control on this side: `quietHeader` drops the streak pill
+                  and the account menu wherever it shows. */}
               {exit && <ZoneExit tone={exit.tone} onExit={exit.run} />}
             </div>
           </div>

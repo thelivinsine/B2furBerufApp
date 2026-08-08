@@ -1,7 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
-import { Clock, Play, RotateCw, Star } from "lucide-react";
+import { Clock, Star } from "lucide-react";
 import { scenarioById } from "@/data/dialogues";
 import { themeById } from "@/data/themes";
 import { speakingBrief } from "@/engine/speaking";
@@ -18,12 +17,9 @@ import { normalizeLevelScope } from "@/lib/writingScope";
 import { matchesLifeArea, normalizeLifeArea, themeGroupsByArea } from "@/lib/lifeAreas";
 import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
 import { ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
-import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import type { Scenario } from "@/types";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,10 +29,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ModuleHeader } from "@/features/pruefung/ModuleHeader";
-import { ModulePicker, ScopeEmpty } from "@/features/pruefung/ModulePicker";
-import { PART_META } from "@/features/exam/partMeta";
+import { ModuleTabs } from "@/features/pruefung/ModuleTabs";
+import { ChooserCard, ChooserGrid } from "@/features/pruefung/ChooserCard";
+import { ModulePage, ModulePicker, ScopeEmpty } from "@/features/pruefung/ModulePicker";
 import { ConversationRunner } from "./ConversationRunner";
-import { cn } from "@/lib/utils";
 
 /**
  * The free Sprechtrainer (s193), rebuilt as a chooser in s196.
@@ -64,9 +60,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "ueben", label: "Üben" },
   { id: "verlauf", label: "Verlauf" },
 ];
-
-/** The module mark, so this page's cards match the hub's Sprechen tile. */
-const SprechenMark = PART_META.sprechen.icon;
 
 export function SprechenHub() {
   const [params, setParams] = useSearchParams();
@@ -221,7 +214,9 @@ export function SprechenHub() {
         ? "das Niveau"
         : null;
 
-  const tabs = <TabSwitcher tab={tab} onSelect={(t) => patch({ tab: t })} />;
+  const tabs = (
+    <ModuleTabs tabs={TABS} value={tab} onSelect={(t) => patch({ tab: t })} ariaLabel="Sprechen" />
+  );
 
   const rail = ({
     layout,
@@ -300,162 +295,67 @@ export function SprechenHub() {
 
   if (tab === "verlauf") {
     return (
-      <div className="space-y-3 sm:space-y-5">
-        {tabs}
-        <ModuleHeader part="sprechen" />
+      // Module row first, switcher second, content in the content column: the
+      // same frame as the Üben tab and the same order Schreiben uses (s201).
+      <ModulePage part="sprechen" head={tabs}>
         <Suspense fallback={<div className="py-16" />}>
           <SprechenHistory onPractice={() => patch({ tab: "ueben" })} />
         </Suspense>
-      </div>
+      </ModulePage>
     );
   }
 
   return (
-    <ModulePicker part="sprechen" head={tabs} rail={rail}>
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-eyebrow text-muted-foreground">Sprechen üben</p>
-          <Badge variant="muted" className="tabular-nums">
-            {list.length} {list.length === 1 ? "Situation" : "Situationen"}
-          </Badge>
-        </div>
-
-        {list.length === 0 ? (
-          <ScopeEmpty what="Situationen" blame={blame} onReset={resetScope} />
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {list.map((sc, i) => {
-              const done = scenariosDone.includes(sc.id);
-              const recommended = sc.id === recommendedId;
-              return (
-                <motion.div
-                  key={sc.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(i * 0.04, 0.2) }}
-                >
-                  <Card
-                    className={cn(
-                      "card-hover h-full cursor-pointer",
-                      recommended && "ring-1 ring-primary/50 shadow-glow",
-                      done && !recommended && "ring-1 ring-success/40",
-                    )}
-                    onClick={() => setActive(sc)}
-                  >
-                    <CardContent className="flex h-full flex-col gap-3 p-4 sm:p-5">
-                      <div className="flex items-start justify-between gap-2">
-                        {/* The module's own mark (founder s195, shared rule 5):
-                            Sprechen was one colour on the hub and another here. */}
-                        <div
-                          className={cn(
-                            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                            PART_META.sprechen.tile,
-                          )}
-                        >
-                          <SprechenMark className={cn("h-5 w-5", PART_META.sprechen.ink)} />
-                        </div>
-                        <div className="flex flex-wrap justify-end gap-1.5">
-                          {/* The Niveau moved onto the card when the level
-                              sections it used to sit under were replaced by the
-                              rail's Niveau dropdown: the fact still has to be
-                              readable, it just is not a heading any more. */}
-                          <Badge variant="outline">{scenarioBandOf(sc)}</Badge>
-                          {recommended && <Badge variant="accent">Empfohlen</Badge>}
-                          {done && <Badge variant="success">Erledigt</Badge>}
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold leading-snug">{sc.title}</p>
-                        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{sc.task}</p>
-                      </div>
-                      <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" />
-                          {sc.minutes} Min
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5" />
-                          {sc.targetRedemittel.length} Redemittel
-                        </span>
-                        <Button size="sm" variant="ghost" className="h-7 gap-1 px-2">
-                          {done ? <RotateCw className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-                          {done ? "Wiederholen" : "Starten"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </ModulePicker>
-  );
-}
-
-/**
- * The page header: the same sliding-pill switcher the Prüfung hub and the
- * Bibliothek use (one always-mounted white pill measured to the active segment,
- * never a per-segment crossfade), capped and centred so two short labels do not
- * stretch across the column.
- */
-function TabSwitcher({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }) {
-  const reduce = useReducedMotion();
-  const { trackRef, registerItem, rect } = useSlidingPill(tab);
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    const ix = TABS.findIndex((t) => t.id === tab);
-    const next =
-      e.key === "ArrowRight" || e.key === "ArrowDown"
-        ? (ix + 1) % TABS.length
-        : e.key === "ArrowLeft" || e.key === "ArrowUp"
-          ? (ix - 1 + TABS.length) % TABS.length
-          : -1;
-    if (next === -1) return;
-    e.preventDefault();
-    onSelect(TABS[next].id);
-  };
-
-  return (
-    <div
-      ref={trackRef as React.RefObject<HTMLDivElement>}
-      role="tablist"
-      aria-label="Sprechen"
-      onKeyDown={onKeyDown}
-      className="relative mx-auto flex w-full max-w-sm items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft lg:max-w-xs"
+    <ModulePicker
+      part="sprechen"
+      head={tabs}
+      rail={rail}
+      toolbar={{
+        eyebrow: "Sprechen üben",
+        count: `${list.length} ${list.length === 1 ? "Situation" : "Situationen"}`,
+        // The draw Lesen and Hören always had and this chooser never did: one
+        // situation out of the current scope, for a learner who does not want
+        // to choose. Same control, same place, same wording.
+        onShuffle: () => setActive(list[Math.floor(Math.random() * list.length)]),
+        shuffleLabel: "Zufällige Situation",
+        canShuffle: list.length > 0,
+      }}
     >
-      {rect && (
-        <motion.span
-          aria-hidden
-          className="absolute bottom-1 left-0 top-1 rounded-md bg-surface shadow-soft"
-          initial={false}
-          animate={{ x: rect.left, width: rect.width }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }}
-        />
+      {list.length === 0 ? (
+        <ScopeEmpty what="Situationen" blame={blame} onReset={resetScope} />
+      ) : (
+        <ChooserGrid>
+          {list.map((sc, i) => {
+            const done = scenariosDone.includes(sc.id);
+            const recommended = sc.id === recommendedId;
+            const themeOf = themeById(sc.themeId);
+            return (
+              <ChooserCard
+                key={sc.id}
+                part="sprechen"
+                index={i}
+                title={sc.title}
+                subtitle={themeOf?.titleDe}
+                description={sc.task}
+                level={scenarioBandOf(sc)}
+                facts={[
+                  { icon: Clock, label: `${sc.minutes} Min` },
+                  { icon: Star, label: `${sc.targetRedemittel.length} Redemittel` },
+                ]}
+                status={
+                  done
+                    ? { label: "Erledigt", tone: "success" }
+                    : recommended
+                      ? { label: "Empfohlen", tone: "accent" }
+                      : undefined
+                }
+                highlight={recommended && !done}
+                onClick={() => setActive(sc)}
+              />
+            );
+          })}
+        </ChooserGrid>
       )}
-      {TABS.map((t) => {
-        const activeTab = tab === t.id;
-        return (
-          <button
-            key={t.id}
-            ref={registerItem(t.id) as React.Ref<HTMLButtonElement>}
-            type="button"
-            role="tab"
-            aria-selected={activeTab}
-            tabIndex={activeTab ? 0 : -1}
-            onClick={() => onSelect(t.id)}
-            className={cn(
-              "relative z-10 flex-1 rounded-md px-5 py-1.5 text-sm transition-colors",
-              activeTab
-                ? "font-bold text-foreground"
-                : "font-semibold text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.label}
-          </button>
-        );
-      })}
-    </div>
+    </ModulePicker>
   );
 }

@@ -5504,7 +5504,6 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   instead of the P1 decision that is now closed.
   **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
 
-
 ## Session 200 (2026-08-07) · branch `claude/whats-next-q992fo`
 
 - **Prompt 1 (verbatim):** `what's next?`
@@ -5566,3 +5565,93 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   **How session 200 shipped:** PR **#828** → squash-merged **`df101d7`**; Validate content and Deploy
   site to GitHub Pages green on `main`; Deploy Supabase functions correctly did not run (path-filtered
   to `supabase/**`, untouched this session). Housekeeping done after the merge.
+
+## Session 201 — 2026-08-07 — branch `claude/ui-polish-consistency-56ja1y`
+
+_(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that number and reached
+`main` first, so this session is 201 wherever it is cited, in the docs and in the code comments.)_
+
+- **Prompt 1 (verbatim):** `[four phone screenshots: /lesen, /hoeren, /simulation, /writing]` `i want
+  you to make these pages consistent and highly polished. Review the exit buttons, toggles, layouts,
+  tile shapes, transition animations, etc - leave no stone unturned. Make it a finished product which
+  is presentable to thousands of audience and investors. I want the highest quality possible like
+  from senior experts of the industry developing billion dollar edutech app. some of the observed
+  bugs:` `- the header bar shouldn't have the aufgabe button - place it somewhere else.` `- shuffle
+  button has a bug where taping it again doesn't deactivate it instead it deactivates when tapped on
+  empty spaces - fix it.` `also make sure to keep the design language consistent with the rest of the
+  app and use the color palette from the brand kit wherever relevant.`
+  **Response:** reproduced every screen in headless Chromium at 360x640 first, which turned the
+  second reported bug into a much bigger finding: **Lesen and Hören were dead pages.** Starting a
+  text or the random draw only wrote the run into `useExamStore`, and the Prüfung hub was the ONLY
+  screen that rendered a run, so nothing happened on `/lesen` and `/hoeren`; what the founder saw as
+  "the shuffle doesn't deactivate" was a stuck touch-`:hover` on a button whose tap led nowhere.
+  Fixes, in the order they matter:
+  1. **The two choosers work.** `TextModuleHub` renders `<MockExamRunner />` while a run exists (the
+     hub's own pattern), `AppShell` gained `STAGE_ROUTES`, and the chooser's `zoneExit` steps aside
+     while the runner owns the exit and only clears an exit that is still its own. Finishing a drill
+     lands back on the list it was picked from. Verified end to end: pick → answer 3 → Teil
+     abschließen → 100 % → Fertig → back on `/lesen`, run cleared, nav restored.
+  2. **The zone's exit was missing on `/lesen` and `/hoeren`**: they were never in `ZONE_ROUTES`, so
+     those two were the only screens in the zone with no way back in the header. Now all four have
+     it, in the same corner.
+  3. **The Aufgabe toggle left the module row** and sits at the right end of the chooser's own
+     toolbar row, level with the count it changes and directly above the panel it opens.
+  4. **Sticky touch-hover is gone app-wide:** `future.hoverOnlyWhenSupported` compiles every
+     `hover:` into `@media (hover: hover)`, so a tapped control no longer stays lit until the next
+     tap somewhere else. (Verified in the minified production CSS, not just in dev.)
+  5. **One chooser, three modules:** `ModulePicker` now owns the toolbar row, `ChooserCard` is the
+     one card anatomy (Sprechen had put the Niveau in the head, rendered a `div onClick` a keyboard
+     could not reach, nested a "Starten" button inside its own click target and wore a
+     `shadow-glow`, a landmine since s136), `ModuleTabs` is the one switcher, and both list
+     animations share one 0.16s stagger. Sprechen's module row moved ABOVE its switcher, so all four
+     pages read module row → switcher → content. Sprechen also gained the random draw the other two
+     always had.
+  **Artifacts:** `src/features/pruefung/{ModulePicker,ChooserCard,ModuleTabs,TextModuleHub}.tsx` ·
+  `src/features/sprechen/SprechenHub.tsx` · `src/components/layout/AppShell.tsx` ·
+  `tailwind.config.ts` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md`.
+
+- **Prompt 2 (verbatim):** `either keep verlauf in every module or remove it from all of the
+  individual modules and just in the prufung hub page`
+  **Prompt 3 (verbatim):** `go with verlauf on all four`
+  **Response:** flagged the cost of the other option before building (removing them would delete the
+  writing corrections and the spoken transcripts from the app, since nothing else renders either),
+  then added the Verlauf tab to Lesen and Hören. The Verlauf card, chart, empty state and delta chip
+  were EXTRACTED from `PruefungHub` into `features/pruefung/verlauf.tsx` rather than rebuilt, and the
+  chooser must not import the hub: that would drag `mockExamAvailability` and the writing-prompt bank
+  into the `/lesen` chunk. The new per-module history (`moduleRuns`) is the Modelltest Verlauf's
+  composition at module scale (last score + delta, Bester, Bestanden, seven bars against the pass
+  line), with the Niveau on each row instead of the module name the page already says, and a
+  Modelltest is never listed there (`isFullMockRun`). The hub keeps the cross-module views only.
+  `ModulePage` gives the Verlauf tab the same columns the Üben tab has, so switching tabs moves no
+  edge sideways.
+  **Artifacts:** `src/features/pruefung/verlauf.tsx` (new) · `PruefungHub.tsx` (now imports it) ·
+  `TextModuleHub.tsx` · `SprechenHub.tsx` · `ModulePicker.tsx` · `tests/pruefungHub.test.ts` ·
+  `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `continue`
+  **Response:** re-verified the whole tree after the `origin/main` merge rather than trusting the
+  pre-merge gates: typecheck, lint (0 errors), 652 tests, build, bundle 128.2 kB of a 400 kB budget,
+  contrast, `lint:content`. Then walked all four pages again in headless Chromium at 360x640 and
+  1280x860, light and dark: the drill loop end to end on `/lesen` (pick → answer → Teil abschließen →
+  Ergebnis → Fertig → back on the list, run cleared, bottom bar restored), the Aufgabe panel opening
+  under its own toggle, the empty scope hiding the draw and naming the one filter to drop, and the
+  new module Verlauf both empty ("Noch kein Ergebnis") and with runs (last score + delta chip, Bester,
+  Bestanden, bars against the pass line, rows, "Alle 4 anzeigen"). Every screen rests at 0 page
+  scroll. Also trimmed `CLAUDE.md` from 391 to 383 lines: the merge had left this session's law and
+  s199's stating the Modelltest-vs-practice rule twice, and the zone bullets carried detail that
+  already lives in `docs/areas/PRUEFUNG.md`. The file is still over the ~350 budget it was over
+  before this session (378 at `66061c3`), so the linter still warns; that debt is older than this
+  work and wants a pass of its own.
+  **Artifacts:** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 5 (verbatim):** `get rid of the streak and account settings wherever the exit or back
+  button is shown`
+  **Response:** one flag in `AppShell`, `quietHeader = exam || !!exit`, now hides the streak pill and
+  the `AccountMenu` on every screen that carries the zone exit, which is what a running Teil had done
+  since s186 while the trainers and choosers kept them. That was the inconsistency: the same corner
+  held three controls on `/writing` and one inside a Teil. The Prüfung HUB is untouched, because it
+  is a nav destination and registers no exit, so it keeps both. Nothing became unreachable: both are
+  one tap away on every screen outside the zone, and the account also lives in Einstellungen. Law
+  restated in `CLAUDE.md` (the one-frame bullet) and `docs/areas/PRUEFUNG.md`.
+  **Artifacts:** `src/components/layout/AppShell.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/PROJECT_STATUS.md` · this log.

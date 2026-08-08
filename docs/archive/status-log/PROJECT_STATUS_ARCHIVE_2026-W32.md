@@ -2,6 +2,71 @@
 
 Handoffs moved out of `docs/PROJECT_STATUS.md` once they aged past the two most recent.
 
+**Handoff after session 199 (2026-08-07): the audit shipped, its top fix shipped, and P2 is the
+next session's work (founder: "I'll continue with the p2 and others in next session").**
+Founder prompts: "what's next in the task list?" → "go ahead" → "go with your recommendation reg
+branche. I prefer to have Berufsleben and Alltag as the first filter and then themen and only then
+Branchen filter as the heirarchy of the filter rail all across. When a user selects a thema where
+there is no branche specific content, just show the options within Branche as locked." → "no need of
+design preview for the above mention rail changes" → "the header and footer of the filter rail seems
+to look like separate pieces attached to the main body. remove the separator lines and make all the
+filter rail same shade to look like one piece." → "document the session."
+
+**Shipped:** PR **#824** (the audit report) → **`66061c3`**; PR **#825** (three commits: `acb21f7`
+Branche cleanup, `7f5c464` rails, `40176d1` docs) → **`bf9db0b`**. Validate content and Deploy site
+to GitHub Pages green on `main` for both. **Deploy Supabase functions did not run on `bf9db0b`, and
+that is correct**: it is path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its
+own file, none of which this session touched. Housekeeping done after both merges.
+
+### START HERE next session: audit P2
+
+The one where the app currently punishes a learner for doing exactly what the brief asked.
+**Six C1 Stellungnahmen at a 200-word target carry only descriptive Leitpunkte**, while `level` is
+what tells `evaluate-writing` to "bewerte streng auf C1-Niveau":
+`wt_conflict_l01`, `wt_conflict_l05`, `wt_conflict_l15`, `wt_conflict_l17`, `wt_conflict_l25`,
+`wt_bildung_l10`.
+1. **REPLACE the weakest descriptive point with a justification one; never add a fifth.** Four
+   Leitpunkte in 200 words is already the exam shape, and `wt_conflict_l05` shows the pattern:
+   "Beschreiben Sie das Problem / Zeigen Sie Verständnis / Schlagen Sie eine Regel vor / Sagen Sie,
+   wer beschließen soll" has no point that forces an argument.
+2. Then sweep the wider set: **20 of 35 `beschwerde`** and **9 of 54 `stellungnahme`** tasks carry no
+   justification point either.
+3. Then **gate it**, so it cannot come back: a `stellungnahme`, `forumsbeitrag` or `widerspruch` at
+   B2 or above must carry ≥1 justification Leitpunkt. Anchor the check on the same phrase-level
+   classifier the audit used, and **read §9 of the report first**: an opening-verb classifier is
+   WRONG for German, because a separable prefix carries the meaning ("**Legen** Sie dar, warum …"
+   scored as unargumentative and is exactly the opposite). Getting this wrong cost a re-run in s199.
+4. Load `/content` before editing `writingPrompts.ts`; ids are permanent, so this edits fields only.
+
+**Then, in priority order (all AI-shippable):**
+- **P3:** retire `exam` from the schema (nothing reads it: not the trainer, not the evaluator, not a
+  filter; the shipped-ids law protects ids, not fields), or fix its 69 out-of-band tags. Either way
+  correct the `words` doc comment, which claims the target follows the exam shape when it is fully
+  determined by (Niveau, Länge).
+- **P4:** add `source` to the 71 reaction tasks (54 Stellungnahmen, 17 Forumsbeiträge), AFTER P2,
+  because a quoted position is what makes a justification Leitpunkt answerable. No schema change.
+- **P5:** the 19-item tail. 5 Textsorte re-tags (`wt_meetings_s05`, `wt_meetings_l17`,
+  `wt_logistics_s13`, `wt_bildung_l03`, `wt_wohnen_l05`) and 14 Adressat/register fixes where `du`
+  meets "Frau <Nachname>". About an hour.
+
+**Two things to know before touching the rails again:**
+- **The rail order lives INSIDE the rails** (`FilterRail` reorders its own `scopes` array), never in
+  a caller. That is what s184 centralised and s199 kept; do not re-introduce per-surface ordering.
+- **The lock lives in ONE place** (`ScopeSelect`'s row renderer + `ScopeLocked` in `ScopeRail.tsx`,
+  plus `lockZero` on the Bibliothek's `ScopeMultiSelect`). It shipped WITHOUT a preview round at the
+  founder's explicit waiver, so if they dislike the look it is a single-file change, not an
+  eight-rail one. **Niveau moved below the hierarchy** on a literal reading of "Berufsleben and
+  Alltag as the first filter"; flipping it back is one move per rail.
+
+**Standing debt, unchanged:** P10 human content verification is still the only open s178 audit item
+and is founder-owned (`pnpm review:queue` → decisions → `pnpm apply:reviews` → `pnpm stamp:verified`).
+`verify:grammar` has still never run over the s198 sentences (no LanguageTool toolchain in this
+sandbox). CLAUDE.md is **378 lines** against its ~350 budget, down from 380 despite three new rules;
+the compression pass is worth finishing.
+
+Gates on the merged work: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) ·
+**649 tests** · build · check:bundle 128.2 kB · check:contrast.
+
 **Handoff after session 195 (2026-08-06):** 2026-08-06 (session 195 gave the Prüfung zone ONE frame: one exit, one Niveau
 control, one width at rest; see "Resume here"). **The Prüfung zone was audited end to end and every
 finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all

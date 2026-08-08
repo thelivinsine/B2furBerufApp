@@ -158,16 +158,18 @@ after pulling.
   retryable. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
-  `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
-  flag and only a run sets it. **A confirm is about losing work, never about the clock:**
+  `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever that exit shows
+  it is the ONLY control on that side** (founder s201): `quietHeader` drops the streak pill and the
+  account menu, which the exam already did. `examStage` is a separate flag and only a run sets it. **A confirm is about losing work, never about the clock:**
   `hasProgress(run)` gates it, the Schreibtrainer never asks (its draft autosaves, so the warning
   would be false) and a started conversation always does. **The word Zurück belongs to that exit
   alone**, so the question stepper is a chevron. A phone carries the module row on every screen
-  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`, on a chooser it carries the
-  Aufgabe toggle). ONE Niveau control per screen. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197:
-  one width for switcher, scope row, module grid AND Verlauf, so every block shares two edges), a
-  chooser wears Schreiben's content-plus-16rem-rail grid (s196), and only a RUNNING Teil gets the
-  wide `lg:max-w-6xl` stage. The Verlauf card ships in an empty state from the first visit.
+  (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`). **That row NAMES the module and
+  carries no control** (founder s201): the Aufgabe toggle moved to the chooser's own toolbar row,
+  level with the count it changes and directly above the panel it opens. ONE Niveau control per
+  screen. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: one width for every block, so they
+  share two edges), a chooser wears Schreiben's content-plus-16rem-rail grid (s196), and only a
+  RUNNING Teil gets the wide `lg:max-w-6xl` stage. A Verlauf ships in an empty state from visit one.
 - **An exercise the app scores can always be handed in, and every score it produces is reachable**
   (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
   question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
@@ -176,16 +178,19 @@ after pulling.
   that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired), and a
   trainer that produces a correction rather than a percentage keeps its own Verlauf on its own page
   (Schreiben since s171, Sprechen since s196 — a recorded row nothing reads back is lost work).
+  **Every module page carries that Verlauf** (founder s201: "either keep verlauf in every module or
+  remove it from all of the individual modules"), so a learner finds their history where they
+  practise; Lesen's and Hören's are their own sittings (`moduleRuns` + `features/pruefung/
+  verlauf.tsx`, which is also the hub's card). The hub keeps the CROSS-module view only.
 - **A failed cloud write is never silent** (s185). supabase-js returns `{ error }` instead of
   throwing, so an ignored result makes a permanently broken sync look identical to a working one.
   Every push reads its error, retries with backoff, and after 3 consecutive failures flips
   `useAuthStore.syncHealth` to `"failing"` ("Sync pausiert" in Settings, with a retry). Any new
   cloud write does the same; never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
-  keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded` so the lifetime figure is unchanged;
-  migration 0015 purges abandoned guest accounts (90 days), transform-cache rows (60 days) and
-  learner TEXT (730 days) by `pg_cron`, NULLing columns rather than deleting rows so limits,
-  aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
+  keep `RETAIN_DAYS` (400) days, folded into `activeDaysFolded`; migration 0015 purges abandoned
+  guest accounts (90 days), transform-cache rows (60 days) and learner TEXT (730 days) by `pg_cron`,
+  NULLing columns rather than deleting rows so limits, aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
   copy describing it ship in the SAME change**; never resolve a conflict between them by editing
   the copy alone.
 - **Never reload over a learner's unsaved work.** Every automatic reload is gated on
@@ -212,6 +217,11 @@ after pulling.
   is in charge; keyboard navigation keeps it, so WCAG 2.4.7 holds. `:focus-visible` alone does not
   settle it: a control that re-renders under the click can come back focused and keep matching, and
   browsers disagree on when. Never answer a stray ring by deleting the indicator outright.
+- **A hover style answers a POINTER only** (founder s201, the same law one input mode further):
+  `future.hoverOnlyWhenSupported` in `tailwind.config.ts` compiles every `hover:` into
+  `@media (hover: hover)`. A touch browser keeps `:hover` on the last element tapped until the next
+  tap somewhere else, so a tapped button stayed lit and "deactivated when tapped on empty spaces".
+  A control's ON state is therefore always its own class, never a hover fill.
 - **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
   hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
   assumption. A scroll container also SLICES what crosses its edge (`useEdgeFade`), and a rail
@@ -243,23 +253,22 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** | **Modelltest**. The switcher IS the header at every width (no HubHero, no `h1`,
-  no page title) and the AppShell greeting slot stays EMPTY here (pick C, s197; a header copy would
-  import `features/pruefung/hubSwitcher.tsx`, never `PruefungHub.tsx`, which drags the banks eager).
-  Niveau is a compact button; scope controls sit BELOW the switcher, both rows centred.
+  no page title) and the AppShell greeting slot stays EMPTY here (pick C, s197). Niveau is a compact
+  button; scope controls sit BELOW the switcher, both rows centred.
   **Mit Zeit / Ohne Zeit** rests on Ohne Zeit and is the ONLY way into the four choosers (`/lesen`,
   `/hoeren`, `/writing`, `/simulation`), which are the same four modules without a clock, never a
-  fifth block. All four wear ONE "Aufgabe wählen" rail (`features/shared/ScopeRail.tsx`, s196),
-  sticky on desktop, behind the module row's Aufgabe toggle on a phone; Lesen/Hören keep their old
-  random draw as a "Zufällige Auswahl" button. **The exam FRAME is Mit Zeit's alone** (s192): Ohne
-  Zeit skips the Anleitung and opens the drill; only the STAGE is shared, and the exit follows the
-  one-frame law, not the clock. The run band's connector is one segment per gap, between the tiles.
+  fifth block. All four wear ONE "Aufgabe wählen" rail (`features/shared/ScopeRail.tsx`, s196);
+  Lesen/Hören keep their old random draw as a "Zufällige Auswahl" button. **The three list choosers
+  are ONE component** (`ModulePicker` + `ChooserCard` + `ModuleTabs`, s201): Üben/Verlauf switcher,
+  one toolbar row (count · Aufgabe · Zufällige Auswahl), one card anatomy (mark + title + context
+  line + chevron, facts on a bottom-aligned foot row), one 0.16s stagger. **The exam FRAME is Mit
+  Zeit's alone** (s192): Ohne Zeit skips the Anleitung and opens the drill; only the STAGE is
+  shared, and the exit follows the one-frame law, not the clock.
 - **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): a height-stable scope
   row, and the module card's minutes badge in a corner RESERVED in both clock states, so the clock
-  switch cannot move a card
-  edge. Modelltest's Verlauf leads with the last score plus its delta (Bester and Bestanden as
-  supporting stats, the last seven runs as bars against the pass line); Module üben's is a
-  Stärkeprofil (pale = first attempt, solid = the gain since). **A Modelltest is a run that sat all
-  four parts; a run that sat one is module practice**, and the two lists never mix.
+  switch cannot move a card edge. Modelltest's Verlauf leads with the last score plus its delta
+  (Bester and Bestanden as supporting stats, the last seven runs as bars against the pass line);
+  Module üben's is a Stärkeprofil (pale = first attempt, solid = the gain since).
 - **Every rail runs ONE order, Lebensbereich FIRST** (founder s184, reordered s199):
   `LifeAreaPills` lead, then Thema, Unterthema, Branche, then Niveau and Textsorte. Single-select
   that toggles off, `?area=` in the URL, honest counts; picking one narrows the Thema dropdown to
