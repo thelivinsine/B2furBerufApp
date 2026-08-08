@@ -172,10 +172,12 @@ No app code was touched, so nothing needs live verification.
   placement from `preview/schreiben-source-text.html`.
 
 **Handoff after session 202 (2026-08-08): a practice conversation now carries its Redemittel while
-the learner speaks.** Branch `claude/sprechen-filter-rail-practice-70gydw`, PR **#830** →
-squash-merged **`9c4ca3b`**. Validate content and Deploy site to GitHub Pages both green on `main`;
+the learner speaks.** Branch `claude/sprechen-filter-rail-practice-70gydw`. Three PRs: **#830** →
+**`9c4ca3b`** (the rail), **#831** → **`e7f1c7f`** (the paper trail), **#834** → **`9e0b74e`** (the
+founder's second pass on the tile). Validate content and Deploy site to GitHub Pages green on each;
 Deploy Supabase functions correctly did not run (path-filtered, nothing under `supabase/` changed).
-Post-merge housekeeping done, tree clean.
+Post-merge housekeeping done after each, tree clean. **Session 203 ran in PARALLEL** and reached
+`main` first, so #834 merged `origin/main` before shipping; this session stays s202 throughout.
 Founder prompts: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
 redemittle even in the practice sessions" → "option a's layout for desktop and option c for mobile
 and also desktop's content" → "the aufgabe text is being cut off ... the Redemittel pills at the
@@ -196,6 +198,9 @@ same heirarchy for Redemittel in desktop view as well".
 - **Not done, deliberately:** no speak button on a phrase (it would fight the partner's voice) and
   no way to send a phrase into the conversation (reading is not saying, and the transcript is what
   the debrief grades).
+- **Open, not this session's:** PR **#808** "docs: record the s192 merge"
+  (`claude/prufung-ui-bottom-bar-u0fdwf`) is still open and stale. It needs a founder call, merge or
+  close; nothing here depends on it.
 
 Older handoffs and session logs (s201 and earlier) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
