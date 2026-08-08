@@ -5726,7 +5726,52 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   brand fill and its honest count. (3) The dropdown went with them: a lit pill states the selection,
   so keeping it would print the same fact twice, and four options is pill territory by the app's own
   rule. Same tile, same order, on desktop. Verified in a real browser at 393x852 and 1440x900, both
-  drawer tabs, page scroll 0 everywhere.
+  drawer tabs, page scroll 0 everywhere. Shipped as PR **#834**, which merged `origin/main` first:
+  session 203 had landed the documentation-maintenance pass (#832, #833) mid-flight, and its trim of
+  `CLAUDE.md` had already condensed this session's Sprechen law, so the only conflict was this
+  append-only file (prompt 4 belongs above the session 203 heading).
   **Artifacts:** `src/features/sprechen/RedemittelHelp.tsx` ·
   `src/features/sprechen/ConversationRunner.tsx` · `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` · this log.
+
+## Session 203 — 2026-08-08 — branch `claude/documentation-maintenance-0w4ywg`
+
+- **Prompt 1 (verbatim):** `do the documentation maintenance`
+  **Response:** a docs-only session; no app code touched. Two standing debts closed. **(1)
+  `CLAUDE.md` back inside its budget, 399 → 349 lines.** The `lint:content` ratchet warns past ~350
+  and had been warning since s198; s201 noted it and left it. The file was over because rules had
+  accreted their own history, so the trim cut each bullet back to the RULE plus a pointer and moved
+  the rest to where it already lived (`docs/areas/CONTENT.md` for the content measurements,
+  `PRUEFUNG.md` for the zone mechanism, `PROJECT_FOUNDATION.md` for the retention timers,
+  `SPRECHEN.md` for the conversation detail). **No law was dropped**, and the three that had no
+  area-doc home were given one BEFORE the sentence was cut: the "`source` belongs to the reply genre"
+  rule and the "match phrases over the whole clause, never the opening verb" trap went into
+  `CONTENT.md` §Writing prompts, the module card's "no description line" into `PRUEFUNG.md`, and the
+  touch-`:hover` law into the `/design` skill's landmine list as #12, beside the focus-ring law it
+  mirrors. The maintenance rule at the top of `CLAUDE.md` now states what a law looks like, so the
+  shape is written down rather than inferred. **(2) Every bank count in the docs re-measured against
+  `pnpm lint:content`,** because most had drifted silently: grammar drills 195 → **320**, texts
+  42 → **52** (126 → 156 checks), scenarios 30 → **36**, exam sets 15 → **21**, provenance
+  3,457 → **3,604** rows and 3,444 → **3,591** draft, writing pools 20 → **40**. `CONTENT.md` still
+  called the provenance register two array parts (it has been four since s182) and told authors to
+  append to the second, which would have put new rows in the middle of the file; `SPRECHEN.md`
+  counted 15 exam sets in its no-`anruf`-set-yet note. The taxonomy line also claimed 5 domains "all
+  populated" when `pruefung` carries no themes and never has. Every number is now stamped with the
+  date it was measured, and `CLAUDE.md` carries a new workflow rule: a count in a doc is MEASURED,
+  never carried forward. Housekeeping: the s199 and s200 session logs and the s201 handoff moved into
+  the 2026-W32 archive chunk, leaving `PROJECT_STATUS.md` at 187 lines of its ~250 budget. Gates:
+  typecheck · lint · test:unit · build · lint:content (the CLAUDE.md warning is gone, 15 → 14
+  warnings, the remaining 14 being the pre-existing noun/pron content warnings).
+  **Artifacts:** `CLAUDE.md` · `docs/areas/CONTENT.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/areas/SPRECHEN.md` · `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log.
+
+- **Shipped (same prompt):** PR **#832** → squash-merged **`48d250c`**. `origin/main` had moved
+  mid-session (PR #831, the session 202 paper trail), so the branch merged `main` first and resolved
+  one conflict in this file: #831's Prompt 3 entry belongs to the session 202 block, above the
+  session 203 heading. Validate content and Deploy site to GitHub Pages both green on `48d250c`;
+  Deploy Supabase functions correctly did not run, being path-filtered to `supabase/**` which this
+  session did not touch. Post-merge housekeeping done (fetch → reset --hard → force-with-lease),
+  tree clean. **Note for the next session: `CLAUDE.md` now has about one line of headroom**, so a
+  new law costs an old line.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.

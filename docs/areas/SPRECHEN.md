@@ -106,9 +106,9 @@ Rules:
   takes what the `50dvh` cap leaves, so the intent pills below it stay on screen and the running
   screen still rests at zero page scroll.
 
-**No exam set is `anruf` yet.** Every one of the 15 authored sets is a "discuss the aspects and
-agree" task whose aspects must stay readable, so the Anruf layout is built, tested and unreached
-until listen-and-hold speaking tasks are authored. That is the next content job, not a bug.
+**No exam set is `anruf` yet.** Every one of the 21 authored sets (measured 2026-08-08) is a "discuss
+the aspects and agree" task whose aspects must stay readable, so the Anruf layout is built, tested and
+unreached until listen-and-hold speaking tasks are authored. That is the next content job, not a bug.
 
 ## Where the content comes from
 

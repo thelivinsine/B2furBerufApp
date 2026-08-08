@@ -267,6 +267,14 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
     (`scripts/justification-markers.mjs`, same shared-lexicon arrangement). `level` is what makes
     `evaluate-writing` mark strictly, so a brief that only describes gets the learner marked down for
     obeying it. Fix by REPLACING the weakest descriptive point, never by adding a fifth. B1 is exempt.
+    **The classifier matches phrases over the WHOLE clause, never the opening verb.** German puts the
+    meaning in the separable prefix, so "**Legen** Sie dar, warum …" scored as unargumentative under
+    an opening-verb rule and is exactly the opposite; getting this wrong cost a re-run in s199.
+  - **A supplied `source` text belongs to the REPLY genre, never to an opinion task (s200).** No exam
+    supplies a text for a Forumsbeitrag or a Stellungnahme (Goethe B2 Teil 1, DTB B2 Teil 2), while
+    DTB B2 Teil 1 prints the customer mail you answer. `source` is read by nothing today, so this is
+    a rule for whoever wires it up: the honest target is the "Antworten Sie" tasks. The audit's P4
+    said the opposite and is marked WRONG in the report; the founder's own exam settled it.
   - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` + `weiterbildung`)
     and, since s200, under Wohnen (a Wohnungsbewerbung). **One deliberate zero: C1 + E-Mail
     (privat)**, which has no exam analogue; the rail greys it with an honest count.
@@ -284,14 +292,16 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
   `lint:content` errors if it reappears.
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
-- **Sprech-Szenarien** (`dialogues.ts`, 30): `id` (`sc_`), `themeId`, `title`, `task`, `context`,
+- **Sprech-Szenarien** (`dialogues.ts`, **36** measured 2026-08-08): `id` (`sc_`), `themeId`,
+  `title`, `task`, `context`,
   `level` 1-3, `minutes`, `targetRedemittel[]`, `start`, `nodes` (keyed by node id, unique WITHIN
   the scenario only). A node is a choice node (`options[]`, each with `next`, `quality`, `feedback`,
   optional `uses`) or a **free-speak node** (`prompt` + `model` + `next`, no options). **Every
   scenario must carry at least one free-speak node with a model answer, on every path** (audit P4,
-  s182: 20 of 30 ended on a multiple-choice turn, so the speaking trainer never asked for produced
-  speech). `tests/scenarios.test.ts` gates it, together with node-reference integrity and
-  reachability. Level 3 is still thin (2 of 30) and is the open half of P4.
+  s182: 20 of the 30 scenarios then shipped ended on a multiple-choice turn, so the speaking trainer
+  never asked for produced speech). `tests/scenarios.test.ts` gates it, together with node-reference
+  integrity and reachability. The level mix is **13 / 15 / 8** (measured 2026-08-08): level 3 was the
+  open half of P4 at 2 of 30 and is no longer thin.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
   (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
   `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a
@@ -378,12 +388,13 @@ has to contain the bare headword, so write the sentence that sounds natural.
 ## Provenance register (`src/data/provenance.ts`)
 One `ProvenanceEntry` row per content_id: `origin` (authored/sourced/adapted), `reference`
 (Wiktionary/DWDS/Tatoeba URL), `license` (SPDX from the allowlist), `review_status`
-(draft/verified), who added/verified. All ~3,273 items have rows with non-empty `reference`; **all
-are `draft`, 0 `verified`** (human verification reset to zero 2026-07-22 at founder request; the
-`human` tier on `/sources` reads 0 until the review pass restarts). The register is **two
-concatenated array literals** (`provenancePart1/2`, TS2590); append new rows to the second. Game
-missions get one row per mission id. Full policy: `docs/strategy/DATA_GOVERNANCE.md` (traceability
-over ownership; Wiktionary/DWDS for word facts; Tatoeba CC-BY for example sentences).
+(draft/verified), who added/verified. Every content_id has a row with a non-empty `reference`:
+**3,604 rows, of which 13 are `verified`** (measured 2026-08-08 with `pnpm lint:content`; human
+verification was reset to zero on 2026-07-22 at founder request and restarted 2026-07-24 with 13
+vocabulary rows, so the `human` tier on `/sources` reads 13). The register is **four concatenated
+array literals** (`provenancePart1-4`, TS2590); append new rows to the LAST one. Game missions get
+one row per mission id. Full policy: `docs/strategy/DATA_GOVERNANCE.md` (traceability over
+ownership; Wiktionary/DWDS for word facts; Tatoeba CC-BY for example sentences).
 
 **Sourcing limit (read before transcribing anything):** individual word facts are free to use, but a
 specific *published* word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database

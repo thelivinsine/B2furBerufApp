@@ -1330,3 +1330,87 @@ Teil 1 shape, and it is the one place `source` earns its keep. What that session
 **Method note for the next audit:** §9 compared the bank against exam shapes from memory of the
 format rather than against the published task descriptions, and that is what produced a wrong
 finding. Where a claim turns on "this is what the exam does", fetch the Modellsatz.
+
+## Session 199 log
+
+_(moved out of `docs/PROJECT_STATUS.md` in session 203)_
+
+Founder: "what's next in the task list?", then "go ahead".
+**The writing-task quality audit is done, and its headline is: the tasks are well written, the tags
+on them are not.** s181 closed the COVERAGE backlog (717 tasks, every Unterthema, Textsorte and
+Branche represented); this audit asked whether the tags are EARNED.
+- **The good news, measured first:** only 6 near-duplicate instruction pairs across 256,686
+  comparisons (all same-theme, zero cross-theme), 2,355 distinct Leitpunkte of 2,691, zero Leitpunkte
+  demanding a non-written act, and a demand ladder that genuinely rises with the Niveau tag.
+- **Branche is a coverage artifact.** All 40 theme×length pools carry exactly 15 distinct sectors,
+  the size of the `WorkSector` enum, assigned in enum order down the pool index, in pools as small as
+  11 tasks. 199 of 600 tagged tasks (33%) carry no marker of the sector they claim.
+  `tests/writingScope.test.ts` forced this and 11-task Alltag pools cannot satisfy it by authoring.
+- **The Niveau tag scales the word target and the AI grader's strictness, but not the task**: 236
+  tasks (207 B2, 29 C1) ask for no justification, sharpest in 6 C1 Stellungnahmen at 200 words.
+- **`exam` is dead metadata** (read by nothing) that contradicts `words`, and **`source` is unused on
+  all 717 tasks**.
+Full detail and the P1–P5 fix list are in the report.
+
+**Then the founder answered P1 and asked for two more things**, so the session shipped three commits:
+- **P1, option (a): a Branche tag is EARNED or it is not there.** `scripts/sector-markers.mjs` is the
+  ONE lexicon (shared by `lint:content` AND `tests/writingScope.test.ts`, so gate and test cannot
+  drift); 331 unearned tag instances stripped, 220 tasks universal again, no id or task text touched.
+  The all-15-Branchen floor is replaced by the property it only proxied for, plus a floor keeping
+  Berufsleben real (≥8 of 15 sectors per pool). Nothing became unreachable: Branche is soft, and a
+  test asserts every Branche still draws everywhere.
+- **The filter hierarchy inverts, in all 8 rails:** Lebensbereich → Thema → Unterthema → Branche, then
+  Niveau and Textsorte (founder: "Berufsleben and Alltag as the first filter ... all across"). Applied
+  inside the rails, never by a caller.
+- **Branche LOCKS instead of greying.** Its count is now the DEDICATED one, so a padlock means nothing
+  is written for that industry on this Thema; when every option is locked, one line replaces the
+  control. The engine keeps its untagged-=-universal fallback, so deep links still work.
+- **The rails are one piece.** The header and footer were painting the accent wash on top of the
+  tile's own, compositing darker, with a tinted rule under each seam. Both fills and both rules gone.
+
+## Session 200 log
+
+_(moved out of `docs/PROJECT_STATUS.md` in session 203)_
+
+Founder: "what's next?" → "go ahead" → "is Text zur Aufgabe really necessary? in my B2 für Beruf exam
+they just gave the topic overview and asked to write a forumsbeitrag ... can you research what is
+more realistic".
+- **P2, the fix that mattered.** An argumentative Textsorte at B2+ must now carry a Leitpunkt
+  demanding a **reason, a consequence or a stance**, because `level` is what makes `evaluate-writing`
+  mark strictly. **30 tasks fixed** (each REPLACING its weakest descriptive point), **110 gated**,
+  one shared classifier for gate and test (`scripts/justification-markers.mjs`).
+- **P3:** `exam` gone from 717 tasks, the interface and the types, with a guard against its return.
+- **P5:** five Textsorte re-tags and the 14 du/Sie hybrids, both now gated.
+- **P4 stopped, then closed.** The founder's own exam contradicted the audit, the published
+  Modellsätze back the founder, and the report carries a correction. The supplied text belongs to the
+  reply genre, so the honest target is the 47 "Antworten Sie" tasks, not the 71 opinion tasks.
+  Nothing was changed, and the founder agreed: the reply wave is the next session's work.
+
+## Handoff after session 201 (2026-08-07)
+
+_(moved out of `docs/PROJECT_STATUS.md` in session 203)_
+
+**The four Ohne-Zeit module pages are one product, and the two that did nothing work.**
+Branch `claude/ui-polish-consistency-56ja1y`, PR #827.
+Founder prompts: four phone screenshots + "make these pages consistent and highly polished ... leave
+no stone unturned ... some of the observed bugs: the header bar shouldn't have the aufgabe button /
+shuffle button ... deactivates when tapped on empty spaces" → "either keep verlauf in every module or
+remove it from all of the individual modules" → "go with verlauf on all four".
+
+- **The reported shuffle bug was a dead page.** `/lesen` and `/hoeren` wrote a run into
+  `useExamStore` and nothing rendered it (only the hub did), so every card and the draw did nothing;
+  the "stuck" button was a touch-`:hover` that never cleared. `TextModuleHub` renders
+  `<MockExamRunner />` now, `AppShell` has `STAGE_ROUTES`, and the chooser's `zoneExit` steps aside
+  while the runner owns the exit, clearing only an exit that is still its own.
+- **`ZONE_ROUTES` never had those two routes**, so they were the only screens in the zone without
+  the header exit. Fixed with the same one-line law.
+- **One chooser for three modules:** `ModulePicker` (frame + toolbar row), `ChooserCard` (one card
+  anatomy), `ModuleTabs` (one switcher), `verlauf.tsx` (the Verlauf card, extracted from the hub so
+  a chooser never imports it and drags the writing-prompt bank into `/lesen`).
+- **`future.hoverOnlyWhenSupported`** is app-wide: a `hover:` fill can no longer read as an ON state
+  on a phone. Any new toggle states its ON state in its own class, never as a hover fill.
+- Verified in a real browser at 360x640 and 1280x860, light and dark. Gates: typecheck · lint 0
+  errors · 652 tests · build · bundle 128.2 kB · contrast · lint:content.
+- **The header carries ONE control where there is a way out** (founder, same session): `quietHeader`
+  drops the streak pill and the account menu wherever the zone exit shows, which the exam already
+  did. The hub keeps both, because it is a nav destination and registers no exit.
