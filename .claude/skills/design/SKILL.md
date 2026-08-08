@@ -105,6 +105,12 @@ Ranked by how often the founder had to correct AI output:
    FACE, so Redemittel sat 77 px above Kollokationen because of an unclamped translation, note and
    English example on a back nobody was looking at. Clamp the worst case, give the clamped element a
    `title`, and keep the full text in Liste/Tabelle.
+12. **A hover style answers a pointer, never a tap** (founder s201, the same law as #9 one input mode
+   further). `future.hoverOnlyWhenSupported` in `tailwind.config.ts` compiles every `hover:` into
+   `@media (hover: hover)`, because a touch browser keeps `:hover` on the last element tapped until
+   the next tap somewhere else. The founder reported this as a button that "deactivates when tapped
+   on empty spaces". **A control's ON state is therefore always its own class, never a hover fill**
+   (which is also why #10 exists), and nothing may rely on `hover:` to show state on a phone.
 
 ## 3. Color language (locked)
 

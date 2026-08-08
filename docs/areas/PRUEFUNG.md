@@ -45,7 +45,9 @@ Their top row is
 icon-left (its size sets the row's height either way, so switching Mit Zeit/Ohne Zeit never moves
 a card edge on its own) with the **minutes badge beside it** when timed, and the **arrow lives in
 the card's bottom-right corner** (founder: swap their positions from the s191/s192 shape, where
-the arrow sat top-right and the badge bottom-right).
+the arrow sat top-right and the badge bottom-right). **There is NO description line on a module
+card** (founder s191): the title carries the module, and a sentence under it is what the minutes
+badge used to sit on top of. The whole anatomy is locked; change it only on a founder request.
 
 **Mit Zeit / Ohne Zeit is one switch beside the Niveau**, resting on Ohne Zeit, and it is the only
 way into the four choosers: `/lesen`, `/hoeren`, `/writing` and `/simulation` are what the SAME
