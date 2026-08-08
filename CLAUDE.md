@@ -144,9 +144,8 @@ after pulling.
   mid-flow. **Layout is a property of the TASK**: practice runs the transcript (`gespraech`), an
   exam task keeps its Aufgabe on screen (`buehne`) unless reading would defeat it (`anruf`). **The
   conversation row is written when a conversation STARTS**, so the daily limit counts what costs
-  money and the turn ceiling is measured against the STORED transcript AND on the client (s194).
-  **The practice counts once the learner has SPOKEN, not once the AI has graded** (s196): the
-  transcript is stored server-side, so a failed debrief is retryable. Detail: `docs/areas/SPRECHEN.md`.
+  money (s194), and **the practice counts once the learner has SPOKEN, not once the AI has graded**
+  (s196), so a failed debrief is retryable. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
   `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
@@ -157,10 +156,9 @@ after pulling.
   (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`). **That row NAMES the module and
   carries no control** (founder s200): the Aufgabe toggle moved to the chooser's own toolbar row,
   level with the count it changes and directly above the panel it opens. ONE Niveau control per
-  screen. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: one width for switcher, scope row,
-  module grid AND Verlauf, so every block shares two edges), a chooser wears Schreiben's
-  content-plus-16rem-rail grid (s196), and only a RUNNING Teil gets the wide `lg:max-w-6xl` stage.
-  The Verlauf card ships in an empty state from the first visit.
+  screen. The HUB rests at `HUB_COL` (`max-w-[40rem]`, s197: one width for every block, so they
+  share two edges), a chooser wears Schreiben's content-plus-16rem-rail grid (s196), and only a
+  RUNNING Teil gets the wide `lg:max-w-6xl` stage. A Verlauf ships in an empty state from visit one.
 - **An exercise the app scores can always be handed in, and every score it produces is reachable**
   (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
   question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
@@ -169,10 +167,9 @@ after pulling.
   (`isFullMockRun`, bank-free; `examsDone` is retired): the two lists never mix, wherever they are
   shown. **Every module page has a Verlauf tab** (founder s200: "either keep verlauf in every module
   or remove it from all of the individual modules"), so a learner finds their history where they
-  practise: Schreiben's and Sprechen's are corrections (s171/s196), Lesen's and Hören's are that
-  module's own sittings (`moduleRuns`, `features/pruefung/verlauf.tsx`, which is also the hub's
-  card). The hub keeps the CROSS-module view, never a second copy of a module's list: Modelltest the
-  full runs, Module üben the four-column Stärkeprofil.
+  practise: Schreiben's and Sprechen's are corrections (s171/s196), Lesen's and Hören's their own
+  sittings (`moduleRuns` + `features/pruefung/verlauf.tsx`, which is also the hub's card). The hub
+  keeps the CROSS-module view only: Modelltest the full runs, Module üben the Stärkeprofil.
 - **A failed cloud write is never silent** (DB audit R3, s185). supabase-js returns `{ error }`
   instead of throwing, so an ignored result makes a permanently broken sync look identical to a
   working one. Every push reads its error, retries with backoff, and after 3 consecutive failures
@@ -245,27 +242,22 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   Verlauf block, never also on the run band or the module cards.
 - **The Prüfung zone is ONE page with a switcher as its header** (founder s189, `/anwenden`):
   **Module üben** | **Modelltest**. The switcher IS the header at every width (no HubHero, no `h1`,
-  no page title) and the AppShell greeting slot stays EMPTY here (pick C, s197; a header copy would
-  import `features/pruefung/hubSwitcher.tsx`, never `PruefungHub.tsx`, which drags the banks eager).
-  Niveau is a compact button; scope controls sit BELOW the switcher, both rows centred.
+  no page title) and the AppShell greeting slot stays EMPTY here (pick C, s197). Niveau is a compact
+  button; scope controls sit BELOW the switcher, both rows centred.
   **Mit Zeit / Ohne Zeit** rests on Ohne Zeit and is the ONLY way into the four choosers (`/lesen`,
   `/hoeren`, `/writing`, `/simulation`), which are the same four modules without a clock, never a
-  fifth block. All four wear ONE "Aufgabe wählen" rail (`features/shared/ScopeRail.tsx`, s196),
-  sticky on desktop, behind the TOOLBAR row's Aufgabe toggle on a phone; Lesen/Hören keep their old
-  random draw as a "Zufällige Auswahl" button. **The three list choosers are ONE component**
-  (`ModulePicker` + `ChooserCard` + `ModuleTabs`, s200): Üben/Verlauf switcher, one toolbar row
-  (count · Aufgabe · Zufällige Auswahl), one card anatomy (mark + title + context line + chevron,
-  facts on a bottom-aligned foot row), one 0.16s stagger. **The exam FRAME is Mit Zeit's alone**
-  (s192): Ohne Zeit skips the Anleitung and opens the drill; only the STAGE is shared, and the exit
-  follows the one-frame law, not the clock. The run band's connector is one segment per gap, between
-  the tiles.
+  fifth block. All four wear ONE "Aufgabe wählen" rail (`features/shared/ScopeRail.tsx`, s196);
+  Lesen/Hören keep their old random draw as a "Zufällige Auswahl" button. **The three list choosers
+  are ONE component** (`ModulePicker` + `ChooserCard` + `ModuleTabs`, s200): Üben/Verlauf switcher,
+  one toolbar row (count · Aufgabe · Zufällige Auswahl), one card anatomy (mark + title + context
+  line + chevron, facts on a bottom-aligned foot row), one 0.16s stagger. **The exam FRAME is Mit
+  Zeit's alone** (s192): Ohne Zeit skips the Anleitung and opens the drill; only the STAGE is
+  shared, and the exit follows the one-frame law, not the clock.
 - **BOTH Prüfung tabs share one frame and end in a Verlauf** (founder s190): a height-stable scope
   row, and the module card's minutes badge in a corner RESERVED in both clock states, so the clock
-  switch cannot move a card
-  edge. Modelltest's Verlauf leads with the last score plus its delta (Bester and Bestanden as
-  supporting stats, the last seven runs as bars against the pass line); Module üben's is a
-  Stärkeprofil (pale = first attempt, solid = the gain since). **A Modelltest is a run that sat all
-  four parts; a run that sat one is module practice**, and the two lists never mix.
+  switch cannot move a card edge. Modelltest's Verlauf leads with the last score plus its delta
+  (Bester and Bestanden as supporting stats, the last seven runs as bars against the pass line);
+  Module üben's is a Stärkeprofil (pale = first attempt, solid = the gain since).
 - **Every rail runs ONE order, Lebensbereich FIRST** (founder s184, reordered s199):
   `LifeAreaPills` lead, then Thema, Unterthema, Branche, then Niveau and Textsorte. Single-select
   that toggles off, `?area=` in the URL, honest counts; picking one narrows the Thema dropdown to

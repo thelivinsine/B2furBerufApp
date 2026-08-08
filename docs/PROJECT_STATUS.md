@@ -26,6 +26,11 @@ shuffle button doesn't deactivate" was a stuck touch-`:hover` on a button whose 
   `ModuleTabs` the one switcher, and all four pages read module row → switcher → content.
 - **A Verlauf on all four** (founder pick): the hub's Verlauf card was extracted to
   `features/pruefung/verlauf.tsx` and Lesen/Hören list their own sittings from it.
+- **Re-verified after the `origin/main` merge**, not just before it: every gate green (652 tests,
+  bundle 128.2 kB, contrast, content lint) and all four pages walked again at 360x640 and 1280x860,
+  light and dark, including the full drill loop and both Verlauf states. `CLAUDE.md` came down 391 →
+  383 lines (the merge had left one rule stated twice); it is still over the ~350 budget it was
+  already over at `66061c3` (378), so that older debt wants a pass of its own.
 
 ## Session 199 log
 

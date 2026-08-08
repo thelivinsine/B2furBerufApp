@@ -5562,3 +5562,19 @@ two branches stay legible. Their prompt 3 says the s197 layout work was already 
   **Artifacts:** `src/features/pruefung/verlauf.tsx` (new) · `PruefungHub.tsx` (now imports it) ·
   `TextModuleHub.tsx` · `SprechenHub.tsx` · `ModulePicker.tsx` · `tests/pruefungHub.test.ts` ·
   `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `continue`
+  **Response:** re-verified the whole tree after the `origin/main` merge rather than trusting the
+  pre-merge gates: typecheck, lint (0 errors), 652 tests, build, bundle 128.2 kB of a 400 kB budget,
+  contrast, `lint:content`. Then walked all four pages again in headless Chromium at 360x640 and
+  1280x860, light and dark: the drill loop end to end on `/lesen` (pick → answer → Teil abschließen →
+  Ergebnis → Fertig → back on the list, run cleared, bottom bar restored), the Aufgabe panel opening
+  under its own toggle, the empty scope hiding the draw and naming the one filter to drop, and the
+  new module Verlauf both empty ("Noch kein Ergebnis") and with runs (last score + delta chip, Bester,
+  Bestanden, bars against the pass line, rows, "Alle 4 anzeigen"). Every screen rests at 0 page
+  scroll. Also trimmed `CLAUDE.md` from 391 to 383 lines: the merge had left this session's law and
+  s199's stating the Modelltest-vs-practice rule twice, and the zone bullets carried detail that
+  already lives in `docs/areas/PRUEFUNG.md`. The file is still over the ~350 budget it was over
+  before this session (378 at `66061c3`), so the linter still warns; that debt is older than this
+  work and wants a pass of its own.
+  **Artifacts:** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log.
