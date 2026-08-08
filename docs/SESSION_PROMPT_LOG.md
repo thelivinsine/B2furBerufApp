@@ -5705,6 +5705,14 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   `src/features/shared/ScopeRail.tsx` · `tests/anrede.test.ts` (new) · `CLAUDE.md` ·
   `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log.
 
+- **Prompt 3 (verbatim):** `if we're done here, document the session and merge everything`
+  **Response:** the work itself was already shipped, with its documentation in the same PR: PR **#830**
+  → squash-merged **`9c4ca3b`**, Validate content and Deploy site to GitHub Pages both green on
+  `main` (Deploy Supabase functions correctly did not run: it is path-filtered and nothing under
+  `supabase/` changed), branch reset to `main` and force-with-leased, tree clean. This entry and the
+  shipped-line on the s202 handoff close the paper trail. Nothing is left unmerged.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
 ## Session 203 — 2026-08-08 — branch `claude/documentation-maintenance-0w4ywg`
 
 - **Prompt 1 (verbatim):** `do the documentation maintenance`
