@@ -68,10 +68,19 @@ jobs:
       # before recovering). Retry automatically instead: attempts 1 and 2 fail
       # soft with growing pauses; attempt 3 fails hard so a genuine outage
       # still surfaces instead of silently shipping nothing.
+      #
+      # s196 found the real cause of the recurring red deploys: a deployment
+      # here takes LONGER than the action's default 600 s timeout, so the action
+      # cancels itself and the leftover sometimes refuses the next merge. Hence
+      # `timeout: 1800000` (30 min) on every attempt: one attempt should outlast
+      # a slow deploy. The retry chain stays, because it is what rescued run
+      # #820 (docs/DECISIONS.md §s196).
       - name: Deploy to GitHub Pages (attempt 1)
         id: deployment
         continue-on-error: true
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+        with:
+          timeout: 1800000
 
       - name: Pause before retry
         if: steps.deployment.outcome == 'failure'
@@ -82,6 +91,8 @@ jobs:
         if: steps.deployment.outcome == 'failure'
         continue-on-error: true
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+        with:
+          timeout: 1800000
 
       - name: Pause before final retry
         if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
@@ -91,3 +102,5 @@ jobs:
         id: deployment_final
         if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+        with:
+          timeout: 1800000
