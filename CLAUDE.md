@@ -155,7 +155,12 @@ after pulling.
   written when a conversation STARTS** (s194), so the daily limit counts what costs money and the
   turn ceiling is measured against the STORED transcript AND on the client; **the practice counts
   once the learner has SPOKEN, not once the AI has graded** (s196), so a failed debrief is
-  retryable. Detail: `docs/areas/SPRECHEN.md`.
+  retryable. **A practice conversation carries its Redemittel while the learner speaks** (founder
+  s202): a rail beside it from `lg` up, the same content as the brief drawer's second tab below,
+  ONE media query so it never prints twice. **Practice only, structurally** (the runner takes it as
+  a prop; the Modelltest passes nothing, so a candidate never reads the phrases they are graded on),
+  nothing sends a phrase into the transcript, and the Anrede matches the partner via the ONE du/Sie
+  rule (`lib/anrede.ts`), which never empties a category. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
   `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever that exit shows

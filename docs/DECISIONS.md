@@ -2100,3 +2100,42 @@ the same session, it has a real use ahead of it) and is still read by nothing to
 the format rather than against the published task descriptions. Where a claim turns on "this is what
 the exam does", fetch the Modellsatz. A wrong premise survived three sessions and was caught only
 because the founder had sat the exam.
+
+## s202 — the Redemittel a learner speaks with, and the two shells they live in
+
+**Decision:** a practice conversation carries the phrases for its own Redemittel categories on
+screen while the learner is speaking: **Option A's rail beside the conversation from `lg` up,
+Option C's brief-drawer tab below it, with the rail's content in both** (founder's pick from
+`preview/sprechen-redemittel-rail.html`).
+
+**Why it was missing.** A spoken task has always named four Redemittel CATEGORIES on the brief card
+and ticked them in the debrief, while the eight phrases behind each name lived only in the
+Bibliothek, in another zone. So the learner held the label ("Vorschläge machen") and never the
+language, at the one moment they needed a sentence to start with, and the debrief then graded
+whether they had reached for exactly those.
+
+**Three rules the shape follows from:**
+- **Practice only, and structurally so.** The runner takes the help as a PROP; the Modelltest passes
+  nothing. Handing a candidate the phrases would grade their reading, and the exam chunk does not
+  carry the phrase bank (verified in the build output).
+- **Reading a phrase is never a tick.** Whether a Redemittel was used stays the model's judgement of
+  what was said. There is deliberately no way to send a phrase into the conversation either: that
+  would put words in the transcript the learner never spoke.
+- **One measurement, never both shells at once.** `useMediaQuery("(min-width: 1024px)")` decides, so
+  the phrases cannot print twice, and the desktop brief row keeps its single-button form (a
+  Redemittel TAB there would duplicate the rail beside it).
+
+**The three content questions the founder did not answer, and the defaults taken (say the word and
+any of them flips):**
+1. **All eight phrases of the chosen intent**, not a curated three. Curation would need an authored
+   order the bank does not have, and "which three are best" is a content decision, not a layout one.
+2. **The Anrede matches the partner**, which is the one thing here that genuinely filters. The bank
+   tags `register` as neutral/formal, which is FORMALITY, not Anrede, so `lib/anrede.ts` derives
+   du/Sie from the phrase text: one rule, one place, gated by `tests/anrede.test.ts` (the `blank.ts`
+   lesson about text rules that get copied). It never empties a category: a category with no fitting
+   phrase serves the full set, because a filter that deletes the feature is not a filter.
+3. **English is hold-to-peek** (`EnPeek`), one chip for the whole list rather than one per row.
+
+**No reset on this rail.** `ScopeRail.onReset` became optional for it. The rail browses phrases, it
+does not narrow a list, so a reset would sit at its default doing nothing, which is the
+dead-control rule.

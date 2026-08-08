@@ -5676,3 +5676,31 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   Awaiting the founder's pick before implementing.
   **Artifacts:** `preview/gen-sprechen-redemittel-rail.mjs` · `preview/sprechen-redemittel-rail.html`
   · `preview/sprechen-redemittel-rail-artifact.html` (published) · this log.
+
+- **Prompt 2 (verbatim):** `option a's layout for desktop and option c for mobile and also desktop's
+  content`
+  **Response:** built exactly that. `RedemittelHelp` is ONE content (intent dropdown with honest
+  counts, the phrases as white cards, the other three intents as one-tap pills, one `EnPeek` chip for
+  the whole list) rendered in two shells: the `ScopeRail` tile beside the conversation from `lg` up
+  (the stage widens `max-w-2xl` → `lg:max-w-4xl`, so the conversation column keeps its width and the
+  rail takes the space that was empty), and the second tab of the brief drawer below it, **Aufgabe |
+  Redemittel**. One `useMediaQuery` decides, so the phrases can never be on screen twice, and the
+  desktop brief row keeps its single-button form. **Practice only, structurally:** the runner takes
+  the help as a PROP and `SprechenPart` passes nothing, so the Modelltest neither shows a candidate
+  the phrases it grades them on nor carries the phrase bank in its chunk (checked in the build
+  output: `MockExamRunner` has no `redemittel-*.js` import, `SprechenHub` does). The founder answered
+  layout only, so the three content switches took stated defaults: all eight phrases of the chosen
+  intent (curating three needs an authored order the bank has not got), the Anrede matched to the
+  partner, English hold-to-peek. The Anrede is the one thing here that really filters, and
+  `RedemittelPhrase.register` cannot answer it (it is formality, not Anrede), so `src/lib/anrede.ts`
+  derives du/Sie from the phrase TEXT: one rule, one place, `tests/anrede.test.ts` gating both the
+  rule and the promise that every scenario's four intents stay servable in both registers. It never
+  empties a category. `ScopeRail.onReset` became optional for this rail, which browses rather than
+  narrows, so a reset would be a dead control. Verified in a real browser (headless Chromium over
+  CDP) at 1440x900, 1280x800 and 393x852, light and dark: rail beside the conversation on desktop,
+  two-tab drawer on the phone with the intent pills still on screen, every screen at 0 page scroll.
+  Gates: typecheck, lint (0 errors), 662 tests, build, bundle 128.3 kB of 400 kB.
+  **Artifacts:** `src/lib/anrede.ts` (new) · `src/features/sprechen/RedemittelHelp.tsx` (new) ·
+  `src/features/sprechen/ConversationRunner.tsx` · `src/features/sprechen/SprechenHub.tsx` ·
+  `src/features/shared/ScopeRail.tsx` · `tests/anrede.test.ts` (new) · `CLAUDE.md` ·
+  `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log.

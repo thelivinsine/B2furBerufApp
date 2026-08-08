@@ -1,9 +1,36 @@
 # Project Status
 
-_Last updated: 2026-08-07 (session 201 made the four Ohne-Zeit module pages one product and
-fixed the two dead ones: Lesen and Hören started runs nothing rendered. Session 200 shipped the
-writing-audit fixes P2/P3/P5 in parallel, and P4 is closed as WRONG. Both handoffs under
-"Resume here")._
+_Last updated: 2026-08-08 (session 202 put the Redemittel a learner needs on screen WHILE they
+speak. Session 201 made the four Ohne-Zeit module pages one product and fixed the two dead ones.
+Both handoffs under "Resume here")._
+
+## Session 202 log
+
+Founder: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
+redemittle even in the practice sessions", then the pick: "option a's layout for desktop and option
+c for mobile and also desktop's content".
+
+**The gap:** a spoken task named its four Redemittel CATEGORIES on the brief card and ticked them in
+the debrief, while the eight phrases behind each name lived only in the Bibliothek. The learner had
+the label ("Vorschläge machen") and never the language, at the one moment they were speaking, and
+the debrief then graded whether they had reached for exactly those.
+- **Previews first** (`preview/sprechen-redemittel-rail.html`, published as an artifact): today's
+  screens plus three placements, each with desktop and phone frames and its cost.
+- **Shipped the founder's pick:** ONE content (`RedemittelHelp`) in two shells. A 16rem `ScopeRail`
+  tile beside the conversation from `lg` up (the stage widens `max-w-2xl` → `lg:max-w-4xl`, so the
+  conversation column keeps its width), and the second tab of the brief drawer below it, **Aufgabe |
+  Redemittel**. One `useMediaQuery` decides, so the phrases never print twice.
+- **Practice only, structurally:** the runner takes the help as a PROP and the Modelltest passes
+  nothing, so a candidate is never shown the phrases they are graded on and the exam chunk carries
+  no phrase bank (`MockExamRunner` has no `redemittel-*.js` import in the build; `SprechenHub` does).
+- **`src/lib/anrede.ts`, the ONE du/Sie rule.** The bank's `register` is formality, not Anrede, so
+  the Anrede is derived from the phrase text, in one place, gated by `tests/anrede.test.ts` (which
+  also asserts every scenario's four intents stay servable in both registers). It never empties a
+  category.
+- **Defaults taken where the founder answered layout only** (each one line to flip): all eight
+  phrases of the chosen intent, Anrede matched to the partner, English hold-to-peek.
+- Verified in a real browser at 1440x900, 1280x800 and 393x852, light and dark; every screen rests
+  at 0 page scroll. Gates: typecheck · lint 0 errors · **662 tests** · build · bundle 128.3 kB.
 
 ## Session 201 log
 
@@ -138,6 +165,23 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 202 (2026-08-08): a practice conversation now carries its Redemittel while
+the learner speaks.** Branch `claude/sprechen-filter-rail-practice-70gydw`.
+Founder prompts: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
+redemittle even in the practice sessions" → "option a's layout for desktop and option c for mobile
+and also desktop's content".
+
+- **What to check first:** the founder answered layout only, so three content defaults are stated
+  and one-line reversible (`docs/DECISIONS.md` §s202): all eight phrases per intent, Anrede matched
+  to the partner, English hold-to-peek. Ask if they want any flipped.
+- `RedemittelHelp` is one content in two shells; `ConversationRunner` takes it as `help`, which is
+  what keeps it out of the Modelltest and out of the exam chunk. Never import it in the runner.
+- `ScopeRail.onReset` is now optional, for the one rail that browses rather than narrows. Every
+  other caller is unchanged.
+- **Not done, deliberately:** no speak button on a phrase (it would fight the partner's voice) and
+  no way to send a phrase into the conversation (reading is not saying, and the transcript is what
+  the debrief grades).
+
 **Handoff after session 201 (2026-08-07): the four Ohne-Zeit module pages are one product, and
 the two that did nothing work.** Branch `claude/ui-polish-consistency-56ja1y`, PR #827.
 Founder prompts: four phone screenshots + "make these pages consistent and highly polished ... leave
@@ -166,67 +210,5 @@ remove it from all of the individual modules" → "go with verlauf on all four".
 - **Open, small:** `CLAUDE.md` is over its ~350-line budget (it was before this session too); the
   Sprechen/Schreiben Verlauf spinner has no timeout, so an unreachable Supabase hangs it forever.
 
-**Handoff after session 200 (2026-08-07): P2, P3 and P5 shipped; P4 was stopped by the founder and
-the audit finding behind it is now marked WRONG.**
-Founder prompts: "what's next?" → "go ahead" → "is Text zur Aufgabe really necessary? in my B2 für
-Beruf exam they just gave the topic overview and asked to write a forumsbeitrag ... can you research
-what is more realistic".
-
-- **P2, the one that mattered** (`663f993`). `level` tells `evaluate-writing` to mark strictly, and
-  Aufgabenerfüllung is graded against the Leitpunkte, so an argumentative Textsorte whose points only
-  describe marks a learner down for obeying the brief. **30 tasks fixed**, each REPLACING its weakest
-  descriptive point (never a fifth), and gated: `scripts/justification-markers.mjs` is the ONE
-  classifier, shared by `lint:content` and `tests/writingScope.test.ts`. **110 tasks gated, all
-  passing.** A point counts when it forces a **reason, a consequence or a stance** (one demand, not
-  two: a first cut demanded a stance specifically and failed `wt_safety_l04`, whose points are
-  "Begründen Sie …/Legen Sie dar …/Entkräften Sie den Einwand …").
-- **P3** (`a7dd57a`). `exam` retired from 717 tasks, the interface and `src/types/index.ts`;
-  `lint:content` errors if it returns. `words` now documents the real rule, (Niveau, Länge).
-- **P5** (`f9a1e78`). Five Textsorte re-tags (the tag follows the requested OUTPUT) and the 14
-  du/Sie hybrids, fixed on the Adressat side with first names; gated in `lint:content`.
-- Gates: lint:content 0 errors · typecheck · **651 tests** · (build/bundle/contrast not re-run after
-  the docs-only commits).
-
-**P4 is NOT a defect as the audit wrote it, and the report now says so.** The founder challenged it
-from their own exam, and the published material agrees: **Goethe B2 Schreiben Teil 1** is a
-Forumsbeitrag from a topic plus four Inhaltspunkte with nothing supplied, and **DTB B2** supplies a
-text in Teil 1 (a forwarded customer complaint to answer) but not in Teil 2, which is a choice of two
-topics, one a Forumsbeitrag. **The supplied text belongs to a GENRE, answering incoming workplace
-mail, not to an exam.** The audit had selected the 54 Stellungnahmen and 17 Forumsbeiträge, exactly
-the opinion tasks that never get one.
-**Shipped:** PR **#828** (four commits: `663f993` P2, `a7dd57a` P3, `f9a1e78` P5, `74828a9` +
-`c96c650` the P4 correction and docs) → squash-merged **`df101d7`**. Validate content and Deploy site
-to GitHub Pages both green on `main`. **Deploy Supabase functions did not run, and that is correct**:
-it is path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its own file, none of
-which this session touched. Post-merge housekeeping done, tree clean.
-
-**START HERE next session: the reply wave** (founder: "i agree with your assessment on p4 and a gap
-with Beschwerde. I'd go with your recommendation"). The **47 reply-shaped tasks** ("Ein Kunde
-beschwert sich … Antworten Sie ihm") show nothing of what came in, which IS the DTB B2 Schreiben
-Teil 1 shape, and it is the one place `source` earns its keep. What that session needs, in order:
-1. **47 authored incoming texts** (customer mail, guest complaint, relative's message), each stating
-   the facts the Leitpunkte answer: dates, order numbers, what was promised, what arrived. `/content`
-   first; ids and instructions do not change, this is a new field only.
-2. **A rendering slot, which does not exist yet.** The Aufgabe card (`GuidedWritingTrainer`), the
-   exam's `SchreibenPart`, and the payload `evaluate-writing` grades against all ignore `source`
-   today. The A/B/C placement mockup is already built and still applies:
-   `preview/schreiben-source-text.html` (A text first / B task first / C folded behind one line);
-   the founder has not picked yet, so start by asking.
-3. **Watch the two height laws** while adding a block to that card: a freshly opened trainer never
-   rests scrolled, and the Schreiben mobile anatomy is locked (`docs/areas/SCHREIBEN.md`). The card
-   already caps and scrolls its task region internally, so the text is more content in that region,
-   not new chrome.
-4. **Gate it** the way s199 and s200 gated their rules: a reply-shaped brief without a `source` is
-   the defect to catch, and the lexicon lives in `scripts/` shared by `lint:content` and the test.
-2. **`source` has NO rendering slot** (read by nothing: not the Aufgabe card, not `SchreibenPart`,
-   not `evaluate-writing`), so P4 was never the data-only edit the audit assumed. Either build it for
-   the reply wave or retire the field like `exam`. Awaiting the founder's pick; nothing was changed.
-3. The A/B/C placement mockup is built and still applies to the reply wave:
-   `preview/schreiben-source-text.html`.
-
-**Method note for the next audit:** §9 compared the bank against exam shapes from memory of the
-format rather than against the published task descriptions, and that is what produced a wrong
-finding. Where a claim turns on "this is what the exam does", fetch the Modellsatz.
-
-Older handoffs (s199 and earlier) are archived in
+Older handoffs (s200 and earlier) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
