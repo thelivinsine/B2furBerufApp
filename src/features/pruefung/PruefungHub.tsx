@@ -648,7 +648,9 @@ function PartLadder() {
  */
 function AiBudgetNote({ level }: { level: HubLevel }) {
   const writing = useDailyAllowance(level === "B1" ? "kurz" : "lang");
-  const speaking = useDailyAllowance("sprechen");
+  // A Modelltest's Teil Sprechen is an EXAM conversation, so it spends the exam
+  // budget (3/day since s197), never the practice one.
+  const speaking = useDailyAllowance("sprechenExam");
   if (!writing.known || !speaking.known) return null;
 
   const short = [

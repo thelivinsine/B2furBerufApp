@@ -21,6 +21,10 @@
 // ---------------------------------------------------------------------------
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  anthropicUsage, geminiUsage, openaiUsage, loadRates, priceCall, providerOf,
+  recordAiCall, type TokenUsage,
+} from "../_shared/aiUsage.ts";
 
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://genauly.de",
@@ -155,10 +159,11 @@ const SYSTEM_PROMPT =
 
 interface TransformOut {
   applicable: boolean; reason: string; transformed: string; note: string; noteEn: string;
-  achieved: Tuple; model: string; cost: number;
+  // What the provider REPORTED (s197); the cost is derived at the call site.
+  achieved: Tuple; model: string; usage: TokenUsage;
 }
 
-function parse(raw: string, target: Tuple): Omit<TransformOut, "model" | "cost"> | null {
+function parse(raw: string, target: Tuple): Omit<TransformOut, "model" | "usage"> | null {
   try {
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) return null;
@@ -233,11 +238,7 @@ async function callAnthropic(source: string, target: Tuple, variant = 0): Promis
       const raw = data.content?.[0]?.text ?? "";
       const parsed = parse(raw, target);
       if (!parsed) { console.error(`[transform] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-      const inTok = data.usage?.input_tokens ?? 0;
-      const outTok = data.usage?.output_tokens ?? 0;
-      const isSonnet = TRANSFORM_MODEL.includes("sonnet");
-      const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
-      return { ...parsed, model: TRANSFORM_MODEL, cost };
+      return { ...parsed, model: TRANSFORM_MODEL, usage: anthropicUsage(data) };
     } catch (e) {
       console.error(`[transform] anthropic threw: ${e}`);
       return null;
@@ -280,7 +281,8 @@ async function callGemini(source: string, target: Tuple, variant = 0): Promise<T
     const parsed = parse(raw, target);
     if (!parsed) { console.error(`[transform] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
     // Free tier: record $0 so free calls never consume the paid spend fuse.
-    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
+    // Free tier prices at $0; the tokens are recorded either way (s197).
+    return { ...parsed, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch (e) {
     console.error(`[transform] gemini threw: ${e}`);
     return null;
@@ -316,7 +318,8 @@ async function callOpenAI(source: string, target: Tuple, variant = 0): Promise<T
     const data = await res.json();
     const parsed = parse(data.choices?.[0]?.message?.content ?? "", target);
     if (!parsed) return null;
-    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
+    // Was a hardcoded flat $0.004 per call until s197.
+    return { ...parsed, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch (e) {
     console.error(`[transform] openai threw: ${e}`);
     return null;
@@ -469,15 +472,21 @@ Deno.serve(async (req) => {
     }
   }
 
+  const cost = priceCall(out.model, out.usage, await loadRates(admin));
+  await recordAiCall(admin, {
+    userId: user.id, feature: "transform", provider: providerOf(out.model),
+    model: out.model, usage: out.usage, costEstimate: cost,
+  });
+
   // Cache globally (free for the next learner) + record the paid op + bump usage.
   await admin.from("sentence_transforms").insert({
     transform_hash: cacheKey, source_hash: await hash(normalize(source)), target_tuple: target,
     applicable, reason, result: transformed, note: out.note, note_en: out.noteEn, tier: "llm", model: out.model, hits: 0,
   }).then(() => {}, () => {});
-  await admin.from("sentence_ai_ops").insert({ user_id: user.id, kind: "transform", model: out.model, cost_estimate: out.cost });
-  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: out.cost }).then(() => {}, async () => {
+  await admin.from("sentence_ai_ops").insert({ user_id: user.id, kind: "transform", model: out.model, cost_estimate: cost });
+  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: cost }).then(() => {}, async () => {
     await admin.from("ai_usage").upsert(
-      { month, calls: 1, cost_estimate: out.cost, updated_at: new Date().toISOString() },
+      { month, calls: 1, cost_estimate: cost, updated_at: new Date().toISOString() },
       { onConflict: "month", ignoreDuplicates: false },
     );
   });

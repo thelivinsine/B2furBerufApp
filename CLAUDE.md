@@ -164,10 +164,17 @@ after pulling.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185). `dailyXp`/`activeDays`
   keep `RETAIN_DAYS` (400) days, folding dropped days into `activeDaysFolded` so the lifetime
   figure is unchanged; migration 0015 purges abandoned guest accounts (90 days), transform-cache
-  rows (60 days) and learner TEXT (730 days) by `pg_cron`. The text purge NULLs columns, never
-  deletes rows, so limits, aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy
-  copy describing it ship in the SAME change**; never resolve a conflict between them by editing
-  the copy alone.
+  rows (60 days) and learner TEXT (730 days) by `pg_cron`; 0018 purges `ai_calls` (400 days). The
+  text purge NULLs columns, never deletes rows, so limits, aggregates and the Verlauf entry survive.
+  **A retention timer and the privacy-policy copy describing it ship in the SAME change**; never
+  resolve a conflict between them by editing the copy alone.
+- **AI usage is MEASURED; only the cost is derived** (founder s197). Every provider call writes an
+  `ai_calls` row with the token counts the provider actually reported, and is priced from the ONE
+  rate table in `supabase/functions/_shared/aiUsage.ts` (runtime-overridable via
+  `app_config.ai_rates`). Never re-hardcode a price in a function, and never invent a per-call cost:
+  a flat guess is what made the old figure unable to tell an expensive call from a cheap one.
+  A cost of 0 for Gemini is an assumption about the free tier, not a measurement, and the UI says
+  so. `ai_usage` stays the monthly spend fuse.
 - **Never reload over a learner's unsaved work.** Every automatic reload is gated on
   `hasLiveWork()` (`src/lib/liveWork.ts`) and retries at a later resume. Any new surface holding
   in-memory work claims it with `useLiveWork(active, label, flush)` AND persists itself, so an

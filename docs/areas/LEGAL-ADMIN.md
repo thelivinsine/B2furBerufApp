@@ -57,7 +57,8 @@ burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA
   (`status`/`priority`/`note`/`link`), `app_config` (world-readable, founder-writable remote
   config) and `launch_checklist` (founder-only), plus the founder-gated SECURITY DEFINER RPCs
   `admin_overview()`, `admin_daily_series()`, `admin_feedback_recent(n)`,
-  `admin_feedback_update(...)`. **Privacy line: RPCs return aggregates only, never individual
+  `admin_feedback_update(...)`, and since s197 `admin_ai_usage_breakdown(days)` (per day, feature,
+  provider and model: call count, real token counts, derived cost). **Privacy line: RPCs return aggregates only, never individual
   learner rows** (exception: `feedback` rows, operational mail to the founder);
   `profiles`/`progress`/`writing_evaluations` keep owner-only RLS with NO admin SELECT policies.
   Client wrappers: `src/lib/adminApi.ts` (typed, fail-soft, lazy-only).

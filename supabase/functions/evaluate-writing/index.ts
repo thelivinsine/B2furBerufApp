@@ -24,6 +24,10 @@
 // ---------------------------------------------------------------------------
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  anthropicUsage, geminiUsage, openaiUsage, loadRates, priceCall, providerOf,
+  recordAiCall, type TokenUsage, EMPTY_USAGE,
+} from "../_shared/aiUsage.ts";
 
 // CORS is locked to an allowlist. Previously this was "*", which let ANY
 // website invoke the function with a user's forwarded token. Origins can be
@@ -412,7 +416,8 @@ interface LlmOut {
   corrected: string | null;
   score: number | null;
   model: string;
-  cost: number;
+  // What the provider REPORTED (s197); priced at the call site, one table.
+  usage: TokenUsage;
 }
 
 async function callAnthropic(text: string, lt: LtBuckets | null, sys: string, brief?: TaskBrief): Promise<LlmOut | null> {
@@ -446,12 +451,7 @@ async function callAnthropic(text: string, lt: LtBuckets | null, sys: string, br
     const raw = data.content?.[0]?.text ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    // Sonnet 5 standard rates ($3/$15 per 1M); Haiku fallback = $1/$5.
-    const inTok = data.usage?.input_tokens ?? 0;
-    const outTok = data.usage?.output_tokens ?? 0;
-    const isSonnet = EVAL_MODEL.includes("sonnet");
-    const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
-    return { ...parsed, model: EVAL_MODEL, cost };
+    return { ...parsed, model: EVAL_MODEL, usage: anthropicUsage(data) };
   } catch {
     return null;
   }
@@ -480,8 +480,8 @@ async function callGemini(text: string, lt: LtBuckets | null, sys: string, brief
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    // Free tier: record $0 so free calls never consume the paid spend fuse.
-    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
+    // Free tier prices at $0; the tokens are recorded either way (s197).
+    return { ...parsed, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch {
     return null;
   }
@@ -513,7 +513,8 @@ async function callOpenAI(text: string, lt: LtBuckets | null, sys: string, brief
     const raw = data.choices?.[0]?.message?.content ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
+    // Was a hardcoded flat $0.004 per call until s197.
+    return { ...parsed, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch {
     return null;
   }
@@ -688,6 +689,15 @@ Deno.serve(async (req) => {
     : withCorrected;
   const cachedRow = (cacheRes.data as Record<string, unknown> | null) ?? null;
   if (cachedRow) {
+    // Recorded as a call that cost nothing, so the cache-hit rate is visible
+    // rather than inferred from an absence of rows (s197).
+    await recordAiCall(admin, {
+      userId: user.id,
+      feature: length === "long" ? "writing_long" : "writing_short",
+      provider: providerOf(String(cachedRow.model ?? "")),
+      model: String(cachedRow.model ?? ""),
+      usage: EMPTY_USAGE, costEstimate: 0, cacheHit: true,
+    });
     return json({
       ok: true,
       cached: true,
@@ -754,7 +764,13 @@ Deno.serve(async (req) => {
     insight = out.insight;
     insightEn = out.insightEn;
     model = out.model;
-    cost = out.cost;
+    cost = priceCall(out.model, out.usage, await loadRates(admin));
+    await recordAiCall(admin, {
+      userId: user.id,
+      feature: length === "long" ? "writing_long" : "writing_short",
+      provider: providerOf(out.model), model: out.model, usage: out.usage,
+      costEstimate: cost,
+    });
     correctedText = sanitizeCorrected(text, out.corrected);
     if (exam) examScore = out.score;
   }

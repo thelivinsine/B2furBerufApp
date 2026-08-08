@@ -5191,3 +5191,59 @@ because the s196 note said 76) · **625 tests** (up from 624, new transform case
 
 - **Artifacts (prompts 2-4):** analysis only · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` §s197 ·
   `docs/areas/SCHREIBEN.md` · this log
+
+
+---
+
+## Session 197 — prompt 5 (2026-08-06): step 1, and the Sprechen limits
+
+**Branch:** `claude/ki-usage-task-kg0vix`
+
+**Prompt (verbatim):**
+
+> continue with step 1. also, I don't want to have the current limit for sprechen exercises. it's
+> very less. increase the limit to 6 for üben and 3 for Prüfung.
+
+**Response summary.** Both, shipped.
+
+**Step 1: AI usage is measured, not assumed.** Migration `0018_ai_calls.sql` adds the per-call
+ledger (feature, provider, model, input/output/cached tokens, cache hit, derived cost, rate
+version), select-own RLS so a learner-facing readout needs no new endpoint, a founder roll-up
+(`admin_ai_usage_breakdown`, aggregates only) and a 400-day `pg_cron` purge.
+`supabase/functions/_shared/aiUsage.ts` is the one place that reads each provider's differently
+named token block, prices it from ONE table (runtime-overridable via `app_config.ai_rates`, with the
+empty-config-equals-today contract preserved) and writes the row. All four Edge Functions were
+rewired to it: gone are the **flat $0.004-per-GPT-5-call guess** in three of them and the four
+hand-copied Claude formulas. Cache hits are recorded as zero-cost calls so the hit rate is visible.
+`ai_usage` is deliberately untouched: it stays the monthly spend fuse, and `ai_calls` is the detail
+behind it.
+
+**Sprechen: 6 Üben + 3 Prüfung per day**, replacing one shared budget of 2. Counted separately
+against `speaking_conversations.exam` on both sides (server `DAILY_LIMIT_CONVERSATIONS` /
+`DAILY_LIMIT_EXAM_CONVERSATIONS`, client `sprechen` / `sprechenExam`). **For an existing
+conversation the ROW's own `exam` decides which budget it spends, never the request body**, so a
+forged flag cannot move a running conversation onto the emptier meter. Two things had to move with
+it: the per-learner monthly ceiling (40 → 120, because 40 against 9 possible a day would have bound
+within four days), and the Modelltest's budget note, which now reads the exam meter rather than the
+practice one.
+
+**One judgement call worth the founder's attention.** `ai_calls` is a new per-user record, so both
+language versions of the privacy policy's retention section now describe it (no text, counts only,
+400 days, link dropped on account deletion) and `CONSENT_VERSION` / `PRIVACY_LAST_UPDATED_ISO` were
+bumped in lockstep to `2026-08-06`. That **asks every signed-in learner to re-consent** on their next
+visit. It follows the documented lockstep rule and errs toward disclosure; reverting is one line if
+the founder would rather not interrupt learners for telemetry that holds no text.
+
+**Gates:** typecheck · lint 0 errors (77 warnings, baseline) · **637 tests** (up from 626;
+`tests/aiUsage.test.ts` pins the pricing arithmetic, the three providers' token shapes and the
+never-free-unknown-model rule, and `tests/aiAllowance.test.ts` pins the two Sprechen budgets) ·
+build · check:bundle 129.8 kB · check:contrast · lint:content · lint:migrations. The Edge Functions
+are Deno and outside `tsc`, so they were syntax-checked with esbuild and read line by line instead.
+
+- **Artifacts:** `supabase/migrations/0018_ai_calls.sql` · `supabase/functions/_shared/aiUsage.ts` ·
+  all four `supabase/functions/*/index.ts` · `src/lib/aiAllowance.ts` · `src/lib/speaking.ts` ·
+  `src/features/sprechen/{ConversationBriefCard,ConversationRunner}.tsx` ·
+  `src/features/pruefung/PruefungHub.tsx` · `src/features/legal/PrivacyPolicy.tsx` ·
+  `src/lib/{consent,legalMeta}.ts` · `tests/aiUsage.test.ts` · `tests/aiAllowance.test.ts` ·
+  `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` · `docs/areas/{SPRECHEN,LEGAL-ADMIN}.md` ·
+  `docs/DECISIONS.md` §s197 · `docs/PROJECT_STATUS.md` · this log

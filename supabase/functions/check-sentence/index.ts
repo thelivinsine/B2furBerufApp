@@ -19,6 +19,10 @@
 // ---------------------------------------------------------------------------
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  anthropicUsage, geminiUsage, openaiUsage, loadRates, priceCall, providerOf,
+  recordAiCall, type TokenUsage, EMPTY_USAGE,
+} from "../_shared/aiUsage.ts";
 
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://genauly.de",
@@ -93,7 +97,9 @@ function monthKey(d = new Date()): string {
 }
 
 interface Detected { text: string; voice: string; tense: string; mood: string }
-interface CheckOut { corrected: string; hasErrors: boolean; sentences: Detected[]; model: string; cost: number }
+// `usage` is what the provider REPORTED (s197): the cost is derived from it at
+// the call site, from one rate table, instead of each leg inventing a number.
+interface CheckOut { corrected: string; hasErrors: boolean; sentences: Detected[]; model: string; usage: TokenUsage }
 
 const SYSTEM_PROMPT =
   `Du bist ein praeziser Korrektor und Grammatik-Analyst fuer Deutsch auf Niveau B1 bis B2. ` +
@@ -178,13 +184,7 @@ async function callAnthropic(text: string): Promise<CheckOut | null> {
       const raw = data.content?.[0]?.text ?? "";
       const parsed = parseCheck(raw);
       if (!parsed) { console.error(`[check] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-      const inTok = data.usage?.input_tokens ?? 0;
-      const outTok = data.usage?.output_tokens ?? 0;
-      // Sonnet 5 standard rates ($3/$15 per 1M); over-estimates during the intro
-      // window, which keeps the monthly spend fuse conservative. Haiku fallback = $1/$5.
-      const isSonnet = CHECK_MODEL.includes("sonnet");
-      const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
-      return { ...parsed, model: CHECK_MODEL, cost };
+      return { ...parsed, model: CHECK_MODEL, usage: anthropicUsage(data) };
     } catch (e) {
       console.error(`[check] anthropic threw: ${e}`);
       return null;
@@ -220,8 +220,9 @@ async function callGemini(text: string): Promise<CheckOut | null> {
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parseCheck(raw);
     if (!parsed) { console.error(`[check] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-    // Free tier: record $0 so free calls never consume the paid spend fuse.
-    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
+    // Free tier prices at $0, but the TOKENS are recorded either way: they are
+    // what tells us how close the free quota is to running out (s197).
+    return { ...parsed, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch (e) {
     console.error(`[check] gemini threw: ${e}`);
     return null;
@@ -257,7 +258,9 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
     const data = await res.json();
     const parsed = parseCheck(data.choices?.[0]?.message?.content ?? "");
     if (!parsed) return null;
-    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
+    // Was a hardcoded flat $0.004 per call until s197, which could not tell an
+    // expensive call from a cheap one. Real reported tokens now.
+    return { ...parsed, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch (e) {
     console.error(`[check] openai threw: ${e}`);
     return null;
@@ -350,6 +353,12 @@ Deno.serve(async (req) => {
       corrected: cachedRow.corrected, has_errors: cachedRow.has_errors,
       grammar: cachedRow.grammar, model: cachedRow.model, cached: true, cost_estimate: 0,
     });
+    // Recorded as a call that cost nothing, so the cache-hit rate is visible
+    // rather than inferred from an absence of rows (s197).
+    await recordAiCall(admin, {
+      userId: user.id, feature: "check", provider: providerOf(cachedRow.model ?? ""),
+      model: cachedRow.model ?? "", usage: EMPTY_USAGE, costEstimate: 0, cacheHit: true,
+    });
     const g = cachedRow.grammar ?? {};
     return json({
       ok: true, cached: true, corrected: cachedRow.corrected, hasErrors: cachedRow.has_errors,
@@ -382,18 +391,24 @@ Deno.serve(async (req) => {
     return json({ ok: false, message: "Die Prüfung ist momentan nicht verfügbar. Bitte versuche es später erneut." });
   }
 
+  const cost = priceCall(out.model, out.usage, await loadRates(admin));
+  await recordAiCall(admin, {
+    userId: user.id, feature: "check", provider: providerOf(out.model),
+    model: out.model, usage: out.usage, costEstimate: cost,
+  });
+
   const focal = out.sentences[0] ?? { text: out.corrected, voice: "aktiv", tense: "praesens", mood: "indikativ" };
   const { data: inserted } = await admin.from("sentence_checks").insert({
     user_id: user.id, source_text: text, source_hash: inputHash,
     corrected: out.corrected, has_errors: out.hasErrors,
     grammar: { voice: focal.voice, tense: focal.tense, mood: focal.mood },
-    model: out.model, cached: false, cost_estimate: out.cost,
+    model: out.model, cached: false, cost_estimate: cost,
   }).select("id").maybeSingle();
 
-  await admin.from("sentence_ai_ops").insert({ user_id: user.id, kind: "check", model: out.model, cost_estimate: out.cost });
-  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: out.cost }).then(() => {}, async () => {
+  await admin.from("sentence_ai_ops").insert({ user_id: user.id, kind: "check", model: out.model, cost_estimate: cost });
+  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: cost }).then(() => {}, async () => {
     await admin.from("ai_usage").upsert(
-      { month, calls: 1, cost_estimate: out.cost, updated_at: new Date().toISOString() },
+      { month, calls: 1, cost_estimate: cost, updated_at: new Date().toISOString() },
       { onConflict: "month", ignoreDuplicates: false },
     );
   });

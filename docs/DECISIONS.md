@@ -1845,3 +1845,67 @@ cheapest first:
 
 Step 1 is the prerequisite for the other two and needs no accounts or keys, which is why it goes
 first.
+
+---
+
+## s197b — step 1 built: usage is measured, cost is derived, and Sprechen gets two budgets
+
+**Founder:** "continue with step 1. also, I don't want to have the current limit for sprechen
+exercises. it's very less. increase the limit to 6 for üben and 3 for Prüfung."
+
+### The ledger
+
+**`ai_calls` (migration 0018) is the measured record; `ai_usage` stays the fuse.** They answer
+different questions and neither replaces the other: `ai_usage` is a running monthly total, read on
+every request to decide whether the app may spend anything at all, and a single row is the right
+shape for that. `ai_calls` is one row per provider call, and it is what you interrogate afterwards.
+Never merge them, and never make the fuse depend on scanning the detail table.
+
+**One rate table, and it lives in code with a config override.** `_shared/aiUsage.ts` holds the
+prefix-matched rates and `app_config.ai_rates` may override them at runtime, so a provider reprice
+is a config edit rather than four function diffs. The compiled defaults are the fallback for an
+absent, empty or malformed config, which keeps the remote-config contract (empty config == today's
+behavior) and means a bad edit cannot silently zero the spend fuse. Every row stores the
+`rate_version` that priced it, so a later reconciliation can tell "we mispriced it" from "the
+provider changed its price".
+
+**An unknown model is priced as the most expensive family we serve, never as free.** The failure
+mode to protect against is a new model id silently disarming the monthly cap.
+
+**Gemini's zero is an assumption and is labelled as one.** The rate is 0 because the calls sit in
+Google's free tier; on a billing-enabled project past the quota, Google charges and the table still
+says zero. The token counts recorded beside it are real either way, which is exactly what makes
+free-tier headroom measurable rather than hoped for.
+
+**Cache hits are recorded as calls that cost nothing.** A cache-hit rate inferred from absent rows
+is not a measurement.
+
+### The two Sprechen budgets
+
+**6 Übungsgespräche and 3 Prüfungsgespräche per day, counted apart** on
+`speaking_conversations.exam`. Separate rather than one pot of 9 because they fail differently: a
+learner who practised all afternoon must still be able to sit a Modelltest, and a Modelltest must
+not be able to eat the practice budget either.
+
+**For an EXISTING conversation the row's own `exam` decides which budget it spends, never the
+request body.** Otherwise a forged flag mid-conversation moves a run onto whichever meter is
+emptier. Same reasoning as the stored-transcript rule (s194): the row is the record, the request is
+a claim.
+
+**The monthly ceiling moved with the daily one** (`USER_MONTHLY_CONVERSATIONS` 40 → 120). A daily
+limit that a monthly limit contradicts within four days is not a limit, it is a surprise. Whenever a
+daily allowance changes, check the monthly ceiling above it in the same change.
+
+### The privacy bump, and why it was not argued around
+
+`ai_calls` holds no learner text, so it was tempting to treat the disclosure as unnecessary. It is
+still a new per-user record with its own retention, so both language versions of the policy describe
+it and `CONSENT_VERSION` / `PRIVACY_LAST_UPDATED_ISO` were bumped in lockstep, which re-prompts
+signed-in learners. The rule (a retention timer and the copy describing it ship together) exists
+precisely so this call is not re-litigated per case. It was flagged to the founder as reversible,
+because interrupting every learner is a product cost, not just a legal one.
+
+**Still not done, and still the point of the exercise:** the cost figure remains DERIVED. Only
+reconciliation against Anthropic's and OpenAI's own usage/cost APIs turns it from our arithmetic
+into a checked number. That is step 2, and it is blocked on the Anthropic account being an
+organization rather than an individual.

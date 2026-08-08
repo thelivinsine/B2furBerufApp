@@ -1,8 +1,31 @@
 # Project Status
 
-_Last updated: 2026-08-06 (session 197 made the Umformung's AI budget visible, previewed the KI
-chip, and then re-scoped the whole task from "how much is left" to "what did the AI actually use";
-see "Resume here")._
+_Last updated: 2026-08-06 (session 197: the Umformung's AI budget is visible, AI usage is now
+MEASURED per call rather than assumed, and Sprechen went from 2 conversations a day to 6 practice +
+3 Prüfung; see "Resume here")._
+
+**Session 197 prompt 5: step 1 shipped, and the Sprechen limits raised.**
+- **AI usage is measured now.** Migration 0018 adds `ai_calls`: one row per provider call holding
+  the token counts the provider ACTUALLY reported (feature, provider, model, input/output/cached
+  tokens, cache hit), priced from ONE rate table in `supabase/functions/_shared/aiUsage.ts` that
+  `app_config.ai_rates` can override at runtime. All four Edge Functions were rewired to it, which
+  kills the hardcoded flat $0.004-per-GPT-5-call guess in three of them and the four copies of the
+  Claude price arithmetic. Cache hits are recorded as zero-cost calls, so the cache-hit rate is
+  visible instead of inferred. `ai_usage` is untouched and still the monthly spend fuse; `ai_calls`
+  is the detail behind it, and the thing step 2 compares against the providers' own bills.
+  Founder roll-up: `admin_ai_usage_breakdown(days)`, aggregates only. Purged at 400 days.
+- **Sprechen: 6 Übungsgespräche + 3 Prüfungsgespräche per day** (was one shared budget of 2),
+  counted separately on `speaking_conversations.exam` so neither can eat the other. For an existing
+  conversation the ROW's flag decides which budget it spends, never the request body. The monthly
+  ceiling rose with them (40 → 120): at up to 9 a day, 40 would have bound within four days.
+- **A privacy-policy change rode along, deliberately.** `ai_calls` is a new per-user record, so both
+  language versions of the retention section now describe it (no text, counts only, 400 days, link
+  dropped on account deletion) and `CONSENT_VERSION` / `PRIVACY_LAST_UPDATED_ISO` were bumped in
+  lockstep to `2026-08-06`. **That bump asks every signed-in learner to re-consent on their next
+  visit.** It follows the documented rule; say the word and it reverts to `2026-08-05` in one line.
+- Gates: typecheck · lint 0 errors (77 warnings, baseline) · **637 tests** (up from 626, new
+  `tests/aiUsage.test.ts` pins the pricing arithmetic and the three providers' token shapes) ·
+  build · check:bundle 129.8 kB · check:contrast · lint:content · lint:migrations.
 
 **Session 197 (2026-08-06, branch `claude/ki-usage-task-kg0vix`): the KI-usage task.** Four founder
 prompts; one shipped change, three of analysis, and a redirect that matters more than the code.
@@ -36,14 +59,19 @@ prompts; one shipped change, three of analysis, and a redirect that matters more
   organization usage/cost endpoints) and show "ours vs theirs" side by side; Gemini has no clean
   billing API, so its free-tier figure stays a self-measured count and the UI must say so; **(3)**
   the learner-facing number stays counts, never money. Full reasoning in `docs/DECISIONS.md` §s197.
-**Resume here:** start step 1 (no accounts or keys needed, and it unblocks steps 2 and 3). Open
-alongside it: the branch has unmerged work and **no PR yet** (part A plus the preview file); part B
+**Resume here:** step 2, the reconciliation. It needs one thing from the founder first: the
+Anthropic account must be an ORGANIZATION (Console → Settings → Organization) before it can issue
+the `sk-ant-admin01-` key the Usage and Cost API requires; OpenAI's organization usage/cost
+endpoints need their own key. Then a nightly job pulls yesterday's real figures into a
+`provider_costs` table and the control centre shows "ours vs theirs". Also unbuilt: the admin view
+of `admin_ai_usage_breakdown` (the RPC exists, nothing renders it yet; it is founder-facing UI, so
+it owes a preview round). Open alongside it: the branch has unmerged work and **no PR yet** (part A plus the preview file); part B
 is previewed and awaiting a pick, superseded in priority but not cancelled (note for whoever builds
 it: `Sparkles` is NOT available as the AI mark, Quiz/empty states/onboarding use it); and the
-five-minute `pages.yml` `timeout` raise from s196 is still untaken. Also still open from earlier
+five-minute `pages.yml` `timeout` raise from s196 is still untaken; CLAUDE.md is now 380 lines
+against its ~350 budget and the next docs pass should bring it down. Also still open from earlier
 sessions: the Prüfung hub loads ~825 kB of content banks via `engine/exam`, no exam set is `anruf`
-shaped, the authored dialogue `nodes` graphs are dead but not retired, and CLAUDE.md sits at ~372
-lines against its ~350 budget.
+shaped, the authored dialogue `nodes` graphs are dead but not retired.
 
 _Session 196 (2026-08-06) gave all four Ohne-Zeit modules ONE Aufgabe rail, fixed the
 Sprechen debrief, and finally diagnosed the recurring red Pages deploy. Founder: "sprechen ohne zeit page tiles are all a bunch

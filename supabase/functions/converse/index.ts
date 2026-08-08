@@ -20,12 +20,17 @@
 //   ANTHROPIC_API_KEY        (required)
 //   GEMINI_API_KEY           (optional, free-tier first leg of the cascade)
 //   OPENAI_API_KEY           (optional fallback)
-//   DAILY_LIMIT_CONVERSATIONS (optional, default 2)  Gespräche pro Tag
+//   DAILY_LIMIT_CONVERSATIONS      (optional, default 6)  Übungsgespräche/Tag
+//   DAILY_LIMIT_EXAM_CONVERSATIONS (optional, default 3)  Prüfungsgespräche/Tag
 //   MONTHLY_SPEND_CAP_USD    (optional, default 5)   shared with every AI feature
 // SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 // ---------------------------------------------------------------------------
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  anthropicUsage, geminiUsage, openaiUsage, loadRates, priceCall, providerOf,
+  recordAiCall, type TokenUsage,
+} from "../_shared/aiUsage.ts";
 
 /* --------------------------------- CORS ---------------------------------- */
 
@@ -65,9 +70,22 @@ function corsHeaders(origin: string): Record<string, string> {
 
 /* -------------------------------- Guards --------------------------------- */
 
-const DAILY_LIMIT = Number(Deno.env.get("DAILY_LIMIT_CONVERSATIONS") ?? "2");
+// TWO daily budgets since s197 (founder: "I don't want to have the current limit
+// for sprechen exercises. it's very less. increase the limit to 6 for üben and 3
+// for Prüfung"). They are counted SEPARATELY against `speaking_conversations.exam`,
+// so a day spent practising can never eat the exam allowance, and neither can be
+// spent by the other. Practice conversations are also the cheaper of the two: an
+// exam debrief scores as well as corrects.
+const DAILY_LIMIT_PRACTICE = Number(Deno.env.get("DAILY_LIMIT_CONVERSATIONS") ?? "6");
+const DAILY_LIMIT_EXAM = Number(Deno.env.get("DAILY_LIMIT_EXAM_CONVERSATIONS") ?? "3");
+const dailyLimitFor = (exam: boolean) => (exam ? DAILY_LIMIT_EXAM : DAILY_LIMIT_PRACTICE);
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
-const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_CONVERSATIONS") ?? "40");
+// Raised with the daily limits (s197): 40/month against 9 possible per day would
+// have bound after four days and made the new daily numbers a fiction. 120 keeps
+// roughly the old ratio (about a fortnight of heavy use). The global
+// MONTHLY_SPEND_CAP_USD fuse still sits above it, and Gemini answers most calls
+// for free, so this raises the ceiling on volume far more than on spend.
+const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_CONVERSATIONS") ?? "120");
 
 /**
  * Hard ceiling on learner turns per conversation, enforced against the STORED
@@ -249,20 +267,9 @@ function parseJson(raw: string): Record<string, unknown> | null {
 interface ModelOut {
   text: string;
   model: string;
-  cost: number;
-}
-
-/** Rough per-model $ estimate; the exact figure only has to be good enough to
- *  drive the shared monthly fuse, which is deliberately conservative. */
-function estimateCost(model: string, inTok: number, outTok: number): number {
-  const rates: Record<string, [number, number]> = {
-    "claude-haiku-4-5": [1, 5],
-    "claude-sonnet-5": [3, 15],
-    "claude-opus-5": [5, 25],
-    "gpt-5": [1.25, 10],
-  };
-  const [i, o] = rates[model] ?? [3, 15];
-  return (inTok / 1e6) * i + (outTok / 1e6) * o;
+  // What the provider REPORTED (s197). Priced at the call site from the one
+  // shared rate table, so a reprice is a config edit rather than four diffs.
+  usage: TokenUsage;
 }
 
 /** What a call needs beyond its prompt: how much it may write, and in what shape. */
@@ -305,8 +312,9 @@ async function callGemini(
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (typeof text !== "string" || !text.trim()) return null;
-    // Free tier: no marginal cost, which is the whole point of leading with it.
-    return { text, model: GEMINI_MODEL, cost: 0 };
+    // Free tier prices at $0, which is the whole point of leading with it; the
+    // tokens are recorded regardless, so free-quota headroom is measurable.
+    return { text, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch {
     return null;
   }
@@ -342,15 +350,7 @@ async function callAnthropic(
     if (data?.stop_reason === "refusal") return null;
     const text = data?.content?.[0]?.text;
     if (typeof text !== "string" || !text.trim()) return null;
-    return {
-      text,
-      model,
-      cost: estimateCost(
-        model,
-        data?.usage?.input_tokens ?? 0,
-        data?.usage?.output_tokens ?? 0,
-      ),
-    };
+    return { text, model, usage: anthropicUsage(data) };
   } catch {
     return null;
   }
@@ -384,15 +384,7 @@ async function callOpenAI(
     const data = await res.json();
     const text = data?.choices?.[0]?.message?.content;
     if (typeof text !== "string" || !text.trim()) return null;
-    return {
-      text,
-      model: OPENAI_MODEL,
-      cost: estimateCost(
-        OPENAI_MODEL,
-        data?.usage?.prompt_tokens ?? 0,
-        data?.usage?.completion_tokens ?? 0,
-      ),
-    };
+    return { text, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch {
     return null;
   }
@@ -516,7 +508,14 @@ Deno.serve(async (req) => {
 
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
-  /** Rows used today, counted once. Cannot change mid-conversation. */
+  /**
+   * Which of the two budgets this conversation spends (s197). For an existing
+   * row the ROW's own flag decides, never the request body: a forged `exam`
+   * cannot move a running conversation onto the other allowance.
+   */
+  const isExam = existing ? existing.exam === true : brief.exam;
+  const dailyLimit = dailyLimitFor(isExam);
+  /** Rows used today ON THIS BUDGET, counted once. Cannot change mid-conversation. */
   let todayUsed: number;
   /** True for the request that CREATED the row, which is what may need undoing. */
   let created = false;
@@ -529,15 +528,18 @@ Deno.serve(async (req) => {
       .from("speaking_conversations")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
+      .eq("exam", isExam)
       .gte("created_at", startOfDay.toISOString());
     todayUsed = todayCount ?? 0;
-    if (todayUsed >= DAILY_LIMIT) {
+    if (todayUsed >= dailyLimit) {
       return json({
         ok: false,
         limitReached: true,
-        dailyLimit: DAILY_LIMIT,
+        dailyLimit,
         dailyRemaining: 0,
-        message: `Du hast heute schon ${DAILY_LIMIT} Gespräche geführt. Komm morgen wieder!`,
+        message: isExam
+          ? `Du hast heute schon ${dailyLimit} Prüfungsgespräche geführt. Übungsgespräche gehen weiter.`
+          : `Du hast heute schon ${dailyLimit} Gespräche geübt. Komm morgen wieder!`,
       });
     }
 
@@ -585,6 +587,7 @@ Deno.serve(async (req) => {
       .from("speaking_conversations")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
+      .eq("exam", isExam)
       .gte("created_at", startOfDay.toISOString());
     todayUsed = count ?? 0;
   }
@@ -596,7 +599,7 @@ Deno.serve(async (req) => {
     : [];
   const learnerTurns = storedTurns.filter((t) => t.role === "learner").length;
 
-  const remainingAfter = Math.max(0, DAILY_LIMIT - todayUsed);
+  const remainingAfter = Math.max(0, dailyLimit - todayUsed);
 
   /**
    * Give the daily unit back when the conversation never got off the ground
@@ -674,6 +677,11 @@ Deno.serve(async (req) => {
       ...(utterance ? [{ role: "learner", text: utterance }] : []),
       { role: "partner", text: reply },
     ];
+    const turnCost = priceCall(out.model, out.usage, await loadRates(admin));
+    await recordAiCall(admin, {
+      userId: user.id, feature: "converse_turn", provider: providerOf(out.model),
+      model: out.model, usage: out.usage, costEstimate: turnCost,
+    });
     // ACCUMULATED, not overwritten (s194 audit P29): the row used to report the
     // cost of its most recent turn, which made per-conversation cost reporting
     // wrong by roughly the number of turns. The global fuse was never affected,
@@ -683,18 +691,18 @@ Deno.serve(async (req) => {
       .from("speaking_conversations")
       .update({
         turns: nextTurns,
-        cost_estimate: spentSoFar + out.cost,
+        cost_estimate: spentSoFar + turnCost,
         model: out.model,
       })
       .eq("id", conversationId)
       .eq("user_id", user.id);
     if (updErr) console.error("speaking_conversations turn update failed", updErr.message);
 
-    await admin.rpc("bump_ai_usage", { p_month: month, p_cost: out.cost }).then(
+    await admin.rpc("bump_ai_usage", { p_month: month, p_cost: turnCost }).then(
       () => {},
       async () => {
         await admin.from("ai_usage").upsert(
-          { month, calls: 1, cost_estimate: out.cost, updated_at: new Date().toISOString() },
+          { month, calls: 1, cost_estimate: turnCost, updated_at: new Date().toISOString() },
           { onConflict: "month", ignoreDuplicates: false },
         );
       },
@@ -704,7 +712,7 @@ Deno.serve(async (req) => {
       ok: true,
       reply,
       turnsLeft: Math.max(0, MAX_LEARNER_TURNS - (learnerTurns + (utterance ? 1 : 0))),
-      dailyLimit: DAILY_LIMIT,
+      dailyLimit,
       dailyRemaining: remainingAfter,
     });
   }
@@ -767,6 +775,12 @@ Deno.serve(async (req) => {
       ? Math.max(0, Math.min(100, Math.round(rawScore)))
       : null;
 
+  const debriefCost = priceCall(out.model, out.usage, await loadRates(admin));
+  await recordAiCall(admin, {
+    userId: user.id, feature: "converse_debrief", provider: providerOf(out.model),
+    model: out.model, usage: out.usage, costEstimate: debriefCost,
+  });
+
   const { error: updErr } = await admin
     .from("speaking_conversations")
     .update({
@@ -779,17 +793,17 @@ Deno.serve(async (req) => {
       model: out.model,
       // The debrief is the most expensive call of the conversation and used to
       // be left out of the row's cost entirely (s194 audit P29).
-      cost_estimate: (Number(existing?.cost_estimate ?? 0) || 0) + out.cost,
+      cost_estimate: (Number(existing?.cost_estimate ?? 0) || 0) + debriefCost,
     })
     .eq("id", conversationId)
     .eq("user_id", user.id);
   if (updErr) console.error("speaking_conversations debrief update failed", updErr.message);
 
-  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: out.cost }).then(
+  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: debriefCost }).then(
     () => {},
     async () => {
       await admin.from("ai_usage").upsert(
-        { month, calls: 1, cost_estimate: out.cost, updated_at: new Date().toISOString() },
+        { month, calls: 1, cost_estimate: debriefCost, updated_at: new Date().toISOString() },
         { onConflict: "month", ignoreDuplicates: false },
       );
     },
@@ -805,7 +819,7 @@ Deno.serve(async (req) => {
     corrected,
     score,
     model: out.model,
-    dailyLimit: DAILY_LIMIT,
+    dailyLimit,
     dailyRemaining: remainingAfter,
   });
 });

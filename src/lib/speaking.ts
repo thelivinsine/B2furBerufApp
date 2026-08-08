@@ -106,7 +106,15 @@ export async function speakTurn(input: {
         message: "Deine Gesprächspartnerin ist gerade nicht erreichbar. Bitte versuche es erneut.",
       };
     }
-    if (data) reportServerAllowance("sprechen", data.dailyLimit, data.dailyRemaining);
+    // Practice and Prüfung are separate budgets (s197), so the response updates
+    // the meter the BRIEF belongs to, never the other one.
+    if (data) {
+      reportServerAllowance(
+        input.brief.exam ? "sprechenExam" : "sprechen",
+        data.dailyLimit,
+        data.dailyRemaining,
+      );
+    }
     return data ?? { ok: false, message: "Keine Antwort erhalten." };
   } catch {
     return {
@@ -209,7 +217,15 @@ export async function requestDebrief(input: {
         message: "Die Rückmeldung ist momentan nicht verfügbar. Bitte versuche es später erneut.",
       };
     }
-    if (data) reportServerAllowance("sprechen", data.dailyLimit, data.dailyRemaining);
+    // Practice and Prüfung are separate budgets (s197), so the response updates
+    // the meter the BRIEF belongs to, never the other one.
+    if (data) {
+      reportServerAllowance(
+        input.brief.exam ? "sprechenExam" : "sprechen",
+        data.dailyLimit,
+        data.dailyRemaining,
+      );
+    }
     return data ?? { ok: false, message: "Keine Antwort erhalten." };
   } catch {
     return {
