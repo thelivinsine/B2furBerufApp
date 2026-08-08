@@ -146,7 +146,10 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 203 (2026-08-08): the docs are back inside their own rules.** Branch
-`claude/documentation-maintenance-0w4ywg`. Founder prompt: "do the documentation maintenance".
+`claude/documentation-maintenance-0w4ywg`, PR **#832** → squash-merged **`48d250c`**. Validate
+content and Deploy site to GitHub Pages both green on `main`; Deploy Supabase functions correctly did
+not run (path-filtered, nothing under `supabase/` changed). Post-merge housekeeping done, tree clean.
+Founder prompt: "do the documentation maintenance".
 No app code was touched, so nothing needs live verification.
 
 - **`CLAUDE.md` is 349 lines** (was 399; the linter warns past ~350). It now carries the RULE plus a

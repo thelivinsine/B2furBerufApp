@@ -5744,3 +5744,13 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   **Artifacts:** `CLAUDE.md` · `docs/areas/CONTENT.md` · `docs/areas/PRUEFUNG.md` ·
   `docs/areas/SPRECHEN.md` · `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log.
+
+- **Shipped (same prompt):** PR **#832** → squash-merged **`48d250c`**. `origin/main` had moved
+  mid-session (PR #831, the session 202 paper trail), so the branch merged `main` first and resolved
+  one conflict in this file: #831's Prompt 3 entry belongs to the session 202 block, above the
+  session 203 heading. Validate content and Deploy site to GitHub Pages both green on `48d250c`;
+  Deploy Supabase functions correctly did not run, being path-filtered to `supabase/**` which this
+  session did not touch. Post-merge housekeeping done (fetch → reset --hard → force-with-lease),
+  tree clean. **Note for the next session: `CLAUDE.md` now has about one line of headroom**, so a
+  new law costs an old line.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
