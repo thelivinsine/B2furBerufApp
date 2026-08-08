@@ -78,10 +78,18 @@ Founder pick: **Option A's layout on desktop, Option C's on a phone, Option A's 
 - **ONE measurement decides** (`useMediaQuery("(min-width: 1024px)")`), so the phrases can never be
   on screen twice.
 
-Contents, per intent: a `ScopeSelect` over the task's four categories with honest counts, the
-phrases as white cards, and the other three categories as one-tap pills. One `EnPeek` chip reveals
-the English for the whole list. **No reset** (`ScopeRail.onReset` is optional since s202): this rail
-browses, it does not narrow a list, so a reset would be a dead control.
+**One hierarchy, both shells** (founder, s202 follow-up): the section label with its `EnPeek` chip,
+then the intent **pills at the top of the tile** (all four, honest counts, the current one LIT), then
+that intent's phrases as white cards. There is no dropdown: a lit pill states the selection, so a
+dropdown above it would print the same fact twice, and four options is pill territory. The pills do
+NOT toggle off, unlike `LifeAreaPills`: a conversation always has one intent in view. **No reset**
+(`ScopeRail.onReset` is optional since s202): this rail browses, it does not narrow a list, so a
+reset would be a dead control.
+
+**The phone drawer's bar is two lines**: the tabs plus the chevron on the first, the task title and
+partner on their own full-width line below. Beside the tabs the title had a third of the row and was
+cut off after four words. Without tabs (desktop, and the whole Modelltest) the bar stays the one row
+it always was.
 
 Rules:
 

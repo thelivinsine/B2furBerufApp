@@ -174,6 +174,10 @@ Founder prompts: "for the sprechen part, I'd want you to add a filter rail kind 
 redemittle even in the practice sessions" → "option a's layout for desktop and option c for mobile
 and also desktop's content".
 
+- **The tile's hierarchy is the founder's second pass** (same session): intent pills at the TOP,
+  all four, the current one lit, no dropdown (a lit pill states the selection, so a dropdown would
+  say it twice), and the phone drawer's task title on its own line below the tabs instead of beside
+  them, where it was cut off. Desktop and phone run the same order.
 - **What to check first:** the founder answered layout only, so three content defaults are stated
   and one-line reversible (`docs/DECISIONS.md` §s202): all eight phrases per intent, Anrede matched
   to the partner, English hold-to-peek. Ask if they want any flipped.
