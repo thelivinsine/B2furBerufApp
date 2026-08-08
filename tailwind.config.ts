@@ -5,7 +5,7 @@ const config: Config = {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   future: {
     /**
-     * `hover:` compiles to `@media (hover: hover)` (s200, founder: the shuffle
+     * `hover:` compiles to `@media (hover: hover)` (s201, founder: the shuffle
      * button "doesn't deactivate when tapped again, it deactivates when tapped
      * on empty spaces").
      *

@@ -23,6 +23,11 @@ import type { ThemeId } from "@/types";
 // have no business in the learner's bundle.
 // @ts-expect-error - plain-JS tooling module, no .d.ts by design
 import { isSectorEarned } from "../scripts/sector-markers.mjs";
+// Same arrangement for the s200 justification rule: ONE classifier, shared by
+// the CI gate and this test, so they cannot drift into disagreeing about what
+// an argumentative Leitpunkt is.
+// @ts-expect-error - plain-JS tooling module, no .d.ts by design
+import { isJustifyingPoint, meetsJustificationRule } from "../scripts/justification-markers.mjs";
 
 const LENGTHS = ["short", "long"] as const;
 const THEME_IDS: ThemeId[] = themes.map((t) => t.id);
@@ -474,6 +479,45 @@ describe("Niveau and Textsorte axes (s167, hard since 2026-07-31)", () => {
         });
       }
     }
+  });
+
+  it("an argumentative Textsorte at B2+ ASKS for the argument it is graded on", () => {
+    // s200, audit §4. `level` is what tells `evaluate-writing` to mark "streng
+    // auf B2-/C1-Niveau", and Aufgabenerfüllung is graded against the
+    // Leitpunkte. Six C1 Stellungnahmen at a 200-word target carried only
+    // descriptive points, so a learner who covered all four exactly had
+    // described, empathised, proposed and delegated, and was then marked down
+    // for not arguing. `lint:content` gates the same rule through the same
+    // classifier, so this is its unit-level twin, exactly like the Branche one.
+    for (const id of THEME_IDS) {
+      for (const length of LENGTHS) {
+        for (const t of writingPrompts[id][length]) {
+          expect(
+            meetsJustificationRule(t),
+            `${t.id} (${t.format} at ${t.level}) has no Leitpunkt demanding a reason, a consequence or a stance`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("the classifier reads the WHOLE clause, not the opening verb", () => {
+    // The defect that cost a re-run in s199: German carries the meaning in the
+    // separable prefix at the end, so "Legen Sie dar, warum ..." opens on a
+    // neutral verb and is the argumentative move itself. Pinned in both
+    // directions so a future "simplification" to first-word matching fails here
+    // instead of silently passing a bank of descriptive briefs.
+    expect(isJustifyingPoint("Legen Sie dar, warum die Forderung unbegründet ist.")).toBe(true);
+    expect(isJustifyingPoint("Erklären Sie, was das für den Kassenabschluss bedeutet.")).toBe(true);
+    expect(isJustifyingPoint("Geben Sie eine Empfehlung.")).toBe(true);
+    expect(isJustifyingPoint("Wägen Sie Vor- und Nachteile ab.")).toBe(true);
+    // Description stays description, however long the clause.
+    expect(isJustifyingPoint("Beschreiben Sie das Problem.")).toBe(false);
+    expect(isJustifyingPoint("Zeigen Sie Verständnis für beide Seiten.")).toBe(false);
+    expect(isJustifyingPoint("Schlagen Sie eine klare Regel für die Zukunft vor.")).toBe(false);
+    expect(isJustifyingPoint("Nennen Sie den Grund.")).toBe(false);
+    // "Folgen Sie der Anleitung" is compliance, not consequence.
+    expect(isJustifyingPoint("Folgen Sie der Anleitung im Anhang.")).toBe(false);
   });
 
   it("covers every Thema at every Niveau in both lengths", () => {

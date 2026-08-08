@@ -62,7 +62,7 @@ function ZoneExit({ tone, onExit }: { tone: "quiet" | "danger"; onExit: () => vo
  * renders on these and nowhere else, so a handler that outlives its screen
  * cannot leak a back button onto another page.
  *
- * `/lesen` and `/hoeren` were missing until s200, which is why those two
+ * `/lesen` and `/hoeren` were missing until s201, which is why those two
  * choosers were the only screens in the zone with no way back in the header
  * while Schreiben and Sprechen had one.
  */
@@ -71,7 +71,7 @@ const ZONE_ROUTES = new Set(["/anwenden", "/exam", "/writing", "/simulation", "/
 /**
  * The routes a Teil can actually run on, and therefore the routes allowed to
  * switch the shell into the one-viewport exam stage. `/lesen` and `/hoeren`
- * joined in s200, when starting a drill from those two choosers began rendering
+ * joined in s201, when starting a drill from those two choosers began rendering
  * the runner on the chooser's own route instead of writing a run nothing
  * displayed.
  */
@@ -138,7 +138,7 @@ export function AppShell() {
   const zoneExit = useSessionStore((s) => s.zoneExit);
   const examStage = useSessionStore((s) => s.examStage);
   // The runner took the `/exam` route over until s189; it now takes over the
-  // Prüfung hub, and since s200 the Lesen/Hören chooser it was started from.
+  // Prüfung hub, and since s201 the Lesen/Hören chooser it was started from.
   // Route-gated so a stale flag still cannot strip the chrome anywhere else.
   const exam = examStage && STAGE_ROUTES.has(location.pathname);
   // The zone's one exit shows on every screen the zone owns, which since s195

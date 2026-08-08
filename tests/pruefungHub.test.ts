@@ -67,7 +67,7 @@ describe("toPractices", () => {
 });
 
 /**
- * The per-module Verlauf (s200, founder: "go with verlauf on all four"). Each
+ * The per-module Verlauf (s201, founder: "go with verlauf on all four"). Each
  * module page lists ITS OWN sittings, and a Modelltest is never one of them:
  * the full run belongs to the Modelltest Verlauf alone, which is the same rule
  * `isFullRun` pins above, applied one level down.

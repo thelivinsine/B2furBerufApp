@@ -2,6 +2,71 @@
 
 Handoffs moved out of `docs/PROJECT_STATUS.md` once they aged past the two most recent.
 
+**Handoff after session 199 (2026-08-07): the audit shipped, its top fix shipped, and P2 is the
+next session's work (founder: "I'll continue with the p2 and others in next session").**
+Founder prompts: "what's next in the task list?" → "go ahead" → "go with your recommendation reg
+branche. I prefer to have Berufsleben and Alltag as the first filter and then themen and only then
+Branchen filter as the heirarchy of the filter rail all across. When a user selects a thema where
+there is no branche specific content, just show the options within Branche as locked." → "no need of
+design preview for the above mention rail changes" → "the header and footer of the filter rail seems
+to look like separate pieces attached to the main body. remove the separator lines and make all the
+filter rail same shade to look like one piece." → "document the session."
+
+**Shipped:** PR **#824** (the audit report) → **`66061c3`**; PR **#825** (three commits: `acb21f7`
+Branche cleanup, `7f5c464` rails, `40176d1` docs) → **`bf9db0b`**. Validate content and Deploy site
+to GitHub Pages green on `main` for both. **Deploy Supabase functions did not run on `bf9db0b`, and
+that is correct**: it is path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its
+own file, none of which this session touched. Housekeeping done after both merges.
+
+### START HERE next session: audit P2
+
+The one where the app currently punishes a learner for doing exactly what the brief asked.
+**Six C1 Stellungnahmen at a 200-word target carry only descriptive Leitpunkte**, while `level` is
+what tells `evaluate-writing` to "bewerte streng auf C1-Niveau":
+`wt_conflict_l01`, `wt_conflict_l05`, `wt_conflict_l15`, `wt_conflict_l17`, `wt_conflict_l25`,
+`wt_bildung_l10`.
+1. **REPLACE the weakest descriptive point with a justification one; never add a fifth.** Four
+   Leitpunkte in 200 words is already the exam shape, and `wt_conflict_l05` shows the pattern:
+   "Beschreiben Sie das Problem / Zeigen Sie Verständnis / Schlagen Sie eine Regel vor / Sagen Sie,
+   wer beschließen soll" has no point that forces an argument.
+2. Then sweep the wider set: **20 of 35 `beschwerde`** and **9 of 54 `stellungnahme`** tasks carry no
+   justification point either.
+3. Then **gate it**, so it cannot come back: a `stellungnahme`, `forumsbeitrag` or `widerspruch` at
+   B2 or above must carry ≥1 justification Leitpunkt. Anchor the check on the same phrase-level
+   classifier the audit used, and **read §9 of the report first**: an opening-verb classifier is
+   WRONG for German, because a separable prefix carries the meaning ("**Legen** Sie dar, warum …"
+   scored as unargumentative and is exactly the opposite). Getting this wrong cost a re-run in s199.
+4. Load `/content` before editing `writingPrompts.ts`; ids are permanent, so this edits fields only.
+
+**Then, in priority order (all AI-shippable):**
+- **P3:** retire `exam` from the schema (nothing reads it: not the trainer, not the evaluator, not a
+  filter; the shipped-ids law protects ids, not fields), or fix its 69 out-of-band tags. Either way
+  correct the `words` doc comment, which claims the target follows the exam shape when it is fully
+  determined by (Niveau, Länge).
+- **P4:** add `source` to the 71 reaction tasks (54 Stellungnahmen, 17 Forumsbeiträge), AFTER P2,
+  because a quoted position is what makes a justification Leitpunkt answerable. No schema change.
+- **P5:** the 19-item tail. 5 Textsorte re-tags (`wt_meetings_s05`, `wt_meetings_l17`,
+  `wt_logistics_s13`, `wt_bildung_l03`, `wt_wohnen_l05`) and 14 Adressat/register fixes where `du`
+  meets "Frau <Nachname>". About an hour.
+
+**Two things to know before touching the rails again:**
+- **The rail order lives INSIDE the rails** (`FilterRail` reorders its own `scopes` array), never in
+  a caller. That is what s184 centralised and s199 kept; do not re-introduce per-surface ordering.
+- **The lock lives in ONE place** (`ScopeSelect`'s row renderer + `ScopeLocked` in `ScopeRail.tsx`,
+  plus `lockZero` on the Bibliothek's `ScopeMultiSelect`). It shipped WITHOUT a preview round at the
+  founder's explicit waiver, so if they dislike the look it is a single-file change, not an
+  eight-rail one. **Niveau moved below the hierarchy** on a literal reading of "Berufsleben and
+  Alltag as the first filter"; flipping it back is one move per rail.
+
+**Standing debt, unchanged:** P10 human content verification is still the only open s178 audit item
+and is founder-owned (`pnpm review:queue` → decisions → `pnpm apply:reviews` → `pnpm stamp:verified`).
+`verify:grammar` has still never run over the s198 sentences (no LanguageTool toolchain in this
+sandbox). CLAUDE.md is **378 lines** against its ~350 budget, down from 380 despite three new rules;
+the compression pass is worth finishing.
+
+Gates on the merged work: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) ·
+**649 tests** · build · check:bundle 128.2 kB · check:contrast.
+
 **Handoff after session 195 (2026-08-06):** 2026-08-06 (session 195 gave the Prüfung zone ONE frame: one exit, one Niveau
 control, one width at rest; see "Resume here"). **The Prüfung zone was audited end to end and every
 finding was fixed.** Founder: "do a thorough audit and analysis of the prufung hub", then "fix all
@@ -1145,3 +1210,61 @@ plus the "Nach oben" button that was sitting behind the Üben CTA (PRs #818 and 
 the first block under "Resume here"; the two branches touched no common source file, only the shared
 docs, and every conflict was resolved by keeping BOTH sessions' facts. The prompt log labels them
 **parallel A** (Bibliothek) and **parallel B** (Prüfung).
+
+---
+
+**Handoff after session 198 (2026-08-07): the content audit is closed except P10
+(branch `claude/content-audit-plan-mbiout`).**
+Founder: "what's next in the content audit plan?", then "build the frequency and part-of-speech
+linter gates", then "except human review task, complete all the recommendations from this plan, push
+them live and document the session".
+
+- **What was actually open.** P1–P9 were closed across s178/s181/s182/s185. What remained was P10
+  (human verification, founder-gated and deferred), the §4 word-level residuals (116 words that
+  could never produce a cloze/typed gap/listening item, 67 with no resolving related term), the §5
+  closing observation that pedagogical shape has no gates, and §2.2's "Reuse" defect. The four §3.2
+  LanguageTool defects were checked and are already fixed in the bank.
+- **The 116 were a regex bug, and fixing the content would have been the wrong fix.** 25 of them
+  start with an umlaut and JavaScript's `\b` is defined on ASCII `\w`, so `\bÜberweisung` can never
+  match; 85 are verbs whose examples use a Perfekt or a finite form rather than the infinitive.
+  Bending 85 natural German sentences into infinitives to satisfy a broken search would have made
+  the content worse to make a report greener. `src/engine/blank.ts` is now the ONE rule (previously
+  four copies: MCQ cloze, listening cloze, typed cloze, coverage report, every one carrying both
+  defects) and it looks for the forms the sentences actually use, including the Partizip II /
+  Präteritum / zu-infinitive from `verbForms.ts`. The blank REPORTS which form it took, so
+  distractors are drawn in that same form ("gebucht" against "verschoben"/"abgesagt", never against
+  a list of infinitives that gives the answer away). Only 15 separable verbs kept a genuine gap and
+  got one example rewritten into a Perfekt or modal construction.
+- **The three gates** (`scripts/content-shape.mjs`, run from `lint:content`): worth-learning (rare
+  share **53.87 %**, no-corpus-evidence **100**), CEFR plausibility (hard: no `core`-frequency word
+  at B2.2/C1; beginner-rare ratchet **32**), part-of-speech mix (**≥3 verbs AND ≥3 adjectives** per
+  theme, noun share **77.59 %**). Every number is the measured bank on the day it landed, so nothing
+  shipped is retroactively illegal, and raising one is a deliberate edit there with a reason.
+  `tests/contentShape.test.ts` asserts each in both directions.
+- **25 authored items** cleared the floors (digitales had 0 verbs and 0 adjectives; freizeit,
+  behoerde, mobilitaet had 0 adjectives), all core-or-common frequency, which also serves P7's
+  standing authoring rule. `verbForms.ts` and `frequency.ts` were regenerated for them
+  (`build:verbs-subset` needs the npm registry, `build:frequency-subset` needs `pip install wordfreq`).
+- **Reading freshness:** `progress.textsDone` + migration **0018**, unioned across devices like
+  `scenariosDone`; the composer draws from unread texts and falls back to the full pool when all are
+  read, so the block never disappears.
+Gates: lint:content · lint:migrations · typecheck · lint 0 errors (77 warnings) · **647 tests** ·
+build · check:bundle 128.2 kB · verify:facts 0 errors · verify:cefr FLAG 0.
+`verify:grammar` was SKIPPED (the LanguageTool toolchain is not built in this sandbox; warn-only by
+design), so the 40 new/edited German sentences have not been through Layer 3. Worth a run in a
+session that has `pnpm build:languagetool` available.
+
+**Shipped:** PR **#822**, squash-merged as **`03ea3dc`**. All three `main` workflows green on that
+commit: Validate content, Deploy site to GitHub Pages and Deploy Supabase functions, whose "Apply
+migrations" step ran and passed, so **migration 0018 is live on the database**. The Pages deploy did
+NOT self-cancel, which is the s197 `timeout: 1800000` fix holding on its first real run.
+
+**Resume here:**
+1. **P10 is the only open audit item** and it is the founder's: `pnpm review:queue` →
+   decisions → `pnpm apply:reviews` → `pnpm stamp:verified`. Start with the ~166 core-frequency
+   words and the Redemittel bank, the high-traffic surface.
+2. **Not scheduled, deliberately:** §2.1's inverted sub-theme structure (eight workplace themes have
+   no sub-themes, 59 % of words carry no `subThemeId`). Every new Unterthema drags the writing-task
+   invariant behind it (≥2 tasks per Unterthema per length), so it is a session of its own.
+3. CLAUDE.md is **380 lines** by the linter's count, still over its ~350 budget (377 before this
+   session; two invariants in, four history paragraphs compressed out).

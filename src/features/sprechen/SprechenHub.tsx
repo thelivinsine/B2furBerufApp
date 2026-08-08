@@ -296,7 +296,7 @@ export function SprechenHub() {
   if (tab === "verlauf") {
     return (
       // Module row first, switcher second, content in the content column: the
-      // same frame as the Üben tab and the same order Schreiben uses (s200).
+      // same frame as the Üben tab and the same order Schreiben uses (s201).
       <ModulePage part="sprechen" head={tabs}>
         <Suspense fallback={<div className="py-16" />}>
           <SprechenHistory onPractice={() => patch({ tab: "ueben" })} />

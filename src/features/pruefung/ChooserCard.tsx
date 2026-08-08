@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
- * ONE card for every Ohne-Zeit chooser (s200).
+ * ONE card for every Ohne-Zeit chooser (s201).
  *
  * Lesen, Hören and Sprechen listed the same kind of thing (an Aufgabe you can
  * start) in three different shapes: two of them put the Niveau in the foot row

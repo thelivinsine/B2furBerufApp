@@ -61,7 +61,7 @@ frame and ONE rail.
 
 - **The frame** is `features/pruefung/ModulePicker.tsx`: Schreiben's desktop grid (content column
   plus a sticky 16rem rail) and, on a phone, the same rail as a collapsible panel behind an
-  **Aufgabe** toggle. Since s200 that toggle sits at the right end of the chooser's own TOOLBAR row,
+  **Aufgabe** toggle. Since s201 that toggle sits at the right end of the chooser's own TOOLBAR row,
   not in the module row (founder: "the header bar shouldn't have the aufgabe button, place it
   somewhere else"): the module row names the module and carries nothing else, and the toggle sits
   level with the count it changes, directly above the panel it opens. `ModulePage` is the same frame
@@ -73,7 +73,7 @@ frame and ONE rail.
 - **The cards** are `features/pruefung/ChooserCard.tsx`, one anatomy for all three lists: module
   mark, title, one grey context line, chevron; the task line where a module has one (Sprechen,
   clamped to two lines); then a foot row pinned to the bottom edge (`mt-auto`, so neighbours line
-  up) with Niveau first, the facts next and a state chip ("Empfohlen"/"Erledigt") last. Before s200
+  up) with Niveau first, the facts next and a state chip ("Empfohlen"/"Erledigt") last. Before s201
   Sprechen put the Niveau in the head, rendered a `div onClick` a keyboard could not reach, nested a
   "Starten" button inside its own click target and wore a `shadow-glow` (a landmine since s136).
 - **The switcher** is `features/pruefung/ModuleTabs.tsx` (Üben | Verlauf), the app's sliding-pill
@@ -88,7 +88,7 @@ frame and ONE rail.
   text as a single-text untimed run through the SAME `LesenPart`/`HoerenPart`, scored the same way
   and recorded in the same Module-üben Verlauf. The old behaviour survives as **Zufällige
   Auswahl**, which draws the module's full exam-shaped set from the current scope.
-- **The drill RUNS on the chooser's route** (s200). Until then `/lesen` and `/hoeren` only wrote the
+- **The drill RUNS on the chooser's route** (s201). Until then `/lesen` and `/hoeren` only wrote the
   run into `useExamStore` and the Prüfung hub was the only screen that rendered one, so every card
   and the random draw did visibly nothing: both pages were dead. `TextModuleHub` now returns
   `<MockExamRunner />` while a run exists (the hub's own pattern), `AppShell` lists the two routes in
@@ -202,14 +202,14 @@ rather than as a zero.
   the same rule without pulling the content banks in behind it.
 - Modelltest's Verlauf leads with the last score plus its delta; Module üben's is a Stärkeprofil
   (pale = first attempt, solid = the gain since).
-- **Every module page carries a Verlauf tab** (founder s200: "either keep verlauf in every module or
+- **Every module page carries a Verlauf tab** (founder s201: "either keep verlauf in every module or
   remove it from all of the individual modules and just in the prüfung hub page ... go with verlauf
   on all four"). Schreiben's and Sprechen's are corrections and transcripts, which nothing else in
   the app renders; Lesen's and Hören's list that module's OWN sittings (`moduleRuns`) led by the
   same "last score + delta + bars" composition the Modelltest Verlauf uses (founder pick V2), with
   the Niveau on each row instead of the module name, which the page already says. The hub keeps the
   cross-module views only: full runs, and the four-column profile.
-- **The Verlauf card itself is `features/pruefung/verlauf.tsx`**, extracted from the hub in s200 the
+- **The Verlauf card itself is `features/pruefung/verlauf.tsx`**, extracted from the hub in s201 the
   moment a second page needed it (`VerlaufCard`, `ScoreChart`, `NoScoreYet`, `DeltaChip`,
   `ModuleVerlaufCard`). A chooser must NOT import `PruefungHub` for it: the hub pulls
   `mockExamAvailability` and, behind it, the writing-prompt bank into the chooser's chunk.

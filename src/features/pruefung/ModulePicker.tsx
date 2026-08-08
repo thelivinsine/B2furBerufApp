@@ -63,7 +63,7 @@ export function ModulePage({
  * sticky 16rem "Aufgabe wählen" rail beside it, and on a phone the same rail as
  * a collapsible panel behind ONE toggle.
  *
- * **Where that toggle lives changed in s200** (founder: "the header bar
+ * **Where that toggle lives changed in s201** (founder: "the header bar
  * shouldn't have the aufgabe button, place it somewhere else"). It used to ride
  * in the module row, which is the row that answers "which module am I in" and
  * nothing else; a filter control sitting in it made a label row look like a
@@ -120,7 +120,7 @@ export function ModulePicker({
 
   return (
     <div className="space-y-3 sm:space-y-5">
-      {/* Mobile: the module row, and ONLY the module row (founder s200). */}
+      {/* Mobile: the module row, and ONLY the module row (founder s201). */}
       <ModuleHeader part={part} />
 
       {/* A switcher belongs over the CONTENT column, not over content + rail:

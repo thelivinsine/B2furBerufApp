@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { HASH_SIDECAR, buildContentIndex, contentHash } from "./content-hash.mjs";
 import { isSectorEarned } from "./sector-markers.mjs";
+import { meetsJustificationRule } from "./justification-markers.mjs";
 import {
   worthLearningFindings,
   cefrPlausibilityFindings,
@@ -101,7 +102,10 @@ const WRITING_FORMATS = [
   "beschwerde", "reklamation",
   "antrag", "widerspruch", "kuendigung", "bewerbung",
 ];
-const WRITING_EXAMS = ["goethe_b1", "goethe_b2", "goethe_c1", "telc_b2_beruf", "dtb", "alltag"];
+// `exam` was RETIRED in s200 (audit P3): dead authoring metadata no surface,
+// filter or grader read, which is exactly why it drifted out of band on 69
+// tasks. The guard below errors if it comes back, the same pattern as the
+// retired singular `sector`.
 const WRITING_REGISTERS = ["du", "sie"];
 
 /** Validate an optional `sectors` array: non-empty, unique, enum values only.
@@ -761,8 +765,13 @@ function checkWritingTask(ds, w, t, themeId, code, seenIds) {
     error(ds, w, `invalid level "${t.level}"`);
   if (t.format !== undefined && !WRITING_FORMATS.includes(t.format))
     error(ds, w, `invalid format "${t.format}"`);
-  if (t.exam !== undefined && !WRITING_EXAMS.includes(t.exam))
-    error(ds, w, `invalid exam "${t.exam}"`);
+  if (t.exam !== undefined)
+    error(
+      ds,
+      w,
+      `"exam" was retired (s200, audit P3): nothing read it and it contradicted "words", ` +
+        `which follows (Niveau, Länge). Drop the field.`,
+    );
   if (t.register !== undefined && !WRITING_REGISTERS.includes(t.register))
     error(ds, w, `invalid register "${t.register}"`);
   if (t.addressee !== undefined && !isStr(t.addressee))
@@ -780,6 +789,32 @@ function checkWritingTask(ds, w, t, themeId, code, seenIds) {
   // Kurz/Lang word target only means something with content points to fill it.
   if (t.register !== undefined && t.addressee === undefined)
     error(ds, w, "register set without an addressee");
+  // A `du` brief may not name a title + surname (s200, audit §7). The Adressat
+  // drives the Anrede, so "Kollegin, Frau Bauer" plus register "du" instructs
+  // the learner to write "Hallo Frau Bauer, ... kannst du ...", a hybrid a
+  // German reader marks as wrong. Fix the Adressat (a first name) or the
+  // register, whichever the situation really is.
+  if (t.register === "du" && isStr(t.addressee) && /\b(Herr|Frau)\b/.test(t.addressee))
+    error(
+      ds,
+      w,
+      `register "du" with addressee "${t.addressee}": a title plus surname demands Sie. ` +
+        `Use a first name, or set register: "sie".`,
+    );
+  // An argumentative Textsorte at B2+ must ASK for the argumentation it is
+  // graded on (s200, audit §4). `level` tells `evaluate-writing` to mark
+  // strictly at B2/C1 and Aufgabenerfüllung is scored against the Leitpunkte,
+  // so a Stellungnahme whose points only describe punishes a learner for doing
+  // exactly what the brief said. Replace the weakest descriptive point rather
+  // than adding a fifth: four Leitpunkte in 200 words is already the exam shape.
+  if (!meetsJustificationRule(t))
+    error(
+      ds,
+      w,
+      `${t.format} at ${t.level} has no Leitpunkt demanding a reason, a consequence or a ` +
+        `stance (see scripts/justification-markers.mjs). The AI grades it strictly at that ` +
+        `Niveau, so the brief has to ask for the argument.`,
+    );
 }
 
 function lintWritingPrompts(writingPrompts, subThemeIndex) {

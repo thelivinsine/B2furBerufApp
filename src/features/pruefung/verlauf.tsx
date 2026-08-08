@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * The ONE Verlauf card, and the pieces every Verlauf in the Prüfung zone is
- * built from (extracted from `PruefungHub` in s200).
+ * built from (extracted from `PruefungHub` in s201).
  *
  * It moved out of the hub the moment a second page needed it: the founder asked
  * for a Verlauf on ALL FOUR module pages ("either keep verlauf in every module
@@ -272,7 +272,7 @@ export function moduleRuns(records: MockExamRecord[], part: MockPartId): ModuleR
 }
 
 /**
- * The Verlauf of ONE module (founder s200: a Verlauf on every module page).
+ * The Verlauf of ONE module (founder s201: a Verlauf on every module page).
  *
  * It is the Modelltest Verlauf's composition (founder pick V2, "Zahl und
  * Kurve") at module scale: the last score leads with its delta, Bester and
