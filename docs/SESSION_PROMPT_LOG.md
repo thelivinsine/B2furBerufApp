@@ -5247,3 +5247,34 @@ are Deno and outside `tsc`, so they were syntax-checked with esbuild and read li
   `src/lib/{consent,legalMeta}.ts` · `tests/aiUsage.test.ts` · `tests/aiAllowance.test.ts` ·
   `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` · `docs/areas/{SPRECHEN,LEGAL-ADMIN}.md` ·
   `docs/DECISIONS.md` §s197 · `docs/PROJECT_STATUS.md` · this log
+
+
+---
+
+## Session 197 — prompt 6 (2026-08-06): ship it
+
+**Branch:** `claude/ki-usage-task-kg0vix` → `main`
+
+**Prompt (verbatim):**
+
+> merge everything to main and live. document the session
+
+**Response summary.** Opened **PR #835** with everything the session produced and squash-merged it
+into `main` under the auto-ship rule, then did the post-merge housekeeping.
+
+**One thing added under "and live" rather than left for later:** the `pages.yml` deploy timeout,
+raised from the action's 600 s default to 30 minutes on all three attempts. s196 had already
+established the diagnosis and the fix and left it untaken as its own review; since this prompt asked
+for the change to go live, shipping the merge on top of the known-broken timeout would have invited
+the same red deploy the founder has now seen three sessions running. The retry chain stays.
+
+**What went live:** the Umformung's visible allowance; the `ai_calls` per-call usage ledger with one
+shared rate table (migration 0018 applies before the Edge Functions deploy, which is the required
+order here); the two Sprechen budgets (6 Üben, 3 Prüfung); the privacy-policy disclosure of the
+usage log with the consent version bumped in lockstep; and the CI timeout fix. `preview/ki-usage-chip.html`
+ships as a preview file only, nothing implemented from it.
+
+**Flagged, not decided:** the consent bump re-prompts every signed-in learner on their next visit,
+and reverting it is one line.
+
+- **Artifacts:** **PR #835**, squash-merged · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
