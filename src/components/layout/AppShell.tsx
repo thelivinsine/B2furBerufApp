@@ -148,6 +148,19 @@ export function AppShell() {
   const exit =
     zoneExit && ZONE_ROUTES.has(location.pathname) ? zoneExit : null;
 
+  /**
+   * The header's right side belongs to ONE control whenever there is a way out
+   * of the screen (founder s201: "get rid of the streak and account settings
+   * wherever the exit or back button is shown").
+   *
+   * The exam already did this (s186); the trainers and choosers kept the streak
+   * pill and the account menu beside their exit, so the same corner held three
+   * things on one screen and one thing on the next. A screen you are meant to
+   * leave by one control should not offer two more that leave it differently.
+   * Both live on every other screen and in Einstellungen, so nothing is lost.
+   */
+  const quietHeader = exam || !!exit;
+
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
   // send them back to /writing, where WritingHub restores the text and resumes
@@ -248,7 +261,7 @@ export function AppShell() {
                   streak/celebration rides the reward tokens, warning stays a
                   semantic state color. */}
               {/* Steuerung H7: the streak pill can be hidden from remote config. */}
-              {!exam && streakPillOn && (
+              {!quietHeader && streakPillOn && (
                 <div
                   className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
                   role="img"
@@ -261,11 +274,11 @@ export function AppShell() {
                   </span>
                 </div>
               )}
-              {!exam && <AccountMenu />}
+              {!quietHeader && <AccountMenu />}
               {/* The zone's one exit, LAST so it sits in the corner itself on
-                  every screen of the zone (founder s195). On an exam screen it
-                  is the only thing here, exactly as before; on a trainer it
-                  follows the streak and the account, which those pages keep. */}
+                  every screen of the zone (founder s195), and since s201 the
+                  ONLY control on this side: `quietHeader` drops the streak pill
+                  and the account menu wherever it shows. */}
               {exit && <ZoneExit tone={exit.tone} onExit={exit.run} />}
             </div>
           </div>

@@ -5643,3 +5643,15 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   before this session (378 at `66061c3`), so the linter still warns; that debt is older than this
   work and wants a pass of its own.
   **Artifacts:** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 5 (verbatim):** `get rid of the streak and account settings wherever the exit or back
+  button is shown`
+  **Response:** one flag in `AppShell`, `quietHeader = exam || !!exit`, now hides the streak pill and
+  the `AccountMenu` on every screen that carries the zone exit, which is what a running Teil had done
+  since s186 while the trainers and choosers kept them. That was the inconsistency: the same corner
+  held three controls on `/writing` and one inside a Teil. The Prüfung HUB is untouched, because it
+  is a nav destination and registers no exit, so it keeps both. Nothing became unreachable: both are
+  one tap away on every screen outside the zone, and the account also lives in Einstellungen. Law
+  restated in `CLAUDE.md` (the one-frame bullet) and `docs/areas/PRUEFUNG.md`.
+  **Artifacts:** `src/components/layout/AppShell.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/PROJECT_STATUS.md` · this log.

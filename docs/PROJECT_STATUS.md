@@ -160,6 +160,9 @@ remove it from all of the individual modules" → "go with verlauf on all four".
 - Verified in a real browser at 360x640 and 1280x860, light and dark: the drill loop end to end, the
   Aufgabe panel, the empty scope, both Verlauf states. Gates: typecheck · lint 0 errors · 652 tests ·
   build · bundle 128.2 kB · contrast · lint:content.
+- **The header carries ONE control where there is a way out** (founder, same session): `quietHeader`
+  drops the streak pill and the account menu wherever the zone exit shows, which the exam already
+  did. The hub keeps both, because it is a nav destination and registers no exit.
 - **Open, small:** `CLAUDE.md` is over its ~350-line budget (it was before this session too); the
   Sprechen/Schreiben Verlauf spinner has no timeout, so an unreachable Supabase hangs it forever.
 

@@ -158,8 +158,9 @@ after pulling.
   retryable. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195). ONE exit, the LAST control in the header, top
   right, on every screen of the zone and at every width (`useSessionStore.zoneExit`, rendered by
-  `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. `examStage` is a separate
-  flag and only a run sets it. **A confirm is about losing work, never about the clock:**
+  `AppShell`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever that exit shows
+  it is the ONLY control on that side** (founder s201): `quietHeader` drops the streak pill and the
+  account menu, which the exam already did. `examStage` is a separate flag and only a run sets it. **A confirm is about losing work, never about the clock:**
   `hasProgress(run)` gates it, the Schreibtrainer never asks (its draft autosaves, so the warning
   would be false) and a started conversation always does. **The word Zurück belongs to that exit
   alone**, so the question stepper is a chevron. A phone carries the module row on every screen

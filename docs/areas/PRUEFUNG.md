@@ -107,12 +107,18 @@ The zone had four different back buttons in three positions, two screens with no
 five content widths. One law now covers all eight screens.
 
 - **ONE exit, top right, always.** `useSessionStore.zoneExit` holds `{ run, tone }`; `AppShell`
-  renders it as the LAST control in the header on `/anwenden`, `/exam`, `/writing` and
-  `/simulation`, and nowhere else. `tone: "danger"` is the red **Verlassen** while a clock is
-  running; `tone: "quiet"` is the grey **Zurück** everywhere else, trainers included. It is a
-  callback because the exam owns its confirm and because `AppShell` may not import `useExamStore`
-  (the keep-eager-code-light invariant). `examStage` is a SEPARATE flag: it strips the sidebar,
-  the bottom bar and the streak, and only a run sets it.
+  renders it as the LAST control in the header on `/anwenden`, `/exam`, `/writing`, `/simulation`,
+  `/lesen` and `/hoeren` (`ZONE_ROUTES`), and nowhere else. `tone: "danger"` is the red
+  **Verlassen** while a clock is running; `tone: "quiet"` is the grey **Zurück** everywhere else,
+  trainers included. It is a callback because the exam owns its confirm and because `AppShell` may
+  not import `useExamStore` (the keep-eager-code-light invariant). `examStage` is a SEPARATE flag:
+  it strips the sidebar and the bottom bar, and only a run sets it.
+- **Where the exit shows, it is the only control on that side** (founder s201: "get rid of the
+  streak and account settings wherever the exit or back button is shown"). `quietHeader = exam ||
+  !!exit` in `AppShell` hides the streak pill and the `AccountMenu`, which a running Teil had
+  hidden since s186 while the trainers and choosers kept them, so the same corner carried three
+  controls on one screen of the zone and one on the next. Both are one tap away on every screen
+  outside the zone, and the account also lives in Einstellungen, so nothing became unreachable.
 - **The confirm is about losing work, not about the clock.** `hasProgress(run)` decides: any
   answer, note, essay text, recorded part result, or having advanced past Teil 1. With nothing to
   lose the exit just leaves, timed or not; with something to lose it asks "Dein Fortschritt wird
