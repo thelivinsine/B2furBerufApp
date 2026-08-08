@@ -5655,3 +5655,24 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   restated in `CLAUDE.md` (the one-frame bullet) and `docs/areas/PRUEFUNG.md`.
   **Artifacts:** `src/components/layout/AppShell.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
   `docs/PROJECT_STATUS.md` · this log.
+
+## Session 202 — 2026-08-08 — branch `claude/sprechen-filter-rail-practice-70gydw`
+
+- **Prompt 1 (verbatim):** `for the sprechen part, I'd want you to add a filter rail kind of rail
+  with useful redemittle even in the practice sessions.`
+  **Response:** design work, so previews first (no app code touched). Established what is on screen
+  today: a spoken task names its four Redemittel CATEGORIES on the brief card and ticks them in the
+  debrief, and the phrases behind them (8 per category, 239 in the bank) live only in the
+  Bibliothek, so the learner has category names but no language at the one moment they are speaking.
+  Built `preview/sprechen-redemittel-rail.html` from the real tokens: today's desktop and phone
+  screens, then three placements for the phrases during a practice conversation, each with a desktop
+  and a phone frame and its cost. **A** a 256 px Redemittel rail beside the conversation in the
+  ScopeRail tile (panel over the transcript on a phone), **B** a phrase strip above the microphone,
+  **C** a second tab (Aufgabe | Redemittel) on the collapsed brief drawer. Three content switches
+  ride the page in every option: 3 phrases per intent vs all 8, du/Sie matched to the partner vs
+  everything, English inline vs hold-to-peek. Stated in the preview and in chat: practice only, not
+  the Modelltest (handing a candidate the phrases would grade the reading), and reading a phrase is
+  never a tick, because whether a Redemittel was used stays the model's judgement of what was said.
+  Awaiting the founder's pick before implementing.
+  **Artifacts:** `preview/gen-sprechen-redemittel-rail.mjs` · `preview/sprechen-redemittel-rail.html`
+  · `preview/sprechen-redemittel-rail-artifact.html` (published) · this log.
