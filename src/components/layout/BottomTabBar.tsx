@@ -5,26 +5,27 @@ import { navItems, DEFAULT_PINNED_TABS, navZoneOf } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useNavLabel, useAppConfigStore } from "@/lib/appConfig";
+import { useT } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 // Flat light-grey backdrop for the active pill (no gradient, no section-colour tint).
 const ACTIVE_BOX = "bg-border";
 const IZ = 29; // icon size
 
-// The middle content sections. Home is the fixed first slot and Einstellungen
-// the fixed last slot (they replaced the retired "Mehr" sheet in s-polish).
-// The transfer zone is back on the bar in s182 (founder, after audit P4 found
-// the Sprechsimulation reachable only from the dashboard recommendation and
-// ⌘K), but the bar stays at FIVE slots: the founder moved Schreiben INTO that
-// zone and renamed it **Prüfung**, so the middle is Bibliothek · Prüfung.
+// The bar's three fixed slots and its reorderable middle.
+//
+// Until s207 Home ("/") was the fixed first slot. The founder reordered the
+// rail: **Bibliothek opens it and Praktisch sits directly left of
+// Einstellungen**, because onboarding now hands a new learner straight to the
+// library and the Praktisch zone is still Beta. So the ends are Bibliothek and
+// Praktisch + Einstellungen, and the middle that reorders (the long-press
+// easter egg) is Prüfung · Fortschritt.
+//
 // `/writing` keeps its route and every deep link; it is a card in the Prüfung
-// hub now instead of a tab, and `ROUTE_SUCCESSOR` remaps a persisted pin.
-// Since s158 (founder request) Fortschritt is pinned to the END of the middle,
-// always directly left of Einstellungen for every user: only Bibliothek and
-// Prüfung reorder, and any older persisted order that moved Fortschritt
-// elsewhere is normalised at read time.
-const REORDERABLE = ["/library", "/anwenden"];
-const FIXED_LAST_CONTENT = "/analytics";
+// hub instead of a tab, and `ROUTE_SUCCESSOR` remaps a persisted pin.
+const FIXED_FIRST = "/library";
+const REORDERABLE = ["/anwenden", "/analytics"];
+const FIXED_LAST_CONTENT = "/";
 
 // Every surface (bottom bar, sidebar) draws the SAME custom branded SVG for a
 // route — defined once in route-icons.tsx — so an icon is recognisable
@@ -45,7 +46,10 @@ function BarTab({ path, active, moreHidden }: { path: string; active: boolean; m
   const item = navItems.find(i => i.to === path);
   // Steuerung H1: apply a remote label override (falls back to the built-in).
   // Called unconditionally before the early return to respect the hooks rule.
-  const label = useNavLabel(path, item?.label ?? "");
+  // s207: the built-in label goes through the interface language first, so an
+  // A2/B1 learner reads "Library"; a founder-authored override wins verbatim.
+  const t = useT();
+  const label = useNavLabel(path, item ? t(item.label) : "");
   if (!item) return null;
   const { to } = item;
   const showActive = active && !moreHidden;
@@ -56,7 +60,7 @@ function BarTab({ path, active, moreHidden }: { path: string; active: boolean; m
     // active"), so the lit tab would never announce itself.
     <Link
       to={to}
-      aria-label={label}
+      aria-label={item.beta ? `${label} (Beta)` : label}
       aria-current={showActive ? "page" : undefined}
       // `min-w-0` is what lets a slot shrink below its label width, so the
       // truncate on the name actually fires. Without it the longest label
@@ -90,6 +94,11 @@ function BarTab({ path, active, moreHidden }: { path: string; active: boolean; m
           aria-hidden={!showActive}
         >
           {label}
+          {/* Beta suffix (founder s207, Praktisch): a plain lighter suffix, not
+              a chip — the label slot is a fixed 12px line, and a bordered chip
+              would grow it and shift the icon rail the slot exists to hold
+              still. It rides inside the truncate like the label itself. */}
+          {item.beta && <span className="ml-1 font-bold text-muted-foreground">Beta</span>}
         </span>
       </div>
     </Link>
@@ -109,17 +118,16 @@ export function BottomTabBar() {
   const [editMode, setEditMode] = useState(false);
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // The three content sections ALWAYS appear: the two reorderable ones in any
-  // saved custom order (so the reorder easter egg persists) completed with any
-  // missing ones, then Fortschritt pinned last. Because there is no add/remove
-  // any more, this guarantees a section can never be stranded off the bar.
+  // The middle sections ALWAYS appear: the reorderable ones in any saved custom
+  // order (so the reorder easter egg persists) completed with any missing ones.
+  // Because there is no add/remove any more, this guarantees a section can never
+  // be stranded off the bar.
   const saved       = pinnedTabs.filter(p => REORDERABLE.includes(p));
-  const reorderable = [...saved, ...REORDERABLE.filter(p => !saved.includes(p))];
-  const middle      = [...reorderable, FIXED_LAST_CONTENT];
+  const middle      = [...saved, ...REORDERABLE.filter(p => !saved.includes(p))];
   // Steuerung H2: hide middle tabs from the RAIL only (routes stay mounted, and
   // edit-mode reorder keeps operating on the full `middle` so hidden tabs are
-  // never dropped from the persisted pins). Home + Einstellungen are never
-  // hideable (locked bar structure).
+  // never dropped from the persisted pins). The three fixed slots (Bibliothek,
+  // Praktisch, Einstellungen) are never hideable (locked bar structure).
   const hiddenTabs = useAppConfigStore(s => s.config.hiddenTabs);
   const shownMiddle = middle.filter(p => !hiddenTabs.includes(p));
 
@@ -131,8 +139,8 @@ export function BottomTabBar() {
   // Navigating anywhere ends the reorder easter egg (there is no sheet to close).
   useEffect(() => { setEditMode(false); }, [pathname]);
 
-  function handleReorder(newReorderable: string[]) {
-    setPinnedTabs(["/", ...newReorderable, FIXED_LAST_CONTENT]);
+  function handleReorder(newMiddle: string[]) {
+    setPinnedTabs([FIXED_FIRST, ...newMiddle, FIXED_LAST_CONTENT]);
   }
 
   function startLongPress() {
@@ -172,26 +180,26 @@ export function BottomTabBar() {
         >
           {editMode ? (
             <>
-              {/* Home — always fixed first */}
+              {/* Bibliothek — always fixed first (s207) */}
               <div className="flex flex-1 p-1">
                 <div className="flex flex-1 items-center justify-center rounded-xl">
-                  <TabIcon path="/" />
+                  <TabIcon path={FIXED_FIRST} />
                 </div>
               </div>
 
               {/* Reorderable content sections (the easter egg). No add/remove
-                  badges — the fixed Home/Einstellungen ends plus the always-on
-                  content set mean nothing can be added or stranded.
+                  badges — the fixed ends plus the always-on content set mean
+                  nothing can be added or stranded.
                   flexGrow = count keeps each slot the same width as the ends. */}
               <Reorder.Group
                 axis="x"
-                values={reorderable}
+                values={middle}
                 onReorder={handleReorder}
                 as="div"
                 className="flex"
-                style={{ flexGrow: reorderable.length, flexShrink: 1, flexBasis: 0 }}
+                style={{ flexGrow: middle.length, flexShrink: 1, flexBasis: 0 }}
               >
-                {reorderable.map((path, idx) => (
+                {middle.map((path, idx) => (
                   <Reorder.Item
                     key={path}
                     value={path}
@@ -210,8 +218,8 @@ export function BottomTabBar() {
                 ))}
               </Reorder.Group>
 
-              {/* Fortschritt — pinned left of Einstellungen, not reorderable
-                  (founder, s158), so it renders as a still tile like the ends. */}
+              {/* Praktisch — pinned left of Einstellungen, not reorderable
+                  (founder, s207), so it renders as a still tile like the ends. */}
               <div className="flex flex-1 p-1">
                 <div className="flex flex-1 items-center justify-center rounded-xl">
                   <TabIcon path={FIXED_LAST_CONTENT} />
@@ -226,12 +234,13 @@ export function BottomTabBar() {
               </div>
             </>
           ) : (
-            /* Normal mode: Home · content sections · Einstellungen */
+            /* Normal mode: Bibliothek · content sections · Praktisch · Einstellungen */
             <>
-              <BarTab path="/" active={activeZone === "/"} />
+              <BarTab path={FIXED_FIRST} active={activeZone === FIXED_FIRST} />
               {shownMiddle.map(path => (
                 <BarTab key={path} path={path} active={activeZone === path} />
               ))}
+              <BarTab path={FIXED_LAST_CONTENT} active={activeZone === FIXED_LAST_CONTENT} />
               <BarTab path="/settings" active={activeZone === "/settings"} />
             </>
           )}

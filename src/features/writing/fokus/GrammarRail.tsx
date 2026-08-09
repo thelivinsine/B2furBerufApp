@@ -1,4 +1,5 @@
 import { Loader2, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { useT } from "@/lib/uiLang";
 import { GRAMMAR_AXES, type AxisId } from "./grammarDimensions";
 import type { FokusSelection } from "./useFokusMachine";
 import { Button } from "@/components/ui/button";
@@ -120,6 +121,7 @@ export function GrammarRail({
   layout = "rail",
   className,
 }: GrammarRailProps) {
+  const t = useT();
   const panel = layout === "panel";
 
   const body = (
@@ -128,9 +130,9 @@ export function GrammarRail({
         const selectedValue = selection[axis.id];
         const detectedValue = detected[axis.id];
         return (
-          <section key={axis.id} role="radiogroup" aria-label={axis.label}>
+          <section key={axis.id} role="radiogroup" aria-label={t(axis.label)}>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {axis.label}
+              {t(axis.label)}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {axis.values.map((v) => (
@@ -153,11 +155,11 @@ export function GrammarRail({
         {enabled ? (
           <>
             {/* Two lines (founder s149): the legend, then the instruction. */}
-            <b className="block text-success">Grüner Punkt = dein Satz.</b>
-            Tippe eine andere Form, um ihn umzuwandeln.
+            <b className="block text-success">{t("Grüner Punkt = dein Satz.")}</b>
+            {t("Tippe eine andere Form, um ihn umzuwandeln.")}
           </>
         ) : (
-          <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.</>
+          <>{t("Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.")}</>
         )}
       </p>
     </div>
@@ -166,7 +168,7 @@ export function GrammarRail({
   return (
     <aside
       role={panel ? "region" : undefined}
-      aria-label="Grammatik"
+      aria-label={t("Grammatik")}
       // Same Himmelblau fill as the Aufgabe-wählen rail (s149 harmonization;
       // was grey), with a quieter dark-mode alpha, and no visible outline: the
       // border wears the fill's own colour and `shadow-soft` does the lifting
@@ -188,8 +190,8 @@ export function GrammarRail({
             type="button"
             onClick={onReset}
             disabled={!canReset}
-            aria-label="Auf die erkannte Form zurücksetzen"
-            title="Zurücksetzen"
+            aria-label={t("Auf die erkannte Form zurücksetzen")}
+            title={t("Zurücksetzen")}
             className={cn(
               "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
               canReset
@@ -204,8 +206,8 @@ export function GrammarRail({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Schließen"
-            title="Schließen"
+            aria-label={t("Schließen")}
+            title={t("Schließen")}
             className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             <X className="h-4 w-4" />

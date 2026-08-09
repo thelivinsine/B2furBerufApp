@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useT, useTitle } from "@/lib/uiLang";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, ListChecks } from "lucide-react";
@@ -25,6 +26,8 @@ function isThemeId(v: string | null): v is ThemeId {
 }
 
 export function QuizHub() {
+  const tr = useT();
+  const titleOf = useTitle();
   const [params, setParams] = useSearchParams();
   const themeParam = params.get("theme");
   const levelParam = Number(params.get("level"));
@@ -70,7 +73,7 @@ export function QuizHub() {
           key={`${theme}-${level}`}
           themeId={theme}
           difficulty={level}
-          themeTitle={t.titleDe}
+          themeTitle={titleOf(t)}
           onExit={backToLevels}
         />
       </div>
@@ -93,8 +96,8 @@ export function QuizHub() {
             <Icon className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-display text-2xl">{t.titleDe}</h1>
-            <p className="text-sm text-muted-foreground">Wähle deine Schwierigkeitsstufe.</p>
+            <h1 className="text-display text-2xl">{titleOf(t)}</h1>
+            <p className="text-sm text-muted-foreground">{tr("Wähle deine Schwierigkeitsstufe.")}</p>
           </div>
         </div>
 
@@ -154,7 +157,7 @@ export function QuizHub() {
                     <Badge variant="muted" className="gap-1"><Sparkles className="h-3 w-3" /> 3 Stufen</Badge>
                   </div>
                   <div>
-                    <p className="font-semibold">{t.titleDe}</p>
+                    <p className="font-semibold">{titleOf(t)}</p>
                     <p className="text-xs text-muted-foreground">{t.words} Wörter · {t.cols} Wendungen</p>
                   </div>
                 </CardContent>

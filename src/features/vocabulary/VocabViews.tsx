@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { translateNow } from "@/lib/uiLang";
 import { Bookmark } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +53,7 @@ const sortForm = (v: VocabItem) => v.de.replace(/^(der|die|das)\s+/i, "");
 function MasteryBadge({ id }: { id: string }) {
   const label = useProgressStore((s) => masteryLabel(mastery(s.srs[id])));
   const badge = masteryBadge[label];
-  return <Badge variant={badge.variant}>{badge.text}</Badge>;
+  return <Badge variant={badge.variant}>{translateNow(badge.text)}</Badge>;
 }
 
 export function SaveButton({ id }: { id: string }) {
@@ -63,7 +64,7 @@ export function SaveButton({ id }: { id: string }) {
       type="button"
       size="icon-sm"
       variant="ghost"
-      aria-label={saved ? "Gespeichert" : "Wort speichern"}
+      aria-label={translateNow(saved ? "Gespeichert" : "Wort speichern")}
       aria-pressed={saved}
       className={cn(saved && "text-primary")}
       onClick={() => toggleSavedWord(id)}
@@ -106,7 +107,9 @@ const VOCAB_COLUMNS: DataColumn<VocabItem>[] = [
   {
     id: "pos",
     label: "Wortart",
-    cell: (v) => <span className="text-muted-foreground">{POS_LABEL[v.pos] ?? v.pos}</span>,
+    cell: (v) => (
+      <span className="text-muted-foreground">{translateNow(POS_LABEL[v.pos] ?? v.pos)}</span>
+    ),
     sortValue: (v) => POS_LABEL[v.pos] ?? v.pos,
   },
   {
@@ -120,7 +123,9 @@ const VOCAB_COLUMNS: DataColumn<VocabItem>[] = [
     label: "Häufigkeit",
     cell: (v) => {
       const bin = v.frequency ?? frequencyBin(v.id);
-      return bin ? <span className="text-muted-foreground">{FREQ_LABEL[bin]}</span> : null;
+      return bin ? (
+        <span className="text-muted-foreground">{translateNow(FREQ_LABEL[bin])}</span>
+      ) : null;
     },
     // Raw Zipf, so "häufig" sorts by actual corpus commonness, not bin order.
     sortValue: (v) => frequencyMap[v.id]?.zipf,

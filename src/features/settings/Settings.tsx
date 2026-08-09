@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sun, Moon, Monitor, Briefcase, Home as HomeIcon, Sparkles, Volume2, VolumeX, Mic, MicOff, AlertTriangle, Download, Loader2, Trash2 } from "lucide-react";
-import { useSettingsStore, type ThemeMode } from "@/store/useSettingsStore";
+import { useSettingsStore, type ThemeMode, type UiLangPref } from "@/store/useSettingsStore";
 import type { LearningMode } from "@/types";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SectionHeading } from "@/components/shared/misc";
+import { useT, useTx } from "@/lib/uiLang";
 import { AccountPanel } from "@/features/auth/AccountPanel";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,8 @@ export function Settings() {
   const [exporting, setExporting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteWord, setDeleteWord] = useState("");
+  const t = useT();
+  const tx = useTx();
 
   const signedIn = status === "signedIn" || status === "anonymous";
   const voices = getGermanVoices();
@@ -65,12 +68,12 @@ export function Settings() {
       const ok = await pushProgressNow();
       showToast(
         ok
-          ? "Fortschritt zurückgesetzt (auch in der Cloud)."
-          : "Lokal zurückgesetzt. Die Cloud wird synchronisiert, sobald du online bist.",
+          ? t("Fortschritt zurückgesetzt (auch in der Cloud).")
+          : t("Lokal zurückgesetzt. Die Cloud wird synchronisiert, sobald du online bist."),
         "warning",
       );
     } else {
-      showToast("Lokaler Fortschritt zurückgesetzt.", "warning");
+      showToast(t("Lokaler Fortschritt zurückgesetzt."), "warning");
     }
     setConfirmReset(false);
   };
@@ -79,9 +82,9 @@ export function Settings() {
     setExporting(true);
     try {
       await exportUserData();
-      showToast("Datenexport heruntergeladen.", "success");
+      showToast(t("Datenexport heruntergeladen."), "success");
     } catch {
-      showToast("Export fehlgeschlagen. Bitte versuche es erneut.", "warning");
+      showToast(t("Export fehlgeschlagen. Bitte versuche es erneut."), "warning");
     }
     setExporting(false);
   };
@@ -90,18 +93,18 @@ export function Settings() {
     if (deleteWord.trim().toUpperCase() !== DELETE_CONFIRM_WORD) return;
     const ok = await deleteAccount();
     if (ok) {
-      showToast("Dein Konto wurde gelöscht.", "default");
+      showToast(t("Dein Konto wurde gelöscht."), "default");
       navigate("/welcome", { replace: true });
     } else {
-      showToast("Konto konnte nicht gelöscht werden. Bitte versuche es erneut.", "warning");
+      showToast(t("Konto konnte nicht gelöscht werden. Bitte versuche es erneut."), "warning");
     }
   };
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <SectionHeading
-        eyebrow="Einstellungen"
-        title="Einstellungen"
+        eyebrow={t("Einstellungen")}
+        title={t("Einstellungen")}
       />
 
       <div className="mx-auto max-w-2xl space-y-5">
@@ -111,19 +114,19 @@ export function Settings() {
         {/* Profile */}
         <Card>
           <CardContent className="space-y-4 p-5">
-            <p className="font-semibold">Profil</p>
+            <p className="font-semibold">{t("Profil")}</p>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Name</label>
+              <label className="text-sm font-medium">{t("Name")}</label>
               <input
                 value={settings.name}
                 onChange={(e) => settings.setSettings({ name: e.target.value })}
                 className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
-                placeholder="Dein Name"
+                placeholder={t("Dein Name")}
               />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Sprachniveau</label>
+                <label className="text-sm font-medium">{t("Sprachniveau")}</label>
                 <Select value={settings.level} onValueChange={(v) => settings.setSettings({ level: v as never })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -134,23 +137,23 @@ export function Settings() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Tägliches XP-Ziel</label>
+                <label className="text-sm font-medium">{t("Tägliches XP-Ziel")}</label>
                 <Select
                   value={String(settings.dailyGoalXp)}
                   onValueChange={(v) => settings.setSettings({ dailyGoalXp: Number(v) })}
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="50">50 XP · Entspannt</SelectItem>
-                    <SelectItem value="80">80 XP · Stetig</SelectItem>
-                    <SelectItem value="120">120 XP · Ehrgeizig</SelectItem>
-                    <SelectItem value="200">200 XP · Intensiv</SelectItem>
+                    <SelectItem value="50">{t("50 XP · Entspannt")}</SelectItem>
+                    <SelectItem value="80">{t("80 XP · Stetig")}</SelectItem>
+                    <SelectItem value="120">{t("120 XP · Ehrgeizig")}</SelectItem>
+                    <SelectItem value="200">{t("200 XP · Intensiv")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Prüfungsdatum</label>
+              <label className="text-sm font-medium">{t("Prüfungsdatum")}</label>
               <input
                 type="date"
                 value={settings.examDate ?? ""}
@@ -158,18 +161,40 @@ export function Settings() {
                 className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
               />
             </div>
+            {/* Interface language (s207). It sits under the level on purpose:
+                the default DERIVES from the level, and this is the control that
+                overrides it when a learner wants the other one. */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">{t("Sprache")}</label>
+              <Select
+                value={settings.uiLang}
+                onValueChange={(v) => settings.setSettings({ uiLang: v as UiLangPref })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto">{t("Automatisch (nach Niveau)")}</SelectItem>
+                  <SelectItem value="de">{t("Deutsch")}</SelectItem>
+                  <SelectItem value="en">{t("Englisch")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  "A2 und B1 sehen die Oberfläche auf Englisch, B2 und C1 auf Deutsch. Der Lernstoff ist immer auf Deutsch.",
+                )}
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         {/* Learning */}
         <Card>
           <CardContent className="space-y-4 p-5">
-            <p className="font-semibold">Lernen</p>
+            <p className="font-semibold">{t("Lernen")}</p>
             <div className="space-y-2">
               <div>
-                <p className="text-sm font-medium">Lernmodus</p>
+                <p className="text-sm font-medium">{t("Lernmodus")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Worauf dein Tag den Fokus legt: Beruf, Alltag oder beides.
+                  {t("Worauf dein Tag den Fokus legt: Beruf, Alltag oder beides.")}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -185,17 +210,18 @@ export function Settings() {
                     )}
                   >
                     <Icon className="h-4 w-4" />
-                    {label}
+                    {t(label)}
                   </button>
                 ))}
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-border pt-4">
               <div>
-                <p className="text-sm font-medium">Erst überlegen, dann Optionen</p>
+                <p className="text-sm font-medium">{t("Erst überlegen, dann Optionen")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Bei Auswahlfragen kurz selbst antworten, bevor die Optionen erscheinen. Das
-                  stärkt den Abruf.
+                  {t(
+                    "Bei Auswahlfragen kurz selbst antworten, bevor die Optionen erscheinen. Das stärkt den Abruf.",
+                  )}
                 </p>
               </div>
               <Switch
@@ -205,10 +231,11 @@ export function Settings() {
             </div>
             <div className="flex items-center justify-between border-t border-border pt-4">
               <div>
-                <p className="text-sm font-medium">Langsame Antworten öfter wiederholen</p>
+                <p className="text-sm font-medium">{t("Langsame Antworten öfter wiederholen")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Wenn du eine Antwort zwar richtig, aber deutlich langsamer als sonst gibst, wird
-                  sie früher wieder abgefragt.
+                  {t(
+                    "Wenn du eine Antwort zwar richtig, aber deutlich langsamer als sonst gibst, wird sie früher wieder abgefragt.",
+                  )}
                 </p>
               </div>
               <Switch
@@ -218,11 +245,14 @@ export function Settings() {
             </div>
             <div className="flex items-center justify-between border-t border-border pt-4">
               <div>
-                <p className="text-sm font-medium">Gespeicherte Wörter</p>
+                <p className="text-sm font-medium">{t("Gespeicherte Wörter")}</p>
                 <p className="text-xs text-muted-foreground">
                   {savedCount > 0
-                    ? `${savedCount} Wort${savedCount !== 1 ? "e" : ""} in deinem Merkzettel. Sie kommen in Übungen häufiger dran.`
-                    : "Tippe das Lesezeichen an einem Wort, um es öfter zu üben."}
+                    ? tx(
+                        `${savedCount} Wort${savedCount !== 1 ? "e" : ""} in deinem Merkzettel. Sie kommen in Übungen häufiger dran.`,
+                        `${savedCount} word${savedCount !== 1 ? "s" : ""} on your list. They come up more often in exercises.`,
+                      )
+                    : t("Tippe das Lesezeichen an einem Wort, um es öfter zu üben.")}
                 </p>
               </div>
               {savedCount > 0 && (
@@ -232,7 +262,7 @@ export function Settings() {
                   className="shrink-0"
                   onClick={() => navigate("/library?tab=woerter&saved=1")}
                 >
-                  Ansehen
+                  {t("Ansehen")}
                 </Button>
               )}
             </div>
@@ -242,7 +272,7 @@ export function Settings() {
         {/* Appearance */}
         <Card>
           <CardContent className="space-y-4 p-5">
-            <p className="font-semibold">Darstellung</p>
+            <p className="font-semibold">{t("Darstellung")}</p>
             <div className="flex gap-2">
               {themeModes.map(({ id, label, icon: Icon }) => (
                 <button
@@ -256,14 +286,14 @@ export function Settings() {
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {label}
+                  {t(label)}
                 </button>
               ))}
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Reduzierte Animation</p>
-                <p className="text-xs text-muted-foreground">Weniger Bewegung in der UI</p>
+                <p className="text-sm font-medium">{t("Reduzierte Animation")}</p>
+                <p className="text-xs text-muted-foreground">{t("Weniger Bewegung in der UI")}</p>
               </div>
               <Switch
                 checked={settings.reducedMotion}
@@ -276,13 +306,13 @@ export function Settings() {
         {/* Speech */}
         <Card>
           <CardContent className="space-y-4 p-5">
-            <p className="font-semibold">Sprachausgabe</p>
+            <p className="font-semibold">{t("Sprachausgabe")}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {settings.speechEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                 <div>
-                  <p className="text-sm font-medium">Text-zu-Sprache</p>
-                  <p className="text-xs text-muted-foreground">Aussprachehilfe für Vokabeln & Dialoge</p>
+                  <p className="text-sm font-medium">{t("Text-zu-Sprache")}</p>
+                  <p className="text-xs text-muted-foreground">{t("Aussprachehilfe für Vokabeln & Dialoge")}</p>
                 </div>
               </div>
               <Switch
@@ -294,7 +324,7 @@ export function Settings() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 pt-1">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="font-medium">Sprechgeschwindigkeit</span>
+                    <span className="font-medium">{t("Sprechgeschwindigkeit")}</span>
                     <span className="tabular-nums text-muted-foreground">{settings.speechRate.toFixed(2)}×</span>
                   </div>
                   <Slider
@@ -307,7 +337,7 @@ export function Settings() {
                 </div>
                 {voices.length > 0 && (
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Stimme (Deutsch)</label>
+                    <label className="text-sm font-medium">{t("Stimme (Deutsch)")}</label>
                     <Select
                       value={settings.voiceURI ?? voices[0]?.voiceURI ?? ""}
                       onValueChange={(v) => settings.setSettings({ voiceURI: v, voiceVariety: false })}
@@ -324,9 +354,9 @@ export function Settings() {
                 {voices.length > 1 && (
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium">Stimmen abwechseln</p>
+                      <p className="text-sm font-medium">{t("Stimmen abwechseln")}</p>
                       <p className="text-xs text-muted-foreground">
-                        Wechselt bei jeder Wiedergabe zwischen den verfügbaren deutschen Stimmen.
+                        {t("Wechselt bei jeder Wiedergabe zwischen den verfügbaren deutschen Stimmen.")}
                       </p>
                     </div>
                     <Switch
@@ -341,8 +371,10 @@ export function Settings() {
               <div className="flex items-center gap-2">
                 {settings.recognitionEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
                 <div>
-                  <p className="text-sm font-medium">Spracherkennung</p>
-                  <p className="text-xs text-muted-foreground">Schaltet Sprechblöcke in Sessions frei. Experimentell, nicht auf allen Geräten verfügbar</p>
+                  <p className="text-sm font-medium">{t("Spracherkennung")}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("Schaltet Sprechblöcke in Sessions frei. Experimentell, nicht auf allen Geräten verfügbar")}
+                  </p>
                 </div>
               </div>
               <Switch
@@ -356,14 +388,15 @@ export function Settings() {
         {/* Your data */}
         <Card>
           <CardContent className="space-y-3 p-5">
-            <p className="font-semibold">Deine Daten</p>
+            <p className="font-semibold">{t("Deine Daten")}</p>
             <p className="text-sm text-muted-foreground">
-              Lade eine Kopie deiner Daten als JSON herunter: dein Profil, dein Lernfortschritt und
-              (wenn du angemeldet bist) deine gespeicherten Schreib-Auswertungen.
+              {t(
+                "Lade eine Kopie deiner Daten als JSON herunter: dein Profil, dein Lernfortschritt und (wenn du angemeldet bist) deine gespeicherten Schreib-Auswertungen.",
+              )}
             </p>
             <Button variant="outline" onClick={handleExport} disabled={exporting} className="gap-2">
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              Daten exportieren
+              {t("Daten exportieren")}
             </Button>
           </CardContent>
         </Card>
@@ -371,14 +404,20 @@ export function Settings() {
         {/* Danger zone: reset progress */}
         <Card className="border-danger/30">
           <CardContent className="space-y-3 p-5">
-            <p className="font-semibold text-danger">Gefahrenzone</p>
-            <p className="text-sm font-medium">Fortschritt zurücksetzen</p>
+            <p className="font-semibold text-danger">{t("Gefahrenzone")}</p>
+            <p className="text-sm font-medium">{t("Fortschritt zurücksetzen")}</p>
             <p className="text-sm text-muted-foreground">
-              Setzt deinen Lernfortschritt (XP, Karteikarten, Serien, Prüfungsdaten) zurück.
+              {tx(
+                "Setzt deinen Lernfortschritt (XP, Karteikarten, Serien, Prüfungsdaten) zurück.",
+                "Resets your learning progress (XP, flashcards, streaks, exam data).",
+              )}
               {signedIn
-                ? " Da du angemeldet bist, wird auch die Cloud-Kopie gelöscht."
-                : " Dies betrifft nur dieses Gerät."}{" "}
-              Dein Konto bleibt bestehen.
+                ? tx(
+                    " Da du angemeldet bist, wird auch die Cloud-Kopie gelöscht.",
+                    " Since you are signed in, the cloud copy is deleted too.",
+                  )
+                : tx(" Dies betrifft nur dieses Gerät.", " This affects this device only.")}{" "}
+              {tx("Dein Konto bleibt bestehen.", "Your account stays.")}
             </p>
             {confirmReset && (
               <motion.div
@@ -387,15 +426,15 @@ export function Settings() {
                 className="flex items-center gap-2 rounded-lg bg-danger/10 p-3 text-sm text-danger"
               >
                 <AlertTriangle className="h-4 w-4 shrink-0" />
-                Bist du sicher? Diese Aktion kann nicht rückgängig gemacht werden.
+                {t("Bist du sicher? Diese Aktion kann nicht rückgängig gemacht werden.")}
               </motion.div>
             )}
             <div className="flex gap-2">
               {confirmReset && (
-                <Button variant="outline" onClick={() => setConfirmReset(false)}>Abbrechen</Button>
+                <Button variant="outline" onClick={() => setConfirmReset(false)}>{t("Abbrechen")}</Button>
               )}
               <Button variant={confirmReset ? "danger" : "outline"} onClick={handleReset}>
-                {confirmReset ? "Ja, Fortschritt löschen" : "Fortschritt zurücksetzen"}
+                {t(confirmReset ? "Ja, Fortschritt löschen" : "Fortschritt zurücksetzen")}
               </Button>
             </div>
           </CardContent>
@@ -406,22 +445,25 @@ export function Settings() {
           <Card className="border-danger/30">
             <CardContent className="space-y-3 p-5">
               <p className="flex items-center gap-2 font-semibold text-danger">
-                <Trash2 className="h-4 w-4" /> Konto löschen
+                <Trash2 className="h-4 w-4" /> {t("Konto löschen")}
               </p>
               <p className="text-sm text-muted-foreground">
-                Löscht dein Konto und alle damit verbundenen Daten (Profil, Fortschritt,
-                Schreib-Auswertungen) endgültig aus der Cloud. Diese Aktion kann nicht rückgängig
-                gemacht werden. Tipp: exportiere vorher deine Daten.
+                {tx(
+                  "Löscht dein Konto und alle damit verbundenen Daten (Profil, Fortschritt, Schreib-Auswertungen) endgültig aus der Cloud. Diese Aktion kann nicht rückgängig gemacht werden. Tipp: exportiere vorher deine Daten.",
+                  "Permanently deletes your account and everything tied to it (profile, progress, writing evaluations) from the cloud. This cannot be undone. Tip: export your data first.",
+                )}
               </p>
               {!confirmDelete ? (
                 <Button variant="outline" onClick={() => setConfirmDelete(true)}>
-                  Konto löschen
+                  {t("Konto löschen")}
                 </Button>
               ) : (
                 <div className="space-y-3 rounded-lg bg-danger/10 p-3">
                   <p className="flex items-start gap-2 text-sm text-danger">
                     <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                    Gib zur Bestätigung <strong>{DELETE_CONFIRM_WORD}</strong> ein.
+                    {tx("Gib zur Bestätigung ", "Type ")}
+                    <strong>{DELETE_CONFIRM_WORD}</strong>
+                    {tx(" ein.", " to confirm.")}
                   </p>
                   <input
                     value={deleteWord}
@@ -438,7 +480,7 @@ export function Settings() {
                       }}
                       disabled={busy}
                     >
-                      Abbrechen
+                      {t("Abbrechen")}
                     </Button>
                     <Button
                       variant="danger"
@@ -447,7 +489,7 @@ export function Settings() {
                       className="gap-2"
                     >
                       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                      Konto endgültig löschen
+                      {t("Konto endgültig löschen")}
                     </Button>
                   </div>
                 </div>
@@ -461,28 +503,28 @@ export function Settings() {
             onClick={() => navigate("/hilfe")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
-            Hilfe & Anleitungen
+            {t("Hilfe & Anleitungen")}
           </button>
           <span aria-hidden className="text-border">·</span>
           <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
-            Datenschutzerklärung
+            {t("Datenschutzerklärung")}
           </button>
           <span aria-hidden className="text-border">·</span>
           <button
             onClick={() => navigate("/terms")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
-            AGB
+            {t("AGB")}
           </button>
           <span aria-hidden className="text-border">·</span>
           <button
             onClick={() => navigate("/sources")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
-            Quellen & Lizenzen
+            {t("Quellen & Lizenzen")}
           </button>
         </p>
       </div>

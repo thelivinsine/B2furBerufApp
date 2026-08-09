@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useT } from "@/lib/uiLang";
 import { Flame } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
 
 export function StreakBadge({ count, className }: { count: number; className?: string }) {
+  const t = useT();
   const active = count > 0;
   return (
     <div
@@ -16,7 +18,7 @@ export function StreakBadge({ count, className }: { count: number; className?: s
       )}
     >
       <Flame className={cn("h-4 w-4", active && "fill-warning/30")} />
-      {count} {count === 1 ? "Tag" : "Tage"}
+      {count} {t(count === 1 ? "Tag" : "Tage")}
     </div>
   );
 }
@@ -50,6 +52,7 @@ export function EmptyState({
   description?: string;
   action?: React.ReactNode;
 }) {
+  const t = useT();
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -60,9 +63,9 @@ export function EmptyState({
         <Icon className="h-6 w-6" />
       </div>
       <div>
-        <p className="font-semibold">{title}</p>
+        <p className="font-semibold">{t(title)}</p>
         {description && (
-          <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{t(description)}</p>
         )}
       </div>
       {action}
@@ -89,17 +92,18 @@ export function SectionHeading({
   description?: string;
   action?: React.ReactNode;
 }) {
+  const t = useT();
   return (
     <div className="mb-4 sm:mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
         {eyebrow && (
           <p className="text-eyebrow mb-1 text-primary">
-            {eyebrow}
+            {t(eyebrow)}
           </p>
         )}
-        <h1 className="text-display text-2xl sm:text-3xl">{title}</h1>
+        <h1 className="text-display text-2xl sm:text-3xl">{t(title)}</h1>
         {description && (
-          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{t(description)}</p>
         )}
       </div>
       {action}

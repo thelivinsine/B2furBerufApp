@@ -1,3 +1,4 @@
+import { useT } from "@/lib/uiLang";
 import {
   Select,
   SelectContent,
@@ -63,13 +64,14 @@ export function BrowseToolbar<T>({
   onRemoveChip,
   trailing,
 }: BrowseToolbarProps<T>) {
+  const t = useT();
   return (
     <div className="space-y-2">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <SearchField
           value={search}
           onChange={onSearch}
-          placeholder={searchPlaceholder}
+          placeholder={t(searchPlaceholder)}
           className="flex-1"
         />
 
@@ -81,16 +83,16 @@ export function BrowseToolbar<T>({
             <SelectContent>
               {primary.options.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(opt.label)}
                   {opt.count != null ? ` (${opt.count})` : ""}
                 </SelectItem>
               ))}
               {primary.groups?.map((group) => (
                 <SelectGroup key={group.label}>
-                  <SelectLabel>{group.label}</SelectLabel>
+                  <SelectLabel>{t(group.label)}</SelectLabel>
                   {group.options.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {t(opt.label)}
                       {opt.count != null ? ` (${opt.count})` : ""}
                     </SelectItem>
                   ))}

@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
@@ -137,6 +138,7 @@ function TileGlyph({ kind, color }: { kind: (typeof STOPS)[number]["key"]; color
 }
 
 export default function UebenPath() {
+  const t = useT();
   const navigate = useNavigate();
   const missionsDone = useProgressStore((s) => s.missionsDone);
   const isDark = useIsDark();
@@ -207,7 +209,7 @@ export default function UebenPath() {
     // it reads as a deliberate focused column instead of a stranded one.
     <div className="flex min-h-[calc(100dvh-15rem)] flex-col gap-4 lg:min-h-0">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
-      <h1 className="text-display text-center text-2xl">Lernpfad</h1>
+      <h1 className="text-display text-center text-2xl">{t("Lernpfad")}</h1>
 
       {/* Illustrated city map: the single journey surface (stepper retired s88).
           Native 3:2 (360x240) in a surface mat (the same mat, same dimensions
@@ -395,7 +397,7 @@ export default function UebenPath() {
                 : { left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 20) / 240) * 100}%` }
             }
           >
-            Du bist hier
+            {t("Du bist hier")}
           </span>
         </div>
       </div>
@@ -423,7 +425,7 @@ export default function UebenPath() {
         }}
       >
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-muted-foreground">Kapitel 1 · {chapterTitle}</span>
+          <span className="text-xs font-semibold text-muted-foreground">{t("Kapitel")} 1 · {chapterTitle}</span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-accent-ink">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             {doneCount} / {kap1.length}
@@ -440,7 +442,7 @@ export default function UebenPath() {
             <span className="text-[13px] font-bold tabular-nums text-muted-foreground">1.{selected.index}</span>
             {isNextModule && (
               <span className="inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
-                Als Nächstes
+                {t("Als Nächstes")}
               </span>
             )}
           </div>
@@ -449,7 +451,7 @@ export default function UebenPath() {
             {selectedDone && (
               <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
                 <Check className="h-3 w-3" />
-                Erledigt
+                {t("Erledigt")}
               </span>
             )}
           </div>
@@ -471,11 +473,11 @@ export default function UebenPath() {
             {selectedDone ? (
               <>
                 <RotateCcw className="h-[17px] w-[17px] text-muted-foreground" />
-                Wiederholen
+                {t("Wiederholen")}
               </>
             ) : (
               <>
-                Jetzt üben
+                {t("Jetzt üben")}
                 <ArrowRight className="h-[18px] w-[18px]" />
               </>
             )}

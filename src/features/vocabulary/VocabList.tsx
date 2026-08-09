@@ -1,4 +1,5 @@
 import { memo, useCallback, useState, type ComponentType } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { ChevronDown, Bookmark } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,6 +47,8 @@ const VocabCard = memo(function VocabCard({
   open: boolean;
   onToggleOpen: (id: string) => void;
 }) {
+  const t = useT();
+  const tx = useTx();
   const saved = useProgressStore((s) => s.savedWords.includes(v.id));
   const toggleSavedWord = useProgressStore((s) => s.toggleSavedWord);
   const relatedEnabled = useAppConfigStore((s) => s.config.features.relatedPanel);
@@ -128,7 +131,7 @@ const VocabCard = memo(function VocabCard({
               aria-expanded={open}
             >
               <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
-              {open ? "Weniger" : "Verbunden"}
+              {t(open ? "Weniger" : "Verbunden")}
             </button>
           </div>
         )}
@@ -166,9 +169,9 @@ const VocabCard = memo(function VocabCard({
               type="button"
               size="icon-sm"
               variant="ghost"
-              aria-label={saved ? "Gespeichert" : "Wort speichern"}
+              aria-label={t(saved ? "Gespeichert" : "Wort speichern")}
               aria-pressed={saved}
-              title={saved ? "Gespeichert" : "Wort speichern"}
+              title={t(saved ? "Gespeichert" : "Wort speichern")}
               className={cn("shrink-0", saved && "text-primary")}
               onClick={(e) => {
                 e.stopPropagation();
@@ -214,7 +217,7 @@ const VocabCard = memo(function VocabCard({
           <dl className="mt-2.5 grid grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)] gap-x-2.5 gap-y-0.5 border-t border-border pt-2 text-xs">
             {forms.praeteritum && (
               <>
-                <dt className="text-muted-foreground">Präteritum</dt>
+                <dt className="text-muted-foreground">{t("Präteritum")}</dt>
                 <dd className="font-medium">{forms.praeteritum}</dd>
               </>
             )}
@@ -225,7 +228,7 @@ const VocabCard = memo(function VocabCard({
             <dd className="font-medium">{perfekt(forms)}</dd>
             {forms.zuInfinitiv && (
               <>
-                <dt className="text-muted-foreground">mit zu</dt>
+                <dt className="text-muted-foreground">{t("mit zu")}</dt>
                 <dd className="font-medium">{forms.zuInfinitiv}</dd>
               </>
             )}
@@ -246,7 +249,14 @@ const VocabCard = memo(function VocabCard({
     </Card>
   );
 
-  return <FlipCard front={front} back={back} label={`Übersetzung von ${v.de}`} onFlip={onFlip} />;
+  return (
+    <FlipCard
+      front={front}
+      back={back}
+      label={tx(`Übersetzung von ${v.de}`, `Translation of ${v.de}`)}
+      onFlip={onFlip}
+    />
+  );
 });
 
 export function VocabList({ items }: { items: VocabItem[] }) {

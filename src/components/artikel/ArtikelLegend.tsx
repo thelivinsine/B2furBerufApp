@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { useT } from "@/lib/uiLang";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Button } from "@/components/ui/button";
 import { Wesen } from "./Wesen";
@@ -16,14 +17,17 @@ const GENDERS: Gender[] = ["der", "die", "das"];
 export function ArtikelLegend() {
   const dismissed = useSettingsStore((s) => s.artikelLegendDismissed);
   const setSettings = useSettingsStore((s) => s.setSettings);
+  const t = useT();
   if (dismissed) return null;
 
   return (
     <div className="relative flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-soft sm:flex-row sm:items-center sm:gap-5">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold">Drei Wesen zeigen den Artikel</p>
+        <p className="text-sm font-semibold">{t("Drei Wesen zeigen den Artikel")}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Jedes Nomen bekommt sein Wesen neben dem Wort. So siehst du den Artikel auf einen Blick.
+          {/* The three articles themselves (der/die/das) stay German below: they
+              ARE the learning material this card teaches. */}
+          {t("Jedes Nomen bekommt sein Wesen neben dem Wort. So siehst du den Artikel auf einen Blick.")}
         </p>
       </div>
       <div className="flex items-center gap-4">
@@ -40,7 +44,7 @@ export function ArtikelLegend() {
         type="button"
         size="icon-sm"
         variant="ghost"
-        aria-label="Hinweis schließen"
+        aria-label={t("Hinweis schließen")}
         className="absolute right-1.5 top-1.5 sm:static"
         onClick={() => setSettings({ artikelLegendDismissed: true })}
       >

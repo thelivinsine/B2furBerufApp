@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useT } from "@/lib/uiLang";
 import { ChevronDown, Loader2, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { GRAMMAR_AXES, valueLabel, type AxisId } from "./grammarDimensions";
 import type { FokusSelection } from "./useFokusMachine";
@@ -46,6 +47,7 @@ export function GrammarDials({
   bottomLimit?: () => number;
   className?: string;
 }) {
+  const t = useT();
   const [open, setOpen] = useState<AxisId | null>(null);
   const rootRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -145,8 +147,8 @@ export function GrammarDials({
           type="button"
           onClick={onReset}
           disabled={!canReset}
-          aria-label="Auf die erkannte Form zurücksetzen"
-          title="Zurücksetzen"
+          aria-label={t("Auf die erkannte Form zurücksetzen")}
+          title={t("Zurücksetzen")}
           className={cn(
             "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
             canReset

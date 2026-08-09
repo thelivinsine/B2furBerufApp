@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { motion } from "framer-motion";
 import { Check, ChevronRight, Clock, X } from "lucide-react";
 import {
@@ -66,6 +67,7 @@ export function hasProgress(run: MockExamRun): boolean {
 }
 
 export function MockExamRunner() {
+  const t = useT();
   const run = useExamStore((s) => s.run);
   const tick = useExamStore((s) => s.tick);
   const abandon = useExamStore((s) => s.abandon);
@@ -164,12 +166,12 @@ export function MockExamRunner() {
               {run.untimed ? "Übung verlassen?" : "Prüfung verlassen?"}
             </DialogTitle>
             <DialogDescription>
-              Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?
+              {t("Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?")}
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2.5">
             <Button variant="outline" className="flex-1" onClick={() => setExitOpen(false)}>
-              Weiter üben
+              {t("Weiter üben")}
             </Button>
             {/* `danger`, not the brand gradient: this app confirms destructive
                 actions in danger red (Settings' Konto löschen), and dark blue
@@ -315,6 +317,7 @@ export function AnswerStrip({
  * mid-intro before that change and resumes after the deploy.
  */
 function PartIntro({ run }: { run: MockExamRun }) {
+  const t = useT();
   const beginPart = useExamStore((s) => s.beginPart);
   const part = currentPart(run);
   const meta = PART_META[part];
@@ -410,7 +413,7 @@ function PartIntro({ run }: { run: MockExamRun }) {
                   the AI debrief weighs. One line, not a second checklist. */}
               {examSet.rubric.length > 0 && (
                 <p className="text-xs leading-snug text-muted-foreground">
-                  <span className="font-semibold text-foreground">Bewertet wird: </span>
+                  <span className="font-semibold text-foreground">{t("Bewertet wird:")}</span>
                   {examSet.rubric.map((c) => c.label).join(" · ")}
                 </p>
               )}
@@ -445,6 +448,7 @@ function PartIntro({ run }: { run: MockExamRun }) {
 /* -------------------------------- Ergebnis -------------------------------- */
 
 function Ergebnis({ run }: { run: MockExamRun }) {
+  const t = useT();
   const finish = useExamStore((s) => s.finish);
   const start = useExamStore((s) => s.start);
   const completeMockExam = useProgressStore((s) => s.completeMockExam);
@@ -502,7 +506,7 @@ function Ergebnis({ run }: { run: MockExamRun }) {
         animate={{ opacity: 1, y: 0 }}
         className="pt-2 text-center"
       >
-        <p className="text-eyebrow text-primary">Ergebnis</p>
+        <p className="text-eyebrow text-primary">{t("Ergebnis")}</p>
         {total.pct != null ? (
           <>
             <p className="text-display mt-1 text-5xl tabular-nums">{total.pct} %</p>
@@ -515,7 +519,7 @@ function Ergebnis({ run }: { run: MockExamRun }) {
             </div>
           </>
         ) : (
-          <p className="mt-2 text-sm text-muted-foreground">Kein Teil wurde bewertet.</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("Kein Teil wurde bewertet.")}</p>
         )}
       </motion.div>
 
@@ -562,7 +566,7 @@ function Ergebnis({ run }: { run: MockExamRun }) {
               size="sm"
               onClick={() => start(run.plan.level, [weakest])}
             >
-              Üben
+              {t("Üben")}
             </Button>
           </CardContent>
         </Card>
@@ -577,7 +581,7 @@ function Ergebnis({ run }: { run: MockExamRun }) {
           </Button>
         )}
         <Button variant="gradient" className="flex-1" onClick={finish}>
-          Fertig
+          {t("Fertig")}
         </Button>
       </div>
 
@@ -676,6 +680,7 @@ function ReviewList({ run }: { run: MockExamRun }) {
  * spoken debrief use: its fifth caller, never a fifth copy.
  */
 function SchreibenReview({ essay, corrected }: { essay: string; corrected: string | null }) {
+  const t = useT();
   const [view, setView] = useState<CorrectionViewMode>("orig");
   const { paragraphs, changes } = useCorrectionDiff(essay, corrected ?? essay);
 
@@ -683,13 +688,13 @@ function SchreibenReview({ essay, corrected }: { essay: string; corrected: strin
     <Card>
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold">Schreiben: dein Text</p>
+          <p className="text-sm font-semibold">{t("Schreiben: dein Text")}</p>
           {corrected && <CorrectionToggle view={view} onChange={setView} />}
         </div>
         <MarkedParagraphs paragraphs={paragraphs} view={view} />
         {!corrected ? (
           <p className="text-xs text-muted-foreground">
-            Für diesen Text gibt es keine Korrektur.
+            {t("Für diesen Text gibt es keine Korrektur.")}
           </p>
         ) : changes.length > 0 ? (
           <FixTiles changes={changes} max={MAX_FIX_TILES} />

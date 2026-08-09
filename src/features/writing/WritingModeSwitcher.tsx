@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useT } from "@/lib/uiLang";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import type { WritingMode } from "./resumeDraft";
 import { cn } from "@/lib/utils";
@@ -29,13 +30,14 @@ export function WritingModeSwitcher({
   onChange: (tab: WritingTab) => void;
   className?: string;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(value);
   return (
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="tablist"
-      aria-label="Schreiben"
+      aria-label={t("Schreiben")}
       className={cn(
         "relative flex w-full items-stretch gap-0.5 rounded-lg border border-border bg-muted p-1 shadow-soft sm:gap-1",
         className,
@@ -71,7 +73,7 @@ export function WritingModeSwitcher({
                 : "font-medium text-muted-foreground hover:text-foreground",
             )}
           >
-            {tab.label}
+            {t(tab.label)}
           </button>
         );
       })}

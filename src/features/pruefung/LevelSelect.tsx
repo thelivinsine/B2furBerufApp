@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ export function LevelSelect({
   label?: string;
   className?: string;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -91,10 +93,10 @@ export function LevelSelect({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={label}
+        aria-label={t(label)}
         className="flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface pl-3 pr-2 text-sm shadow-soft transition-colors hover:border-primary/40"
       >
-        <span className="text-muted-foreground">{label}</span>
+        <span className="text-muted-foreground">{t(label)}</span>
         <span className="font-bold tabular-nums">{current?.label}</span>
         <ChevronDown
           className={cn(
@@ -107,7 +109,7 @@ export function LevelSelect({
         {open && (
           <motion.div
             role="listbox"
-            aria-label={label}
+            aria-label={t(label)}
             initial={reduce ? false : { opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
@@ -137,7 +139,7 @@ export function LevelSelect({
                         : "hover:bg-muted/60",
                   )}
                 >
-                  <span className="flex-1 tabular-nums">{o.label}</span>
+                  <span className="flex-1 tabular-nums">{t(o.label)}</span>
                   <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                     {o.note}
                   </span>

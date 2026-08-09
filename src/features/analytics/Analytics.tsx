@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -130,6 +131,8 @@ function CompetenceCard({
   achieved: number;
   canDoTotal: number;
 }) {
+  const tx = useTx();
+  const t = useT();
   const masteryHistory = useProgressStore((s) => s.masteryHistory);
   const canDoAchievedAt = useProgressStore((s) => s.canDoAchievedAt);
   const [metric, setMetric] = useState<CompetenceMetric>("w");
@@ -179,13 +182,15 @@ function CompetenceCard({
   const delta = prior.length ? current - prior[prior.length - 1].value : null;
 
   const unit =
-    metric === "w" ? "Wörter gemeistert" : `von ${canDoTotal} Kompetenzen erreicht`;
+    metric === "w"
+      ? t("Wörter gemeistert")
+      : tx(`von ${canDoTotal} Kompetenzen erreicht`, `of ${canDoTotal} skills reached`);
 
   return (
     <Card>
       <CardContent className="space-y-3 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-eyebrow text-muted-foreground">Kompetenz</p>
+          <p className="text-eyebrow text-muted-foreground">{t("Kompetenz")}</p>
           {canDoTotal > 0 && (
             <div
               ref={trackRef as React.RefObject<HTMLDivElement>}
@@ -295,6 +300,8 @@ function CompetenceCard({
 }
 
 export function Analytics() {
+  const t = useT();
+  const tx = useTx();
   const xp = useProgressStore((s) => s.xp);
   const streak = useEffectiveStreak();
   const longestStreak = useProgressStore((s) => s.longestStreak);
@@ -491,8 +498,8 @@ export function Analytics() {
   return (
     <div className="space-y-6 sm:space-y-8">
       <SectionHeading
-        eyebrow="Fortschritt"
-        title="Deine Statistiken"
+        eyebrow={t("Fortschritt")}
+        title={t("Deine Statistiken")}
       />
 
       {/* ── Überblick: today's goal ring + level progress, then lifetime tiles ── */}
@@ -534,14 +541,19 @@ export function Analytics() {
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <div>
-                <p className="text-sm font-medium text-primary">Dein Ziel</p>
+                <p className="text-sm font-medium text-primary">{t("Dein Ziel")}</p>
                 <p className="mt-1 text-xl font-semibold">
                   {level} · {goalLabelDe[learningGoal]}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {minutesGoal} Min/Tag
-                  {daysToExam !== null && ` · noch ${daysToExam} ${daysToExam === 1 ? "Tag" : "Tage"} bis zur Prüfung`}.
-                  Starte deine erste Runde, dann siehst du hier deinen Fortschritt.
+                  {tx(`${minutesGoal} Min/Tag`, `${minutesGoal} min/day`)}
+                  {daysToExam !== null &&
+                    tx(
+                      ` · noch ${daysToExam} ${daysToExam === 1 ? "Tag" : "Tage"} bis zur Prüfung`,
+                      ` · ${daysToExam} ${daysToExam === 1 ? "day" : "days"} until the exam`,
+                    )}
+                  .{" "}
+                  {t("Starte deine erste Runde, dann siehst du hier deinen Fortschritt.")}
                 </p>
               </div>
               <Button onClick={() => navigate(rec.to)}>
@@ -551,10 +563,10 @@ export function Analytics() {
           </Card>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            <StatCard icon={Zap} label="Gesamt-XP" value={xp.toLocaleString()} hint={`${totalSessions} Sitzungen`} />
-            <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak}`} accent="reward" />
-            <StatCard icon={BookOpen} label="Vokabeln" value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={`${pct(masteryGroups.mastered, vocabulary.length)}% gemeistert`} accent="success" />
-            <StatCard icon={Trophy} label="Szenarien" value={`${scenariosDone.length}/${scenarios.length}`} hint={`${fullRuns.length} Modelltests`} accent="accent" />
+            <StatCard icon={Zap} label={t("Gesamt-XP")} value={xp.toLocaleString()} hint={tx(`${totalSessions} Sitzungen`, `${totalSessions} sessions`)} />
+            <StatCard icon={Flame} label={t("Aktuelle Serie")} value={tx(`${streak} Tage`, `${streak} days`)} hint={tx(`Rekord: ${longestStreak}`, `Record: ${longestStreak}`)} accent="reward" />
+            <StatCard icon={BookOpen} label={t("Vokabeln")} value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={tx(`${pct(masteryGroups.mastered, vocabulary.length)}% gemeistert`, `${pct(masteryGroups.mastered, vocabulary.length)}% mastered`)} accent="success" />
+            <StatCard icon={Trophy} label={t("Szenarien")} value={`${scenariosDone.length}/${scenarios.length}`} hint={tx(`${fullRuns.length} Modelltests`, `${fullRuns.length} mock exams`)} accent="accent" />
           </div>
         )}
       </section>
@@ -610,7 +622,7 @@ export function Analytics() {
           {examUpcoming && (
             <Card>
               <CardContent className="flex h-full flex-col gap-3 p-5">
-                <p className="text-eyebrow text-muted-foreground">Prüfung</p>
+                <p className="text-eyebrow text-muted-foreground">{t("Prüfung")}</p>
                 <div className="flex flex-1 items-center gap-4">
                   <div
                     className="relative h-[60px] w-[60px] shrink-0 rounded-full"
@@ -648,7 +660,7 @@ export function Analytics() {
           {/* Diagnose — the most specific weak spot available, one tap into it. */}
           <Card>
             <CardContent className="flex h-full flex-col gap-3 p-5">
-              <p className="text-eyebrow text-muted-foreground">Diagnose</p>
+              <p className="text-eyebrow text-muted-foreground">{t("Diagnose")}</p>
               {topWriting ? (
                 <>
                   <div className="flex-1">
@@ -677,8 +689,14 @@ export function Analytics() {
                     </p>
                     <p className="mt-0.5 text-sm text-muted-foreground">
                       {weakBand
-                        ? `Am wenigsten gefestigt: dein Wortschatz auf Niveau ${weakBand}.`
-                        : `Am wenigsten gefestigt: ${weakThemeTitle}.`}
+                        ? tx(
+                            `Am wenigsten gefestigt: dein Wortschatz auf Niveau ${weakBand}.`,
+                            `Weakest right now: your vocabulary at level ${weakBand}.`,
+                          )
+                        : tx(
+                            `Am wenigsten gefestigt: ${weakThemeTitle}.`,
+                            `Weakest right now: ${weakThemeTitle}.`,
+                          )}
                     </p>
                   </div>
                   <Button
@@ -686,7 +704,7 @@ export function Analytics() {
                     className="self-start"
                     onClick={() => navigate(`/session?theme=${weakTheme}`)}
                   >
-                    <Zap className="h-4 w-4" /> Session starten
+                    <Zap className="h-4 w-4" /> {t("Session starten")}
                   </Button>
                 </>
               )}
@@ -699,19 +717,19 @@ export function Analytics() {
               <CardContent className="flex h-full flex-col gap-3 p-5">
                 <div className="flex items-center gap-2 text-primary">
                   <Sparkles className="h-4 w-4 shrink-0" />
-                  <p className="text-sm font-medium">Nächste Quest</p>
+                  <p className="text-sm font-medium">{t("Nächste Quest")}</p>
                 </div>
                 <div className="flex-1">
                   <p className="text-base font-semibold">{nextQuest.item.statement}</p>
                   <div className="mt-2 flex items-center gap-2">
                     <Progress value={(nextQuest.ratio / nextQuest.item.threshold) * 100} className="h-1.5 w-24" />
                     <span className="text-xs tabular-nums text-muted-foreground">
-                      Ziel {Math.round(nextQuest.item.threshold * 100)}%
+                      {t("Ziel")} {Math.round(nextQuest.item.threshold * 100)}%
                     </span>
                   </div>
                 </div>
                 <Button size="sm" className="self-start" onClick={() => navigate(`/session?theme=${nextQuest.theme.id}`)}>
-                  <Zap className="h-4 w-4" /> Quest üben
+                  <Zap className="h-4 w-4" /> {t("Quest üben")}
                 </Button>
               </CardContent>
             </Card>
@@ -726,7 +744,7 @@ export function Analytics() {
                 <CardContent className="flex h-full items-center gap-3 p-5">
                   <Sparkles className="h-5 w-5 shrink-0 text-success" />
                   <p className="text-sm font-medium text-success">
-                    Alle Kompetenzen erreicht. Neue Themen schalten neue Quests frei.
+                    {t("Alle Kompetenzen erreicht. Neue Themen schalten neue Quests frei.")}
                   </p>
                 </CardContent>
               </Card>
@@ -739,7 +757,7 @@ export function Analytics() {
       {canDoGroups.length > 0 && (
         <section className="space-y-3">
           <Subheading aside={<Badge variant="muted">{canDoAchieved}/{canDoTotal}</Badge>}>
-            Was du schon kannst
+            {t("Was du schon kannst")}
           </Subheading>
           <Card>
             <CardContent className="space-y-4 p-5">
@@ -765,7 +783,7 @@ export function Analytics() {
                           <span className="flex-1">{c.statement}</span>
                           {!achieved && (
                             <span className="shrink-0 text-xs tabular-nums text-muted-foreground/70">
-                              Ziel {Math.round(c.threshold * 100)}%
+                              {t("Ziel")} {Math.round(c.threshold * 100)}%
                             </span>
                           )}
                         </div>
@@ -845,7 +863,7 @@ export function Analytics() {
             <Card>
               <CardContent className="p-5">
                 <p className="mb-1 font-semibold">Beherrschung nach Thema</p>
-                <p className="mb-4 text-xs text-muted-foreground">Sortiert nach Lernbedarf (oben = meiste Lücken)</p>
+                <p className="mb-4 text-xs text-muted-foreground">{t("Sortiert nach Lernbedarf (oben = meiste Lücken)")}</p>
                 <div className="space-y-3">
                   {themeStats.map(({ theme, total, mastered, ratio }) => (
                     <div key={theme.id} className="space-y-1">
@@ -898,9 +916,9 @@ export function Analytics() {
             {/* Vocab by frequency, mastery-overlaid (audit PR 3) */}
             <Card>
               <CardContent className="p-5">
-                <p className="mb-1 font-semibold">Wortschatz nach Häufigkeit</p>
+                <p className="mb-1 font-semibold">{t("Wortschatz nach Häufigkeit")}</p>
                 <p className="mb-4 text-xs text-muted-foreground">
-                  Tippe auf einen Balken und lerne zuerst, was im Alltag am häufigsten vorkommt.
+                  {t("Tippe auf einen Balken und lerne zuerst, was im Alltag am häufigsten vorkommt.")}
                 </p>
                 <ResponsiveContainer width="100%" height={140}>
                   <BarChart data={frequencyData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
@@ -972,6 +990,7 @@ export function Analytics() {
 }
 
 function ActivityCalendar() {
+  const t = useT();
   const activeDays = useProgressStore((s) => s.activeDays);
   const activeDaysFolded = useProgressStore((s) => s.activeDaysFolded);
   const activeSet = new Set(activeDays);
@@ -995,7 +1014,7 @@ function ActivityCalendar() {
   return (
     <Card>
       <CardContent className="p-5">
-        <p className="mb-4 font-semibold">Aktivitätskalender</p>
+        <p className="mb-4 font-semibold">{t("Aktivitätskalender")}</p>
         <div className="flex flex-wrap gap-1">
           {cells.map((d) => (
             <div

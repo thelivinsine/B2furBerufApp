@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { translateNow, useT, useTitle, useTx } from "@/lib/uiLang";
 import {
   forceCollide,
   forceLink,
@@ -110,6 +111,9 @@ const MIN_FOCUS_K = 1.5;
 const TARGET_FOCUS_K = 2.3;
 
 export default function WordGraph({ items }: { items: VocabItem[] }) {
+  const t = useT();
+  const tx = useTx();
+  const titleOf = useTitle();
   const isDark = useIsDark();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1078,8 +1082,8 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     return (
       <EmptyState
         icon={Waypoints}
-        title="Keine Wörter im Graph"
-        description="Lockere Filter oder Suche, dann erscheinen hier Wörter und ihre Verbindungen."
+        title={t("Keine Wörter im Graph")}
+        description={t("Lockere Filter oder Suche, dann erscheinen hier Wörter und ihre Verbindungen.")}
       />
     );
   }
@@ -1095,29 +1099,29 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
           className="block h-full w-full"
           role="img"
           aria-label={`Interaktiver Wortgraph: ${graph.nodes.length} Wörter, ${graph.links.length} Verbindungen. Tippen wählt ein Wort aus, Ziehen verschiebt die Ansicht.`}
-          title="Strg/Cmd + Scrollen zum Zoomen"
+          title={t("Strg/Cmd + Scrollen zum Zoomen")}
         />
 
         {/* Zoom controls */}
         <div className="absolute right-3 top-3 flex flex-col gap-1">
           <button
             onClick={() => zoomBy(1.35)}
-            aria-label="Vergrößern"
+            aria-label={t("Vergrößern")}
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Plus className="h-4 w-4" />
           </button>
           <button
             onClick={() => zoomBy(1 / 1.35)}
-            aria-label="Verkleinern"
+            aria-label={t("Verkleinern")}
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Minus className="h-4 w-4" />
           </button>
           <button
             onClick={onFitButton}
-            aria-label="Einpassen, erneut tippen für ein zufälliges häufiges Wort"
-            title="Einpassen · nochmal für ein zufälliges häufiges Wort"
+            aria-label={t("Einpassen, erneut tippen für ein zufälliges häufiges Wort")}
+            title={t("Einpassen · nochmal für ein zufälliges häufiges Wort")}
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Maximize className="h-4 w-4" />
@@ -1151,7 +1155,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
               {selected.cefr && <Badge variant="muted">{selected.cefr}</Badge>}
               {(() => {
                 const bin = selected.frequency ?? frequencyBin(selected.id);
-                return bin ? <Badge variant="muted">{FREQ_LABEL[bin]}</Badge> : null;
+                return bin ? <Badge variant="muted">{translateNow(FREQ_LABEL[bin])}</Badge> : null;
               })()}
               <Badge variant="muted">
                 {selectedNode?.degree ?? 0} Verbindung{(selectedNode?.degree ?? 0) !== 1 ? "en" : ""}
@@ -1190,12 +1194,15 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
               )}
             >
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-              {d.titleDe}
+              {titleOf(d)}
             </button>
           );
         })}
         <span className="tabular-nums">
-          {visibleLinkCount} Verbindung{visibleLinkCount !== 1 ? "en" : ""}
+          {tx(
+            `${visibleLinkCount} Verbindung${visibleLinkCount !== 1 ? "en" : ""}`,
+            `${visibleLinkCount} link${visibleLinkCount !== 1 ? "s" : ""}`,
+          )}
         </span>
       </div>
     </div>

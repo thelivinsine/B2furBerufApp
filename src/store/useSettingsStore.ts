@@ -25,6 +25,14 @@ function remapTabs(saved: string[] | undefined): string[] {
 export type ThemeMode = "light" | "dark" | "system";
 export type CefrLevel = "A2" | "B1" | "B2" | "C1";
 export type LearningGoal = "exam" | "work" | "fluency";
+/**
+ * Interface language (founder s207). "auto" derives it from the learner's
+ * level, which is the rule the founder stated: an A2/B1 learner reads the
+ * INTERFACE in English, a B2/C1 learner keeps the German one. The learning
+ * material itself is German at every level and is never translated by this
+ * setting. See `src/lib/uiLang.ts` for the one fold.
+ */
+export type UiLangPref = "auto" | "de" | "en";
 
 interface SettingsState {
   name: string;
@@ -38,6 +46,12 @@ interface SettingsState {
   // GDPR consent record (rides into profiles.settings jsonb via cloudSync).
   consentedAt: string | null; // ISO timestamp of when the user accepted AGB + Datenschutz
   consentVersion: string | null; // CONSENT_VERSION accepted, for future re-consent prompts
+
+  /**
+   * Interface language. "auto" (the default) follows `level`: A2/B1 read the
+   * interface in English, B2/C1 in German. Learning content stays German.
+   */
+  uiLang: UiLangPref;
 
   themeMode: ThemeMode;
   speechEnabled: boolean;
@@ -101,6 +115,7 @@ const defaults = {
   mode: "both" as LearningMode,
   consentedAt: null,
   consentVersion: null,
+  uiLang: "auto" as UiLangPref,
   themeMode: "system" as ThemeMode,
   speechEnabled: true,
   speechRate: 0.95,

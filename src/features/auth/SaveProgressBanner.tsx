@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { AuthDialog } from "@/features/auth/AuthDialog";
+import { useT } from "@/lib/uiLang";
 
 /**
  * Gentle nudge shown to learners who aren't signed in with an email yet
@@ -25,6 +26,7 @@ export function SaveProgressBanner({
   const dismissed = useSettingsStore((s) => s.signInBannerDismissed);
   const setSettings = useSettingsStore((s) => s.setSettings);
   const [authOpen, setAuthOpen] = useState(false);
+  const t = useT();
 
   // Only nudge guests / signed-out learners — never someone already signed in.
   const show = !dismissed && (status === "anonymous" || status === "signedOut");
@@ -46,18 +48,18 @@ export function SaveProgressBanner({
                   <CloudUpload className="h-4 w-4" />
                 </div>
                 <p className="min-w-0 flex-1 text-sm font-semibold leading-tight">
-                  Sichere deinen Fortschritt
+                  {t("Sichere deinen Fortschritt")}
                 </p>
                 <button
                   onClick={dismiss}
-                  aria-label="Hinweis schließen"
+                  aria-label={t("Hinweis schließen")}
                   className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
               <p className="mt-2 text-xs leading-snug text-muted-foreground">
-                Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.
+                {t("Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.")}
               </p>
               <Button
                 size="sm"
@@ -65,7 +67,7 @@ export function SaveProgressBanner({
                 className="mt-3 w-full"
                 onClick={() => setAuthOpen(true)}
               >
-                Anmelden
+                {t("Anmelden")}
               </Button>
             </motion.div>
           ) : (
@@ -79,17 +81,17 @@ export function SaveProgressBanner({
                 <CloudUpload className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">Sichere deinen Fortschritt</p>
+                <p className="text-sm font-semibold">{t("Sichere deinen Fortschritt")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.
+                  {t("Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.")}
                 </p>
               </div>
               <Button size="sm" variant="gradient" onClick={() => setAuthOpen(true)}>
-                Anmelden
+                {t("Anmelden")}
               </Button>
               <button
                 onClick={dismiss}
-                aria-label="Hinweis schließen"
+                aria-label={t("Hinweis schließen")}
                 className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <X className="h-4 w-4" />

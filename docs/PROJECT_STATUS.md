@@ -1,9 +1,74 @@
 # Project Status
 
-_Last updated: 2026-08-09 (session 206 fixed the Sprechen AI failure the founder reported: it was
-the sign-in wall arriving as a grey caption, not a broken model. Session 205 gave the AI cost figure
-a second opinion: Anthropic's own daily numbers beside ours in the control centre. Session 204 made AI usage MEASURED per call and gave
-Sprechen 6 + 3 conversations a day; see "Resume here")._
+_Last updated: 2026-08-09 (session 207 reordered the nav, ended onboarding in the Bibliothek and made
+the INTERFACE LANGUAGE follow the learner's level: A2/B1 English, B2/C1 German, learning material
+German at every level. Session 206 fixed the Sprechen AI failure the founder reported: it was the
+sign-in wall arriving as a grey caption, not a broken model. Session 205 gave the AI cost figure a
+second opinion. All handoffs under their own "Resume here")._
+
+**Session 207 (2026-08-09, branch `claude/remove-onboarding-practice-z7qfwu`): the nav order, the
+onboarding hand-off, and the interface language.**
+
+Founder, three prompts: *"remove the onboarding practice session when a new user signs up … finish
+the onboarding form and immediately shown the bibliothek. Keep bibliothek on the top, and the
+praktisch beside the settings. Praktisch should be labeled as beta."* → *"the app's language should
+adapt to various levels of user language proficiency … if the user logs A2 or B1 level, the app
+should show everything in English except the learning material which should obviously be in
+german."* → *"the buttons like üben or stufe b1.1 and the hint on what the gender means are all
+still in german. they're also considered as app language … check for other such overlooked items
+all across the app."* → *"if the user selects b2, then the app can have the current german
+wordings."*
+
+- **Onboarding ends in the Bibliothek.** `completeOnboarding` used to hand straight over to a ~90s
+  composed taster (`/session?min=1`), which decided a new learner's first minute for them. It now
+  goes to `/library`. Nothing else about setup changed (one card, consent recorded before any
+  progress is stored).
+- **The nav runs ONE new order, on both surfaces:** Bibliothek · Prüfung · Fortschritt · Praktisch
+  (**Beta**) · Einstellungen. Bibliothek opens the rail (it is what setup hands over to now),
+  Praktisch sits directly left of Einstellungen because that zone is still being built, and it
+  carries a Beta mark: a neutral bordered chip in the sidebar, a lighter bold suffix inside the bar's
+  label slot (a chip there would grow the fixed 12px line and shift the icon rail). `/` is unchanged
+  as a route: still the Dashboard, still the app root. The bar pins its own ends and only READS a
+  saved order for the reorderable middle, so every pre-s205 pin list still renders five slots with no
+  migration. `NEVER_HIDEABLE` makes the three fixed slots un-hideable on BOTH surfaces, so remote
+  config cannot empty a slot on one and leave it drawn on the other.
+- **The interface language follows the LEVEL** (`src/lib/uiLang.ts`, the one fold): A2/B1 read the
+  interface in English, B2/C1 keep today's German, and **the learning material is German at every
+  level** (a word, its example, a Redemittel, a grammar drill, an exam text, a writing brief, the
+  game's German world). `useSettingsStore.uiLang` ("auto" | "de" | "en", default auto) overrides it
+  from Einstellungen → Profil → Sprache and rides cloudSync in the settings blob. `<html lang>`
+  follows. Onboarding reacts to the level chip the learner is LOOKING at, so tapping A2 flips that
+  card to English before anything is saved.
+- **How it is built, and why that shape:** the app is German-first, so **the German string is the
+  key**. `t("Wörter")` looks up `src/lib/uiStrings.ts`, and a missing key renders the German, which
+  is exactly what that call site rendered before. That is what let coverage grow surface by surface
+  with no half-broken state, and it puts every English string in ONE file the founder can read as a
+  document. Shared components translate at the SINK (FilterRail, ScopeRail, FacetSheet, DataTable,
+  EmptyState/SectionHeading, ViewSwitcher, SearchField, UebenLabel), so one edit covered dozens of
+  call sites. Taxonomy that already carries both languages in the bank (Themen, sub-themes, domains,
+  life areas) goes through `useTitle()` instead of the dictionary, so 66 theme names are not
+  duplicated. **~700 chrome strings across ~60 components** are converted: the shell, onboarding,
+  Settings, all four Bibliothek tabs and their rails/graphs/tables, the Prüfung zone and its exam
+  runner, Schreiben, Sprechen, the session player, Fortschritt, Sammlung and the game chrome.
+- **Deliberately still German** (stated, not overlooked): the Modelltest's Anleitung, which
+  reproduces the real telc instruction text; the grammar dial VALUES in Fokus (Aktiv/Passiv/Präsens/
+  Perfekt are the forms being practised); the Neuland world's place and mission names; and the
+  German grammar abbreviations on a word card (Pl./Perf.).
+- **`main` moved under this branch** (#840, #841, #842, sessions 205 and 206 in parallel), so it was
+  merged in and every gate re-run on the merged tree. The conflicts were all in the docs: CLAUDE.md
+  took main's compressions plus this session's two new laws, and the append-only logs kept both sides.
+- Gates on the MERGED tree: typecheck · lint 0 errors (77 warnings, unchanged baseline) · **701
+  tests** (687 on `main`; `tests/uiLang.test.ts` pins the level rule, the German fallback and the
+  dictionary's shape, and two nav cases join) · build · check:bundle 153.2 kB · check:contrast ·
+  lint:content (CLAUDE.md back under its budget) · lint:migrations. Verified in a real browser at
+  390px and 1280px, at A2 and at B2.
+
+**Resume here (s207):** the language work is complete for chrome the learner meets, and the pattern
+is documented in `docs/areas/UI-LANGUAGE.md`. What is left is deliberate, not missing: the four
+items above stay German by decision, and any NEW surface must call `useT()` and add its pair to
+`uiStrings.ts` (the area doc says how). Worth a founder look on the live site: the Prüfung module
+names now read Reading/Listening/Writing/Speaking in English, which is a judgement call, and the
+sidebar tagline still says "German for work · B2" for every level.
 
 **Session 205 (2026-08-09, branch `claude/ki-usage-task-kg0vix`): step 2, the reconciliation.**
 The founder created a Console team organization and an Admin API key (30-day expiry, by choice) and

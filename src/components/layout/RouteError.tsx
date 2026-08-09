@@ -1,4 +1,5 @@
 import { useRouteError } from "react-router-dom";
+import { useT } from "@/lib/uiLang";
 import { Link } from "react-router-dom";
 import { isChunkLoadError, recoverFromStaleAssets } from "@/lib/recover";
 
@@ -10,6 +11,7 @@ import { isChunkLoadError, recoverFromStaleAssets } from "@/lib/recover";
  * (nav, header) stays alive and the learner gets a way back.
  */
 export function RouteError() {
+  const t = useT();
   const error = useRouteError();
 
   if (isChunkLoadError(error)) {
@@ -18,7 +20,7 @@ export function RouteError() {
     void recoverFromStaleAssets();
     return (
       <div className="mx-auto max-w-md py-16 text-center">
-        <h2 className="text-lg font-semibold">Neue Version verfügbar</h2>
+        <h2 className="text-lg font-semibold">{t("Neue Version verfügbar")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Die App wurde aktualisiert. Bitte lade neu, um weiterzumachen.
         </p>
@@ -35,9 +37,9 @@ export function RouteError() {
   const message = error instanceof Error ? error.message : String(error);
   return (
     <div className="mx-auto max-w-md py-16 text-center">
-      <h2 className="text-lg font-semibold">Hier ist etwas schiefgelaufen</h2>
+      <h2 className="text-lg font-semibold">{t("Hier ist etwas schiefgelaufen")}</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Dieser Bereich konnte nicht geladen werden. Dein Lernfortschritt ist gespeichert.
+        {t("Dieser Bereich konnte nicht geladen werden. Dein Lernfortschritt ist gespeichert.")}
       </p>
       <pre className="mt-4 overflow-x-auto rounded-lg bg-muted/50 p-3 text-left text-xs text-muted-foreground">
         {message}
@@ -54,7 +56,7 @@ export function RouteError() {
           reloadDocument
           className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
         >
-          Zur Übersicht
+          {t("Zur Übersicht")}
         </Link>
       </div>
     </div>

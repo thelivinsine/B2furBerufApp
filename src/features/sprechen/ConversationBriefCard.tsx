@@ -1,4 +1,5 @@
 import { ArrowRight, Mic } from "lucide-react";
+import { useT } from "@/lib/uiLang";
 import type { ConversationBrief } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,6 +47,7 @@ export function ConversationBriefCard({
    */
   onSignIn?: () => void;
 }) {
+  const t = useT();
   // Practice and Prüfung run on separate daily budgets (s204), so the brief
   // decides which meter this card is reading.
   const allowance = useDailyAllowance(brief.exam ? "sprechenExam" : "sprechen");
@@ -84,7 +86,7 @@ export function ConversationBriefCard({
           </div>
           <div className="h-px bg-border" />
           <div>
-            <p className="text-eyebrow text-muted-foreground">Das musst du schaffen</p>
+            <p className="text-eyebrow text-muted-foreground">{t("Das musst du schaffen")}</p>
             <ol className="mt-2 space-y-1.5">
               {brief.goals.map((g, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm leading-snug">
@@ -101,7 +103,7 @@ export function ConversationBriefCard({
 
       {brief.targetRedemittel.length > 0 && (
         <div className="rounded-xl border border-accent/20 bg-accent/20 p-4 shadow-soft dark:border-accent/10 dark:bg-accent/10">
-          <p className="text-eyebrow text-accent-ink">Nützliche Redemittel</p>
+          <p className="text-eyebrow text-accent-ink">{t("Nützliche Redemittel")}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {brief.targetRedemittel.map((r) => (
               <span

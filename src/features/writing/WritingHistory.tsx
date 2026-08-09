@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -143,6 +144,7 @@ function WeaknessChip({ children }: { children: React.ReactNode }) {
  * prove.
  */
 function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
+  const t = useT();
   const navigate = useNavigate();
 
   const model = useMemo(() => {
@@ -209,7 +211,7 @@ function WeaknessTrend({ entries }: { entries: WritingHistoryEntry[] }) {
     <Card>
       <CardContent className="space-y-4 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-eyebrow text-muted-foreground">Deine Entwicklung</p>
+          <p className="text-eyebrow text-muted-foreground">{t("Deine Entwicklung")}</p>
           {improvement && (
             <Badge variant="success">
               {practiceAreaById(improvement.weakness)?.labelDe ?? improvement.weakness}:{" "}
@@ -384,6 +386,7 @@ function HistoryEntry({
   index: number;
   onDelete: (id: string) => Promise<void>;
 }) {
+  const t = useT();
   const navigate = useNavigate();
   const reduce = useReducedMotion();
   const theme = themeById(entry.theme);
@@ -532,13 +535,13 @@ function HistoryEntry({
                     className="flex items-center gap-1 text-xs font-medium text-danger hover:underline"
                   >
                     {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                    Löschen
+                    {t("Löschen")}
                   </button>
                 </span>
               ) : (
                 <button
                   onClick={() => setConfirming(true)}
-                  aria-label="Auswertung löschen"
+                  aria-label={t("Auswertung löschen")}
                   className="text-muted-foreground transition-colors hover:text-danger"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -553,7 +556,7 @@ function HistoryEntry({
 
             <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
               <Sparkles className="h-3 w-3 shrink-0" />
-              KI-generierte Rückmeldung
+              {t("KI-generierte Rückmeldung")}
             </p>
           </CardContent>
         )}
@@ -577,6 +580,7 @@ function FokusEntry({
   index: number;
   onDelete: (id: string) => Promise<void>;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -675,13 +679,13 @@ function FokusEntry({
                     className="flex items-center gap-1 text-xs font-medium text-danger hover:underline"
                   >
                     {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                    Löschen
+                    {t("Löschen")}
                   </button>
                 </span>
               ) : (
                 <button
                   onClick={() => setConfirming(true)}
-                  aria-label="Satz löschen"
+                  aria-label={t("Satz löschen")}
                   className="text-muted-foreground transition-colors hover:text-danger"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -689,7 +693,7 @@ function FokusEntry({
               )}
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Sparkles className="h-3 w-3 shrink-0" />
-                KI-generierte Rückmeldung
+                {t("KI-generierte Rückmeldung")}
               </p>
             </div>
           </CardContent>
@@ -700,6 +704,7 @@ function FokusEntry({
 }
 
 export function WritingHistory() {
+  const t = useT();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<WritingHistoryEntry[]>([]);
   const [fokus, setFokus] = useState<FokusHistoryEntry[]>([]);
@@ -786,7 +791,7 @@ export function WritingHistory() {
         <CardContent className="flex items-start gap-3 p-5">
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
           <div className="space-y-2">
-            <p className="font-medium">Verlauf konnte nicht geladen werden</p>
+            <p className="font-medium">{t("Verlauf konnte nicht geladen werden")}</p>
             <Button size="sm" variant="outline" onClick={load}>
               Erneut versuchen
             </Button>
@@ -803,9 +808,9 @@ export function WritingHistory() {
           <div className="rounded-full bg-muted/50 p-4">
             <PenLine className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="font-medium">Noch keine Auswertungen</p>
+          <p className="font-medium">{t("Noch keine Auswertungen")}</p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            Reiche deinen ersten Text ein und sieh hier deine Schwachstellen im Verlauf.
+            {t("Reiche deinen ersten Text ein und sieh hier deine Schwachstellen im Verlauf.")}
           </p>
           <Button variant="gradient" onClick={() => navigate("/writing?mode=kurz")}>
             <PenLine className="h-4 w-4" /> Ersten Text schreiben

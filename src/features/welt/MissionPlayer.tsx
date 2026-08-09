@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Zap, KeyRound } from "lucide-react";
 import type { Mission } from "@/types/game";
@@ -41,6 +42,7 @@ import {
  * the app chrome underneath, exactly like `/session`.
  */
 export function MissionPlayer({ mission, onExit }: { mission: Mission; onExit: () => void }) {
+  const t = useT();
   const addXp = useProgressStore((s) => s.addXp);
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const practiceRedemittel = useProgressStore((s) => s.practiceRedemittel);
@@ -142,7 +144,7 @@ export function MissionPlayer({ mission, onExit }: { mission: Mission; onExit: (
         <button
           type="button"
           onClick={() => setBagOpen(true)}
-          aria-label="Tasche öffnen"
+          aria-label={t("Tasche öffnen")}
           className="relative flex h-9 w-11 items-center justify-center rounded-md border-2 bg-[#fdfcf8]"
           style={{ borderColor: GAME_OUT }}
         >
@@ -252,6 +254,7 @@ function BagSheet({
   onAdmit: () => void;
   onUseDict: () => void;
 }) {
+  const t = useT();
   const [inspect, setInspect] = useState<string | null>(null);
   const asking = askItem !== undefined;
   const items = run.bag.map((id) => keyItemById.get(id)).filter((k): k is NonNullable<typeof k> => !!k);
@@ -291,12 +294,12 @@ function BagSheet({
                 className="w-6 select-none"
                 style={{ imageRendering: "pixelated" }}
               />
-              Deine Tasche
+              {t("Deine Tasche")}
             </p>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Tasche schließen"
+              aria-label={t("Tasche schließen")}
               className="flex h-7 w-7 items-center justify-center rounded-md border-2 bg-white/90 text-slate-600"
               style={{ borderColor: GAME_OUT }}
             >
@@ -315,7 +318,7 @@ function BagSheet({
           )}
 
           {items.length === 0 ? (
-            <p className="text-sm text-slate-500">Noch keine Dokumente eingepackt.</p>
+            <p className="text-sm text-slate-500">{t("Noch keine Dokumente eingepackt.")}</p>
           ) : (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {items.map((item) => (
@@ -367,7 +370,7 @@ function BagSheet({
                 style={{ imageRendering: "pixelated" }}
               />
               <span>
-                <span className="block text-xs font-bold text-slate-700">Wörterbuch</span>
+                <span className="block text-xs font-bold text-slate-700">{t("Wörterbuch")}</span>
                 <span className="block text-[11px] text-slate-500">
                   {dictActive
                     ? "Aktiv für diese Szene"
@@ -379,7 +382,7 @@ function BagSheet({
             </button>
             {asking && (
               <Pill onClick={onAdmit} className="shrink-0 text-xs">
-                Hab ich nicht dabei
+                {t("Hab ich nicht dabei")}
               </Pill>
             )}
           </div>
@@ -395,6 +398,7 @@ function BagSheet({
  * reward-gold tokens: a completed mission IS a loot moment.
  */
 function VictoryScreen({ run, onExit }: { run: MissionRun; onExit: () => void }) {
+  const t = useT();
   const rewards = run.replay
     ? []
     : (run.mission.rewardItems ?? [])
@@ -431,7 +435,7 @@ function VictoryScreen({ run, onExit }: { run: MissionRun; onExit: () => void })
             <GameCard className="space-y-2 border-reward/60 bg-reward-bg p-5 text-center">
               <KeyRound className="mx-auto h-8 w-8 text-reward" />
               <p className="text-xs font-semibold uppercase tracking-widest text-reward">
-                Schlüssel-Dokument
+                {t("Schlüssel-Dokument")}
               </p>
               <p className="text-lg font-bold text-slate-800">
                 <Gloss de={item.de} en={item.en} />
@@ -456,7 +460,7 @@ function VictoryScreen({ run, onExit }: { run: MissionRun; onExit: () => void })
             <Zap className="h-4 w-4" /> +{run.xp} XP
           </span>
           <Pill primary onClick={onExit} className="px-6 py-2.5">
-            Zurück nach Neustadt
+            {t("Zurück nach Neustadt")}
           </Pill>
         </motion.div>
       </div>

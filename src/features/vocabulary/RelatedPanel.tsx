@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useT } from "@/lib/uiLang";
 import { Combine, PenLine, Mic, ChevronRight, type LucideIcon } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { collocationsBySubTheme, collocationsByTheme } from "@/data/collocations";
@@ -75,13 +76,14 @@ export function relatedRows(item: VocabItem): RelatedRow[] {
 }
 
 export function RelatedPanel({ item }: { item: VocabItem }) {
+  const t = useT();
   const rows = relatedRows(item);
   if (rows.length === 0) return null;
 
   return (
     <div className="mt-3 border-t border-border pt-3">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        Verbunden · zum selben Thema
+        {t("Verbunden · zum selben Thema")}
       </p>
       <div className="space-y-1.5">
         {rows.map((r) => {

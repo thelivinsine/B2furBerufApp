@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ArrowUp, Zap } from "lucide-react";
@@ -200,12 +201,21 @@ export function UebenLabel({
 }: {
   iconClass?: string;
   count?: number;
+  /** The GERMAN noun ("Wort" / "Wörtern"); translated here, never by the caller. */
   noun?: string;
 }) {
+  const t = useT();
+  const tx = useTx();
   return (
     <span className="inline-flex items-center justify-center gap-1.5">
       <Zap className={iconClass} />
-      {count != null && noun ? `Üben mit ${count} ${noun}` : "Üben"}
+      {/* s207: the noun arrives as its GERMAN form (the dictionary key), so a
+          caller keeps saying "Wort"/"Wörtern" and the label reads
+          "Practise 171 words" for an A2 learner without every call site
+          carrying two languages. */}
+      {count != null && noun
+        ? tx(`Üben mit ${count} ${noun}`, `Practise ${count} ${t(noun)}`)
+        : t("Üben")}
     </span>
   );
 }

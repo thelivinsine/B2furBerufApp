@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Dumbbell, Play } from "lucide-react";
@@ -27,6 +28,7 @@ const fallback = (
 );
 
 export function Dashboard() {
+  const t = useT();
   const [params, setParams] = useSearchParams();
   // Open on Spielen when returned here from the mission player (/?tab=spielen),
   // so exiting a game lands back on the tab with the Trainieren/Spielen toggle.
@@ -83,7 +85,7 @@ export function Dashboard() {
         transition={{ duration: 0.18, ease: "easeOut" }}
         ref={trackRef as React.RefObject<HTMLDivElement>}
         role="tablist"
-        aria-label="Modus"
+        aria-label={t("Modus")}
         className="relative mx-auto flex w-fit items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft"
       >
         {rect && (
@@ -127,7 +129,7 @@ export function Dashboard() {
             ) : (
               <Play className={cn("h-4 w-4", tab === id && "fill-current")} />
             )}
-            {label}
+            {t(label)}
           </button>
         ))}
       </motion.div>

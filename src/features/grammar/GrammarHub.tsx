@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, SlidersHorizontal } from "lucide-react";
@@ -62,6 +63,7 @@ const GRAMMAR_FACETS = [GROUP_FACET, ...grammarFacets()];
 const FACET_IDS = GRAMMAR_FACETS.map((f) => f.id);
 
 export function GrammarHub() {
+  const t = useT();
   const [params, setParams] = useSearchParams();
   // The desktop scroll container, handed to `usePagedList` through context so
   // its sentinel observes THIS element rather than the viewport (s189).
@@ -189,8 +191,8 @@ export function GrammarHub() {
                   variant="accent"
                   aria-pressed={filtersOpen}
                   aria-expanded={filtersOpen}
-                  aria-label="Filter"
-                  title="Filter"
+                  aria-label={t("Filter")}
+                  title={t("Filter")}
                   className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
@@ -219,7 +221,7 @@ export function GrammarHub() {
                     <SearchField
                       value={search}
                       onChange={setSearch}
-                      placeholder="Suche nach Thema, Muster …"
+                      placeholder={t("Suche nach Thema, Muster …")}
                       autoFocus
                     />
                   </motion.div>
@@ -231,8 +233,8 @@ export function GrammarHub() {
                   variant="outline"
                   aria-pressed={searchOpen}
                   aria-expanded={searchOpen}
-                  aria-label="Suche"
-                  title="Suche"
+                  aria-label={t("Suche")}
+                  title={t("Suche")}
                   className={cn(
                     BROWSE_TOOLBAR_BUTTON,
                     (searchOpen || search.trim()) && BROWSE_TOOLBAR_BUTTON_ON,
@@ -254,7 +256,7 @@ export function GrammarHub() {
               <SearchField
                 value={search}
                 onChange={setSearch}
-                placeholder="Suche nach Thema, Muster …"
+                placeholder={t("Suche nach Thema, Muster …")}
                 autoFocus
                 className="lg:hidden"
               />

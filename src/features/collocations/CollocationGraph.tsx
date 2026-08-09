@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import {
   forceCollide,
   forceLink,
@@ -99,6 +100,7 @@ function hexToRgba(hex: string, a: number): string {
 }
 
 export default function CollocationGraph({ items }: { items: Collocation[] }) {
+  const t = useT();
   const isDark = useIsDark();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1307,7 +1309,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       <EmptyState
         icon={Waypoints}
         title="Keine Kollokationen im Graph"
-        description="Lockere Filter oder Suche, dann erscheinen hier Nomen, Verben und ihre Verbindungen."
+        description={t("Lockere Filter oder Suche, dann erscheinen hier Nomen, Verben und ihre Verbindungen.")}
       />
     );
   }
@@ -1323,14 +1325,14 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           className="block h-full w-full"
           role="img"
           aria-label={`Interaktiver Kollokationen-Graph: ${graph.nodes.length} Nomen und Verben, ${graph.links.length} Verbindungen. Tippen wählt einen Knoten aus, Ziehen verschiebt die Ansicht.`}
-          title="Strg/Cmd + Scrollen zum Zoomen"
+          title={t("Strg/Cmd + Scrollen zum Zoomen")}
         />
 
         {/* Zoom controls */}
         <div className="absolute right-3 top-3 flex flex-col gap-1">
           <button
             onClick={() => zoomBy(1.35)}
-            aria-label="Vergrößern"
+            aria-label={t("Vergrößern")}
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Plus className="h-4 w-4" />
@@ -1344,8 +1346,8 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           </button>
           <button
             onClick={onFitButton}
-            aria-label="Einpassen, erneut tippen für einen zufälligen Knoten"
-            title="Einpassen · nochmal für einen zufälligen Knoten"
+            aria-label={t("Einpassen, erneut tippen für einen zufälligen Knoten")}
+            title={t("Einpassen · nochmal für einen zufälligen Knoten")}
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Maximize className="h-4 w-4" />
@@ -1397,7 +1399,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
                 </button>
                 <button
                   onClick={() => setSelectedId(null)}
-                  aria-label="Auswahl schließen"
+                  aria-label={t("Auswahl schließen")}
                   className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <X className="h-4 w-4" />

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, Pencil, RotateCcw, Volume2 } from "lucide-react";
 import type { ConversationBrief } from "@/types";
@@ -103,6 +104,7 @@ export function ConversationRunner({
    */
   help?: (layout: "rail" | "drawer") => React.ReactNode;
 }) {
+  const tr = useT();
   const [phase, setPhase] = useState<Phase>("brief");
   const [state, setState] = useState<ConversationState>(() => startConversation(brief));
   const [debrief, setDebrief] = useState<DebriefResult | null>(null);
@@ -319,7 +321,7 @@ export function ConversationRunner({
     return framed(
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 text-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        <p className="text-sm text-muted-foreground">Deine Rückmeldung wird erstellt …</p>
+        <p className="text-sm text-muted-foreground">{tr("Deine Rückmeldung wird erstellt …")}</p>
       </div>,
     );
   }
@@ -333,10 +335,10 @@ export function ConversationRunner({
       return framed(
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
           <div className="space-y-1.5">
-            <p className="text-sm font-semibold">Die Rückmeldung hat nicht geklappt</p>
+            <p className="text-sm font-semibold">{tr("Die Rückmeldung hat nicht geklappt")}</p>
             <p className="text-sm text-muted-foreground">{debrief.message}</p>
             <p className="text-xs text-muted-foreground">
-              Dein Gespräch ist gespeichert und steht in deinem Verlauf.
+              {tr("Dein Gespräch ist gespeichert und steht in deinem Verlauf.")}
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-2.5">
@@ -344,7 +346,7 @@ export function ConversationRunner({
               <RotateCcw className="h-4 w-4" /> Erneut versuchen
             </Button>
             <Button variant="outline" onClick={() => onExit(null)}>
-              Zurück
+              {tr("Zurück")}
             </Button>
           </div>
         </div>,
@@ -619,6 +621,7 @@ function ThreadStage({
   onEditCommit: () => void;
   onReplay: (text: string) => void;
 }) {
+  const tr = useT();
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
@@ -653,11 +656,11 @@ function ThreadStage({
                     value={editing}
                     onChange={(e) => onEditChange(e.target.value)}
                     autoFocus
-                    aria-label="Antwort korrigieren"
+                    aria-label={tr("Antwort korrigieren")}
                     className="w-full rounded-md border border-input bg-surface px-2 py-1 text-[15px] outline-none"
                   />
                   <Button size="sm" variant="accent" onClick={onEditCommit}>
-                    Übernehmen
+                    {tr("Übernehmen")}
                   </Button>
                 </div>
               ) : (
@@ -704,6 +707,7 @@ function BuehneStage({
   mine: string;
   onReplay: () => void;
 }) {
+  const tr = useT();
   return (
     <div className="flex min-h-0 flex-1 flex-col justify-center gap-5">
       <Card>
@@ -713,7 +717,7 @@ function BuehneStage({
             <button
               type="button"
               onClick={onReplay}
-              aria-label="Nochmal hören"
+              aria-label={tr("Nochmal hören")}
               className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-surface text-muted-foreground"
             >
               <Volume2 className="h-[17px] w-[17px]" />

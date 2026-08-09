@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, Lock, RotateCcw, Target, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,7 @@ export function ScopeSelect({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -103,7 +105,7 @@ export function ScopeSelect({
         )}
       >
         {opt.locked && !selected && <Lock className="h-3 w-3 shrink-0" aria-hidden />}
-        <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+        <span className="min-w-0 flex-1 truncate">{t(opt.label)}</span>
         {/* The count stays on a greyed option (founder rule: zero-yield options
             grey out with HONEST counts). Hiding it made "unavailable" and
             "nothing here for your other filters" look identical. */}
@@ -133,10 +135,10 @@ export function ScopeSelect({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={ariaLabel}
+        aria-label={t(ariaLabel)}
         className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 lg:px-2.5 lg:py-1.5 lg:text-xs"
       >
-        <span className="min-w-0 flex-1 truncate font-medium">{triggerLabel}</span>
+        <span className="min-w-0 flex-1 truncate font-medium">{t(triggerLabel)}</span>
         <ChevronDown
           className={cn(
             "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
@@ -148,7 +150,7 @@ export function ScopeSelect({
         {open && (
           <motion.div
             role="listbox"
-            aria-label={ariaLabel}
+            aria-label={t(ariaLabel)}
             // Micro-motion pass (s149 P2): one quick fade/slide for every
             // popover, matching the panel timing family.
             initial={reduce ? false : { opacity: 0, y: -4 }}
@@ -186,9 +188,10 @@ export function ScopeSection({
   label: string;
   children: React.ReactNode;
 }) {
+  const t = useT();
   return (
     <section>
-      <p className={cn("mb-2", scopeSectionLabel)}>{label}</p>
+      <p className={cn("mb-2", scopeSectionLabel)}>{t(label)}</p>
       {children}
     </section>
   );
@@ -247,11 +250,12 @@ export function ScopeRail({
   resetLabel?: string;
   className?: string;
 }) {
+  const t = useT();
   const panel = layout === "panel";
   return (
     <aside
       role={panel ? "region" : undefined}
-      aria-label={title}
+      aria-label={t(title)}
       // Himmelblau FILL (founder s149): a light accent wash instead of the grey
       // bg-muted; dark mode gets its own quieter alpha so the wash reads as a
       // cool sky tint, not murky teal. NO visible outline (founder s169): the
@@ -268,7 +272,7 @@ export function ScopeRail({
       <div className="flex items-center gap-1 px-3 py-2.5">
         <span className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary">
           <Icon className="h-4 w-4" />
-          {title}
+          {t(title)}
         </span>
         {/* Always active (founder s149 P2): clears every scope AND draws a
             fresh random Aufgabe, so the button always visibly does something. */}
@@ -276,8 +280,8 @@ export function ScopeRail({
           <button
             type="button"
             onClick={onReset}
-            aria-label={resetLabel}
-            title={resetLabel}
+            aria-label={t(resetLabel)}
+            title={t(resetLabel)}
             className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             <RotateCcw className="h-4 w-4" />
@@ -287,8 +291,8 @@ export function ScopeRail({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Schließen"
-            title="Schließen"
+            aria-label={t("Schließen")}
+            title={t("Schließen")}
             className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             <X className="h-4 w-4" />

@@ -1,4 +1,5 @@
 import { themes, themeById } from "@/data/themes";
+import { useT } from "@/lib/uiLang";
 import { writingPrompts } from "@/data/writingPrompts";
 import { matchesLifeArea, themeGroupsByArea, type LifeAreaId } from "@/lib/lifeAreas";
 import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
@@ -165,6 +166,7 @@ export function WritingRail({
   onClose,
   className,
 }: WritingRailProps) {
+  const t = useT();
   const theme = themeById(value);
   const subThemes = theme?.subThemes ?? [];
 
@@ -302,7 +304,7 @@ export function WritingRail({
             has anything here, one line says so instead of fifteen padlocks. */}
         {sectorOptions.every((o) => o.locked) ? (
           <ScopeLocked>
-            Für dieses Thema gibt es keine Aufgaben nach Branche. Du übst hier alle.
+            {t("Für dieses Thema gibt es keine Aufgaben nach Branche. Du übst hier alle.")}
           </ScopeLocked>
         ) : (
           <ScopeSelect

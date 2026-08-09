@@ -1,4 +1,5 @@
 import { domains } from "@/data/domains";
+import { uiLangNow } from "@/lib/uiLang";
 import { themes } from "@/data/themes";
 import type { DomainId } from "@/types";
 
@@ -89,15 +90,19 @@ export function themeGroupsByArea(
   countFor: (themeId: string) => number,
   opts: { include?: (themeId: string) => boolean; disableZero?: boolean } = {},
 ): AreaThemeGroup[] {
+  // s207: the labels are built in the interface language. Both the life areas
+  // and the Themen carry an English title in the data already, so this is a
+  // pick, not a translation, and the rails render whatever they are handed.
+  const de = uiLangNow() === "de";
   return LIFE_AREAS.map((area) => ({
-    label: area.titleDe,
+    label: de ? area.titleDe : area.titleEn,
     options: themes
       .filter((t) => lifeAreaOf(t.domain) === area.id && (opts.include?.(t.id) ?? true))
       .map((t) => {
         const count = countFor(t.id);
         return {
           value: t.id,
-          label: t.titleDe,
+          label: de ? t.titleDe : t.title,
           count,
           ...(opts.disableZero ? { disabled: count === 0 } : {}),
         };

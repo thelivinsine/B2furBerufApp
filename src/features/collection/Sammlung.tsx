@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { Boxes, Bookmark, Zap } from "lucide-react";
 import { browsableVocabulary } from "@/data/vocabulary";
@@ -76,6 +77,7 @@ function SammlungCard({ entry }: { entry: Entry }) {
 const LEVEL_FILTERS = [0, MAX_LEVEL, 4, 3, 2, 1] as const;
 
 export function Sammlung() {
+  const t = useT();
   const navigate = useNavigate();
   const srs = useProgressStore((s) => s.srs);
   const savedWords = useProgressStore((s) => s.savedWords);
@@ -127,7 +129,7 @@ export function Sammlung() {
       {entries.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-surface px-4 py-10 text-center">
           <p className="text-sm text-muted-foreground">
-            Deine Sammlung ist noch leer. Übe eine Runde, um Wörter zu sammeln.
+            {t("Deine Sammlung ist noch leer. Übe eine Runde, um Wörter zu sammeln.")}
           </p>
           <Button onClick={() => navigate("/session")}>
             <Zap className="h-4 w-4" /> Session starten

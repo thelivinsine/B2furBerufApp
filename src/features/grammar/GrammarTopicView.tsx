@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -52,6 +53,7 @@ function Lesson({
   onBack: () => void;
   onOpenTopic: (id: string) => void;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const navigate = useNavigate();
   const meta = groupMeta[topic.group];
@@ -265,8 +267,8 @@ function Lesson({
         ) : (
           <EmptyState
             icon={GraduationCap}
-            title="Keine Übungen"
-            description="Für dieses Thema gibt es noch keine Übungen."
+            title={t("Keine Übungen")}
+            description={t("Für dieses Thema gibt es noch keine Übungen.")}
           />
         )}
 
@@ -307,7 +309,7 @@ function Lesson({
               <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="min-w-0">
                 <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
-                  Zurück
+                  {t("Zurück")}
                 </span>
                 <span className="block truncate text-sm font-semibold">{prev.titleDe}</span>
               </span>
@@ -322,7 +324,7 @@ function Lesson({
             >
               <span className="min-w-0">
                 <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
-                  Weiter
+                  {t("Weiter")}
                 </span>
                 <span className="block truncate text-sm font-semibold">{next.titleDe}</span>
               </span>

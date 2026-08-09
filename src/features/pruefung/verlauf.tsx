@@ -1,4 +1,5 @@
 import { useId, useMemo } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { ChevronDown, Clock, TrendingUp } from "lucide-react";
 import { PASS_PCT, type MockPartId } from "@/engine/exam";
 import { isFullMockRun, type MockExamRecord } from "@/store/useProgressStore";
@@ -66,6 +67,7 @@ export function VerlaufCard({
   split?: boolean;
   className?: string;
 }) {
+  const t = useT();
   const panelRef = useStagePanel<HTMLDivElement>(open);
   const listId = useId();
   const shown = open ? rows : rows.slice(0, restRows);
@@ -91,7 +93,7 @@ export function VerlaufCard({
       )}
     >
       <div className="flex flex-none items-baseline justify-between gap-3 px-4 pt-3 sm:px-5 lg:px-6">
-        <p className="text-eyebrow text-muted-foreground">Verlauf</p>
+        <p className="text-eyebrow text-muted-foreground">{t("Verlauf")}</p>
         <p className="text-xs tabular-nums text-muted-foreground">{count}</p>
       </div>
 
@@ -145,7 +147,7 @@ export function VerlaufCard({
                   asSplit && "lg:border-t-0",
                 )}
               >
-                {open ? "Weniger anzeigen" : moreLabel}
+                {open ? t("Weniger anzeigen") : moreLabel}
                 <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
               </button>
             )}
@@ -163,6 +165,8 @@ export function VerlaufCard({
  * the chart, where the label sat on top of the early bars.
  */
 export function ScoreChart({ series, best }: { series: number[]; best: number }) {
+  const t = useT();
+  const tx = useTx();
   const H = 52;
   return (
     <div className="flex flex-col items-start">
@@ -171,8 +175,8 @@ export function ScoreChart({ series, best }: { series: number[]; best: number })
         role="img"
         aria-label={
           series.length
-            ? `Deine letzten ${series.length} Ergebnisse: ${series.join(" %, ")} %. Bestanden ab ${PASS_PCT} %.`
-            : "Noch keine Ergebnisse"
+            ? tx(`Deine letzten ${series.length} Ergebnisse: ${series.join(" %, ")} %. Bestanden ab ${PASS_PCT} %.`, `Your last ${series.length} results: ${series.join(" %, ")} %. Pass mark ${PASS_PCT} %.`)
+            : t("Noch keine Ergebnisse")
         }
       >
         <span
@@ -218,14 +222,15 @@ export function NoScoreYet({
   title?: string;
   line?: string;
 }) {
+  const t = useT();
   return (
     <div className="flex items-start gap-3">
       <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
         <Clock className="h-[17px] w-[17px]" />
       </span>
       <p className="text-[13px] leading-snug text-muted-foreground">
-        <span className="block text-sm font-semibold text-foreground">{title}</span>
-        {line}
+        <span className="block text-sm font-semibold text-foreground">{t(title)}</span>
+        {t(line)}
       </p>
     </div>
   );
@@ -293,6 +298,8 @@ export function ModuleVerlaufCard({
   /** What one sitting is called here ("Übung"). */
   noun: { one: string; many: string };
 }) {
+  const t = useT();
+  const tx = useTx();
   const scored = useMemo(() => runs.filter((r) => r.pct != null), [runs]);
   const best = scored.length ? Math.max(...scored.map((r) => r.pct as number)) : null;
   const passed = scored.filter((r) => (r.pct as number) >= PASS_PCT).length;
@@ -306,7 +313,7 @@ export function ModuleVerlaufCard({
     <VerlaufCard
       count={
         runs.length === 0
-          ? `noch keine ${noun.one}`
+          ? tx(`noch keine ${noun.one}`, `nothing yet`)
           : `${runs.length} ${runs.length === 1 ? noun.one : noun.many}`
       }
       open={open}
@@ -315,8 +322,8 @@ export function ModuleVerlaufCard({
       head={
         last == null ? (
           <NoScoreYet
-            title="Noch kein Ergebnis"
-            line={`Schließe eine ${noun.one} ab, dann steht hier dein Ergebnis.`}
+            title={t("Noch kein Ergebnis")}
+            line={tx(`Schließe eine ${noun.one} ab, dann steht hier dein Ergebnis.`, `Finish one and your result appears here.`)}
           />
         ) : (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-5">

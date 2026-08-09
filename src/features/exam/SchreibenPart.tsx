@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { Loader2, Maximize2 } from "lucide-react";
 import { planWritingTask, writingLengthFor } from "@/engine/exam";
 import { useExamStore, type MockExamRun } from "@/store/useExamStore";
@@ -25,6 +26,7 @@ import { RunBar } from "./MockExamRunner";
  * 0:00 scores 0 like in the real exam.
  */
 export function SchreibenPart({ run }: { run: MockExamRun }) {
+  const t = useT();
   const setEssay = useExamStore((s) => s.setEssay);
   const completePart = useExamStore((s) => s.completePart);
   const [taskOpen, setTaskOpen] = useState(false);
@@ -102,12 +104,12 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
       <Card className="max-h-[34%] shrink-0 overflow-hidden lg:max-h-none lg:basis-2/5">
         <CardContent className="slim-scrollbar h-full overflow-y-auto p-4">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-bold text-primary">Aufgabe</p>
+            <p className="text-sm font-bold text-primary">{t("Aufgabe")}</p>
             <button
               type="button"
               onClick={() => setTaskOpen(true)}
-              aria-label="Aufgabe vergrößern"
-              title="Aufgabe vergrößern"
+              aria-label={t("Aufgabe vergrößern")}
+              title={t("Aufgabe vergrößern")}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
             >
               <Maximize2 className="h-4 w-4" />
@@ -134,8 +136,8 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
             ref={textareaRef}
             value={run.essay}
             onChange={(e) => setEssay(e.target.value)}
-            aria-label="Dein Text"
-            placeholder="Schreibe hier deinen Text …"
+            aria-label={t("Dein Text")}
+            placeholder={t("Schreibe hier deinen Text …")}
             className="slim-scrollbar min-h-0 w-full flex-1 resize-none bg-transparent text-sm leading-relaxed outline-none"
           />
           <div className="mt-2 flex shrink-0 items-center justify-between gap-2 border-t border-border pt-2.5">
@@ -170,12 +172,12 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
               completePart({ pct: null, insight: "Der Text wurde ohne KI-Bewertung abgegeben." })
             }
           >
-            Ohne Bewertung fortfahren
+            {t("Ohne Bewertung fortfahren")}
           </Button>
         </div>
       )}
       <p className="text-center text-xs text-muted-foreground">
-        Dein Text wird zur Auswertung an eine KI gesendet.
+        {t("Dein Text wird zur Auswertung an eine KI gesendet.")}
       </p>
       </div>
 
@@ -183,7 +185,7 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
         <DialogContent className="gap-3">
           <DialogHeader>
             <DialogTitle className="pr-8 text-xs font-bold uppercase tracking-wide text-primary">
-              Aufgabe
+              {t("Aufgabe")}
             </DialogTitle>
             <DialogDescription className="text-xs">{taskMeta(task)}</DialogDescription>
           </DialogHeader>

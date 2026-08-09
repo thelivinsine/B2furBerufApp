@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Loader2, MailWarning } from "lucide-react";
 import type { EmailOtpType } from "@supabase/supabase-js";
@@ -32,6 +33,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 type Phase = "working" | "done" | "failed";
 
 export function ConfirmEmail() {
+  const t = useT();
   const navigate = useNavigate();
   const showToast = useSessionStore((s) => s.showToast);
   const status = useAuthStore((s) => s.status);
@@ -104,24 +106,24 @@ export function ConfirmEmail() {
         {phase === "working" && (
           <>
             <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
-            <h1 className="text-lg font-semibold text-foreground">E-Mail wird bestätigt</h1>
+            <h1 className="text-lg font-semibold text-foreground">{t("E-Mail wird bestätigt")}</h1>
           </>
         )}
 
         {phase === "done" && (
           <>
             <CheckCircle2 className="mx-auto mb-4 h-8 w-8 text-success" />
-            <h1 className="text-lg font-semibold text-foreground">Bestätigt</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Es geht gleich weiter.</p>
+            <h1 className="text-lg font-semibold text-foreground">{t("Bestätigt")}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">{t("Es geht gleich weiter.")}</p>
           </>
         )}
 
         {phase === "failed" && (
           <>
             <MailWarning className="mx-auto mb-4 h-8 w-8 text-danger" />
-            <h1 className="text-lg font-semibold text-foreground">Link nicht mehr gültig</h1>
+            <h1 className="text-lg font-semibold text-foreground">{t("Link nicht mehr gültig")}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Bestätigungs-Links laufen ab und lassen sich nur einmal öffnen. Melde dich an, dann
+              {t("Bestätigungs-Links laufen ab und lassen sich nur einmal öffnen. Melde dich an, dann")}
               schicken wir dir einen neuen.
             </p>
             <Button variant="gradient" className="mt-5 w-full" onClick={() => navigate("/")}>

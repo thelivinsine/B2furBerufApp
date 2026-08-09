@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { motion } from "framer-motion";
 import { Check, X, Sparkles, RotateCw, Trophy, ArrowRight } from "lucide-react";
 import type { VocabItem } from "@/types";
@@ -31,6 +32,8 @@ function buildQuiz(items: VocabItem[], count: number): Question[] {
 }
 
 export function VocabQuiz({ items }: { items: VocabItem[] }) {
+  const t = useT();
+  const tx = useTx();
   const addXp = useProgressStore((s) => s.addXp);
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const registerSession = useProgressStore((s) => s.registerSession);
@@ -63,7 +66,13 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
   const summary = useMemo(() => Math.round((score / Math.max(total, 1)) * 100), [score, total]);
 
   if (items.length < 4) {
-    return <EmptyState icon={Sparkles} title="Zu wenige Vokabeln" description="Wähle ein Thema mit mindestens 4 Vokabeln für das Quiz." />;
+    return (
+      <EmptyState
+        icon={Sparkles}
+        title={t("Zu wenige Vokabeln")}
+        description={t("Wähle ein Thema mit mindestens 4 Vokabeln für das Quiz.")}
+      />
+    );
   }
 
   if (done) {
@@ -71,8 +80,15 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
       <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
         <EmptyState
           icon={Trophy}
-          title={`${score} von ${total} richtig · ${summary}%`}
-          description={summary >= 80 ? "Ausgezeichnet! Du beherrschst diese Vokabeln." : "Gute Arbeit – wiederhole die schwierigen Wörter."}
+          title={tx(
+            `${score} von ${total} richtig · ${summary}%`,
+            `${score} of ${total} correct · ${summary}%`,
+          )}
+          description={t(
+            summary >= 80
+              ? "Ausgezeichnet! Du beherrschst diese Vokabeln."
+              : "Gute Arbeit – wiederhole die schwierigen Wörter.",
+          )}
           action={<Button variant="gradient" onClick={restart}><RotateCw className="h-4 w-4" /> Neues Quiz</Button>}
         />
       </motion.div>
@@ -95,7 +111,7 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
     if (!picked) return;
     if (index + 1 >= total) {
       registerSession();
-      showToast(`Quiz beendet: ${score}/${total}`, "success");
+      showToast(tx(`Quiz beendet: ${score}/${total}`, `Quiz done: ${score}/${total}`), "success");
       setDone(true);
     } else {
       setIndex((i) => i + 1);
@@ -141,7 +157,7 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
       {!revealed ? (
         <div className="space-y-3">
           <p className="text-center text-sm text-muted-foreground">
-            Überlege zuerst: Wie heißt die Antwort? Dann vergleiche.
+            {t("Überlege zuerst: Wie heißt die Antwort? Dann vergleiche.")}
           </p>
           <Button variant="outline" className="w-full" onClick={() => setRevealed(true)}>
             Optionen zeigen
@@ -201,7 +217,7 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
             )}
           </div>
           <Button variant="gradient" className="w-full" onClick={next}>
-            {index + 1 >= total ? "Quiz beenden" : "Weiter"} <ArrowRight className="h-4 w-4" />
+            {t(index + 1 >= total ? "Quiz beenden" : "Weiter")} <ArrowRight className="h-4 w-4" />
           </Button>
           <p className="text-center text-xs text-muted-foreground">Tippe irgendwo, um fortzufahren</p>
         </motion.div>

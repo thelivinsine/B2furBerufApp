@@ -34,42 +34,38 @@ after pulling.
   (400 kB main-chunk budget, after build) · `pnpm check:contrast` (WCAG gate, after `src/index.css`
   token edits) · `pnpm verify:facts` (noun fact gate; `pnpm build:oracles` first after adding nouns).
   Warn-only: `pnpm verify:grammar` · `pnpm verify:cefr` (`pnpm verify:sentences` = both).
-- Generated data (`frequency.ts`, `verification.ts`, `verbForms.ts`): regenerate with the matching
+- Generated data (`frequency.ts`, `verification.ts`, `verbForms.ts`): regenerate with its
   `pnpm build:*` script, never hand-edit.
-- Review loop: `pnpm review:queue` · `pnpm stamp:verified` (same commit as any verified flip) ·
+- Review loop: `pnpm review:queue` · `pnpm stamp:verified` (same commit as a verified flip) ·
   `pnpm apply:reviews` (integrity rules in COMMANDS.md, do not weaken) · `pnpm build:review-queue`
 - `.npmrc` supply-chain cooldown + blocked dependency build scripts: keep it that way.
 
 ## Layout (`src/`)
 - `data/` — content banks + `provenance.ts` + generated `frequency.ts`/`verification.ts`/
   `verbForms.ts` (see `docs/areas/CONTENT.md`)
-- `engine/` — `srs.ts` (FSRS-6), `session.ts` (composed-session composer), `exam.ts` (mock-exam
-  composer + scoring), `mission.ts` (game runner), `collection.ts` (FSRS→Lv 1-5 mapping, stable game
-  contract, don't drift the bands), `conversation.ts` + `speaking.ts` (spoken-conversation state
-  machine + brief derivation), `blank.ts` (the ONE gap rule), `pronounce.ts`, `scoring.ts`,
-  `speech.ts`, `quiz.ts`
-- `store/` — `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`,
-  `useLibraryScope`, `useExamStore` (the one running mock exam, persisted)
-- `lib/` — `facets.ts` (single facet registry, ≤12-option rule + coverage floor), `cefr.ts`
-  (single CEFR source), `lifeAreas.ts` (the ONE Berufsleben/Alltag fold + the `?area=` matcher) with
-  `themeGroups.ts` (the grouped Thema options every dropdown reads), `anrede.ts` (the ONE du/Sie
-  rule), `liveWork.ts`, `admin.ts` (FOUNDER_EMAILS), `appConfig.ts` (remote config; empty config ==
-  default behavior), plus `search.ts`, `fuzzy.ts`, `graphPalette.ts`, `phase.ts`, `idRenames.ts`,
-  hooks/icons/utils
-- `features/` — `pruefung/` (the one Prüfung hub + the shared chooser), `exam/` (MockExamRunner +
-  the four part views), `session/`, `library/`, `vocabulary/`, `collocations/`, `redemittel/`,
-  `grammar/`, `writing/`, `sprechen/` (the AI conversation partner), `dashboard/`, `welt/` (game),
-  `collection/` (Sammlung), `help/`, `legal/`, `admin/`, `shared/` (FilterRail, ScopeRail,
-  LifeAreaPills, ViewSwitcher, DataTable, SearchField, useSlidingPill)
+- `engine/` — `srs.ts` (FSRS-6), `session.ts` (composer), `exam.ts` (mock-exam composer + scoring),
+  `mission.ts` (game runner), `collection.ts` (FSRS→Lv 1-5 mapping, stable game contract, don't
+  drift the bands), `conversation.ts` + `speaking.ts` (spoken-conversation state machine + brief
+  derivation), `blank.ts` (the ONE gap rule), `pronounce.ts scoring.ts speech.ts quiz.ts`
+- `store/` — `useProgressStore useSessionStore useSettingsStore useAuthStore useLibraryScope`,
+  `useExamStore` (the one running mock exam, persisted)
+- `lib/` — `facets.ts` (facet registry, ≤12-option rule + coverage floor), `cefr.ts`, `lifeAreas.ts`
+  (the ONE Berufsleben/Alltag fold + `?area=`) with `themeGroups.ts` (the grouped Thema options),
+  `anrede.ts` (the ONE du/Sie rule), `uiLang.ts` + `uiStrings.ts` (the ONE interface-language fold),
+  `appConfig.ts` (remote config; empty config == default behavior), plus `liveWork.ts admin.ts
+  search.ts fuzzy.ts graphPalette.ts phase.ts idRenames.ts`, hooks/icons/utils
+- `features/` — `pruefung/` (the one Prüfung hub + shared chooser), `exam/` (MockExamRunner + the
+  four part views), `sprechen/` (AI conversation partner), `welt/` (game), `collection/` (Sammlung),
+  plus `session/ library/ vocabulary/ collocations/ redemittel/ grammar/ writing/ dashboard/ help/
+  legal/ admin/` and `shared/` (FilterRail, ScopeRail, LifeAreaPills, ViewSwitcher, DataTable, …)
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
   `artikel/` + `city/` (see `docs/areas/COMPONENTS.md`), `ui/` primitives, `shared/Logo.tsx`
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx` · `App.tsx`
-- Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/analytics` Fortschritt · `/settings` ·
-  `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone holding the four modules +
-  Modelltest) · the four Ohne-Zeit choosers `/lesen` · `/hoeren` · `/writing` · `/simulation` (each
-  a card in that hub, not a tab) · `/exam` **Modelltest** (hub at rest, the running Teil takes the
-  route over) · `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) ·
-  `/auth/confirm` (ungated on purpose) · `/hilfe`, `/privacy`, `/terms`, `/about`, `/welcome`
+- Routes (all of them, with the why, in `router.tsx`): `/` Praktisch · `/library` · `/analytics` ·
+  `/settings` · `/session` · `/welt` · `/anwenden` **Prüfung**, the zone holding the four modules +
+  Modelltest (`/lesen` `/hoeren` `/writing` `/simulation` are its Ohne-Zeit choosers, cards not
+  tabs; `/exam` is the Modelltest a running Teil takes over) · `/sources` · `/admin/*` · `/hilfe`
+  `/privacy` `/terms` `/about` `/welcome` · `/auth/confirm` (ungated on purpose)
 
 ## Hard invariants (cross-cutting; never break without an explicit founder request)
 - **Shipped content ids are PERMANENT** — progress is id-keyed locally + in the cloud. Retire,
@@ -90,10 +86,9 @@ after pulling.
   ties the `verified` stamp to exact content, so a new check WARNS on verified rows and queues them
   for the next human pass; it never re-stamps them and never flips them back to draft.
 - **A filter filters; it never substitutes.** In every Aufgabe rail (all four modules since s196)
-  Niveau, Thema, Unterthema and Textsorte are HARD; Branche stays soft (untagged-=-universal) and is
-  applied last so it cannot hide a hard match; ONE function counts what the module draws; zero-yield
-  options grey out with their honest count; an empty scope gets an empty state naming the one filter
-  to drop. (Why → `DECISIONS.md` §s180/s196.)
+  Niveau, Thema, Unterthema and Textsorte are HARD; Branche stays soft (untagged-=-universal), applied
+  last so it cannot hide a hard match; ONE function counts what the module draws; zero-yield options
+  grey out with their honest count; an empty scope names the one filter to drop. (§s180/s196.)
 - **Only a task carrying the full brief is served** (Adressat, du/Sie, 2-5 Leitpunkte, Niveau,
   Textsorte, word target), because the AI grades Aufgabenerfüllung against it: **717 writing tasks,
   every one servable**, ≥2 per Unterthema per length, all 16 Textsorten live. A `du` brief never
@@ -122,6 +117,11 @@ after pulling.
   Himmelblau-fill/white-controls FilterRail and Aufgabe-rail answer (s189/s196, `ScopeRail.tsx`), the
   sliding-pill switcher (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card's
   anatomy (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
+- **The nav runs ONE order and setup ends in the Bibliothek** (founder s207, `PRAKTISCH-NAV.md`):
+  Bibliothek · Prüfung · Fortschritt · Praktisch (**Beta**) · Einstellungen, bar and sidebar alike,
+  from the single `navItems`. Bibliothek, Praktisch and Einstellungen are the fixed slots
+  (`NEVER_HIDEABLE`), only Prüfung + Fortschritt reorder. Onboarding hands over to `/library`, and
+  the ~90s taster session it used to start is gone.
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and
@@ -202,8 +202,7 @@ after pulling.
   beside it needs `self-start` or the grid stretches it to its cap.
 - **Design landmines:** never reintroduce anything on the `/design` skill's §7 reverted list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior
-  byte-for-byte (`tests/appConfig.test.ts`). Admin RPCs return aggregates only, never individual
-  learner rows (exception: `feedback`).
+  byte-for-byte (`tests/appConfig.test.ts`). Admin RPCs return aggregates only (exception: `feedback`).
 
 ## Founder design preferences (UI; full record in `docs/DECISIONS.md`)
 **Before ANY design/UI work (new page, section, component, restyle, mockup), load the `design`
@@ -272,15 +271,18 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   applies to every visible string (UI labels, content data, legal copy, toasts, manifest). En
   dash `–` and bullet `·` are fine. This rule is for all AI tools building this app.
 - **Microcopy budget:** interface copy is chrome, not content. Eyebrow ≤ 2 words, title ≤ 5 words, no
-  section-description sentence under a header (the `SectionHeading`/`HubHero` `description` prop
-  stays unset). German learning content is display-size and exempt; functional strings (EmptyState,
-  form helpers, the session preview line) are kept.
-- In-app UI language is German (hold-to-peek EN pattern); public/landing pages English-first.
+  section-description sentence under a header (`SectionHeading`/`HubHero` `description` stays unset).
+  Learning content is display-size and exempt; functional strings (EmptyState, form helpers, the
+  session preview line) are kept.
+- **In-app UI language follows the LEVEL** (founder s207): A2/B1 English, B2/C1 German, and **the
+  learning material is German at every level** (hold-to-peek gloss unchanged). One fold
+  `src/lib/uiLang.ts`, all English in `uiStrings.ts` keyed by the German string so an unconverted
+  one still renders; coverage so far + what is still German: `UI-LANGUAGE.md`. Landing stays EN.
 - **Everything the FOUNDER reads is ENGLISH** (founder rule, restated s187): chat, PR bodies, docs,
-  and every `preview/*.html` mockup or artifact, including its headings, option names, notes, tables
-  and switch labels. The German-UI rule above is about the product, not about review material. The
-  ONLY German inside a preview is the copy that is literally app copy in the mocked screen, because
-  that is the thing under review. Same for any AI tool working on this app.
+  and every `preview/*.html` mockup or artifact, including headings, option names, notes, tables and
+  switch labels. The interface-language rule above is about the product, not review material: the
+  ONLY German in a preview is copy that is literally app copy in the mocked screen, the thing under
+  review. Same for any AI tool working on this app.
 
 ## Area guides (`docs/areas/` — read the matching file BEFORE touching an area)
 - `COMMANDS.md` — every script's full behavior, gates vs warn-only, integrity rules.
@@ -293,6 +295,7 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - `SPRECHEN.md` — the AI conversation partner: the brief/conversation/debrief shape, the three
   layouts, the Redemittel rail, the cost guards, the `converse` function.
 - `PRAKTISCH-NAV.md` — dashboard Üben/Spielen, bottom tab bar (locked), header, feedback pill.
+- `UI-LANGUAGE.md` — the A2/B1-English rule, the `t()` mechanism, what is converted and what is not.
 - `GAME.md` — the Neuland layer: missions-as-data, scenes/sprites, pixel rules, hub surfaces.
 - `BRAND.md` — logo/wordmark rules, icons/favicons, theme tokens, dialog overlay convention.
 - `LEGAL-ADMIN.md` — legal pages, consent, GDPR self-service, `/sources`, the admin center.
@@ -317,8 +320,8 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   open** (s173), so a learner mid-task adopts the new build at their next clean resume.
 
 ## Workflow
-- **Token/context discipline:** prefer targeted Grep/Glob over whole-file reads; batch independent
-  tool calls; no subagents for routine work; plan first on big refactors; keep the docs lean.
+- **Token/context discipline:** targeted Grep/Glob over whole-file reads; batch independent tool
+  calls; no subagents for routine work; plan first on big refactors; keep the docs lean.
 - The dev branch is **reassigned every session**; `main` is always the source of truth. Ship by
   PR into `main`, squash-merged.
 - **Auto-ship (founder approved):** when a change is complete and `pnpm build` is green, open a PR
@@ -333,10 +336,10 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   means BOTH `PROJECT_STATUS.md` AND `SESSION_PROMPT_LOG.md`** plus any docs the work made stale
   (including this file and the matching `docs/areas/*`). **A count in a doc is MEASURED, never
   carried forward:** re-run `pnpm lint:content` and quote it with the date you measured it.
-- **Prompt & session log (REQUIRED for every founder prompt):** append one entry per founder
-  prompt to `docs/SESSION_PROMPT_LOG.md` (append-only, newest at the bottom: verbatim prompt,
-  timestamp, branch, response summary, artifacts · commit SHAs · PR #s). Authorship paper trail;
-  no secrets, no internal model identifiers. Any "document this session" request implies it.
+- **Prompt & session log (REQUIRED for every founder prompt):** append one entry per founder prompt
+  to `docs/SESSION_PROMPT_LOG.md` (append-only, newest at the bottom: verbatim prompt, timestamp,
+  branch, response summary, artifacts · commit SHAs · PR #s). Authorship paper trail; no secrets, no
+  internal model identifiers. Any "document this session" request implies it.
 - The founder is **non-technical**; act as a decisive CTO who minimizes their ops burden, caps
   costs, and explains things in plain language.
 
@@ -345,5 +348,4 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
 - **`docs/PROJECT_FOUNDATION.md`** — stable technical baseline (architecture, infra, Supabase).
 - **`docs/PROJECT_REFERENCE.md`** — founder backlog, model guidance, research findings.
 - **`docs/DECISIONS.md`** — the "why" behind locked decisions; read before undoing anything called
-  "locked". · **`docs/SESSION_PROMPT_LOG.md`** — the append-only founder-prompt paper trail. ·
-  **`docs/archive/`** — status-log history by ISO week + completed plans.
+  "locked". · **`docs/SESSION_PROMPT_LOG.md`** — the founder-prompt paper trail. · **`docs/archive/`**.

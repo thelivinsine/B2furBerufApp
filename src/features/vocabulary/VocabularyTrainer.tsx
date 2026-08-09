@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { useT, useTitle } from "@/lib/uiLang";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -91,6 +92,8 @@ const WOERTER_VIEWS: LibraryView[] = ["tabelle", "graph", "karten", "liste"];
 // (`features.practiceTabs`, default false); the component reads it below.
 
 export function VocabularyTrainer() {
+  const t = useT();
+  const titleOf = useTitle();
   // The desktop scroll container, handed to `usePagedList` through context so
   // its sentinel observes THIS element rather than the viewport (s189).
   const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
@@ -391,7 +394,7 @@ export function VocabularyTrainer() {
       size="icon"
       variant="outline"
       aria-pressed={savedActive}
-      aria-label={savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter"}
+      aria-label={t(savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter")}
       title="Gespeichert"
       className={cn(BROWSE_TOOLBAR_BUTTON, savedActive && BROWSE_TOOLBAR_BUTTON_ON)}
       onClick={toggleSaved}
@@ -407,8 +410,8 @@ export function VocabularyTrainer() {
       variant="outline"
       aria-pressed={searchOpen}
       aria-expanded={searchOpen}
-      aria-label="Suche"
-      title="Suche"
+      aria-label={t("Suche")}
+      title={t("Suche")}
       className={cn(BROWSE_TOOLBAR_BUTTON, (searchOpen || search.trim()) && BROWSE_TOOLBAR_BUTTON_ON)}
       onClick={() =>
         setSearchOpen((o) => {
@@ -435,8 +438,8 @@ export function VocabularyTrainer() {
       variant="accent"
       aria-pressed={filtersOpen}
       aria-expanded={filtersOpen}
-      aria-label="Filter"
-      title="Filter"
+      aria-label={t("Filter")}
+      title={t("Filter")}
       className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
       onClick={() => setFiltersOpen((o) => !o)}
     >
@@ -501,7 +504,7 @@ export function VocabularyTrainer() {
               },
               options: subThemes.map((s) => ({
                 value: s.id,
-                label: s.titleDe,
+                label: titleOf(s),
                 count: vocabBySubTheme(s.id).length,
               })),
             },
@@ -536,7 +539,7 @@ export function VocabularyTrainer() {
           <Sparkles className="h-4 w-4" /> Quiz
         </TabsTrigger>
         <TabsTrigger value="list">
-          <BookOpen className="h-4 w-4" /> Übersicht
+          <BookOpen className="h-4 w-4" /> {t("Übersicht")}
         </TabsTrigger>
       </TabsList>
 
@@ -554,7 +557,7 @@ export function VocabularyTrainer() {
     </Tabs>
   ) : savedActive && items.length === 0 ? (
     <p className="rounded-lg border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted-foreground">
-      Noch keine gespeicherten Wörter. Tippe das Lesezeichen an einem Wort.
+      {t("Noch keine gespeicherten Wörter. Tippe das Lesezeichen an einem Wort.")}
     </p>
   ) : view === "tabelle" ? (
     <VocabTable items={items} />
@@ -622,7 +625,7 @@ export function VocabularyTrainer() {
                     <SearchField
                       value={search}
                       onChange={setSearch}
-                      placeholder="Suche nach Wort, Übersetzung …"
+                      placeholder={t("Suche nach Wort, Übersetzung …")}
                       autoFocus
                     />
                   </motion.div>
@@ -640,7 +643,7 @@ export function VocabularyTrainer() {
               <SearchField
                 value={search}
                 onChange={setSearch}
-                placeholder="Suche nach Wort, Übersetzung …"
+                placeholder={t("Suche nach Wort, Übersetzung …")}
                 autoFocus
                 className="lg:hidden"
               />
@@ -687,7 +690,7 @@ export function VocabularyTrainer() {
             {hiddenLabel && (
               <div className="flex flex-wrap items-center gap-2">
                 <ActiveFilterChip
-                  label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                  label={`${t("Stufe: bis")} ${visibleBands[visibleBands.length - 1]}`}
                   onRemove={() => setShowAllLevels(true)}
                 />
               </div>
@@ -708,12 +711,12 @@ export function VocabularyTrainer() {
                 className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 <ChevronLeft className="h-4 w-4" />
-                {activeTheme?.titleDe}
+                {activeTheme ? titleOf(activeTheme) : ""}
                 <span className="text-muted-foreground/60">/</span>
                 <span className="text-foreground">
                   {subs.length === 1
-                    ? (activeSub?.titleDe ?? "Gesamtes Thema")
-                    : `${subs.length} Unterthemen`}
+                    ? (activeSub ? titleOf(activeSub) : t("Gesamtes Thema"))
+                    : `${subs.length} ${t("Unterthemen")}`}
                 </span>
               </button>
             )}
