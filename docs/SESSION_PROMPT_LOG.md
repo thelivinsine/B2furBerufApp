@@ -5734,6 +5734,28 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   `src/features/sprechen/ConversationRunner.tsx` · `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` · this log.
 
+- **Prompt 5 (verbatim):** `id everything merged to main nd live?`
+  **Response:** verified rather than asserted. `git log origin/main..HEAD` empty and the branch at
+  the same commit as `origin/main` (`9e0b74e`), so nothing from this session sits unmerged; the four
+  PRs are #830 → `9c4ca3b` (the rail), #831 → `e7f1c7f` (the paper trail), #834 → `9e0b74e` (the
+  founder's second pass), with session 203's #832/#833 in between. Deploy site to GitHub Pages
+  completed successfully on `9e0b74e`, which is the commit carrying both the rail and the
+  corrections. Said plainly that the sandbox cannot reach genauly.de, so "live" here means the
+  deploy went green, not that the page was opened. Also surfaced one open PR that is NOT this
+  session's: **#808 "docs: record the s192 merge"** on `claude/prufung-ui-bottom-bar-u0fdwf`, stale
+  and unrelated, awaiting a founder call on merge-or-close.
+  **Artifacts:** none (verification only).
+
+- **Prompt 6 (verbatim):** `document the session`
+  **Response:** the session's substance was documented inside its own PRs (`CLAUDE.md`,
+  `docs/areas/SPRECHEN.md`, `docs/DECISIONS.md` §s202 and the s202 follow-up, `PROJECT_STATUS.md`,
+  this log through prompt 4). This entry closes the remaining gap: prompts 5 and 6, the merge SHA
+  and deploy result for PR #834, and the stale #808 as an open item on the handoff. Also recorded
+  the session-numbering collision for whoever reads this next: session 203 ran in PARALLEL and
+  reached `main` first with the documentation-maintenance pass, so this session's work is s202
+  throughout, even though two of its PRs merged after s203's.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
 ## Session 203 — 2026-08-08 — branch `claude/documentation-maintenance-0w4ywg`
 
 - **Prompt 1 (verbatim):** `do the documentation maintenance`
@@ -5774,6 +5796,20 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   session did not touch. Post-merge housekeeping done (fetch → reset --hard → force-with-lease),
   tree clean. **Note for the next session: `CLAUDE.md` now has about one line of headroom**, so a
   new law costs an old line.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 2 (verbatim):** `document the session`
+  **Response:** most of it was already written, because this session's deliverable WAS documentation
+  and it shipped with its own log: the session 203 entry above (Prompt 1 + the shipped note), the
+  `PROJECT_STATUS.md` session log and handoff, and the area-doc corrections all went out in PR #832
+  and PR #833. What this prompt adds is the paper trail that could not exist yet when those merged:
+  **PR #833 → `8a45be9`** (recorded nowhere until now, having been written before its own merge),
+  this entry, and the PR list on the s203 log and handoff (#832, #833, #837), so the session reads
+  as three merges rather than one. Nothing else was stale on a re-read: `CLAUDE.md` holds at 349,
+  `PROJECT_STATUS.md` at 199 of its ~250, and `lint:content` reports the same 14 pre-existing content
+  warnings with no `[docs]` line. **Standing note carried forward:** `CLAUDE.md` has about one line
+  of headroom, so the next law added to it costs an old line somewhere, and a count quoted in any doc
+  is re-measured with `pnpm lint:content` rather than copied from the line above it.
   **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
 ---
 
