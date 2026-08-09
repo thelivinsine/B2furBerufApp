@@ -80,17 +80,15 @@ after pulling.
 - **Content facts are stated, never left blank** (s185, all gates): every noun carries `plural` XOR
   `numerus`; `pron` follows the ONE respelling scheme; every grammar topic has 10 drills with ≥3
   productive. **Pedagogical shape is gated too** (s198; `scripts/content-shape.mjs` +
-  `tests/contentShape.test.ts`): a `core`-frequency word is never labelled B2.2/C1, and every theme
-  carries ≥3 verbs AND ≥3 adjectives. Every other threshold is a RATCHET on the measured bank,
-  because a rare compound is not an advanced word; raising a ceiling is a deliberate edit there with
-  a reason, never the way to land a word. Gates, thresholds, checklist: `docs/areas/CONTENT.md`.
-- **A gap in an example sentence comes from ONE rule** (`src/engine/blank.ts`, s198), used by the
-  MCQ/listening/typed clozes and the coverage report; it reports WHICH form it blanked so distractors
-  match. Never re-copy it into a call site (four copies is how an ASCII `\b` disabled every
-  umlaut-initial word).
+  `tests/contentShape.test.ts`): a `core`-frequency word is never labelled B2.2/C1, every theme
+  carries ≥3 verbs AND ≥3 adjectives, and every other threshold is a RATCHET on the measured bank.
+  Raising a ceiling is a deliberate edit with a reason, never the way to land a word. →`CONTENT.md`.
+- **A gap in an example sentence comes from ONE rule** (`src/engine/blank.ts`, s198) for every cloze
+  and the coverage report, reporting WHICH form it blanked so distractors match. Never re-copy it
+  into a call site (four copies is how an ASCII `\b` disabled every umlaut-initial word).
 - **A human-verified row is never edited by an AI to satisfy a new rule.** The content fingerprint
-  ties the `verified` stamp to exact content, so a new content-shape check WARNS on verified rows
-  and queues them for the next human pass; it never re-stamps and never flips them back to draft.
+  ties the `verified` stamp to exact content, so a new check WARNS on verified rows and queues them
+  for the next human pass; it never re-stamps them and never flips them back to draft.
 - **A filter filters; it never substitutes.** In every Aufgabe rail (all four modules since s196)
   Niveau, Thema, Unterthema and Textsorte are HARD; Branche stays soft (untagged-=-universal) and is
   applied last so it cannot hide a hard match; ONE function counts what the module draws; zero-yield
@@ -114,17 +112,16 @@ after pulling.
   - **A supplied `source` text belongs to the REPLY genre, never to an opinion task** (s200), and
     `source` is currently read by nothing.
   (Detail → `docs/areas/CONTENT.md`; why → `DECISIONS.md` §s199/§s200.)
-- **Keep eager code light:** the Dashboard imports NO content bank (bank-consuming elements are lazy
-  chunks). Never re-introduce a static import chain from eager code to a bank.
+- **Keep eager code light:** the Dashboard imports NO content bank (they are lazy chunks); never
+  re-introduce a static import chain from eager code to a bank.
 - **Reward color (Koralle, `--reward`)** is loot/combo/streak moments plus Fokus error underlines
   only; never general chrome or building marks.
 - **Locked structures** (change only on explicit founder request): the mobile bottom tab bar
   (`PRAKTISCH-NAV.md`), the dialog/overlay recipe (`BRAND.md` §Dialog), the in-mission pixel chrome +
   "failure is content, never lockout" + the ungated boss mission 1.6 (`GAME.md`), the
   Himmelblau-fill/white-controls FilterRail and Aufgabe-rail answer (s189/s196, `ScopeRail.tsx`), the
-  sliding-pill switcher mechanism (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module
-  card's anatomy (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy (`SCHREIBEN.md`), the
-  Prüfung zone's one frame (s195, below).
+  sliding-pill switcher (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card's
+  anatomy (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and
@@ -136,9 +133,15 @@ after pulling.
   the partner never corrects mid-flow. **Layout is a property of the TASK** (`gespraech` / `buehne` /
   `anruf`). **The row is written when a conversation STARTS** (s194), so the daily limit counts what
   costs money; **the practice counts once the learner has SPOKEN, not once the AI has graded**
-  (s196), so a failed debrief is retryable. **A practice conversation carries its Redemittel** (founder s202), **structurally**:
-  the runner takes them as a PROP and the Modelltest passes nothing, so a candidate never reads the
-  phrases they are graded on. Anrede follows `lib/anrede.ts`. Detail: `docs/areas/SPRECHEN.md`.
+  (s196), so a failed debrief is retryable. **A practice conversation carries its Redemittel**
+  (founder s202) **structurally**: the runner takes them as a PROP and the Modelltest passes nothing,
+  so a candidate never reads the phrases they are graded on, and the rail shows at most FIVE, the
+  easiest by CEFR (s206). Anrede follows `lib/anrede.ts`. Detail: `docs/areas/SPRECHEN.md`.
+- **A wall is stated BEFORE the commitment, and a wall with a remedy IS its remedy** (s194, widened
+  s206): allowance, account and connection are gates on the start, never a caption after the learner
+  has committed, ONE rule serves both the guard and the gate, and a failure never renders in the
+  grey a status uses. **Every provider call carries a deadline** and a losing leg logs provider,
+  status and code (a thinking model given a 500-token turn budget returns nothing). → `SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195; mechanism in `docs/areas/PRUEFUNG.md`). ONE exit,
   the LAST control in the header, top right, on every screen of the zone and at every width
   (`useSessionStore.zoneExit`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever
@@ -160,35 +163,32 @@ after pulling.
   module page carries that Verlauf** (founder s201), empty state from visit one; the hub keeps the
   CROSS-module view only.
 - **A failed cloud write is never silent** (s185). supabase-js returns `{ error }` instead of
-  throwing, so an ignored result makes a permanently broken sync look identical to a working one.
-  Every push reads its error, retries with backoff, and after 3 consecutive failures flips
-  `useAuthStore.syncHealth` to `"failing"` ("Sync pausiert" in Settings). Never `await` a Supabase
-  call and drop its result.
+  throwing, so an ignored result makes a broken sync look exactly like a working one: every push
+  reads its error, retries with backoff, and after 3 failures flips `useAuthStore.syncHealth` to
+  `"failing"` ("Sync pausiert" in Settings). Never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185; timers in
-  `docs/PROJECT_FOUNDATION.md`). `dailyXp`/`activeDays` keep `RETAIN_DAYS` (400) days folded into
-  `activeDaysFolded`, and `pg_cron` purges abandoned guests, cache rows and learner TEXT, NULLing
-  columns rather than deleting rows so limits, aggregates and the Verlauf entry survive. **A
-  retention timer and the privacy-policy copy describing it ship in the SAME change**; never resolve
-  a conflict between them by editing the copy alone.
+  `docs/PROJECT_FOUNDATION.md`): `RETAIN_DAYS` (400) folded into `activeDaysFolded`, `pg_cron`
+  purging guests, cache rows and learner TEXT by NULLing columns, never deleting rows, so limits,
+  aggregates and the Verlauf entry survive. **A retention timer and the privacy-policy copy
+  describing it ship in the SAME change**, never resolved by editing the copy alone.
 - **AI usage is MEASURED; only the cost is derived** (s204): every call writes an `ai_calls` row with
   the provider's own token counts, priced from ONE table (`functions/_shared/aiUsage.ts`, overridable
-  via `app_config.ai_rates`). Never re-hardcode a price in a function.
-- **Never reload over a learner's unsaved work.** Every automatic reload is gated on `hasLiveWork()`
-  (`src/lib/liveWork.ts`) and retries at a later resume. Any new surface holding in-memory work
-  claims it with `useLiveWork(active, label, flush)` AND persists itself.
+  via `app_config.ai_rates`) and checked against the provider's own bill (s205). Never re-hardcode
+  a price in a function.
+- **Never reload over a learner's unsaved work:** every automatic reload is gated on `hasLiveWork()`
+  (`src/lib/liveWork.ts`) and retries at a later resume; a new surface holding in-memory work claims
+  it with `useLiveWork(active, label, flush)` AND persists itself.
 - **A tile the learner EXPANDS obeys one rule, everywhere, filters included** (founder s189): at rest
-  the page does not scroll; expanding releases the page's height cap (`.h-page-stage`); the expanded
-  tile is never taller than one screen (`.max-h-panel-stage`), so its own borders stay visible; ONE
-  inner region scrolls (`min-h-0 flex-1 overflow-y-auto`) and, nothing setting `overscroll-behavior`,
-  reaching its top hands the scroll on to the page; and it scrolls itself into view via
-  `useStagePanel` WITH `scroll-mt-*`/`scroll-mb-*` for the header and bottom bar.
-- **A freshly opened page never scrolls.** Every trainer sizes its elastic element to the room
-  actually left and gives up its preferred floor rather than push the resting page past one viewport
-  (`useFillEditor`, `measureMobile`). The **exam** answers this with a stage instead of measurement
-  (s186): a running Teil is `h-exam-stage` tall, pins its RunBar/strip/actions and scrolls ONE inner
-  region. Height only, never `overflow:hidden`, or the mobile keyboard cannot scroll the field into
-  view. **The Prüfung hub** uses `h-pruefung-stage` (s196), which unlike the shared `h-page-stage`
-  keeps a real ceiling from `lg` up too.
+  the page does not scroll; expanding releases the page's height cap (`.h-page-stage`); the tile is
+  never taller than one screen (`.max-h-panel-stage`); ONE inner region scrolls (`min-h-0 flex-1
+  overflow-y-auto`), handing the scroll back to the page at its top (nothing sets
+  `overscroll-behavior`); and it scrolls into view via `useStagePanel` WITH `scroll-mt-*`/`-mb-*`.
+- **A freshly opened page never scrolls.** Every trainer sizes its elastic element to the room left
+  and gives up its preferred floor rather than push the resting page past one viewport
+  (`useFillEditor`, `measureMobile`); the **exam** answers it with a stage instead (s186):
+  `h-exam-stage`, pinned RunBar/strip/actions, ONE inner region scrolling. Height only, never
+  `overflow:hidden`, or the mobile keyboard cannot scroll the field into view. **The Prüfung hub**
+  uses `h-pruefung-stage` (s196), which keeps a real ceiling from `lg` up too.
 - **A focus ring answers the KEYBOARD only, and a hover style answers a POINTER only** (founder
   s190/s201). `trackInputMode()` marks `<html data-input="pointer|keyboard">` and one rule in
   `index.css` drops the ring while the pointer is in charge, so WCAG 2.4.7 holds without a stray ring
