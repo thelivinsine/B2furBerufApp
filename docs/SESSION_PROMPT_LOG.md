@@ -6015,3 +6015,61 @@ the fix is a renumber plus a gate: `0019_ai_calls.sql`, and `pnpm lint:migration
 files sharing a version prefix. Verified by planting a duplicate and watching it go red. Shipped as
 **PR #839**.
 
+
+
+---
+
+## Session 205 — 2026-08-09 — branch `claude/ki-usage-task-kg0vix`
+
+Step 2 of the AI-cost work, unblocked by the founder creating an organization and an admin key.
+
+- **Prompt 1 (verbatim):** `what's next step from me? be as clear and consise as possible`
+  **Response:** one instruction (create the org, then an Admin API key, then store it in Supabase),
+  plus the two reversible calls from s204 (the consent bump, the Sprechen numbers).
+
+- **Prompts 2-4 (three screenshots + `I'm a bit lost.. what should I select here` /
+  `there's no settings option below analytics` / `what here?`):** navigation help through the
+  Console. **This is where I sent the founder in circles twice**, first by reading "Organization
+  credits" on the dashboard as proof of an organization, then by pointing at a Settings menu that
+  does not exist on that account. The founder's `can you cross check your response with official
+  website and sources before giving me wrong instructions?` was fair. Fetching the official docs
+  produced the real answer: **the Admin API is unavailable for individual accounts**, and the org
+  was literally named "Arya's Individual Org". Corrected the earlier claim explicitly rather than
+  quietly, and recommended NOT converting, because monthly spend was $0.04 and reconciliation at
+  four cents verifies a rounding error.
+
+- **Prompt 5 (verbatim):** `I clicked on create team account to see if it's free or not and it seems
+  free so I went ahead to create it and then admin key.`
+  **Response:** flagged two things before they clicked Add: a 30-day expiry would stop the job
+  silently, and a Console admin key has **no scopes**, so the "readonly" name is a white lie and the
+  key carries full admin rights. Asked them to verify no subscription charge appeared, since I
+  cannot see their billing.
+
+- **Prompt 6 (verbatim):** `done with supabase secret. I selected 30 days for security reasons. I
+  can do it again after sep 8 if needed.`
+  **Response, and the build:** the right call, and it shaped the design. Because the key expiring is
+  a PLANNED event, the failure had to be loud: a 401 becomes a German sentence in
+  `provider_sync_state.last_error` that the admin card renders above the numbers.
+  Shipped: migration `0020_provider_costs.sql` (`provider_costs`, `provider_sync_state`,
+  `admin_ai_reconciliation`, `admin_ai_sync_state`, 400-day purge), the founder-gated
+  `reconcile-ai-cost` Edge Function, `_shared/costReport.ts` with `tests/costReport.test.ts`, and
+  `AiCostReconciliation.tsx` in the admin System screen.
+  **Two design calls worth keeping:** no cron (scheduling from the database means storing a
+  credential there, so the card refreshes on open at most hourly and on demand), and an unreported
+  provider day renders "–" rather than 0, because "not yet known" and "cost nothing" are opposite
+  facts that a zero makes identical. Why → `docs/DECISIONS.md` §s205.
+
+- **Prompts 7-8 (verbatim, mid-turn):** `merge to main when done.` and `document the session at the
+  end`
+  **Response:** shipped as PR #840 and squash-merged; this entry and the status log are the
+  documentation.
+
+**Gates:** typecheck · lint 0 errors (78 warnings, one new, same async-setState class as the
+existing ones) · **687 tests** (up from 675) · build · check:bundle · lint:content · lint:migrations.
+Edge Functions are Deno and outside `tsc`, so they were syntax-checked with esbuild.
+
+- **Artifacts:** `supabase/migrations/0020_provider_costs.sql` ·
+  `supabase/functions/{reconcile-ai-cost/index.ts,_shared/costReport.ts}` ·
+  `src/features/admin/{AiCostReconciliation,AdminSystem}.tsx` · `src/lib/adminApi.ts` ·
+  `tests/costReport.test.ts` · `docs/{PROJECT_STATUS,PROJECT_FOUNDATION,DECISIONS}.md` ·
+  `docs/areas/LEGAL-ADMIN.md` · this log

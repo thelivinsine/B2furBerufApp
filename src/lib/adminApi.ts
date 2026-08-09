@@ -259,3 +259,83 @@ export async function fetchGdprEvidence(): Promise<GdprEvidence | null> {
     return null;
   }
 }
+
+/* --------------------- AI cost: ours vs the provider's --------------------- */
+/**
+ * The founder-facing half of the s205 reconciliation. `ai_calls` holds what WE
+ * derived from real token counts; `provider_costs` holds what ANTHROPIC says it
+ * charged. Showing them side by side is the whole point: a single number, from
+ * either source alone, cannot tell you it has drifted.
+ */
+
+export interface AiReconciliationRow {
+  day: string; // YYYY-MM-DD
+  provider: "google" | "anthropic" | "openai";
+  /** Our own estimate, derived from the tokens the provider reported. */
+  oursUsd: number;
+  /** What the provider says it charged. Null while it has not reported yet,
+   *  which is deliberately different from "it cost nothing". */
+  theirsUsd: number | null;
+  calls: number;
+}
+
+export interface AiSyncState {
+  provider: string;
+  lastOkAt: string | null;
+  lastTryAt: string | null;
+  lastError: string | null;
+  daysFetched: number;
+}
+
+export async function fetchAiReconciliation(days = 14): Promise<AiReconciliationRow[]> {
+  try {
+    const { data, error } = await supabase.rpc("admin_ai_reconciliation", { p_days: days });
+    if (error || !Array.isArray(data)) return [];
+    return (data as Record<string, unknown>[]).map((r) => ({
+      day: String(r.day),
+      provider: r.provider as AiReconciliationRow["provider"],
+      oursUsd: Number(r.ours_usd ?? 0),
+      theirsUsd: r.theirs_usd === null || r.theirs_usd === undefined ? null : Number(r.theirs_usd),
+      calls: Number(r.calls ?? 0),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchAiSyncState(): Promise<AiSyncState[]> {
+  try {
+    const { data, error } = await supabase.rpc("admin_ai_sync_state");
+    if (error || !Array.isArray(data)) return [];
+    return (data as Record<string, unknown>[]).map((r) => ({
+      provider: String(r.provider),
+      lastOkAt: (r.last_ok_at as string | null) ?? null,
+      lastTryAt: (r.last_try_at as string | null) ?? null,
+      lastError: (r.last_error as string | null) ?? null,
+      daysFetched: Number(r.days_fetched ?? 0),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Pull the provider's own figures now. Founder-gated inside the Edge Function
+ * (it checks `admins`, not an email claim), and it reports its own failure
+ * rather than throwing, because the expected failure is an expired admin key.
+ */
+export async function refreshAiReconciliation(
+  days = 14,
+): Promise<{ ok: boolean; message?: string; days?: number }> {
+  try {
+    const { data, error } = await supabase.functions.invoke<{
+      ok: boolean;
+      message?: string;
+      days?: number;
+    }>("reconcile-ai-cost", { body: { days } });
+    if (error) return { ok: false, message: "Der Abgleich war nicht erreichbar." };
+    return data ?? { ok: false, message: "Keine Antwort erhalten." };
+  } catch {
+    return { ok: false, message: "Der Abgleich war nicht erreichbar." };
+  }
+}

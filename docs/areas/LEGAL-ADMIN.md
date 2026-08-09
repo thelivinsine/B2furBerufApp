@@ -57,8 +57,9 @@ burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA
   (`status`/`priority`/`note`/`link`), `app_config` (world-readable, founder-writable remote
   config) and `launch_checklist` (founder-only), plus the founder-gated SECURITY DEFINER RPCs
   `admin_overview()`, `admin_daily_series()`, `admin_feedback_recent(n)`,
-  `admin_feedback_update(...)`, and since s204 `admin_ai_usage_breakdown(days)` (per day, feature,
-  provider and model: call count, real token counts, derived cost). **Privacy line: RPCs return aggregates only, never individual
+  `admin_feedback_update(...)`, since s204 `admin_ai_usage_breakdown(days)` (per day, feature,
+  provider and model: call count, real token counts, derived cost), and since s205
+  `admin_ai_reconciliation(days)` + `admin_ai_sync_state()`. **Privacy line: RPCs return aggregates only, never individual
   learner rows** (exception: `feedback` rows, operational mail to the founder);
   `profiles`/`progress`/`writing_evaluations` keep owner-only RLS with NO admin SELECT policies.
   Client wrappers: `src/lib/adminApi.ts` (typed, fail-soft, lazy-only).
@@ -86,6 +87,14 @@ burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA
   CSV export, "Entscheidungen" decision export, per-row segmented Freigeben/Ablehnen + note with a
   Save button). Both segments write through the one shared `useWorkbench` store, so a decision in
   the cockpit shows in the table and vice versa.
+- **KI-Kosten, ours vs theirs** (`AiCostReconciliation.tsx`, s205, above the KI-Budget meter in
+  System): our DERIVED figure from `ai_calls` beside the amount ANTHROPIC reports, difference last,
+  14 days. Three rules: an unreported provider day renders "–", never 0; the sync state and any
+  error (the founder's admin key expires every 30 days by choice) render ABOVE the numbers, because
+  a stale comparison is worse than none; Gemini and OpenAI are named as unreconciled rather than
+  shown as agreeing. Refreshed via the founder-gated `reconcile-ai-cost` function on open (hourly at
+  most) and on demand. **No cron on purpose**: scheduling it from the database would mean keeping a
+  second copy of a credential there.
 - **Feedback-Inbox** (`AdminFeedback.tsx`): triage via `admin_feedback_update`, optimistic
   writes. **System + Launch** (`AdminSystem.tsx` gate strip/pings/meters via `systemHealth.ts`;
   `AdminLaunch.tsx` checklist in `launch_checklist`). **Inhalte** (`AdminInhalte.tsx`: depth

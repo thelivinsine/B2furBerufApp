@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { TURNSTILE_ENABLED } from "@/store/useAuthStore";
 import { useAdminLang } from "./adminI18n";
 import { useAdminData } from "./AdminShell";
+import { AiCostReconciliation } from "./AiCostReconciliation";
 import {
   fetchGateRuns,
   pingServices,
@@ -191,6 +192,11 @@ export function AdminSystem() {
           )}
         </div>
       </div>
+
+      {/* Ours vs the provider's own bill (s205). It sits directly above the
+          KI-Budget meter, because that meter shows OUR figure and this is what
+          says whether that figure can be trusted. */}
+      <AiCostReconciliation />
 
       {/* D2 meters */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

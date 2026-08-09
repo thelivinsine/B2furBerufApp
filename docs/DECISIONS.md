@@ -2289,3 +2289,42 @@ because interrupting every learner is a product cost, not just a legal one.
 reconciliation against Anthropic's and OpenAI's own usage/cost APIs turns it from our arithmetic
 into a checked number. That is step 2, and it is blocked on the Anthropic account being an
 organization rather than an individual.
+
+---
+
+## s205 — the cost figure gets a second opinion
+
+**Founder:** created a Console team organization and an Admin API key, chose a **30-day expiry**
+("for security reasons. I can do it again after sep 8 if needed"), and stored it as
+`ANTHROPIC_ADMIN_KEY`. Step 2 of the s204 recommendation became buildable.
+
+**What was actually wrong before.** Nothing was lying, but nothing could be checked either. Our
+figure is real tokens times a rate table WE maintain, so it drifts silently in three ways: a
+provider reprices, a model falls through to the fallback rate, or an assumption (Gemini's free tier
+being free) stops holding. A number that cannot be wrong in a visible way is not a measurement.
+
+**The shape, and why.**
+- **Store the provider's own number beside ours, per day** (`provider_costs`, migration 0020), and
+  show the two with the difference last. The DELTA is the product; either number alone is what we
+  already had.
+- **A day the provider has not reported is NULL, never 0.** "Not yet known" and "cost nothing" look
+  identical in a zero and mean opposite things.
+- **Sync health renders above the numbers.** The founder's key expires every 30 days by choice, so
+  an expired key is a planned event, not an edge case: it must read as a broken comparison rather
+  than as quiet agreement. `provider_sync_state` carries the last error and the admin card leads
+  with it.
+- **No cron.** Scheduling the pull from `pg_cron` means storing a credential inside the database to
+  authenticate the call, which is a worse trade than a founder-triggered refresh. The admin screen
+  pulls on open (at most hourly) and on demand. This is honest about what it is: the comparison is
+  current whenever the founder is looking at it, which is when it matters.
+- **Anthropic only, and the UI says so.** Gemini has no comparable billing API, so its $0 stays an
+  assumption and is labelled as one; OpenAI would need its own key. Naming them as unreconciled is
+  the difference between "we checked" and "we checked one of three".
+
+**One wire-format trap, tested rather than trusted** (`tests/costReport.test.ts`): Anthropic's
+`amount` is a decimal string in CENTS, so a missing divide-by-100 makes the bill look 100x worse,
+and a day arrives as many rows (per model, per token type) that must be summed, so reading the first
+row makes it look far cheaper. Both directions are wrong in a way that would survive a glance.
+
+**What this does NOT do.** It does not make the cost measured. It makes the derived cost
+*checkable*, which is the honest ceiling until every provider publishes a bill we can read.
