@@ -6,13 +6,16 @@ its line budget and every bank count in the docs is re-measured. Session 202 put
 learner needs on screen WHILE they speak. Both handoffs under "Resume here")._
 
 **Session 204 (2026-08-06 → 08, branch `claude/ki-usage-task-kg0vix`): the KI-usage task.**
-**Shipped as PR #835, squash-merged to `main` as `ad8fead`.**
+**Shipped as PR #835, squash-merged to `main` as `ad8fead`, with the migration renumbered by #839.**
 _Started before sessions 197-203 and merged after them, which is why it is numbered here rather
 than where its dates would put it. Two things to know about how it landed: the branch carries two
 merges of `main` with every gate re-run on the merged tree, and **GitHub never queued a CI run for
 the PR** (other branches were queuing normally), so the merge rests on the local gate run, which is
 stated in the merge commit._
-- **AI usage is measured now.** Migration 0018 adds `ai_calls`: one row per provider call holding
+- **AI usage is measured now.** Migration 0019 adds `ai_calls` (**it shipped as 0018 and had to be
+  renumbered**: a parallel session had taken that version in #822, the remote keeps one row per
+  version, and the clash killed the whole backend deploy because migrations run before the functions.
+  `pnpm lint:migrations` now fails on a duplicate version, so it cannot recur): one row per provider call holding
   the token counts the provider ACTUALLY reported (feature, provider, model, input/output/cached
   tokens, cache hit), priced from ONE rate table in `supabase/functions/_shared/aiUsage.ts` that
   `app_config.ai_rates` can override at runtime. All four Edge Functions were rewired to it, which

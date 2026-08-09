@@ -74,6 +74,31 @@ function nameAfter(statement, keyword) {
 
 const problems = [];
 
+/**
+ * A version number belongs to ONE file, forever (s204). Two branches each added
+ * an `0018_*.sql`; the remote records one row per VERSION, so the second one hit
+ * a duplicate-key error on `schema_migrations` and, because migrations run
+ * before the functions in the same workflow, took the whole backend deploy down
+ * with it. Idempotency cannot save you here: the collision is in the ledger, not
+ * in the SQL. Renumber the newer file rather than renaming the older one, which
+ * is already recorded remotely.
+ */
+{
+  const byVersion = new Map();
+  for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
+    const version = file.slice(0, 4);
+    if (byVersion.has(version)) {
+      problems.push({
+        file,
+        rule: `duplicate migration version ${version} (also ${byVersion.get(version)})`,
+        statement: "renumber this file to the next free version",
+      });
+    } else {
+      byVersion.set(version, file);
+    }
+  }
+}
+
 for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
   const number = Number(file.slice(0, 4));
   if (Number.isFinite(number) && number <= LEGACY_THROUGH) continue;

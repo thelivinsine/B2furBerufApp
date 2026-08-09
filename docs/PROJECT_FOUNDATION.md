@@ -56,7 +56,7 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   client-side to the newest 100) and `writing_evaluations.exam_score` (smallint, the 0-100 score
   the evaluator returns in exam mode; null on every practice row and on any run the model could
   not score).
-- **s204 added migration 0018: `ai_calls`,** the per-call AI usage ledger. One row per provider
+- **s204 added migration 0019: `ai_calls`,** the per-call AI usage ledger. One row per provider
   call holding what the provider ACTUALLY reported (feature, provider, model, input/output/cached
   tokens, cache hit) plus a cost derived from one shared rate table
   (`supabase/functions/_shared/aiUsage.ts`, overridable at runtime from `app_config.ai_rates`).
