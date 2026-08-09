@@ -33,7 +33,7 @@ export const UI_EN: Record<string, string> = {
   Kontrollzentrum: "Control center",
   Suche: "Search",
   "Zur Startseite": "To the start page",
-  "Deutsch im Beruf · B2": "German for work · B2",
+  "Deutsch fürs echte Leben · B1–B2": "German for real life · B1–B2",
 
   /* -------------------------------------------------------------- shell --- */
   "Guten Morgen": "Good morning",

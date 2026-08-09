@@ -6245,3 +6245,37 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   sessions, the renumbering, the doc conflicts and how each was resolved) plus this prompt.
 
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+
+### Prompt 7 (2026-08-09)
+
+> [screenshot of the sidebar caption "Deutsch im Beruf · B2"] shouldn't the caption be "german for
+> real life"? why is it different here? change any such mistakes
+
+- **Response summary:** It was a leftover from the PRE-repositioning product. The scope note in
+  `CLAUDE.md` records that Genauly stopped being "B2 Beruf speaking-exam prep" in s21 and became the
+  B1-B2 plateau (work AND everyday life, with exam prep as ONE pillar), and the landing hero,
+  `index.html`, the OG tags and the PWA manifest were all updated then. Three surfaces were missed
+  and still described the old product:
+  1. **The sidebar caption** (the screenshot): now `"Deutsch fürs echte Leben · B1–B2"` /
+     `"German for real life · B1–B2"`, which is the canonical tagline in both languages, and it
+     follows the interface language like the rest of the shell. The level claim was wrong too: the
+     product is B1-B2, not B2.
+  2. **The AGB and the Datenschutzerklärung**, both languages, still opened by defining Genauly as
+     "eine Prüfungsvorbereitungs-App für die mündliche Prüfung Goethe / telc Deutsch B2 Beruf" / "an
+     exam-prep app for the … speaking exam". That is the service description in a legal document, so
+     it now says what the app actually is: a German learning app for B1-B2, work and everyday life,
+     including preparation for telc Deutsch B2 Beruf and Goethe-Zertifikat B2. The "Nutzung"/"Using"
+     paragraph likewise named only workplace German for one exam and now names all eight practice
+     surfaces.
+  3. **`src/types/index.ts`**, whose file header still called this "the B2 Beruf speaking-prep
+     platform".
+  Plus one consistency fix: the landing footer said "Deutsch für das echte Leben" while the hero and
+  the admin placeholder said "Deutsch fürs echte Leben". One wording now, the hero's.
+- **`CONSENT_VERSION` was deliberately NOT bumped.** The rule ties it to
+  `PRIVACY_LAST_UPDATED_ISO` for changes to what is collected, why, with whom it is shared or how
+  long it is kept. This edit changes none of that, it corrects a description of the product, and
+  bumping would ask every signed-in learner to re-consent for a wording fix. Say the word if you
+  want it bumped anyway.
+- Verified in a browser: the caption reads "Deutsch fürs echte Leben · B1–B2" at B2 and "German for
+  real life · B1–B2" at A2. Gates: typecheck · 701 tests · lint 0 errors · build · check:bundle
+  153.3 kB · lint:content.

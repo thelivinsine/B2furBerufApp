@@ -40,8 +40,9 @@ function PrivacyDe() {
     <>
       <Section title="Überblick">
         <p>
-          Genauly (unabhängig betrieben, erreichbar unter <MailLink />) ist eine
-          Prüfungsvorbereitungs-App für die mündliche Prüfung Goethe / telc Deutsch B2 Beruf.
+          Genauly (unabhängig betrieben, erreichbar unter <MailLink />) ist eine Lern-App für
+          Deutsch auf dem Niveau B1 bis B2, im Beruf und im Alltag, mit gezielter Vorbereitung auf
+          die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2.
           Diese Seite erklärt, welche Informationen Genauly erhebt, warum, mit wem sie (falls
           überhaupt) geteilt werden und welche Wahlmöglichkeiten du hast. Wir erheben nur das
           Minimum, das nötig ist, damit die App funktioniert, und wir verkaufen deine Daten
@@ -303,8 +304,9 @@ function PrivacyEn() {
     <>
       <Section title="Overview">
         <p>
-          Genauly (operated independently, reachable at <MailLink />) is an exam-prep app for the
-          Goethe / telc Deutsch B2 Beruf speaking exam. This page explains what information Genauly
+          Genauly (operated independently, reachable at <MailLink />) is a German learning app for
+          the B1 to B2 range, for work and everyday life, including preparation for the telc Deutsch
+          B2 Beruf and Goethe-Zertifikat B2 exams. This page explains what information Genauly
           collects, why, who (if anyone) it is shared with, and what choices you have. We collect
           the minimum needed to make the app work, and we never sell your data.
         </p>

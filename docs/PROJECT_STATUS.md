@@ -65,6 +65,15 @@ wordings."*
   lint:content (CLAUDE.md back under its budget) · lint:migrations. Verified in a real browser at
   390px and 1280px, at A2 and at B2.
 
+- **The tagline drift, found by the founder in a screenshot.** The sidebar caption still read
+  "Deutsch im Beruf · B2", the line from before the s21 repositioning. It is
+  "Deutsch fürs echte Leben · B1–B2" / "German for real life · B1–B2" now, the same tagline the
+  landing hero, `index.html`, the OG tags and the PWA manifest already used. The same stale scope
+  was still in the AGB and the Datenschutzerklärung (both languages opened by calling Genauly an
+  exam-prep app for the B2-Beruf SPEAKING exam) and in the `types/index.ts` header; all corrected to
+  what the app is. **`CONSENT_VERSION` was deliberately not bumped**: the edit changes no data
+  practice, and a bump would ask every signed-in learner to re-consent for a wording fix.
+
 **Resume here (s207):** the language work is complete for chrome the learner meets, and the pattern
 is documented in `docs/areas/UI-LANGUAGE.md`. What is left is deliberate, not missing: the four
 items above stay German by decision, and any NEW surface must call `useT()` and add its pair to
