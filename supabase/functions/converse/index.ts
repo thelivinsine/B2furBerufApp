@@ -123,7 +123,7 @@ const DEBRIEF_MAX_TOKENS = 4096;
 
 /**
  * How long one leg of the cascade may take before it is abandoned and the next
- * model is asked (s205).
+ * model is asked (s206).
  *
  * There was no timeout at all, on any leg, in any function here. A provider that
  * answers slowly or not at all therefore held the whole request open, and the
@@ -299,7 +299,7 @@ interface CallOpts {
   /** Milliseconds one leg may take before the next model is asked. */
   timeoutMs: number;
   /**
-   * Whether the Gemini leg may think before it writes (s205).
+   * Whether the Gemini leg may think before it writes (s206).
    *
    * FALSE for a turn, and this is the bug the founder hit. `gemini-2.5-flash`
    * reasons by default, and Google bills those thoughts as OUTPUT, so they come

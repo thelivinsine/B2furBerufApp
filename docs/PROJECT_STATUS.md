@@ -1,12 +1,39 @@
 # Project Status
 
-_Last updated: 2026-08-09 (session 205 fixed the Sprechen AI failure the founder reported: it was
-the sign-in wall arriving as a grey caption, not a broken model. Session 204 made AI usage MEASURED per call and gave Sprechen 6 + 3
-conversations a day; session 203 was a documentation-maintenance pass: CLAUDE.md is back under
-its line budget and every bank count in the docs is re-measured. Session 202 put the Redemittel a
-learner needs on screen WHILE they speak. Both handoffs under "Resume here")._
+_Last updated: 2026-08-09 (session 206 fixed the Sprechen AI failure the founder reported: it was
+the sign-in wall arriving as a grey caption, not a broken model. Session 205 gave the AI cost figure
+a second opinion: Anthropic's own daily numbers beside ours in the control centre. Session 204 made AI usage MEASURED per call and gave
+Sprechen 6 + 3 conversations a day; see "Resume here")._
 
-**Session 205 (2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): "the ai feature
+**Session 205 (2026-08-09, branch `claude/ki-usage-task-kg0vix`): step 2, the reconciliation.**
+The founder created a Console team organization and an Admin API key (30-day expiry, by choice) and
+stored it as `ANTHROPIC_ADMIN_KEY`, which unblocked the step s204 could only recommend.
+- **Migration 0020** adds `provider_costs` (one row per provider per UTC day, the amount the
+  PROVIDER reports) and `provider_sync_state` (last success, last attempt, last error), plus
+  `admin_ai_reconciliation(days)` and `admin_ai_sync_state()`.
+- **`reconcile-ai-cost` Edge Function** pulls Anthropic's Cost Report, converts its cents-as-string
+  amounts once, and upserts by day. Founder-gated against `admins`. **No cron on purpose**: a
+  scheduled pull would need a credential stored inside the database, so the admin screen refreshes
+  on open (hourly at most) and on demand.
+- **A card in `/admin` System** shows our derived figure, Anthropic's, and the difference over 14
+  days. An unreported day reads "–", never 0; sync errors render above the numbers; Gemini and
+  OpenAI are named as unreconciled rather than shown as agreeing.
+- **The expiry is handled, not ignored.** The key dies on 8 September; a 401 is turned into "der
+  Schlüssel ist abgelaufen" in `provider_sync_state.last_error` and shown on the card, so the
+  comparison cannot go quietly stale.
+- Gates: typecheck · lint 0 errors (78 warnings, one new and of the same async-setState class as
+  the existing ones) · **687 tests** (up from 675; `tests/costReport.test.ts` pins the cents→dollars
+  conversion and the sum-every-row rule, both wrong in ways that survive a glance) · build ·
+  check:bundle · lint:content · lint:migrations.
+**Resume here:** nothing is blocked. Two open items, both flagged rather than urgent: **the admin
+key expires 2026-09-08** (the card will say so; create a new one and replace the secret), and the
+reconciliation covers **Anthropic only** (OpenAI needs its own org key; Gemini has no billing API
+and its $0 stays a labelled assumption). Also still unbuilt from s204: **part B, the reserved KI
+chip**, previewed in `preview/ki-usage-chip.html` and awaiting a pick.
+
+**Session 206 (2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): ran in PARALLEL
+with session 206, which reached `main` first, so this one renumbered rather than reuse 205.**
+**(2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): "the ai feature
 doesn't work" in Sprechen, and the Redemittel rail's second pass.**
 Founder prompts: "there is an error with speaking exercies - the ai feature doesn't work" → "for the
 redemittel rail, display only 4-5 highly useful and frequently used redemittel phrases, not too many
@@ -106,7 +133,7 @@ prompts; one shipped change, three of analysis, and a redirect that matters more
   organization usage/cost endpoints) and show "ours vs theirs" side by side; Gemini has no clean
   billing API, so its free-tier figure stays a self-measured count and the UI must say so; **(3)**
   the learner-facing number stays counts, never money. Full reasoning in `docs/DECISIONS.md` §s204.
-**Resume here:** step 2, the reconciliation. It needs one thing from the founder first: the
+**Resume here (s204, now DONE in s205 below the header):** step 2, the reconciliation. It needed one thing from the founder first: the
 Anthropic account must be an ORGANIZATION (Console → Settings → Organization) before it can issue
 the `sk-ant-admin01-` key the Usage and Cost API requires; OpenAI's organization usage/cost
 endpoints need their own key. Then a nightly job pulls yesterday's real figures into a

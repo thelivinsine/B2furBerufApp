@@ -54,7 +54,7 @@ export function MicCluster({
   endLabel?: string;
   caption?: string | null;
   /**
-   * "error" when the caption is a FAILURE rather than a status (s205). The slot
+   * "error" when the caption is a FAILURE rather than a status (s206). The slot
    * carries both "Ich höre zu …" and "Deine Gesprächspartnerin ist gerade nicht
    * erreichbar", and printing them in the same muted grey is why a refused turn
    * read to the founder as the app simply doing nothing.
@@ -97,7 +97,7 @@ export function MicCluster({
         <div className="mt-2 flex items-center gap-2">
           {/* The typed fallback printed no caption at all, so on a browser with
               no speech recognition a refused turn showed the learner literally
-              nothing (s205). Same slot, same rules as the microphone's. */}
+              nothing (s206). Same slot, same rules as the microphone's. */}
           <p
             className={cn(
               "min-h-[18px] flex-1 text-xs",

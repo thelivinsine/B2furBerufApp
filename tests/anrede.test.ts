@@ -65,7 +65,7 @@ describe("the rail is servable for every scenario", () => {
     }
   });
 
-  it("never offers more than five phrases at once (founder s205)", () => {
+  it("never offers more than five phrases at once (founder s206)", () => {
     for (const register of ["du", "sie"] as const) {
       for (const category of new Set(scenarios.flatMap((s) => s.targetRedemittel))) {
         // The rail is read mid-conversation with a partner waiting, so it is a

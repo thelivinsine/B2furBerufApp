@@ -80,12 +80,12 @@ Founder pick: **Option A's layout on desktop, Option C's on a phone, Option A's 
 
 **One hierarchy, both shells** (founder, s202 follow-up): the section label with its `EnPeek` chip,
 then the intent **pills at the top of the tile** (all four, the current one LIT), then that intent's
-phrases as white cards, **at most five of them** (founder s205: "display only 4-5 highly useful and
+phrases as white cards, **at most five of them** (founder s206: "display only 4-5 highly useful and
 frequently used redemittel phrases, not too many of them"). The rail is read mid-conversation with a
 partner waiting, so it is a prompt, not the Bibliothek, and some categories carry 24 phrases.
 `MAX_HELP_PHRASES` picks the EASIEST that fit the Anrede, ranked by `CEFR_ORDER` (the one CEFR
 source) with the bank's authored order inside a band, and shows them in that authored order, so the
-list never rearranges itself between two glances. **The pills carry no count since s205:** capped at
+list never rearranges itself between two glances. **The pills carry no count since s206:** capped at
 five, every intent printed the same digit, and a number that cannot vary is dead chrome rather than
 honesty. There is no dropdown: a lit pill states the selection, so a
 dropdown above it would print the same fact twice, and four options is pill territory. The pills do
@@ -112,7 +112,7 @@ Rules:
 - **The list is the one elastic element** in both shells: bounded in the rail, and in the drawer it
   takes what the `50dvh` cap leaves, so the intent pills below it stay on screen and the running
   screen still rests at zero page scroll.
-- **The edge fade is per edge and conditional** (`useEdgeFade`, s205), never the unconditional
+- **The edge fade is per edge and conditional** (`useEdgeFade`, s206), never the unconditional
   `mask-fade-y` it shipped as. A list resting at its top faded its own FIRST phrase out under the
   pills, which reads as a shadow cast by them (founder: "the first redemittel is literally
   overshadowed"). A fade means "content continues past here"; with five phrases there is usually
@@ -200,7 +200,7 @@ fixed:
    and the streak day. It now fires once per conversation either way, and the failure screen says
    the conversation is stored and offers the retry instead of one lone "Zurück".
 
-## Signing in is a WALL, not a caption (s205)
+## Signing in is a WALL, not a caption (s206)
 
 The founder: "there is an error with speaking exercises, the ai feature doesn't work ... I say
 something and submit but it loads and there's no response". The screenshot settled it: the caption
@@ -223,7 +223,7 @@ header drops the account menu (s201). It reads as the app doing nothing.
   fallback prints the caption at all now: on a browser with no speech recognition a refused turn
   showed the learner literally nothing.
 
-## Every leg of the cascade has a deadline (s205)
+## Every leg of the cascade has a deadline (s206)
 
 There was no timeout on any provider call, in any Edge Function here. A provider that answers slowly
 or hangs therefore held the whole request open, which on the one AI surface a learner waits at
@@ -285,7 +285,7 @@ Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
 | `features/sprechen/ConversationRunner.tsx` | The one runner + the three stage views. |
 | `features/sprechen/ConversationBriefCard.tsx` | The pre-conversation brief. |
 | `features/sprechen/ConversationDebrief.tsx` | Goals, correction card, Redemittel. |
-| `features/sprechen/RedemittelHelp.tsx` | The phrases while speaking (s202): the rail tile and the drawer body, one content. Practice only, passed to the runner as `help`. Caps at five and fades only where content continues (s205). |
+| `features/sprechen/RedemittelHelp.tsx` | The phrases while speaking (s202): the rail tile and the drawer body, one content. Practice only, passed to the runner as `help`. Caps at five and fades only where content continues (s206). |
 | `lib/anrede.ts` | The ONE du/Sie rule, derived from phrase text. |
 | `features/sprechen/MicCluster.tsx` | The shared control cluster + typed fallback. |
 | `features/sprechen/useSpeechInput.ts` | The microphone, over `engine/speech.ts`. |

@@ -71,7 +71,7 @@ function wireBrief(brief: ConversationBrief) {
 
 /**
  * The one sentence that says why Sprechen cannot call the AI right now, or null
- * when it can (s205).
+ * when it can (s206).
  *
  * It exists as its own function because the SCREEN has to ask the same question
  * the API client asks, and the two must give the same answer. The founder hit

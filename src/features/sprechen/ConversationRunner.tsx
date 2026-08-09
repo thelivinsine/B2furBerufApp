@@ -122,7 +122,7 @@ export function ConversationRunner({
   const reduce = useReducedMotion();
   /**
    * Why the AI cannot be called, asked of the SAME function the API client asks
-   * (s205), and re-read whenever auth changes so signing in clears the wall on
+   * (s206), and re-read whenever auth changes so signing in clears the wall on
    * the spot instead of after a reload.
    */
   const authBlock = useSpeakingAuthBlock();
@@ -198,7 +198,7 @@ export function ConversationRunner({
         if (res.conversationOver) setOver(true);
         // A session that lapsed mid-conversation is the one failure the learner
         // can actually fix, so it is put in front of them instead of ending up
-        // as a caption they will read as silence (s205).
+        // as a caption they will read as silence (s206).
         if (res.needsAuth) setAuthOpen(true);
         return;
       }
@@ -563,7 +563,7 @@ export function ConversationRunner({
       )}
 
       <MicCluster
-        // A failure is never printed in the status grey (s205).
+        // A failure is never printed in the status grey (s206).
         captionTone={!finished && state.error ? "error" : "status"}
         listening={speech.listening}
         supported={speech.supported}

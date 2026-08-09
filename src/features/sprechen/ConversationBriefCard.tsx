@@ -39,7 +39,7 @@ export function ConversationBriefCard({
   disabledReason?: string | null;
   /**
    * Set ONLY when the wall is a missing account, and the learner can clear it
-   * from here (s205). A wall with a remedy gets a button that performs the
+   * from here (s206). A wall with a remedy gets a button that performs the
    * remedy, not a dead Start with a note under it: "controls always visibly
    * act" is the founder's rule, and an allowance that is spent has no action,
    * while signing in does.

@@ -41,7 +41,7 @@ const LABEL_DE = new Map(redemittelCategories.map((c) => [c.id, c.labelDe]));
 
 /**
  * How many phrases one intent offers while the learner is speaking (founder
- * s205: "display only 4-5 highly useful and frequently used redemittel phrases,
+ * s206: "display only 4-5 highly useful and frequently used redemittel phrases,
  * not too many of them").
  *
  * The rail is read mid-conversation, with a partner waiting, so it is a prompt,
@@ -59,7 +59,7 @@ const MAX_HELP_PHRASES = 5;
  * register falls back to the full set. An empty rail would be a filter that
  * deleted the feature rather than narrowed it.
  *
- * WHICH five (s205): the EASIEST that fit, by CEFR, keeping the bank's authored
+ * WHICH five (s206): the EASIEST that fit, by CEFR, keeping the bank's authored
  * order inside a band. A B1.1 phrase is the one a B1-B2 learner already half
  * owns and can say under pressure, and the plateau this app exists for is not
  * crossed by reaching for the rarest formulation. `CEFR_ORDER` is the app's one
@@ -143,7 +143,7 @@ export function RedemittelHelp({
             and wrapping. NOT a toggle-off: a conversation always has one intent
             in view, so there is no "none" state to return to.
 
-            NO COUNT since s205. It was there to be an honest number, and an
+            NO COUNT since s206. It was there to be an honest number, and an
             honest number is only worth printing when it varies: with every
             intent capped at five phrases it printed the same digit four times,
             which is the founder's dead-chrome rule, not honesty. */}
@@ -181,7 +181,7 @@ export function RedemittelHelp({
           "slim-scrollbar flex min-h-0 flex-col gap-1.5 overflow-y-auto",
           layout === "rail" ? "max-h-[20rem]" : "flex-1",
           // The fade is a hint that content CONTINUES past an edge, so it is
-          // applied per edge and only when it does (founder s205: "the first
+          // applied per edge and only when it does (founder s206: "the first
           // redemittel is literally overshadowed"). It was unconditional, so a
           // list resting at its top, with nothing above it and often nothing
           // below it either, faded its own first phrase out under the pills and
