@@ -139,7 +139,9 @@ export function CollocationsBrowser() {
   const learningMode = useSettingsStore((s) => s.mode);
   const scope = useLibraryScope();
   const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
-  const [showAllLevels, setShowAllLevels] = useState(false);
+  const showAllLevels = useSettingsStore((s) => s.showAllCefrLevels);
+  const setSettings = useSettingsStore((s) => s.setSettings);
+  const setShowAllLevels = (v: boolean) => setSettings({ showAllCefrLevels: v });
   // Mobile filter panel open state: the toggle is an icon on the view line.
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useViewParam(KOLLOKATION_VIEWS);
