@@ -2235,7 +2235,7 @@ exercises. it's very less. increase the limit to 6 for üben and 3 for Prüfung.
 
 ### The ledger
 
-**`ai_calls` (migration 0018) is the measured record; `ai_usage` stays the fuse.** They answer
+**`ai_calls` (migration 0019) is the measured record; `ai_usage` stays the fuse.** They answer
 different questions and neither replaces the other: `ai_usage` is a running monthly total, read on
 every request to decide whether the app may spend anything at all, and a single row is the right
 shape for that. `ai_calls` is one row per provider call, and it is what you interrogate afterwards.

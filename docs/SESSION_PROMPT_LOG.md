@@ -6001,3 +6001,17 @@ and reverting it is one line.
 
 - **Artifacts:** **PR #835**, squash-merged as `ad8fead` · merge commits `3f31172` and `bcfb3f7` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+
+**Post-merge: the backend deploy went red, and why.** `Deploy Supabase functions` failed on
+`ad8fead` with `duplicate key value violates unique constraint "schema_migrations_pkey", Key
+(version)=(0018)`. A parallel session had shipped `0018_texts_done.sql` in #822 while this branch
+was open, and this branch's ledger migration was also numbered 0018. The remote records ONE row per
+VERSION, so the second file could never be applied, and because migrations run BEFORE the Edge
+Functions in that workflow, the collision took the whole backend deploy with it: no `ai_calls`
+table, and none of the four rewired functions live.
+
+Idempotency does not protect against this (the clash is in the migration ledger, not in the SQL), so
+the fix is a renumber plus a gate: `0019_ai_calls.sql`, and `pnpm lint:migrations` now FAILS on two
+files sharing a version prefix. Verified by planting a duplicate and watching it go red. Shipped as
+**PR #839**.
+

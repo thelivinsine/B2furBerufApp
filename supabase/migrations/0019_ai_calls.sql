@@ -1,4 +1,4 @@
--- 0018_ai_calls.sql
+-- 0019_ai_calls.sql
 -- The per-call AI usage ledger (founder s204: "how do we make sure we see real
 -- usage and costs and not just estimates?").
 --
@@ -17,7 +17,12 @@
 -- NO LEARNER TEXT LIVES HERE. Counts, model ids and a cost estimate only, which
 -- is why the retention window below can be long without holding anyone's prose.
 --
--- Safe to re-run (deploy runs `--include-all`).
+-- Safe to re-run (deploy runs `--include-all`), which is what made the number
+-- collision below recoverable: this file shipped as 0018 first, and a parallel
+-- session had already taken that version with 0018_texts_done.sql. The remote
+-- records ONE row per version, so the push died on a duplicate key before the
+-- Edge Functions deployed. Renumbered to 0019; never reuse a version number that
+-- exists on any branch, and `pnpm lint:migrations` now fails on a duplicate.
 
 -- ---------------------------------------------------------------------------
 -- 1. The ledger.

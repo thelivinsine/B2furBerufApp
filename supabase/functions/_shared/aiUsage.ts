@@ -12,7 +12,7 @@
 //   2. prices those tokens from ONE rate table, overridable at runtime from
 //      `app_config.ai_rates` so a provider reprice is a config edit, not a
 //      redeploy of four functions;
-//   3. writes one `ai_calls` row per call (migration 0018), which is what a
+//   3. writes one `ai_calls` row per call (migration 0019), which is what a
 //      later reconciliation against the providers' own usage/cost APIs is
 //      compared to.
 //
@@ -25,7 +25,7 @@
 /** Who answered the call. Gemini is the free-tier primary in every cascade. */
 export type Provider = "google" | "anthropic" | "openai";
 
-/** Which product surface spent the call. Mirrors the `feature` check in 0018. */
+/** Which product surface spent the call. Mirrors the `feature` check in 0019. */
 export type AiFeature =
   | "check"
   | "transform"
