@@ -26,7 +26,7 @@ export type ThemeMode = "light" | "dark" | "system";
 export type CefrLevel = "A2" | "B1" | "B2" | "C1";
 export type LearningGoal = "exam" | "work" | "fluency";
 /**
- * Interface language (founder s205). "auto" derives it from the learner's
+ * Interface language (founder s207). "auto" derives it from the learner's
  * level, which is the rule the founder stated: an A2/B1 learner reads the
  * INTERFACE in English, a B2/C1 learner keeps the German one. The learning
  * material itself is German at every level and is never translated by this

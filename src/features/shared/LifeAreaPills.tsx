@@ -52,7 +52,7 @@ export function LifeAreaPills({
   disableZero?: boolean;
   className?: string;
 }) {
-  // s205: `LIFE_AREAS` already carries `titleEn` ("Working life" / "Daily
+  // s207: `LIFE_AREAS` already carries `titleEn` ("Working life" / "Daily
   // life"), so the pills read it directly instead of going through the string
   // dictionary. Same fold, one source.
   const lang = useUiLang();

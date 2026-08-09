@@ -209,7 +209,7 @@ export function UebenLabel({
   return (
     <span className="inline-flex items-center justify-center gap-1.5">
       <Zap className={iconClass} />
-      {/* s205: the noun arrives as its GERMAN form (the dictionary key), so a
+      {/* s207: the noun arrives as its GERMAN form (the dictionary key), so a
           caller keeps saying "Wort"/"Wörtern" and the label reads
           "Practise 171 words" for an A2 learner without every call site
           carrying two languages. */}

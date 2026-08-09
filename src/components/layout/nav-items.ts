@@ -44,7 +44,7 @@ export interface NavItem {
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
 // pairing. The routes are unchanged (/ and /library).
 //
-// ORDER (founder s205): **Bibliothek leads the nav and Praktisch sits beside
+// ORDER (founder s207): **Bibliothek leads the nav and Praktisch sits beside
 // Einstellungen, marked Beta.** The library is what a learner meets first now
 // (onboarding hands straight over to it, no taster session), and the Praktisch
 // zone is still being built, so it moved to the far end of the rail instead of
@@ -70,7 +70,7 @@ export const navItems: NavItem[] = [
 
 // Five slots, unchanged in count since s182 reshaped what fills them (founder:
 // move Schreiben into the transfer hub and call that hub Prüfung), reordered in
-// s205: Bibliothek, Prüfung, Fortschritt, Praktisch, Einstellungen. An existing
+// s207: Bibliothek, Prüfung, Fortschritt, Praktisch, Einstellungen. An existing
 // learner's persisted order still works: BottomTabBar completes the reorderable
 // group with whatever is missing, pins the two fixed ends itself, and a pinned
 // "/writing" remaps via ROUTE_SUCCESSOR.

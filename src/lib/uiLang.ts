@@ -2,7 +2,7 @@ import { useSettingsStore, type CefrLevel, type UiLangPref } from "@/store/useSe
 import { UI_EN } from "./uiStrings";
 
 /**
- * The ONE interface-language rule (founder s205).
+ * The ONE interface-language rule (founder s207).
  *
  * "the app's language should adapt to various levels of user language
  * proficiency. if the user logs A2 or B1 level, the app should show everything

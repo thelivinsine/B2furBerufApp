@@ -27,7 +27,7 @@ export function Sidebar({
     (i) => NEVER_HIDEABLE.includes(i.to) || !hiddenTabs.includes(i.to),
   );
   const founder = isFounder(useAuthStore((s) => s.user));
-  // Interface language (s205). A remote `navLabels` override is founder-authored
+  // Interface language (s207). A remote `navLabels` override is founder-authored
   // copy and is taken verbatim; only the built-in label is translated.
   const t = useT();
   // Same zone fold as the bottom bar (s192): the Schreibtrainer marks Prüfung,
@@ -80,7 +80,7 @@ export function Sidebar({
                   gradient + bold text). */}
               <RouteIcon path={to} size={18} active={active} />
               {navLabels[to] ?? t(label)}
-              {/* Beta suffix (founder s205, Praktisch). Same neutral chip as the
+              {/* Beta suffix (founder s207, Praktisch). Same neutral chip as the
                   Neuland heading: bordered, muted, never the accent colour. */}
               {beta && (
                 <span className="ml-auto rounded-full border border-border px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-muted-foreground">

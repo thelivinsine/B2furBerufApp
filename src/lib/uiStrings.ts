@@ -1,5 +1,5 @@
 /**
- * The English interface, one file (founder s205).
+ * The English interface, one file (founder s207).
  *
  * The app is written German-first, so **the German string is the key** and this
  * map holds its English. A key that is missing renders the German, which is

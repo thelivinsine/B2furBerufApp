@@ -29,7 +29,7 @@ export function LibrarySwitcher() {
   const { theme, sub } = useLibraryScope();
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(current);
-  // s205: the four tab NAMES are chrome, so they follow the interface language.
+  // s207: the four tab NAMES are chrome, so they follow the interface language.
   // What sits inside a tab (the words, the phrases, the drills) never does.
   const t = useT();
 

@@ -161,7 +161,7 @@ export function Settings() {
                 className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm outline-none"
               />
             </div>
-            {/* Interface language (s205). It sits under the level on purpose:
+            {/* Interface language (s207). It sits under the level on purpose:
                 the default DERIVES from the level, and this is the control that
                 overrides it when a learner wants the other one. */}
             <div className="space-y-1.5">

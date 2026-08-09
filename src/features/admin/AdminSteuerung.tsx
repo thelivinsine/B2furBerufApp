@@ -25,7 +25,7 @@ import { useAdminLang } from "./adminI18n";
  */
 
 // Only middle tabs may be hidden. The locked bar keeps three slots fixed, and
-// since s205 those are Bibliothek (first), Praktisch (beside Einstellungen) and
+// since s207 those are Bibliothek (first), Praktisch (beside Einstellungen) and
 // Einstellungen, so Fortschritt is what is left to hide. Bibliothek dropped off
 // this list when it became the fixed first slot: hiding it would have emptied
 // the slot the rail opens with.

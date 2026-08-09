@@ -23,7 +23,7 @@ every deep link, and a pin saved while it was a tab remaps through `ROUTE_SUCCES
 `BottomTabBar` `FIXED_FIRST = "/library"` + `REORDERABLE = ["/anwenden", "/analytics"]` +
 `FIXED_LAST_CONTENT = "/"` (s205; before that the fixed ends were Home first and Fortschritt last,
 founder s158). `DEFAULT_PINNED_TABS = ["/library", "/anwenden", "/analytics", "/"]`. The bar pins
-its own ends and only READS a saved order for the reorderable middle, so every pre-s205 pin list
+its own ends and only READS a saved order for the reorderable middle, so every pre-s207 pin list
 still renders the new five slots with no migration.
 `NEVER_HIDEABLE = ["/library", "/", "/settings"]` (nav-items.ts) is the three fixed slots: remote
 config may hide only a middle tab, and both the bar and the sidebar enforce it, so a stale
@@ -265,7 +265,7 @@ Remote-config overrides (admin Steuerung H1/H2/H8) may relabel/hide nav items at
 match the above.
 
 ## Bottom tab bar (mobile)
-- Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots (s205 order): Bibliothek
+- Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots (s207 order): Bibliothek
   (fixed slot 1) + 2 middle (Prüfung · Fortschritt) + Praktisch + Einstellungen (both fixed last,
   plain links). The More sheet is retired (`MoreSheet.tsx` deleted); no add/remove — the middle
   sections are always visible and only Prüfung + Fortschritt REORDER via a hidden long-press easter

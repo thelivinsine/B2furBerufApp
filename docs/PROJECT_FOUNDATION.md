@@ -65,6 +65,18 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   still the monthly spend FUSE; this is the detail behind it, and the thing a future reconciliation
   against the providers' own usage/cost APIs gets compared to. Purged at 400 days
   (`purge_old_ai_calls`, `pg_cron`), matching the client's activity window. No learner text.
+- **s205 added migration 0020: `provider_costs` + `provider_sync_state`,** the other side of the AI
+  cost figure. `provider_costs` holds one row per provider per UTC day with the amount the PROVIDER
+  reports (Anthropic's Cost Report API; its `amount` is cents-as-a-string, converted once at the
+  edge). `provider_sync_state` holds the last successful and last attempted pull plus the last
+  error, so a stale comparison can never render as a healthy one. Service-role only; read through
+  `admin_ai_reconciliation(days)` (ours vs theirs per day, a provider day that has not been reported
+  yet returns NULL rather than 0) and `admin_ai_sync_state()`. Fetched by the `reconcile-ai-cost`
+  Edge Function, which is **founder-gated against `admins` and has no cron**: scheduling it from the
+  database would mean storing a second copy of a credential in the database, so the admin screen
+  refreshes it on open (at most hourly) and on demand instead. Needs the `ANTHROPIC_ADMIN_KEY`
+  secret (`sk-ant-admin01-…`, full org admin rights, Console → Settings → Admin keys). Purged at
+  400 days, matching `ai_calls`.
 - **Full schema as of s185 (15 migrations).** Per-learner, owner-only RLS: `profiles`, `progress`,
   `writing_evaluations`, `sentence_checks`, `sentence_ai_ops`. Service-role only (no client
   policies at all): `ai_usage`, `feedback`, `admins`, `gdpr_events`, `sentence_transforms` (the one

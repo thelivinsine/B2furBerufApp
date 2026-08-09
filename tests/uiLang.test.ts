@@ -6,7 +6,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 afterEach(() => useSettingsStore.getState().resetSettings());
 
 /**
- * The interface-language rule (founder s205): "if the user logs A2 or B1 level,
+ * The interface-language rule (founder s207): "if the user logs A2 or B1 level,
  * the app should show everything in English except the learning material which
  * should obviously be in german."
  */

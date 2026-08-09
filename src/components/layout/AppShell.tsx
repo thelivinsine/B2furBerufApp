@@ -85,7 +85,7 @@ export function AppShell() {
   const tx = useTx();
   const uiLang = useUiLang();
 
-  // Keep the document language honest (s205): the chrome is what `<html lang>`
+  // Keep the document language honest (s207): the chrome is what `<html lang>`
   // describes, and it now switches with the learner's level. Set here rather
   // than in index.html, which ships one static value for both languages.
   useEffect(() => {

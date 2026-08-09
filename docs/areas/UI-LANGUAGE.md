@@ -1,6 +1,6 @@
 # Interface language — current state
 
-The founder's rule (s205): *"the app's language should adapt to various levels of user language
+The founder's rule (s207): *"the app's language should adapt to various levels of user language
 proficiency. if the user logs A2 or B1 level, the app should show everything in English except the
 learning material which should obviously be in german."*
 
@@ -47,7 +47,7 @@ Two more helpers, same rule:
 A German word needing two different English words takes a context: `t("Start", "session")` looks up
 `"Start#session"` first, then plain `"Start"`.
 
-## What is converted (s205)
+## What is converted (s207)
 
 Everything a learner meets as CHROME: the shell (header, greeting, streak, zone exit, resume
 screen), both nav surfaces, the account menu/panel and the sign-in nudge, the feedback affordances,

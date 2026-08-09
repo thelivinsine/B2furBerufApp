@@ -26,7 +26,7 @@ import { Logo } from "@/components/shared/Logo";
  * One-screen setup (redesign Phase 1.3). A single "Wofür lernst du Deutsch?"
  * choice sets both the learning goal and the Mode lens, one CEFR chip row sets
  * the level, and the consent checkbox is recorded BEFORE any learning progress
- * is stored. Then the learner lands in the **Bibliothek** (founder s205): the
+ * is stored. Then the learner lands in the **Bibliothek** (founder s207): the
  * setup card used to hand straight over to a ~90s composed taster session
  * (`/session?min=1`), which decided the first minute for the learner. The
  * library is the zone the nav now opens with, so setup ends by showing them
@@ -65,7 +65,7 @@ export function Onboarding() {
   // not the one in the store (nothing is stored until they submit), so tapping
   // A2 switches this card to English on the spot. That is also the moment the
   // rule is easiest to understand: you say your level, the app answers in a
-  // language you can read (founder s205).
+  // language you can read (founder s207).
   const lang = uiLangFor(langPref, level);
   const t = (de: string) => translate(de, lang);
 
@@ -75,7 +75,7 @@ export function Onboarding() {
     // Consent is recorded before completeOnboarding writes any profile state.
     recordConsent();
     completeOnboarding({ goal: setup.goal, mode: setup.mode, level });
-    // Straight into the Bibliothek, the zone the nav opens with (s205).
+    // Straight into the Bibliothek, the zone the nav opens with (s207).
     navigate("/library", { replace: true });
   };
 

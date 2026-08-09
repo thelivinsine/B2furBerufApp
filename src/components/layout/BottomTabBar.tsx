@@ -14,7 +14,7 @@ const IZ = 29; // icon size
 
 // The bar's three fixed slots and its reorderable middle.
 //
-// Until s205 Home ("/") was the fixed first slot. The founder reordered the
+// Until s207 Home ("/") was the fixed first slot. The founder reordered the
 // rail: **Bibliothek opens it and Praktisch sits directly left of
 // Einstellungen**, because onboarding now hands a new learner straight to the
 // library and the Praktisch zone is still Beta. So the ends are Bibliothek and
@@ -46,7 +46,7 @@ function BarTab({ path, active, moreHidden }: { path: string; active: boolean; m
   const item = navItems.find(i => i.to === path);
   // Steuerung H1: apply a remote label override (falls back to the built-in).
   // Called unconditionally before the early return to respect the hooks rule.
-  // s205: the built-in label goes through the interface language first, so an
+  // s207: the built-in label goes through the interface language first, so an
   // A2/B1 learner reads "Library"; a founder-authored override wins verbatim.
   const t = useT();
   const label = useNavLabel(path, item ? t(item.label) : "");
@@ -94,7 +94,7 @@ function BarTab({ path, active, moreHidden }: { path: string; active: boolean; m
           aria-hidden={!showActive}
         >
           {label}
-          {/* Beta suffix (founder s205, Praktisch): a plain lighter suffix, not
+          {/* Beta suffix (founder s207, Praktisch): a plain lighter suffix, not
               a chip — the label slot is a fixed 12px line, and a bordered chip
               would grow it and shift the icon rail the slot exists to hold
               still. It rides inside the truncate like the label itself. */}
@@ -180,7 +180,7 @@ export function BottomTabBar() {
         >
           {editMode ? (
             <>
-              {/* Bibliothek — always fixed first (s205) */}
+              {/* Bibliothek — always fixed first (s207) */}
               <div className="flex flex-1 p-1">
                 <div className="flex flex-1 items-center justify-center rounded-xl">
                   <TabIcon path={FIXED_FIRST} />
@@ -219,7 +219,7 @@ export function BottomTabBar() {
               </Reorder.Group>
 
               {/* Praktisch — pinned left of Einstellungen, not reorderable
-                  (founder, s205), so it renders as a still tile like the ends. */}
+                  (founder, s207), so it renders as a still tile like the ends. */}
               <div className="flex flex-1 p-1">
                 <div className="flex flex-1 items-center justify-center rounded-xl">
                   <TabIcon path={FIXED_LAST_CONTENT} />

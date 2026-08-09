@@ -8,7 +8,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 afterEach(cleanup);
 
 /**
- * The nav after s205 (founder: "keep bibliothek on the top, and the praktisch
+ * The nav after s207 (founder: "keep bibliothek on the top, and the praktisch
  * beside the settings; praktisch should be labeled as beta").
  *
  * The bar is FIVE slots and stays five, reordered: Bibliothek · Prüfung ·
@@ -48,7 +48,7 @@ describe("bottom tab bar: five slots, in order", () => {
   });
 
   it("keeps the fixed ends even when a stale pin order says otherwise", () => {
-    // The pre-s205 default, still in every existing learner's localStorage.
+    // The pre-s207 default, still in every existing learner's localStorage.
     useSettingsStore.getState().setPinnedTabs(["/", "/library", "/anwenden", "/analytics"]);
     render(
       <MemoryRouter initialEntries={["/"]}>

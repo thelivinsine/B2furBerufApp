@@ -1,11 +1,12 @@
 # Project Status
 
-_Last updated: 2026-08-09 (session 205 reordered the nav, ended onboarding in the Bibliothek and
-made the INTERFACE LANGUAGE follow the learner's level: A2/B1 English, B2/C1 German, learning
-material German at every level. Session 204 made AI usage MEASURED per call and gave Sprechen 6 + 3
-conversations a day. Both handoffs under "Resume here")._
+_Last updated: 2026-08-09 (session 207 reordered the nav, ended onboarding in the Bibliothek and made
+the INTERFACE LANGUAGE follow the learner's level: A2/B1 English, B2/C1 German, learning material
+German at every level. Session 206 fixed the Sprechen AI failure the founder reported: it was the
+sign-in wall arriving as a grey caption, not a broken model. Session 205 gave the AI cost figure a
+second opinion. All handoffs under their own "Resume here")._
 
-**Session 205 (2026-08-09, branch `claude/remove-onboarding-practice-z7qfwu`): the nav order, the
+**Session 207 (2026-08-09, branch `claude/remove-onboarding-practice-z7qfwu`): the nav order, the
 onboarding hand-off, and the interface language.**
 
 Founder, three prompts: *"remove the onboarding practice session when a new user signs up … finish
@@ -53,17 +54,85 @@ wordings."*
   reproduces the real telc instruction text; the grammar dial VALUES in Fokus (Aktiv/Passiv/Präsens/
   Perfekt are the forms being practised); the Neuland world's place and mission names; and the
   German grammar abbreviations on a word card (Pl./Perf.).
-- Gates: typecheck · lint 0 errors (77 warnings, unchanged baseline) · **688 tests** (up from 685 on `main`,
-  new `tests/uiLang.test.ts` pins the level rule, the German-fallback and the dictionary's shape) ·
-  build · check:bundle 152.3 kB · check:contrast · lint:content (CLAUDE.md back under its budget).
-  Verified in a real browser at 390px and 1280px, at A2 and at B2.
+- **`main` moved under this branch** (#840, #841, #842, sessions 205 and 206 in parallel), so it was
+  merged in and every gate re-run on the merged tree. The conflicts were all in the docs: CLAUDE.md
+  took main's compressions plus this session's two new laws, and the append-only logs kept both sides.
+- Gates on the MERGED tree: typecheck · lint 0 errors (77 warnings, unchanged baseline) · **701
+  tests** (687 on `main`; `tests/uiLang.test.ts` pins the level rule, the German fallback and the
+  dictionary's shape, and two nav cases join) · build · check:bundle 153.2 kB · check:contrast ·
+  lint:content (CLAUDE.md back under its budget) · lint:migrations. Verified in a real browser at
+  390px and 1280px, at A2 and at B2.
 
-**Resume here (s205):** the language work is complete for chrome the learner meets, and the pattern
+**Resume here (s207):** the language work is complete for chrome the learner meets, and the pattern
 is documented in `docs/areas/UI-LANGUAGE.md`. What is left is deliberate, not missing: the four
 items above stay German by decision, and any NEW surface must call `useT()` and add its pair to
 `uiStrings.ts` (the area doc says how). Worth a founder look on the live site: the Prüfung module
 names now read Reading/Listening/Writing/Speaking in English, which is a judgement call, and the
 sidebar tagline still says "German for work · B2" for every level.
+
+**Session 205 (2026-08-09, branch `claude/ki-usage-task-kg0vix`): step 2, the reconciliation.**
+The founder created a Console team organization and an Admin API key (30-day expiry, by choice) and
+stored it as `ANTHROPIC_ADMIN_KEY`, which unblocked the step s204 could only recommend.
+- **Migration 0020** adds `provider_costs` (one row per provider per UTC day, the amount the
+  PROVIDER reports) and `provider_sync_state` (last success, last attempt, last error), plus
+  `admin_ai_reconciliation(days)` and `admin_ai_sync_state()`.
+- **`reconcile-ai-cost` Edge Function** pulls Anthropic's Cost Report, converts its cents-as-string
+  amounts once, and upserts by day. Founder-gated against `admins`. **No cron on purpose**: a
+  scheduled pull would need a credential stored inside the database, so the admin screen refreshes
+  on open (hourly at most) and on demand.
+- **A card in `/admin` System** shows our derived figure, Anthropic's, and the difference over 14
+  days. An unreported day reads "–", never 0; sync errors render above the numbers; Gemini and
+  OpenAI are named as unreconciled rather than shown as agreeing.
+- **The expiry is handled, not ignored.** The key dies on 8 September; a 401 is turned into "der
+  Schlüssel ist abgelaufen" in `provider_sync_state.last_error` and shown on the card, so the
+  comparison cannot go quietly stale.
+- Gates: typecheck · lint 0 errors (78 warnings, one new and of the same async-setState class as
+  the existing ones) · **687 tests** (up from 675; `tests/costReport.test.ts` pins the cents→dollars
+  conversion and the sum-every-row rule, both wrong in ways that survive a glance) · build ·
+  check:bundle · lint:content · lint:migrations.
+**Resume here:** nothing is blocked. Two open items, both flagged rather than urgent: **the admin
+key expires 2026-09-08** (the card will say so; create a new one and replace the secret), and the
+reconciliation covers **Anthropic only** (OpenAI needs its own org key; Gemini has no billing API
+and its $0 stays a labelled assumption). Also still unbuilt from s204: **part B, the reserved KI
+chip**, previewed in `preview/ki-usage-chip.html` and awaiting a pick.
+
+**Session 206 (2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): ran in PARALLEL
+with session 206, which reached `main` first, so this one renumbered rather than reuse 205.**
+**(2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): "the ai feature
+doesn't work" in Sprechen, and the Redemittel rail's second pass.**
+Founder prompts: "there is an error with speaking exercies - the ai feature doesn't work" → "for the
+redemittel rail, display only 4-5 highly useful and frequently used redemittel phrases, not too many
+of them.. Also, the first redemittel is literally overshadowed due to unnecessary shadow effect below
+the toggle buttons and pills. fix it" → a screenshot: "this is what happens.. no response".
+**The screenshot is what solved it. Nothing was broken upstream:** the caption under the microphone
+read "Bitte melde dich an, um mit der KI zu sprechen." Signed out with Turnstile on, `converse`
+cannot be called, and the refusal arrived after the learner had started the conversation, opened the
+mic and spoken a sentence, in the same grey slot that otherwise says "Ich höre zu …", on a screen
+whose quiet header has no account menu (s201). No error, no reply, no way to sign in: it reads as
+the app doing nothing.
+- **The sign-in wall moved to the brief card** (`speakingAuthBlock` / `useSpeakingAuthBlock`, ONE
+  rule, two readers), the same law the daily allowance follows: stated BEFORE the commitment. Start
+  becomes **Anmelden** and opens `AuthDialog`, because a wall with a remedy gets the remedy as its
+  button. A session that lapses mid-run opens the same dialog (`needsAuth`).
+- **A failure is no longer printed in the status grey** (`MicCluster.captionTone`), and the typed
+  fallback prints the caption at all now: in Firefox a refused turn showed literally nothing.
+- **Every cascade leg has a deadline** (`AbortSignal.timeout`, 20 s turns / 60 s debrief). There was
+  none anywhere in any function, so a hung provider held the request open forever, which on the one
+  surface a learner waits at synchronously is the same thing as a dead app.
+- **The free Gemini leg was dead, not free.** `gemini-2.5-flash` reasons by default and Google bills
+  thoughts as output, so the 500-token turn budget was spent thinking: no text part, leg discarded,
+  and EVERY turn silently fell through to the paid model at the cost of an extra round trip. Turns
+  now send `thinkingBudget: 0`. Losing legs log provider + HTTP status + the provider's error code,
+  so the next report is diagnosable from the logs without reproducing it.
+- **Redemittel rail (founder's second prompt):** at most **five** phrases per intent, the easiest
+  that fit the Anrede by `CEFR_ORDER`, shown in the bank's own order. The pills lost their count (a
+  number that cannot vary is dead chrome). The "shadow" was the unconditional `mask-fade-y` fading
+  the FIRST phrase out under the pills; it is `useEdgeFade` now, per edge and only where content
+  actually continues, which with five phrases is usually nowhere.
+- Gates: typecheck · lint 0 errors (77 warnings, baseline) · **676 tests** (up from 675, the cap is
+  pinned in `tests/anrede.test.ts`) · build · check:bundle 128.3 kB.
+- **Not verified in a browser:** the sandbox's network policy blocks the Supabase project, so the
+  conversation screen cannot be reached here. The founder verifies live.
 
 **Session 204 (2026-08-06 → 08, branch `claude/ki-usage-task-kg0vix`): the KI-usage task.**
 **Shipped as PR #835, squash-merged to `main` as `ad8fead`, with the migration renumbered by #839.**
@@ -97,52 +166,9 @@ stated in the merge commit._
   `tests/aiUsage.test.ts` pins the pricing arithmetic and the three providers' token shapes) ·
   build · check:bundle 129.8 kB · check:contrast · lint:content · lint:migrations.
 
-**Its first four prompts** (2026-08-06): four founder
-prompts; one shipped change, three of analysis, and a redirect that matters more than the code.
-- **Shipped (A): the Umformung is no longer a silent AI feature.** `transform-sentence` enforces its
-  own 30/day cap and was in no allowance at all, so learners hit that wall unannounced. `AiMode`
-  gains `transform`, counted against the SAME ledger the function counts (`sentence_ai_ops`,
-  `kind = 'transform'`, paid ops only, so a cached Umformung is free on both sides), the function
-  returns `dailyLimit`/`dailyRemaining` on the responses that spend a unit, and the existing
-  `AllowanceNote` renders it in the Umformung card. It keeps its OWN budget: an Umformung has never
-  cost a Korrektur, and one round can spend three. Gates: typecheck · lint 0 errors (77 warnings,
-  baseline verified) · **625 tests** · build · check:bundle 129.8 kB. Commits `457fcbd`, `1e9f3d7`
-  on the branch, **no PR opened yet**.
-- **Previewed, not built (B): the one reserved KI chip.** `preview/ki-usage-chip.html` (artifact
-  <https://claude.ai/code/artifact/749b6ec2-d56d-4f48-bd5a-cfef4efeedb4>): four chip variants in
-  three real contexts, light/dark, three allowance states, plus three candidate AI marks. The
-  founder dismissed the pick and redirected instead.
-- **The redirect.** Founder: "this one shows just the count we arbitrarily determined. I want to
-  show the actual usage of the AI", then "whenever I use AI feature, I see some cost in the control
-  center. Does that mean it's real money?" **Answer, from the code:** the count is real, the LIMIT
-  is ours. The control centre's figure is our own ledger, not a bill: **Gemini books 0.00** (true
-  only while the key stays inside Google's free tier — an assumption, not a measurement), **Claude
-  and GPT-5-in-`converse`** are real tokens times published rates (our hardcoded $3/$15 Sonnet and
-  $1/$5 Haiku match Anthropic's current rates), and **GPT-5 in the other three functions is a
-  hardcoded flat 0.004 $ per call**, which is the one genuinely arbitrary number. A non-zero cost
-  therefore means Gemini did NOT answer that call.
-- **The recommendation (documented, approved to record, not built).** Three steps, cheapest first:
-  **(1)** an `ai_calls` table storing what each provider actually reports (tokens in/out/cached,
-  model, cache hit) with prices moved into one config row — after this, usage is measured and only
-  cost is derived; **(2)** reconcile nightly against the providers themselves (Anthropic's Usage and
-  Cost Admin API — separate admin key, **organization account required, not individual**; OpenAI's
-  organization usage/cost endpoints) and show "ours vs theirs" side by side; Gemini has no clean
-  billing API, so its free-tier figure stays a self-measured count and the UI must say so; **(3)**
-  the learner-facing number stays counts, never money. Full reasoning in `docs/DECISIONS.md` §s204.
-**Resume here:** step 2, the reconciliation. It needs one thing from the founder first: the
-Anthropic account must be an ORGANIZATION (Console → Settings → Organization) before it can issue
-the `sk-ant-admin01-` key the Usage and Cost API requires; OpenAI's organization usage/cost
-endpoints need their own key. Then a nightly job pulls yesterday's real figures into a
-`provider_costs` table and the control centre shows "ours vs theirs". Also unbuilt: the admin view
-of `admin_ai_usage_breakdown` (the RPC exists, nothing renders it yet; it is founder-facing UI, so
-it owes a preview round). Also open: **part B, the reserved KI chip**, previewed in
-`preview/ki-usage-chip.html` and awaiting a pick, superseded in priority but not cancelled (note for
-whoever builds it: `Sparkles` is NOT available as the AI mark, Quiz/empty states/onboarding use it).
-**Two things this session expected to do and did not have to:** the `pages.yml` timeout raise had
-already shipped on `main` as #821, and the CLAUDE.md budget was already fixed by s203, so the merge
-took main's version of both. Also still open from earlier sessions: the Prüfung hub loads ~825 kB of
-content banks via `engine/exam`, no exam set is `anruf` shaped, and the authored dialogue `nodes`
-graphs are dead but not retired.
+**Its first four prompts** (2026-08-06) are archived in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`: the Umformung allowance, the KI-chip
+preview the founder redirected, and the answer to "does that cost real money?".
 
 ## Where things stand
 
@@ -203,62 +229,35 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 203 (2026-08-08): the docs are back inside their own rules.** Branch
-`claude/documentation-maintenance-0w4ywg`, PRs **#832** → **`48d250c`** (the pass), **#833** →
-**`8a45be9`** (its paper trail) and **#837** (this closing entry), each squash-merged. Validate
-content and Deploy site to GitHub Pages green on `main`; Deploy Supabase functions correctly did
-not run (path-filtered, nothing under `supabase/` changed). Post-merge housekeeping done after every
-merge, tree clean.
-Founder prompts: "do the documentation maintenance" → "document the session".
-No app code was touched, so nothing needs live verification.
+**Handoff after session 206 (2026-08-09): the Sprechen "AI doesn't work" was the sign-in wall.**
+Branch `claude/speaking-exercises-ai-error-xk6o7h`, PR **#841** → **`d4a4771`**, squash-merged.
+Post-merge housekeeping done, tree clean. **Ran in PARALLEL with session 205** (the cost
+reconciliation), which reached `main` first; this branch merged `origin/main` and re-ran every gate
+on the merged tree (688 tests, bundle 129.3 kB, lint:migrations green).
+Founder prompts: "there is an error with speaking exercies - the ai feature doesn't work" → "for the
+redemittel rail, display only 4-5 highly useful and frequently used redemittel phrases ... the first
+redemittel is literally overshadowed due to unnecessary shadow effect" → a screenshot, "this is what
+happens.. no response" → "first merge the changes from this session and make it live" → "complete
+the merge and also documentation".
 
-- **`CLAUDE.md` is 349 lines** (was 399; the linter warns past ~350). It now carries the RULE plus a
-  pointer, and nothing else. **Write to that shape:** if a new bullet needs a measurement, a
-  mechanism or a story, that part goes in the matching `docs/areas/*` file and the "why" in
-  `DECISIONS.md`. There is ~1 line of headroom, so any new law costs an old line somewhere.
-- **Counts are measured, not remembered.** Five bank counts in `PROJECT_STATUS` and three claims in
-  the area docs had drifted, some by 60 %. Every number in "Where things stand" is now stamped
-  2026-08-08 and comes from `pnpm lint:content`. Re-run it before quoting any of them.
-- **Nothing was reworded away.** The three laws that had no area-doc home were given one first
-  (`CONTENT.md` for the `source` reply-genre rule and the phrase-level argumentation classifier, the
-  `/design` skill §7 #12 for the touch-`:hover` law), so the trim removed duplication only.
-- **Still open, small** (unchanged from s201): the Sprechen/Schreiben Verlauf spinner has no timeout,
-  so an unreachable Supabase hangs it forever.
-- **The next content job** is still the reply-task wave (writing-audit P4 replacement): 47 authored
-  `source` texts plus the rendering slot that does not exist yet. The brief is in
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`, and the founder has not yet picked a
-  placement from `preview/schreiben-source-text.html`.
-
-**Handoff after session 202 (2026-08-08): a practice conversation now carries its Redemittel while
-the learner speaks.** Branch `claude/sprechen-filter-rail-practice-70gydw`. Three PRs: **#830** →
-**`9c4ca3b`** (the rail), **#831** → **`e7f1c7f`** (the paper trail), **#834** → **`9e0b74e`** (the
-founder's second pass on the tile). Validate content and Deploy site to GitHub Pages green on each;
-Deploy Supabase functions correctly did not run (path-filtered, nothing under `supabase/` changed).
-Post-merge housekeeping done after each, tree clean. **Session 203 ran in PARALLEL** and reached
-`main` first, so #834 merged `origin/main` before shipping; this session stays s202 throughout.
-Founder prompts: "for the sprechen part, I'd want you to add a filter rail kind of rail with useful
-redemittle even in the practice sessions" → "option a's layout for desktop and option c for mobile
-and also desktop's content" → "the aufgabe text is being cut off ... the Redemittel pills at the
-bottom should be at the top of that tile and the selected pill should also be shown ... adapt the
-same heirarchy for Redemittel in desktop view as well".
-
-- **The tile's hierarchy is the founder's second pass** (same session, PR **#834**): intent pills at the TOP,
-  all four, the current one lit, no dropdown (a lit pill states the selection, so a dropdown would
-  say it twice), and the phone drawer's task title on its own line below the tabs instead of beside
-  them, where it was cut off. Desktop and phone run the same order.
-- **What to check first:** the founder answered layout only, so three content defaults are stated
-  and one-line reversible (`docs/DECISIONS.md` §s202): all eight phrases per intent, Anrede matched
-  to the partner, English hold-to-peek. Ask if they want any flipped.
-- `RedemittelHelp` is one content in two shells; `ConversationRunner` takes it as `help`, which is
-  what keeps it out of the Modelltest and out of the exam chunk. Never import it in the runner.
-- `ScopeRail.onReset` is now optional, for the one rail that browses rather than narrows. Every
-  other caller is unchanged.
-- **Not done, deliberately:** no speak button on a phrase (it would fight the partner's voice) and
-  no way to send a phrase into the conversation (reading is not saying, and the transcript is what
-  the debrief grades).
-- **Open, not this session's:** PR **#808** "docs: record the s192 merge"
-  (`claude/prufung-ui-bottom-bar-u0fdwf`) is still open and stale. It needs a founder call, merge or
-  close; nothing here depends on it.
-
-Older handoffs and session logs (s201 and earlier) are archived in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
+- **The screenshot is what solved it, and it is worth repeating why.** The report said "it loads and
+  there's no response from ai", which reads as a broken model, a hung request or a dead key. The
+  caption under the microphone said **"Bitte melde dich an, um mit der KI zu sprechen."** The
+  founder was signed out. Diagnosis by code review had four plausible branches and no way to choose
+  between them from the sandbox (**the network policy blocks the Supabase project**, so the live
+  function cannot be probed from here). **Ask for the screen before theorising about the server.**
+- **Live verification is the founder's.** Nothing in this change was seen in a browser here: the
+  conversation screen needs the backend. Worth a look on `genauly.de`: signed OUT, a scenario's
+  brief card should show **Anmelden** instead of a dead "Gespräch starten"; signed IN, everything
+  should behave as before.
+- **Two real defects were found on the way and are fixed**, both invisible until now: no cascade leg
+  in any Edge Function had a timeout, and the free Gemini turn leg had been returning nothing since
+  s196 (thinking tokens eating a 500-token budget), so every turn was silently paid for by Claude.
+  **If the Sprechen bill looks lower from here, that is why.** The same thinking-budget trap applies
+  to any future short-output Gemini call.
+- **Still open, small** (unchanged from s201/s203): the Sprechen/Schreiben Verlauf spinner has no
+  timeout, so an unreachable Supabase hangs it forever. The leg timeouts shipped here do not cover
+  it; it is a client-side fetch with no deadline.
+- **The next content job** is unchanged: the reply-task wave (writing-audit P4), 47 authored
+  `source` texts plus a rendering slot that does not exist yet, waiting on a founder placement pick
+  from `preview/schreiben-source-text.html`.

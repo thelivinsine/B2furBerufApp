@@ -6015,9 +6015,135 @@ the fix is a renumber plus a gate: `0019_ai_calls.sql`, and `pnpm lint:migration
 files sharing a version prefix. Verified by planting a duplicate and watching it go red. Shipped as
 **PR #839**.
 
+
+
 ---
 
-## Session 205 — 2026-08-09 — branch `claude/remove-onboarding-practice-z7qfwu`
+## Session 205 — 2026-08-09 — branch `claude/ki-usage-task-kg0vix`
+
+Step 2 of the AI-cost work, unblocked by the founder creating an organization and an admin key.
+
+- **Prompt 1 (verbatim):** `what's next step from me? be as clear and consise as possible`
+  **Response:** one instruction (create the org, then an Admin API key, then store it in Supabase),
+  plus the two reversible calls from s204 (the consent bump, the Sprechen numbers).
+
+- **Prompts 2-4 (three screenshots + `I'm a bit lost.. what should I select here` /
+  `there's no settings option below analytics` / `what here?`):** navigation help through the
+  Console. **This is where I sent the founder in circles twice**, first by reading "Organization
+  credits" on the dashboard as proof of an organization, then by pointing at a Settings menu that
+  does not exist on that account. The founder's `can you cross check your response with official
+  website and sources before giving me wrong instructions?` was fair. Fetching the official docs
+  produced the real answer: **the Admin API is unavailable for individual accounts**, and the org
+  was literally named "Arya's Individual Org". Corrected the earlier claim explicitly rather than
+  quietly, and recommended NOT converting, because monthly spend was $0.04 and reconciliation at
+  four cents verifies a rounding error.
+
+- **Prompt 5 (verbatim):** `I clicked on create team account to see if it's free or not and it seems
+  free so I went ahead to create it and then admin key.`
+  **Response:** flagged two things before they clicked Add: a 30-day expiry would stop the job
+  silently, and a Console admin key has **no scopes**, so the "readonly" name is a white lie and the
+  key carries full admin rights. Asked them to verify no subscription charge appeared, since I
+  cannot see their billing.
+
+- **Prompt 6 (verbatim):** `done with supabase secret. I selected 30 days for security reasons. I
+  can do it again after sep 8 if needed.`
+  **Response, and the build:** the right call, and it shaped the design. Because the key expiring is
+  a PLANNED event, the failure had to be loud: a 401 becomes a German sentence in
+  `provider_sync_state.last_error` that the admin card renders above the numbers.
+  Shipped: migration `0020_provider_costs.sql` (`provider_costs`, `provider_sync_state`,
+  `admin_ai_reconciliation`, `admin_ai_sync_state`, 400-day purge), the founder-gated
+  `reconcile-ai-cost` Edge Function, `_shared/costReport.ts` with `tests/costReport.test.ts`, and
+  `AiCostReconciliation.tsx` in the admin System screen.
+  **Two design calls worth keeping:** no cron (scheduling from the database means storing a
+  credential there, so the card refreshes on open at most hourly and on demand), and an unreported
+  provider day renders "–" rather than 0, because "not yet known" and "cost nothing" are opposite
+  facts that a zero makes identical. Why → `docs/DECISIONS.md` §s205.
+
+- **Prompts 7-8 (verbatim, mid-turn):** `merge to main when done.` and `document the session at the
+  end`
+  **Response:** shipped as PR #840 and squash-merged; this entry and the status log are the
+  documentation.
+
+**Gates:** typecheck · lint 0 errors (78 warnings, one new, same async-setState class as the
+existing ones) · **687 tests** (up from 675) · build · check:bundle · lint:content · lint:migrations.
+Edge Functions are Deno and outside `tsc`, so they were syntax-checked with esbuild.
+
+- **Artifacts:** `supabase/migrations/0020_provider_costs.sql` ·
+  `supabase/functions/{reconcile-ai-cost/index.ts,_shared/costReport.ts}` ·
+  `src/features/admin/{AiCostReconciliation,AdminSystem}.tsx` · `src/lib/adminApi.ts` ·
+  `tests/costReport.test.ts` · `docs/{PROJECT_STATUS,PROJECT_FOUNDATION,DECISIONS}.md` ·
+  `docs/areas/LEGAL-ADMIN.md` · this log
+
+---
+
+## Session 206 — 2026-08-09 — branch `claude/speaking-exercises-ai-error-xk6o7h`
+
+_Ran in PARALLEL with session 205 (the cost reconciliation), which reached `main` first. This
+session renumbered from 205 to 206 rather than reuse a taken number._
+
+- **Prompt 1 (verbatim):** `there is an error with speaking exercies - the ai feature doesn't work`
+  **Response:** read the whole `converse` path plus the two commits that had touched Sprechen last
+  (s202's Redemittel rail, s204's usage ledger) and confirmed the backend deploy for both was green.
+  **The sandbox cannot probe the live function** (the environment's network policy answers 403 to
+  `stkfdavpjflpqoxjunnj.supabase.co`), so the four plausible branches could not be told apart from
+  here. Asked the founder which of four German messages the screen showed, with each option naming
+  the branch it would implicate.
+
+- **Prompt 2 (verbatim, mid-turn):** `for the redemittel rail, display only 4-5 highly useful and
+  frequently used redemittel phrases, not too many of them.. Also, the first redemittel is literally
+  overshadowed due to unnecessary shadow effect below the toggle buttons and pills. fix it`
+  **Response:** the "shadow" is `mask-fade-y`, applied unconditionally to the phrase list, so a list
+  resting at its top faded its own first phrase out under the pills. Replaced with `useEdgeFade`
+  (per edge, only where content continues, the rule the Bibliothek columns already run on). Capped
+  the list at five, picked as the EASIEST that fit the Anrede by `CEFR_ORDER` and shown in the bank's
+  authored order, and dropped the count from the intent pills: capped at five it printed the same
+  digit four times, which is dead chrome, not honesty.
+
+- **Prompt 3 (answer to the question):** `it says nothing.. I say something and submit but it loads
+  and there's no response from ai`, then a screenshot: `this is what happens.. no response`
+  **The screenshot solved it.** The caption under the microphone read **"Bitte melde dich an, um mit
+  der KI zu sprechen."** Signed out with Turnstile on, `converse` cannot be called, and the refusal
+  arrived after the learner had started the conversation, opened the mic and spoken a full sentence,
+  in the same faint grey slot that otherwise says "Ich höre zu …", on a screen whose quiet header
+  carries no account menu (s201). **Ask for the screen before theorising about the server.**
+  Shipped: `speakingAuthBlock()` / `useSpeakingAuthBlock()` (one rule, two readers) with the gate on
+  the brief card, Start becoming **Anmelden** and opening `AuthDialog`, `TurnResult.needsAuth`
+  opening the same dialog when a session lapses mid-run, `MicCluster.captionTone` so a failure is
+  never printed in the status grey, and the caption rendered at all in the typed fallback.
+  **Two real defects found on the way:** no cascade leg in any Edge Function had a timeout
+  (`AbortSignal.timeout`, 20 s turns / 60 s debrief), and the free Gemini turn leg had been returning
+  nothing since s196, because `gemini-2.5-flash` reasons by default and Google bills thoughts as
+  output, so a 500-token turn budget was spent thinking: every turn had been silently falling
+  through to the paid model. Turns now send `thinkingBudget: 0`, and a losing leg logs its provider,
+  HTTP status and error code.
+
+- **Prompt 4 (verbatim, mid-turn):** `first merge the changes from this session and make it live.
+  stop the documentation where you are. I'll prompt you later to do it`
+  **Response:** stopped the documentation pass mid-file, shipped what was written, opened PR #841.
+  The squash hit a conflict (session 205 had merged `main` meanwhile), so `origin/main` was merged
+  in, the session renumbered to 206, and every gate re-run on the merged tree before merging.
+
+- **Prompt 5 (verbatim, mid-turn):** `compelte the merge and also documentation`
+  **Response:** merged as **`d4a4771`**, post-merge housekeeping done, then the documentation
+  finished: `CLAUDE.md` carries the widened wall law and is back at **349 lines** (six existing
+  bullets were compacted to pay for it, per the replace-don't-append rule), `docs/areas/SPRECHEN.md`
+  carries both new mechanisms in full, and `PROJECT_STATUS.md` is down to **198 lines** with the
+  201-203 logs and handoffs archived into the W32 chunk.
+
+**Gates (on the merged tree):** typecheck · lint 0 errors (78 warnings, baseline) · **688 tests**
+(the five-phrase cap is pinned in `tests/anrede.test.ts`) · build · check:bundle 129.3 kB ·
+lint:content · lint:migrations. **Nothing was verified in a browser:** the conversation screen needs
+the backend, which the sandbox cannot reach. The founder verifies live.
+
+- **Artifacts:** PR **#841** → **`d4a4771`** · `src/lib/speaking.ts` ·
+  `src/features/sprechen/{ConversationRunner,ConversationBriefCard,MicCluster,RedemittelHelp}.tsx` ·
+  `supabase/functions/converse/index.ts` · `tests/anrede.test.ts` · `CLAUDE.md` ·
+  `docs/areas/SPRECHEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
+
+---
+
+## Session 207 — 2026-08-09 — branch `claude/remove-onboarding-practice-z7qfwu`
 
 ### Prompt 1 (2026-08-09)
 
@@ -6096,6 +6222,6 @@ files sharing a version prefix. Verified by planting a duplicate and watching it
 
 > merge to main and document the session when done
 
-- **Response summary:** Ran the full gate set (typecheck, 688 unit tests, lint 0 errors, build,
-  check:bundle 152.3 kB, check:contrast, lint:content), documented the session in
+- **Response summary:** Ran the full gate set (typecheck, 701 unit tests, lint 0 errors, build,
+  check:bundle 153.2 kB, check:contrast, lint:content), documented the session in
   `PROJECT_STATUS.md` + this log + the two area docs, then opened and squash-merged the PR.
