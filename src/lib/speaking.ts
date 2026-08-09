@@ -22,6 +22,8 @@ export interface TurnResult {
   turnsLeft?: number;
   conversationOver?: boolean;
   limitReached?: boolean;
+  /** The call was refused because nobody is signed in; the learner must act. */
+  needsAuth?: boolean;
   message?: string;
 }
 
@@ -45,6 +47,8 @@ export interface DebriefResult {
   /** 0-100, exam runs only. */
   score?: number | null;
   limitReached?: boolean;
+  /** The call was refused because nobody is signed in; the learner must act. */
+  needsAuth?: boolean;
   message?: string;
 }
 
@@ -65,14 +69,50 @@ function wireBrief(brief: ConversationBrief) {
   };
 }
 
-async function ensureSession(): Promise<string | null> {
+/**
+ * The one sentence that says why Sprechen cannot call the AI right now, or null
+ * when it can (s206).
+ *
+ * It exists as its own function because the SCREEN has to ask the same question
+ * the API client asks, and the two must give the same answer. The founder hit
+ * exactly what happens when only the client knows: signed out with Turnstile
+ * active, the conversation started normally, the microphone opened, they spoke
+ * a whole sentence, and the refusal arrived as a grey caption under the mic in
+ * the slot that otherwise says "Ich höre zu …". No error, no reply, no way to
+ * sign in from that screen (the Prüfung zone's quiet header has no account menu,
+ * s201). It reads as the app doing nothing, which is what they reported.
+ *
+ * So the gate moved to where the learner can still act on it: the brief card,
+ * before a single word is spoken. Same law the daily allowance already follows
+ * (s194): a wall is stated BEFORE the commitment, never as a caption after it.
+ *
+ * A guest session counts as signed in. Only `signedOut` is a wall, and only when
+ * Turnstile is on, because that is what stops us minting a guest silently.
+ */
+const SIGN_IN_TO_SPEAK = "Melde dich an, um mit der KI zu sprechen.";
+
+/** The rule itself, so the imperative and the reactive reader cannot drift. */
+function authBlockFor(status: string, hasSession: boolean): string | null {
+  const missing = status === "signedOut" || !hasSession;
+  return missing && TURNSTILE_ENABLED ? SIGN_IN_TO_SPEAK : null;
+}
+
+/** Read once, for the API clients below. */
+export function speakingAuthBlock(): string | null {
   const auth = useAuthStore.getState();
-  if (auth.status === "signedOut" || !auth.session) {
-    if (TURNSTILE_ENABLED) {
-      return "Bitte melde dich an, um mit der KI zu sprechen.";
-    }
-    await auth.signInAsGuest();
-  }
+  return authBlockFor(auth.status, !!auth.session);
+}
+
+/** Subscribed, for the screens: signing in clears the wall on the spot. */
+export function useSpeakingAuthBlock(): string | null {
+  return useAuthStore((s) => authBlockFor(s.status, !!s.session));
+}
+
+async function ensureSession(): Promise<string | null> {
+  const blocked = speakingAuthBlock();
+  if (blocked) return blocked;
+  const auth = useAuthStore.getState();
+  if (auth.status === "signedOut" || !auth.session) await auth.signInAsGuest();
   return null;
 }
 
@@ -86,7 +126,7 @@ export async function speakTurn(input: {
   utterance: string;
 }): Promise<TurnResult> {
   const blocked = await ensureSession();
-  if (blocked) return { ok: false, message: blocked };
+  if (blocked) return { ok: false, needsAuth: true, message: blocked };
 
   try {
     const { data, error } = await supabase.functions.invoke<TurnResult & {
@@ -198,7 +238,7 @@ export async function requestDebrief(input: {
   brief: ConversationBrief;
 }): Promise<DebriefResult> {
   const blocked = await ensureSession();
-  if (blocked) return { ok: false, message: blocked };
+  if (blocked) return { ok: false, needsAuth: true, message: blocked };
 
   try {
     const { data, error } = await supabase.functions.invoke<DebriefResult & {

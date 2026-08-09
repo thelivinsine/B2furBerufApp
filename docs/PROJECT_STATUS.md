@@ -1,7 +1,8 @@
 # Project Status
 
-_Last updated: 2026-08-09 (session 205 gave the AI cost figure a second opinion: Anthropic's own
-daily numbers beside ours in the control centre. Session 204 made AI usage MEASURED per call and gave
+_Last updated: 2026-08-09 (session 206 fixed the Sprechen AI failure the founder reported: it was
+the sign-in wall arriving as a grey caption, not a broken model. Session 205 gave the AI cost figure
+a second opinion: Anthropic's own daily numbers beside ours in the control centre. Session 204 made AI usage MEASURED per call and gave
 Sprechen 6 + 3 conversations a day; see "Resume here")._
 
 **Session 205 (2026-08-09, branch `claude/ki-usage-task-kg0vix`): step 2, the reconciliation.**
@@ -29,6 +30,44 @@ key expires 2026-09-08** (the card will say so; create a new one and replace the
 reconciliation covers **Anthropic only** (OpenAI needs its own org key; Gemini has no billing API
 and its $0 stays a labelled assumption). Also still unbuilt from s204: **part B, the reserved KI
 chip**, previewed in `preview/ki-usage-chip.html` and awaiting a pick.
+
+**Session 206 (2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): ran in PARALLEL
+with session 206, which reached `main` first, so this one renumbered rather than reuse 205.**
+**(2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): "the ai feature
+doesn't work" in Sprechen, and the Redemittel rail's second pass.**
+Founder prompts: "there is an error with speaking exercies - the ai feature doesn't work" → "for the
+redemittel rail, display only 4-5 highly useful and frequently used redemittel phrases, not too many
+of them.. Also, the first redemittel is literally overshadowed due to unnecessary shadow effect below
+the toggle buttons and pills. fix it" → a screenshot: "this is what happens.. no response".
+**The screenshot is what solved it. Nothing was broken upstream:** the caption under the microphone
+read "Bitte melde dich an, um mit der KI zu sprechen." Signed out with Turnstile on, `converse`
+cannot be called, and the refusal arrived after the learner had started the conversation, opened the
+mic and spoken a sentence, in the same grey slot that otherwise says "Ich höre zu …", on a screen
+whose quiet header has no account menu (s201). No error, no reply, no way to sign in: it reads as
+the app doing nothing.
+- **The sign-in wall moved to the brief card** (`speakingAuthBlock` / `useSpeakingAuthBlock`, ONE
+  rule, two readers), the same law the daily allowance follows: stated BEFORE the commitment. Start
+  becomes **Anmelden** and opens `AuthDialog`, because a wall with a remedy gets the remedy as its
+  button. A session that lapses mid-run opens the same dialog (`needsAuth`).
+- **A failure is no longer printed in the status grey** (`MicCluster.captionTone`), and the typed
+  fallback prints the caption at all now: in Firefox a refused turn showed literally nothing.
+- **Every cascade leg has a deadline** (`AbortSignal.timeout`, 20 s turns / 60 s debrief). There was
+  none anywhere in any function, so a hung provider held the request open forever, which on the one
+  surface a learner waits at synchronously is the same thing as a dead app.
+- **The free Gemini leg was dead, not free.** `gemini-2.5-flash` reasons by default and Google bills
+  thoughts as output, so the 500-token turn budget was spent thinking: no text part, leg discarded,
+  and EVERY turn silently fell through to the paid model at the cost of an extra round trip. Turns
+  now send `thinkingBudget: 0`. Losing legs log provider + HTTP status + the provider's error code,
+  so the next report is diagnosable from the logs without reproducing it.
+- **Redemittel rail (founder's second prompt):** at most **five** phrases per intent, the easiest
+  that fit the Anrede by `CEFR_ORDER`, shown in the bank's own order. The pills lost their count (a
+  number that cannot vary is dead chrome). The "shadow" was the unconditional `mask-fade-y` fading
+  the FIRST phrase out under the pills; it is `useEdgeFade` now, per edge and only where content
+  actually continues, which with five phrases is usually nowhere.
+- Gates: typecheck · lint 0 errors (77 warnings, baseline) · **676 tests** (up from 675, the cap is
+  pinned in `tests/anrede.test.ts`) · build · check:bundle 128.3 kB.
+- **Not verified in a browser:** the sandbox's network policy blocks the Supabase project, so the
+  conversation screen cannot be reached here. The founder verifies live.
 
 **Session 204 (2026-08-06 → 08, branch `claude/ki-usage-task-kg0vix`): the KI-usage task.**
 **Shipped as PR #835, squash-merged to `main` as `ad8fead`, with the migration renumbered by #839.**

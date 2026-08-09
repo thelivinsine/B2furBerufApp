@@ -28,6 +28,7 @@ export function MicCluster({
   endLabel = "Beenden",
   highlightEnd = false,
   caption,
+  captionTone = "status",
   typed,
   onTypedChange,
   onTypedSubmit,
@@ -52,6 +53,13 @@ export function MicCluster({
    *  convention). */
   endLabel?: string;
   caption?: string | null;
+  /**
+   * "error" when the caption is a FAILURE rather than a status (s206). The slot
+   * carries both "Ich höre zu …" and "Deine Gesprächspartnerin ist gerade nicht
+   * erreichbar", and printing them in the same muted grey is why a refused turn
+   * read to the founder as the app simply doing nothing.
+   */
+  captionTone?: "status" | "error";
   typed: string;
   onTypedChange: (v: string) => void;
   onTypedSubmit: () => void;
@@ -86,7 +94,18 @@ export function MicCluster({
             <Send className="h-4 w-4" />
           </Button>
         </div>
-        <div className="mt-2 flex justify-end">
+        <div className="mt-2 flex items-center gap-2">
+          {/* The typed fallback printed no caption at all, so on a browser with
+              no speech recognition a refused turn showed the learner literally
+              nothing (s206). Same slot, same rules as the microphone's. */}
+          <p
+            className={cn(
+              "min-h-[18px] flex-1 text-xs",
+              captionTone === "error" ? "font-semibold text-danger" : "text-muted-foreground",
+            )}
+          >
+            {caption ?? ""}
+          </p>
           <Button variant="ghost" size="sm" onClick={onEnd}>
             {endLabel}
           </Button>
@@ -139,7 +158,12 @@ export function MicCluster({
           highlight={highlightEnd}
         />
       </div>
-      <p className="mt-2.5 min-h-[18px] text-center text-xs text-muted-foreground">
+      <p
+        className={cn(
+          "mt-2.5 min-h-[18px] text-center text-xs",
+          captionTone === "error" ? "font-semibold text-danger" : "text-muted-foreground",
+        )}
+      >
         {caption ?? ""}
       </p>
     </div>
