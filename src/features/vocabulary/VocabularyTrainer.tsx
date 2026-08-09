@@ -130,7 +130,9 @@ export function VocabularyTrainer() {
   const savedActive = params.get("saved") === "1";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
-  const [showAllLevels, setShowAllLevels] = useState(false);
+  const showAllLevels = useSettingsStore((s) => s.showAllCefrLevels);
+  const setSettings = useSettingsStore((s) => s.setSettings);
+  const setShowAllLevels = (v: boolean) => setSettings({ showAllCefrLevels: v });
   const [view, setView] = useViewParam(WOERTER_VIEWS);
   // Mobile filter panel open state: the toggle lives on the view-options line
   // (an icon), the desktop rail keeps its own header/state.

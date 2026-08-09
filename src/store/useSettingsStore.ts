@@ -89,6 +89,15 @@ interface SettingsState {
   progressDetailsExpanded: boolean;
 
   /**
+   * Whether the learner dismissed the default CEFR level-band cut on the
+   * Bibliothek list trainers (Wörter/Kollokationen/Redemittel). Was local
+   * `useState` per trainer, which reset on every refresh so the "Level: up
+   * to …" chip kept reappearing right after being dismissed; now persisted
+   * like the other dismiss flags above.
+   */
+  showAllCefrLevels: boolean;
+
+  /**
    * Can-Do milestone ids the learner has explicitly claimed on the Fortschritt
    * quest board (redesign Phase 3.3 "claim moment"). A milestone becomes
    * claimable once its theme-mastery ratio crosses the threshold; claiming it
@@ -135,6 +144,7 @@ const defaults = {
   artikelLegendDismissed: false,
   progressDetailsExpanded: false,
   claimedMilestones: [] as string[],
+  showAllCefrLevels: false,
 };
 
 export const useSettingsStore = create<SettingsState>()(
