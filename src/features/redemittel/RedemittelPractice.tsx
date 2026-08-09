@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, X, Lightbulb, RotateCw, Eye, ArrowRight, Trophy } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
@@ -44,6 +45,7 @@ function buildTasks(phrases: RedemittelPhrase[], count: number): Task[] {
 }
 
 export function RedemittelPractice({ phrases }: { phrases: RedemittelPhrase[] }) {
+  const t = useT();
   const addXp = useProgressStore((s) => s.addXp);
   const practiceRedemittel = useProgressStore((s) => s.practiceRedemittel);
   const registerSession = useProgressStore((s) => s.registerSession);
@@ -97,7 +99,13 @@ export function RedemittelPractice({ phrases }: { phrases: RedemittelPhrase[] })
   };
 
   if (phrases.length < 4) {
-    return <EmptyState icon={Lightbulb} title="Zu wenige Wendungen" description="Es werden mindestens 4 Redemittel benötigt." />;
+    return (
+      <EmptyState
+        icon={Lightbulb}
+        title={t("Zu wenige Wendungen")}
+        description={t("Es werden mindestens 4 Redemittel benötigt.")}
+      />
+    );
   }
 
   if (done) {
@@ -192,6 +200,7 @@ function ChooseTask({ task, onResult }: { task: Task; onResult: (correct: boolea
 
 /* ---------------- Construct the phrase from word tiles ---------------- */
 function ConstructTask({ task, onResult }: { task: Task; onResult: (correct: boolean) => void }) {
+  const t = useT();
   const [pool, setPool] = useState<string[]>(task.tokens!);
   const [built, setBuilt] = useState<string[]>([]);
   const [checked, setChecked] = useState<null | boolean>(null);
@@ -219,7 +228,7 @@ function ConstructTask({ task, onResult }: { task: Task; onResult: (correct: boo
         checked === false && "border-danger bg-danger/5",
         checked === null && "border-border",
       )}>
-        {built.length === 0 && <span className="self-center text-sm text-muted-foreground">Tippe unten auf die Wörter …</span>}
+        {built.length === 0 && <span className="self-center text-sm text-muted-foreground">{t("Tippe unten auf die Wörter …")}</span>}
         {built.map((w, i) => (
           <button
             key={`${w}-${i}`}
@@ -267,6 +276,7 @@ function ConstructTask({ task, onResult }: { task: Task; onResult: (correct: boo
 
 /* ---------------- Quick free-response prompt ---------------- */
 function RespondTask({ task, onResult }: { task: Task; onResult: (correct: boolean) => void }) {
+  const t = useT();
   const [revealed, setRevealed] = useState(false);
   const [answer, setAnswer] = useState("");
 
@@ -280,14 +290,14 @@ function RespondTask({ task, onResult }: { task: Task; onResult: (correct: boole
           <p className="mt-1 text-base">
             Wie drückst du das auf Deutsch aus? <span className="font-semibold">„{task.phrase.en}"</span>
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Sprich laut – oder tippe deine Antwort.</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("Sprich laut – oder tippe deine Antwort.")}</p>
         </CardContent>
       </Card>
 
       <input
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
-        placeholder="Deine Antwort (optional) …"
+        placeholder={t("Deine Antwort (optional) …")}
         className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none"
       />
 

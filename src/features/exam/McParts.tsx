@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Maximize2, Play } from "lucide-react";
 import { readingTextById, scoreChecks } from "@/engine/exam";
@@ -323,6 +324,7 @@ function PartFooter({
   total: number;
   answeredCount: number;
 }) {
+  const t = useT();
   const completePart = useExamStore((s) => s.completePart);
   const [confirmOpen, setConfirmOpen] = useState(false);
   // "Teil abschließen" only on the LAST question (founder s186): a permanent
@@ -359,11 +361,11 @@ function PartFooter({
             className="flex-1"
             onClick={() => (open > 0 ? setConfirmOpen(true) : submit())}
           >
-            Teil abschließen
+            {t("Teil abschließen")}
           </Button>
         ) : (
           <Button variant="outline" className="flex-1" onClick={() => go((qIx + 1) % total)}>
-            Weiter
+            {t("Weiter")}
           </Button>
         )}
       </div>
@@ -371,7 +373,7 @@ function PartFooter({
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="gap-3">
           <DialogHeader>
-            <DialogTitle className="pr-8 text-base">Teil abschließen?</DialogTitle>
+            <DialogTitle className="pr-8 text-base">{t("Teil abschließen?")}</DialogTitle>
             <DialogDescription>
               {open === 1
                 ? "Eine Aufgabe ist noch nicht beantwortet und zählt als falsch."
@@ -380,7 +382,7 @@ function PartFooter({
           </DialogHeader>
           <div className="flex gap-2.5">
             <Button variant="outline" className="flex-1" onClick={() => setConfirmOpen(false)}>
-              Weiter bearbeiten
+              {t("Weiter bearbeiten")}
             </Button>
             <Button
               variant="gradient"
@@ -390,7 +392,7 @@ function PartFooter({
                 submit();
               }}
             >
-              Abschließen
+              {t("Abschließen")}
             </Button>
           </div>
         </DialogContent>
@@ -415,6 +417,7 @@ function TextCard({
   grow: (e: React.PointerEvent) => void;
   growKey: (e: React.KeyboardEvent) => void;
 }) {
+  const t = useT();
   const { ref: body, more } = useOverflowFade<HTMLDivElement>(text.id);
 
   return (
@@ -434,8 +437,8 @@ function TextCard({
           <button
             type="button"
             onClick={onExpand}
-            aria-label="Text vergrößern"
-            title="Text vergrößern"
+            aria-label={t("Text vergrößern")}
+            title={t("Text vergrößern")}
             className="-mr-1.5 -mt-1.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
           >
             <Maximize2 className="h-4 w-4" />
@@ -455,7 +458,7 @@ function TextCard({
       <div
         role="separator"
         aria-orientation="horizontal"
-        aria-label="Textkarte höher oder niedriger ziehen"
+        aria-label={t("Textkarte höher oder niedriger ziehen")}
         tabIndex={0}
         onPointerDown={grow}
         onKeyDown={growKey}
@@ -522,6 +525,7 @@ export function LesenPart({ run }: { run: MockExamRun }) {
 /* --------------------------------- Hören ---------------------------------- */
 
 export function HoerenPart({ run }: { run: MockExamRun }) {
+  const t = useT();
   const questions = useQuestions(run.plan.hoeren);
   const [qIx, setQIx] = useState(() => {
     const first = questions.findIndex((q) => !run.answers[q.check.id]);
@@ -614,7 +618,7 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
             <Card className="shrink-0">
               <CardContent className="p-4">
                 <p className="text-xs font-bold uppercase tracking-wide text-primary">
-                  Text der Ansage
+                  {t("Text der Ansage")}
                 </p>
                 <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed">{text.de}</p>
               </CardContent>
@@ -625,7 +629,7 @@ export function HoerenPart({ run }: { run: MockExamRun }) {
             <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <CardContent className="slim-scrollbar min-h-0 flex-1 overflow-y-auto p-4">
                 <p className="text-xs font-bold uppercase tracking-wide text-primary">
-                  Deine Notizen
+                  {t("Deine Notizen")}
                 </p>
                 <div className="mt-1">
                   {text.notes.map((n) => {

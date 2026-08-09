@@ -1,4 +1,5 @@
 import { LIFE_AREAS, type LifeAreaId } from "@/lib/lifeAreas";
+import { useUiLang } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
@@ -51,6 +52,10 @@ export function LifeAreaPills({
   disableZero?: boolean;
   className?: string;
 }) {
+  // s205: `LIFE_AREAS` already carries `titleEn` ("Working life" / "Daily
+  // life"), so the pills read it directly instead of going through the string
+  // dictionary. Same fold, one source.
+  const lang = useUiLang();
   return (
     <div className={cn("flex flex-wrap gap-1.5", className)}>
       {LIFE_AREAS.map((area) => {
@@ -76,7 +81,7 @@ export function LifeAreaPills({
                   : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-surface/70",
             )}
           >
-            {area.titleDe}
+            {lang === "de" ? area.titleDe : area.titleEn}
             <span
               className={cn(
                 "text-xs tabular-nums lg:text-[11px]",

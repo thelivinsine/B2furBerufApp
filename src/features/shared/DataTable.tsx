@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePagedList } from "@/lib/usePagedList";
@@ -37,6 +38,7 @@ export function DataTable<T>({
   columns: DataColumn<T>[];
   rowKey: (item: T) => string;
 }) {
+  const t = useT();
   const [sort, setSort] = useState<SortState>(null);
 
   const cycleSort = (id: string) =>
@@ -96,7 +98,7 @@ export function DataTable<T>({
                       onClick={() => cycleSort(col.id)}
                       className="inline-flex items-center gap-1 uppercase tracking-wide transition-colors hover:text-foreground"
                     >
-                      {col.label}
+                      {t(col.label)}
                       {sort?.id === col.id ? (
                         sort.dir === "asc" ? (
                           <ArrowUp className="h-3 w-3" />
@@ -108,7 +110,7 @@ export function DataTable<T>({
                       )}
                     </button>
                   ) : (
-                    col.label
+                    t(col.label)
                   )}
                 </th>
               ))}

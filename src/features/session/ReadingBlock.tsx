@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { motion } from "framer-motion";
 import { Check, X, ArrowRight, Play, RotateCw, BookOpen, Headphones } from "lucide-react";
 import type { SessionBlock, TextKind, TextCheck } from "@/types";
@@ -44,6 +45,7 @@ export function ReadingBlock({
   onCorrectCheck: () => void;
   onComplete: (passed: boolean) => void;
 }) {
+  const t = useT();
   const text = textById(block.textId);
   const listening = block.listening && ttsSupported();
 
@@ -201,7 +203,7 @@ export function ReadingBlock({
             onClick={() => setTextShown(true)}
             className="-mt-1 block text-xs font-medium text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground"
           >
-            Text anzeigen
+            {t("Text anzeigen")}
           </button>
         )}
 
@@ -212,7 +214,7 @@ export function ReadingBlock({
             a notepad actually looks like. */}
         {hasNotes && (
           <div className="rounded-2xl border border-border bg-surface p-4 shadow-soft">
-            <p className="text-eyebrow mb-1 text-primary">Notizen</p>
+            <p className="text-eyebrow mb-1 text-primary">{t("Notizen")}</p>
             {noteFields.map((field, i) => (
               <div key={field.label} className="pt-3">
                 <label

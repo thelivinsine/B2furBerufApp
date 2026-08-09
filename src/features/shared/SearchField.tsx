@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ export function SearchField({
   className?: string;
   autoFocus?: boolean;
 }) {
+  const t = useT();
   const [value, setValue] = useState(external);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSentRef = useRef(external);
@@ -65,8 +67,8 @@ export function SearchField({
         autoFocus={autoFocus}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
-        placeholder={placeholder}
-        aria-label={placeholder}
+        placeholder={t(placeholder)}
+        aria-label={t(placeholder)}
         className="h-[1.875rem] w-full rounded-lg border border-input bg-surface py-1 pl-8 pr-8 text-sm outline-none"
       />
       {value && (

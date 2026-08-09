@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { motion } from "framer-motion";
 import { Check, Volume2, X } from "lucide-react";
 import type {
@@ -35,6 +36,7 @@ export function MCQView({
   answered: boolean;
   onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
+  const t = useT();
   const guessFirst = useSettingsStore((s) => s.guessFirst);
   const speechRate = useSettingsStore((s) => s.speechRate);
   const voiceURI = useSettingsStore((s) => s.voiceURI);
@@ -71,7 +73,7 @@ export function MCQView({
           {isAudio ? (
             <div className="flex flex-col items-center gap-3">
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Hör zu und wähle das fehlende Wort:
+                {t("Hör zu und wähle das fehlende Wort:")}
               </p>
               <Button variant="outline" size="lg" className="gap-2" onClick={playAudio}>
                 <Volume2 className="h-5 w-5" /> Anhören
@@ -95,7 +97,7 @@ export function MCQView({
       {!revealed ? (
         <div className="space-y-3">
           <p className="text-center text-sm text-muted-foreground">
-            Überlege zuerst: Wie heißt die Antwort? Dann vergleiche.
+            {t("Überlege zuerst: Wie heißt die Antwort? Dann vergleiche.")}
           </p>
           <Button variant="outline" className="w-full" onClick={() => setRevealed(true)}>
             Optionen zeigen
@@ -146,6 +148,7 @@ export function TypedView({
   answered: boolean;
   onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
+  const t = useT();
   const [value, setValue] = useState("");
   const [verdict, setVerdict] = useState<TypedVerdict | null>(null);
   const elapsed = useAnswerTimer(q.id);
@@ -201,7 +204,7 @@ export function TypedView({
               className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors"
             />
             <Button variant="gradient" className="h-11" onClick={submit}>
-              Prüfen
+              {t("Prüfen")}
             </Button>
           </div>
           <Button variant="ghost" size="sm" className="w-full" onClick={() => finish("wrong")}>
@@ -223,6 +226,7 @@ export function WordOrderView({
   answered: boolean;
   onResult: (correct: boolean) => void;
 }) {
+  const t = useT();
   const [pool, setPool] = useState<string[]>(q.tokens);
   const [built, setBuilt] = useState<string[]>([]);
   const correct = built.join(" ") === q.answer;
@@ -247,7 +251,7 @@ export function WordOrderView({
         )}
       >
         {built.length === 0 && (
-          <span className="self-center text-sm text-muted-foreground">Tippe unten auf die Wörter …</span>
+          <span className="self-center text-sm text-muted-foreground">{t("Tippe unten auf die Wörter …")}</span>
         )}
         {built.map((w, i) => (
           <button
@@ -283,7 +287,7 @@ export function WordOrderView({
 
       {!answered ? (
         <Button className="w-full" variant="gradient" disabled={pool.length > 0} onClick={check}>
-          Prüfen
+          {t("Prüfen")}
         </Button>
       ) : (
         <div
@@ -311,6 +315,7 @@ export function MatchingView({
   answered: boolean;
   onResult: (correct: boolean) => void;
 }) {
+  const t = useT();
   const rights = useMemo(() => shuffle(q.pairs.map((p) => p.right)), [q.id]);
   const [assignment, setAssignment] = useState<Record<string, string>>({});
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
@@ -394,7 +399,7 @@ export function MatchingView({
 
       {!answered && (
         <Button className="w-full" variant="gradient" disabled={!allAssigned} onClick={check}>
-          Prüfen
+          {t("Prüfen")}
         </Button>
       )}
     </div>

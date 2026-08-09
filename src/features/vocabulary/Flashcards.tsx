@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { AnimatePresence, motion } from "framer-motion";
 import { RotateCw, Check, Sparkles, ChevronRight } from "lucide-react";
 import type { Grade, VocabItem } from "@/types";
@@ -24,6 +25,8 @@ const grades: { grade: Grade; label: string; variant: "danger" | "warning" | "in
 ];
 
 export function Flashcards({ items }: { items: VocabItem[] }) {
+  const t = useT();
+  const tx = useTx();
   const srs = useProgressStore((s) => s.srs);
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const addXp = useProgressStore((s) => s.addXp);
@@ -62,7 +65,13 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
   };
 
   if (items.length === 0) {
-    return <EmptyState icon={Sparkles} title="Keine Vokabeln" description="Für dieses Thema gibt es noch keine Einträge." />;
+    return (
+      <EmptyState
+        icon={Sparkles}
+        title={t("Keine Vokabeln")}
+        description={t("Für dieses Thema gibt es noch keine Einträge.")}
+      />
+    );
   }
 
   if (done) {
@@ -70,8 +79,11 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
       <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
         <EmptyState
           icon={Check}
-          title="Runde geschafft! 🎉"
-          description={`Du hast ${reviewed} Karten wiederholt und XP gesammelt.`}
+          title={t("Runde geschafft! 🎉")}
+          description={tx(
+            `Du hast ${reviewed} Karten wiederholt und XP gesammelt.`,
+            `You reviewed ${reviewed} cards and collected XP.`,
+          )}
           action={
             <Button
               variant="gradient"
@@ -102,7 +114,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
     setReviewed(nextReviewed);
     if (index + 1 >= queue.length) {
       registerSession();
-      showToast("Runde abgeschlossen – stark!", "success");
+      showToast(t("Runde abgeschlossen – stark!"), "success");
       setDone(true);
     } else {
       setIndex(index + 1);
@@ -132,7 +144,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             className="relative block w-full text-left focus-visible:outline-none"
-            aria-label="Karte umdrehen"
+            aria-label={t("Karte umdrehen")}
           >
             <motion.div
               animate={{ rotateY: flipped ? 180 : 0 }}
@@ -145,7 +157,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
               {/* Front */}
               <div className="relative [grid-area:1/1] flex flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-surface p-8 shadow-soft [backface-visibility:hidden]">
                 <Badge variant={m === "mastered" ? "success" : m === "new" ? "muted" : "default"}>
-                  {m === "new" ? "neu" : m === "learning" ? "lernen" : m === "review" ? "wiederholen" : "gemeistert"}
+                  {t(m === "new" ? "neu" : m === "learning" ? "lernen" : m === "review" ? "wiederholen" : "gemeistert")}
                 </Badge>
                 <div className="flex items-center gap-2">
                   {genderOf(card) && <Wesen gender={genderOf(card)!} size={30} />}
@@ -194,7 +206,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {grades.map((g) => (
             <Button key={g.grade} variant={g.variant} onClick={() => grade(g.grade)} className="flex-col gap-0 py-2 min-h-[44px] h-auto sm:min-h-0 sm:h-10 sm:flex-row">
-              {g.label}
+              {t(g.label)}
             </Button>
           ))}
         </motion.div>

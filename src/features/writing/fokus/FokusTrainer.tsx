@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
@@ -58,6 +59,7 @@ export function FokusTrainer({
   onRequireAuth: (sentence: string) => void;
   initialText?: string;
 }) {
+  const t = useT();
   // Autosave restore (s172): the sentence survives ANY reload, not just the
   // sign-in hand-off. Read once, before the machine is seeded, so a restore
   // never fights a later render.
@@ -252,7 +254,7 @@ export function FokusTrainer({
         </>
       ) : (
         <>
-          <Sparkles className="h-4 w-4" /> Korrigieren
+          <Sparkles className="h-4 w-4" /> {t("Korrigieren")}
         </>
       )}
     </Button>
@@ -269,7 +271,7 @@ export function FokusTrainer({
             view toggle (s150). */}
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-bold uppercase tracking-wide text-primary">
-            Dein Satz
+            {t("Dein Satz")}
           </p>
           {showResult && (
             <CorrectionToggle
@@ -323,7 +325,7 @@ export function FokusTrainer({
               onChange={(e) => m.setInput(e.target.value)}
               disabled={m.status === "submitting"}
               rows={3}
-              placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
+              placeholder={t("Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.")}
               className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none"
             />
             {/* Umlaut keys share the footer row with Korrigieren (desktop);
@@ -348,7 +350,7 @@ export function FokusTrainer({
 
         {m.words > 25 && m.status !== "corrected" && (
           <p className="text-right text-xs text-muted-foreground">
-            Tipp: In Fokus funktioniert ein Satz am besten.
+            {t("Tipp: In Fokus funktioniert ein Satz am besten.")}
           </p>
         )}
 
@@ -376,8 +378,9 @@ export function FokusTrainer({
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <p className="max-w-[calc(100%-18rem)] text-center text-xs leading-relaxed text-muted-foreground">
           <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
-          Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die
-          Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
+          {t(
+            "Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die Rückmeldung ist KI-generiert und kann Fehler enthalten.",
+          )}{" "}
           <Link
             to="/privacy"
             className="pointer-events-auto font-medium text-primary underline-offset-2 hover:underline"
@@ -512,18 +515,18 @@ export function FokusTrainer({
   // did not happen (refusal / error), closest to the controls that caused it.
   const dialsLegend =
     m.status !== "corrected" ? (
-      <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.</>
+      <>{t("Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.")}</>
     ) : m.transform.status === "error" ? (
       <>{m.transform.message ?? "Diese Umformung war gerade nicht möglich."}</>
     ) : m.transform.status === "done" && !m.transform.applicable ? (
       <>{refusalCopy(m.transform.reason)}</>
     ) : canReset ? (
       <>
-        <b className="font-bold text-success">Grüner Punkt = dein Satz.</b> Blau = dein Ziel.
+        <b className="font-bold text-success">{t("Grüner Punkt = dein Satz.")}</b> Blau = dein Ziel.
       </>
     ) : (
       <>
-        <b className="font-bold text-success">Grüner Punkt = dein Satz.</b> Tippe eine andere Form.
+        <b className="font-bold text-success">{t("Grüner Punkt = dein Satz.")}</b> Tippe eine andere Form.
       </>
     );
 
@@ -535,7 +538,7 @@ export function FokusTrainer({
   const sentenceSkeleton = (
     <div
       role="status"
-      aria-label="Die KI prüft deinen Satz"
+      aria-label={t("Die KI prüft deinen Satz")}
       className="flex w-full flex-col items-center gap-2.5"
     >
       {["86%", "72%", "45%"].map((w, i) => (
@@ -592,8 +595,8 @@ export function FokusTrainer({
             <button
               type="button"
               onClick={m.startOver}
-              aria-label="Neuer Satz"
-              title="Neuer Satz"
+              aria-label={t("Neuer Satz")}
+              title={t("Neuer Satz")}
               className="absolute right-0 top-1/2 inline-flex h-9 -translate-y-1/2 items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -708,13 +711,13 @@ export function FokusTrainer({
             </div>
           ) : (
             <>
-              <p className="text-xs font-bold uppercase tracking-wide text-primary">Dein Satz</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-primary">{t("Dein Satz")}</p>
               <textarea
                 ref={taMobileRef}
                 value={m.input}
                 onChange={(e) => m.setInput(e.target.value)}
                 rows={3}
-                placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
+                placeholder={t("Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.")}
                 className="min-h-[72px] w-full flex-1 resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none"
               />
               <UmlautKeys textareaRef={taMobileRef} value={m.input} onChange={m.setInput} />
@@ -746,7 +749,7 @@ export function FokusTrainer({
               ) : null}
               {m.words > 25 && (
                 <p className="text-right text-xs text-muted-foreground">
-                  Tipp: In Fokus funktioniert ein Satz am besten.
+                  {t("Tipp: In Fokus funktioniert ein Satz am besten.")}
                 </p>
               )}
             </>

@@ -24,8 +24,12 @@ import { useAdminLang } from "./adminI18n";
  * not reach content banks or the prerendered /hilfe pages.
  */
 
-// Only middle tabs may be hidden (locked bar keeps Home + Einstellungen fixed).
-const HIDEABLE = new Set(["/library", "/analytics"]);
+// Only middle tabs may be hidden. The locked bar keeps three slots fixed, and
+// since s205 those are Bibliothek (first), Praktisch (beside Einstellungen) and
+// Einstellungen, so Fortschritt is what is left to hide. Bibliothek dropped off
+// this list when it became the fixed first slot: hiding it would have emptied
+// the slot the rail opens with.
+const HIDEABLE = new Set(["/analytics"]);
 
 const CONFIG_KEYS: (keyof AppConfigData)[] = [
   "navLabels",
@@ -129,8 +133,8 @@ export function AdminSteuerung() {
       <Section
         title={t("Menü-Sichtbarkeit", "Nav visibility")}
         note={t(
-          "Blendet nur die Menü-Kachel aus. Die Route bleibt aktiv (Deep-Links funktionieren weiter). Praktisch und Einstellungen sind fest.",
-          "Hides only the menu tile. The route stays live (deep links keep working). Praktisch and Einstellungen are fixed.",
+          "Blendet nur die Menü-Kachel aus. Die Route bleibt aktiv (Deep-Links funktionieren weiter). Bibliothek, Praktisch und Einstellungen sind fest.",
+          "Hides only the menu tile. The route stays live (deep links keep working). Bibliothek, Praktisch and Einstellungen are fixed.",
         )}
       >
         <div className="space-y-2">

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { Check, ChevronDown, Lock, Pin, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -99,6 +100,7 @@ function scopeOptionLabel(p: RailPrimary, value: string): string {
  *  or Escape (same pattern as `AccountMenu`). Radix `Select` only supports a
  *  single value, so this is a small hand-built listbox instead. */
 function ScopeMultiSelect({ p }: { p: RailPrimary }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -171,7 +173,7 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
             {checked && <Check className="h-3 w-3" />}
           </span>
         )}
-        <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+        <span className="min-w-0 flex-1 truncate">{t(opt.label)}</span>
         {opt.count != null && <CountBadge value={opt.count} muted={locked} />}
       </button>
     );
@@ -184,10 +186,10 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={p.label}
+        aria-label={t(p.label)}
         className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 lg:px-2.5 lg:py-1.5 lg:text-xs"
       >
-        <span className="min-w-0 flex-1 truncate">{triggerLabel}</span>
+        <span className="min-w-0 flex-1 truncate">{t(triggerLabel)}</span>
         {/* Nothing selected: show the number of options (Branchen/Themen), in
             the same muted pill format as the facet counts. */}
         {p.values.length === 0 && <CountBadge value={optionTotal} />}
@@ -202,7 +204,7 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
         <div
           role="listbox"
           aria-multiselectable
-          aria-label={p.label}
+          aria-label={t(p.label)}
           className="slim-scrollbar absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
         >
           <button
@@ -218,7 +220,7 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
               p.values.length === 0 ? "bg-primary/10 text-primary" : "hover:bg-muted/60",
             )}
           >
-            <span className="min-w-0 flex-1 truncate">{p.all.label}</span>
+            <span className="min-w-0 flex-1 truncate">{t(p.all.label)}</span>
             <CountBadge value={optionTotal} />
           </button>
           {(p.options?.length ?? 0) > 0 && <div className="my-1 h-px bg-border" />}
@@ -226,7 +228,7 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
           {p.groups?.map((group) => (
             <div key={group.label}>
               <p className="mt-1.5 px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                {group.label}
+                {t(group.label)}
               </p>
               {group.options.map(row)}
             </div>
@@ -296,6 +298,7 @@ function SectionHeader({
    *  has no collapse, so it hides them. */
   pinnable?: boolean;
 }) {
+  const t = useT();
   return (
     <div className="mb-2 flex items-center justify-between gap-2">
       <span
@@ -305,14 +308,14 @@ function SectionHeader({
             : "text-sm font-semibold",
         )}
       >
-        {label}
+        {t(label)}
       </span>
       {pinnable && (
       <button
         onClick={onTogglePin}
         aria-pressed={pinned}
-        aria-label={pinned ? `${label} lösen` : `${label} anheften`}
-        title={pinned ? "Angeheftet: bleibt beim Einklappen sichtbar" : "Anheften"}
+        aria-label={pinned ? `${t(label)} ${t("lösen")}` : `${t(label)} ${t("anheften")}`}
+        title={t(pinned ? "Angeheftet: bleibt beim Einklappen sichtbar" : "Anheften")}
         className={cn(
           "rounded p-0.5 transition-colors",
           pinned ? "text-primary" : "text-muted-foreground/40 hover:text-muted-foreground",
@@ -384,6 +387,7 @@ export function FilterRail<T>({
   layout?: "rail" | "panel";
   className?: string;
 }) {
+  const t = useT();
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   // Per-facet "Mehr/Weniger anzeigen" expansion (founder 2026-07-13): a facet
   // with many options (e.g. Redemittel Kategorie, Grammatik Gruppe) shows only
@@ -414,8 +418,8 @@ export function FilterRail<T>({
       // the same rule the Schreiben "Aufgabe wählen" toggle follows).
       variant="accent"
       aria-expanded={open}
-      aria-label="Filter"
-      title="Filter"
+      aria-label={t("Filter")}
+      title={t("Filter")}
       className="relative h-10 w-10 shrink-0"
       onClick={() => setOpen(!open)}
     >
@@ -453,8 +457,8 @@ export function FilterRail<T>({
         if (area?.value) area.onChange("");
       }}
       disabled={activeCount === 0}
-      aria-label="Filter zurücksetzen"
-      title="Filter zurücksetzen"
+      aria-label={t("Filter zurücksetzen")}
+      title={t("Filter zurücksetzen")}
       className={cn(
         "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
         activeCount === 0
@@ -469,8 +473,8 @@ export function FilterRail<T>({
     <button
       type="button"
       onClick={onClose}
-      aria-label="Filter schließen"
-      title="Schließen"
+      aria-label={t("Filter schließen")}
+      title={t("Schließen")}
       className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
     >
       <X className="h-4 w-4" />
@@ -538,7 +542,7 @@ export function FilterRail<T>({
         {allLocked ? (
           <p className="flex items-start gap-2 rounded-lg border border-dashed border-border px-2.5 py-2 text-xs leading-relaxed text-muted-foreground">
             <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
-            <span>Für dieses Thema gibt es nichts nach Branche. Du übst hier alles.</span>
+            <span>{t("Für dieses Thema gibt es nichts nach Branche. Du übst hier alles.")}</span>
           </p>
         ) : (
           <ScopeMultiSelect p={p} />
@@ -551,7 +555,7 @@ export function FilterRail<T>({
   const areaSection = area ? (
     <section key="area">
       <SectionHeader
-        label="Lebensbereich"
+        label={t("Lebensbereich")}
         eyebrow
         pinned={pins.includes(AREA_PIN_ID)}
         onTogglePin={() => togglePin(AREA_PIN_ID)}
@@ -624,7 +628,7 @@ export function FilterRail<T>({
                     : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-surface/70",
               )}
             >
-              {opt.label}
+              {t(opt.label)}
               {!disabled && (
                 <span
                   className={cn(
@@ -653,8 +657,8 @@ export function FilterRail<T>({
           className="mt-2 text-xs font-medium text-primary transition-colors hover:opacity-80"
         >
           {expandedFacets.has(facet.id)
-            ? "Weniger anzeigen"
-            : `Mehr anzeigen (${facet.options.length - FACET_COLLAPSE_AT})`}
+            ? t("Weniger anzeigen")
+            : `${t("Mehr anzeigen")} (${facet.options.length - FACET_COLLAPSE_AT})`}
         </button>
       )}
     </section>
@@ -692,7 +696,7 @@ export function FilterRail<T>({
     return (
       <div
         role="region"
-        aria-label="Filter"
+        aria-label={t("Filter")}
         // Capped to ~45% of the viewport with the filters scrolling INSIDE
         // (founder, mobile): a flex column with a fixed header and one internal
         // scroll region, so an open panel never swallows the whole screen. The
@@ -744,7 +748,7 @@ export function FilterRail<T>({
         `rounded-xl border ${ACCENT} shadow-soft`,
         className,
       )}
-      aria-label="Filter"
+      aria-label={t("Filter")}
     >
       {/* Tile header: the expand/collapse toggle (flex-1, so it still reads
           as one clickable row) plus the reset icon beside it, always visible
@@ -759,7 +763,7 @@ export function FilterRail<T>({
             className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary transition-colors hover:opacity-80"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            Filter
+            {t("Filter")}
             {activeCount > 0 && (
               <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
                 {activeCount}

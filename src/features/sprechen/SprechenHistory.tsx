@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   AlertCircle,
@@ -89,6 +90,7 @@ function ConversationRow({
   index: number;
   onDelete: (id: string) => Promise<void>;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -149,7 +151,7 @@ function ConversationRow({
                 {met}/{goalsMet.length} Punkte
               </span>
             ) : (
-              !graded && <Badge variant="muted">Ohne Bewertung</Badge>
+              !graded && <Badge variant="muted">{t("Ohne Bewertung")}</Badge>
             )}
             <ChevronDown
               className={cn(
@@ -210,7 +212,7 @@ function ConversationRow({
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Das Transkript wurde inzwischen gelöscht.
+                  {t("Das Transkript wurde inzwischen gelöscht.")}
                 </p>
               )}
             </div>
@@ -236,7 +238,7 @@ function ConversationRow({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Für dieses Gespräch gibt es keine Rückmeldung. Dein Gespräch ist trotzdem
+                {t("Für dieses Gespräch gibt es keine Rückmeldung. Dein Gespräch ist trotzdem")}
                 gespeichert.
               </p>
             )}
@@ -257,13 +259,13 @@ function ConversationRow({
                     className="flex items-center gap-1 text-xs font-medium text-danger hover:underline"
                   >
                     {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                    Löschen
+                    {t("Löschen")}
                   </button>
                 </span>
               ) : (
                 <button
                   onClick={() => setConfirming(true)}
-                  aria-label="Gespräch löschen"
+                  aria-label={t("Gespräch löschen")}
                   className="text-muted-foreground transition-colors hover:text-danger"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -271,7 +273,7 @@ function ConversationRow({
               )}
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Sparkles className="h-3 w-3 shrink-0" />
-                KI-generierte Rückmeldung
+                {t("KI-generierte Rückmeldung")}
               </p>
             </div>
           </CardContent>
@@ -282,6 +284,7 @@ function ConversationRow({
 }
 
 export function SprechenHistory({ onPractice }: { onPractice: () => void }) {
+  const t = useT();
   const [entries, setEntries] = useState<SpeakingHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -323,7 +326,7 @@ export function SprechenHistory({ onPractice }: { onPractice: () => void }) {
         <CardContent className="flex items-start gap-3 p-5">
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
           <div className="space-y-2">
-            <p className="font-medium">Verlauf konnte nicht geladen werden</p>
+            <p className="font-medium">{t("Verlauf konnte nicht geladen werden")}</p>
             <Button size="sm" variant="outline" onClick={load}>
               Erneut versuchen
             </Button>
@@ -340,9 +343,9 @@ export function SprechenHistory({ onPractice }: { onPractice: () => void }) {
           <div className="rounded-full bg-muted/50 p-4">
             <MessagesSquare className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="font-medium">Noch keine Gespräche</p>
+          <p className="font-medium">{t("Noch keine Gespräche")}</p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            Führe dein erstes Gespräch, dann steht hier deine Rückmeldung.
+            {t("Führe dein erstes Gespräch, dann steht hier deine Rückmeldung.")}
           </p>
           <Button variant="gradient" onClick={onPractice}>
             <Mic className="h-4 w-4" /> Erstes Gespräch führen
@@ -355,7 +358,7 @@ export function SprechenHistory({ onPractice }: { onPractice: () => void }) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-eyebrow text-muted-foreground">Letzte Gespräche</p>
+        <p className="text-eyebrow text-muted-foreground">{t("Letzte Gespräche")}</p>
         <Badge variant="muted" className="tabular-nums">
           {entries.length}
         </Badge>

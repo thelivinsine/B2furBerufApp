@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown, Clock, Play } from "lucide-react";
@@ -359,6 +360,7 @@ function ClockSwitcher({
   mode: ClockMode;
   onSelect: (m: ClockMode) => void;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(mode);
 
@@ -366,7 +368,7 @@ function ClockSwitcher({
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="group"
-      aria-label="Zeit"
+      aria-label={t("Zeit")}
       className="relative flex h-9 items-stretch gap-0.5 rounded-lg border border-border bg-muted p-0.5 shadow-soft"
     >
       {rect && (
@@ -392,7 +394,7 @@ function ClockSwitcher({
               active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {m === "free" ? "Ohne Zeit" : "Mit Zeit"}
+            {t(m === "free" ? "Ohne Zeit" : "Mit Zeit")}
           </button>
         );
       })}
@@ -431,6 +433,7 @@ function ModuleGrid({
   countFor: (p: MockPartId) => number;
   onOpen: (p: MockPartId) => void;
 }) {
+  const t = useT();
   return (
     // 2x2 at EVERY width (founder s189): four across a 1152px column left the
     // cards narrow and cramped against all that empty page. No cap of its own
@@ -488,11 +491,11 @@ function ModuleGrid({
             </span>
 
             <span className="relative mt-2 text-base font-bold leading-tight tracking-[-0.015em] sm:mt-2.5 sm:text-lg">
-              {PART_LABEL[part]}
+              {t(PART_LABEL[part])}
             </span>
             {!canOpen && (
               <span className="relative mt-1 text-[12.5px] leading-snug text-muted-foreground sm:text-sm">
-                Noch keine Inhalte
+                {t("Noch keine Inhalte")}
               </span>
             )}
 
@@ -527,12 +530,13 @@ function RunBand({
   canStart: boolean;
   onStart: () => void;
 }) {
+  const t = useT();
   const cta = canStart ? (
     <Button variant="gradient" className="w-full sm:w-auto" onClick={onStart}>
-      <Play className="h-4 w-4" /> Prüfung starten
+      <Play className="h-4 w-4" /> {t("Prüfung starten")}
     </Button>
   ) : (
-    <span className="text-sm text-muted-foreground">Noch keine Inhalte</span>
+    <span className="text-sm text-muted-foreground">{t("Noch keine Inhalte")}</span>
   );
 
   return (
@@ -540,7 +544,7 @@ function RunBand({
       {/* Desktop: the left half of the ticket. Phone/tablet: the whole band. */}
       <div className="flex flex-1 flex-col p-4 sm:p-5 lg:items-start lg:p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 lg:block">
-          <p className="text-eyebrow text-muted-foreground">Komplette Prüfung</p>
+          <p className="text-eyebrow text-muted-foreground">{t("Komplette Prüfung")}</p>
           {/* The total is stated ONCE. On a desktop it is the display figure the
               ticket leads with; below lg it is the quiet fact beside the eyebrow,
               because there the four Teile are already a full-width timeline. */}
@@ -549,10 +553,10 @@ function RunBand({
           </p>
           <p className="hidden text-display text-[2.875rem] leading-none tabular-nums lg:mt-3 lg:block">
             {TOTAL_MINUTES}
-            <span className="ml-1.5 text-[1.1875rem] font-bold text-muted-foreground">Min</span>
+            <span className="ml-1.5 text-[1.1875rem] font-bold text-muted-foreground">{t("Min")}</span>
           </p>
           <p className="hidden text-sm text-muted-foreground lg:mt-2 lg:block">
-            Vier Teile am Stück, wie am Prüfungstag
+            {t("Vier Teile am Stück, wie am Prüfungstag")}
           </p>
         </div>
 
@@ -587,6 +591,7 @@ function RunBand({
  * instead of four islands stranded across a wide card.
  */
 function PartTrack() {
+  const t = useT();
   return (
     <div className="mx-auto mt-3.5 flex w-full max-w-[35rem] items-start justify-between">
       {MOCK_PART_ORDER.map((part, i) => {
@@ -608,7 +613,7 @@ function PartTrack() {
             >
               <Icon className={cn("h-5 w-5", meta.ink)} />
             </span>
-            <span className="text-xs font-semibold sm:text-sm">{PART_LABEL[part]}</span>
+            <span className="text-xs font-semibold sm:text-sm">{t(PART_LABEL[part])}</span>
             <span className="text-[11px] tabular-nums text-muted-foreground">
               {PART_MINUTES[part]} Min
             </span>
@@ -621,6 +626,7 @@ function PartTrack() {
 
 /** The same four parts as the ticket's right column: a vertical ladder. */
 function PartLadder() {
+  const t = useT();
   return (
     <div className="flex flex-col">
       {MOCK_PART_ORDER.map((part, i) => {
@@ -642,7 +648,7 @@ function PartLadder() {
             >
               <Icon className={cn("h-[1.0625rem] w-[1.0625rem]", meta.ink)} />
             </span>
-            <span className="text-sm font-semibold">{PART_LABEL[part]}</span>
+            <span className="text-sm font-semibold">{t(PART_LABEL[part])}</span>
             <span className="ml-auto text-xs tabular-nums text-muted-foreground">
               {PART_MINUTES[part]} Min
             </span>
@@ -666,6 +672,7 @@ function PartLadder() {
  * an AI grade is still worth sitting.
  */
 function AiBudgetNote({ level }: { level: HubLevel }) {
+  const tx = useTx();
   const writing = useDailyAllowance(level === "B1" ? "kurz" : "lang");
   // A Modelltest's Teil Sprechen is an EXAM conversation, so it spends the exam
   // budget (3/day since s204), never the practice one.
@@ -685,8 +692,14 @@ function AiBudgetNote({ level }: { level: HubLevel }) {
       )}
     >
       {short.length
-        ? `Heute keine KI-Bewertung mehr für ${short.join(" und ")}. Der Durchlauf zählt trotzdem, ${short.length === 1 ? "dieser Teil bleibt" : "diese Teile bleiben"} ohne Punktzahl.`
-        : `Ein Durchlauf nutzt je eine KI-Bewertung: heute noch ${writing.remaining} fürs Schreiben, ${speaking.remaining} fürs Sprechen.`}
+        ? tx(
+            `Heute keine KI-Bewertung mehr für ${short.join(" und ")}. Der Durchlauf zählt trotzdem, ${short.length === 1 ? "dieser Teil bleibt" : "diese Teile bleiben"} ohne Punktzahl.`,
+            `No AI marking left today for ${short.join(" and ")}. The run still counts, ${short.length === 1 ? "that part stays" : "those parts stay"} without a score.`,
+          )
+        : tx(
+            `Ein Durchlauf nutzt je eine KI-Bewertung: heute noch ${writing.remaining} fürs Schreiben, ${speaking.remaining} fürs Sprechen.`,
+            `A run uses one AI marking each: ${writing.remaining} left today for writing, ${speaking.remaining} for speaking.`,
+          )}
     </p>
   );
 }
@@ -696,6 +709,8 @@ function AiBudgetNote({ level }: { level: HubLevel }) {
  * date has passed, so it can never sit at "0 Tage" forever.
  */
 function ExamCountdown({ examDate }: { examDate: string | null }) {
+  const t = useT();
+  const tx = useTx();
   if (!examDate || examDate < todayKey()) return null;
   const days = Math.max(0, daysBetween(todayKey(), examDate));
   const label = new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long" }).format(
@@ -705,8 +720,11 @@ function ExamCountdown({ examDate }: { examDate: string | null }) {
     <span className="mt-2 inline-flex items-center gap-1.5 text-sm tabular-nums text-muted-foreground lg:mt-2.5">
       <Clock className="h-3.5 w-3.5 shrink-0" />
       {days === 0
-        ? "Heute ist Prüfungstag"
-        : `Noch ${days} ${days === 1 ? "Tag" : "Tage"} bis zum ${label}`}
+        ? t("Heute ist Prüfungstag")
+        : tx(
+            `Noch ${days} ${days === 1 ? "Tag" : "Tage"} bis zum ${label}`,
+            `${days} ${days === 1 ? "day" : "days"} until the ${label}`,
+          )}
     </span>
   );
 }
@@ -716,7 +734,7 @@ function ExamCountdown({ examDate }: { examDate: string | null }) {
 /* ---------------------------- Modelltest Verlauf --------------------------- */
 
 /**
- * Founder pick V2 "Zahl und Kurve". The last score leads as a display figure
+ * Founder pick V2 t("Zahl und Kurve"). The last score leads as a display figure
  * with its delta against the run before it; Bester and Bestanden stay as
  * figures (the founder kept them) but as supporting stats rather than three
  * equal cells; the chart carries the shape of the whole history beside them.
@@ -730,6 +748,8 @@ function RunVerlauf({
   open: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
+  const tx = useTx();
   const scored = useMemo(() => runs.filter((r) => r.total != null), [runs]);
   const best = scored.length ? Math.max(...scored.map((r) => r.total as number)) : null;
   const passed = scored.filter((r) => (r.total as number) >= PASS_PCT).length;
@@ -743,13 +763,16 @@ function RunVerlauf({
     <VerlaufCard
       count={
         runs.length === 0
-          ? "noch kein Durchlauf"
-          : `${runs.length} ${runs.length === 1 ? "Durchlauf" : "Durchläufe"}`
+          ? t("noch kein Durchlauf")
+          : tx(
+              `${runs.length} ${runs.length === 1 ? "Durchlauf" : "Durchläufe"}`,
+              `${runs.length} ${runs.length === 1 ? "run" : "runs"}`,
+            )
       }
       open={open}
       onToggle={onToggle}
       restRows={VERLAUF_REST_ROWS}
-      moreLabel={`Alle ${runs.length} anzeigen`}
+      moreLabel={tx(`Alle ${runs.length} anzeigen`, `Show all ${runs.length}`)}
       head={
         last == null ? (
           <NoScoreYet />
@@ -768,13 +791,13 @@ function RunVerlauf({
                   <span className="block text-base font-bold tabular-nums text-foreground">
                     {best} %
                   </span>
-                  Bester
+                  {t("Bester")}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   <span className="block text-base font-bold tabular-nums text-foreground">
                     {passed} von {scored.length}
                   </span>
-                  Bestanden
+                  {t("Bestanden")}
                 </p>
               </div>
             </div>
@@ -791,6 +814,7 @@ function RunVerlauf({
 
 /** One Modelltest run: date, the four parts as segments, the total. */
 function RunRow({ record }: { record: MockExamRecord }) {
+  const t = useT();
   const [expanded, setExpanded] = useState(false);
   // A run that produced no score at all: four empty tracks read as a loading
   // skeleton, so the row states the fact instead of drawing nothing.
@@ -818,7 +842,7 @@ function RunRow({ record }: { record: MockExamRecord }) {
             className="flex min-w-0 max-w-[320px] flex-1 gap-1"
             role="img"
             aria-label={MOCK_PART_ORDER.map(
-              (p) => `${PART_LABEL[p]} ${record.parts[p] ?? "ohne Punktzahl"}`,
+              (p) => `${t(PART_LABEL[p])} ${record.parts[p] ?? t("ohne Punktzahl")}`,
             ).join(", ")}
           >
             {MOCK_PART_ORDER.map((part) => {
@@ -860,7 +884,7 @@ function RunRow({ record }: { record: MockExamRecord }) {
             const pct = record.parts[part];
             return (
               <div key={part} className="text-center">
-                <p className="text-xs text-muted-foreground">{PART_LABEL[part]}</p>
+                <p className="text-xs text-muted-foreground">{t(PART_LABEL[part])}</p>
                 <p
                   className={cn(
                     "mt-0.5 text-sm font-semibold tabular-nums",
@@ -881,7 +905,7 @@ function RunRow({ record }: { record: MockExamRecord }) {
 /* --------------------------- Module üben Verlauf --------------------------- */
 
 /**
- * Founder pick M3 "Stärkeprofil". Four columns on ONE scale, so the modules are
+ * Founder pick M3 t("Stärkeprofil"). Four columns on ONE scale, so the modules are
  * directly comparable: the pale part is where the learner started, the solid cap
  * on top is what they have gained since. A dotted marker line was tried first
  * and disappeared against a saturated fill.
@@ -899,6 +923,8 @@ function ModuleVerlauf({
   open: boolean;
   onToggle: () => void;
 }) {
+  const t = useT();
+  const tx = useTx();
   // Oldest first per module, so "first" is the learner's first attempt.
   const byPart = useMemo(() => {
     const map = {} as Record<MockPartId, number[]>;
@@ -915,13 +941,16 @@ function ModuleVerlauf({
     <VerlaufCard
       count={
         practice.length === 0
-          ? "noch keine Übung"
-          : `${practice.length} ${practice.length === 1 ? "Übung" : "Übungen"}`
+          ? t("noch keine Übung")
+          : tx(
+              `${practice.length} ${practice.length === 1 ? "Übung" : "Übungen"}`,
+              `${practice.length} ${practice.length === 1 ? "exercise" : "exercises"}`,
+            )
       }
       open={open}
       onToggle={onToggle}
       restRows={VERLAUF_REST_ROWS}
-      moreLabel={`Alle ${practice.length} anzeigen`}
+      moreLabel={tx(`Alle ${practice.length} anzeigen`, `Show all ${practice.length}`)}
       split
       head={
         <>
@@ -982,7 +1011,7 @@ function ModuleVerlauf({
                       >
                         <Icon className={cn("h-3 w-3", meta.ink)} />
                       </span>
-                      {PART_LABEL[part]}
+                      {t(PART_LABEL[part])}
                     </span>
                   </div>
                 );
@@ -992,12 +1021,12 @@ function ModuleVerlauf({
               {scored.length === 0 ? (
                 <>
                   <span className="block text-sm font-semibold text-foreground">
-                    Dein Stärkeprofil
+                    {t("Dein Stärkeprofil")}
                   </span>
-                  Übe ein Modul, dann siehst du hier deinen Fortschritt.
+                  {t("Übe ein Modul, dann siehst du hier deinen Fortschritt.")}
                 </>
               ) : (
-                "Blass: dein erster Versuch · Kräftig: dein Fortschritt"
+                t("Blass: dein erster Versuch · Kräftig: dein Fortschritt")
               )}
             </p>
           </>
@@ -1009,6 +1038,7 @@ function ModuleVerlauf({
 
 /** One module practice: date, which module, the score it produced. */
 function PracticeRow({ entry }: { entry: ModulePractice }) {
+  const t = useT();
   const meta = PART_META[entry.part];
   const Icon = meta.icon;
   const date = shortDate(entry.date);
@@ -1028,7 +1058,7 @@ function PracticeRow({ entry }: { entry: ModulePractice }) {
       >
         <Icon className={cn("h-[15px] w-[15px]", meta.ink)} />
       </span>
-      <span className="truncate text-sm font-semibold">{PART_LABEL[entry.part]}</span>
+      <span className="truncate text-sm font-semibold">{t(PART_LABEL[entry.part])}</span>
       {entry.pct != null && (
         <Badge
           variant={entry.pct >= PASS_PCT ? "success" : "muted"}

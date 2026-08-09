@@ -17,6 +17,8 @@ export interface NavItem {
   bg: string;
   /** Short subtitle (used on the landing/marketing surfaces and kept for reuse). */
   desc: string;
+  /** Marks the zone as unfinished: the nav draws a "Beta" suffix next to its label. */
+  beta?: boolean;
 }
 
 // Each route owns ONE unique accent colour. The same colour is reused
@@ -41,10 +43,18 @@ export interface NavItem {
 // Labels: "Heute" was renamed to "Praktisch" and "Bibliothek" to "Theorie"
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
 // pairing. The routes are unchanged (/ and /library).
+//
+// ORDER (founder s205): **Bibliothek leads the nav and Praktisch sits beside
+// Einstellungen, marked Beta.** The library is what a learner meets first now
+// (onboarding hands straight over to it, no taster session), and the Praktisch
+// zone is still being built, so it moved to the far end of the rail instead of
+// owning the first slot. The routes are untouched: "/" is still the Dashboard
+// and still the app's root, it is simply not the FIRST tab any more.
+// This list is the order both nav surfaces draw: the sidebar top-to-bottom, and
+// the bottom bar left-to-right.
 export const navItems: NavItem[] = [
   // No `end` flag any more: which routes belong to which tab is `navZoneOf`'s
   // job (below), and Home matching only itself is stated there.
-  { to: "/",          label: "Praktisch",    icon: Compass,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag" },
   { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
   // Schreiben had its own tab from 2026-07-22 until s182, when the founder
   // moved it INTO the transfer hub and renamed that hub **Prüfung**: the three
@@ -54,15 +64,24 @@ export const navItems: NavItem[] = [
   // absent from this list on purpose (see ROUTE_SUCCESSOR below).
   { to: "/anwenden",  label: "Prüfung",      icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Module üben und Modelltest" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
+  { to: "/",          label: "Praktisch",    icon: Compass,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Deine Session und dein Tag", beta: true },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];
 
 // Five slots, unchanged in count since s182 reshaped what fills them (founder:
-// move Schreiben into the transfer hub and call that hub Prüfung): Home,
-// Bibliothek, Prüfung, Fortschritt, Einstellungen. An existing learner's
-// persisted order still works: BottomTabBar completes the reorderable group
-// with whatever is missing, and a pinned "/writing" remaps via ROUTE_SUCCESSOR.
-export const DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"];
+// move Schreiben into the transfer hub and call that hub Prüfung), reordered in
+// s205: Bibliothek, Prüfung, Fortschritt, Praktisch, Einstellungen. An existing
+// learner's persisted order still works: BottomTabBar completes the reorderable
+// group with whatever is missing, pins the two fixed ends itself, and a pinned
+// "/writing" remaps via ROUTE_SUCCESSOR.
+export const DEFAULT_PINNED_TABS = ["/library", "/anwenden", "/analytics", "/"];
+
+// The three slots the nav rail ALWAYS draws (locked bar structure): the
+// Bibliothek slot that opens the rail, the Praktisch slot beside Einstellungen,
+// and Einstellungen itself. Remote config (Steuerung H2) may hide only the
+// middle tabs, so a stale `hiddenTabs` entry can never empty a fixed slot on one
+// surface while the other keeps drawing it.
+export const NEVER_HIDEABLE = ["/library", "/", "/settings"];
 
 // Removed top-level routes → their successor zone. Used by the settings-store
 // migration so an existing learner's custom pins / More-sheet order remap onto

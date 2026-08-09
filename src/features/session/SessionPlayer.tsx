@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Zap,
@@ -111,6 +112,7 @@ function SessionRun({
   libraryIds,
   onRestart,
 }: SessionPlayerProps & { onRestart: () => void }) {
+  const t = useT();
   const navigate = useNavigate();
   // Exit returns the learner to wherever they launched Üben from (Bibliothek,
   // Heute, a Grammatik lesson, Fortschritt, …), not always the dashboard. Every
@@ -423,11 +425,11 @@ function SessionRun({
         <SectionHeading eyebrow={eyebrow} title="Alles erledigt" />
         <EmptyState
           icon={Sparkles}
-          title="Keine fälligen Übungen"
-          description="Du bist für heute durch. Komm später wieder für eine neue Runde."
+          title={t("Keine fälligen Übungen")}
+          description={t("Du bist für heute durch. Komm später wieder für eine neue Runde.")}
           action={
             <Button variant="gradient" onClick={exit}>
-              Zurück
+              {t("Zurück")}
             </Button>
           }
         />
@@ -475,7 +477,7 @@ function SessionRun({
             <RotateCw className="h-4 w-4" /> Neue Runde
           </Button>
           <Button variant="outline" onClick={exit}>
-            Zurück
+            {t("Zurück")}
           </Button>
         </div>
       </div>
@@ -611,7 +613,7 @@ function SessionRun({
               <p className="mt-1 text-sm text-muted-foreground">Dein Fortschritt bleibt gespeichert.</p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Button variant="outline" onClick={() => setExitConfirm(false)}>
-                  Weiter üben
+                  {t("Weiter üben")}
                 </Button>
                 <Button variant="gradient" onClick={exit}>
                   Beenden
@@ -710,6 +712,7 @@ function SpeakingBlock({
   onSttError: () => void;
   onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
+  const t = useT();
   const [stage, setStage] = useState<"prompt" | "listening" | "typed">(
     sttDisabled ? "typed" : "prompt",
   );
@@ -875,7 +878,7 @@ function SpeakingBlock({
         <div className="space-y-2">
           {noSpeech && (
             <p className="text-center text-sm text-muted-foreground">
-              Nichts gehört. Versuch es nochmal oder tippe deine Antwort.
+              {t("Nichts gehört. Versuch es nochmal oder tippe deine Antwort.")}
             </p>
           )}
           <Button variant="gradient" className="h-12 w-full gap-2" onClick={startListening}>
@@ -894,7 +897,7 @@ function SpeakingBlock({
           className="h-12 w-full"
           onClick={() => handleRef.current?.stop()}
         >
-          Fertig
+          {t("Fertig")}
         </Button>
       ) : (
         <div className="space-y-2">
@@ -909,11 +912,11 @@ function SpeakingBlock({
               value={typedAnswer}
               onChange={(e) => setTypedAnswer(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submitTyped()}
-              placeholder="Deine Antwort auf Deutsch …"
+              placeholder={t("Deine Antwort auf Deutsch …")}
               className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors"
             />
             <Button variant="gradient" className="h-11" onClick={submitTyped}>
-              Prüfen
+              {t("Prüfen")}
             </Button>
           </div>
           <Button variant="ghost" size="sm" className="w-full" onClick={() => evaluate("")}>
@@ -949,6 +952,7 @@ function TypingBlock({
   block: Extract<SessionBlock, { kind: "typing" }>;
   onResult: (grade: TypedGrade, latencyMs?: number) => void;
 }) {
+  const t = useT();
   const [value, setValue] = useState("");
   const [outcome, setOutcome] = useState<TypedGrade | null>(null);
   const startRef = useRef(performance.now());
@@ -1039,11 +1043,11 @@ function TypingBlock({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder="Deutsches Wort tippen …"
+              placeholder={t("Deutsches Wort tippen …")}
               className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors"
             />
             <Button variant="gradient" className="h-11" onClick={submit}>
-              Prüfen
+              {t("Prüfen")}
             </Button>
           </div>
           <Button
@@ -1068,6 +1072,7 @@ function FlashcardBlock({
   block: Extract<SessionBlock, { kind: "flashcard" }>;
   onGrade: (correct: boolean, latencyMs?: number) => void;
 }) {
+  const t = useT();
   const [flipped, setFlipped] = useState(false);
   // Latency = mount (front render) to first flip (reveal). The block remounts
   // per block.key, so a mount-time ref is the render start; capture once and
@@ -1116,7 +1121,7 @@ function FlashcardBlock({
                 wraps inside the card instead of overflowing to the right. */}
             <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.de}</p>
             <SpeakButton text={block.de} />
-            <p className="text-xs text-muted-foreground">Tippen zum Umdrehen</p>
+            <p className="text-xs text-muted-foreground">{t("Tippen zum Umdrehen")}</p>
           </div>
           {/* Back */}
           <div className="[grid-area:1/1] flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-surface p-6 shadow-glow [backface-visibility:hidden] [transform:rotateY(180deg)]">

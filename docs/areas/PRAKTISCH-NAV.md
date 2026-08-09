@@ -4,8 +4,14 @@ Structure here is **locked**: do not change bar structure, edit-mode behavior, o
 without an explicit founder request. Mechanism history + mockups: `docs/DECISIONS.md`.
 
 ## Nav zones
-Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Prüfung** (`/anwenden`, orange
-Absolventenhut), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
+Tabs, in the ONE order both surfaces draw (s205, founder: "keep bibliothek on the top, and the
+praktisch beside the settings; praktisch should be labeled as beta"):
+**Bibliothek** (`/library`, fixed FIRST slot), **Prüfung** (`/anwenden`, orange Absolventenhut),
+**Fortschritt** (`/analytics`), **Praktisch** (`/`, fixed directly left of Einstellungen, wearing a
+**Beta** suffix), + **Einstellungen** (fixed last slot). Bibliothek took the opening slot because
+onboarding now hands a new learner straight to it (no taster session), and Praktisch moved to the
+far end because that zone is still being built. `/` is unchanged as a route: still the Dashboard,
+still the app root and the catch-all target, just not the first tab.
 **The transfer zone came back and absorbed Schreiben in s182.** Audit P4 found the Sprechsimulation
 reachable only from the dashboard recommendation and ⌘K (the hub had been off `navItems` since
 2026-07-13, founder, for the demo). It returned to the desktop sidebar first; the founder then
@@ -14,13 +20,17 @@ anwenden and rename anwenden as prufung"**. So `/writing` lost its tab (it had o
 the hub is labelled **Prüfung**, and it holds the three exam skills: Sprechen, Schreiben,
 Prüfungssimulation. The bar is still FIVE slots. `/writing` keeps its route, its pencil mark and
 every deep link, and a pin saved while it was a tab remaps through `ROUTE_SUCCESSOR`.
-`BottomTabBar` `REORDERABLE = ["/library", "/anwenden"]` + `FIXED_LAST_CONTENT = "/analytics"`
-(Fortschritt is pinned directly left of Einstellungen for every user since s158, founder request;
-older persisted orders are normalised at read time);
-`DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]` (Home + 2 middle + Fortschritt
-+ fixed Einstellungen = the 5 locked slots). Every slot carries `min-w-0` so the name under the
+`BottomTabBar` `FIXED_FIRST = "/library"` + `REORDERABLE = ["/anwenden", "/analytics"]` +
+`FIXED_LAST_CONTENT = "/"` (s205; before that the fixed ends were Home first and Fortschritt last,
+founder s158). `DEFAULT_PINNED_TABS = ["/library", "/anwenden", "/analytics", "/"]`. The bar pins
+its own ends and only READS a saved order for the reorderable middle, so every pre-s205 pin list
+still renders the new five slots with no migration.
+`NEVER_HIDEABLE = ["/library", "/", "/settings"]` (nav-items.ts) is the three fixed slots: remote
+config may hide only a middle tab, and both the bar and the sidebar enforce it, so a stale
+`hiddenTabs` entry can never empty a slot on one surface while the other keeps drawing it.
+`HIDEABLE` in admin Steuerung is therefore Fortschritt alone. Every slot carries `min-w-0` so the name under the
 active tab truncates instead of setting a width floor (s182: "Einstellungen" was forcing a 73px
-slot). Remote config can still hide a middle tab (`hiddenTabs`, admin Steuerung). Route marks
+slot). Route marks
 (founder picks, s158; Bibliothek, Fortschritt + Schreiben swapped s170): Praktisch = Wegweiser
 signpost, Bibliothek = stack of three books, Prüfung = Absolventenhut (orange cap + amber base,
 founder pick D s183; it replaced the target rings, the bar's ONLY outline mark among filled
@@ -255,13 +265,19 @@ Remote-config overrides (admin Steuerung H1/H2/H8) may relabel/hide nav items at
 match the above.
 
 ## Bottom tab bar (mobile)
-- Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots: Home (fixed slot 1) + 3
-  middle (Bibliothek · Prüfung · Fortschritt) + Einstellungen (fixed last, plain NavLink to
-  `/settings`). The More sheet is retired (`MoreSheet.tsx` deleted); no add/remove — the middle
-  sections are always visible and only Bibliothek + Prüfung REORDER via a hidden long-press easter
+- Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots (s205 order): Bibliothek
+  (fixed slot 1) + 2 middle (Prüfung · Fortschritt) + Praktisch + Einstellungen (both fixed last,
+  plain links). The More sheet is retired (`MoreSheet.tsx` deleted); no add/remove — the middle
+  sections are always visible and only Prüfung + Fortschritt REORDER via a hidden long-press easter
   egg (600ms, haptic; jiggle + drag; transparent full-screen layer = "tap anywhere to finish";
   navigating also ends it).
-  Home, Fortschritt and Einstellungen never move (Fortschritt pinned s158).
+  Bibliothek, Praktisch and Einstellungen never move.
+- **Beta suffix:** `NavItem.beta` marks a zone as unfinished; only Praktisch carries it today.
+  The sidebar draws the neutral bordered chip (the Neuland heading's chip); the bar appends a
+  lighter bold "Beta" INSIDE the label span, never a bordered chip, because the label slot is a
+  fixed 12px line and a chip would grow it and shift the icon rail that slot exists to hold still.
+  The bar's label shows on the selected tab only (locked anatomy), so the always-visible mark is
+  the sidebar's; `aria-label` says "Praktisch (Beta)" on both.
 - **Active-tab labels:** each tab shows its section name under the icon, visible ONLY on the
   selected tab. The label slot is a reserved fixed-height row on every tab (selection never
   shifts the icon rail); the label is neutral theme-aware dark grey

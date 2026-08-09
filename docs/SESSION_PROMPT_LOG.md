@@ -6015,3 +6015,87 @@ the fix is a renumber plus a gate: `0019_ai_calls.sql`, and `pnpm lint:migration
 files sharing a version prefix. Verified by planting a duplicate and watching it go red. Shipped as
 **PR #839**.
 
+---
+
+## Session 205 — 2026-08-09 — branch `claude/remove-onboarding-practice-z7qfwu`
+
+### Prompt 1 (2026-08-09)
+
+> i want you to remove the onboarding practice session when a new user signs up. The users should
+> finish the onboarding form and immediately shown the bibliothek. Keep bibliothek on the top, and
+> the praktisch beside the settings. Praktisch should be labeled as beta.
+
+- **Response summary:** Read the onboarding flow, the router and both nav surfaces first.
+  `Onboarding.start()` now navigates to `/library` instead of the ~90s composed taster
+  (`/session?min=1`); the setup card's footer line follows ("In unter einer Minute in deiner
+  Bibliothek"). Reordered the ONE `navItems` list to Bibliothek · Prüfung · Fortschritt · Praktisch ·
+  Einstellungen, which is what both the sidebar and the bottom bar draw. In `BottomTabBar` the fixed
+  ends became `FIXED_FIRST = "/library"` and `FIXED_LAST_CONTENT = "/"` with `REORDERABLE =
+  ["/anwenden", "/analytics"]`; the bar pins its own ends and only reads a saved order for the
+  middle, so every pre-s205 pin list still renders five slots without a store migration. Added
+  `NavItem.beta` (only Praktisch carries it): a neutral bordered chip in the sidebar, a lighter bold
+  suffix inside the bar's label slot, because a bordered chip would grow that fixed 12px line and
+  shift the icon rail. Added `NEVER_HIDEABLE` so remote config cannot empty one of the three fixed
+  slots on one surface while the other keeps drawing it; `HIDEABLE` in admin Steuerung is Fortschritt
+  alone now. Updated `tests/nav.test.tsx` (locked order, stale-pin case, the Beta mark) and
+  `docs/areas/PRAKTISCH-NAV.md`. Verified in a real browser at 390px and 1280px.
+
+### Prompt 2 (2026-08-09)
+
+> also, the app's language should adapt to various levels of user language proficiency.. if the user
+> logs A2 or B1 level, the app should show everything in English except the learning material which
+> should obviously be in german.
+
+- **Response summary:** Built the mechanism rather than a one-off: `src/lib/uiLang.ts` is the ONE
+  fold (`uiLangFor(pref, level)`, `useT`, `useTx`, `useTitle`, `translateNow`) and
+  `src/lib/uiStrings.ts` holds every English string keyed by the GERMAN source string, so a missing
+  key renders exactly what that call site rendered before. Added `useSettingsStore.uiLang`
+  ("auto" | "de" | "en", default auto, rides cloudSync in the settings blob) plus the Sprache control
+  in Einstellungen → Profil, and `<html lang>` now follows the interface language. Converted the
+  shell, onboarding (it reacts to the level chip being LOOKED at, so tapping A2 flips the card before
+  anything is saved), Settings, the account surfaces and the Bibliothek tab row first, and reported
+  the coverage honestly rather than implying the whole app was done.
+
+### Prompt 3 (2026-08-09)
+
+> in your screenshots except the toggle buttons and menu names, the buttons like üben or stufe b1.1
+> and the hint on what the gender means are all still in german. they're also considered as app
+> language and not german learning content. so, they should also be in English. check for other such
+> overlooked items all across the app and fix them too. Think smart acc to what the goal is and apply
+> your expertise and knowledge accordingly
+
+### Prompt 4 (2026-08-09)
+
+> if the user selects b2, then the app can have the current german wordings. For each level A2, B1,
+> B2, C1, the app's language should adapt to the user's current level.
+
+- **Response summary (prompts 3 + 4):** Confirmed prompt 4 is exactly the rule already shipped
+  (B2/C1 keep today's German) and swept the rest of the app. The leverage came from translating at
+  the SINKS: `FilterRail`, `ScopeRail`, `FacetSheet`, `DataTable`, `EmptyState`/`SectionHeading`,
+  `ViewSwitcher`, `SearchField`, `BrowseToolbar` and `UebenLabel` take German strings as props from
+  dozens of call sites, so one edit each covered them all ("Üben mit 171 Wörtern" → "Practise 171
+  words", "Stufe: bis B1.1" → "Level: up to B1.1", the Artikel-Wesen hint, every facet and sector
+  label). Taxonomy that already carries both languages in the bank (Themen, sub-themes, domains, life
+  areas) goes through `useTitle()` instead of the dictionary, so 66 theme names are not duplicated
+  into `uiStrings.ts`. Then the trainers themselves: all four Bibliothek tabs incl. the graphs and
+  tables, the Prüfung zone and its exam runner, Schreiben (incl. Fokus), Sprechen, the session
+  player, Fortschritt, Sammlung, the game chrome, the auth dialogs and the error/search surfaces.
+  A scripted audit proved coverage: every key any component passes to the translator has an English
+  entry (0 missing). **Four things stay German by decision, and are stated as such:** the Modelltest
+  Anleitung (it reproduces the real telc instruction text), the grammar dial VALUES in Fokus
+  (Aktiv/Passiv/Präsens/Perfekt are the forms being practised), the Neuland world's place and mission
+  names, and the German grammar abbreviations on a word card. Also fixed a real bug the sweep
+  surfaced: the AI disclaimer under both writing trainers was one sentence split across two JSX
+  lines, so half of it was translated and the join lost its space; it is one key per trainer now.
+
+- **Artifacts:** `src/lib/uiLang.ts` · `src/lib/uiStrings.ts` · `docs/areas/UI-LANGUAGE.md` ·
+  `tests/uiLang.test.ts` · `tests/nav.test.tsx` · `docs/areas/PRAKTISCH-NAV.md` · `CLAUDE.md`
+  (nav-order law, interface-language law, back under its line budget) · `docs/PROJECT_STATUS.md`
+
+### Prompt 5 (2026-08-09)
+
+> merge to main and document the session when done
+
+- **Response summary:** Ran the full gate set (typecheck, 688 unit tests, lint 0 errors, build,
+  check:bundle 152.3 kB, check:contrast, lint:content), documented the session in
+  `PROJECT_STATUS.md` + this log + the two area docs, then opened and squash-merged the PR.

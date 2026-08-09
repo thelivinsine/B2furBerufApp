@@ -1,4 +1,5 @@
 import { useReducedMotion, motion } from "framer-motion";
+import { useT } from "@/lib/uiLang";
 import { useSearchParams } from "react-router-dom";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { cn } from "@/lib/utils";
@@ -58,6 +59,7 @@ export function TabSwitcher({
   onSelect: (t: Tab) => void;
   className?: string;
 }) {
+  const tr = useT();
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(tab);
 
@@ -87,7 +89,7 @@ export function TabSwitcher({
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="tablist"
-      aria-label="Prüfung"
+      aria-label={tr("Prüfung")}
       onKeyDown={onKeyDown}
       // The column is `items-center`, so from lg up the track sizes to its two
       // labels instead of stretching across the page, which is the "switcher
@@ -125,7 +127,7 @@ export function TabSwitcher({
               active ? "font-bold text-foreground" : "font-semibold text-muted-foreground hover:text-foreground",
             )}
           >
-            {t.label}
+            {tr(t.label)}
           </button>
         );
       })}

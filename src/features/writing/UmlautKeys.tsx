@@ -1,4 +1,5 @@
 import type { RefObject } from "react";
+import { useT } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
@@ -22,6 +23,7 @@ export function UmlautKeys({
   onChange: (next: string) => void;
   className?: string;
 }) {
+  const t = useT();
   const insert = (ch: string) => {
     const ta = textareaRef.current;
     const start = ta ? ta.selectionStart : value.length;
@@ -38,7 +40,7 @@ export function UmlautKeys({
   };
 
   return (
-    <div className={cn("flex gap-1.5", className)} role="group" aria-label="Umlaute einfügen">
+    <div className={cn("flex gap-1.5", className)} role="group" aria-label={t("Umlaute einfügen")}>
       {CHARS.map((ch) => (
         <button
           key={ch}

@@ -8,13 +8,15 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 afterEach(cleanup);
 
 /**
- * The nav after s182 (founder: "just move schreiben to anwenden and rename
- * anwenden as prufung").
+ * The nav after s205 (founder: "keep bibliothek on the top, and the praktisch
+ * beside the settings; praktisch should be labeled as beta").
  *
- * The bar is FIVE slots and stays five: Praktisch · Bibliothek · Prüfung ·
- * Fortschritt · Einstellungen. Schreiben is a card inside the Prüfung hub, not
- * a tab, and `/writing` keeps its route so every deep link and every resumed
- * draft still resolves.
+ * The bar is FIVE slots and stays five, reordered: Bibliothek · Prüfung ·
+ * Fortschritt · Praktisch · Einstellungen. Bibliothek opens the rail (onboarding
+ * hands straight over to it), Praktisch sits directly left of Einstellungen and
+ * carries a Beta suffix. Schreiben is a card inside the Prüfung hub, not a tab,
+ * and `/writing` keeps its route so every deep link and every resumed draft
+ * still resolves.
  */
 const barPaths = () =>
   Array.from(document.querySelectorAll("nav a")).map((a) => a.getAttribute("href"));
@@ -27,7 +29,7 @@ describe("bottom tab bar: five slots, in order", () => {
         <BottomTabBar />
       </MemoryRouter>,
     );
-    expect(barPaths()).toEqual(["/", "/library", "/anwenden", "/analytics", "/settings"]);
+    expect(barPaths()).toEqual(["/library", "/anwenden", "/analytics", "/", "/settings"]);
   });
 
   it("an order persisted while Schreiben was a tab still yields five slots", () => {
@@ -43,6 +45,32 @@ describe("bottom tab bar: five slots, in order", () => {
     expect(paths).not.toContain("/writing");
     expect(paths).toContain("/anwenden");
     useSettingsStore.getState().resetSettings();
+  });
+
+  it("keeps the fixed ends even when a stale pin order says otherwise", () => {
+    // The pre-s205 default, still in every existing learner's localStorage.
+    useSettingsStore.getState().setPinnedTabs(["/", "/library", "/anwenden", "/analytics"]);
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <BottomTabBar />
+      </MemoryRouter>,
+    );
+    const paths = barPaths();
+    expect(paths[0]).toBe("/library");
+    expect(paths.slice(-2)).toEqual(["/", "/settings"]);
+    useSettingsStore.getState().resetSettings();
+  });
+
+  it("marks Praktisch as Beta", () => {
+    useSettingsStore.getState().resetSettings();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <BottomTabBar />
+      </MemoryRouter>,
+    );
+    const praktisch = document.querySelector('nav a[href="/"]');
+    expect(praktisch?.getAttribute("aria-label")).toBe("Praktisch (Beta)");
+    expect(praktisch?.textContent).toContain("Beta");
   });
 });
 
@@ -60,5 +88,12 @@ describe("nav registry", () => {
   it("every default pin is a real nav entry", () => {
     for (const path of DEFAULT_PINNED_TABS)
       expect(navItems.some((i) => i.to === path), path).toBe(true);
+  });
+
+  it("Bibliothek leads the registry and Praktisch sits beside Einstellungen", () => {
+    const order = navItems.map((i) => i.to);
+    expect(order[0]).toBe("/library");
+    expect(order.slice(-2)).toEqual(["/", "/settings"]);
+    expect(navItems.find((i) => i.to === "/")?.beta).toBe(true);
   });
 });

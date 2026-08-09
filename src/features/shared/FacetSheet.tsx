@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -73,6 +74,7 @@ export function FacetSheet<T>({
   resultLabel: (n: number) => string;
   triggerClassName?: string;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   // Draft so the sheet previews counts live but only commits on "Apply".
   const [draft, setDraft] = useState<FacetSelection>(selection);
@@ -132,7 +134,7 @@ export function FacetSheet<T>({
         )}
       >
         <SlidersHorizontal className="h-3.5 w-3.5" />
-        Filter
+        {t("Filter")}
         {activeCount > 0 && (
           <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
             {activeCount}
@@ -148,13 +150,13 @@ export function FacetSheet<T>({
           <div className="mx-auto mt-2.5 h-1 w-9 shrink-0 rounded-full bg-border" />
 
           <div className="flex items-center justify-between px-5 pb-3 pt-3 pr-14">
-            <DialogTitle>Filter</DialogTitle>
+            <DialogTitle>{t("Filter")}</DialogTitle>
             {activeFacetCount(draft) > 0 && (
               <button
                 onClick={reset}
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                Zurücksetzen
+                {t("Zurücksetzen")}
               </button>
             )}
           </div>
@@ -163,7 +165,7 @@ export function FacetSheet<T>({
             {facets.map((facet) => (
               <div key={facet.id}>
                 <div className="mb-2 flex items-baseline justify-between">
-                  <span className="text-sm font-semibold">{facet.label}</span>
+                  <span className="text-sm font-semibold">{t(facet.label)}</span>
                   {facet.hint && (
                     <span className="text-xs text-muted-foreground">{facet.hint}</span>
                   )}
@@ -187,7 +189,7 @@ export function FacetSheet<T>({
                               : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
                         )}
                       >
-                        {opt.label}
+                        {t(opt.label)}
                         {!disabled && (
                           <span
                             className={cn(
@@ -228,10 +230,11 @@ export function ActiveFilterChip({
   label: string;
   onRemove: () => void;
 }) {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-      {label}
-      <button onClick={onRemove} aria-label={`${label} entfernen`} className="hover:text-primary/70">
+      {t(label)}
+      <button onClick={onRemove} aria-label={`${t(label)} ${t("entfernen")}`} className="hover:text-primary/70">
         <X className="h-3 w-3" />
       </button>
     </span>

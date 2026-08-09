@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import type { BattleMove, DialogueBattleScene } from "@/types/game";
@@ -50,6 +51,7 @@ export function BattleView({
   run: MissionRun;
   onOpenBag: () => void;
 }) {
+  const t = useT();
   // Typed challenge in progress (the input ladder's higher rung).
   const [typingMove, setTypingMove] = useState<BattleMove | null>(null);
   const [typedInput, setTypedInput] = useState("");
@@ -165,7 +167,7 @@ export function BattleView({
           )}
           {last?.typed === "wrong" && !missingItem && (
             <p className="rounded-md border-2 border-rose-300 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-600">
-              Vertippt! Der Satz verliert seine Wirkung.
+              {t("Vertippt! Der Satz verliert seine Wirkung.")}
             </p>
           )}
           {last?.feedback && !missingItem && (
@@ -183,7 +185,7 @@ export function BattleView({
           ) : node.ask ? (
             /* item demand: the bag is the answer surface */
             <div className="space-y-2">
-              <p className="text-xs font-bold text-slate-400">Zeig das richtige Dokument.</p>
+              <p className="text-xs font-bold text-slate-400">{t("Zeig das richtige Dokument.")}</p>
               <button
                 type="button"
                 onClick={onOpenBag}
@@ -198,12 +200,12 @@ export function BattleView({
                   animate={{ y: [0, -2, 0] }}
                   transition={{ repeat: Infinity, duration: 0.9 }}
                 />
-                Tasche öffnen
+                {t("Tasche öffnen")}
               </button>
             </div>
           ) : (
             <div className="space-y-2">
-              <p className="text-xs font-bold text-slate-400">Wähle deine Antwort</p>
+              <p className="text-xs font-bold text-slate-400">{t("Wähle deine Antwort")}</p>
               {node.moves?.map((m) =>
                 typingMove?.id === m.id ? (
                   /* typed challenge: complete the gap to land the move */
@@ -226,7 +228,7 @@ export function BattleView({
                         autoCapitalize="none"
                         autoCorrect="off"
                         spellCheck={false}
-                        placeholder="Fehlendes Wort"
+                        placeholder={t("Fehlendes Wort")}
                         className="min-w-0 flex-1 rounded-md border-2 border-[#463c44]/60 bg-white px-3 py-1.5 text-sm text-slate-800 outline-none focus:border-[#3D74ED]"
                       />
                       <Pill primary disabled={!typedInput.trim()} onClick={() => submitTyped(m)}>

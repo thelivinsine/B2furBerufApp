@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useT, useTitle, useTx, useUiLang } from "@/lib/uiLang";
 import { ChevronRight, LayoutGrid } from "lucide-react";
 import type { ExamTheme } from "@/types";
 import { Card } from "@/components/ui/card";
@@ -19,12 +20,12 @@ function cefrRange(subId: string): string | null {
   return lo === hi ? lo : `${lo}–${hi}`;
 }
 
-function countLine(subId: string): string {
+function countLine(subId: string, de: boolean): string {
   const words = vocabBySubTheme(subId).length;
   const cols = collocationsBySubTheme(subId).length;
   const range = cefrRange(subId);
-  const parts = [`${words} Wörter`];
-  if (cols) parts.push(`${cols} Kollokationen`);
+  const parts = [de ? `${words} Wörter` : `${words} words`];
+  if (cols) parts.push(de ? `${cols} Kollokationen` : `${cols} collocations`);
   if (range) parts.push(range);
   return parts.join(" · ");
 }
@@ -43,11 +44,15 @@ export function SubThemePicker({
 }) {
   const subs = theme.subThemes ?? [];
   const totalWords = vocabByTheme(theme.id).length;
+  const t = useT();
+  const tx = useTx();
+  const titleOf = useTitle();
+  const lang = useUiLang();
 
   return (
     <div className="space-y-3">
       {/* Section header only (the explainer sentence was cut per the microcopy budget). */}
-      <h2 className="text-lg font-semibold tracking-tight">Wähle einen Bereich</h2>
+      <h2 className="text-lg font-semibold tracking-tight">{t("Wähle einen Bereich")}</h2>
 
       <div className="space-y-2.5">
         {subs.map((st, i) => (
@@ -66,9 +71,11 @@ export function SubThemePicker({
                 {i + 1}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{st.titleDe}</p>
+                <p className="truncate font-semibold">{titleOf(st)}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {st.title} · {countLine(st.id)}
+                  {/* The other language's title is the quiet second line, so a
+                      German UI keeps its English gloss and vice versa. */}
+                  {lang === "de" ? st.title : st.titleDe} · {countLine(st.id, lang === "de")}
                 </p>
               </div>
               <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
@@ -83,9 +90,10 @@ export function SubThemePicker({
               <LayoutGrid className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold">Gesamtes Thema</p>
+              <p className="truncate font-semibold">{t("Gesamtes Thema")}</p>
               <p className="truncate text-xs text-muted-foreground">
-                {totalLine ?? `Alle ${totalWords} Wörter auf einmal`}
+                {totalLine ??
+                  tx(`Alle ${totalWords} Wörter auf einmal`, `All ${totalWords} words at once`)}
               </p>
             </div>
             <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />

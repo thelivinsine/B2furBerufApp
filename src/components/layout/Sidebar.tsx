@@ -1,11 +1,12 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Search, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { navItems, navZoneOf } from "./nav-items";
+import { navItems, navZoneOf, NEVER_HIDEABLE } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { Logo } from "@/components/shared/Logo";
 import { useAppConfig } from "@/lib/appConfig";
+import { useT } from "@/lib/uiLang";
 import { useAuthStore } from "@/store/useAuthStore";
 import { isFounder } from "@/lib/admin";
 
@@ -18,10 +19,17 @@ export function Sidebar({
   onSearch?: () => void;
 }) {
   // Steuerung H1/H2: remote nav-label overrides + middle-tab hiding (routes
-  // stay mounted; Home "/" and Einstellungen "/settings" are never hideable).
+  // stay mounted; the three fixed slots in NEVER_HIDEABLE — Bibliothek,
+  // Praktisch, Einstellungen — are never hideable, so remote config can't empty
+  // a slot here that the bottom bar keeps drawing).
   const { navLabels, hiddenTabs } = useAppConfig();
-  const shownNav = navItems.filter((i) => !hiddenTabs.includes(i.to));
+  const shownNav = navItems.filter(
+    (i) => NEVER_HIDEABLE.includes(i.to) || !hiddenTabs.includes(i.to),
+  );
   const founder = isFounder(useAuthStore((s) => s.user));
+  // Interface language (s205). A remote `navLabels` override is founder-authored
+  // copy and is taken verbatim; only the built-in label is translated.
+  const t = useT();
   // Same zone fold as the bottom bar (s192): the Schreibtrainer marks Prüfung,
   // a running session marks Praktisch, the Sammlung marks Fortschritt.
   const activeZone = navZoneOf(useLocation().pathname);
@@ -31,10 +39,10 @@ export function Sidebar({
         to="/welcome"
         onClick={onNavigate}
         className="mb-4 flex flex-col items-start gap-1.5 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60"
-        aria-label="Zur Startseite"
+        aria-label={t("Zur Startseite")}
       >
         <Logo variant="wordmark" className="h-7 w-auto" />
-        <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
+        <p className="text-xs text-muted-foreground">{t("Deutsch im Beruf · B2")}</p>
       </Link>
 
       {onSearch && (
@@ -43,7 +51,7 @@ export function Sidebar({
           className="mb-2 flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
         >
           <Search className="h-4 w-4" />
-          Suche
+          {t("Suche")}
           <span className="ml-auto rounded border border-border px-1.5 py-0.5 text-[10px] font-medium">
             ⌘K
           </span>
@@ -51,7 +59,7 @@ export function Sidebar({
       )}
 
       <nav className="flex flex-col gap-0.5">
-        {shownNav.map(({ to, label }) => {
+        {shownNav.map(({ to, label, beta }) => {
           const active = activeZone === to;
           return (
             // Plain Link: the active row is the ZONE's, see BottomTabBar.
@@ -71,7 +79,14 @@ export function Sidebar({
                   (full opacity everywhere; the active row is marked by its grey
                   gradient + bold text). */}
               <RouteIcon path={to} size={18} active={active} />
-              {navLabels[to] ?? label}
+              {navLabels[to] ?? t(label)}
+              {/* Beta suffix (founder s205, Praktisch). Same neutral chip as the
+                  Neuland heading: bordered, muted, never the accent colour. */}
+              {beta && (
+                <span className="ml-auto rounded-full border border-border px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-muted-foreground">
+                  Beta
+                </span>
+              )}
             </Link>
           );
         })}
@@ -95,7 +110,7 @@ export function Sidebar({
             }
           >
             <ShieldCheck className="h-[18px] w-[18px] shrink-0 text-muted-foreground group-hover:text-foreground" />
-            Kontrollzentrum
+            {t("Kontrollzentrum")}
           </NavLink>
         )}
       </nav>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { motion } from "framer-motion";
 import { Check, X, RotateCw, Trophy, ArrowRight, Sparkles } from "lucide-react";
 import type { Difficulty, QuizQuestion, ThemeId } from "@/types";
@@ -31,6 +32,7 @@ export function QuizRunner({
   count?: number;
   onExit?: () => void;
 }) {
+  const t = useT();
   const addXp = useProgressStore((s) => s.addXp);
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const registerSession = useProgressStore((s) => s.registerSession);
@@ -86,9 +88,9 @@ export function QuizRunner({
     return (
       <EmptyState
         icon={Sparkles}
-        title="Kein Quiz möglich"
-        description="Für dieses Thema und diese Stufe konnten keine Fragen erzeugt werden."
-        action={onExit && <Button variant="outline" onClick={onExit}>Zurück</Button>}
+        title={t("Kein Quiz möglich")}
+        description={t("Für dieses Thema und diese Stufe konnten keine Fragen erzeugt werden.")}
+        action={onExit && <Button variant="outline" onClick={onExit}>{t("Zurück")}</Button>}
       />
     );
   }
@@ -124,7 +126,7 @@ export function QuizRunner({
         {weakKinds.length > 0 && (
           <Card>
             <CardContent className="space-y-2 p-4">
-              <p className="text-sm font-semibold">Schwächere Bereiche</p>
+              <p className="text-sm font-semibold">{t("Schwächere Bereiche")}</p>
               <div className="flex flex-wrap gap-2">
                 {weakKinds.map((k) => (
                   <Badge key={k} variant="warning">{k}</Badge>

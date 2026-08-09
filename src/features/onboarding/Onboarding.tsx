@@ -19,13 +19,18 @@ import {
 } from "@/store/useSettingsStore";
 import type { LearningMode } from "@/types";
 import { recordConsent, hasConsented } from "@/lib/consent";
+import { translate, uiLangFor } from "@/lib/uiLang";
 import { Logo } from "@/components/shared/Logo";
 
 /**
  * One-screen setup (redesign Phase 1.3). A single "Wofür lernst du Deutsch?"
  * choice sets both the learning goal and the Mode lens, one CEFR chip row sets
  * the level, and the consent checkbox is recorded BEFORE any learning progress
- * is stored. Then the learner drops straight into a short composed taster.
+ * is stored. Then the learner lands in the **Bibliothek** (founder s205): the
+ * setup card used to hand straight over to a ~90s composed taster session
+ * (`/session?min=1`), which decided the first minute for the learner. The
+ * library is the zone the nav now opens with, so setup ends by showing them
+ * what they signed up for instead of starting a drill.
  * Name, exam date and daily rhythm are collected contextually later, so
  * completeOnboarding leaves them at their store defaults.
  */
@@ -49,11 +54,20 @@ const levels: CefrLevel[] = ["A2", "B1", "B2", "C1"];
 export function Onboarding() {
   const navigate = useNavigate();
   const completeOnboarding = useSettingsStore((s) => s.completeOnboarding);
+  const langPref = useSettingsStore((s) => s.uiLang);
 
   const [setupId, setSetupId] = useState("pruefung");
   const [level, setLevel] = useState<CefrLevel>("B2");
   // Guests never open AuthDialog, so setup gates on accepting the terms here.
   const [consent, setConsent] = useState(hasConsented());
+
+  // The interface language follows the level chip the learner is LOOKING at,
+  // not the one in the store (nothing is stored until they submit), so tapping
+  // A2 switches this card to English on the spot. That is also the moment the
+  // rule is easiest to understand: you say your level, the app answers in a
+  // language you can read (founder s205).
+  const lang = uiLangFor(langPref, level);
+  const t = (de: string) => translate(de, lang);
 
   const start = () => {
     if (!consent) return;
@@ -61,8 +75,8 @@ export function Onboarding() {
     // Consent is recorded before completeOnboarding writes any profile state.
     recordConsent();
     completeOnboarding({ goal: setup.goal, mode: setup.mode, level });
-    // Straight into a short composed taster (existing composer, ~90s).
-    navigate("/session?min=1", { replace: true });
+    // Straight into the Bibliothek, the zone the nav opens with (s205).
+    navigate("/library", { replace: true });
   };
 
   return (
@@ -80,7 +94,7 @@ export function Onboarding() {
 
         <Card className="space-y-6 p-6 shadow-elevated">
           <div>
-            <h2 className="text-xl font-semibold tracking-tight">Wofür lernst du Deutsch?</h2>
+            <h2 className="text-xl font-semibold tracking-tight">{t("Wofür lernst du Deutsch?")}</h2>
             <div className="mt-4 grid grid-cols-2 gap-2.5">
               {setups.map((s) => {
                 const Icon = s.icon;
@@ -104,8 +118,8 @@ export function Onboarding() {
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-semibold">{s.label}</p>
-                    <p className="text-xs text-muted-foreground">{s.desc}</p>
+                    <p className="text-sm font-semibold">{t(s.label)}</p>
+                    <p className="text-xs text-muted-foreground">{t(s.desc)}</p>
                   </button>
                 );
               })}
@@ -113,7 +127,7 @@ export function Onboarding() {
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-medium">Dein Niveau</p>
+            <p className="mb-2 text-sm font-medium">{t("Dein Niveau")}</p>
             <div className="grid grid-cols-4 gap-2">
               {levels.map((l) => (
                 <button
@@ -139,26 +153,45 @@ export function Onboarding() {
               onChange={(e) => setConsent(e.target.checked)}
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
             />
+            {/* Composed as one sentence per language rather than three
+                translated fragments: the two links sit in different places in
+                German and English, and a fragment map cannot move them. */}
             <span>
-              Ich stimme den{" "}
-              <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                AGB
-              </a>{" "}
-              und der{" "}
-              <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                Datenschutzerklärung
-              </a>{" "}
-              zu.
+              {lang === "de" ? (
+                <>
+                  Ich stimme den{" "}
+                  <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                    AGB
+                  </a>{" "}
+                  und der{" "}
+                  <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                    Datenschutzerklärung
+                  </a>{" "}
+                  zu.
+                </>
+              ) : (
+                <>
+                  I accept the{" "}
+                  <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                    Terms
+                  </a>{" "}
+                  and the{" "}
+                  <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                    Privacy Policy
+                  </a>
+                  .
+                </>
+              )}
             </span>
           </label>
 
           <Button variant="gradient" onClick={start} disabled={!consent} className="w-full gap-1.5">
-            Los geht's <ArrowRight className="h-4 w-4" />
+            {t("Los geht's")} <ArrowRight className="h-4 w-4" />
           </Button>
         </Card>
 
         <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-          <Check className="h-3.5 w-3.5" /> In unter einer Minute in deiner ersten Übung
+          <Check className="h-3.5 w-3.5" /> {t("In unter einer Minute in deiner Bibliothek")}
         </p>
       </motion.div>
     </div>

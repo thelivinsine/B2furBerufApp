@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { useT } from "@/lib/uiLang";
 import { motion, useReducedMotion } from "framer-motion";
 import { Table2, Waypoints, LayoutGrid, List } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -52,13 +53,14 @@ export function ViewSwitcher({
   onChange: (view: LibraryView) => void;
   className?: string;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(value);
   return (
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="group"
-      aria-label="Ansicht"
+      aria-label={t("Ansicht")}
       className={cn(
         // Same lifted-white-pill toggle language as the page toggle
         // (LibrarySwitcher): recessed grey track, active button on a white pill.
@@ -94,8 +96,8 @@ export function ViewSwitcher({
             ref={registerItem(v)}
             onClick={() => onChange(v)}
             aria-pressed={active}
-            aria-label={label}
-            title={label}
+            aria-label={t(label)}
+            title={t(label)}
             className={cn(
               "relative z-10 inline-flex h-[1.625rem] w-[1.625rem] items-center justify-center rounded-md transition-colors",
               active ? "text-primary" : "text-muted-foreground hover:text-foreground",

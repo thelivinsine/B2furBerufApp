@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
+import { useT } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
@@ -28,6 +29,9 @@ export function LibrarySwitcher() {
   const { theme, sub } = useLibraryScope();
   const reduce = useReducedMotion();
   const { trackRef, registerItem, rect } = useSlidingPill(current);
+  // s205: the four tab NAMES are chrome, so they follow the interface language.
+  // What sits inside a tab (the words, the phrases, the drills) never does.
+  const t = useT();
 
   const linkFor = (seg: (typeof SEGMENTS)[number]) => {
     const p = new URLSearchParams();
@@ -49,7 +53,7 @@ export function LibrarySwitcher() {
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
       role="tablist"
-      aria-label="Bibliothek"
+      aria-label={t("Bibliothek")}
       // Doubles as the page header now that the HubHero is gone (founder s92):
       // a lifted bar (shadow) anchors the top of the page, while the active tab
       // reads as the current section title (bold + brand) and the others stay
@@ -92,7 +96,7 @@ export function LibrarySwitcher() {
                 : "font-medium text-muted-foreground hover:text-foreground",
             )}
           >
-            {seg.label}
+            {t(seg.label)}
           </Link>
         );
       })}
@@ -102,10 +106,11 @@ export function LibrarySwitcher() {
 
 /** Dismissible chip showing the active library scope on theme-scoped surfaces. */
 export function ScopeChip({ label, onClear }: { label: string; onClear: () => void }) {
+  const t = useT();
   return (
     <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-      Kontext: {label}
-      <button onClick={onClear} aria-label="Kontext entfernen" className="hover:text-primary/70">
+      {t("Kontext")}: {label}
+      <button onClick={onClear} aria-label={t("Kontext entfernen")} className="hover:text-primary/70">
         <X className="h-3 w-3" />
       </button>
     </span>

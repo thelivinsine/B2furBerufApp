@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { useT } from "@/lib/uiLang";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { themeById } from "@/data/themes";
@@ -19,6 +20,7 @@ import { SessionPlayer } from "./SessionPlayer";
  * Schnellwiederholung (`/revision`) renders the same player with a short preset.
  */
 export function Session() {
+  const t = useT();
   const [params] = useSearchParams();
   const dailyGoalXp = useSettingsStore((s) => s.dailyGoalXp);
   const librarySession = useSessionStore((s) => s.librarySession);
@@ -38,8 +40,8 @@ export function Session() {
         minutes={minutes}
         contentScope={librarySession.type}
         libraryIds={librarySession.ids}
-        eyebrow="Üben"
-        title="Deine Session"
+        eyebrow={t("Üben")}
+        title={t("Deine Session")}
       />
     );
   }
@@ -82,7 +84,7 @@ export function Session() {
       focus={focus}
       grammarTopicId={grammarTopicId}
       eyebrow="Praktisch"
-      title="Deine Session"
+      title={t("Deine Session")}
     />
   );
 }

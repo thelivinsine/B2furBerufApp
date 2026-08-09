@@ -1,5 +1,7 @@
 # Sprechen — the AI conversation partner
 
+**Interface language (s205):** every chrome string on this surface goes through `useT()`; A2/B1 read it in English, B2/C1 in German, and the learning material stays German at every level. Rule + mechanism: `docs/areas/UI-LANGUAGE.md`.
+
 Current state only. History → `docs/DECISIONS.md`, blow-by-blow →
 `docs/SESSION_PROMPT_LOG.md`. Read this before touching anything under
 `src/features/sprechen/`, `src/engine/conversation.ts`, `src/engine/speaking.ts` or

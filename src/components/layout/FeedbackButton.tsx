@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { submitFeedback } from "@/lib/feedback";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAppConfig } from "@/lib/appConfig";
+import { useT } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 /**
@@ -35,6 +36,7 @@ export function FeedbackDialog() {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const t = useT();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -50,9 +52,9 @@ export function FeedbackDialog() {
       setOpen(false);
       setMessage("");
       setEmail("");
-      showToast("Danke für dein Feedback!", "success");
+      showToast(t("Danke für dein Feedback!"), "success");
     } else {
-      showToast(res.message ?? "Konnte nicht gesendet werden.", "warning");
+      showToast(res.message ?? t("Konnte nicht gesendet werden."), "warning");
     }
   }
 
@@ -60,10 +62,11 @@ export function FeedbackDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Feedback geben</DialogTitle>
+          <DialogTitle>{t("Feedback geben")}</DialogTitle>
           <DialogDescription>
-            Diese App wird gerade mit KI entwickelt (Beta). Dein Feedback hilft
-            uns sehr, sie besser zu machen. Was ist dir aufgefallen?
+            {t(
+              "Diese App wird gerade mit KI entwickelt (Beta). Dein Feedback hilft uns sehr, sie besser zu machen. Was ist dir aufgefallen?",
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -74,12 +77,12 @@ export function FeedbackDialog() {
             onChange={(e) => setMessage(e.target.value)}
             rows={5}
             maxLength={4000}
-            placeholder="Deine Nachricht, Idee oder ein Fehler …"
+            placeholder={t("Deine Nachricht, Idee oder ein Fehler …")}
             className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary/50 focus:ring-2 focus:ring-ring"
           />
           <div className="flex flex-col gap-1.5">
             <label htmlFor="feedback-email" className="text-xs font-medium text-muted-foreground">
-              E-Mail (optional, falls wir dich erreichen dürfen)
+              {t("E-Mail (optional, falls wir dich erreichen dürfen)")}
             </label>
             <input
               id="feedback-email"
@@ -94,11 +97,11 @@ export function FeedbackDialog() {
           <Button type="submit" disabled={!message.trim() || sending} className="w-full sm:w-auto sm:self-end">
             {sending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Wird gesendet …
+                <Loader2 className="h-4 w-4 animate-spin" /> {t("Wird gesendet …")}
               </>
             ) : (
               <>
-                <Send className="h-4 w-4" /> Senden
+                <Send className="h-4 w-4" /> {t("Senden")}
               </>
             )}
           </Button>
@@ -129,6 +132,7 @@ export function FeedbackDialog() {
 export function FeedbackPill() {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   const { pathname } = useLocation();
+  const t = useT();
   // Steuerung H5: the whole feedback affordance can be turned off, relabelled,
   // or suppressed per route from remote config (default = today's behavior).
   const feedback = useAppConfig().feedback;
@@ -148,11 +152,11 @@ export function FeedbackPill() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            aria-label="Feedback geben"
+            aria-label={t("Feedback geben")}
             className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground"
           >
             <MessageSquareText className="h-3.5 w-3.5 text-primary" />
-            <span>{feedback.label ?? "Feedback"}</span>
+            <span>{feedback.label ?? t("Feedback")}</span>
           </button>
         </div>
       </div>
@@ -167,21 +171,23 @@ export function FeedbackPill() {
  */
 export function FeedbackLink({ className }: { className?: string }) {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
+  const t = useT();
   return (
     <button
       type="button"
       onClick={() => setOpen(true)}
       className={cn("font-medium text-primary underline-offset-2 hover:underline", className)}
     >
-      Feedback geben
+      {t("Feedback geben")}
     </button>
   );
 }
 
 export function FeedbackNote() {
+  const t = useT();
   return (
     <>
-      Etwas verbessern? <FeedbackLink />
+      {t("Etwas verbessern?")} <FeedbackLink />
     </>
   );
 }
@@ -192,18 +198,19 @@ export function FeedbackNote() {
  */
 export function FeedbackFullButton({ className }: { className?: string }) {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
+  const t = useT();
   return (
     <button
       type="button"
       onClick={() => setOpen(true)}
-      aria-label="Feedback geben"
+      aria-label={t("Feedback geben")}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-soft transition-colors hover:border-primary/40 hover:text-foreground",
         className,
       )}
     >
       <MessageSquareText className="h-3.5 w-3.5 text-primary" />
-      Feedback
+      {t("Feedback")}
     </button>
   );
 }

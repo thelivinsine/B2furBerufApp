@@ -1,4 +1,5 @@
 import { lazy, memo, Suspense, useEffect, useMemo, useState } from "react";
+import { useT, useTitle } from "@/lib/uiLang";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
@@ -124,6 +125,8 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
 });
 
 export function CollocationsBrowser() {
+  const t = useT();
+  const titleOf = useTitle();
   const [params, setParams] = useSearchParams();
   // The desktop scroll container, handed to `usePagedList` through context so
   // its sentinel observes THIS element rather than the viewport (s189).
@@ -405,7 +408,7 @@ export function CollocationsBrowser() {
               },
               options: subThemes.map((s) => ({
                 value: s.id,
-                label: s.titleDe,
+                label: titleOf(s),
                 count: collocationsBySubTheme(s.id).length,
               })),
             },
@@ -485,8 +488,8 @@ export function CollocationsBrowser() {
                   variant="accent"
                   aria-pressed={filtersOpen}
                   aria-expanded={filtersOpen}
-                  aria-label="Filter"
-                  title="Filter"
+                  aria-label={t("Filter")}
+                  title={t("Filter")}
                   className={cn("relative lg:hidden", BROWSE_TOOLBAR_BUTTON, BROWSE_FILTER_BUTTON)}
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
@@ -515,7 +518,7 @@ export function CollocationsBrowser() {
                     <SearchField
                       value={search}
                       onChange={setSearch}
-                      placeholder="Suche nach Nomen, Verb, Übersetzung …"
+                      placeholder={t("Suche nach Nomen, Verb, Übersetzung …")}
                       autoFocus
                     />
                   </motion.div>
@@ -527,8 +530,8 @@ export function CollocationsBrowser() {
                   variant="outline"
                   aria-pressed={searchOpen}
                   aria-expanded={searchOpen}
-                  aria-label="Suche"
-                  title="Suche"
+                  aria-label={t("Suche")}
+                  title={t("Suche")}
                   className={cn(
                     BROWSE_TOOLBAR_BUTTON,
                     (searchOpen || search.trim()) && BROWSE_TOOLBAR_BUTTON_ON,
@@ -550,7 +553,7 @@ export function CollocationsBrowser() {
               <SearchField
                 value={search}
                 onChange={setSearch}
-                placeholder="Suche nach Nomen, Verb, Übersetzung …"
+                placeholder={t("Suche nach Nomen, Verb, Übersetzung …")}
                 autoFocus
                 className="lg:hidden"
               />
@@ -608,12 +611,12 @@ export function CollocationsBrowser() {
                 className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 <ChevronLeft className="h-4 w-4" />
-                {activeTheme?.titleDe}
+                {activeTheme ? titleOf(activeTheme) : ""}
                 <span className="text-muted-foreground/60">/</span>
                 <span className="text-foreground">
                   {subs.length === 1
-                    ? (activeSub?.titleDe ?? "Gesamtes Thema")
-                    : `${subs.length} Unterthemen`}
+                    ? (activeSub ? titleOf(activeSub) : t("Gesamtes Thema"))
+                    : `${subs.length} ${t("Unterthemen")}`}
                 </span>
               </button>
             )}

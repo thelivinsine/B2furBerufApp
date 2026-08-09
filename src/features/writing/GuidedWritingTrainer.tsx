@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -206,6 +207,7 @@ export function GuidedWritingTrainer({
   /** Restores the exact Aufgabe a resumed draft was written against. */
   initialPromptIndex?: number;
 }) {
+  const tr = useT();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const reduce = useReducedMotion();
@@ -590,8 +592,9 @@ export function GuidedWritingTrainer({
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <p className="max-w-[calc(100%-18rem)] text-center text-xs leading-relaxed text-muted-foreground">
           <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
-          Dein Text wird zur Auswertung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die
-          Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
+          {tr(
+            "Dein Text wird zur Auswertung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten.",
+          )}{" "}
           <Link
             to="/privacy"
             className="pointer-events-auto font-medium text-primary underline-offset-2 hover:underline"
@@ -613,7 +616,7 @@ export function GuidedWritingTrainer({
   const emptyScope = (
     <EmptyState
       icon={Target}
-      title="Keine Aufgabe für diese Auswahl"
+      title={tr("Keine Aufgabe für diese Auswahl")}
       description={emptyReason({ blocking, format, level, lifeArea, themeScope, sub, sector, length })}
       action={
         <Button onClick={relax} variant="gradient">
@@ -655,8 +658,8 @@ export function GuidedWritingTrainer({
               <button
                 type="button"
                 onClick={reroll}
-                aria-label="Neue Aufgabe"
-                title="Neue Aufgabe"
+                aria-label={tr("Neue Aufgabe")}
+                title={tr("Neue Aufgabe")}
                 className={iconButton}
               >
                 {/* Shuffle instead of the dice (founder s169 follow-up). The
@@ -670,8 +673,8 @@ export function GuidedWritingTrainer({
               <button
                 type="button"
                 onClick={() => setTaskOpen(true)}
-                aria-label="Aufgabe vergrößern"
-                title="Aufgabe vergrößern"
+                aria-label={tr("Aufgabe vergrößern")}
+                title={tr("Aufgabe vergrößern")}
                 className={iconButton}
               >
                 <Maximize2 className="h-4 w-4" />
@@ -723,7 +726,7 @@ export function GuidedWritingTrainer({
               {/* Card-title eyebrow = bold brand blue, sharing its row with the
                   view toggle: Fokus's "Dein Satz" header, one word apart. */}
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-primary">Dein Text</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">{tr("Dein Text")}</p>
                 <CorrectionToggle view={view} onChange={setView} />
               </div>
               <MarkedParagraphs paragraphs={correction.paragraphs} view={view} />
@@ -755,7 +758,7 @@ export function GuidedWritingTrainer({
                 onChange={(e) => setText(e.target.value)}
                 disabled={submitting}
                 rows={length === "long" ? 10 : 6}
-                placeholder="Schreibe hier deinen Text auf Deutsch …"
+                placeholder={tr("Schreibe hier deinen Text auf Deutsch …")}
                 className="block w-full resize-none rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none"
               />
               <div className="flex flex-wrap items-center gap-2">
@@ -889,13 +892,13 @@ export function GuidedWritingTrainer({
             variant={pickerOpen ? "default" : "accent"}
             aria-expanded={pickerOpen}
             aria-pressed={pickerOpen}
-            aria-label="Aufgabe wählen"
+            aria-label={tr("Aufgabe wählen")}
             // No icon: at 360 the four switcher labels beside it need every
             // pixel, and "Aufgabe" with a chevron says what it opens on its own.
             className="h-auto shrink-0 gap-1 self-stretch rounded-lg px-2.5 text-[13px] font-semibold"
             onClick={() => setPickerOpen((o) => !o)}
           >
-            Aufgabe
+            {tr("Aufgabe")}
             <ChevronDown
               className={cn("h-4 w-4 shrink-0 transition-transform", pickerOpen && "rotate-180")}
             />

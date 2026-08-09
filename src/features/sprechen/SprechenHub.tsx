@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Clock, Star } from "lucide-react";
 import { scenarioById } from "@/data/dialogues";
@@ -63,6 +64,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export function SprechenHub() {
+  const t = useT();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const scenariosDone = useProgressStore((s) => s.scenariosDone);
@@ -152,14 +154,14 @@ export function SprechenHub() {
     <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
       <DialogContent className="gap-3">
         <DialogHeader>
-          <DialogTitle className="pr-8 text-base">Gespräch verlassen?</DialogTitle>
+          <DialogTitle className="pr-8 text-base">{t("Gespräch verlassen?")}</DialogTitle>
           <DialogDescription>
-            Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?
+            {t("Dein Fortschritt wird nicht gespeichert. Möchtest du wirklich zurück?")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2.5">
           <Button variant="outline" className="flex-1" onClick={() => setConfirmOpen(false)}>
-            Weiter sprechen
+            {t("Weiter sprechen")}
           </Button>
           <Button
             variant="danger"

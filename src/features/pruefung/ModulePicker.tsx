@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT, useTx } from "@/lib/uiLang";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, Shuffle } from "lucide-react";
 import type { MockPartId } from "@/engine/exam";
@@ -107,6 +108,7 @@ export function ModulePicker({
   /** The list of Aufgaben the current scope serves. */
   children: React.ReactNode;
 }) {
+  const t = useT();
   const [pickerOpen, setPickerOpen] = useState(false);
   const reduce = useReducedMotion();
   const {
@@ -153,11 +155,11 @@ export function ModulePicker({
                 variant={pickerOpen ? "default" : "accent"}
                 aria-expanded={pickerOpen}
                 aria-pressed={pickerOpen}
-                aria-label="Aufgabe wählen"
+                aria-label={t("Aufgabe wählen")}
                 className={cn(TOOLBAR_BUTTON, "gap-1 lg:hidden")}
                 onClick={() => setPickerOpen((o) => !o)}
               >
-                Aufgabe
+                {t("Aufgabe")}
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 shrink-0 transition-transform",
@@ -171,11 +173,11 @@ export function ModulePicker({
                   variant="outline"
                   className={TOOLBAR_BUTTON}
                   onClick={onShuffle}
-                  title={shuffleLabel}
+                  title={t(shuffleLabel)}
                 >
                   <Shuffle className="h-4 w-4" />
-                  <span className="hidden sm:inline">{shuffleLabel}</span>
-                  <span className="sm:hidden">{shuffleShortLabel}</span>
+                  <span className="hidden sm:inline">{t(shuffleLabel)}</span>
+                  <span className="sm:hidden">{t(shuffleShortLabel)}</span>
                 </Button>
               )}
             </div>
@@ -224,16 +226,18 @@ export function ScopeEmpty({
   blame: string | null;
   onReset: () => void;
 }) {
+  const t = useT();
+  const tx = useTx();
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface px-6 py-12 text-center shadow-soft">
       <p className="font-semibold">Keine {what} in dieser Auswahl</p>
       <p className="max-w-xs text-sm text-muted-foreground">
         {blame
-          ? `Nimm ${blame} aus der Auswahl, dann gibt es wieder etwas zu üben.`
-          : "Setz die Auswahl zurück, dann gibt es wieder etwas zu üben."}
+          ? tx(`Nimm ${blame} aus der Auswahl, dann gibt es wieder etwas zu üben.`, `Drop ${blame} from your selection and there will be something to practise again.`)
+          : t("Setz die Auswahl zurück, dann gibt es wieder etwas zu üben.")}
       </p>
       <Button size="sm" variant="outline" onClick={onReset}>
-        Auswahl zurücksetzen
+        {t("Auswahl zurücksetzen")}
       </Button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useT } from "@/lib/uiLang";
 import type { Collocation } from "@/types";
 import { collocations, collocationsByTheme } from "@/data/collocations";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,13 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 
 export function CollocationsList({ theme }: { theme: string }) {
+  const t = useT();
   const items: Collocation[] =
     theme === "all" ? collocations : collocationsByTheme(theme);
 
   if (items.length === 0) {
     return (
       <p className="py-12 text-center text-sm text-muted-foreground">
-        Keine Kollokationen für dieses Thema.
+        {t("Keine Kollokationen für dieses Thema.")}
       </p>
     );
   }

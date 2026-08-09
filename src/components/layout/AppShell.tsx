@@ -8,6 +8,7 @@ import { GlobalSearch } from "./GlobalSearch";
 import { FeedbackDialog, FeedbackPill } from "./FeedbackButton";
 import { useEffectiveStreak } from "@/store/useProgressStore";
 import { useAppConfigStore } from "@/lib/appConfig";
+import { useT, useTx, useUiLang } from "@/lib/uiLang";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -28,8 +29,9 @@ import { Logo } from "@/components/shared/Logo";
  * options X1 + X2). No tooltip beside a visible label.
  */
 function ZoneExit({ tone, onExit }: { tone: "quiet" | "danger"; onExit: () => void }) {
+  const t = useT();
   const danger = tone === "danger";
-  const label = danger ? "Prüfung verlassen" : "Zurück";
+  const label = danger ? t("Prüfung verlassen") : t("Zurück");
   return (
     <button
       type="button"
@@ -51,7 +53,7 @@ function ZoneExit({ tone, onExit }: { tone: "quiet" | "danger"; onExit: () => vo
         <ArrowLeft className="h-[17px] w-[17px]" />
       )}
       <span className="hidden text-sm font-semibold sm:inline">
-        {danger ? "Verlassen" : "Zurück"}
+        {danger ? t("Verlassen") : t("Zurück")}
       </span>
     </button>
   );
@@ -79,6 +81,16 @@ const STAGE_ROUTES = new Set(["/anwenden", "/exam", "/lesen", "/hoeren"]);
 
 export function AppShell() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const t = useT();
+  const tx = useTx();
+  const uiLang = useUiLang();
+
+  // Keep the document language honest (s205): the chrome is what `<html lang>`
+  // describes, and it now switches with the learner's level. Set here rather
+  // than in index.html, which ships one static value for both languages.
+  useEffect(() => {
+    document.documentElement.lang = uiLang;
+  }, [uiLang]);
 
   // Universal shortcut (UX overhaul Phase 2, Tier 1): ⌘K / Ctrl+K opens global
   // search from anywhere. The header no longer carries a search icon (s-polish);
@@ -107,7 +119,7 @@ export function AppShell() {
   // 2026-07-13). Hour-based greeting keeps the header personal.
   const name = useSettingsStore((s) => s.name);
   const hour = new Date().getHours();
-  const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
+  const greeting = t(hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend");
 
   // The Prüfung hub keeps this slot EMPTY (founder pick C, s197). s196 had put
   // a "Prüfung" title plus the Module üben/Modelltest switcher here, which put
@@ -187,7 +199,7 @@ export function AppShell() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background bg-page text-muted-foreground">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        <p className="text-sm">Schreibtraining wird fortgesetzt …</p>
+        <p className="text-sm">{t("Schreibtraining wird fortgesetzt …")}</p>
       </div>
     );
   }
@@ -239,7 +251,7 @@ export function AppShell() {
                 <Link
                   to="/welcome"
                   className="flex items-center gap-2 lg:hidden"
-                  aria-label="Zur Startseite"
+                  aria-label={t("Zur Startseite")}
                 >
                   <Logo className="h-8 w-8" />
                 </Link>
@@ -265,12 +277,12 @@ export function AppShell() {
                 <div
                   className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
                   role="img"
-                  aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
+                  aria-label={`${t("Serie")}: ${streak} ${t(streak === 1 ? "Tag" : "Tage")}`}
                 >
                   <Flame className={cn("h-4 w-4 text-reward", streak > 0 && "fill-reward/30")} />
                   <span className="text-sm font-bold tabular-nums text-reward">{streak}</span>
                   <span className="text-xs font-medium text-muted-foreground">
-                    {streak === 1 ? "Tag" : "Tage"}
+                    {tx(streak === 1 ? "Tag" : "Tage", streak === 1 ? "day" : "days")}
                   </span>
                 </div>
               )}

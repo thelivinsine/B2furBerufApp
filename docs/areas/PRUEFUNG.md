@@ -1,5 +1,7 @@
 # Prüfung — the exam zone
 
+**Interface language (s205):** every chrome string on this surface goes through `useT()`; A2/B1 read it in English, B2/C1 in German, and the learning material stays German at every level. Rule + mechanism: `docs/areas/UI-LANGUAGE.md`.
+
 Current state only. History → `docs/DECISIONS.md`, blow-by-blow → `docs/SESSION_PROMPT_LOG.md`.
 Read this before touching `src/features/pruefung/`, `src/features/exam/`, `src/engine/exam.ts`,
 `src/store/useExamStore.ts` or the `mockExams` collection. Sprechen has its own file

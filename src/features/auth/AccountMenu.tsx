@@ -7,6 +7,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { useSettingsStore, type ThemeMode } from "@/store/useSettingsStore";
 import { Button } from "@/components/ui/button";
 import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
+import { useT } from "@/lib/uiLang";
 import { cn } from "@/lib/utils";
 
 // Theme control moved off the header into this menu (s-polish): light/system/dark.
@@ -30,6 +31,7 @@ export function AccountMenu() {
   const [open, setOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [intent, setIntent] = useState<AuthIntent>("signup");
+  const t = useT();
   const ref = useRef<HTMLDivElement>(null);
 
   // Close on outside click or Escape.
@@ -60,7 +62,7 @@ export function AccountMenu() {
   const handleSignOut = async () => {
     setOpen(false);
     await signOut();
-    showToast("Du wurdest abgemeldet.", "default");
+    showToast(t("Du wurdest abgemeldet."), "default");
   };
 
   return (
@@ -68,7 +70,7 @@ export function AccountMenu() {
       <Button
         variant="ghost"
         size="icon"
-        aria-label="Konto"
+        aria-label={t("Konto")}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
@@ -86,7 +88,7 @@ export function AccountMenu() {
             <UserCircle2 className="h-5 w-5 shrink-0 text-primary" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">
-                {signedIn ? user?.email : status === "anonymous" ? "Gast" : "Nicht angemeldet"}
+                {signedIn ? user?.email : t(status === "anonymous" ? "Gast" : "Nicht angemeldet")}
               </p>
               <p
                 className={cn(
@@ -95,7 +97,7 @@ export function AccountMenu() {
                 )}
               >
                 {synced ? <Cloud className="h-3 w-3" /> : <CloudOff className="h-3 w-3" />}
-                {synced ? "Synchronisiert" : "Nur lokal"}
+                {t(synced ? "Synchronisiert" : "Nur lokal")}
               </p>
             </div>
           </div>
@@ -105,7 +107,7 @@ export function AccountMenu() {
           {/* Design (theme) — moved here from the header. */}
           <div className="px-2 py-1.5">
             <p className="pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Design
+              {t("Design")}
             </p>
             <div className="grid grid-cols-3 gap-1.5">
               {THEME_OPTIONS.map(({ value, icon: Icon, label }) => (
@@ -122,7 +124,7 @@ export function AccountMenu() {
                   )}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{label}</span>
+                  <span className="truncate">{t(label)}</span>
                 </button>
               ))}
             </div>
@@ -138,7 +140,7 @@ export function AccountMenu() {
                 onClick={() => openAuth("signup")}
                 disabled={busy}
               >
-                Konto erstellen
+                {t("Konto erstellen")}
               </Button>
               <Button
                 variant="ghost"
@@ -146,7 +148,7 @@ export function AccountMenu() {
                 onClick={() => openAuth("login")}
                 disabled={busy}
               >
-                Anmelden
+                {t("Anmelden")}
               </Button>
             </>
           )}
@@ -154,7 +156,7 @@ export function AccountMenu() {
           <Link to="/settings" onClick={() => setOpen(false)}>
             <Button variant="ghost" className="w-full justify-start px-2">
               <SettingsIcon className="h-4 w-4" />
-              Einstellungen
+              {t("Einstellungen")}
             </Button>
           </Link>
 
@@ -164,7 +166,7 @@ export function AccountMenu() {
             <Link to="/admin" onClick={() => setOpen(false)} className="lg:hidden">
               <Button variant="ghost" className="w-full justify-start px-2 text-primary hover:text-primary">
                 <ShieldCheck className="h-4 w-4" />
-                Kontrollzentrum
+                {t("Kontrollzentrum")}
               </Button>
             </Link>
           )}
@@ -177,7 +179,7 @@ export function AccountMenu() {
               disabled={busy}
             >
               <LogOut className="h-4 w-4" />
-              Abmelden
+              {t("Abmelden")}
             </Button>
           )}
         </div>

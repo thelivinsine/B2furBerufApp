@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { Check, RotateCw } from "lucide-react";
 import type { ConversationBrief } from "@/types";
 import type { DebriefResult } from "@/lib/speaking";
@@ -46,6 +47,7 @@ export function ConversationDebrief({
   onRetry?: () => void;
   onDone: () => void;
 }) {
+  const t = useT();
   const [view, setView] = useState<CorrectionViewMode>("orig");
   const { paragraphs, changes } = useCorrectionDiff(
     result.original ?? "",
@@ -58,7 +60,7 @@ export function ConversationDebrief({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div>
-        <p className="text-eyebrow text-primary">Rückmeldung</p>
+        <p className="text-eyebrow text-primary">{t("Rückmeldung")}</p>
         <p className="text-[17px] font-semibold leading-tight">{brief.title}</p>
       </div>
 
@@ -67,7 +69,7 @@ export function ConversationDebrief({
       <div className="slim-scrollbar mask-fade-y flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
         <Card>
           <CardContent className="space-y-2.5 p-4">
-            <p className="text-eyebrow text-muted-foreground">Deine Ziele</p>
+            <p className="text-eyebrow text-muted-foreground">{t("Deine Ziele")}</p>
             {brief.goals.map((g, i) => (
               <div
                 key={i}
@@ -105,7 +107,7 @@ export function ConversationDebrief({
           <Card>
             <CardContent className="space-y-3 p-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-eyebrow text-muted-foreground">Deine Worte</p>
+                <p className="text-eyebrow text-muted-foreground">{t("Deine Worte")}</p>
                 <CorrectionToggle view={view} onChange={setView} />
               </div>
               <MarkedParagraphs paragraphs={paragraphs} view={view} />
@@ -153,11 +155,11 @@ export function ConversationDebrief({
             </Button>
           )}
           <Button variant="gradient" className="flex-1" onClick={onDone}>
-            Weiter
+            {t("Weiter")}
           </Button>
         </div>
         <p className="mt-2.5 text-center text-[11px] text-muted-foreground">
-          KI-Rückmeldung kann Fehler enthalten.
+          {t("KI-Rückmeldung kann Fehler enthalten.")}
         </p>
       </div>
     </div>

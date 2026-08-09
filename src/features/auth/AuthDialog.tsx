@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lock, Mail, Cloud, Eye, EyeOff, MailCheck } from "lucide-react";
 import {
@@ -53,6 +54,7 @@ export function AuthDialog({
   onOpenChange: (open: boolean) => void;
   intent?: AuthIntent;
 }) {
+  const t = useT();
   const { busy, error, status, signUp, signIn, signInWithGoogle, resendConfirmation, clearError } =
     useAuthStore();
   const showToast = useSessionStore((s) => s.showToast);
@@ -349,7 +351,7 @@ export function AuthDialog({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onAnimationStart={syncAutofilled}
-                placeholder="du@beispiel.de"
+                placeholder={t("du@beispiel.de")}
                 className="h-11 flex-1 bg-transparent text-sm outline-none"
               />
             </div>
@@ -417,7 +419,7 @@ export function AuthDialog({
                   rel="noreferrer"
                   className="text-primary underline underline-offset-2"
                 >
-                  Datenschutzerklärung
+                  {t("Datenschutzerklärung")}
                 </a>{" "}
                 zu.
               </span>

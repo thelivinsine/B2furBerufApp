@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useT, useTitle, useTx } from "@/lib/uiLang";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AudioLines, FileText, ListChecks } from "lucide-react";
 import { themeById } from "@/data/themes";
@@ -71,6 +72,9 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export function TextModuleHub({ part }: { part: ReceptivePart }) {
+  const t = useT();
+  const tx = useTx();
+  const titleOf = useTitle();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const start = useExamStore((s) => s.start);
@@ -229,7 +233,7 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
       onClose={onClose}
       className={className}
       onReset={resetScope}
-      resetLabel="Auswahl zurücksetzen"
+      resetLabel={t("Auswahl zurücksetzen")}
     >
       {/* Niveau -> Branche -> Lebensbereich -> Thema -> Unterthema -> Textsorte:
           the ONE Bibliothek hierarchy, in the order the Schreiben rail uses. */}
@@ -239,7 +243,7 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
       {/* Lebensbereich -> Thema -> Unterthema -> Branche -> Niveau -> Textsorte
           (founder s199), the ONE app-wide hierarchy, same order as every other
           rail. It used to lead with Niveau and put Branche second. */}
-      <ScopeSection label="Lebensbereich">
+      <ScopeSection label={t("Lebensbereich")}>
         <LifeAreaPills
           value={scope.area}
           onChange={(area) => patch({ area, theme: "", sub: "" })}
@@ -250,10 +254,10 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
         />
       </ScopeSection>
 
-      <ScopeSection label="Thema">
+      <ScopeSection label={t("Thema")}>
         <ScopeSelect
-          ariaLabel="Thema"
-          triggerLabel={scope.theme ? theme?.titleDe ?? scope.theme : "Alle Themen"}
+          ariaLabel={t("Thema")}
+          triggerLabel={scope.theme ? (theme ? titleOf(theme) : scope.theme) : t("Alle Themen")}
           value={scope.theme}
           onChange={(id) => patch({ theme: id, sub: "" })}
           groups={[
@@ -273,13 +277,13 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
       </ScopeSection>
 
       {subThemes.length > 0 && (
-        <ScopeSection label="Unterthema">
+        <ScopeSection label={t("Unterthema")}>
           <ScopeSelect
-            ariaLabel="Unterthema"
+            ariaLabel={t("Unterthema")}
             triggerLabel={
               scope.sub
                 ? subThemes.find((s) => s.id === scope.sub)?.titleDe ?? scope.sub
-                : "Gesamtes Thema"
+                : t("Gesamtes Thema")
             }
             value={scope.sub}
             onChange={(sub) => patch({ sub })}
@@ -299,22 +303,22 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
         </ScopeSection>
       )}
 
-      <ScopeSection label="Branche">
+      <ScopeSection label={t("Branche")}>
         {/* LOCKED, not greyed (founder s199): the count is the DEDICATED one, so
             a zero means no text is written for that industry on this Thema.
             Only 4 of 52 texts carry a Branche tag, so here the whole control is
             usually the one-line locked state, which is the honest picture. */}
         {sectorOptions.every((o) => o.locked) ? (
           <ScopeLocked>
-            Für dieses Thema gibt es keine Texte nach Branche. Du übst hier alle.
+            {t("Für dieses Thema gibt es keine Texte nach Branche. Du übst hier alle.")}
           </ScopeLocked>
         ) : (
           <ScopeSelect
-            ariaLabel="Branche"
+            ariaLabel={t("Branche")}
             triggerLabel={
               scope.sector
                 ? SECTOR_OPTIONS.find((o) => o.value === scope.sector)?.label ?? scope.sector
-                : "Alle Branchen"
+                : t("Alle Branchen")
             }
             value={scope.sector}
             onChange={(sector) => patch({ sector })}
@@ -331,10 +335,10 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
         )}
       </ScopeSection>
 
-      <ScopeSection label="Niveau">
+      <ScopeSection label={t("Niveau")}>
         <ScopeSelect
-          ariaLabel="Niveau"
-          triggerLabel={scope.level || "Alle Niveaus"}
+          ariaLabel={t("Niveau")}
+          triggerLabel={scope.level || t("Alle Niveaus")}
           value={scope.level}
           onChange={(level) => patch({ level })}
           groups={[
@@ -353,9 +357,9 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
       </ScopeSection>
 
       {kinds.length > 1 && (
-        <ScopeSection label="Textsorte">
+        <ScopeSection label={t("Textsorte")}>
           <ScopeSelect
-            ariaLabel="Textsorte"
+            ariaLabel={t("Textsorte")}
             triggerLabel={
               scope.kind ? TEXT_KIND_LABEL[scope.kind as keyof typeof TEXT_KIND_LABEL] : "Alle Textsorten"
             }
@@ -407,7 +411,7 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
       head={tabs}
       rail={rail}
       toolbar={{
-        eyebrow: `${PART_LABEL[part]} üben`,
+        eyebrow: tx(`${PART_LABEL[part]} üben`, `Practise ${PART_LABEL[part]}`),
         count: `${list.length} ${list.length === 1 ? noun.one : noun.many}`,
         // The exam-shaped draw the module card used to perform on its own. It
         // is hidden rather than disabled while the scope serves nothing: a dead
@@ -436,7 +440,7 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
                 facts={[
                   {
                     icon: ListChecks,
-                    label: `${text.checks.length} ${text.checks.length === 1 ? "Aufgabe" : "Aufgaben"}`,
+                    label: tx(`${text.checks.length} ${text.checks.length === 1 ? "Aufgabe" : "Aufgaben"}`, `${text.checks.length} ${text.checks.length === 1 ? "task" : "tasks"}`),
                   },
                   ...(hasNotes
                     ? [{ icon: part === "hoeren" ? AudioLines : FileText, label: "Notizen" }]

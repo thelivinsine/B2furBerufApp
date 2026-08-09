@@ -1,4 +1,5 @@
 import { useDeferredValue, useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/uiLang";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -32,6 +33,7 @@ export function GlobalSearch({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const t = useT();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,7 +88,7 @@ export function GlobalSearch({
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Wörter, Kollokationen, Redemittel, Grammatik durchsuchen …"
+            placeholder={t("Wörter, Kollokationen, Redemittel, Grammatik durchsuchen …")}
             className="h-6 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
