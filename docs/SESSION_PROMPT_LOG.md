@@ -6295,3 +6295,25 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
 - **Note for the founder:** the app is a PWA, so an installed copy can serve the previous build from
   its service worker. A hard refresh settles it.
+
+## Session 208 (branch `claude/filter-persistence-error-yr2716`)
+
+### Prompt 1 (2026-08-09)
+
+> [screenshot of the Wörter tab, "Level: up to B1.1" chip visible] there seems to be an error with
+> the filter here. Even if I remove and refresh it's still appearing. Fix it
+
+- **Response summary:** Found the "Level: up to …" `ActiveFilterChip` (the removable UI over the
+  default CEFR-band cut, `defaultVisibleBands`, on Wörter/Kollokationen/Redemittel) tracked its
+  dismissal in local `useState(false)` per trainer, so a full page refresh always remounted the
+  component and reset the flag, bringing the chip back even right after dismissal. Moved the flag
+  into `useSettingsStore` as a new persisted field `showAllCefrLevels` (default `false`), matching
+  the existing dismiss-flag pattern (`artikelLegendDismissed`, `signInBannerDismissed`). Updated
+  `VocabularyTrainer.tsx`, `CollocationsBrowser.tsx` and `RedemittelTrainer.tsx` to read/write that
+  one store field instead of local state. Gates: typecheck · lint 0 errors (78 warnings, pre-existing
+  baseline) · build. Opened PR **#847**, squash-merged to `main` as `de70c9b`, post-merge housekeeping
+  done. Not verified in a browser here (sandbox network policy blocks the live Supabase project); the
+  founder verifies live.
+- **Artifacts:** PR **#847** (`de70c9b`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (sessions 204-206 archived off the
+  main status file to stay under its line budget) · `docs/SESSION_PROMPT_LOG.md`

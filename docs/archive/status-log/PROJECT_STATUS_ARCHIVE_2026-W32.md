@@ -752,3 +752,116 @@ shuffle button doesn't deactivate" was a stuck touch-`:hover` on a button whose 
   light and dark, including the full drill loop and both Verlauf states. `CLAUDE.md` came down 391 →
   383 lines (the merge had left one rule stated twice) but was still over its ~350 budget, which it
   had been since s198. (That debt was closed in s203; the file is 349 lines now.)
+
+## Session 204 (2026-08-06 → 08, branch `claude/ki-usage-task-kg0vix`): the KI-usage task, shipped
+
+**Shipped as PR #835, squash-merged to `main` as `ad8fead`, with the migration renumbered by #839.**
+_Started before sessions 197-203 and merged after them, which is why it is numbered here rather
+than where its dates would put it. Two things to know about how it landed: the branch carries two
+merges of `main` with every gate re-run on the merged tree, and **GitHub never queued a CI run for
+the PR** (other branches were queuing normally), so the merge rests on the local gate run, which is
+stated in the merge commit._
+- **AI usage is measured now.** Migration 0019 adds `ai_calls` (**it shipped as 0018 and had to be
+  renumbered**: a parallel session had taken that version in #822, the remote keeps one row per
+  version, and the clash killed the whole backend deploy because migrations run before the functions.
+  `pnpm lint:migrations` now fails on a duplicate version, so it cannot recur): one row per provider call holding
+  the token counts the provider ACTUALLY reported (feature, provider, model, input/output/cached
+  tokens, cache hit), priced from ONE rate table in `supabase/functions/_shared/aiUsage.ts` that
+  `app_config.ai_rates` can override at runtime. All four Edge Functions were rewired to it, which
+  kills the hardcoded flat $0.004-per-GPT-5-call guess in three of them and the four copies of the
+  Claude price arithmetic. Cache hits are recorded as zero-cost calls, so the cache-hit rate is
+  visible instead of inferred. `ai_usage` is untouched and still the monthly spend fuse; `ai_calls`
+  is the detail behind it, and the thing step 2 compares against the providers' own bills.
+  Founder roll-up: `admin_ai_usage_breakdown(days)`, aggregates only. Purged at 400 days.
+- **Sprechen: 6 Übungsgespräche + 3 Prüfungsgespräche per day** (was one shared budget of 2),
+  counted separately on `speaking_conversations.exam` so neither can eat the other. For an existing
+  conversation the ROW's flag decides which budget it spends, never the request body. The monthly
+  ceiling rose with them (40 → 120): at up to 9 a day, 40 would have bound within four days.
+- **A privacy-policy change rode along, deliberately.** `ai_calls` is a new per-user record, so both
+  language versions of the retention section now describe it (no text, counts only, 400 days, link
+  dropped on account deletion) and `CONSENT_VERSION` / `PRIVACY_LAST_UPDATED_ISO` were bumped in
+  lockstep to `2026-08-06`. **That bump asks every signed-in learner to re-consent on their next
+  visit.** It follows the documented rule; say the word and it reverts to `2026-08-05` in one line.
+- Gates: typecheck · lint 0 errors (77 warnings, baseline) · **637 tests** (up from 626, new
+  `tests/aiUsage.test.ts` pins the pricing arithmetic and the three providers' token shapes) ·
+  build · check:bundle 129.8 kB · check:contrast · lint:content · lint:migrations.
+
+## Session 205 (2026-08-09, branch `claude/ki-usage-task-kg0vix`): step 2, the reconciliation
+
+The founder created a Console team organization and an Admin API key (30-day expiry, by choice) and
+stored it as `ANTHROPIC_ADMIN_KEY`, which unblocked the step s204 could only recommend.
+- **Migration 0020** adds `provider_costs` (one row per provider per UTC day, the amount the
+  PROVIDER reports) and `provider_sync_state` (last success, last attempt, last error), plus
+  `admin_ai_reconciliation(days)` and `admin_ai_sync_state()`.
+- **`reconcile-ai-cost` Edge Function** pulls Anthropic's Cost Report, converts its cents-as-string
+  amounts once, and upserts by day. Founder-gated against `admins`. **No cron on purpose**: a
+  scheduled pull would need a credential stored inside the database, so the admin screen refreshes
+  on open (hourly at most) and on demand.
+- **A card in `/admin` System** shows our derived figure, Anthropic's, and the difference over 14
+  days. An unreported day reads "–", never 0; sync errors render above the numbers; Gemini and
+  OpenAI are named as unreconciled rather than shown as agreeing.
+- **The expiry is handled, not ignored.** The key dies on 8 September; a 401 is turned into "der
+  Schlüssel ist abgelaufen" in `provider_sync_state.last_error` and shown on the card, so the
+  comparison cannot go quietly stale.
+- Gates: typecheck · lint 0 errors (78 warnings, one new and of the same async-setState class as
+  the existing ones) · **687 tests** (up from 675; `tests/costReport.test.ts` pins the cents→dollars
+  conversion and the sum-every-row rule, both wrong in ways that survive a glance) · build ·
+  check:bundle · lint:content · lint:migrations.
+- Two open items, both flagged rather than urgent, closed by later sessions or still open: **the
+  admin key expires 2026-09-08** (create a new one and replace the secret), and the reconciliation
+  covers **Anthropic only** (OpenAI needs its own org key; Gemini has no billing API and its $0
+  stays a labelled assumption). Also still unbuilt from s204: **part B, the reserved KI chip**,
+  previewed in `preview/ki-usage-chip.html` and awaiting a pick.
+
+## Session 206 (2026-08-09, branch `claude/speaking-exercises-ai-error-xk6o7h`): Sprechen "AI doesn't work", the sign-in wall
+
+**Ran in PARALLEL with session 205, which reached `main` first, so this one renumbered rather than
+reuse 205.** Shipped as PR **#841** → **`d4a4771`**, squash-merged.
+Founder prompts: "there is an error with speaking exercies - the ai feature doesn't work" → "for the
+redemittel rail, display only 4-5 highly useful and frequently used redemittel phrases, not too many
+of them.. Also, the first redemittel is literally overshadowed due to unnecessary shadow effect below
+the toggle buttons and pills. fix it" → a screenshot: "this is what happens.. no response" → "first
+merge the changes from this session and make it live" → "complete the merge and also documentation".
+**The screenshot is what solved it. Nothing was broken upstream:** the caption under the microphone
+read "Bitte melde dich an, um mit der KI zu sprechen." Signed out with Turnstile on, `converse`
+cannot be called, and the refusal arrived after the learner had started the conversation, opened the
+mic and spoken a sentence, in the same grey slot that otherwise says "Ich höre zu …", on a screen
+whose quiet header has no account menu (s201). No error, no reply, no way to sign in: it reads as
+the app doing nothing. **The report said "it loads and there's no response from ai", which reads as
+a broken model, a hung request or a dead key — diagnosis by code review had four plausible branches
+and no way to choose between them from the sandbox (the network policy blocks the Supabase project,
+so the live function cannot be probed from here). Ask for the screen before theorising about the
+server.**
+- **The sign-in wall moved to the brief card** (`speakingAuthBlock` / `useSpeakingAuthBlock`, ONE
+  rule, two readers), the same law the daily allowance follows: stated BEFORE the commitment. Start
+  becomes **Anmelden** and opens `AuthDialog`, because a wall with a remedy gets the remedy as its
+  button. A session that lapses mid-run opens the same dialog (`needsAuth`).
+- **A failure is no longer printed in the status grey** (`MicCluster.captionTone`), and the typed
+  fallback prints the caption at all now: in Firefox a refused turn showed literally nothing.
+- **Every cascade leg has a deadline** (`AbortSignal.timeout`, 20 s turns / 60 s debrief). There was
+  none anywhere in any function, so a hung provider held the request open forever, which on the one
+  surface a learner waits at synchronously is the same thing as a dead app.
+- **The free Gemini leg was dead, not free.** `gemini-2.5-flash` reasons by default and Google bills
+  thoughts as output, so the 500-token turn budget was spent thinking: no text part, leg discarded,
+  and EVERY turn silently fell through to the paid model at the cost of an extra round trip. Turns
+  now send `thinkingBudget: 0`. Losing legs log provider + HTTP status + the provider's error code,
+  so the next report is diagnosable from the logs without reproducing it. **If the Sprechen bill
+  looks lower from here, that is why**, and the same thinking-budget trap applies to any future
+  short-output Gemini call.
+- **Redemittel rail (founder's second prompt):** at most **five** phrases per intent, the easiest
+  that fit the Anrede by `CEFR_ORDER`, shown in the bank's own order. The pills lost their count (a
+  number that cannot vary is dead chrome). The "shadow" was the unconditional `mask-fade-y` fading
+  the FIRST phrase out under the pills; it is `useEdgeFade` now, per edge and only where content
+  actually continues, which with five phrases is usually nowhere.
+- **Ran in PARALLEL with session 205** (the cost reconciliation), which reached `main` first; this
+  branch merged `origin/main` and re-ran every gate on the merged tree (688 tests, bundle 129.3 kB,
+  lint:migrations green).
+- Gates: typecheck · lint 0 errors (77 warnings, baseline) · **676 tests** (up from 675, the cap is
+  pinned in `tests/anrede.test.ts`) · build · check:bundle 128.3 kB.
+- **Not verified in a browser from the sandbox**: the network policy blocks the Supabase project.
+  The founder verified live.
+- **Left open at handoff, both since resolved or still open:** the Sprechen/Schreiben Verlauf
+  spinner has no timeout on an unreachable Supabase (client-side fetch, no deadline); the next
+  content job is the reply-task wave (writing-audit P4), 47 authored `source` texts plus a rendering
+  slot that does not exist yet, awaiting a founder placement pick from
+  `preview/schreiben-source-text.html`.
