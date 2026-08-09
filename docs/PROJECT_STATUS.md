@@ -31,7 +31,7 @@ Founder: "do the documentation maintenance". No app code was touched.
 - Housekeeping: the s199 and s200 session logs and the s201 handoff moved into
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`, per the two-most-recent rule.
 - **Shipped in three PRs:** **#832** (the pass) → `48d250c`, **#833** (the paper trail) → `8a45be9`,
-  **#834** (this line and the founder's "document the session") → see the handoff. `origin/main`
+  **#837** (this line and the founder's "document the session") → see the handoff. `origin/main`
   moved mid-session (#831), so #832 merged it first; the one conflict was in
   `SESSION_PROMPT_LOG.md`, where #831's entry belongs to the session 202 block.
 
@@ -151,7 +151,7 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 **Handoff after session 203 (2026-08-08): the docs are back inside their own rules.** Branch
 `claude/documentation-maintenance-0w4ywg`, PRs **#832** → **`48d250c`** (the pass), **#833** →
-**`8a45be9`** (its paper trail) and **#834** (this closing entry), each squash-merged. Validate
+**`8a45be9`** (its paper trail) and **#837** (this closing entry), each squash-merged. Validate
 content and Deploy site to GitHub Pages green on `main`; Deploy Supabase functions correctly did
 not run (path-filtered, nothing under `supabase/` changed). Post-merge housekeeping done after every
 merge, tree clean.
