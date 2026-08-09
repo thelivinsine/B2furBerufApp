@@ -42,7 +42,13 @@ export function Sidebar({
         aria-label={t("Zur Startseite")}
       >
         <Logo variant="wordmark" className="h-7 w-auto" />
-        <p className="text-xs text-muted-foreground">{t("Deutsch im Beruf · B2")}</p>
+        {/* The ONE tagline (s207 founder correction): "Deutsch im Beruf · B2" was
+            the pre-repositioning line, from when the product was B2-Beruf
+            speaking-exam prep. The scope has been the B1-B2 plateau (work AND
+            everyday life) since s21, and the landing page, index.html and the
+            PWA manifest all say so. This is the same line, in the interface
+            language. */}
+        <p className="text-xs text-muted-foreground">{t("Deutsch fürs echte Leben · B1–B2")}</p>
       </Link>
 
       {onSearch && (

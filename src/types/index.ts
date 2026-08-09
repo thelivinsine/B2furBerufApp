@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------ */
-/* Domain types for the B2 Beruf speaking-prep platform                */
+/* Domain types for Genauly: German for the B1-B2 plateau              */
 /* ------------------------------------------------------------------ */
 
 export type ThemeId =

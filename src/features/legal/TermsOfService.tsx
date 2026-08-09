@@ -44,8 +44,9 @@ function TermsDe() {
       <Section title="Überblick">
         <p>
           Diese Allgemeinen Geschäftsbedingungen („AGB“) regeln deine Nutzung von Genauly, einer
-          Prüfungsvorbereitungs-App für die mündliche Prüfung Goethe / telc Deutsch B2 Beruf,
-          erreichbar unter <MailLink />. Mit der Nutzung von Genauly stimmst du diesen AGB zu. Wenn
+          Lern-App für Deutsch auf dem Niveau B1 bis B2, im Beruf und im Alltag, mit gezielter
+          Vorbereitung auf die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2, erreichbar
+          unter <MailLink />. Mit der Nutzung von Genauly stimmst du diesen AGB zu. Wenn
           du nicht einverstanden bist, nutze die App bitte nicht. Genauly wird unabhängig von einer
           Privatperson betrieben.
         </p>
@@ -53,8 +54,9 @@ function TermsDe() {
 
       <Section title="Nutzung von Genauly">
         <p>
-          Genauly ist ein Lernwerkzeug. Es hilft dir, berufsbezogenes Deutsch (Wortschatz,
-          Grammatik, Schreiben und Sprechen) für die Prüfung B2 Beruf zu üben. Es wird für deine
+          Genauly ist ein Lernwerkzeug. Es hilft dir, Deutsch für echte Situationen zu üben
+          (Wortschatz, Kollokationen, Redemittel, Grammatik, Lesen, Hören, Schreiben und Sprechen),
+          im Beruf wie im Alltag, und bereitet dich auf die genannten Prüfungen vor. Es wird für deine
           persönliche, nicht-kommerzielle Nutzung bereitgestellt. Wir können Funktionen jederzeit
           hinzufügen, ändern oder entfernen, um die App zu verbessern.
         </p>
@@ -190,8 +192,9 @@ function TermsEn() {
     <>
       <Section title="Overview">
         <p>
-          These Terms of Service ("Terms") govern your use of Genauly, an exam-prep app for the
-          Goethe / telc Deutsch B2 Beruf speaking exam, reachable at <MailLink />. By using
+          These Terms of Service ("Terms") govern your use of Genauly, a German learning app for
+          the B1 to B2 range, for work and everyday life, including preparation for the telc Deutsch
+          B2 Beruf and Goethe-Zertifikat B2 exams, reachable at <MailLink />. By using
           Genauly, you agree to these Terms. If you do not agree, please do not use the app.
           Genauly is operated independently by a private individual.
         </p>
@@ -199,8 +202,9 @@ function TermsEn() {
 
       <Section title="Using Genauly">
         <p>
-          Genauly is a learning tool. It helps you practise workplace German (vocabulary, grammar,
-          writing, and speaking) for the B2 Beruf exam. It is provided for your personal,
+          Genauly is a learning tool. It helps you practise German for real situations (vocabulary,
+          collocations, phrases, grammar, reading, listening, writing and speaking), at work and in
+          everyday life, and prepares you for the exams named above. It is provided for your personal,
           non-commercial use. We may add, change, or remove features at any time to improve the
           app.
         </p>

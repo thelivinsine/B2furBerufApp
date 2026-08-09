@@ -1050,7 +1050,7 @@ export function LandingPage() {
           </nav>
         </div>
         <p className="mx-auto mt-7 max-w-6xl border-t border-border px-4 pt-5 text-xs sm:px-6">
-          Genauly · German for real life · Deutsch für das echte Leben · B1–B2
+          Genauly · German for real life · Deutsch fürs echte Leben · B1–B2
         </p>
       </footer>
 
