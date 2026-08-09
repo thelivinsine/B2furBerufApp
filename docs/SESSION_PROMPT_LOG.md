@@ -6073,3 +6073,70 @@ Edge Functions are Deno and outside `tsc`, so they were syntax-checked with esbu
   `src/features/admin/{AiCostReconciliation,AdminSystem}.tsx` · `src/lib/adminApi.ts` ·
   `tests/costReport.test.ts` · `docs/{PROJECT_STATUS,PROJECT_FOUNDATION,DECISIONS}.md` ·
   `docs/areas/LEGAL-ADMIN.md` · this log
+
+---
+
+## Session 206 — 2026-08-09 — branch `claude/speaking-exercises-ai-error-xk6o7h`
+
+_Ran in PARALLEL with session 205 (the cost reconciliation), which reached `main` first. This
+session renumbered from 205 to 206 rather than reuse a taken number._
+
+- **Prompt 1 (verbatim):** `there is an error with speaking exercies - the ai feature doesn't work`
+  **Response:** read the whole `converse` path plus the two commits that had touched Sprechen last
+  (s202's Redemittel rail, s204's usage ledger) and confirmed the backend deploy for both was green.
+  **The sandbox cannot probe the live function** (the environment's network policy answers 403 to
+  `stkfdavpjflpqoxjunnj.supabase.co`), so the four plausible branches could not be told apart from
+  here. Asked the founder which of four German messages the screen showed, with each option naming
+  the branch it would implicate.
+
+- **Prompt 2 (verbatim, mid-turn):** `for the redemittel rail, display only 4-5 highly useful and
+  frequently used redemittel phrases, not too many of them.. Also, the first redemittel is literally
+  overshadowed due to unnecessary shadow effect below the toggle buttons and pills. fix it`
+  **Response:** the "shadow" is `mask-fade-y`, applied unconditionally to the phrase list, so a list
+  resting at its top faded its own first phrase out under the pills. Replaced with `useEdgeFade`
+  (per edge, only where content continues, the rule the Bibliothek columns already run on). Capped
+  the list at five, picked as the EASIEST that fit the Anrede by `CEFR_ORDER` and shown in the bank's
+  authored order, and dropped the count from the intent pills: capped at five it printed the same
+  digit four times, which is dead chrome, not honesty.
+
+- **Prompt 3 (answer to the question):** `it says nothing.. I say something and submit but it loads
+  and there's no response from ai`, then a screenshot: `this is what happens.. no response`
+  **The screenshot solved it.** The caption under the microphone read **"Bitte melde dich an, um mit
+  der KI zu sprechen."** Signed out with Turnstile on, `converse` cannot be called, and the refusal
+  arrived after the learner had started the conversation, opened the mic and spoken a full sentence,
+  in the same faint grey slot that otherwise says "Ich höre zu …", on a screen whose quiet header
+  carries no account menu (s201). **Ask for the screen before theorising about the server.**
+  Shipped: `speakingAuthBlock()` / `useSpeakingAuthBlock()` (one rule, two readers) with the gate on
+  the brief card, Start becoming **Anmelden** and opening `AuthDialog`, `TurnResult.needsAuth`
+  opening the same dialog when a session lapses mid-run, `MicCluster.captionTone` so a failure is
+  never printed in the status grey, and the caption rendered at all in the typed fallback.
+  **Two real defects found on the way:** no cascade leg in any Edge Function had a timeout
+  (`AbortSignal.timeout`, 20 s turns / 60 s debrief), and the free Gemini turn leg had been returning
+  nothing since s196, because `gemini-2.5-flash` reasons by default and Google bills thoughts as
+  output, so a 500-token turn budget was spent thinking: every turn had been silently falling
+  through to the paid model. Turns now send `thinkingBudget: 0`, and a losing leg logs its provider,
+  HTTP status and error code.
+
+- **Prompt 4 (verbatim, mid-turn):** `first merge the changes from this session and make it live.
+  stop the documentation where you are. I'll prompt you later to do it`
+  **Response:** stopped the documentation pass mid-file, shipped what was written, opened PR #841.
+  The squash hit a conflict (session 205 had merged `main` meanwhile), so `origin/main` was merged
+  in, the session renumbered to 206, and every gate re-run on the merged tree before merging.
+
+- **Prompt 5 (verbatim, mid-turn):** `compelte the merge and also documentation`
+  **Response:** merged as **`d4a4771`**, post-merge housekeeping done, then the documentation
+  finished: `CLAUDE.md` carries the widened wall law and is back at **349 lines** (six existing
+  bullets were compacted to pay for it, per the replace-don't-append rule), `docs/areas/SPRECHEN.md`
+  carries both new mechanisms in full, and `PROJECT_STATUS.md` is down to **198 lines** with the
+  201-203 logs and handoffs archived into the W32 chunk.
+
+**Gates (on the merged tree):** typecheck · lint 0 errors (78 warnings, baseline) · **688 tests**
+(the five-phrase cap is pinned in `tests/anrede.test.ts`) · build · check:bundle 129.3 kB ·
+lint:content · lint:migrations. **Nothing was verified in a browser:** the conversation screen needs
+the backend, which the sandbox cannot reach. The founder verifies live.
+
+- **Artifacts:** PR **#841** → **`d4a4771`** · `src/lib/speaking.ts` ·
+  `src/features/sprechen/{ConversationRunner,ConversationBriefCard,MicCluster,RedemittelHelp}.tsx` ·
+  `supabase/functions/converse/index.ts` · `tests/anrede.test.ts` · `CLAUDE.md` ·
+  `docs/areas/SPRECHEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log
