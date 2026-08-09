@@ -5761,8 +5761,8 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   `PROJECT_STATUS.md` session log and handoff, and the area-doc corrections all went out in PR #832
   and PR #833. What this prompt adds is the paper trail that could not exist yet when those merged:
   **PR #833 → `8a45be9`** (recorded nowhere until now, having been written before its own merge),
-  this entry, and the PR list on the s203 log and handoff (#832, #833, #837), so the session reads as three merges
-  rather than one. Nothing else was found stale on a re-read: `CLAUDE.md` holds at 349 lines,
+  this entry, and the PR list on the s203 log and handoff (#832, #833, #837), so the session reads
+  as three merges rather than one. Nothing else was stale on a re-read: `CLAUDE.md` holds at 349,
   `PROJECT_STATUS.md` at 199 of its ~250, and `lint:content` reports the same 14 pre-existing content
   warnings with no `[docs]` line. **Standing note carried forward:** `CLAUDE.md` has about one line
   of headroom, so the next law added to it costs an old line somewhere, and a count quoted in any doc
