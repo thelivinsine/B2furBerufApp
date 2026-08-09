@@ -8,8 +8,10 @@ second opinion. All handoffs under their own "Resume here")._
 
 **Session 207 (2026-08-09, branch `claude/remove-onboarding-practice-z7qfwu`): the nav order, the
 onboarding hand-off, and the interface language.**
+**Shipped as PR #843, squash-merged to `main` as `c334b65`** (CI green on the merged tree, `18a909f`;
+the Pages deploy then went green on attempt 1, so the change is live).
 
-Founder, three prompts: *"remove the onboarding practice session when a new user signs up … finish
+Founder, four prompts: *"remove the onboarding practice session when a new user signs up … finish
 the onboarding form and immediately shown the bibliothek. Keep bibliothek on the top, and the
 praktisch beside the settings. Praktisch should be labeled as beta."* → *"the app's language should
 adapt to various levels of user language proficiency … if the user logs A2 or B1 level, the app
