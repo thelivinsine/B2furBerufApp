@@ -6279,3 +6279,19 @@ the backend, which the sandbox cannot reach. The founder verifies live.
 - Verified in a browser: the caption reads "Deutsch fürs echte Leben · B1–B2" at B2 and "German for
   real life · B1–B2" at A2. Gates: typecheck · 701 tests · lint 0 errors · build · check:bundle
   153.3 kB · lint:content.
+
+### Prompt 8 (2026-08-09)
+
+> document the session and merge everyhting live
+
+- **Response summary:** Nothing was left unmerged: the session shipped in three PRs, each
+  squash-merged to `main` and each followed by a green **Deploy site to GitHub Pages** run on
+  attempt 1 — **#843** the change itself (`c334b65`, CI green on the merged tree `18a909f`),
+  **#844** the paper trail (`fa3e97d`), **#845** the tagline correction (`c0e7b0f`). Verified each
+  deploy by its workflow run rather than by claiming it, since the sandbox cannot reach the live
+  site. Closed the documentation with this entry, and the `PROJECT_STATUS.md` session-207 header now
+  names all three PRs, their SHAs and their deploys in one line instead of only the first.
+- **Artifacts:** PRs **#843** (`c334b65`) · **#844** (`fa3e97d`) · **#845** (`c0e7b0f`) ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Note for the founder:** the app is a PWA, so an installed copy can serve the previous build from
+  its service worker. A hard refresh settles it.
