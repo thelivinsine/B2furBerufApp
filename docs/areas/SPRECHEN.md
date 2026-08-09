@@ -79,8 +79,15 @@ Founder pick: **Option A's layout on desktop, Option C's on a phone, Option A's 
   on screen twice.
 
 **One hierarchy, both shells** (founder, s202 follow-up): the section label with its `EnPeek` chip,
-then the intent **pills at the top of the tile** (all four, honest counts, the current one LIT), then
-that intent's phrases as white cards. There is no dropdown: a lit pill states the selection, so a
+then the intent **pills at the top of the tile** (all four, the current one LIT), then that intent's
+phrases as white cards, **at most five of them** (founder s205: "display only 4-5 highly useful and
+frequently used redemittel phrases, not too many of them"). The rail is read mid-conversation with a
+partner waiting, so it is a prompt, not the Bibliothek, and some categories carry 24 phrases.
+`MAX_HELP_PHRASES` picks the EASIEST that fit the Anrede, ranked by `CEFR_ORDER` (the one CEFR
+source) with the bank's authored order inside a band, and shows them in that authored order, so the
+list never rearranges itself between two glances. **The pills carry no count since s205:** capped at
+five, every intent printed the same digit, and a number that cannot vary is dead chrome rather than
+honesty. There is no dropdown: a lit pill states the selection, so a
 dropdown above it would print the same fact twice, and four options is pill territory. The pills do
 NOT toggle off, unlike `LifeAreaPills`: a conversation always has one intent in view. **No reset**
 (`ScopeRail.onReset` is optional since s202): this rail browses, it does not narrow a list, so a
@@ -105,6 +112,11 @@ Rules:
 - **The list is the one elastic element** in both shells: bounded in the rail, and in the drawer it
   takes what the `50dvh` cap leaves, so the intent pills below it stay on screen and the running
   screen still rests at zero page scroll.
+- **The edge fade is per edge and conditional** (`useEdgeFade`, s205), never the unconditional
+  `mask-fade-y` it shipped as. A list resting at its top faded its own FIRST phrase out under the
+  pills, which reads as a shadow cast by them (founder: "the first redemittel is literally
+  overshadowed"). A fade means "content continues past here"; with five phrases there is usually
+  nothing to continue, so there is usually no fade.
 
 **No exam set is `anruf` yet.** Every one of the 21 authored sets (measured 2026-08-08) is a "discuss
 the aspects and agree" task whose aspects must stay readable, so the Anruf layout is built, tested and
@@ -188,6 +200,46 @@ fixed:
    and the streak day. It now fires once per conversation either way, and the failure screen says
    the conversation is stored and offers the retry instead of one lone "Zurück".
 
+## Signing in is a WALL, not a caption (s205)
+
+The founder: "there is an error with speaking exercises, the ai feature doesn't work ... I say
+something and submit but it loads and there's no response". The screenshot settled it: the caption
+under the microphone read **"Bitte melde dich an, um mit der KI zu sprechen."** Nothing was broken
+upstream. Signed out with Turnstile on, `converse` cannot be called (it needs a user and a guest
+cannot be minted without a captcha token), and the refusal arrived AFTER the learner had opened the
+conversation, opened the microphone and spoken a full sentence, in the same faint grey slot that
+otherwise says "Ich höre zu …". There was no way to sign in from that screen either: the zone's quiet
+header drops the account menu (s201). It reads as the app doing nothing.
+
+- **`speakingAuthBlock()` / `useSpeakingAuthBlock()`** (`lib/speaking.ts`) are ONE rule with two
+  readers, imperative for the API client and subscribed for the screen, so the guard and the gate
+  cannot disagree. A guest counts as signed in; only `signedOut` is a wall.
+- **The gate is on the brief card**, the same law the daily allowance already follows (s194): a wall
+  is stated BEFORE the commitment. The wall with a remedy gets the remedy as its button, so Start
+  becomes **Anmelden** and opens `AuthDialog` rather than sitting there disabled with a note under
+  it. The sign-in wall is stated before the allowance one, being absolute.
+- **A session that lapses mid-conversation opens the dialog** (`TurnResult.needsAuth`).
+- **A failed caption is never printed in the status grey** (`MicCluster.captionTone`), and the typed
+  fallback prints the caption at all now: on a browser with no speech recognition a refused turn
+  showed the learner literally nothing.
+
+## Every leg of the cascade has a deadline (s205)
+
+There was no timeout on any provider call, in any Edge Function here. A provider that answers slowly
+or hangs therefore held the whole request open, which on the one AI surface a learner waits at
+SYNCHRONOUSLY is indistinguishable from the app being dead. `TURN_TIMEOUT_MS` (20 s) and
+`DEBRIEF_TIMEOUT_MS` (60 s) are `AbortSignal.timeout`s per leg, so a hung leg ENDS and the next model
+gets its turn.
+
+**The free leg was dead, not free.** `gemini-2.5-flash` reasons by default and Google bills thoughts
+as OUTPUT, so a 500-token turn budget was spent thinking about a two-sentence reply: the response
+came back `finishReason: "MAX_TOKENS"` with no text part, `converse` discarded it, and EVERY turn of
+every conversation fell through to the paid model behind it, at the cost of a whole extra round trip.
+Turns now send `thinkingConfig: { thinkingBudget: 0 }`. The other functions never hit this because
+they give Gemini 4096 tokens, where the thoughts fit; Sprechen is the one place a model is asked for
+two sentences. A losing leg now also LOGS its provider, HTTP status and the provider's own error
+code, so "the AI doesn't work" is diagnosable from the function logs without reproducing it.
+
 ## The Verlauf (s196)
 
 `speaking_conversations` had recorded every conversation since s193 and **nothing read it back**,
@@ -233,7 +285,7 @@ Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
 | `features/sprechen/ConversationRunner.tsx` | The one runner + the three stage views. |
 | `features/sprechen/ConversationBriefCard.tsx` | The pre-conversation brief. |
 | `features/sprechen/ConversationDebrief.tsx` | Goals, correction card, Redemittel. |
-| `features/sprechen/RedemittelHelp.tsx` | The phrases while speaking (s202): the rail tile and the drawer body, one content. Practice only, passed to the runner as `help`. |
+| `features/sprechen/RedemittelHelp.tsx` | The phrases while speaking (s202): the rail tile and the drawer body, one content. Practice only, passed to the runner as `help`. Caps at five and fades only where content continues (s205). |
 | `lib/anrede.ts` | The ONE du/Sie rule, derived from phrase text. |
 | `features/sprechen/MicCluster.tsx` | The shared control cluster + typed fallback. |
 | `features/sprechen/useSpeechInput.ts` | The microphone, over `engine/speech.ts`. |

@@ -17,10 +17,16 @@ import {
   type ConversationState,
 } from "@/engine/conversation";
 import { speak, stopSpeaking } from "@/engine/speech";
-import { requestDebrief, speakTurn, type DebriefResult } from "@/lib/speaking";
+import {
+  requestDebrief,
+  speakTurn,
+  useSpeakingAuthBlock,
+  type DebriefResult,
+} from "@/lib/speaking";
 import { useDailyAllowance } from "@/lib/aiAllowance";
 import { useMediaQuery } from "@/lib/hooks";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { AuthDialog } from "@/features/auth/AuthDialog";
 import { useLiveWork } from "@/lib/liveWork";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -108,11 +114,18 @@ export function ConversationRunner({
   const [editing, setEditing] = useState<string | null>(null);
   const [hint, setHint] = useState<string | null>(null);
   const [over, setOver] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const conversationId = useRef<string>(crypto.randomUUID());
   /** This conversation has already been counted as practice; see `runDebrief`. */
   const counted = useRef(false);
   const speech = useSpeechInput();
   const reduce = useReducedMotion();
+  /**
+   * Why the AI cannot be called, asked of the SAME function the API client asks
+   * (s205), and re-read whenever auth changes so signing in clears the wall on
+   * the spot instead of after a reload.
+   */
+  const authBlock = useSpeakingAuthBlock();
   // The budget this run spends: Prüfungsgespräche are counted apart from
   // Übungsgespräche (s204).
   const allowance = useDailyAllowance(brief.exam ? "sprechenExam" : "sprechen");
@@ -183,6 +196,10 @@ export function ConversationRunner({
         // its ceiling. Without this the microphone stayed live and the learner
         // kept speaking into a transcript nobody would read.
         if (res.conversationOver) setOver(true);
+        // A session that lapsed mid-conversation is the one failure the learner
+        // can actually fix, so it is put in front of them instead of ending up
+        // as a caption they will read as silence (s205).
+        if (res.needsAuth) setAuthOpen(true);
         return;
       }
       setState((s) => addPartnerTurn(s, res.reply!));
@@ -269,6 +286,9 @@ export function ConversationRunner({
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       {header}
       {node}
+      {/* Every screen carries it, because the wall it clears can appear on the
+          brief (nobody signed in) or mid-run (a session that lapsed). */}
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} intent="signup" />
     </div>
   );
 
@@ -282,11 +302,15 @@ export function ConversationRunner({
       <ConversationBriefCard
         brief={brief}
         onStart={start}
+        // The sign-in wall is stated FIRST: it is absolute, while the allowance
+        // is only the next wall behind it.
         disabledReason={
-          spent
+          authBlock ??
+          (spent
             ? `Du hast heute schon ${allowance.limit} ${allowance.limit === 1 ? "Gespräch" : "Gespräche"} geführt. Komm morgen wieder!`
-            : null
+            : null)
         }
+        onSignIn={authBlock ? () => setAuthOpen(true) : undefined}
       />,
     );
   }
@@ -539,6 +563,8 @@ export function ConversationRunner({
       )}
 
       <MicCluster
+        // A failure is never printed in the status grey (s205).
+        captionTone={!finished && state.error ? "error" : "status"}
         listening={speech.listening}
         supported={speech.supported}
         busy={busy || finished}

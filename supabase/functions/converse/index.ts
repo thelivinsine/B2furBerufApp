@@ -121,6 +121,25 @@ const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
 const TURN_MAX_TOKENS = 500;
 const DEBRIEF_MAX_TOKENS = 4096;
 
+/**
+ * How long one leg of the cascade may take before it is abandoned and the next
+ * model is asked (s205).
+ *
+ * There was no timeout at all, on any leg, in any function here. A provider that
+ * answers slowly or not at all therefore held the whole request open, and the
+ * learner sat on "… antwortet" with no reply and no error, because the client
+ * only ever learns something when the request RETURNS (the founder's "it loads
+ * and there's no response from ai"). A cascade whose first leg cannot time out
+ * is not a cascade: it is a single point of failure with two spares behind it.
+ *
+ * The numbers are the shape of the call, not a guess: a spoken turn is one to
+ * three sentences and is back in two or three seconds when it is healthy, so 20
+ * seconds is already pathological; the debrief writes a whole JSON object over a
+ * twelve-turn transcript and is allowed proportionally longer.
+ */
+const TURN_TIMEOUT_MS = 20_000;
+const DEBRIEF_TIMEOUT_MS = 60_000;
+
 function monthKey(d = new Date()): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
@@ -277,6 +296,52 @@ interface CallOpts {
   maxTokens: number;
   /** Ask the model for raw JSON. The debrief does; a spoken turn does not. */
   json?: boolean;
+  /** Milliseconds one leg may take before the next model is asked. */
+  timeoutMs: number;
+  /**
+   * Whether the Gemini leg may think before it writes (s205).
+   *
+   * FALSE for a turn, and this is the bug the founder hit. `gemini-2.5-flash`
+   * reasons by default, and Google bills those thoughts as OUTPUT, so they come
+   * out of `maxOutputTokens`. A turn allows 500 tokens, which a thinking model
+   * spends in full on thoughts about a one-sentence reply: the response comes
+   * back with `finishReason: "MAX_TOKENS"` and NO text part, this function
+   * discards it, and every single turn silently fell through to the paid leg
+   * behind it. The free leg was not free, it was dead, and it cost a whole extra
+   * round trip on every turn of every conversation.
+   *
+   * The other functions here never saw it because they give Gemini 4096 tokens,
+   * where the thoughts fit. Sprechen is the one place a model is asked for two
+   * sentences, which is exactly where a thinking budget does not fit.
+   */
+  think?: boolean;
+}
+
+/**
+ * A leg's own deadline. `AbortSignal.timeout` is what makes the cascade able to
+ * move on: without it a hanging provider is indistinguishable from a slow one,
+ * forever.
+ */
+function legSignal(ms: number): AbortSignal {
+  return AbortSignal.timeout(ms);
+}
+
+/**
+ * Why a leg lost, in the function logs. It used to return `null` for every
+ * cause, so a 401 from an expired key, a 429, a model id that no longer exists
+ * and a genuine timeout were all the same silent nothing, and "the AI doesn't
+ * work" could not be diagnosed without reproducing it. Nothing here is a secret:
+ * a provider name, an HTTP status and the provider's own error code.
+ */
+async function legFailed(provider: string, res: Response): Promise<null> {
+  let detail = "";
+  try {
+    detail = (await res.text()).slice(0, 300);
+  } catch {
+    /* body already consumed or unreadable; the status is the useful part */
+  }
+  console.error(`converse: ${provider} HTTP ${res.status} ${detail}`);
+  return null;
 }
 
 async function callGemini(
@@ -291,6 +356,7 @@ async function callGemini(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
       {
         method: "POST",
+        signal: legSignal(opts.timeoutMs),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
@@ -304,18 +370,35 @@ async function callGemini(
             // Gemini wraps the object in prose or code fences and the parse is
             // a gamble; `parseJson` covered the fences, not the prose.
             ...(opts.json ? { responseMimeType: "application/json" } : {}),
+            // Thoughts are billed as output, so on a 500-token turn they ate
+            // the entire budget and the answer was never written (see
+            // CallOpts.think). Zero is the documented way to turn 2.5 Flash's
+            // reasoning off; a turn is one to three spoken sentences and has
+            // nothing to reason about.
+            ...(opts.think === false ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
           },
         }),
       },
     );
-    if (!res.ok) return null;
+    if (!res.ok) return await legFailed("gemini", res);
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (typeof text !== "string" || !text.trim()) return null;
+    if (typeof text !== "string" || !text.trim()) {
+      // Almost always `finishReason: "MAX_TOKENS"` with the budget spent on
+      // thoughts. Logged with the reason so it is a fact in the logs rather
+      // than an invisible fall-through to the paid leg.
+      console.error(
+        `converse: gemini returned no text (finishReason ${data?.candidates?.[0]?.finishReason})`,
+      );
+      return null;
+    }
     // Free tier prices at $0, which is the whole point of leading with it; the
     // tokens are recorded regardless, so free-quota headroom is measurable.
     return { text, model: GEMINI_MODEL, usage: geminiUsage(data) };
-  } catch {
+  } catch (e) {
+    // Includes the leg's own timeout, which is the point: a hanging provider
+    // now ENDS, and the next model gets its turn.
+    console.error(`converse: gemini call failed: ${e}`);
     return null;
   }
 }
@@ -331,6 +414,7 @@ async function callAnthropic(
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
+      signal: legSignal(opts.timeoutMs),
       headers: {
         "Content-Type": "application/json",
         "x-api-key": key,
@@ -343,7 +427,7 @@ async function callAnthropic(
         messages: turns.map((t) => ({ role: t.role, content: t.text })),
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) return await legFailed("anthropic", res);
     const data = await res.json();
     // A safety decline returns HTTP 200 with stop_reason "refusal" and no
     // usable content, so `stop_reason` is checked before `content` is read.
@@ -351,7 +435,8 @@ async function callAnthropic(
     const text = data?.content?.[0]?.text;
     if (typeof text !== "string" || !text.trim()) return null;
     return { text, model, usage: anthropicUsage(data) };
-  } catch {
+  } catch (e) {
+    console.error(`converse: anthropic call failed: ${e}`);
     return null;
   }
 }
@@ -366,6 +451,7 @@ async function callOpenAI(
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
+      signal: legSignal(opts.timeoutMs),
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
         model: OPENAI_MODEL,
@@ -380,12 +466,13 @@ async function callOpenAI(
         ...(opts.json ? { response_format: { type: "json_object" } } : {}),
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) return await legFailed("openai", res);
     const data = await res.json();
     const text = data?.choices?.[0]?.message?.content;
     if (typeof text !== "string" || !text.trim()) return null;
     return { text, model: OPENAI_MODEL, usage: openaiUsage(data) };
-  } catch {
+  } catch (e) {
+    console.error(`converse: openai call failed: ${e}`);
     return null;
   }
 }
@@ -661,6 +748,8 @@ Deno.serve(async (req) => {
 
     const out = await cascade(turnSystemPrompt(brief), wire, TURN_MODEL, {
       maxTokens: TURN_MAX_TOKENS,
+      timeoutMs: TURN_TIMEOUT_MS,
+      think: false,
     });
     if (!out) {
       await undoEmptyStart();
@@ -741,7 +830,7 @@ Deno.serve(async (req) => {
     debriefSystemPrompt(brief),
     [{ role: "user", text: `TRANSKRIPT:\n${transcript}` }],
     DEBRIEF_MODEL,
-    { maxTokens: DEBRIEF_MAX_TOKENS, json: true },
+    { maxTokens: DEBRIEF_MAX_TOKENS, json: true, timeoutMs: DEBRIEF_TIMEOUT_MS },
     (o) => parseJson(o.text) !== null,
   );
   const parsed = out ? parseJson(out.text) : null;

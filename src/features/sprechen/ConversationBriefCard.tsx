@@ -30,12 +30,21 @@ export function ConversationBriefCard({
   onStart,
   starting,
   disabledReason,
+  onSignIn,
 }: {
   brief: ConversationBrief;
   onStart: () => void;
   starting?: boolean;
   /** Set when the conversation cannot start (no allowance left, offline). */
   disabledReason?: string | null;
+  /**
+   * Set ONLY when the wall is a missing account, and the learner can clear it
+   * from here (s205). A wall with a remedy gets a button that performs the
+   * remedy, not a dead Start with a note under it: "controls always visibly
+   * act" is the founder's rule, and an allowance that is spent has no action,
+   * while signing in does.
+   */
+  onSignIn?: () => void;
 }) {
   // Practice and Prüfung run on separate daily budgets (s204), so the brief
   // decides which meter this card is reading.
@@ -120,15 +129,22 @@ export function ConversationBriefCard({
       </div>
 
       <div className={cn("mt-auto")}>
-        <Button
-          variant="gradient"
-          className="w-full"
-          onClick={onStart}
-          disabled={starting || !!disabledReason}
-        >
-          {starting ? "Gespräch wird gestartet …" : "Gespräch starten"}
-          {!starting && <ArrowRight className="h-4 w-4" />}
-        </Button>
+        {onSignIn ? (
+          <Button variant="gradient" className="w-full" onClick={onSignIn}>
+            Anmelden
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button
+            variant="gradient"
+            className="w-full"
+            onClick={onStart}
+            disabled={starting || !!disabledReason}
+          >
+            {starting ? "Gespräch wird gestartet …" : "Gespräch starten"}
+            {!starting && <ArrowRight className="h-4 w-4" />}
+          </Button>
+        )}
         <p className="mt-2.5 text-center text-[11px] leading-snug text-muted-foreground">
           {disabledReason ??
             "Dein Mikrofon wird nur während des Gesprächs benutzt. KI-Rückmeldung kann Fehler enthalten."}

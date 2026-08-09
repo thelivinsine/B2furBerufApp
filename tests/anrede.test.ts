@@ -65,6 +65,16 @@ describe("the rail is servable for every scenario", () => {
     }
   });
 
+  it("never offers more than five phrases at once (founder s205)", () => {
+    for (const register of ["du", "sie"] as const) {
+      for (const category of new Set(scenarios.flatMap((s) => s.targetRedemittel))) {
+        // The rail is read mid-conversation with a partner waiting, so it is a
+        // prompt, not the Bibliothek. Some categories carry 24 phrases.
+        expect(helpPhrases(category, register).length).toBeLessThanOrEqual(5);
+      }
+    }
+  });
+
   it("never offers a phrase in the wrong Anrede while a fitting one exists", () => {
     for (const register of ["du", "sie"] as const) {
       for (const category of new Set(scenarios.flatMap((s) => s.targetRedemittel))) {
