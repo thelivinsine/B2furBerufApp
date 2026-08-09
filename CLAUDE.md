@@ -63,7 +63,7 @@ after pulling.
   LifeAreaPills, ViewSwitcher, DataTable, SearchField, useSlidingPill)
 - `components/` — `layout/` (AppShell, BottomTabBar, Sidebar, route-icons, FeedbackButton),
   `artikel/` + `city/` (see `docs/areas/COMPONENTS.md`), `ui/` primitives, `shared/Logo.tsx`
-- `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
+- `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx` · `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/analytics` Fortschritt · `/settings` ·
   `/session` · `/welt` game · `/anwenden` **Prüfung** (the nav zone holding the four modules +
   Modelltest) · the four Ohne-Zeit choosers `/lesen` · `/hoeren` · `/writing` · `/simulation` (each
@@ -114,10 +114,10 @@ after pulling.
   - **A supplied `source` text belongs to the REPLY genre, never to an opinion task** (s200), and
     `source` is currently read by nothing.
   (Detail → `docs/areas/CONTENT.md`; why → `DECISIONS.md` §s199/§s200.)
-- **Keep eager code light:** the Dashboard imports NO content bank; bank-consuming dashboard
-  elements are lazy chunks. Never re-introduce a static import chain from eager code to a bank.
-- **Reward color (Koralle, `--reward`)** is reserved for loot/combo/streak celebration moments
-  (plus Fokus error underlines); never general chrome, never building marks.
+- **Keep eager code light:** the Dashboard imports NO content bank (bank-consuming elements are lazy
+  chunks). Never re-introduce a static import chain from eager code to a bank.
+- **Reward color (Koralle, `--reward`)** is loot/combo/streak moments plus Fokus error underlines
+  only; never general chrome or building marks.
 - **Locked structures** (change only on explicit founder request): the mobile bottom tab bar
   (`PRAKTISCH-NAV.md`), the dialog/overlay recipe (`BRAND.md` §Dialog), the in-mission pixel chrome +
   "failure is content, never lockout" + the ungated boss mission 1.6 (`GAME.md`), the
@@ -136,11 +136,9 @@ after pulling.
   the partner never corrects mid-flow. **Layout is a property of the TASK** (`gespraech` / `buehne` /
   `anruf`). **The row is written when a conversation STARTS** (s194), so the daily limit counts what
   costs money; **the practice counts once the learner has SPOKEN, not once the AI has graded**
-  (s196), so a failed debrief is retryable. **A practice
-  conversation carries its Redemittel while the learner speaks** (founder s202), **practice only,
-  structurally**: the runner takes them as a PROP and the Modelltest passes nothing, so a candidate
-  never reads the phrases they are graded on. Nothing sends a phrase into the transcript; the Anrede
-  follows the ONE du/Sie rule (`lib/anrede.ts`). Detail: `docs/areas/SPRECHEN.md`.
+  (s196), so a failed debrief is retryable. **A practice conversation carries its Redemittel** (founder s202), **structurally**:
+  the runner takes them as a PROP and the Modelltest passes nothing, so a candidate never reads the
+  phrases they are graded on. Anrede follows `lib/anrede.ts`. Detail: `docs/areas/SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195; mechanism in `docs/areas/PRUEFUNG.md`). ONE exit,
   the LAST control in the header, top right, on every screen of the zone and at every width
   (`useSessionStore.zoneExit`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever
@@ -172,6 +170,9 @@ after pulling.
   columns rather than deleting rows so limits, aggregates and the Verlauf entry survive. **A
   retention timer and the privacy-policy copy describing it ship in the SAME change**; never resolve
   a conflict between them by editing the copy alone.
+- **AI usage is MEASURED; only the cost is derived** (s204): every call writes an `ai_calls` row with
+  the provider's own token counts, priced from ONE table (`functions/_shared/aiUsage.ts`, overridable
+  via `app_config.ai_rates`). Never re-hardcode a price in a function.
 - **Never reload over a learner's unsaved work.** Every automatic reload is gated on `hasLiveWork()`
   (`src/lib/liveWork.ts`) and retries at a later resume. Any new surface holding in-memory work
   claims it with `useLiveWork(active, label, flush)` AND persists itself.
@@ -310,8 +311,7 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   as applied history; never raise that baseline). Rescue inputs + detail: `docs/areas/COMMANDS.md`.
 - **Feature-branch pushes do NOT update the live site** ("I don't see the change" = unmerged work),
   and the sandbox cannot reach the live site; the founder verifies live results.
-- **A Pages deploy outlasts the action's 10-minute default:** attempt 1 gets 30 min
-  (`timeout: 1800000`), the retries 10; a red deploy is re-run before the build is suspected.
+- **A Pages deploy outlasts the 10-min default:** attempt 1 gets 30 min, the retries 10 (why → §s197).
 - The app is a PWA: after a deploy a stale service worker can serve the old build, so hard-refresh
   before diagnosing "missing" changes. The auto-update reload **defers while a draft or session is
   open** (s173), so a learner mid-task adopts the new build at their next clean resume.

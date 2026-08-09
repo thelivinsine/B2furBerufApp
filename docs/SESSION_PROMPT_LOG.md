@@ -5811,3 +5811,176 @@ _(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that num
   of headroom, so the next law added to it costs an old line somewhere, and a count quoted in any doc
   is re-measured with `pnpm lint:content` rather than copied from the line above it.
   **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+---
+
+## Session 204 — prompt 1 (2026-08-06): the KI-usage task, part A
+
+**Branch:** `claude/ki-usage-task-kg0vix`
+
+**Prompt (verbatim):**
+
+> continue with KI usage task
+
+**Response summary.** Picked up s196's prompt-2 scope (founder-approved A + B) from the
+"Resume here" note. **Shipped A, prepared B's preview round, did not build B.**
+
+**A: the Umformung is no longer a silent AI feature.** `transform-sentence` enforces
+`TRANSFORM_DAILY_LIMIT` (30/day) and was in no allowance at all, so that wall arrived unannounced.
+`AiMode` gains `transform` (default 30), counted against the SAME ledger the function counts
+(`sentence_ai_ops`, `kind = 'transform'`, paid ops only, so a cached Umformung is free on both
+sides); the function returns `dailyLimit`/`dailyRemaining` on its success and limit-reached
+responses; `transformSentence` reports them like every other AI client. The Umformung keeps its OWN
+budget rather than joining Fokus, because it has never spent a Korrektur (s167) and one round can
+spend three of it. Rendered with the existing `AllowanceNote`, no new component. Also fixed a stale
+header comment in the function (it claimed a default of 40; the code says 30).
+
+**B: previews built, not implemented.** `preview/ki-usage-chip.html` (artifact
+<https://claude.ai/code/artifact/749b6ec2-d56d-4f48-bd5a-cfef4efeedb4>) shows four candidate chips
+(A quiet line · B accent chip beside the button · C count on the button · D chip with a dot meter)
+in the same three contexts, built from the real `src/index.css` tokens, with a light/dark switch and
+a plenty / nearly-gone / used-up switch, plus three candidates for the AI mark itself (the sparkle
+cannot be it: Quiz, empty states and onboarding already use it). Screenshot-verified in headless
+Chromium at 1280px in both themes and all three states before publishing.
+
+**Gates:** typecheck · lint 0 errors (77 warnings, unchanged — verified against a stashed baseline,
+because the s196 note said 76) · **625 tests** (up from 624, new transform cases in
+`tests/aiAllowance.test.ts`) · build · check:bundle 129.8 kB of 400.
+
+- **Artifacts:** `src/lib/aiAllowance.ts` · `src/lib/sentenceStudio.ts` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `supabase/functions/transform-sentence/index.ts` ·
+  `tests/aiAllowance.test.ts` · `preview/ki-usage-chip.html` · commits `457fcbd`, `1e9f3d7`
+  (branch pushed, no PR yet)
+
+---
+
+## Session 204 — prompts 2-4 (2026-08-06): what "AI usage" should actually mean
+
+**Branch:** `claude/ki-usage-task-kg0vix`
+
+- **Prompt 2 (verbatim):** `this one shows just the count we arbitrarily determined. I want to show
+  the actual usage of the AI`
+  **Response (no code).** Dismissed the chip/mark question and answered the premise instead: the
+  count is real (it counts actual calls), the LIMIT is invented (a cost guard we chose). What the
+  app already records per call: the feature, the timestamp, which model answered, whether it was a
+  free cache hit, and an estimated cost. What it does NOT record: tokens (read from the provider,
+  turned into a cost, discarded). Offered three readings of "actual usage" — (1) count UP real
+  consumption learner-facing, (2) extend the founder-facing spend view, (3) store real tokens like
+  Claude Code — and asked which.
+
+- **Prompt 3 (verbatim):** `whenever I use AI feature, I see some cost in the control center. Does
+  that mean it's real money being used or just an arbitrary number? I'm confused because you
+  mentioned in several cases that Gemini has a free tier that means no money should be used`
+  **Response (no code).** Read the four functions and answered per provider: **Gemini books 0.00**
+  (true while the key stays inside Google's free tier, and it is an assumption, not a measurement),
+  **Claude** is computed from the token counts the API actually reports times the published
+  per-million rates (real money, accurately estimated), **GPT-5 in `converse`** likewise, but
+  **GPT-5 in `check-sentence`, `evaluate-writing` and `transform-sentence` is a hardcoded flat
+  0.004 $ per call** — the one genuinely arbitrary number. So a non-zero figure in the control
+  centre means Gemini did NOT answer that call. Also flagged that the rates are hardcoded in four
+  places and drift when a provider repricies. Nobody bills the figure: `ai_usage.cost_estimate` is
+  our own reconstruction and a fuse against `MONTHLY_SPEND_CAP_USD`.
+
+- **Prompt 4 (verbatim):** `how do we make sure we see real usage and costs and not just estimates?`
+  **Response (no code), and the recommendation this session ends on.** Three steps, cheapest first:
+  **(1) measure tokens instead of assuming them** — one `ai_calls` table where every call writes
+  what the provider reported (feature, provider, model, input/output/cached tokens, cache hit), and
+  prices move out of four Edge Functions into one config row; **(2) reconcile against the
+  providers** — Anthropic's Usage and Cost Admin API (`/v1/organizations/usage_report/messages` and
+  `/v1/organizations/cost_report`, separate `sk-ant-admin01-` key, **organization account required,
+  not an individual one**, data fresh within ~5 min) and OpenAI's equivalent organization
+  usage/cost endpoints, pulled nightly so the control centre can show "ours 3.42 $ · Anthropic says
+  3.51 $"; Gemini has no clean billing API, so free-tier consumption stays a self-measured count
+  against the published limits and must SAY so; **(3) the learner-facing number stays counts, never
+  money.** One accuracy check run against the live code: our hardcoded Claude rates ($3/$15 Sonnet,
+  $1/$5 Haiku) match Anthropic's current published rates, so those rows are close to right today.
+  Founder: "document the session along with your recommendation. We'll continue later."
+
+- **Artifacts (prompts 2-4):** analysis only · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` §s204 ·
+  `docs/areas/SCHREIBEN.md` · this log
+
+
+---
+
+## Session 204 — prompt 5 (2026-08-06): step 1, and the Sprechen limits
+
+**Branch:** `claude/ki-usage-task-kg0vix`
+
+**Prompt (verbatim):**
+
+> continue with step 1. also, I don't want to have the current limit for sprechen exercises. it's
+> very less. increase the limit to 6 for üben and 3 for Prüfung.
+
+**Response summary.** Both, shipped.
+
+**Step 1: AI usage is measured, not assumed.** Migration `0018_ai_calls.sql` adds the per-call
+ledger (feature, provider, model, input/output/cached tokens, cache hit, derived cost, rate
+version), select-own RLS so a learner-facing readout needs no new endpoint, a founder roll-up
+(`admin_ai_usage_breakdown`, aggregates only) and a 400-day `pg_cron` purge.
+`supabase/functions/_shared/aiUsage.ts` is the one place that reads each provider's differently
+named token block, prices it from ONE table (runtime-overridable via `app_config.ai_rates`, with the
+empty-config-equals-today contract preserved) and writes the row. All four Edge Functions were
+rewired to it: gone are the **flat $0.004-per-GPT-5-call guess** in three of them and the four
+hand-copied Claude formulas. Cache hits are recorded as zero-cost calls so the hit rate is visible.
+`ai_usage` is deliberately untouched: it stays the monthly spend fuse, and `ai_calls` is the detail
+behind it.
+
+**Sprechen: 6 Üben + 3 Prüfung per day**, replacing one shared budget of 2. Counted separately
+against `speaking_conversations.exam` on both sides (server `DAILY_LIMIT_CONVERSATIONS` /
+`DAILY_LIMIT_EXAM_CONVERSATIONS`, client `sprechen` / `sprechenExam`). **For an existing
+conversation the ROW's own `exam` decides which budget it spends, never the request body**, so a
+forged flag cannot move a running conversation onto the emptier meter. Two things had to move with
+it: the per-learner monthly ceiling (40 → 120, because 40 against 9 possible a day would have bound
+within four days), and the Modelltest's budget note, which now reads the exam meter rather than the
+practice one.
+
+**One judgement call worth the founder's attention.** `ai_calls` is a new per-user record, so both
+language versions of the privacy policy's retention section now describe it (no text, counts only,
+400 days, link dropped on account deletion) and `CONSENT_VERSION` / `PRIVACY_LAST_UPDATED_ISO` were
+bumped in lockstep to `2026-08-06`. That **asks every signed-in learner to re-consent** on their next
+visit. It follows the documented lockstep rule and errs toward disclosure; reverting is one line if
+the founder would rather not interrupt learners for telemetry that holds no text.
+
+**Gates:** typecheck · lint 0 errors (77 warnings, baseline) · **637 tests** (up from 626;
+`tests/aiUsage.test.ts` pins the pricing arithmetic, the three providers' token shapes and the
+never-free-unknown-model rule, and `tests/aiAllowance.test.ts` pins the two Sprechen budgets) ·
+build · check:bundle 129.8 kB · check:contrast · lint:content · lint:migrations. The Edge Functions
+are Deno and outside `tsc`, so they were syntax-checked with esbuild and read line by line instead.
+
+- **Artifacts:** `supabase/migrations/0018_ai_calls.sql` · `supabase/functions/_shared/aiUsage.ts` ·
+  all four `supabase/functions/*/index.ts` · `src/lib/aiAllowance.ts` · `src/lib/speaking.ts` ·
+  `src/features/sprechen/{ConversationBriefCard,ConversationRunner}.tsx` ·
+  `src/features/pruefung/PruefungHub.tsx` · `src/features/legal/PrivacyPolicy.tsx` ·
+  `src/lib/{consent,legalMeta}.ts` · `tests/aiUsage.test.ts` · `tests/aiAllowance.test.ts` ·
+  `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` · `docs/areas/{SPRECHEN,LEGAL-ADMIN}.md` ·
+  `docs/DECISIONS.md` §s204 · `docs/PROJECT_STATUS.md` · this log
+
+
+---
+
+## Session 204 — prompt 6 (2026-08-08): ship it
+
+**Branch:** `claude/ki-usage-task-kg0vix` → `main`
+
+**Prompt (verbatim):**
+
+> merge everything to main and live. document the session
+
+**Response summary.** Opened **PR #835** with everything the session produced and squash-merged it
+into `main` under the auto-ship rule, then did the post-merge housekeeping.
+
+**One thing added under "and live" rather than left for later:** the `pages.yml` deploy timeout,
+raised from the action's 600 s default to 30 minutes on all three attempts. s196 had already
+established the diagnosis and the fix and left it untaken as its own review; since this prompt asked
+for the change to go live, shipping the merge on top of the known-broken timeout would have invited
+the same red deploy the founder has now seen three sessions running. The retry chain stays.
+
+**What went live:** the Umformung's visible allowance; the `ai_calls` per-call usage ledger with one
+shared rate table (migration 0018 applies before the Edge Functions deploy, which is the required
+order here); the two Sprechen budgets (6 Üben, 3 Prüfung); the privacy-policy disclosure of the
+usage log with the consent version bumped in lockstep; and the CI timeout fix. `preview/ki-usage-chip.html`
+ships as a preview file only, nothing implemented from it.
+
+**Flagged, not decided:** the consent bump re-prompts every signed-in learner on their next visit,
+and reverting it is one line.
+
+- **Artifacts:** **PR #835**, squash-merged · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

@@ -10,7 +10,11 @@ import { PRIVACY_LAST_UPDATED_ISO } from "@/lib/legalMeta";
  * `consentInSync()` (admin Launch §G2) and `tests/consent.test.ts` guard the
  * lockstep.
  */
-export const CONSENT_VERSION = "2026-08-05";
+// Bumped for s204: the policy now discloses the technical AI usage log
+// (`ai_calls`, migration 0018). It holds no learner text, but it is a new
+// per-user record with its own 400-day retention, so it is disclosed and the
+// lockstep is honoured rather than argued around.
+export const CONSENT_VERSION = "2026-08-06";
 
 /**
  * G2 consent-drift check: true when the consent version matches the legal

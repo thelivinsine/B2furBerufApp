@@ -113,7 +113,9 @@ export function ConversationRunner({
   const counted = useRef(false);
   const speech = useSpeechInput();
   const reduce = useReducedMotion();
-  const allowance = useDailyAllowance("sprechen");
+  // The budget this run spends: Prüfungsgespräche are counted apart from
+  // Übungsgespräche (s204).
+  const allowance = useDailyAllowance(brief.exam ? "sprechenExam" : "sprechen");
 
   const speechEnabled = useSettingsStore((s) => s.speechEnabled);
   const voiceURI = useSettingsStore((s) => s.voiceURI);

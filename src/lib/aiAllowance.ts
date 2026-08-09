@@ -22,7 +22,13 @@ import { useAuthStore } from "@/store/useAuthStore";
  *       - Fokus -> `sentence_checks` (one row per Korrektur, cached ones
  *         included, which is exactly what `DAILY_CHECK_LIMIT` counts; an
  *         Umformung writes no row and never consumes a unit).
- *       - Kurz / Lang -> `writing_evaluations` filtered by `length`, counted
+ *       - Umformung -> `sentence_ai_ops` with `kind = "transform"`, which is
+ *         the SAME ledger `transform-sentence` counts against
+ *         `TRANSFORM_DAILY_LIMIT`. Only PAID ops land there, so a cached
+ *         Umformung is free here exactly as it is on the server.
+ *       - Sprechen -> `speaking_conversations` filtered by `exam`, because
+         practice and Prüfung run on separate daily budgets (s204: 6 and 3).
+       - Kurz / Lang -> `writing_evaluations` filtered by `length`, counted
  *         separately per mode so a day of Kurz cannot eat the Lang allowance. A
  *         cached resubmission returns before the row is written, so it is free
  *         here too.
@@ -33,16 +39,24 @@ import { useAuthStore } from "@/store/useAuthStore";
  * shows NO number rather than one it cannot stand behind.
  */
 
-export type AiMode = "fokus" | "kurz" | "lang" | "sprechen";
+export type AiMode = "fokus" | "kurz" | "lang" | "sprechen" | "sprechenExam" | "transform";
 
 /** Defaults, mirroring the Edge Function defaults. A server value always wins. */
 export const DAILY_ALLOWANCE: Record<AiMode, number> = {
   fokus: 10,
   kurz: 4,
   lang: 2,
-  // Founder s193: a spoken conversation costs about what a Lang evaluation
-  // costs, so it sits beside Lang rather than getting its own generous budget.
-  sprechen: 2,
+  // Founder s204 ("it's very less"): 6 Übungsgespräche and 3 Prüfungsgespräche
+  // per day, counted SEPARATELY against `speaking_conversations.exam`, so a day
+  // spent practising can never eat the exam allowance or the other way round.
+  // (Was one shared budget of 2 from s193.)
+  sprechen: 6,
+  sprechenExam: 3,
+  // Founder s204: the Umformung was the one AI feature with NO readout, so a
+  // learner hit `TRANSFORM_DAILY_LIMIT` with no warning. It is a SEPARATE
+  // budget, not part of Fokus: an Umformung never spends a Korrektur (s167),
+  // and 30 is DAILY_CHECK_LIMIT (10) x TRANSFORM_VARIANTS (3).
+  transform: 30,
 };
 
 /* ------------------------- what the server last said ---------------------- */
@@ -107,25 +121,40 @@ function startOfUtcDay(): string {
 export async function fetchUsedToday(mode: AiMode): Promise<number | null> {
   try {
     const since = startOfUtcDay();
-    const query =
-      mode === "fokus"
-        ? supabase
+    const rows = () => {
+      switch (mode) {
+        case "fokus":
+          return supabase
             .from("sentence_checks")
             .select("id", { count: "exact", head: true })
-            .gte("created_at", since)
-        : mode === "sprechen"
-          ? // One row per conversation, written when it STARTS (migration 0017),
-            // which is the same thing the `converse` function counts.
-            supabase
-              .from("speaking_conversations")
-              .select("id", { count: "exact", head: true })
-              .gte("created_at", since)
-          : supabase
-              .from("writing_evaluations")
-              .select("id", { count: "exact", head: true })
-              .eq("length", mode === "lang" ? "long" : "short")
-              .gte("created_at", since);
-    const { count, error } = await query;
+            .gte("created_at", since);
+        case "transform":
+          // Only PAID Umformungen are ledgered, which is exactly what
+          // `TRANSFORM_DAILY_LIMIT` counts; a cached one is free on both sides.
+          return supabase
+            .from("sentence_ai_ops")
+            .select("id", { count: "exact", head: true })
+            .eq("kind", "transform")
+            .gte("created_at", since);
+        case "sprechen":
+        case "sprechenExam":
+          // One row per conversation, written when it STARTS (migration 0017),
+          // which is the same thing the `converse` function counts, split by the
+          // same `exam` flag the server's two daily budgets are counted against.
+          return supabase
+            .from("speaking_conversations")
+            .select("id", { count: "exact", head: true })
+            .eq("exam", mode === "sprechenExam")
+            .gte("created_at", since);
+        default:
+          return supabase
+            .from("writing_evaluations")
+            .select("id", { count: "exact", head: true })
+            .eq("length", mode === "lang" ? "long" : "short")
+            .gte("created_at", since);
+      }
+    };
+    const { count, error } = await rows();
     if (error) return null;
     return count ?? 0;
   } catch {

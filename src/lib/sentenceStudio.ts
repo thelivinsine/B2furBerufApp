@@ -58,6 +58,10 @@ export interface TransformResult {
   noteEn?: string;
   cached?: boolean;
   limitReached?: boolean;
+  /** Today's Umformung allowance as the server enforces it (s204). Absent on a
+   *  cache hit, which costs no unit and returns before the count is taken. */
+  dailyLimit?: number;
+  dailyRemaining?: number;
   message?: string;
 }
 
@@ -117,6 +121,7 @@ export async function transformSentence(input: {
       },
     );
     if (error) return { ok: false, message: UNAVAILABLE };
+    if (data) reportServerAllowance("transform", data.dailyLimit, data.dailyRemaining);
     return data ?? { ok: false, message: "Keine Antwort erhalten." };
   } catch {
     return { ok: false, message: UNAVAILABLE };

@@ -56,6 +56,15 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   client-side to the newest 100) and `writing_evaluations.exam_score` (smallint, the 0-100 score
   the evaluator returns in exam mode; null on every practice row and on any run the model could
   not score).
+- **s204 added migration 0018: `ai_calls`,** the per-call AI usage ledger. One row per provider
+  call holding what the provider ACTUALLY reported (feature, provider, model, input/output/cached
+  tokens, cache hit) plus a cost derived from one shared rate table
+  (`supabase/functions/_shared/aiUsage.ts`, overridable at runtime from `app_config.ai_rates`).
+  Learner-readable for their own rows (select-own RLS), written only by the service role; the
+  founder roll-up is `admin_ai_usage_breakdown(days)`, aggregates only. `ai_usage` is unchanged and
+  still the monthly spend FUSE; this is the detail behind it, and the thing a future reconciliation
+  against the providers' own usage/cost APIs gets compared to. Purged at 400 days
+  (`purge_old_ai_calls`, `pg_cron`), matching the client's activity window. No learner text.
 - **Full schema as of s185 (15 migrations).** Per-learner, owner-only RLS: `profiles`, `progress`,
   `writing_evaluations`, `sentence_checks`, `sentence_ai_ops`. Service-role only (no client
   policies at all): `ai_usage`, `feedback`, `admins`, `gdpr_events`, `sentence_transforms` (the one

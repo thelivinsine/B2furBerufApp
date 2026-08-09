@@ -133,8 +133,15 @@ never leaves the device, which is why the privacy policy can say so.
 - ~2-4 cents per 12-turn conversation, and effectively 0 while the free Gemini Flash leg of the
   cascade absorbs the turns. Turns use `SPEAKING_TURN_MODEL` (cheap), the debrief
   `SPEAKING_DEBRIEF_MODEL`.
-- **2 conversations per learner per day** (`DAILY_LIMIT_CONVERSATIONS`), beside Lang in
-  `lib/aiAllowance.ts`.
+- **TWO daily budgets, counted separately** (founder s204, "it's very less"): **6 Übungsgespräche**
+  (`DAILY_LIMIT_CONVERSATIONS`) and **3 Prüfungsgespräche** (`DAILY_LIMIT_EXAM_CONVERSATIONS`),
+  split on `speaking_conversations.exam` so a day spent practising can never eat the exam allowance
+  or the other way round. Mirrored client-side as the `sprechen` / `sprechenExam` modes in
+  `lib/aiAllowance.ts`, which read the same flag. **For an EXISTING conversation the row's own
+  `exam` decides which budget it spends, never the request body**, so a forged flag cannot move a
+  running conversation onto the emptier meter. The per-learner monthly ceiling rose with them
+  (`USER_MONTHLY_CONVERSATIONS` 40 → 120): at up to 9 a day, 40 would have bound within four days
+  and made the daily numbers a fiction. (Was one shared budget of 2 from s193.)
 - **The row is written when a conversation STARTS**, not when it finishes. The daily limit counts
   rows, so it counts what actually costs money; a learner cannot abandon conversations to farm
   free turns.
@@ -151,7 +158,7 @@ never leaves the device, which is why the privacy policy can say so.
   the failure screen re-asks the grader without touching the daily budget.
 - **A conversation whose very first turn fails gives its unit back.** The row is still inserted
   before the model call, so an abandoned run cannot farm free turns, but a transient upstream
-  failure no longer costs half of a two-per-day allowance for a conversation that never happened.
+  failure no longer costs a unit for a conversation that never happened.
 - **`cost_estimate` accumulates** across turns and the debrief; it used to be overwritten per turn.
 - **An over-long utterance is refused, not silently clipped**, so the shown and the stored
   transcripts cannot disagree.

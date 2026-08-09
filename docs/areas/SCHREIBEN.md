@@ -500,6 +500,15 @@ Per learner, per day, all env-overridable in the Edge Functions:
   (2) a row count on mount over the same tables and the same UTC day boundary the functions
   count (`sentence_checks`, `writing_evaluations` filtered by `length`; both are select-own under
   RLS). Unknown (signed out, offline, query failed) renders NO number rather than a guess.
+- **The Umformung has its OWN visible allowance since s204** (`AiMode` gained `transform`, default
+  30). It was the one AI feature with no readout at all, so `TRANSFORM_DAILY_LIMIT` arrived as a
+  wall with no warning. It stays a SEPARATE budget rather than joining Fokus, because an Umformung
+  has never spent a Korrektur (above) and one round can spend three of it. Counted against the same
+  ledger the function counts (`sentence_ai_ops`, `kind = 'transform'`, select-own under RLS; only
+  PAID ops land there, so a cached Umformung is free on both sides), and `transform-sentence` now
+  returns `dailyLimit`/`dailyRemaining` on its success and limit-reached responses (never on a cache
+  hit, which spends nothing and returns before the count is taken). Rendered by the existing
+  `AllowanceNote` in the Umformung card: the header row on desktop, under the Nochmal row on a phone.
 - **"Nochmal" carries its own counter**: `2 von 3 übrig`, the NEW AI phrasings still available for
   the current target form (`TRANSFORM_VARIANTS`, matching the server's 0..2 clamp). Cycling back to
   an already-generated phrasing is cached and free, so it does not count down; picking a different

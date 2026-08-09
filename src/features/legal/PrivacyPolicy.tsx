@@ -207,6 +207,14 @@ function PrivacyDe() {
           der alte Wortlaut, nicht dein Fortschritt.
         </p>
         <p className="mt-2">
+          Getrennt davon führen wir ein technisches Nutzungsprotokoll unserer KI-Kosten. Darin steht
+          kein Text von dir: nur, welche Funktion wann eine KI-Anfrage ausgelöst hat, welches Modell
+          geantwortet hat und wie viele Tokens dabei angefallen sind. Wir brauchen es, um die
+          täglichen Freikontingente zu zählen und unsere eigenen Kosten zu überwachen. Diese
+          Einträge löschen wir nach 400 Tagen automatisch, und wenn du dein Konto löschst, verlieren
+          sie sofort den Bezug zu dir.
+        </p>
+        <p className="mt-2">
           Eine Ausnahme sind Gastkonten: Wenn du ohne Konto lernst, legen wir für dich ein
           anonymes Gastkonto an. Bleibt es 90 Tage lang ungenutzt, löschen wir es mitsamt allen
           zugehörigen Daten automatisch. Ein Gastkonto hat keine E-Mail-Adresse, du könntest dich
@@ -449,6 +457,13 @@ function PrivacyEn() {
           transcript, and the correction that goes with them. The evaluation stays in your history
           (date, topic, and your focus area) so your progress curve stays complete. Only the old
           wording disappears, not your progress.
+        </p>
+        <p className="mt-2">
+          Separately, we keep a technical usage log of our AI costs. It contains none of your text:
+          only which feature triggered an AI request and when, which model answered, and how many
+          tokens it used. We need it to count the daily free allowances and to monitor our own
+          costs. These entries are deleted automatically after 400 days, and if you delete your
+          account they immediately lose any link to you.
         </p>
         <p className="mt-2">
           Guest accounts are an exception: if you learn without an account, we create an anonymous

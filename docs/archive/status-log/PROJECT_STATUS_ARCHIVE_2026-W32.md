@@ -832,6 +832,9 @@ both squash-merged into `main`; the founder verifies the live result.
 **Nothing is left open in this zone.** The CDP driver lives in the session scratchpad, not the repo,
 so it is rebuilt each time a surface has to be checked in the real app rather than in a mockup.
 
+
+---
+
 **Handoff after session 195 (2026-08-06): the Prüfung zone got ONE frame
 (branch `claude/prufung-hub-design-consistency-193qrh`).**
 Two founder prompts. The first asked for a review of the zone's inconsistent back buttons and empty

@@ -1,0 +1,491 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI usage, made visible — the KI chip</title>
+<style>
+  /* ------------------------------------------------------------------
+     REVIEW CHROME. Deliberately NOT the app palette, so every mocked app
+     screen below reads as a separate object on the page.
+     ------------------------------------------------------------------ */
+  :root {
+    --c-ground: #eceef1; --c-panel: #ffffff; --c-ink: #191d24;
+    --c-muted: #5c6672; --c-line: #d3d8de; --c-accent: #1f6f68; --c-chip: #e2e6ea;
+  }
+  [data-appearance="dark"] {
+    --c-ground: #0e1013; --c-panel: #16191d; --c-ink: #e6e9ec;
+    --c-muted: #98a1ab; --c-line: #292e35; --c-accent: #58bdb2; --c-chip: #212630;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--c-ground); color: var(--c-ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55; padding: 32px 24px 96px; min-height: 100vh;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p { margin: 0; }
+  .lede { color: var(--c-muted); max-width: 78ch; }
+  .kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--c-accent); }
+  .rule { height: 1px; background: var(--c-line); border: 0; margin: 34px 0 0; }
+  .stack > * + * { margin-top: 12px; }
+
+  .controls {
+    position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px;
+    padding: 12px 14px; margin: 22px 0 30px; box-shadow: 0 6px 18px -12px rgba(0,0,0,.4);
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl > span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); }
+  .seg { display: inline-flex; background: var(--c-chip); border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent;
+    color: var(--c-muted); padding: 5px 12px; border-radius: 7px; cursor: pointer; transition: background .14s, color .14s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--c-panel); color: var(--c-ink); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+
+  .panel { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 12px; padding: 20px 22px; }
+  .panel + .panel { margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); }
+  td { color: var(--c-ink); }
+  tr:last-child td { border-bottom: 0; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+    background: var(--c-chip); color: var(--c-muted);
+  }
+  .tag.done { color: #1f6f68; }
+  .tag.todo { color: #a4562a; }
+  [data-appearance="dark"] .tag.done { color: #58bdb2; }
+  [data-appearance="dark"] .tag.todo { color: #e0a06d; }
+
+  .optionhead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .optionhead .letter {
+    font-size: 12px; font-weight: 800; letter-spacing: .08em; background: var(--c-chip);
+    color: var(--c-accent); padding: 3px 9px; border-radius: 7px;
+  }
+  .cost { font-size: 13.5px; color: var(--c-muted); max-width: 82ch; }
+  .screens { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 16px; }
+  .screencap { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); margin-bottom: 7px; }
+
+  /* ------------------------------------------------------------------
+     APP TOKENS — copied verbatim from src/index.css so the mocks are the
+     real palette, not an approximation.
+     ------------------------------------------------------------------ */
+  .app {
+    --background: 180 45% 98%; --page-from: 144 45% 98%; --page-to: 198 83% 98%;
+    --foreground: 252 16% 12%; --surface: 0 0% 100%;
+    --muted: 220 13% 88%; --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%; --primary-foreground: 0 0% 100%;
+    --accent: 197 93% 77%; --accent-foreground: 202 71% 13%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%; --warning: 38 92% 46%;
+    --gradient-from: 224 76% 40%; --gradient-to: 198 92% 52%;
+    --shadow: 221 40% 22%;
+    --radius: 0.5rem;
+  }
+  [data-appearance="dark"] .app {
+    --background: 220 15% 4%; --page-from: 220 15% 4%; --page-to: 220 15% 4%;
+    --foreground: 220 12% 94%; --surface: 220 10% 17%;
+    --muted: 220 9% 25%; --muted-foreground: 220 8% 72%;
+    --border: 220 10% 38%;
+    --primary: 219 90% 74%; --primary-foreground: 228 30% 8%;
+    --accent: 197 93% 77%; --accent-foreground: 202 71% 10%; --accent-ink: 198 72% 72%;
+    --success: 153 50% 52%; --warning: 43 90% 62%;
+    --gradient-from: 226 90% 66%; --gradient-to: 198 90% 58%;
+    --shadow: 220 30% 2%;
+  }
+  .app {
+    background: linear-gradient(120deg, hsl(var(--page-from)), hsl(var(--page-to)));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border) / .6); border-radius: 14px; padding: 18px;
+    font-size: 14px;
+  }
+  .card {
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    border-radius: 10px; padding: 16px;
+    box-shadow: 0 10px 24px -18px hsl(var(--shadow) / .55), 0 2px 6px -4px hsl(var(--shadow) / .35);
+  }
+  .eyebrow { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: hsl(var(--primary)); }
+  .sentence { font-size: 14.5px; line-height: 1.6; }
+  .field {
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); border-radius: 8px;
+    padding: 10px 12px; color: hsl(var(--muted-foreground)); font-size: 13.5px; min-height: 58px;
+  }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .row.end { justify-content: flex-end; }
+  .row.between { justify-content: space-between; }
+  .btn {
+    font: inherit; font-size: 13.5px; font-weight: 600; border: 0; cursor: default;
+    border-radius: 8px; padding: 0 14px; height: 36px; display: inline-flex; align-items: center; gap: 7px;
+    background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+  }
+  .btn.grad { background: linear-gradient(100deg, hsl(var(--gradient-from)), hsl(var(--gradient-to))); }
+  .btn.ghost {
+    background: hsl(var(--surface)); color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border)); font-size: 12.5px; height: 30px; padding: 0 10px;
+  }
+  .note { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .note b { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ---------------- the four candidate chips ---------------- */
+
+  /* The mark: a "KI" monogram squircle. Reserved for AI, nothing else. */
+  .mark {
+    flex: none; display: inline-grid; place-items: center;
+    width: 18px; height: 18px; border-radius: 6px;
+    background: hsl(var(--accent) / .55); color: hsl(var(--accent-foreground));
+    font-size: 9.5px; font-weight: 800; letter-spacing: .02em;
+  }
+  [data-appearance="dark"] .mark { background: hsl(var(--accent) / .22); color: hsl(var(--accent-ink)); }
+  .mark.sm { width: 16px; height: 16px; border-radius: 5px; font-size: 9px; }
+  .mark.solid { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+  .mark.spark { font-size: 11px; }
+
+  /* A — quiet line: today's AllowanceNote with the mark in front. */
+  .ki-a { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: hsl(var(--muted-foreground)); }
+
+  /* B — accent chip: Himmelblau fill, no visible edge (border = own fill). */
+  .ki-b {
+    display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 9px 0 6px;
+    border-radius: 7px; background: hsl(var(--accent) / .20); border: 1px solid hsl(var(--accent) / .20);
+    color: hsl(var(--accent-foreground)); font-size: 12px; font-weight: 600;
+    box-shadow: 0 6px 14px -12px hsl(var(--shadow) / .6);
+  }
+  [data-appearance="dark"] .ki-b { background: hsl(var(--accent) / .10); border-color: hsl(var(--accent) / .10); color: hsl(var(--accent-ink)); }
+  .ki-b .n { font-variant-numeric: tabular-nums; font-weight: 800; }
+  .ki-b .of { opacity: .7; font-weight: 600; }
+
+  /* C — on the button itself. */
+  .btn .onbtn {
+    display: inline-flex; align-items: center; gap: 5px; margin-left: 2px; padding-left: 9px;
+    border-left: 1px solid hsl(var(--primary-foreground) / .35);
+    font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; opacity: .92;
+  }
+  .btn .onbtn .mark {
+    background: hsl(var(--primary-foreground) / .22); color: hsl(var(--primary-foreground));
+    width: 16px; height: 16px; border-radius: 5px; font-size: 9px;
+  }
+
+  /* D — dot meter. */
+  .ki-d {
+    display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 9px 0 6px;
+    border-radius: 7px; background: hsl(var(--accent) / .20); border: 1px solid hsl(var(--accent) / .20);
+    color: hsl(var(--accent-foreground)); font-size: 12px; font-weight: 700;
+  }
+  [data-appearance="dark"] .ki-d { background: hsl(var(--accent) / .10); border-color: hsl(var(--accent) / .10); color: hsl(var(--accent-ink)); }
+  .dots { display: inline-flex; gap: 3px; }
+  .dot { width: 5px; height: 5px; border-radius: 999px; background: hsl(var(--accent-ink)); }
+  .dot.off { background: hsl(var(--accent-ink) / .22); }
+  .ki-d .n { font-variant-numeric: tabular-nums; }
+
+  /* Empty / spent state, shared by B and D. */
+  .spent { background: hsl(var(--muted)); border-color: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .spent .mark { background: hsl(var(--muted-foreground) / .18); color: hsl(var(--muted-foreground)); }
+  .spent .dot { background: hsl(var(--muted-foreground) / .3); }
+
+  .states { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 14px; }
+  .state { text-align: center; }
+  .state .lab { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--c-muted); margin-bottom: 8px; }
+  .state .box { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 14px; display: grid; place-items: center; min-height: 62px; }
+
+  .marks { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 14px; }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <p class="kicker">Genauly · design review</p>
+  <h1>AI usage, made visible</h1>
+  <p class="lede" style="margin-top:10px">
+    You asked for something like Claude Code's usage readout: the app should say, wherever a feature
+    uses AI, that it is using AI and how much of today's free allowance is left. This page is the
+    second half of that job. Pick one chip design and one AI mark.
+  </p>
+
+  <div class="controls">
+    <div class="ctl"><span>Theme</span>
+      <div class="seg" role="group">
+        <button type="button" data-theme-btn="light" aria-pressed="true">Light</button>
+        <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+    <div class="ctl"><span>Allowance left</span>
+      <div class="seg" role="group">
+        <button type="button" data-state-btn="plenty" aria-pressed="true">Plenty</button>
+        <button type="button" data-state-btn="low" aria-pressed="false">Nearly gone</button>
+        <button type="button" data-state-btn="none" aria-pressed="false">Used up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ------------------------------------------------------------------ -->
+  <div class="panel">
+    <h2>What is already done, and what this page decides</h2>
+    <div class="stack" style="margin-top:10px">
+      <p class="cost">
+        <span class="tag done">Done</span> &nbsp;<b>Part A: no AI feature is silent any more.</b>
+        The sentence transformation in Fokus (the "Nochmal" / grammar-dial feature) had its own daily
+        cap of 30 and no readout at all, so learners could hit that wall with no warning. It is now
+        counted and shown like every other AI feature, on its own budget, because a transformation
+        has never cost a correction.
+      </p>
+      <p class="cost">
+        <span class="tag todo">This page</span> &nbsp;<b>Part B: one reserved KI chip.</b>
+        Today the count is a plain grey line of text that only appears in four places, and it is
+        never seen <i>before</i> the AI runs. Part B gives the app one mark that always means
+        "this uses AI", carrying its own count, placed on every control that spends a unit.
+      </p>
+      <p class="cost">
+        One thing deliberately not copied from Claude Code: money and token numbers. Claude Code
+        shows those because the user pays the bill. Your learners do not, so a euro figure would
+        only be alarming. The learner-facing number stays "how many free AI helps do I have left
+        today".
+      </p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Where the chip would appear</h3>
+    <table style="margin-top:10px">
+      <tr><th>Control</th><th>What one unit buys</th><th>Free per day</th><th>Today</th></tr>
+      <tr><td>Fokus · Korrigieren</td><td>One sentence corrected</td><td>10</td><td>Grey text line</td></tr>
+      <tr><td>Fokus · grammar dial / Nochmal</td><td>One sentence transformed</td><td>30</td><td><span class="tag done">New in part A</span></td></tr>
+      <tr><td>Schreiben Kurz · Auswerten</td><td>One short text graded</td><td>4</td><td>Grey text line</td></tr>
+      <tr><td>Schreiben Lang · Auswerten</td><td>One long text graded</td><td>2</td><td>Grey text line</td></tr>
+      <tr><td>Sprechen · Gespräch starten</td><td>One spoken conversation</td><td>2</td><td>Grey text line</td></tr>
+      <tr><td>Modelltest · run band</td><td>The written and spoken parts</td><td>uses the above</td><td>Grey text line</td></tr>
+    </table>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ------------------------------------------------------------------ -->
+  <h2 style="margin-top:26px">The four options</h2>
+  <p class="lede" style="margin-top:8px">
+    Each option is drawn in the same three places, with the real colours and the real button sizes.
+    Use the switches above to see it in dark mode, and to see what it looks like when the day's
+    allowance is nearly gone or used up.
+  </p>
+
+  <!-- OPTION A -->
+  <div class="panel" style="margin-top:16px">
+    <div class="optionhead"><span class="letter">Option A</span><h3>Quiet line, one mark added</h3></div>
+    <p class="cost">
+      Keeps today's grey sentence and only puts the KI mark in front of it, then repeats it on the
+      controls that are missing it. Quietest and cheapest. Weakness: grey body text is easy to miss,
+      which is the complaint that started this.
+    </p>
+    <div class="screens" data-variant="a"></div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="panel">
+    <div class="optionhead"><span class="letter">Option B</span><h3>Accent chip beside the button</h3></div>
+    <p class="cost">
+      A small Himmelblau chip, the same fill as the filter rails, holding the mark and the count:
+      <i>KI 7/10</i>. Reads at a glance, sits next to the button that spends it, and turns grey when
+      the day is used up. Weakness: one more object beside every AI button.
+    </p>
+    <div class="screens" data-variant="b"></div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="panel">
+    <div class="optionhead"><span class="letter">Option C</span><h3>The count rides on the button</h3></div>
+    <p class="cost">
+      Nothing floats beside the button, because the count is inside it: the button says what it
+      costs. Tightest layout of the four and impossible to miss. Weakness: the button grows wider,
+      which is tight on a 360px phone, and at zero the button still has to read as pressable
+      (it stays pressable: cached answers are free).
+    </p>
+    <div class="screens" data-variant="c"></div>
+  </div>
+
+  <!-- OPTION D -->
+  <div class="panel">
+    <div class="optionhead"><span class="letter">Option D</span><h3>Chip with a dot meter</h3></div>
+    <p class="cost">
+      Option B plus a row of dots that empties through the day, so the learner sees how much is left
+      without reading a number. Weakness: it only works for small allowances. Ten dots for Fokus is
+      already a lot, thirty for the transformations is impossible, so those fall back to the number
+      alone and the chip is then not quite the same object everywhere.
+    </p>
+    <div class="screens" data-variant="d"></div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ------------------------------------------------------------------ -->
+  <h2 style="margin-top:26px">The mark itself</h2>
+  <p class="lede" style="margin-top:8px">
+    Whichever chip you pick, it needs one symbol that means AI and nothing else. The sparkle icon
+    cannot be it: the app already uses sparkles for the quiz, for empty states and in onboarding,
+    so it would mean two things at once. Three candidates, shown at real size.
+  </p>
+  <div class="panel" style="margin-top:14px">
+    <div class="marks">
+      <div class="app">
+        <div class="screencap">Mark 1 · KI monogram, accent</div>
+        <div class="card row" style="gap:10px">
+          <span class="mark">KI</span><span class="note">Two letters, no icon. Says it in words, in German, and never collides with an existing icon.</span>
+        </div>
+      </div>
+      <div class="app">
+        <div class="screencap">Mark 2 · KI monogram, brand blue</div>
+        <div class="card row" style="gap:10px">
+          <span class="mark solid">KI</span><span class="note">The same, in the brand action colour. Louder, and it competes with the buttons beside it.</span>
+        </div>
+      </div>
+      <div class="app">
+        <div class="screencap">Mark 3 · Spark glyph</div>
+        <div class="card row" style="gap:10px">
+          <span class="mark spark">✦</span><span class="note">Icon only. Needs the sparkle removed from the quiz and onboarding first, so it costs an extra pass.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="panel" style="margin-top:26px">
+    <h3>What I need from you</h3>
+    <table style="margin-top:10px">
+      <tr><th>Question</th><th>Answer with</th></tr>
+      <tr><td>Which chip design?</td><td>A, B, C or D</td></tr>
+      <tr><td>Which AI mark?</td><td>Mark 1, 2 or 3</td></tr>
+      <tr><td>Should the chip also appear on the Modelltest run band, where a whole exam spends several units?</td><td>Yes / no</td></tr>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<script>
+  /* The three mocked contexts, rendered per option. Keeping them in one place
+     means every option is compared on exactly the same screens. */
+  const CONTEXTS = [
+    { key: "fokus", cap: "Fokus · correct a sentence", limit: 10 },
+    { key: "kurz",  cap: "Schreiben Kurz · grade my text", limit: 4 },
+    { key: "sprechen", cap: "Sprechen · start a conversation", limit: 2 },
+  ];
+
+  const LEVELS = { plenty: 0.7, low: 0.15, none: 0 };
+  let state = "plenty";
+
+  function remaining(limit) {
+    if (state === "none") return 0;
+    if (state === "low") return limit <= 4 ? 1 : 2;
+    return Math.round(limit * LEVELS.plenty);
+  }
+
+  function chip(variant, limit) {
+    const left = remaining(limit);
+    const spent = left === 0 ? " spent" : "";
+    if (variant === "a") {
+      return `<span class="ki-a"><span class="mark sm">KI</span>Heute noch <b style="font-weight:700">${left}</b> von ${limit}</span>`;
+    }
+    if (variant === "b") {
+      return `<span class="ki-b${spent}"><span class="mark sm">KI</span><span class="n">${left}</span><span class="of">/${limit}</span></span>`;
+    }
+    if (variant === "d") {
+      // Dots only while they stay countable at a glance; otherwise the number.
+      const dots = limit <= 10
+        ? `<span class="dots">${Array.from({ length: limit }, (_, i) =>
+            `<span class="dot${i < left ? "" : " off"}"></span>`).join("")}</span>`
+        : `<span class="n">${left}/${limit}</span>`;
+      return `<span class="ki-d${spent}"><span class="mark sm">KI</span>${dots}</span>`;
+    }
+    return "";
+  }
+
+  function button(variant, label, limit) {
+    const left = remaining(limit);
+    const onbtn = variant === "c"
+      ? `<span class="onbtn"><span class="mark">KI</span>${left}/${limit}</span>`
+      : "";
+    return `<button class="btn${label === "Gespräch starten" ? " grad" : ""}">${label}${onbtn}</button>`;
+  }
+
+  function screenFokus(variant) {
+    const c = CONTEXTS[0];
+    const side = variant === "c" ? "" : chip(variant, c.limit);
+    return `
+      <div class="app">
+        <div class="screencap">${c.cap}</div>
+        <div class="card">
+          <p class="eyebrow">Dein Satz</p>
+          <div class="field" style="margin-top:8px">Der Chef schreibt die E-Mail an die Kollegin.</div>
+          <div class="row end" style="margin-top:12px">
+            ${side}
+            ${button(variant, "Korrigieren", c.limit)}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function screenKurz(variant) {
+    const c = CONTEXTS[1];
+    const side = variant === "c" ? "" : chip(variant, c.limit);
+    return `
+      <div class="app">
+        <div class="screencap">${c.cap}</div>
+        <div class="card">
+          <p class="eyebrow">Aufgabe: Krankmeldung</p>
+          <p class="sentence" style="margin-top:6px">Schreiben Sie Ihrem Teamleiter eine kurze Nachricht.</p>
+          <div class="field" style="margin-top:10px">Sehr geehrter Herr Braun, leider muss ich mich heute krankmelden …</div>
+          <div class="row between" style="margin-top:12px">
+            <span class="note">Ziel: 80 Wörter</span>
+            <span class="row">${side}${button(variant, "Auswerten", c.limit)}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function screenSprechen(variant) {
+    const c = CONTEXTS[2];
+    const side = variant === "c" ? "" : chip(variant, c.limit);
+    return `
+      <div class="app">
+        <div class="screencap">${c.cap}</div>
+        <div class="card">
+          <p class="eyebrow">Gespräch: Termin beim Amt</p>
+          <p class="sentence" style="margin-top:6px">Sie sprechen mit Frau Keller. Siezen. Nennen Sie Ihr Anliegen, fragen Sie nach Unterlagen.</p>
+          <div class="row between" style="margin-top:12px">
+            <span class="note">Etwa 6 Minuten</span>
+            <span class="row">${side}${button(variant, "Gespräch starten", c.limit)}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function render() {
+    document.querySelectorAll("[data-variant]").forEach((host) => {
+      const v = host.dataset.variant;
+      host.innerHTML = screenFokus(v) + screenKurz(v) + screenSprechen(v);
+    });
+  }
+
+  document.querySelectorAll("[data-theme-btn]").forEach((b) => {
+    b.addEventListener("click", () => {
+      const dark = b.dataset.themeBtn === "dark";
+      document.documentElement.dataset.appearance = dark ? "dark" : "light";
+      document.querySelectorAll("[data-theme-btn]").forEach((x) =>
+        x.setAttribute("aria-pressed", String((x.dataset.themeBtn === "dark") === dark)));
+    });
+  });
+
+  document.querySelectorAll("[data-state-btn]").forEach((b) => {
+    b.addEventListener("click", () => {
+      state = b.dataset.stateBtn;
+      document.querySelectorAll("[data-state-btn]").forEach((x) =>
+        x.setAttribute("aria-pressed", String(x.dataset.stateBtn === state)));
+      render();
+    });
+  });
+
+  render();
+</script>
