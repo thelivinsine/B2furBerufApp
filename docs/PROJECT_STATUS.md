@@ -30,6 +30,10 @@ Founder: "do the documentation maintenance". No app code was touched.
   no themes and never has.
 - Housekeeping: the s199 and s200 session logs and the s201 handoff moved into
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`, per the two-most-recent rule.
+- **Shipped in three PRs:** **#832** (the pass) → `48d250c`, **#833** (the paper trail) → `8a45be9`,
+  **#837** (this line and the founder's "document the session") → see the handoff. `origin/main`
+  moved mid-session (#831), so #832 merged it first; the one conflict was in
+  `SESSION_PROMPT_LOG.md`, where #831's entry belongs to the session 202 block.
 
 ## Session 202 log
 
@@ -148,10 +152,12 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 203 (2026-08-08): the docs are back inside their own rules.** Branch
-`claude/documentation-maintenance-0w4ywg`, PR **#832** → squash-merged **`48d250c`**. Validate
-content and Deploy site to GitHub Pages both green on `main`; Deploy Supabase functions correctly did
-not run (path-filtered, nothing under `supabase/` changed). Post-merge housekeeping done, tree clean.
-Founder prompt: "do the documentation maintenance".
+`claude/documentation-maintenance-0w4ywg`, PRs **#832** → **`48d250c`** (the pass), **#833** →
+**`8a45be9`** (its paper trail) and **#837** (this closing entry), each squash-merged. Validate
+content and Deploy site to GitHub Pages green on `main`; Deploy Supabase functions correctly did
+not run (path-filtered, nothing under `supabase/` changed). Post-merge housekeeping done after every
+merge, tree clean.
+Founder prompts: "do the documentation maintenance" → "document the session".
 No app code was touched, so nothing needs live verification.
 
 - **`CLAUDE.md` is 349 lines** (was 399; the linter warns past ~350). It now carries the RULE plus a
