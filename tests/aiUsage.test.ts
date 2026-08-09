@@ -10,7 +10,7 @@ import {
 } from "../supabase/functions/_shared/aiUsage.ts";
 
 /**
- * Pins the AI usage accounting shipped in s197 (founder: "how do we make sure we
+ * Pins the AI usage accounting shipped in s204 (founder: "how do we make sure we
  * see real usage and costs and not just estimates?").
  *
  * The module runs inside Deno on the Edge Functions, but it is plain TypeScript

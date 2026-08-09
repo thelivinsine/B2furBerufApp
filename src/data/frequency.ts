@@ -7,7 +7,7 @@
 // "Fachsprache". Regenerate with `pnpm build:frequency` after content changes.
 import type { Frequency } from "@/types";
 
-export const frequencyGeneratedAt = "2026-07-28";
+export const frequencyGeneratedAt = "2026-08-06";
 
 export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_besprechung": { bin: "common", zipf: 3.75 },
@@ -1653,6 +1653,31 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_zukuenftig": { bin: "common", zipf: 4 },
   "v_krankheitsbedingt": { bin: "specialized", zipf: 2.96 },
   "v_voruebergehend": { bin: "common", zipf: 4.09 },
+  "v_aufladen": { bin: "specialized", zipf: 3.48 },
+  "v_verbinden": { bin: "common", zipf: 4.32 },
+  "v_loeschen": { bin: "common", zipf: 4.38 },
+  "v_kostenlos": { bin: "core", zipf: 4.75 },
+  "v_mobil": { bin: "common", zipf: 4.05 },
+  "v_unbegrenzt": { bin: "common", zipf: 3.5 },
+  "v_einladen": { bin: "common", zipf: 3.99 },
+  "v_unternehmen": { bin: "core", zipf: 5.38 },
+  "v_gemuetlich": { bin: "common", zipf: 4.12 },
+  "v_spannend": { bin: "common", zipf: 4.43 },
+  "v_gesellig": { bin: "specialized", zipf: 2.94 },
+  "v_zustaendig_amt": { bin: "common", zipf: 4.44 },
+  "v_vollstaendig": { bin: "core", zipf: 4.67 },
+  "v_gueltig": { bin: "common", zipf: 4.05 },
+  "v_ueberfuellt": { bin: "specialized", zipf: 3.45 },
+  "v_direkt": { bin: "core", zipf: 5.34 },
+  "v_guenstig": { bin: "common", zipf: 4.44 },
+  "v_haltbar": { bin: "common", zipf: 3.61 },
+  "v_preiswert": { bin: "specialized", zipf: 3.42 },
+  "v_gebuehrenfrei": { bin: "specialized", zipf: 2.79 },
+  "v_monatlich": { bin: "common", zipf: 4.15 },
+  "v_geschaeftlich": { bin: "specialized", zipf: 3.19 },
+  "v_chronisch": { bin: "common", zipf: 3.6 },
+  "v_einverstanden": { bin: "common", zipf: 4.27 },
+  "v_lieferbar": { bin: "specialized", zipf: 3.3 },
   "c_entscheidung_treffen": { bin: "core", zipf: 5.03 },
   "c_vorschlag_machen": { bin: "core", zipf: 4.57 },
   "c_protokoll_führen": { bin: "common", zipf: 4.12 },

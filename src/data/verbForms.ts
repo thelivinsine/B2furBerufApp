@@ -16,9 +16,9 @@
 //   pnpm build:verbs-subset && pnpm build:verb-forms
 import type { VerbForms } from "@/types";
 
-export const verbFormsGeneratedAt = "2026-07-30";
+export const verbFormsGeneratedAt = "2026-08-06";
 
-/** 234 verbs: 225 dictionary-attested, 9 rule-derived. */
+/** 239 verbs: 230 dictionary-attested, 9 rule-derived. */
 export const verbForms: Record<string, VerbForms> = {
   "v_abbiegen": { partizip2: "abgebogen", aux: "sein", praeteritum: "bog ab", separable: true, zuInfinitiv: "abzubiegen" },
   "v_abdichten": { partizip2: "abgedichtet", aux: "haben", praeteritum: "dichtete ab", separable: true, zuInfinitiv: "abzudichten" },
@@ -42,6 +42,7 @@ export const verbForms: Record<string, VerbForms> = {
   "v_anschliessen": { partizip2: "angeschlossen", aux: "haben", praeteritum: "schloss an", separable: true, zuInfinitiv: "anzuschließen" },
   "v_ansprechen": { partizip2: "angesprochen", aux: "haben", praeteritum: "sprach an", separable: true, zuInfinitiv: "anzusprechen" },
   "v_auffuellen": { partizip2: "aufgefüllt", aux: "haben", praeteritum: "füllte auf", separable: true, zuInfinitiv: "aufzufüllen" },
+  "v_aufladen": { partizip2: "aufgeladen", aux: "haben", praeteritum: "lud auf", separable: true, zuInfinitiv: "aufzuladen" },
   "v_aufrechterhalten": { partizip2: "aufrechterhalten", aux: "haben", praeteritum: "erhielt aufrecht", separable: true },
   "v_aufrunden": { partizip2: "aufgerundet", aux: "haben", praeteritum: "rundete auf", separable: true, zuInfinitiv: "aufzurunden" },
   "v_auftragen": { partizip2: "aufgetragen", aux: "haben", praeteritum: "trug auf", separable: true, zuInfinitiv: "aufzutragen" },
@@ -96,6 +97,7 @@ export const verbForms: Record<string, VerbForms> = {
   "v_einfuehren": { partizip2: "eingeführt", aux: "haben", praeteritum: "führte ein", separable: true, zuInfinitiv: "einzuführen" },
   "v_eingreifen": { partizip2: "eingegriffen", aux: "haben", praeteritum: "griff ein", separable: true, zuInfinitiv: "einzugreifen" },
   "v_einhalten": { partizip2: "eingehalten", aux: "haben", praeteritum: "hielt ein", separable: true, zuInfinitiv: "einzuhalten" },
+  "v_einladen": { partizip2: "eingeladen", aux: "haben", praeteritum: "lud ein", separable: true, zuInfinitiv: "einzuladen" },
   "v_einlenken": { partizip2: "eingelenkt", aux: "haben", praeteritum: "lenkte ein", separable: true, zuInfinitiv: "einzulenken" },
   "v_einraeumen": { partizip2: "eingeräumt", aux: "haben", praeteritum: "räumte ein", separable: true, zuInfinitiv: "einzuräumen" },
   "v_einreichen": { partizip2: "eingereicht", aux: "haben", praeteritum: "reichte ein", separable: true, zuInfinitiv: "einzureichen" },
@@ -148,6 +150,7 @@ export const verbForms: Record<string, VerbForms> = {
   "v_kuemmern": { partizip2: "gekümmert", aux: "haben", praeteritum: "kümmerte" },
   "v_leidtun": { partizip2: "leidgetan", aux: "haben", praeteritum: "tat leid", separable: true },
   "v_liefern": { partizip2: "geliefert", aux: "haben", praeteritum: "lieferte" },
+  "v_loeschen": { partizip2: "gelöscht", aux: "haben", praeteritum: "löschte" },
   "v_loesen": { partizip2: "gelöst", aux: "haben", praeteritum: "löste" },
   "v_mauern": { partizip2: "gemauert", aux: "haben", praeteritum: "mauerte" },
   "v_melden": { partizip2: "gemeldet", aux: "haben", praeteritum: "meldete" },
@@ -212,11 +215,13 @@ export const verbForms: Record<string, VerbForms> = {
   "v_umsteigen": { partizip2: "umgestiegen", aux: "sein", praeteritum: "stieg um", separable: true, zuInfinitiv: "umzusteigen" },
   "v_umstellen": { partizip2: "umgestellt", aux: "haben", praeteritum: "stellte um", separable: true, zuInfinitiv: "umzustellen", variants: ["umgestellt", "umstellt"] },
   "v_umtauschen": { partizip2: "umgetauscht", aux: "haben", praeteritum: "tauschte um", separable: true, zuInfinitiv: "umzutauschen" },
+  "v_unternehmen": { partizip2: "unternommen", aux: "haben", praeteritum: "nahm unter", separable: true },
   "v_untersuchen": { partizip2: "untersucht", aux: "haben", praeteritum: "suchte unter", separable: true },
   "v_verabreden": { partizip2: "verabredet", aux: "haben", praeteritum: "verabredete" },
   "v_verabreichen": { partizip2: "verabreicht", aux: "haben", praeteritum: "verabreichte" },
   "v_veranlassen": { partizip2: "veranlasst", aux: "haben", praeteritum: "veranlasste" },
   "v_verbessern": { partizip2: "verbessert", aux: "haben", praeteritum: "verbesserte" },
+  "v_verbinden": { partizip2: "verbunden", aux: "haben", praeteritum: "verband" },
   "v_vereinbaren": { partizip2: "vereinbart", aux: "haben", praeteritum: "vereinbarte", zuInfinitiv: "zu vereinbaren", source: "rule" },
   "v_verhandeln": { partizip2: "verhandelt", aux: "haben", praeteritum: "verhandelte" },
   "v_verhindern": { partizip2: "verhindert", aux: "haben", praeteritum: "verhinderte" },

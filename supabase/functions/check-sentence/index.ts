@@ -97,7 +97,7 @@ function monthKey(d = new Date()): string {
 }
 
 interface Detected { text: string; voice: string; tense: string; mood: string }
-// `usage` is what the provider REPORTED (s197): the cost is derived from it at
+// `usage` is what the provider REPORTED (s204): the cost is derived from it at
 // the call site, from one rate table, instead of each leg inventing a number.
 interface CheckOut { corrected: string; hasErrors: boolean; sentences: Detected[]; model: string; usage: TokenUsage }
 
@@ -221,7 +221,7 @@ async function callGemini(text: string): Promise<CheckOut | null> {
     const parsed = parseCheck(raw);
     if (!parsed) { console.error(`[check] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
     // Free tier prices at $0, but the TOKENS are recorded either way: they are
-    // what tells us how close the free quota is to running out (s197).
+    // what tells us how close the free quota is to running out (s204).
     return { ...parsed, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch (e) {
     console.error(`[check] gemini threw: ${e}`);
@@ -258,7 +258,7 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
     const data = await res.json();
     const parsed = parseCheck(data.choices?.[0]?.message?.content ?? "");
     if (!parsed) return null;
-    // Was a hardcoded flat $0.004 per call until s197, which could not tell an
+    // Was a hardcoded flat $0.004 per call until s204, which could not tell an
     // expensive call from a cheap one. Real reported tokens now.
     return { ...parsed, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch (e) {
@@ -354,7 +354,7 @@ Deno.serve(async (req) => {
       grammar: cachedRow.grammar, model: cachedRow.model, cached: true, cost_estimate: 0,
     });
     // Recorded as a call that cost nothing, so the cache-hit rate is visible
-    // rather than inferred from an absence of rows (s197).
+    // rather than inferred from an absence of rows (s204).
     await recordAiCall(admin, {
       userId: user.id, feature: "check", provider: providerOf(cachedRow.model ?? ""),
       model: cachedRow.model ?? "", usage: EMPTY_USAGE, costEstimate: 0, cacheHit: true,

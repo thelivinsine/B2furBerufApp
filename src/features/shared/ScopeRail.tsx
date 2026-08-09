@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
+import { Check, ChevronDown, Lock, RotateCcw, Target, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -25,6 +25,14 @@ export interface ScopeOption {
   label: string;
   count?: number;
   disabled?: boolean;
+  /**
+   * LOCKED, not merely zero-yield (founder s199). A locked option is one the app
+   * has no DEDICATED content for: picking it could only serve the universal pool
+   * behind it, which is what made Branche feel like a working filter while it
+   * quietly changed nothing. It renders with a padlock so "we have nothing
+   * specific here" stops looking like "your other filters emptied this".
+   */
+  locked?: boolean;
 }
 
 export interface ScopeGroup {
@@ -71,15 +79,17 @@ export function ScopeSelect({
 
   const row = (opt: ScopeOption) => {
     const selected = opt.value === value;
+    const off = (opt.disabled || opt.locked) && !selected;
     return (
       <button
         key={opt.value || "__all"}
         type="button"
         role="option"
         aria-selected={selected}
-        disabled={opt.disabled && !selected}
+        aria-disabled={off || undefined}
+        disabled={off}
         onClick={() => {
-          if (opt.disabled && !selected) return;
+          if (off) return;
           onChange(opt.value);
           setOpen(false);
         }}
@@ -87,11 +97,12 @@ export function ScopeSelect({
           "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
           selected
             ? "bg-primary/10 font-medium text-primary"
-            : opt.disabled
+            : off
               ? "cursor-not-allowed text-muted-foreground/40"
               : "hover:bg-muted/60",
         )}
       >
+        {opt.locked && !selected && <Lock className="h-3 w-3 shrink-0" aria-hidden />}
         <span className="min-w-0 flex-1 truncate">{opt.label}</span>
         {/* The count stays on a greyed option (founder rule: zero-yield options
             grey out with HONEST counts). Hiding it made "unavailable" and
@@ -102,7 +113,7 @@ export function ScopeSelect({
               "shrink-0 text-xs tabular-nums",
               selected
                 ? "text-primary/70"
-                : opt.disabled
+                : off
                   ? "text-muted-foreground/40"
                   : "text-muted-foreground",
             )}
@@ -184,6 +195,26 @@ export function ScopeSection({
 }
 
 /**
+ * The whole-control locked state (founder s199): what a scope section renders
+ * INSTEAD of its dropdown when the app has no dedicated content for any option.
+ *
+ * Fifteen padlocked rows say the same thing fifteen times, which is the
+ * redundancy rule's exact target, and on Lesen/Hören it would be the normal
+ * sight (only 4 of 52 texts carry a Branche tag). One line says it once. The
+ * box is dashed and border-only on purpose: it is an absence, so it must not
+ * look like a control that could be pressed, and it must not wear the accent
+ * fill, which belongs to rails and the buttons that open them.
+ */
+export function ScopeLocked({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="flex items-start gap-2 rounded-lg border border-dashed border-border px-2.5 py-2 text-xs leading-relaxed text-muted-foreground">
+      <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+      <span>{children}</span>
+    </p>
+  );
+}
+
+/**
  * The rail TILE: header row ("Aufgabe wählen" + reset, plus the panel variant's
  * close), a tinted divider, then whatever sections the module puts inside it.
  */
@@ -193,16 +224,26 @@ export function ScopeRail({
   onClose,
   layout = "rail",
   title = "Aufgabe wählen",
+  icon: Icon = Target,
   resetLabel = "Zurücksetzen und neue Aufgabe ziehen",
   className,
 }: {
   children: React.ReactNode;
-  /** Full reset (always active): clears every scope AND redraws. */
-  onReset: () => void;
+  /**
+   * Full reset (always active): clears every scope AND redraws.
+   *
+   * Optional since s202, for the ONE rail that filters nothing: the Sprechen
+   * Redemittel rail browses phrases rather than narrowing a list, so a reset
+   * there would sit at its default doing nothing, which is the founder's
+   * dead-control rule. Absent = no reset icon, never a disabled one.
+   */
+  onReset?: () => void;
   /** Close handler for the panel's X icon (mobile). */
   onClose?: () => void;
   layout?: "rail" | "panel";
   title?: string;
+  /** The mark beside the title. Defaults to the Aufgabe rail's target. */
+  icon?: typeof Target;
   resetLabel?: string;
   className?: string;
 }) {
@@ -226,20 +267,22 @@ export function ScopeRail({
     >
       <div className="flex items-center gap-1 px-3 py-2.5">
         <span className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary">
-          <Target className="h-4 w-4" />
+          <Icon className="h-4 w-4" />
           {title}
         </span>
         {/* Always active (founder s149 P2): clears every scope AND draws a
             fresh random Aufgabe, so the button always visibly does something. */}
-        <button
-          type="button"
-          onClick={onReset}
-          aria-label={resetLabel}
-          title={resetLabel}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
+        {onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            aria-label={resetLabel}
+            title={resetLabel}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
+        )}
         {panel && onClose && (
           <button
             type="button"
@@ -252,9 +295,13 @@ export function ScopeRail({
           </button>
         )}
       </div>
-      {/* Divider tinted to the tile, not the neutral `border` grey: with the
-          outline gone a grey rule would be the only hard edge left (s169). */}
-      <div className="border-t border-accent-ink/10 p-3">
+      {/* NO divider and no second fill (founder s199: "the header and footer of
+          the filter rail seems to look like separate pieces attached to the main
+          body"). The tile is ONE shade end to end: the header sits on the same
+          wash as the body, and the rule that used to separate them is gone. The
+          s169 note this replaces was right that a divider here must never be
+          neutral grey; the answer turned out to be no divider at all. */}
+      <div className="px-3 pb-3 pt-0.5">
         <div className="space-y-4">{children}</div>
       </div>
     </aside>

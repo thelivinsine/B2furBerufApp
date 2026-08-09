@@ -58,7 +58,7 @@ export interface TransformResult {
   noteEn?: string;
   cached?: boolean;
   limitReached?: boolean;
-  /** Today's Umformung allowance as the server enforces it (s197). Absent on a
+  /** Today's Umformung allowance as the server enforces it (s204). Absent on a
    *  cache hit, which costs no unit and returns before the count is taken. */
   dailyLimit?: number;
   dailyRemaining?: number;

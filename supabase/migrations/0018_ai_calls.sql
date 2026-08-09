@@ -1,5 +1,5 @@
 -- 0018_ai_calls.sql
--- The per-call AI usage ledger (founder s197: "how do we make sure we see real
+-- The per-call AI usage ledger (founder s204: "how do we make sure we see real
 -- usage and costs and not just estimates?").
 --
 -- WHY. Every AI call already reported its token counts, and every function threw

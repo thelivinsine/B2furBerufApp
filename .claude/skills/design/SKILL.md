@@ -105,6 +105,12 @@ Ranked by how often the founder had to correct AI output:
    FACE, so Redemittel sat 77 px above Kollokationen because of an unclamped translation, note and
    English example on a back nobody was looking at. Clamp the worst case, give the clamped element a
    `title`, and keep the full text in Liste/Tabelle.
+12. **A hover style answers a pointer, never a tap** (founder s201, the same law as #9 one input mode
+   further). `future.hoverOnlyWhenSupported` in `tailwind.config.ts` compiles every `hover:` into
+   `@media (hover: hover)`, because a touch browser keeps `:hover` on the last element tapped until
+   the next tap somewhere else. The founder reported this as a button that "deactivates when tapped
+   on empty spaces". **A control's ON state is therefore always its own class, never a hover fill**
+   (which is also why #10 exists), and nothing may rely on `hover:` to show state on a phone.
 
 ## 3. Color language (locked)
 
@@ -190,6 +196,11 @@ Ranked by how often the founder had to correct AI output:
   portalled to `<body>` because both hubs slide their panels with a transform. Schreiben's three
   trainers and all four Bibliothek tabs share it (founder s189: "same positions and design as
   schreiben"). Sticky bars were rejected (s168) and the four hand-copied Bibliothek bars are gone.
+  Since s197 it also brings its own soft bottom: a short page-ground scrim so the cards dissolve on
+  their way down (the mobile answer to the desktop `mask-fade-bottom`, which a phone cannot have
+  because it scrolls the page rather than a column), plus a frosted band in the strip BELOW the
+  button, where the note line sits. Border-free, `pointer-events-none`, and the blur never reaches
+  above the button, so neither reject comes back.
   `SearchField` transient toolbar search;
   `DataTable` for tabular views; `UmlautKeys` for German text inputs; `Logo` component for any
   logo spot (never boxed).

@@ -1,4 +1,4 @@
-// Shared AI usage accounting (founder s197: "how do we make sure we see real
+// Shared AI usage accounting (founder s204: "how do we make sure we see real
 // usage and costs and not just estimates?").
 // ---------------------------------------------------------------------------
 // Until now every function computed a cost and threw the token counts away, and

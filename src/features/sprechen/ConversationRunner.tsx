@@ -19,6 +19,7 @@ import {
 import { speak, stopSpeaking } from "@/engine/speech";
 import { requestDebrief, speakTurn, type DebriefResult } from "@/lib/speaking";
 import { useDailyAllowance } from "@/lib/aiAllowance";
+import { useMediaQuery } from "@/lib/hooks";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLiveWork } from "@/lib/liveWork";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,12 @@ import { cn } from "@/lib/utils";
 
 type Phase = "brief" | "running" | "debriefing" | "debrief";
 
+/** The phone drawer's two halves (s202). Desktop shows Aufgabe only. */
+const BRIEF_TABS = [
+  { id: "aufgabe", label: "Aufgabe" },
+  { id: "redemittel", label: "Redemittel" },
+] as const;
+
 export function ConversationRunner({
   brief,
   onExit,
@@ -52,6 +59,7 @@ export function ConversationRunner({
   onBusyChange,
   /** Rendered above the stage: the exam's RunBar, or practice's ModuleHeader. */
   header,
+  help,
 }: {
   brief: ConversationBrief;
   /**
@@ -77,12 +85,25 @@ export function ConversationRunner({
    */
   onBusyChange?: (talking: boolean) => void;
   header?: React.ReactNode;
+  /**
+   * The Redemittel help, PRACTICE ONLY (founder s202). Taken as a prop rather
+   * than imported: the Modelltest passes nothing, so it neither shows a
+   * candidate the phrases it is about to grade them on, nor carries the phrase
+   * bank in its chunk.
+   *
+   * Two layouts, one content (founder's pick): beside the conversation as a
+   * rail from `lg` up, and inside the brief drawer's second tab below it, where
+   * the conversation has no column to spare.
+   */
+  help?: (layout: "rail" | "drawer") => React.ReactNode;
 }) {
   const [phase, setPhase] = useState<Phase>("brief");
   const [state, setState] = useState<ConversationState>(() => startConversation(brief));
   const [debrief, setDebrief] = useState<DebriefResult | null>(null);
   const [typed, setTyped] = useState("");
   const [briefOpen, setBriefOpen] = useState(false);
+  /** Which half of the brief drawer is showing on a phone (s202). */
+  const [briefTab, setBriefTab] = useState<"aufgabe" | "redemittel">("aufgabe");
   const [subtitles, setSubtitles] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [hint, setHint] = useState<string | null>(null);
@@ -93,7 +114,7 @@ export function ConversationRunner({
   const speech = useSpeechInput();
   const reduce = useReducedMotion();
   // The budget this run spends: Prüfungsgespräche are counted apart from
-  // Übungsgespräche (s197).
+  // Übungsgespräche (s204).
   const allowance = useDailyAllowance(brief.exam ? "sprechenExam" : "sprechen");
 
   const speechEnabled = useSettingsStore((s) => s.speechEnabled);
@@ -102,6 +123,16 @@ export function ConversationRunner({
   const speechRate = useSettingsStore((s) => s.speechRate);
 
   const busy = state.status === "thinking" || phase === "debriefing";
+
+  /**
+   * The founder's s202 split: the Redemittel rail beside the conversation from
+   * `lg` up (Option A), the same content inside the brief drawer's second tab
+   * below it (Option C). ONE measurement decides, so the two can never be on
+   * screen at once, which would print the phrases twice.
+   */
+  const wide = useMediaQuery("(min-width: 1024px)");
+  const sideRail = help && wide ? help("rail") : null;
+  const drawerTabs = !!help && !wide;
 
   // A conversation in progress is live work: the PWA must not adopt a new build
   // on top of it. There is nothing to flush (the transcript of record lives
@@ -339,53 +370,131 @@ export function ConversationRunner({
             ? `Noch ${left} ${left === 1 ? "Beitrag" : "Beiträge"}`
             : speech.error;
 
-  return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
-      {header}
+  const goalList = (
+    <ol className="space-y-1.5">
+      {brief.goals.map((g, i) => (
+        <li key={i} className="flex items-start gap-2 text-[13px] leading-snug">
+          <span className="mt-0.5 text-xs font-bold tabular-nums text-accent-ink">{i + 1}.</span>
+          <span>{g}</span>
+        </li>
+      ))}
+    </ol>
+  );
 
-      {/* The collapsed brief. Every layout carries it, because a learner who
-          has lost the thread needs the task back without leaving the run. */}
-      <div className="shrink-0">
-        <button
-          type="button"
-          onClick={() => setBriefOpen((v) => !v)}
-          aria-expanded={briefOpen}
-          className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-2 text-left text-[13px] shadow-soft"
-        >
-          <span className="min-w-0 flex-1 truncate font-semibold">
-            {brief.title}
-            <span className="font-medium text-muted-foreground"> · {brief.partner.name}</span>
-          </span>
-          <ChevronDown
-            className={cn(
-              "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
-              briefOpen && "rotate-180",
-            )}
-          />
-        </button>
-        <AnimatePresence initial={false}>
-          {briefOpen && (
-            <motion.div
-              initial={reduce ? false : { height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={reduce ? undefined : { height: 0, opacity: 0 }}
-              transition={{ duration: 0.16 }}
-              className="overflow-hidden"
-            >
-              <ol className="mt-2 space-y-1.5 rounded-lg border border-accent/20 bg-accent/20 p-3 dark:border-accent/10 dark:bg-accent/10">
-                {brief.goals.map((g, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[13px] leading-snug">
-                    <span className="mt-0.5 text-xs font-bold tabular-nums text-accent-ink">
-                      {i + 1}.
-                    </span>
-                    <span>{g}</span>
-                  </li>
-                ))}
-              </ol>
-            </motion.div>
-          )}
-        </AnimatePresence>
+  /**
+   * The collapsed brief. Every layout carries it, because a learner who has lost
+   * the thread needs the task back without leaving the run.
+   *
+   * On a phone WITH the Redemittel help it is the founder's Option C: the same
+   * disclosure with two tabs, Aufgabe | Redemittel, because a phone has no
+   * column to put a rail in and a second control row would be a second thing to
+   * find. Everywhere else (desktop, and the whole Modelltest) it stays the one
+   * button it has always been, and the phrases live in the rail beside it.
+   */
+  const titleLine = (
+    <>
+      {brief.title}
+      <span className="font-medium text-muted-foreground"> · {brief.partner.name}</span>
+    </>
+  );
+
+  const briefBar = (
+    <div className="shrink-0">
+      <div
+        className={cn(
+          "w-full rounded-lg border text-left text-[13px] shadow-soft",
+          drawerTabs
+            ? "border-accent/20 bg-accent/20 px-1.5 py-1.5 dark:border-accent/10 dark:bg-accent/10"
+            : "border-border bg-surface px-2.5 py-2",
+        )}
+      >
+        <div className="flex w-full items-center gap-1.5">
+          {drawerTabs &&
+            BRIEF_TABS.map((t) => {
+              const on = briefOpen && briefTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  aria-expanded={on}
+                  onClick={() => {
+                    if (briefOpen && briefTab === t.id) return setBriefOpen(false);
+                    setBriefTab(t.id);
+                    setBriefOpen(true);
+                  }}
+                  className={cn(
+                    "shrink-0 rounded-md px-2.5 py-1 text-xs font-bold transition-colors",
+                    // The ON state is its own class, never a hover fill (s201).
+                    on ? "bg-surface text-primary shadow-soft" : "text-muted-foreground",
+                  )}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          <button
+            type="button"
+            onClick={() => setBriefOpen((v) => !v)}
+            aria-expanded={briefOpen}
+            aria-label={briefOpen ? "Aufgabe schließen" : "Aufgabe öffnen"}
+            className="flex min-w-0 flex-1 items-center gap-2"
+          >
+            {/* With the tabs beside it the title had a third of the row and was
+                cut off after four words (founder). It gets its own full-width
+                line below them instead; without tabs the row is the title's, so
+                it stays where it always was. */}
+            {!drawerTabs && <span className="min-w-0 flex-1 truncate font-semibold">{titleLine}</span>}
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                drawerTabs && "ml-auto",
+                briefOpen && "rotate-180",
+              )}
+            />
+          </button>
+        </div>
+        {drawerTabs && (
+          <button
+            type="button"
+            onClick={() => setBriefOpen((v) => !v)}
+            aria-hidden
+            tabIndex={-1}
+            className="mt-1 block w-full truncate px-1 pb-0.5 text-left text-[12.5px] font-semibold"
+          >
+            {titleLine}
+          </button>
+        )}
       </div>
+      <AnimatePresence initial={false}>
+        {briefOpen && (
+          <motion.div
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? undefined : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.16 }}
+            className="overflow-hidden"
+          >
+            {/* Bounded: opening this must shrink the transcript, never push the
+                running screen into a page scroll. Nothing scrolls at THIS level.
+                The panel is a flex column so its one elastic part (the goal
+                list, or the phrase list inside the help) takes what the cap
+                leaves, which is how every other trainer sizes itself. */}
+            <div className="mt-2 flex max-h-[50dvh] flex-col overflow-hidden rounded-lg border border-accent/20 bg-accent/20 p-3 dark:border-accent/10 dark:bg-accent/10">
+              {drawerTabs && briefTab === "redemittel" ? (
+                help?.("drawer")
+              ) : (
+                <div className="slim-scrollbar min-h-0 overflow-y-auto">{goalList}</div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
+  const conversation = (
+    <>
+      {briefBar}
 
       {brief.stage === "gespraech" && (
         <ThreadStage
@@ -447,6 +556,20 @@ export function ConversationRunner({
         onTypedChange={setTyped}
         onTypedSubmit={() => submit(typed)}
       />
+    </>
+  );
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      {header}
+      {/* The stage, plus the rail from `lg` up. One row, so the conversation
+          column keeps its own height and the rail sits beside it rather than
+          above it; `self-start` keeps the tile its content's height instead of
+          letting the row stretch it to the stage's. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">{conversation}</div>
+        {sideRail && <div className="w-64 shrink-0 self-start">{sideRail}</div>}
+      </div>
     </div>
   );
 }

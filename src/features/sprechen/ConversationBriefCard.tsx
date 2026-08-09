@@ -37,7 +37,7 @@ export function ConversationBriefCard({
   /** Set when the conversation cannot start (no allowance left, offline). */
   disabledReason?: string | null;
 }) {
-  // Practice and Prüfung run on separate daily budgets (s197), so the brief
+  // Practice and Prüfung run on separate daily budgets (s204), so the brief
   // decides which meter this card is reading.
   const allowance = useDailyAllowance(brief.exam ? "sprechenExam" : "sprechen");
   const initials = brief.partner.name

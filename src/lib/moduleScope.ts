@@ -83,6 +83,28 @@ export function countTexts(part: "lesen" | "hoeren", scope: TextScope): number {
 }
 
 /**
+ * How many texts in this scope are actually TAGGED with `sector` (founder s199,
+ * the twin of `writingScope.countDedicatedTasks`).
+ *
+ * `countTexts` can never return zero for a Branche, because the fallback above
+ * serves the universal texts instead. That is right for the draw and wrong for
+ * the rail, which printed a healthy number next to an industry that changed
+ * nothing about the draw. A zero here LOCKS the option. Only 4 of the 52 texts
+ * carry a Branche tag today, so on Lesen and Hören this locks nearly everything,
+ * which is the honest state of that bank and the reason the rail collapses to
+ * one line rather than showing fifteen padlocks.
+ */
+export function countDedicatedTexts(
+  part: "lesen" | "hoeren",
+  scope: TextScope,
+  sector: string,
+): number {
+  return scopedTexts(part, { ...scope, sector: "" }).filter((t) =>
+    t.sectors?.includes(sector as WorkSector),
+  ).length;
+}
+
+/**
  * The Modelltest level a single text belongs to, for the run it starts. The
  * bands pair up the same way `LEVEL_BANDS` does in `engine/exam.ts`, so a B2.2
  * text drills as a B2 module and its score lands in the B2 Stärkeprofil.

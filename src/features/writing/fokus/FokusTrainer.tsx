@@ -404,7 +404,7 @@ export function FokusTrainer({
         </span>
         <div className="flex items-center gap-2">
           {/* The Umformung has its OWN daily budget (it never spends a
-              Korrektur, s167), and until s197 it was the one AI feature whose
+              Korrektur, s167), and until s204 it was the one AI feature whose
               wall arrived with no warning. */}
           {transformAllowance.known && (
             <AllowanceNote
@@ -646,7 +646,7 @@ export function FokusTrainer({
                   <SpeakButton text={m.transform.transformed} />
                 </div>
                 {/* Same fact as the desktop card's header, in the one place a
-                    phone has room for it (s197). */}
+                    phone has room for it (s204). */}
                 {transformAllowance.known && (
                   <AllowanceNote
                     remaining={transformAllowance.remaining}

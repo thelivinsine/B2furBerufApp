@@ -61,9 +61,54 @@ rejected there by the content linter, because the transcript is a practice affor
 **The exam RunBar frames every screen of a Teil** (s194), the brief and the debrief included, not
 only the talking one.
 
-**No exam set is `anruf` yet.** Every one of the 15 authored sets is a "discuss the aspects and
-agree" task whose aspects must stay readable, so the Anruf layout is built, tested and unreached
-until listen-and-hold speaking tasks are authored. That is the next content job, not a bug.
+## The Redemittel rail (s202)
+
+A practice conversation carries the phrases for its own Redemittel categories while the learner is
+speaking. Before this, the four category NAMES were on the brief card and in the debrief, and the
+phrases behind them were only in the Bibliothek, so the learner had the label and never the language
+at the moment they needed a sentence.
+
+Founder pick: **Option A's layout on desktop, Option C's on a phone, Option A's content in both.**
+
+- **`lg` and up:** `RedemittelHelp` as a 16rem `ScopeRail` tile beside the conversation. The stage
+  widens from `max-w-2xl` to `lg:max-w-4xl`, so the conversation column keeps its width and the rail
+  takes the space that was empty beside it. The brief row stays the single button it has always been.
+- **Below `lg`:** the same content as the second tab of the brief drawer, **Aufgabe | Redemittel**. A
+  phone has no column for a rail, and a second control row would be a second thing to find.
+- **ONE measurement decides** (`useMediaQuery("(min-width: 1024px)")`), so the phrases can never be
+  on screen twice.
+
+**One hierarchy, both shells** (founder, s202 follow-up): the section label with its `EnPeek` chip,
+then the intent **pills at the top of the tile** (all four, honest counts, the current one LIT), then
+that intent's phrases as white cards. There is no dropdown: a lit pill states the selection, so a
+dropdown above it would print the same fact twice, and four options is pill territory. The pills do
+NOT toggle off, unlike `LifeAreaPills`: a conversation always has one intent in view. **No reset**
+(`ScopeRail.onReset` is optional since s202): this rail browses, it does not narrow a list, so a
+reset would be a dead control.
+
+**The phone drawer's bar is two lines**: the tabs plus the chevron on the first, the task title and
+partner on their own full-width line below. Beside the tabs the title had a third of the row and was
+cut off after four words. Without tabs (desktop, and the whole Modelltest) the bar stays the one row
+it always was.
+
+Rules:
+
+- **Practice only, structurally.** `ConversationRunner` takes `help` as a PROP and the Modelltest
+  passes nothing, so a candidate is never shown the phrases they are graded on and the exam chunk
+  does not carry the phrase bank.
+- **Nothing sends a phrase into the conversation.** Reading is not saying, and the debrief grades
+  what was actually said.
+- **The Anrede matches the partner** (`src/lib/anrede.ts`, the ONE du/Sie rule, derived from the
+  phrase TEXT because `RedemittelPhrase.register` is formality, not Anrede). A category with no
+  fitting phrase serves its full set rather than emptying. Gated by `tests/anrede.test.ts`, which
+  also asserts every scenario's four intents stay servable in both registers.
+- **The list is the one elastic element** in both shells: bounded in the rail, and in the drawer it
+  takes what the `50dvh` cap leaves, so the intent pills below it stay on screen and the running
+  screen still rests at zero page scroll.
+
+**No exam set is `anruf` yet.** Every one of the 21 authored sets (measured 2026-08-08) is a "discuss
+the aspects and agree" task whose aspects must stay readable, so the Anruf layout is built, tested and
+unreached until listen-and-hold speaking tasks are authored. That is the next content job, not a bug.
 
 ## Where the content comes from
 
@@ -88,7 +133,7 @@ never leaves the device, which is why the privacy policy can say so.
 - ~2-4 cents per 12-turn conversation, and effectively 0 while the free Gemini Flash leg of the
   cascade absorbs the turns. Turns use `SPEAKING_TURN_MODEL` (cheap), the debrief
   `SPEAKING_DEBRIEF_MODEL`.
-- **TWO daily budgets, counted separately** (founder s197, "it's very less"): **6 Übungsgespräche**
+- **TWO daily budgets, counted separately** (founder s204, "it's very less"): **6 Übungsgespräche**
   (`DAILY_LIMIT_CONVERSATIONS`) and **3 Prüfungsgespräche** (`DAILY_LIMIT_EXAM_CONVERSATIONS`),
   split on `speaking_conversations.exam` so a day spent practising can never eat the exam allowance
   or the other way round. Mirrored client-side as the `sprechen` / `sprechenExam` modes in
@@ -188,6 +233,8 @@ Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
 | `features/sprechen/ConversationRunner.tsx` | The one runner + the three stage views. |
 | `features/sprechen/ConversationBriefCard.tsx` | The pre-conversation brief. |
 | `features/sprechen/ConversationDebrief.tsx` | Goals, correction card, Redemittel. |
+| `features/sprechen/RedemittelHelp.tsx` | The phrases while speaking (s202): the rail tile and the drawer body, one content. Practice only, passed to the runner as `help`. |
+| `lib/anrede.ts` | The ONE du/Sie rule, derived from phrase text. |
 | `features/sprechen/MicCluster.tsx` | The shared control cluster + typed fallback. |
 | `features/sprechen/useSpeechInput.ts` | The microphone, over `engine/speech.ts`. |
 | `features/sprechen/SprechenHub.tsx` | `/simulation`, the free trainer. Üben \| Verlauf switcher, the shared `ScopeRail` in Schreiben's frame (s196), the scenario grid. Registers the zone's ONE exit (s195): from the list it leaves for the hub, from a started conversation it asks first, because a conversation cannot be resumed. |

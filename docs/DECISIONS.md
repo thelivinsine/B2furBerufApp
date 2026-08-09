@@ -1778,9 +1778,389 @@ When the founder says "I don't see the change", check WHICH of the two deploys f
 suspecting the code.
 
 
+## s197 — the Prüfung hub's page title, and why the answer was to delete it
+
+**Founder, on the s196 result:** "it created this funny looking page ... It is looking ridiculous at
+the moment", asking for previews of the whole page before anything else was built.
+
+**What s196 had been asked for** (s196 prompt 1): "Instead of guten morgen greeting, use that space
+to show a big header like Prufung or Bibliothek **aligned to left vertically with the toggle
+buttons**".
+
+**Why the shipped answer failed.** It read "aligned to left" as the APP header's left gutter and put
+the title there, beside a second copy of the tab switcher. That gutter is a different left edge from
+every control the title was supposed to line up with. Worse, the page underneath already nested
+THREE separately centred widths — a `lg:max-w-4xl` panel column, holding a `max-w-[30rem]` module
+grid (s196's own answer to "the tiles look empty"), holding a `max-w-[26rem]` Stärkeprofil — so the
+tiles started ~220px right of the title, a narrow tile island floated over a full-width Verlauf
+card, and the empty Stärkeprofil filled half of the widest card on the page with grey slabs at "–".
+Four different left edges on one screen, of which the title was only the most visible.
+
+**The round.** `preview/pruefung-header-align.html` (artifact
+<https://claude.ai/code/artifact/77b2bdcf-aa2d-431d-a45a-cd6ea9d16c49>): the diagnosis at today's
+measured widths, then **A** title inside the page (h1 left, switcher right, one column), **B** title
+stays in the app header and the PAGE moves to its left edge, **C** no title at all, the switcher IS
+the page header, which is what the Bibliothek and Schreiben pages already do. All three collapsed
+the nested widths into one column; the page carried live Theme / Column-width / Alignment-guide
+switches so the measurement itself could be picked.
+
+**Founder picked C at "medium" (640px).** So the app keeps the part of s196 that was actually
+wanted (no greeting on this route) and drops the title that was the misreading. The nav tab is lit
+"Prüfung" already; a page title would have been the third place the word appears.
+
+**The width is measured from the TILES, not chosen for the page.** s196 locked "the module grid is
+capped narrower than the column". That lock existed because wide tiles read as empty strips, and it
+is honoured here in the only way that also lets the page have one edge: `HUB_COL` (`max-w-[40rem]`)
+IS the tile grid's width, so the grid needs no cap of its own. Flagged in the preview rather than
+overridden silently, because it re-reads a locked rule.
+
+**Two smaller findings, both from measuring rather than looking.** The practice row inside the
+Verlauf's right half had exactly 0px spare at `sm:gap-4 lg:px-6` (72+28+55+53 of content, 48 of
+gaps, 40 of padding, in 296px), so the score badge wrapped its "%" and the module name truncated to
+"Schre..."; and the Stärkeprofil's mark-beside-name label pushed "Schreiben" through the card's
+divider into the list. Both are what a narrower card exposes in a layout that was only ever tested
+at a wider one.
+
+**Known and NOT fixed here:** the hub still rests 54px scrolled at a 1023px-wide window and 43px on
+a 360×640 phone (63px before this change; measured against a build of `main`, so neither is new).
+Both come from the Verlauf card being `flex-none` at rest, so it cannot give room back on a short
+stage; fixing it means letting its collapsed list scroll inside the card, which changes s195/s196
+Verlauf behaviour and is the founder's call, not a silent side effect of a layout PR.
+
+## s197 — the mobile list needed a bottom edge, not a plate
+
+**Founder:** a screenshot of the dark desktop Bibliothek list dissolving at the bottom of its
+column, then "can you put similar effect even in the mobile view so that the floating text below the
+ueben button is more readable and visible?", and after the previews, "insert short fade but soft
+blur but not above the blue button, it should be below the blue button behind the text."
+
+**Why the text was unreadable, precisely.** Two earlier decisions met. s189 moved the desktop browse
+scroll INSIDE the content column, which is what let `browseColumnClass` mask the column's own bottom
+edge so cards fade into the page ground rather than ending at a cut. The same session removed the
+`floatingNote` plate from the Bibliothek's note line, because over WHITE cards the
+`bg-background/90` plate read as a frosted chip rather than as page ground. Neither was wrong. But a
+phone scrolls the PAGE, so it never got the s189 edge, and it had just lost the only backing that
+line had. The founder's "floating text" is that gap.
+
+**Why a veil here, when the desktop answer is explicitly a MASK and not an overlay.** The desktop
+rule exists because the fade sits in the middle of a page whose ground is a gradient, so one flat
+colour would show as a band. This veil sits at the very BOTTOM of the viewport, against the nav,
+where the ground has arrived at effectively one colour (identical to `--background` in dark, within
+a hair of it in light) and where there is no scroll container to mask in the first place. Same
+intent, different mechanism, for a reason that does not generalise upward: do not answer a
+mid-page cut with an overlay.
+
+**Why the blur is a separate, much shorter layer.** The preview's option C blurred the whole 9rem,
+which frosts the cards behind the button as well. The founder cut it to the strip below the button,
+which is the only place the frosting has a job: the note line. So `.cluster-blur` is exactly as tall
+as the gap between the nav and the button's lower edge, masked at its own top so it ends in a fade
+rather than a line. It is not the s169 blurred band, which was a full-width bar strapped across a
+scrolling page; this is 32px of frosting under a control, with no chrome of its own.
+
+**Why the scrim deliberately stops short of full opacity.** The first build ramped to ~0.99 by the
+time it reached the note, which made the frosted band invisible, i.e. it silently implemented option
+A and called it the founder's pick. It holds ~0.85 through that strip now so the blur has something
+to act on. Contrast survives because what shows through is a card that is itself within a few per
+cent of the ground in both themes.
+
+## s197 — the Pages timeout is raised (the s196 fix, finally taken)
+
+**Taken:** attempt 1 of `actions/deploy-pages` now runs with `timeout: 1800000` (30 min); attempts 2
+and 3 keep the 600000 default. Founder said "go ahead" after it had cost a third session.
+
+**Why the three attempts are not all the same.** Two different failures share this step and want
+opposite deadlines. The TIMEOUT failure needs a longer one: a deployment for this repo regularly
+runs past 10 minutes, the action cancels itself when its `timeout` expires, and the cancelled
+leftover can refuse the next merge outright ("in progress deployment. Please cancel `<sha>` first"),
+which is how a green build ends with no deploy run at all. The transient PLATFORM failure
+("Deployment failed, try again later") wants a shorter one: it fails fast, so giving all three
+attempts 30 minutes would hold a genuinely broken deploy for an hour and a half before it went red.
+One long first attempt plus two fast retries answers both: worst case ~51 minutes, and in the normal
+case there is no self-cancel and nothing left over.
+
+**Evidence it was the timeout, not the code** (collected across s196 and s197): #820's deploy sat in
+`deployment_in_progress` for the full 10 minutes, self-cancelled, and went live only because attempt
+2 re-created it; #816's deploy job ran 16:24:20 → 16:39:26 and was cancelled with the `build` job
+green in 60 s; and the merge after it (`a2ad467`) got no deploy run created at all until
+`pages.yml` was dispatched by hand, which then succeeded.
+
+**What this does NOT fix.** The leftover-deployment case can still happen if a deploy exceeds 30
+minutes, and GitHub occasionally schedules no runs for the repo at all (s197 saw `Validate content`
+cancelled after 15 minutes without starting, and no check ever registered on PR #817). Neither is
+something the workflow can settle; the manual `workflow_dispatch` of `pages.yml` on `main` stays the
+documented rescue.
+
+## s198 — the 116 words that "needed content" were a regex bug, and the three gates the audit asked for
+
+The last content-audit session (`docs/reports/CONTENT_AUDIT_2026-07-30.md`) left three things open
+besides P10 (human review, founder-deferred): 116 words that could never appear as a cloze, typed
+gap or listening item, 67 with no resolving related term, and the closing observation that there is
+"no gate for is this word worth learning, is this band plausible, or does this theme have a balanced
+part-of-speech mix". The founder asked for all of it except the human review.
+
+**The 116 were not a content gap.** The audit read the coverage report's framing ("Fix: adjust one
+of the example sentences so the word appears in it") and priced them as cheap content fixes. Reading
+the actual list said otherwise: 25 of them start with an umlaut and 85 are verbs. JavaScript's `\b`
+is defined on `\w`, which is ASCII, so `\bÜberweisung` can never match: there is no boundary between
+a space and "Ü", and every umlaut-initial headword was unblankable no matter how many of its
+examples used it. The verbs failed for a different reason: only the infinitive was searched for, so
+"Ich habe den Flug gebucht" did not count as an example of `buchen`.
+
+**So the fix is the matcher, not the sentences.** Bending 85 natural German sentences into
+infinitives to satisfy a broken search would have made the content worse to make a report greener.
+`src/engine/blank.ts` is now the ONE rule (the MCQ cloze, the listening cloze, the typed cloze and
+`report-exercise-coverage.mjs` all call it) and it looks for the forms the sentences actually use:
+the headword, the Partizip II / Präteritum / zu-infinitive from `verbForms.ts`, the plural, and the
+content token of a multi-word headword. `verbForms.ts` did not exist when the audit was written,
+which is why the audit could not have prescribed this.
+
+The interesting consequence is the distractors. A gap holding "gebucht" answered against a list of
+infinitives gives itself away by shape, so the blank REPORTS which form it took and the builder
+draws same-form distractors ("verschoben", "abgesagt", "bestätigt"). That turns the fix into a
+better exercise than the one the audit was asking to restore. 15 separable verbs whose particle
+detaches in a main clause ("löste den Ausfall aus") kept a genuine gap and got one example rewritten
+into a Perfekt or modal construction; 67 words gained a related term that resolves to a bank entry.
+Both residuals in the coverage report are 0.
+
+**Why four copies of the rule existed at all** is the lesson worth keeping: each call site was
+written when it was needed, each copied the two-line regex, and no single place owned the rule, so
+one wrong character disabled a whole class of words in three surfaces at once and no test noticed.
+
+**The three gates are ratchets, not targets.** Every threshold in `scripts/content-shape.mjs` is the
+measured state of the bank on the day it landed (rare share 53.87 %, no-corpus-evidence 100,
+beginner-rare 32, noun share 77.59 %, plus the hard rule that a `core`-frequency word is never
+B2.2/C1 and the floor of ≥3 verbs and ≥3 adjectives per theme). A target invented from pedagogy
+would have made today's content illegal on the day it shipped, which is how a gate gets disabled
+instead of obeyed. Shares rather than counts wherever adding good content should buy room: the way
+past the rare-share ceiling is to add common words, which is the behaviour the audit wanted anyway.
+`tests/contentShape.test.ts` asserts each gate in both directions, because a ratchet that cannot
+fire is decoration.
+
+**The floors demanded content, which is the point.** `digitales` had no verb and no adjective at
+all; `freizeit`, `behoerde` and `mobilitaet` had no adjective. Those themes could only ever drill
+nouns, which is exactly the "noun museum" the audit named. 25 everyday verbs and adjectives were
+authored to clear the floors (aufladen, verbinden, löschen, einladen, unternehmen, gemütlich,
+zuständig, gültig, überfüllt, günstig, haltbar, gebührenfrei, chronisch, einverstanden, lieferbar …),
+all core-or-common frequency, which also serves P7's standing "spend the next slots on core verbs,
+adjectives and connectors" rule.
+
+**One finding is deliberately NOT scheduled:** §2.1's inverted sub-theme structure (eight workplace
+themes carry no sub-themes, so 59 % of words have no `subThemeId`). It is a taxonomy project, not a
+content fix, because each new Unterthema drags the writing-task invariant behind it (≥2 tasks per
+Unterthema per length, gated by `tests/writingScope.test.ts`), so it is a session of its own.
+
 ---
 
-## s197 — the KI-usage readout, and what the "$" in the control centre actually is
+## s199 — Branche was a coverage artifact, and the fix was to delete tags, not add content
+
+**The audit finding.** The s181 writing-task backlog closed on COVERAGE: 717 tasks, every Unterthema,
+every Textsorte, and "all 15 Branchen on every Beruf AND Alltag theme at both lengths", gated by two
+tests in `tests/writingScope.test.ts`. The s199 quality audit
+(`docs/reports/writing-tasks-audit-2026-08-07.md`) asked the question coverage cannot answer, which is
+whether the tags are EARNED, and the answer was visible in one table: **every one of the 40
+theme×length pools carried exactly 15 distinct sectors**, the exact size of the `WorkSector` enum,
+handed out in enum order down the pool index, in pools as small as 11 tasks. 199 of 600 tagged tasks
+contained no marker of the industry they claimed. `wt_freizeit_s08` was tagged `pharma` for "Sie haben
+auf einer Feier eine Bekannte wiedergetroffen".
+
+**Why it happened.** The invariant was arithmetically unsatisfiable by authoring: eleven everyday tasks
+cannot honestly represent fifteen industries. It was met the only other way available. The gate did
+exactly what it was written to do, which is the lesson: a coverage floor over a soft axis measures
+tagging, not content, and will be paid in tags.
+
+**The founder's choice (option a).** Presented as (a) relax the floor for Alltag and strip the tags no
+brief earns, or (b) keep the floor and author ~199 sector-specific variants. Founder: "go with your
+recommendation reg branche." Option (a) was recommended because **Branche is SOFT**: untagged means
+universal, and the axis is applied last precisely so it can never empty a pool. Deleting a dishonest
+tag therefore costs a learner nothing at all. It does not remove a task from anyone's reach; it only
+stops the app preferring a party anecdote for a Pharma learner over tasks that actually fit.
+
+**What replaced the floor.** `scripts/sector-markers.mjs`: one lexicon of per-sector markers, used by
+`lint:content` AND by the test, so the gate and the unit test cannot drift into disagreeing about what
+an earned tag is. Markers are deliberately SHARED where the word really is shared (`charge` belongs to
+production, chemicals and pharma; `objekt` to cleaning and security), because the job is to reject the
+tag with NO connection, not to be strict for its own sake. A first cut withheld the shared words and
+stripped `wt_safety_s09` ("An Anlage 2 sitzt die Schutzabdeckung locker. Melden Sie das dem
+Schichtleiter.") from `production`, which is as production-shaped as a brief gets: strictness in the
+wrong place is just a different wrong answer.
+
+Result: 331 tag instances stripped, 220 tasks universal again, no id changed and no task text touched.
+Beruf pools average 13.4 of 15 sectors with earned content (floor 8, `travel`, because a Dienstreise is
+genuinely the same job in every industry, which is a fact about the world rather than a content gap);
+Alltag averages 3.0.
+
+---
+
+## s199 — the filter hierarchy inverts, and Branche locks instead of pretending
+
+**The order.** Founder: "I prefer to have Berufsleben and Alltag as the first filter and then themen
+and only then Branchen filter as the heirarchy of the filter rail all across." Every rail ran
+Niveau → Branche → Lebensbereich → Thema → Unterthema → Textsorte (s149, with the pills pinned under
+Branche by s184). It now runs **Lebensbereich → Thema → Unterthema → Branche → Niveau → Textsorte**.
+
+Niveau was the one open question, because it is not part of the Berufsleben/Thema/Branche hierarchy
+yet led every rail. "As the first filter" was read literally: Lebensbereich leads, Niveau follows the
+hierarchy, Textsorte stays last. Moving Branche from second to fourth also fixed a smaller thing: after
+the tag cleanup it is the axis most often empty, and a filter that frequently has nothing to offer
+should not be the first control a learner meets.
+
+The order is applied INSIDE the rails (`FilterRail` reorders the `scopes` array itself), never by the
+callers, so no surface can drift. That is the same reasoning s184 used to place the pills centrally.
+
+**The lock.** Founder, same message: "When a user selects a thema where there is no branche specific
+content, just show the options within Branche as locked." This required a second counting function.
+`countTasks`/`countTexts` answer "what will I get", and for Branche that is never zero, because the
+soft fallback serves the universal pool. Right for the draw, wrong for the rail: it printed a healthy
+number beside every industry while choosing one changed nothing, which is the same rail-vs-engine
+disagreement s167 fixed for the other axes. `countDedicatedTasks`/`countDedicatedTexts` answer "what is
+written FOR this industry", and a zero there locks the option with a padlock.
+
+**Why a whole-control state exists too.** Fifteen padlocked rows say the same thing fifteen times,
+which is exactly what the redundancy rule targets, and on Lesen/Hören it would be the normal sight:
+only 4 of 52 texts carry a Branche tag. So when every option is locked, one line replaces the control.
+The engine's fallback is untouched, so nothing became unreachable and a deep link naming a locked
+Branche still serves the universal pool rather than breaking.
+
+**Deliberately no preview round.** The design law is previews-first; the founder waived it here ("no
+need of design preview for the above mention rail changes"). The two open sub-decisions (where Niveau
+lands, what "locked" looks like) were therefore decided in-session and are recorded above so they can
+be flipped cheaply: the lock lives in ONE place (`ScopeSelect`'s row renderer plus `ScopeLocked`), so
+restyling it is a single-file change rather than an eight-rail one.
+
+---
+
+## s199 — the rail is one piece (why the header looked bolted on)
+
+Founder: "the header and footer of the filter rail seems to look like separate pieces attached to the
+main body. remove the separator lines and make all the filter rail same shade to look like one piece."
+
+The cause was compositing, not a colour choice. The tile wears `bg-accent/20`, and the header and the
+Üben footer each painted `bg-accent/20` **again on top of it**, so both strips resolved to roughly
+double the wash of the body between them. A tinted `border-t` under the header and above the footer
+then underlined each seam. Two strips a visibly different shade from the middle, each with a rule at
+its boundary, is a picture of three parts bolted together, which is what the founder saw.
+
+The second fills existed to keep the fixed header and footer opaque while the middle scrolled. They
+were unnecessary: the rail is a flex column with `overflow-hidden` and the scroll region is `flex-1`,
+so the region already clips its own content and can never render into them. The mobile `layout="panel"`
+variant had been built without them from the start and was already seamless, which is the proof.
+
+Both extra fills and both rules are gone, in `FilterRail` and in `ScopeRail` (the Aufgabe rails' header
+divider went with them), so the two rails stay identical, as s189 established. This supersedes the s169
+note that a divider on such a tile must be tinted rather than grey: the note was right that a grey rule
+was wrong, and the answer turned out to be no rule at all.
+
+## s200 — a brief has to ASK for the argument it is graded on
+
+**Decision:** an argumentative Textsorte (`stellungnahme`, `forumsbeitrag`, `widerspruch`,
+`beschwerde`) at B2 or above must carry at least one Leitpunkt that forces a **reason, a consequence
+or a stance**, gated by `lint:content` and `tests/writingScope.test.ts` through the one classifier in
+`scripts/justification-markers.mjs`.
+
+**Why.** `level` is what tells `evaluate-writing` to "bewerte streng auf C1-Niveau", and
+Aufgabenerfüllung is graded against the Leitpunkte. Six C1 Stellungnahmen at a 200-word target
+carried only descriptive points, so a learner who covered all four exactly had described, empathised,
+proposed and delegated, and was then marked down for not arguing. That is the one failure mode a
+Leitpunkt-based brief exists to prevent. 30 tasks were fixed by REPLACING their weakest descriptive
+point: four Leitpunkte in 200 words is already the exam shape, so a fifth would have made the task
+harder rather than clearer.
+
+**Two design mistakes worth keeping, both from building the classifier:**
+1. **Two tiers were wrong.** A first cut demanded a STANCE marker specifically from every
+   Stellungnahme and a reason from every Beschwerde. It failed `wt_safety_l04`, whose points are
+   "Begründen Sie, warum das Training nötig ist", "Legen Sie dar …", "Entkräften Sie den Einwand der
+   Ausfallzeit". A gate that fails the most argumentative task in the pool is measuring the wrong
+   thing. One demand, three ways to satisfy it.
+2. **The classifier must not be tuned to make tasks pass.** Consequence points ("Erklären Sie, was
+   das für den Kassenabschluss bedeutet") were admitted because naming what something costs IS the
+   argument a complaint runs on, not because it shrank the fix list. The line stays at pure
+   description: `begründ` is a marker, bare `grund` is not.
+
+## s200 — the reaction text belongs to the reply genre, and the audit was wrong about it
+
+**Decision:** P4 of the s199 writing-task audit is NOT implemented. The 54 Stellungnahmen and 17
+Forumsbeiträge do not get a supplied `source` text, and the report carries a correction saying so.
+
+**Why.** The founder challenged the finding from their own exam: "in my B2 für Beruf exam they just
+gave the topic overview and asked to write a forumsbeitrag. The additional text wasn't provided."
+The published material agrees with them:
+- **Goethe-Zertifikat B2, Schreiben Teil 1** is a Forumsbeitrag from a topic sentence plus four
+  Inhaltspunkte, nothing supplied. Teil 2 (a Nachricht to a supervisor) is the same shape.
+- **Deutsch-Test für den Beruf B2** has two writing parts and prints a text in ONE of them: Teil 1
+  forwards a customer complaint to answer, Teil 2 is a choice of two topics, one a Forumsbeitrag.
+
+**The supplied text belongs to a GENRE, answering incoming workplace mail, not to an exam.** The
+audit had selected precisely the opinion tasks that never get one, so implementing P4 would have
+moved 71 tasks AWAY from the exam shape and added reading the real task does not have. The honest
+target is the **47 reply-shaped tasks** ("Ein Kunde beschwert sich … Antworten Sie ihm"), which show
+nothing of what came in. `source` stays in the schema for that wave (unlike `exam`, which was retired
+the same session, it has a real use ahead of it) and is still read by nothing today.
+
+**Method rule this produces:** the audit's §9 compared the bank against exam shapes from memory of
+the format rather than against the published task descriptions. Where a claim turns on "this is what
+the exam does", fetch the Modellsatz. A wrong premise survived three sessions and was caught only
+because the founder had sat the exam.
+
+## s202 — the Redemittel a learner speaks with, and the two shells they live in
+
+**Decision:** a practice conversation carries the phrases for its own Redemittel categories on
+screen while the learner is speaking: **Option A's rail beside the conversation from `lg` up,
+Option C's brief-drawer tab below it, with the rail's content in both** (founder's pick from
+`preview/sprechen-redemittel-rail.html`).
+
+**Why it was missing.** A spoken task has always named four Redemittel CATEGORIES on the brief card
+and ticked them in the debrief, while the eight phrases behind each name lived only in the
+Bibliothek, in another zone. So the learner held the label ("Vorschläge machen") and never the
+language, at the one moment they needed a sentence to start with, and the debrief then graded
+whether they had reached for exactly those.
+
+**Three rules the shape follows from:**
+- **Practice only, and structurally so.** The runner takes the help as a PROP; the Modelltest passes
+  nothing. Handing a candidate the phrases would grade their reading, and the exam chunk does not
+  carry the phrase bank (verified in the build output).
+- **Reading a phrase is never a tick.** Whether a Redemittel was used stays the model's judgement of
+  what was said. There is deliberately no way to send a phrase into the conversation either: that
+  would put words in the transcript the learner never spoke.
+- **One measurement, never both shells at once.** `useMediaQuery("(min-width: 1024px)")` decides, so
+  the phrases cannot print twice, and the desktop brief row keeps its single-button form (a
+  Redemittel TAB there would duplicate the rail beside it).
+
+**The three content questions the founder did not answer, and the defaults taken (say the word and
+any of them flips):**
+1. **All eight phrases of the chosen intent**, not a curated three. Curation would need an authored
+   order the bank does not have, and "which three are best" is a content decision, not a layout one.
+2. **The Anrede matches the partner**, which is the one thing here that genuinely filters. The bank
+   tags `register` as neutral/formal, which is FORMALITY, not Anrede, so `lib/anrede.ts` derives
+   du/Sie from the phrase text: one rule, one place, gated by `tests/anrede.test.ts` (the `blank.ts`
+   lesson about text rules that get copied). It never empties a category: a category with no fitting
+   phrase serves the full set, because a filter that deletes the feature is not a filter.
+3. **English is hold-to-peek** (`EnPeek`), one chip for the whole list rather than one per row.
+
+**No reset on this rail.** `ScopeRail.onReset` became optional for it. The rail browses phrases, it
+does not narrow a list, so a reset would sit at its default doing nothing, which is the
+dead-control rule.
+
+## s202 follow-up — the intent picker IS the pills, and a title needs its own line
+
+Three founder corrections from the shipped screens, one hierarchy for both shells:
+
+1. **The task title was cut off** ("Projekt termingerecht absc…"). Beside the two drawer tabs it had
+   a third of the row. It now has its **own full-width line below the tabs**, which is also where a
+   phone can actually read it. The one-row bar survives everywhere without tabs (desktop, the whole
+   Modelltest), because there the row is the title's already.
+2. **The intent pills moved to the TOP of the tile** and **the selected intent is shown among
+   them**, lit. They used to sit under the phrase list as "Auch im Gespräch", holding only the
+   other three: the tile said which intent was showing in a dropdown at the top and which ones were
+   not at the bottom, so the selection lived in two places and the pills could never carry state.
+3. **The dropdown is gone with them.** A lit pill states the selection, so keeping the dropdown
+   would print the same fact twice, which is the redundancy rule's exact target; and four options is
+   pill territory (dropdowns are for the long scope lists, ≤12 options are pills).
+
+The pills deliberately do NOT toggle off, unlike `LifeAreaPills`: there is no "no intent" state to
+return to, because the list below always shows one.
+---
+
+## s204 — the KI-usage readout, and what the "$" in the control centre actually is
 
 **Founder ask (s196 prompt 2, continued here):** "is it possible to have a KI usage similar to how
 claude code shows wherever a feature uses ai is in the app?" Scope A + B was approved then. This
@@ -1848,7 +2228,7 @@ first.
 
 ---
 
-## s197b — step 1 built: usage is measured, cost is derived, and Sprechen gets two budgets
+## s204b — step 1 built: usage is measured, cost is derived, and Sprechen gets two budgets
 
 **Founder:** "continue with step 1. also, I don't want to have the current limit for sprechen
 exercises. it's very less. increase the limit to 6 for üben and 3 for Prüfung."

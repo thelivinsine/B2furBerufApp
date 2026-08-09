@@ -7,35 +7,47 @@ Read this before touching `src/features/pruefung/`, `src/features/exam/`, `src/e
 
 ## The shape
 
-**ONE page at `/anwenden`.** Below `lg` the switcher IS the page header (founder s189: no
-HubHero, no in-page `h1`). From `lg` up (founder, s196) the switcher moved into the **AppShell
-header** beside a big left-aligned **"Prüfung"** title, in the space every other route's generic
-greeting ("Guten Morgen …") occupies; the page body then opens straight on the scope row
-(Ohne Zeit/Mit Zeit + Niveau). `features/pruefung/hubSwitcher.tsx` holds the switcher, the `Tab`
-type and `usePruefungTab` (a `?tab=` reader/writer) so both copies drive the SAME URL param and
-never disagree; `AppShell` imports ONLY that tiny file, never `PruefungHub.tsx` itself, which
-pulls in `engine/exam` and the content banks behind it (the keep-eager-code-light invariant would
-break the moment AppShell — mounted on every route — imported a content bank).
+**ONE page at `/anwenden`.** The switcher IS the page header, at EVERY width (founder s189, and
+founder pick C in s197: no HubHero, no in-page `h1`, no page title anywhere), with the scope row
+(Ohne Zeit/Mit Zeit + Niveau) centred under it. The **AppShell header's greeting slot stays empty**
+on this route, which is the part of s196 that survives: the founder had asked for the
+"Guten Morgen …" space to carry a big page title instead.
+
+**Why the s196 header title is gone.** It read "aligned to left vertically with the toggle buttons"
+as the APP header's left gutter, which is a different left edge from every control it was meant to
+line up with, and the page underneath it kept three separately centred widths (a `max-w-4xl` panel
+column holding a `max-w-[30rem]` module grid holding a `max-w-[26rem]` Stärkeprofil). Nothing shared
+an edge with anything. `features/pruefung/hubSwitcher.tsx` still holds the switcher, the `Tab` type
+and `usePruefungTab` (a `?tab=` reader/writer); the hub is its only caller again, and the split
+stands so that a future header copy can import THAT file and never `PruefungHub.tsx`, which pulls in
+`engine/exam` and the content banks behind it (the keep-eager-code-light invariant would break the
+moment AppShell — mounted on every route — imported a content bank).
 
 | Tab | What it is |
 |---|---|
 | **Module üben** | the four exam modules as four identical cards, then a Stärkeprofil Verlauf |
 | **Modelltest** | the complete run as a ticket band, then a Verlauf led by the last score |
 
-Both tabs live in the same `max-w-4xl` centred column, so switching never changes the page's
-width. Neither scrolls at rest: the page is `h-pruefung-stage`, which — unlike the shared
+Both tabs live in the same centred column, `HUB_COL` = **`max-w-[40rem]`** (founder pick "medium",
+s197), so switching never changes the page's width. Neither scrolls at rest: the page is `h-pruefung-stage`, which — unlike the shared
 `h-page-stage` other trainers use — keeps a real height ceiling from `lg` up too, not just below
 it (s196: a taller Verlauf card had made the hub scroll on real laptop heights, ~750-800px usable
 under browser chrome, because `h-page-stage` goes `auto` on desktop on the assumption there is
 "no shortage of room"). The elastic regions give up their room; what may grow is a Verlauf, and
 only when the learner opens it (`useStagePanel`).
 
-**The module cards are capped narrower than the column** (s196, founder: they "look empty"), so
-each of the four reads closer to square instead of a wide, half-empty strip. Their top row is
+**The module cards fill the column; the COLUMN is what was narrowed** (s197). s196 answered "the
+tiles look empty" by capping the GRID at `max-w-[30rem]` inside a `max-w-4xl` column, which is what
+left a narrow tile island floating over a full-width Verlauf card. `HUB_COL` is picked from the
+tiles instead, so they keep that shape with no cap of their own and every block on the page shares
+one left and one right edge. Same for the Stärkeprofil grid, which had its own `max-w-[26rem]`.
+Their top row is
 icon-left (its size sets the row's height either way, so switching Mit Zeit/Ohne Zeit never moves
 a card edge on its own) with the **minutes badge beside it** when timed, and the **arrow lives in
 the card's bottom-right corner** (founder: swap their positions from the s191/s192 shape, where
-the arrow sat top-right and the badge bottom-right).
+the arrow sat top-right and the badge bottom-right). **There is NO description line on a module
+card** (founder s191): the title carries the module, and a sentence under it is what the minutes
+badge used to sit on top of. The whole anatomy is locked; change it only on a founder request.
 
 **Mit Zeit / Ohne Zeit is one switch beside the Niveau**, resting on Ohne Zeit, and it is the only
 way into the four choosers: `/lesen`, `/hoeren`, `/writing` and `/simulation` are what the SAME
@@ -51,8 +63,23 @@ frame and ONE rail.
 
 - **The frame** is `features/pruefung/ModulePicker.tsx`: Schreiben's desktop grid (content column
   plus a sticky 16rem rail) and, on a phone, the same rail as a collapsible panel behind an
-  **Aufgabe** toggle that rides in the module row the zone already carries (`ModuleHeader`), so the
-  picker costs a phone no extra row.
+  **Aufgabe** toggle. Since s201 that toggle sits at the right end of the chooser's own TOOLBAR row,
+  not in the module row (founder: "the header bar shouldn't have the aufgabe button, place it
+  somewhere else"): the module row names the module and carries nothing else, and the toggle sits
+  level with the count it changes, directly above the panel it opens. `ModulePage` is the same frame
+  minus the rail, for the Verlauf tab, so switching tabs moves no edge sideways.
+- **The toolbar row** is part of the frame, not of each module: count badge left (plus a
+  desktop-only "<Modul> üben" eyebrow, which a phone does not need because the module row is two
+  lines up), then **Aufgabe** and **Zufällige Auswahl**, both 32px, `rounded-lg`, 13px, the geometry
+  the Schreiben toggle wears. The draw is HIDDEN, never disabled, while the scope serves nothing.
+- **The cards** are `features/pruefung/ChooserCard.tsx`, one anatomy for all three lists: module
+  mark, title, one grey context line, chevron; the task line where a module has one (Sprechen,
+  clamped to two lines); then a foot row pinned to the bottom edge (`mt-auto`, so neighbours line
+  up) with Niveau first, the facts next and a state chip ("Empfohlen"/"Erledigt") last. Before s201
+  Sprechen put the Niveau in the head, rendered a `div onClick` a keyboard could not reach, nested a
+  "Starten" button inside its own click target and wore a `shadow-glow` (a landmine since s136).
+- **The switcher** is `features/pruefung/ModuleTabs.tsx` (Üben | Verlauf), the app's sliding-pill
+  mechanism, on every module page and always the SECOND row, under the module row.
 - **The rail** is `features/shared/ScopeRail.tsx`, lifted out of `WritingRail` unchanged: the
   Himmelblau tile with no visible edge, the uppercase section eyebrows, the Bibliothek scope
   dropdowns with honest zero-yield counts, the always-active reset. Anything visual lives there
@@ -63,6 +90,14 @@ frame and ONE rail.
   text as a single-text untimed run through the SAME `LesenPart`/`HoerenPart`, scored the same way
   and recorded in the same Module-üben Verlauf. The old behaviour survives as **Zufällige
   Auswahl**, which draws the module's full exam-shaped set from the current scope.
+- **The drill RUNS on the chooser's route** (s201). Until then `/lesen` and `/hoeren` only wrote the
+  run into `useExamStore` and the Prüfung hub was the only screen that rendered one, so every card
+  and the random draw did visibly nothing: both pages were dead. `TextModuleHub` now returns
+  `<MockExamRunner />` while a run exists (the hub's own pattern), `AppShell` lists the two routes in
+  `ZONE_ROUTES` and `STAGE_ROUTES`, and the chooser's `zoneExit` registration steps aside while the
+  runner owns the exit (it only clears an exit that is still its own, because the runner registers in
+  a layout effect and this cleanup runs after it). Finishing or leaving a drill lands back on the
+  list it was picked from.
 - **A picked id reaches the run** through `MockExamPicks` (`composeMockExam(level, parts, picks)`),
   filtered against the bank so a stale deep link cannot compose a run over a text that is gone.
 - Niveau on a chooser is the RAIL's, which is the zone's one-Niveau-control rule applied per
@@ -74,12 +109,18 @@ The zone had four different back buttons in three positions, two screens with no
 five content widths. One law now covers all eight screens.
 
 - **ONE exit, top right, always.** `useSessionStore.zoneExit` holds `{ run, tone }`; `AppShell`
-  renders it as the LAST control in the header on `/anwenden`, `/exam`, `/writing` and
-  `/simulation`, and nowhere else. `tone: "danger"` is the red **Verlassen** while a clock is
-  running; `tone: "quiet"` is the grey **Zurück** everywhere else, trainers included. It is a
-  callback because the exam owns its confirm and because `AppShell` may not import `useExamStore`
-  (the keep-eager-code-light invariant). `examStage` is a SEPARATE flag: it strips the sidebar,
-  the bottom bar and the streak, and only a run sets it.
+  renders it as the LAST control in the header on `/anwenden`, `/exam`, `/writing`, `/simulation`,
+  `/lesen` and `/hoeren` (`ZONE_ROUTES`), and nowhere else. `tone: "danger"` is the red
+  **Verlassen** while a clock is running; `tone: "quiet"` is the grey **Zurück** everywhere else,
+  trainers included. It is a callback because the exam owns its confirm and because `AppShell` may
+  not import `useExamStore` (the keep-eager-code-light invariant). `examStage` is a SEPARATE flag:
+  it strips the sidebar and the bottom bar, and only a run sets it.
+- **Where the exit shows, it is the only control on that side** (founder s201: "get rid of the
+  streak and account settings wherever the exit or back button is shown"). `quietHeader = exam ||
+  !!exit` in `AppShell` hides the streak pill and the `AccountMenu`, which a running Teil had
+  hidden since s186 while the trainers and choosers kept them, so the same corner carried three
+  controls on one screen of the zone and one on the next. Both are one tap away on every screen
+  outside the zone, and the account also lives in Einstellungen, so nothing became unreachable.
 - **The confirm is about losing work, not about the clock.** `hasProgress(run)` decides: any
   answer, note, essay text, recorded part result, or having advanced past Teil 1. With nothing to
   lose the exit just leaves, timed or not; with something to lose it asks "Dein Fortschritt wird
@@ -95,13 +136,18 @@ five content widths. One law now covers all eight screens.
   no back button and is `lg:hidden`: on a desktop the room belongs to the task.
 - **ONE Niveau control** (`features/pruefung/LevelSelect.tsx`), shared by the hub and the
   Sprechtrainer, which used a row of level pills before.
-- **One width at rest:** `max-w-4xl`, the Sprechtrainer list included. The wide `lg:max-w-6xl`
+- **One width at rest:** `max-w-4xl` across the zone, the Sprechtrainer list included; the HUB
+  itself is narrower since s197 (`HUB_COL`, `max-w-[40rem]`), because its column is measured from
+  the module tiles. The wide `lg:max-w-6xl`
   stage is a RUNNING Teil's alone, and the two screens that sat 448px wide inside it are
   compositions for that width now: the Anleitung is a two-column ticket and the Ergebnis puts the
   score and the bars beside what to do next.
 - **The Verlauf card is on the page from the first visit** (founder pick 2). Empty it shows the
   shape of what is coming and takes the room the tab has left, because both tabs hold a
-  one-viewport frame whose lower half was otherwise blank until a learner had history.
+  one-viewport frame whose lower half was otherwise blank until a learner had history. **Its
+  Stärkeprofil columns are HALF height while empty** (`h-6 sm:h-8` against `h-10 sm:h-16`, s197):
+  at full height, four grey slabs at "–" read as a chart that failed to render rather than as a
+  promise, and the caption is one line.
 
 **The scope lives in the URL** (s194): `?tab=`, `?level=`, `?zeit=mit`. A reload, a share and the
 browser's back button all land where the learner was, and the Niveau travels into a trainer with
@@ -164,6 +210,17 @@ rather than as a zero.
   the same rule without pulling the content banks in behind it.
 - Modelltest's Verlauf leads with the last score plus its delta; Module üben's is a Stärkeprofil
   (pale = first attempt, solid = the gain since).
+- **Every module page carries a Verlauf tab** (founder s201: "either keep verlauf in every module or
+  remove it from all of the individual modules and just in the prüfung hub page ... go with verlauf
+  on all four"). Schreiben's and Sprechen's are corrections and transcripts, which nothing else in
+  the app renders; Lesen's and Hören's list that module's OWN sittings (`moduleRuns`) led by the
+  same "last score + delta + bars" composition the Modelltest Verlauf uses (founder pick V2), with
+  the Niveau on each row instead of the module name, which the page already says. The hub keeps the
+  cross-module views only: full runs, and the four-column profile.
+- **The Verlauf card itself is `features/pruefung/verlauf.tsx`**, extracted from the hub in s201 the
+  moment a second page needed it (`VerlaufCard`, `ScoreChart`, `NoScoreYet`, `DeltaChip`,
+  `ModuleVerlaufCard`). A chooser must NOT import `PruefungHub` for it: the hub pulls
+  `mockExamAvailability` and, behind it, the writing-prompt bank into the chooser's chunk.
 - Fortschritt reads **`mockExams`**. `examsDone` is RETIRED: the branching runner that wrote it was
   replaced in s186, and Fortschritt kept reading it until s194, reporting "noch keine Simulation"
   forever. The field stays, and stays synced, because it is real pre-s186 history.
@@ -177,18 +234,24 @@ rather than as a zero.
 - **`toPractices` returns one row per module a run sat**, not the first one it finds.
 - **The counts the hub shows come from one place.** Adding a second availability computation is how
   the Niveau list and the module cards start disagreeing.
-- **`AppShell` may import `hubSwitcher.tsx`, never `PruefungHub.tsx`.** The hub pulls in
-  `engine/exam` and, behind it, the text/dialogue/writing content banks; AppShell is mounted on
-  every route, so a static import of the hub there would drag those banks into the eager bundle
-  for every page in the app, not just this one.
+- **If `AppShell` ever needs the switcher again it imports `hubSwitcher.tsx`, never
+  `PruefungHub.tsx`.** The hub pulls in `engine/exam` and, behind it, the text/dialogue/writing
+  content banks; AppShell is mounted on every route, so a static import of the hub there would drag
+  those banks into the eager bundle for every page in the app, not just this one. (It imports
+  neither today, since s197 took the header copy back out.)
+- **One column, one width.** Anything added to the hub takes `HUB_COL`; a block with its own
+  `max-w-*` is how the page ended up with four different left edges in s196.
 
 ## Files
 
 | File | What it holds |
 |---|---|
-| `features/pruefung/PruefungHub.tsx` | the one page: mobile switcher, scope row, module grid, run band, both Verläufe |
-| `features/pruefung/hubSwitcher.tsx` | the Tab switcher + `usePruefungTab`; imported by `PruefungHub` AND by `AppShell`'s desktop header, so it may only carry light, route-agnostic deps |
-| `features/pruefung/ModulePicker.tsx` | the chooser frame all four Ohne-Zeit modules share |
+| `features/pruefung/PruefungHub.tsx` | the one page: `HUB_COL`, switcher, scope row, module grid, run band, both Verläufe |
+| `features/pruefung/hubSwitcher.tsx` | the Tab switcher + `usePruefungTab`; imported by `PruefungHub` alone since s197, and kept free of content-bank deps so a header copy stays possible |
+| `features/pruefung/ModulePicker.tsx` | the chooser frame all four Ohne-Zeit modules share: module row, switcher slot, toolbar row, rail grid (`ModulePage` = the same frame without the rail) |
+| `features/pruefung/ChooserCard.tsx` | the ONE card + grid the three list choosers use |
+| `features/pruefung/ModuleTabs.tsx` | the Üben/Verlauf sliding-pill switcher every module page wears |
+| `features/pruefung/verlauf.tsx` | the shared Verlauf card, chart and per-module history (`moduleRuns`) |
 | `features/pruefung/TextModuleHub.tsx` | `/lesen` + `/hoeren`: the rail, the list, the single-text run |
 | `features/shared/ScopeRail.tsx` | the ONE "Aufgabe wählen" rail + `ScopeSelect` |
 | `lib/moduleScope.ts` | the choosers' scope selectors and counters |

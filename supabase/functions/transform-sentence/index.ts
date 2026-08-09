@@ -159,7 +159,7 @@ const SYSTEM_PROMPT =
 
 interface TransformOut {
   applicable: boolean; reason: string; transformed: string; note: string; noteEn: string;
-  // What the provider REPORTED (s197); the cost is derived at the call site.
+  // What the provider REPORTED (s204); the cost is derived at the call site.
   achieved: Tuple; model: string; usage: TokenUsage;
 }
 
@@ -281,7 +281,7 @@ async function callGemini(source: string, target: Tuple, variant = 0): Promise<T
     const parsed = parse(raw, target);
     if (!parsed) { console.error(`[transform] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
     // Free tier: record $0 so free calls never consume the paid spend fuse.
-    // Free tier prices at $0; the tokens are recorded either way (s197).
+    // Free tier prices at $0; the tokens are recorded either way (s204).
     return { ...parsed, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch (e) {
     console.error(`[transform] gemini threw: ${e}`);
@@ -318,7 +318,7 @@ async function callOpenAI(source: string, target: Tuple, variant = 0): Promise<T
     const data = await res.json();
     const parsed = parse(data.choices?.[0]?.message?.content ?? "", target);
     if (!parsed) return null;
-    // Was a hardcoded flat $0.004 per call until s197.
+    // Was a hardcoded flat $0.004 per call until s204.
     return { ...parsed, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch (e) {
     console.error(`[transform] openai threw: ${e}`);
@@ -492,7 +492,7 @@ Deno.serve(async (req) => {
   });
 
   // The allowance the learner has left AFTER this paid op, so the Umformung
-  // count in Fokus is the server's number and not the client's guess (s197).
+  // count in Fokus is the server's number and not the client's guess (s204).
   // A cache hit returns earlier and reports nothing: it spends no unit, and the
   // client's own row count already covers it.
   return json({

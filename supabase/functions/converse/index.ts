@@ -70,7 +70,7 @@ function corsHeaders(origin: string): Record<string, string> {
 
 /* -------------------------------- Guards --------------------------------- */
 
-// TWO daily budgets since s197 (founder: "I don't want to have the current limit
+// TWO daily budgets since s204 (founder: "I don't want to have the current limit
 // for sprechen exercises. it's very less. increase the limit to 6 for üben and 3
 // for Prüfung"). They are counted SEPARATELY against `speaking_conversations.exam`,
 // so a day spent practising can never eat the exam allowance, and neither can be
@@ -80,7 +80,7 @@ const DAILY_LIMIT_PRACTICE = Number(Deno.env.get("DAILY_LIMIT_CONVERSATIONS") ??
 const DAILY_LIMIT_EXAM = Number(Deno.env.get("DAILY_LIMIT_EXAM_CONVERSATIONS") ?? "3");
 const dailyLimitFor = (exam: boolean) => (exam ? DAILY_LIMIT_EXAM : DAILY_LIMIT_PRACTICE);
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
-// Raised with the daily limits (s197): 40/month against 9 possible per day would
+// Raised with the daily limits (s204): 40/month against 9 possible per day would
 // have bound after four days and made the new daily numbers a fiction. 120 keeps
 // roughly the old ratio (about a fortnight of heavy use). The global
 // MONTHLY_SPEND_CAP_USD fuse still sits above it, and Gemini answers most calls
@@ -267,7 +267,7 @@ function parseJson(raw: string): Record<string, unknown> | null {
 interface ModelOut {
   text: string;
   model: string;
-  // What the provider REPORTED (s197). Priced at the call site from the one
+  // What the provider REPORTED (s204). Priced at the call site from the one
   // shared rate table, so a reprice is a config edit rather than four diffs.
   usage: TokenUsage;
 }
@@ -509,7 +509,7 @@ Deno.serve(async (req) => {
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
   /**
-   * Which of the two budgets this conversation spends (s197). For an existing
+   * Which of the two budgets this conversation spends (s204). For an existing
    * row the ROW's own flag decides, never the request body: a forged `exam`
    * cannot move a running conversation onto the other allowance.
    */

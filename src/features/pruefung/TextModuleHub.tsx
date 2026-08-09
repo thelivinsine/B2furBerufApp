@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { AudioLines, ChevronRight, FileText, ListChecks, Shuffle } from "lucide-react";
+import { AudioLines, FileText, ListChecks } from "lucide-react";
 import { themeById } from "@/data/themes";
 import { LISTENING_COUNT, PART_LABEL, READING_COUNT, type MockExamLevel } from "@/engine/exam";
 import {
   EMPTY_TEXT_SCOPE,
   MODULE_LEVELS,
   TEXT_KIND_LABEL,
+  countDedicatedTexts,
   countTexts,
   kindsInPart,
   levelOfText,
@@ -19,14 +19,15 @@ import { normalizeLevelScope } from "@/lib/writingScope";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { matchesLifeArea, normalizeLifeArea, themeGroupsByArea } from "@/lib/lifeAreas";
 import { LifeAreaPills } from "@/features/shared/LifeAreaPills";
-import { ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
+import { ScopeLocked, ScopeRail, ScopeSection, ScopeSelect } from "@/features/shared/ScopeRail";
 import { useExamStore } from "@/store/useExamStore";
+import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ModulePicker, ScopeEmpty } from "./ModulePicker";
-import { PART_META } from "@/features/exam/partMeta";
-import { cn } from "@/lib/utils";
+import { MockExamRunner } from "@/features/exam/MockExamRunner";
+import { ChooserCard, ChooserGrid } from "./ChooserCard";
+import { ModuleTabs } from "./ModuleTabs";
+import { ModulePage, ModulePicker, ScopeEmpty } from "./ModulePicker";
+import { ModuleVerlaufCard, moduleRuns } from "./verlauf";
 
 /**
  * Lesen and Hören, without a clock (founder s196).
@@ -42,6 +43,15 @@ import { cn } from "@/lib/utils";
  * uses, untimed and over the picked id (`MockExamPicks`), so it scores the same
  * way and its result lands in the same Module-üben Verlauf. The exam draw is
  * still one tap away as "Zufällige Auswahl", which is what the card used to do.
+ *
+ * **The run is rendered HERE** (s201). Starting one only wrote it into
+ * `useExamStore`, and the only screen that rendered a run was the Prüfung hub,
+ * so on `/lesen` and `/hoeren` every card and the random draw did visibly
+ * nothing (founder: "shuffle button has a bug ... it deactivates when tapped on
+ * empty spaces", which is a stuck touch-hover on a button whose tap led
+ * nowhere). Rendering the runner on this route rather than sending the learner
+ * to the hub is also what makes finishing a drill land back on the list they
+ * picked it from.
  */
 
 const COUNT_FOR: Record<ReceptivePart, number> = {
@@ -54,11 +64,22 @@ const NOUN: Record<ReceptivePart, { one: string; many: string }> = {
   hoeren: { one: "Ansage", many: "Ansagen" },
 };
 
+type Tab = "ueben" | "verlauf";
+const TABS: { id: Tab; label: string }[] = [
+  { id: "ueben", label: "Üben" },
+  { id: "verlauf", label: "Verlauf" },
+];
+
 export function TextModuleHub({ part }: { part: ReceptivePart }) {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const start = useExamStore((s) => s.start);
+  const run = useExamStore((s) => s.run);
+  const mockExams = useProgressStore((s) => s.mockExams);
   const setZoneExit = useSessionStore((s) => s.setZoneExit);
+  const [verlaufOpen, setVerlaufOpen] = useState(false);
+
+  const tab: Tab = params.get("tab") === "verlauf" ? "verlauf" : "ueben";
 
   // The whole scope lives in the URL, like Schreiben's: a reload, a share and
   // the back button all land on the same list, and the Niveau the hub handed
@@ -76,10 +97,10 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
   );
 
   const patch = useCallback(
-    (next: Partial<TextScope>) => {
+    (next: Partial<TextScope> & { tab?: Tab }) => {
       const p = new URLSearchParams(params);
       for (const [k, v] of Object.entries(next)) {
-        if (!v) p.delete(k);
+        if (!v || (k === "tab" && v === "ueben")) p.delete(k);
         else p.set(k, v);
       }
       setParams(p, { replace: true });
@@ -87,11 +108,22 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
     [params, setParams],
   );
 
-  /** The zone's ONE exit (founder s195): a list has nothing to lose, so no confirm. */
+  /**
+   * The zone's ONE exit (founder s195): a list has nothing to lose, so no
+   * confirm. While a drill runs the RUNNER owns the exit, so this one steps
+   * aside, and the cleanup only clears an exit that is still its own: the
+   * runner registers in a layout effect (during the commit) and this passive
+   * effect cleans up afterwards, so an unguarded `setZoneExit(null)` would wipe
+   * the exit the drill had just installed and leave the screen with no way out.
+   */
   useEffect(() => {
-    setZoneExit({ tone: "quiet", run: () => navigate("/anwenden") });
-    return () => setZoneExit(null);
-  }, [navigate, setZoneExit]);
+    if (run) return;
+    const exit = { tone: "quiet" as const, run: () => navigate("/anwenden") };
+    setZoneExit(exit);
+    return () => {
+      if (useSessionStore.getState().zoneExit === exit) setZoneExit(null);
+    };
+  }, [run, navigate, setZoneExit]);
 
   const list = useMemo(() => scopedTexts(part, scope), [part, scope]);
   const countWith = useCallback(
@@ -99,9 +131,47 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
     [part, scope],
   );
 
+  // Branche options carry the DEDICATED count and lock at zero (s199). Built
+  // once so the dropdown and the "is everything locked" test read one list.
+  const sectorOptions = useMemo(
+    () =>
+      SECTOR_OPTIONS.map((o) => {
+        const count = countDedicatedTexts(part, { ...scope, sector: "" }, o.value);
+        // The active Branche never locks: it is the way back out.
+        return {
+          value: o.value,
+          label: o.label,
+          count,
+          locked: count === 0 && o.value !== scope.sector,
+        };
+      }),
+    [part, scope],
+  );
+
   const kinds = useMemo(() => kindsInPart(part), [part]);
   const theme = themeById(scope.theme);
   const subThemes = theme?.subThemes ?? [];
+
+  // This module's own sittings, newest first. Bank-free (`moduleRuns` reads the
+  // progress store), and a Modelltest is excluded there by the app's one rule.
+  const history = moduleRuns(mockExams, part);
+
+  const tabs = (
+    <ModuleTabs
+      tabs={TABS}
+      value={tab}
+      onSelect={(t) => {
+        patch({ tab: t });
+        setVerlaufOpen(false);
+      }}
+      ariaLabel={PART_LABEL[part]}
+    />
+  );
+
+  // A drill takes the route over, exactly as it does on the Prüfung hub, so a
+  // reload lands back inside it and leaving it lands back on this list. Below
+  // every hook, like the hub's own early return.
+  if (run) return <MockExamRunner />;
 
   const resetScope = () => {
     const p = new URLSearchParams(params);
@@ -163,54 +233,12 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
     >
       {/* Niveau -> Branche -> Lebensbereich -> Thema -> Unterthema -> Textsorte:
           the ONE Bibliothek hierarchy, in the order the Schreiben rail uses. */}
-      <ScopeSection label="Niveau">
-        <ScopeSelect
-          ariaLabel="Niveau"
-          triggerLabel={scope.level || "Alle Niveaus"}
-          value={scope.level}
-          onChange={(level) => patch({ level })}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
-                ...MODULE_LEVELS.map((l) => {
-                  const count = countWith({ level: l.value });
-                  return { value: l.value, label: l.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
 
-      <ScopeSection label="Branche">
-        <ScopeSelect
-          ariaLabel="Branche"
-          triggerLabel={
-            scope.sector
-              ? SECTOR_OPTIONS.find((o) => o.value === scope.sector)?.label ?? scope.sector
-              : "Alle Branchen"
-          }
-          value={scope.sector}
-          onChange={(sector) => patch({ sector })}
-          groups={[
-            {
-              label: "",
-              options: [
-                { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
-                // Soft axis: untagged texts are universal, so a Branche narrows
-                // the pool and can never empty it on its own.
-                ...SECTOR_OPTIONS.map((o) => {
-                  const count = countWith({ sector: o.value });
-                  return { value: o.value, label: o.label, count, disabled: count === 0 };
-                }),
-              ],
-            },
-          ]}
-        />
-      </ScopeSection>
 
+
+      {/* Lebensbereich -> Thema -> Unterthema -> Branche -> Niveau -> Textsorte
+          (founder s199), the ONE app-wide hierarchy, same order as every other
+          rail. It used to lead with Niveau and put Branche second. */}
       <ScopeSection label="Lebensbereich">
         <LifeAreaPills
           value={scope.area}
@@ -271,6 +299,59 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
         </ScopeSection>
       )}
 
+      <ScopeSection label="Branche">
+        {/* LOCKED, not greyed (founder s199): the count is the DEDICATED one, so
+            a zero means no text is written for that industry on this Thema.
+            Only 4 of 52 texts carry a Branche tag, so here the whole control is
+            usually the one-line locked state, which is the honest picture. */}
+        {sectorOptions.every((o) => o.locked) ? (
+          <ScopeLocked>
+            Für dieses Thema gibt es keine Texte nach Branche. Du übst hier alle.
+          </ScopeLocked>
+        ) : (
+          <ScopeSelect
+            ariaLabel="Branche"
+            triggerLabel={
+              scope.sector
+                ? SECTOR_OPTIONS.find((o) => o.value === scope.sector)?.label ?? scope.sector
+                : "Alle Branchen"
+            }
+            value={scope.sector}
+            onChange={(sector) => patch({ sector })}
+            groups={[
+              {
+                label: "",
+                options: [
+                  { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
+                  ...sectorOptions,
+                ],
+              },
+            ]}
+          />
+        )}
+      </ScopeSection>
+
+      <ScopeSection label="Niveau">
+        <ScopeSelect
+          ariaLabel="Niveau"
+          triggerLabel={scope.level || "Alle Niveaus"}
+          value={scope.level}
+          onChange={(level) => patch({ level })}
+          groups={[
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Niveaus", count: countWith({ level: "" }) },
+                ...MODULE_LEVELS.map((l) => {
+                  const count = countWith({ level: l.value });
+                  return { value: l.value, label: l.label, count, disabled: count === 0 };
+                }),
+              ],
+            },
+          ]}
+        />
+      </ScopeSection>
+
       {kinds.length > 1 && (
         <ScopeSection label="Textsorte">
           <ScopeSelect
@@ -304,93 +385,69 @@ export function TextModuleHub({ part }: { part: ReceptivePart }) {
   );
 
   const noun = NOUN[part];
-  const Mark = PART_META[part].icon;
+
+  if (tab === "verlauf") {
+    return (
+      // The SAME frame as the Üben tab, minus the rail: module row, switcher,
+      // content, in the same columns, so a tab switch moves nothing sideways.
+      <ModulePage part={part} head={tabs}>
+        <ModuleVerlaufCard
+          runs={history}
+          open={verlaufOpen}
+          onToggle={() => setVerlaufOpen((v) => !v)}
+          noun={{ one: "Übung", many: "Übungen" }}
+        />
+      </ModulePage>
+    );
+  }
 
   return (
-    <ModulePicker part={part} rail={rail}>
-      <div className="space-y-3">
-        {/* The count and the random draw, on ONE row: what the scope serves,
-            and the one action that does not require choosing (the exam draw the
-            card used to perform on its own). */}
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-eyebrow text-muted-foreground">{PART_LABEL[part]} üben</p>
-          <Badge variant="muted" className="tabular-nums">
-            {list.length} {list.length === 1 ? noun.one : noun.many}
-          </Badge>
-          <Button
-            size="sm"
-            variant="outline"
-            className="ml-auto"
-            onClick={openRandom}
-            disabled={list.length === 0}
-          >
-            <Shuffle className="h-3.5 w-3.5" /> Zufällige Auswahl
-          </Button>
-        </div>
-
-        {list.length === 0 ? (
-          <ScopeEmpty what={noun.many} blame={blame} onReset={resetScope} />
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {list.map((text, i) => {
-              const themeOf = themeById(text.themeId);
-              const level = levelOfText(text);
-              const hasNotes = (text.notes?.length ?? 0) > 0;
-              return (
-                <motion.button
-                  key={text.id}
-                  type="button"
-                  onClick={() => openText(text.id, level)}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(i * 0.03, 0.18), duration: 0.16 }}
-                  className="card-hover flex flex-col items-start gap-2.5 rounded-xl border border-border bg-surface p-4 text-left shadow-soft"
-                >
-                  <span className="flex w-full items-start gap-2.5">
-                    <span
-                      className={cn(
-                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                        PART_META[part].tile,
-                      )}
-                    >
-                      <Mark className={cn("h-[1.0625rem] w-[1.0625rem]", PART_META[part].ink)} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold leading-snug">
-                        {text.title}
-                      </span>
-                      <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                        {TEXT_KIND_LABEL[text.kind]}
-                        {themeOf ? ` · ${themeOf.titleDe}` : ""}
-                      </span>
-                    </span>
-                    <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
-                  </span>
-                  <span className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-2.5 text-xs text-muted-foreground">
-                    <Badge variant="outline" className="tabular-nums">
-                      {text.cefr}
-                    </Badge>
-                    <span className="flex items-center gap-1 tabular-nums">
-                      <ListChecks className="h-3.5 w-3.5" />
-                      {text.checks.length} {text.checks.length === 1 ? "Aufgabe" : "Aufgaben"}
-                    </span>
-                    {hasNotes && (
-                      <span className="flex items-center gap-1">
-                        {part === "hoeren" ? (
-                          <AudioLines className="h-3.5 w-3.5" />
-                        ) : (
-                          <FileText className="h-3.5 w-3.5" />
-                        )}
-                        Notizen
-                      </span>
-                    )}
-                  </span>
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
-      </div>
+    <ModulePicker
+      part={part}
+      head={tabs}
+      rail={rail}
+      toolbar={{
+        eyebrow: `${PART_LABEL[part]} üben`,
+        count: `${list.length} ${list.length === 1 ? noun.one : noun.many}`,
+        // The exam-shaped draw the module card used to perform on its own. It
+        // is hidden rather than disabled while the scope serves nothing: a dead
+        // control reads as a broken one, and the empty state below already
+        // carries the way out.
+        onShuffle: openRandom,
+        canShuffle: list.length > 0,
+      }}
+    >
+      {list.length === 0 ? (
+        <ScopeEmpty what={noun.many} blame={blame} onReset={resetScope} />
+      ) : (
+        <ChooserGrid>
+          {list.map((text, i) => {
+            const themeOf = themeById(text.themeId);
+            const level = levelOfText(text);
+            const hasNotes = (text.notes?.length ?? 0) > 0;
+            return (
+              <ChooserCard
+                key={text.id}
+                part={part}
+                index={i}
+                title={text.title}
+                subtitle={`${TEXT_KIND_LABEL[text.kind]}${themeOf ? ` · ${themeOf.titleDe}` : ""}`}
+                level={text.cefr}
+                facts={[
+                  {
+                    icon: ListChecks,
+                    label: `${text.checks.length} ${text.checks.length === 1 ? "Aufgabe" : "Aufgaben"}`,
+                  },
+                  ...(hasNotes
+                    ? [{ icon: part === "hoeren" ? AudioLines : FileText, label: "Notizen" }]
+                    : []),
+                ]}
+                onClick={() => openText(text.id, level)}
+              />
+            );
+          })}
+        </ChooserGrid>
+      )}
     </ModulePicker>
   );
 }

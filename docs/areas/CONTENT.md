@@ -56,12 +56,25 @@ Above the flat themes sits Domain → Theme → Sub-theme plus orthogonal facets
   `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`): `sectors?: WorkSector[]` multi-tag with
   **untagged = universal** (`matchesSector` in `lib/facets.ts`: untagged items show under EVERY
   Branche; tagged items hide only under other Branchen). 15 values, each with a starter pack;
-  `transport` is labeled "Transport & Logistik". Branche renders as the FIRST dropdown in the rail
-  hierarchy Branche → Thema → Unterthema; `?sector=` is a single-value scope param; sector-tagged
+  `transport` is labeled "Transport & Logistik". Branche renders LAST in the rail hierarchy
+  Lebensbereich → Thema → Unterthema → Branche (founder s199; it used to lead), and locks where no
+  item carries the tag; `?sector=` is a single-value scope param; sector-tagged
   items sort first when a Branche is selected. As a scope it escapes the ≤12-option facet cap AND
   the coverage floor. The singular `sector` field is retired (linter errors); `office` stays
   deleted as a category error; `workSituation`/`counterpart`/`taskType` stay retired (linter errors
   on reintroduction). Retag-audit report: `docs/reports/sector-audit-report.md`.
+  **On WRITING TASKS a Branche tag must be EARNED (s199):** the brief (instruction + Leitpunkte +
+  Adressat) has to contain a marker of that workplace, defined once in `scripts/sector-markers.mjs`
+  and enforced by `lint:content` plus `tests/writingScope.test.ts` (one lexicon, so gate and test
+  cannot drift). This replaced the "all 15 Branchen on every Thema at both lengths" coverage floor,
+  which was satisfiable by tagging and duly was: all 40 pools carried exactly 15 sectors, the size
+  of the enum, in pools as small as 11 tasks, and 199 of 600 tagged tasks named an industry their
+  brief never entered. 331 unearned tag instances were stripped; 220 tasks became universal again.
+  Authoring rule: when a real sector term is missing from the lexicon ADD IT; otherwise drop the
+  tag, which costs no reach because Branche is soft and untagged = universal. Measured after the
+  strip: Beruf pools average 13.4 of 15 sectors with earned content (floor 8, `travel`, because a
+  Dienstreise is genuinely industry-neutral), Alltag 3.0. Full audit:
+  `docs/reports/writing-tasks-audit-2026-08-07.md`.
   **Axis rule: Branche = where you work, Thema = what you are doing; never reuse a label across
   axes.** Situation = the sub-theme grain of Thema, never a separate axis.
 - **`mode`** (`LearningMode` in `useSettingsStore`, default `both`) is a top-level lens chosen at
@@ -242,27 +255,53 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
   in place: same ids, same pool positions, only text and tags changed. Gated in
   `tests/writingScope.test.ts`, so these are invariants now, not aspirations:
   - **Unterthema:** every declared sub-theme has ≥2 short + ≥2 long servable tasks.
-  - **Branche:** all 10 Beruf Themen x 15 Branchen x both Längen carry a dedicated task (wave 2 did
-    5 Themen, wave 4 the rest). **Alltag is tagged too** (founder decision): every Alltag task
-    carries Branchen, and each names the work context that makes the everyday situation hard
-    (Schichtdienst gegen Behörden-Öffnungszeiten, Montage ohne Wochentage, Spätdienst) rather than
-    name-dropping an industry. All 15 are reachable per Alltag theme x length.
-  - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` +
-    `weiterbildung`), B1/B2/C1 at both lengths. **One deliberate zero: C1 + E-Mail (privat)**, which
-    has no exam analogue; the rail greys it with an honest count.
+  - **Branche: a tag is EARNED, and the old all-15-per-Thema floor is GONE (s199).** The floor was
+    satisfiable by tagging, and tagging is what happened (199 of 600 tagged tasks named an industry
+    their brief never entered). A `sectors` tag now requires a marker of that workplace in the brief,
+    checked by `scripts/sector-markers.mjs`, the ONE lexicon shared by `lint:content` and
+    `tests/writingScope.test.ts`. Beruf pools keep ≥8 of 15 sectors earned; Alltag has few, honestly.
+    Add a missing word to the lexicon rather than dropping a true tag; dropping a false one costs no
+    reach, because Branche is soft.
+  - **Argumentation (s200):** a `stellungnahme`, `forumsbeitrag`, `widerspruch` or `beschwerde` at
+    B2 or above carries ≥1 Leitpunkt demanding a reason, a consequence or a stance
+    (`scripts/justification-markers.mjs`, same shared-lexicon arrangement). `level` is what makes
+    `evaluate-writing` mark strictly, so a brief that only describes gets the learner marked down for
+    obeying it. Fix by REPLACING the weakest descriptive point, never by adding a fifth. B1 is exempt.
+    **The classifier matches phrases over the WHOLE clause, never the opening verb.** German puts the
+    meaning in the separable prefix, so "**Legen** Sie dar, warum …" scored as unargumentative under
+    an opening-verb rule and is exactly the opposite; getting this wrong cost a re-run in s199.
+  - **A supplied `source` text belongs to the REPLY genre, never to an opinion task (s200).** No exam
+    supplies a text for a Forumsbeitrag or a Stellungnahme (Goethe B2 Teil 1, DTB B2 Teil 2), while
+    DTB B2 Teil 1 prints the customer mail you answer. `source` is read by nothing today, so this is
+    a rule for whoever wires it up: the honest target is the "Antworten Sie" tasks. The audit's P4
+    said the opposite and is marked WRONG in the report; the founder's own exam settled it.
+  - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` + `weiterbildung`)
+    and, since s200, under Wohnen (a Wohnungsbewerbung). **One deliberate zero: C1 + E-Mail
+    (privat)**, which has no exam analogue; the rail greys it with an honest count.
+    **The tag follows the REQUESTED OUTPUT, not the situation** (s200): "Sie führen das Protokoll …
+    Halten Sie die Ergebnisse fest" is a `protokoll` however the situation is framed, while an
+    incoming Reklamation the learner answers with a Nachricht is a `nachricht`.
+  - **Register:** a `du` brief never names a title + surname. The Adressat drives the Anrede, so
+    "Kollegin, Frau Bauer" with register `du` instructs "Hallo Frau Bauer, … kannst du …", which a
+    German reader marks as wrong. Gated in `lint:content` since s200; use a first name, or `sie`.
   - **Niveau:** B1 307 / B2 302 / C1 108. Kurz stays B1-heavy on purpose (a 40-word task with three
     Leitpunkte is B1 work); promotion to B2 is limited to Lang tasks in demanding genres.
-  Word targets by band, keep them consistent: B1 40/80, B2 100/150, C1 120/200 (short/long).
+  Word targets are determined by (Niveau, Länge), and nothing else: B1 40/80, B2 100/150, C1 120/200
+  (short/long). The `exam` field that claimed to set them was RETIRED in s200 (audit P3): no surface,
+  filter or grader read it, so it drifted (69 tasks out of band, 61 `goethe_b1` tasks at 150 words).
+  `lint:content` errors if it reappears.
 - **Missions** (`src/data/missions.ts`; `m_` ids) — see `docs/areas/GAME.md`.
 - Other banks: `dialogues.ts` (`sc_`), `examSets.ts` (`ex_`), `themes.ts`, `domains.ts`.
-- **Sprech-Szenarien** (`dialogues.ts`, 30): `id` (`sc_`), `themeId`, `title`, `task`, `context`,
+- **Sprech-Szenarien** (`dialogues.ts`, **36** measured 2026-08-08): `id` (`sc_`), `themeId`,
+  `title`, `task`, `context`,
   `level` 1-3, `minutes`, `targetRedemittel[]`, `start`, `nodes` (keyed by node id, unique WITHIN
   the scenario only). A node is a choice node (`options[]`, each with `next`, `quality`, `feedback`,
   optional `uses`) or a **free-speak node** (`prompt` + `model` + `next`, no options). **Every
   scenario must carry at least one free-speak node with a model answer, on every path** (audit P4,
-  s182: 20 of 30 ended on a multiple-choice turn, so the speaking trainer never asked for produced
-  speech). `tests/scenarios.test.ts` gates it, together with node-reference integrity and
-  reachability. Level 3 is still thin (2 of 30) and is the open half of P4.
+  s182: 20 of the 30 scenarios then shipped ended on a multiple-choice turn, so the speaking trainer
+  never asked for produced speech). `tests/scenarios.test.ts` gates it, together with node-reference
+  integrity and reachability. The level mix is **13 / 15 / 8** (measured 2026-08-08): level 3 was the
+  open half of P4 at 2 of 30 and is no longer thin.
 - **Verb morphology** (`src/data/verbForms.ts`, 234 verbs; GENERATED, s178): Partizip II, auxiliary
   (haben/sein), Präteritum, `separable`, zu-infinitive, keyed by vocab id. Nouns carry `article` +
   `plural` on the item; verbs deliberately do NOT carry their forms as authored fields, because a
@@ -310,15 +349,52 @@ pass instead of being edited through the gate.
 It also writes `docs/reports/related-terms-report.md` (unresolvable `related` terms = dropped
 word-graph edges, by design; visible, not a gate).
 
+### The three pedagogical-shape gates (`scripts/content-shape.mjs`, s198)
+The audit's closing observation was that structural quality is systematised and pedagogical shape is
+not: a linter for every enum, a gate for every fact, and **no** gate for "is this word worth
+learning", "is this band plausible" or "does this theme have a balanced part-of-speech mix". These
+three are those gates, run from `lint:content` over the BROWSABLE bank (retired ids excluded) and
+skipped wholesale when the generated frequency map is missing. Every threshold is the MEASURED state
+on the day it landed, so none of them makes today's content illegal; raising one is a deliberate
+edit in `content-shape.mjs`, with a reason.
+
+| Gate | Rule | Anchor |
+|---|---|---|
+| Worth learning | share of specialized-or-unattested items may not grow | **53.87 %** |
+| Worth learning | items with no corpus evidence at all may not grow | **100** |
+| Band plausible | a `core`-frequency word may NOT be labelled B2.2/C1 | hard 0 |
+| Band plausible | specialized-or-unattested items at A2/B1.1 may not grow | **32** |
+| Part-of-speech | every theme carries ≥ 3 verbs AND ≥ 3 adjectives | floor |
+| Part-of-speech | noun share of the bank may not grow | **77.59 %** |
+
+A SHARE rather than a count wherever adding good content should buy room for a rare-but-necessary
+item: the way past the rare-share ceiling is to add common words, which is the behaviour the audit
+wanted. `tests/contentShape.test.ts` asserts each gate in both directions, because a ratchet that
+cannot fire is decoration.
+
+### One blanking rule (`src/engine/blank.ts`, s198)
+Which word of an example sentence can become a gap is ONE function, shared by the MCQ cloze, the
+listening cloze (`engine/quiz.ts`), the typed cloze (`engine/session.ts`) and
+`report-exercise-coverage.mjs`. It used to be four copies carrying the same two defects: JavaScript's
+`\b` is ASCII-only, so no umlaut-initial headword could ever match its own examples (25 words), and
+only the infinitive was searched for, so every Perfekt sentence hid its verb (85 words). The rule now
+looks for the headword, the Partizip II / Präteritum / zu-infinitive from `verbForms.ts`, the plural,
+and the content token of a multi-word headword, and it REPORTS which form it found so distractors can
+match the gap's shape (a Partizip II gap is answered against other Partizip II forms, never against a
+list of infinitives that gives the answer away). Where an item has a choice it prefers the example
+that does not leak its own answer inside a compound. **Authoring consequence:** an example no longer
+has to contain the bare headword, so write the sentence that sounds natural.
+
 ## Provenance register (`src/data/provenance.ts`)
 One `ProvenanceEntry` row per content_id: `origin` (authored/sourced/adapted), `reference`
 (Wiktionary/DWDS/Tatoeba URL), `license` (SPDX from the allowlist), `review_status`
-(draft/verified), who added/verified. All ~3,273 items have rows with non-empty `reference`; **all
-are `draft`, 0 `verified`** (human verification reset to zero 2026-07-22 at founder request; the
-`human` tier on `/sources` reads 0 until the review pass restarts). The register is **two
-concatenated array literals** (`provenancePart1/2`, TS2590); append new rows to the second. Game
-missions get one row per mission id. Full policy: `docs/strategy/DATA_GOVERNANCE.md` (traceability
-over ownership; Wiktionary/DWDS for word facts; Tatoeba CC-BY for example sentences).
+(draft/verified), who added/verified. Every content_id has a row with a non-empty `reference`:
+**3,604 rows, of which 13 are `verified`** (measured 2026-08-08 with `pnpm lint:content`; human
+verification was reset to zero on 2026-07-22 at founder request and restarted 2026-07-24 with 13
+vocabulary rows, so the `human` tier on `/sources` reads 13). The register is **four concatenated
+array literals** (`provenancePart1-4`, TS2590); append new rows to the LAST one. Game missions get
+one row per mission id. Full policy: `docs/strategy/DATA_GOVERNANCE.md` (traceability over
+ownership; Wiktionary/DWDS for word facts; Tatoeba CC-BY for example sentences).
 
 **Sourcing limit (read before transcribing anything):** individual word facts are free to use, but a
 specific *published* word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database

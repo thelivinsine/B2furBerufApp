@@ -106,7 +106,7 @@ export async function speakTurn(input: {
         message: "Deine Gesprächspartnerin ist gerade nicht erreichbar. Bitte versuche es erneut.",
       };
     }
-    // Practice and Prüfung are separate budgets (s197), so the response updates
+    // Practice and Prüfung are separate budgets (s204), so the response updates
     // the meter the BRIEF belongs to, never the other one.
     if (data) {
       reportServerAllowance(
@@ -217,7 +217,7 @@ export async function requestDebrief(input: {
         message: "Die Rückmeldung ist momentan nicht verfügbar. Bitte versuche es später erneut.",
       };
     }
-    // Practice and Prüfung are separate budgets (s197), so the response updates
+    // Practice and Prüfung are separate budgets (s204), so the response updates
     // the meter the BRIEF belongs to, never the other one.
     if (data) {
       reportServerAllowance(

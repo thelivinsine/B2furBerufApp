@@ -109,17 +109,13 @@ export type WritingFormat =
   | "kuendigung"
   | "bewerbung";
 
-// Which exam task shape a writing Aufgabe is modelled on. Reference only: the
-// tasks are Genauly's own, not reproductions of exam material (founder s167).
-// "alltag" = a real-world genre that appears on no exam (Widerspruch,
-// Mängelanzeige) but matters more in daily life.
-export type WritingExam =
-  | "goethe_b1"
-  | "goethe_b2"
-  | "goethe_c1"
-  | "telc_b2_beruf"
-  | "dtb"
-  | "alltag";
+// (The former `WritingExam` enum, "which exam task shape a writing Aufgabe is
+// modelled on", was RETIRED in s200 (audit P3). It was authoring metadata that
+// no surface, filter or grader ever read, and because nothing read it, it
+// drifted: 69 of 717 tasks carried a Niveau outside their own exam shape's band
+// and 61 `goethe_b1` tasks a 150-word target. The word target is determined by
+// (Niveau, Länge), which is what `words` now documents. The shipped-ids law
+// protects ids, not fields.)
 
 /** Who the learner writes to; drives Anrede and the du/Sie choice. */
 export type WritingRegister = "du" | "sie";

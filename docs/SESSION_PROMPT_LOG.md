@@ -5104,10 +5104,680 @@ wanted.
   this log · **PR #812** (the chooser + Sprechen work) and **PR #815** (the deploy diagnosis), both
   squash-merged into `main` · no `pages.yml` change (deliberately left for its own review)
 
+---
+
+## Session 197 (parallel A) — the mobile fade behind the Üben button
+
+**Branch:** `claude/mobile-floating-text-readability-bs49dz`
+
+- **Prompt 1 (verbatim):** `[screenshot of the dark-mode Bibliothek list fading at the bottom edge of
+  the desktop scroll column] can you put similar effect even in the mobile view so that the floating
+  text below the ueben button is more readable and visible? generate a couple of previews`
+  **Response:** named the cause before designing anything. The screenshot is
+  `lg:mask-fade-bottom` (`browseColumnClass`, s190): desktop scrolls INSIDE the content column, so
+  the column masks its own bottom edge and the cards dissolve into the page ground. On a phone the
+  PAGE scrolls, so there is no such edge, and the cards run at full strength behind the fixed
+  `FloatingActionCluster` and its note line, which since s189 deliberately carries no
+  `floatingNote` plate (the plate read as a frosted chip over white cards). Built
+  `preview/mobile-cluster-fade.html` (+ the artifact copy): four phone mocks at the REAL cluster
+  offsets (nav `3.9375rem`, buttons `+2rem`, note `+0.5rem`) and the real tokens, in both themes.
+  Today (baseline, note printing over a card) · **A** short 7rem dissolve · **B** long 11rem
+  dissolve, closest to the desktop edge · **C** dissolve plus a bottom-ramped blur. All three are a
+  pointer-events-none veil in `--background` at `z-20`, under the cluster and over the cards: no
+  border, no bar, so the s168 sticky-bar and s169 blurred-band rejects stay rejected (C is flagged
+  in the preview as the one that flirts with the band). No app code touched: awaiting the pick.
+
+- **Artifacts:** `preview/mobile-cluster-fade.html` · `preview/mobile-cluster-fade-artifact.html` ·
+  artifact <https://claude.ai/code/artifact/8bbc7f2e-d581-4767-84ee-a024380d0604>
+
+- **Prompt 2 (verbatim):** `insert short fade but soft blur but not above the blue button, it should
+  be below the blue button behind the text.`
+  **Response:** shipped variant A's 7rem scrim plus C's blur, cut down from a 9rem band to the
+  2rem strip between the nav and the button's LOWER edge, so the frosting sits behind the note line
+  and stops before the button. Two new utilities in `src/index.css` (`.cluster-scrim`,
+  `.cluster-blur`), both rendered by `FloatingActionCluster`, `pointer-events-none`, border-free,
+  `lg:hidden`; the note moved to `z-[25]` so it stays above them. One tuning pass came out of
+  screenshotting the REAL app at 390x800 in both themes: the first scrim reached ~0.99 through the
+  note strip, which made the frosted band invisible, so the ramp now holds ~0.85 there and the blur
+  has something left to act on (still AA, because what shows through is a card within a few per
+  cent of the ground). Only the four Bibliothek tabs mount this cluster, so no writing editor is
+  dimmed. Gates: typecheck, lint, `check:contrast`, `test:unit` (624), `build`, `check:bundle` all
+  green. Preview updated with a fifth "Shipped" phone so the mockup and the live surface agree.
+
+- **Artifacts (prompt 2):** `src/index.css` · `src/features/shared/floatingCluster.tsx` ·
+  `docs/areas/BIBLIOTHEK.md` · `.claude/skills/design/SKILL.md` · `preview/mobile-cluster-fade.html`
 
 ---
 
-## Session 197 — prompt 1 (2026-08-06): the KI-usage task, part A
+## Session 197 (parallel B) · 2026-08-06 · branch `claude/page-header-alignment-glqts5`
+
+- **Prompt 1 (verbatim):** `in one of the previous sessions, I asked sonnet to replace the hello
+  greeting with the page's name as a header. I wanted the header position to align vertically
+  leftwards with the page components like toggle and verlauf. Butit created this funny looking
+  page. Can you access that prompt and generate a couple of previews of how this page should look
+  overall? It is looking ridiculous at the moment` (with a screenshot of the shipped `/anwenden`
+  hub at desktop width, sidebar cropped).
+  **Response:** found the prompt they meant (s196, prompt 1, quoted back in the preview page),
+  diagnosed the shipped layout from the code, and shipped a preview round. **No app code touched**:
+  this is design work, so it owes the preview-first process a pick first.
+  **The diagnosis.** The s196 change answered "aligned to left with the toggle buttons" by putting
+  the title in the APP header at the app's left gutter, which is a different left edge from every
+  control it was supposed to line up with. Underneath it the page nests THREE separately centred
+  widths: the tab panel column (`lg:max-w-4xl`, 896 px), the module grid (`max-w-[30rem]`, 480 px)
+  and the Stärkeprofil grid (`max-w-[26rem]`, 416 px). So the tiles start ~220 px right of the
+  title, a narrow tile island floats over a full-width Verlauf card, and at first visit four
+  full-height grey bars at "–" fill half the widest card on the page.
+  **The options** (`preview/pruefung-header-align.html`, generator
+  `preview/gen-pruefung-header-align.mjs`, artifact published): **A** title back INSIDE the page
+  (h1 left, tab switcher right of the same line, controls left-aligned under it, one column for
+  everything); **B** keep the header title and move the PAGE to its left edge instead (needs the
+  header row to sit in the same centred container as `main`, or the two drift apart as the window
+  grows); **C** no title at all, the switcher IS the page header, centred, which is the
+  Bibliothek/Schreiben law. All three collapse the three nested widths into ONE column, halve the
+  empty Stärkeprofil, and leave the locked module-card anatomy untouched. The review page carries
+  live Theme / Column width (512·640·768) / Alignment guides switches, a light and dark pass, a
+  desktop and a phone frame per option, and the "today" frame drawn at the shipped measurements.
+  **One locked rule flagged, not quietly overridden:** s196 locked "tile grid narrower than the
+  column"; all three options narrow the COLUMN to the tiles instead, which keeps the reason for the
+  lock (wide tiles read as empty) and drops its side effect (mismatched edges). Called out in the
+  preview for the founder to accept or reject.
+  **Verified in headless Chromium**, not by eye: every phone frame rests inside the 668 px a
+  393×852 phone leaves between the app header and the tab bar (0 px overflow, all three), no
+  horizontal overflow in any Verlauf split, and the three control switches read back on the root
+  element.
+- **Artifacts (prompt 1):** `preview/gen-pruefung-header-align.mjs` (new) ·
+  `preview/pruefung-header-align.html` + `-artifact.html` (new) · this log · no `src/` change yet
+
+- **Prompt 2 (verbatim):** `C, medium`
+  **Response:** implemented option C at the 640px column, verified in the real built app, gates run,
+  docs updated.
+  **`AppShell`** no longer renders the "Prüfung" `h1` or the second switcher copy; the greeting slot
+  stays EMPTY on `/anwenden` (the part of s196 that survives) and every other route keeps its
+  greeting untouched. **`PruefungHub`** renders the switcher as its header at EVERY width (the
+  `lg:hidden` is gone), and ONE new `HUB_COL` (`max-w-[40rem]`) carries the switcher row, the scope
+  row, the module grid and the Verlauf card. The module grid and the Stärkeprofil grid lost their
+  own `max-w-[30rem]`/`max-w-[26rem]` caps: the COLUMN was measured from the tiles instead, which
+  keeps the shape s196 asked for ("the tiles look empty") without the cap that left four different
+  left edges on one page. **`hubSwitcher.tsx` stays a separate module** (the hub is its only caller
+  again) so a future header copy still has a bank-free file to import; `idPrefix` went with the
+  second copy.
+  **Three details the narrower card forced**, each found by measuring rather than by eye: the
+  Verlauf split is proportional (`1.15fr / 1px / 1fr`) instead of a fixed 26rem half; the four
+  profile labels put the mark ABOVE the name at every width, because side by side "Schreiben"
+  pushed through the divider into the list; and `PracticeRow` uses one padding and one gap at every
+  width, because at `sm:gap-4 lg:px-6` the row had exactly 0px spare (72+28+55+53 content, 48 gaps,
+  40 padding, in 296px) so the score badge wrapped its "%" and the module name truncated to
+  "Schre...". The empty Stärkeprofil is half height with a one-line caption.
+  **Verified in the real built app**, not a mockup (Playwright over the global Chromium, seeded
+  localStorage): at 1440×900, 1440×760, 1024×850, 1023×850, 390×844 and 360×640, both tabs, three
+  history states, the panel / module grid / Verlauf card report the SAME left edge and width at
+  every size. Zero resting page scroll and zero horizontal overflow everywhere except two bands that
+  scroll on `main` too, measured BEFORE and AFTER against a build of `origin/main`: 1023×850 rests
+  at 54px (unchanged) and 360×640 at 43px (63px before). Both come from the Verlauf card being
+  `flex-none` at rest; fixing that means letting its collapsed list scroll inside the card, which
+  touches the s195/s196 Verlauf behaviour, so it is reported rather than assumed.
+  Gates: typecheck · lint 0 errors (77 warnings) · 624 tests · build · check:bundle 127.9 kB of 400
+  (down from 129.0: AppShell dropped its `hubSwitcher` import) · check:contrast.
+- **Artifacts (prompt 2):** `src/components/layout/AppShell.tsx` ·
+  `src/features/pruefung/{PruefungHub,hubSwitcher}.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (s195
+  handoff archived) · this log
+
+- **Prompt 3 (verbatim):** `document the session`
+  **Response:** this entry, plus the s197 handoff in `docs/PROJECT_STATUS.md` and the "why" in
+  `docs/DECISIONS.md` §s197 (written before the merge, not after).
+  **How the merge went, since the CI story matters more than usual this time.** GitHub Actions
+  scheduled NOTHING for this repository across the whole window: no check ever registered on PR
+  #817, no `Validate content` run was created for the branch or the PR, and the `Validate content`
+  run for the PREVIOUS merge (#816, on `main`) was cancelled after sitting 15 minutes without ever
+  starting. So every gate `validate.yml` runs was run locally first, in its own order
+  (`lint:content` · `lint:migrations` · `check:contrast` · `verify:facts` · `test:srs` ·
+  `test:pronounce` · `lint` · `test:unit`), plus typecheck, build and `check:bundle`, and the merge
+  went ahead on that evidence rather than on a green tick that was never going to appear.
+  `verify:facts` rewrites `docs/reports/verify-facts-report.json` with today's date on every run;
+  that timestamp-only diff was reverted rather than committed as noise.
+  **The Pages deploy, third session running.** #816's deploy job self-cancelled at exactly 15
+  minutes (`build` green in 60 s, `deploy` 16:24:20 → 16:39:26), which is the 600 s timeout already
+  diagnosed in s196, and its leftover is the likeliest reason no deploy run was created for this
+  merge at all. Used the documented workaround: dispatched `pages.yml` on `main` manually
+  (`workflow_dispatch`), which built `a2ad467` and **succeeded** (run 31128920435), so the change is
+  live without the founder having to do anything. The real fix (RAISE `timeout` to ~30 min, keep the
+  retry) is still not taken, and it has now cost a third session; it is offered as its own small PR.
+- **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` §s197 · this log ·
+  merge commit `a2ad467` (**PR #817**, squash-merged into `main`) · Pages run 31128920435 green
+
+---
+
+## Session 197 (parallel A, continued) · 2026-08-06 · branch `claude/mobile-bibliothek-fade-*`
+
+_Prompts 3-4 of the parallel A session. They landed under parallel B's header when that
+session merged `main` in; the entries are theirs, unedited, and are re-headed here so the
+two branches stay legible. Their prompt 3 says the s197 layout work was already good._
+
+- **Prompt 3 (verbatim):** `what's shipped is good. document the session and merge everything live`
+  **Response:** documented (`docs/PROJECT_STATUS.md` handoff, `docs/DECISIONS.md` §s197, this log)
+  and merged. One thing worth carrying forward: a PARALLEL s197 branch
+  (`claude/page-header-alignment-glqts5`, PR #817) landed on `main` first and restructured
+  `PROJECT_STATUS.md`, so this branch merged `main` in and resolved three doc conflicts by keeping
+  BOTH sessions' facts (their structure, this session's handoff added under "Resume here"; the
+  prompt log now labels the two branches "parallel A/B"; their s195 archive text kept over this
+  session's duplicate). Gates re-run after the merge: typecheck · 624 tests · build · check:bundle
+  127.9 kB. **CI never fired for PR #818** at all: no check run was ever created, and the same
+  window shows a `main` validate run the platform CANCELLED after 15 minutes, so this is GitHub's
+  side, not the branch. Every gate `validate.yml` runs was therefore run locally before merging.
+
+- **Prompt 4 (verbatim):** `also, the go to top button seems hidden behind the blue button.. move it
+  upward and decrease its size slightly - no need of preview, implement it directly`
+  **Response:** implemented directly, no preview. The mobile `ScrollTopButton` sat at
+  `nav + 3.5rem` while the cluster puts the Üben CTA's top at `nav + 2rem + 2.75rem` (its own
+  `h-11`), so the arrow was inside the CTA's box and hidden behind it at every scroll position, on
+  every Bibliothek tab (it predates this session; it was visible as a ghost in the s197 verification
+  screenshots). Now `nav + 5.25rem`, half a rem clear of the button, and a step smaller: `p-1.5`
+  with an 18px glyph, 30px total instead of 36. Verified in the real app at 390x800 in both themes.
+  Gates: typecheck · lint 0 errors · 624 tests · build · check:bundle 127.9 kB.
+
+- **Prompt 4 (verbatim):** `go ahead`
+  **Response:** took the `pages.yml` timeout fix that s196 wrote down and s197 kept paying for.
+  Attempt 1 of `actions/deploy-pages` now runs with `timeout: 1800000` (30 min); attempts 2 and 3
+  keep the 600000 default **on purpose**, because two different failures share that step. The
+  timeout failure needs a LONGER deadline (a deploy here outruns 10 minutes, the action cancels
+  itself, and the leftover can refuse the next merge); the transient "Deployment failed, try again
+  later" fails FAST, so giving all three attempts 30 minutes would hold a genuinely broken deploy
+  for ~90 minutes before it went red. One long attempt plus two fast retries caps the worst case at
+  ~51 minutes and removes the self-cancel in the normal case. YAML parsed and the three steps'
+  inputs read back before pushing; nothing else in the workflow moved (same pinned action SHAs, same
+  retry chain, same hard-fail on attempt 3).
+- **Artifacts (prompt 4):** `.github/workflows/pages.yml` · `CLAUDE.md` (the deploy bullet now
+  states the fix, not the workaround) · `docs/DECISIONS.md` §s197 (why the three attempts differ,
+  and what this does NOT fix) · this log
+
+## Session 198 — 2026-08-07 — branch `claude/content-audit-plan-mbiout`
+
+- **Prompt 1 (verbatim):** `what's next in the content audit plan?`
+  **Response:** read `docs/reports/CONTENT_AUDIT_2026-07-30.md` and reported the state: P1–P9 all
+  closed across s178/s181/s182/s185, **P10 (human verification) the only open item and
+  founder-deferred**, and it is a founder task by law (only a human flips `review_status`, and a
+  verified row is never edited by an AI). Flagged the two carried-over tails (12 verified rows the
+  s185 rules WARN on, three s178 founder rejections still `draft`) and offered the AI-shippable
+  alternative from the audit's §5 closing observation: the missing "is this word worth learning" and
+  "does this theme have a balanced part-of-speech mix" gates, whose data already ships in
+  `frequency.ts`.
+  **Artifacts:** none (research answer).
+
+- **Prompt 2 (verbatim):** `build the frequency and part-of-speech linter gates`
+- **Prompt 3 (verbatim, mid-turn):** `except human review task, complete all the recommendations
+  from this plan, push them live and document the session`
+  **Response:** took the whole remaining audit except P10, in one session.
+  1. **The 116 "words needing an example" were a matcher bug, not a content gap.** 25 of them start
+     with an umlaut (JavaScript's `\b` is ASCII-only, so `\bÜberweisung` can never match) and 85 are
+     verbs whose examples use a real verb form rather than the infinitive. Extracted the ONE blanking
+     rule to `src/engine/blank.ts` (previously four copies: MCQ cloze, listening cloze, typed cloze,
+     coverage report, all with the same two defects), now reading the Partizip II / Präteritum /
+     zu-infinitive from `verbForms.ts` (which did not exist when the audit was written) plus plurals
+     and multi-word headwords. The blank reports WHICH form it took so distractors match the gap's
+     shape. 15 separable verbs kept a genuine gap and got one example rewritten; 67 words gained a
+     related term that resolves. Both word-level residuals in the coverage report: **116 → 0** and
+     **67 → 0**.
+  2. **The three gates the audit asked for** live in `scripts/content-shape.mjs`, each anchored on
+     the measured bank: worth-learning (rare share 53.87 %, no-corpus-evidence 100), CEFR
+     plausibility (hard rule: no `core`-frequency word at B2.2/C1; beginner-rare ratchet 32),
+     part-of-speech mix (≥3 verbs AND ≥3 adjectives per theme, noun share 77.59 %).
+     `tests/contentShape.test.ts` asserts each in both directions.
+  3. **25 everyday verbs and adjectives authored** to clear the part-of-speech floors (`digitales`
+     had no verb and no adjective at all; `freizeit`, `behoerde`, `mobilitaet` had no adjective), all
+     core-or-common frequency, which also serves P7's standing authoring rule. Bank shape
+     78.7/13.5/5.1 → **77.6/13.6/6.1** noun/verb/adjective.
+  4. **§2.2 "Reuse" closed:** `progress.textsDone` (migration 0018, synced and unioned like
+     `scenariosDone`) makes the composer prefer a text the learner has not read, so a scoped learner
+     stops seeing the same one alternate.
+  Verified along the way that the four §3.2 LanguageTool defects are already fixed in the bank. The
+  one finding deliberately left open besides P10 is §2.1's inverted sub-theme structure: it drags the
+  writing-task invariant (≥2 tasks per Unterthema per length) behind it, so it is a session of its
+  own.
+  Gates: `lint:content` · `lint:migrations` · typecheck · lint (0 errors, 77 warnings) ·
+  **647 tests** (21 new) · build · `check:bundle` 128.2 kB · `verify:facts` 0 errors ·
+  `verify:cefr` FLAG 0 · regenerated `verbForms.ts`, `frequency.ts`, `verification.ts`, the review
+  queue and the coverage report. `verify:grammar` skipped: the LanguageTool toolchain is not built in
+  this sandbox (warn-only by design).
+  **Artifacts:** `src/engine/blank.ts` (new) · `scripts/content-shape.mjs` (new) ·
+  `tests/blank.test.ts` + `tests/contentShape.test.ts` (new) · `supabase/migrations/0018_texts_done.sql`
+  (new) · `src/engine/quiz.ts` · `src/engine/session.ts` · `src/features/session/SessionPlayer.tsx` ·
+  `src/store/useProgressStore.ts` · `src/lib/cloudSync.ts` · `src/lib/idRenames.ts` ·
+  `src/data/vocabulary.ts` + `provenance.ts` (+25 items, 82 rows edited) ·
+  `scripts/lint-content.mjs` · `scripts/report-exercise-coverage.mjs` · `tests/engine.test.ts` ·
+  `CLAUDE.md` · `docs/areas/CONTENT.md` · `docs/areas/COMMANDS.md` · `docs/areas/SESSION.md` ·
+  `docs/reports/CONTENT_AUDIT_2026-07-30.md` · `docs/DECISIONS.md` §s198 · `docs/PROJECT_STATUS.md` ·
+  this log.
+  **Shipped:** three commits (`752bfce` the blanking rule + the gates + the 25 words, `8006e2d`
+  reading freshness, `fcea41d` docs) → **PR #822**, CI green (the single `lint-content` job runs
+  every gate), squash-merged as **`03ea3dc`**. All three `main` workflows green on that commit:
+  Validate content, Deploy site to GitHub Pages (**no self-cancel: the s197 timeout fix held on its
+  first real run**) and Deploy Supabase functions, whose "Apply migrations" step ran and passed, so
+  **migration 0018 is applied on the live database**. Post-merge housekeeping done (fetch → reset
+  --hard origin/main → force-with-lease, tree clean).
+
+- **Prompt 4 (verbatim):** `document the session`
+  **Response:** the session documentation had already shipped inside PR #822 (`PROJECT_STATUS.md`
+  session-198 log + handoff, this log, `DECISIONS.md` §s198, `CLAUDE.md`, three `docs/areas/*` files
+  and the audit report's backlog status), so this pass added only what was not knowable before the
+  merge: the shipping record above (PR number, the three commit SHAs, the squash SHA, the three
+  green `main` workflows, migration 0018 applied) and the same facts in the status handoff, whose
+  "resume" list no longer tells the next session to expect the migration on a future merge.
+  **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md`.
+
+## Session 199 — 2026-08-07 — branch `claude/task-list-priorities-3f50ad`
+
+- **Prompt 1 (verbatim):** `what's next in the task list?`
+  **Response:** read `docs/PROJECT_STATUS.md` and the `PROJECT_REFERENCE.md` backlog and reported the
+  state: nothing mid-flight (s198 shipped clean as `03ea3dc`, all three `main` workflows green,
+  migration 0018 live), P10 the only open content-audit item and founder-owned, then the four queued
+  items in priority order: the s181 writing-task **quality** audit, the s186 exam content gaps (A2
+  has zero exam content, C1 Hören has one audio text), the §2.1 sub-theme restructure (deliberately
+  unscheduled, it drags the writing-task invariant behind it), and the housekeeping tail (CLAUDE.md
+  380 lines against a ~350 budget; `verify:grammar` skipped in s198). Recommended the writing-task
+  quality audit as this session's work and asked whether to start.
+  **Artifacts:** none (read-only).
+
+- **Prompt 2 (verbatim):** `go ahead`
+  **Response:** ran the s181-queued audit and shipped
+  **`docs/reports/writing-tasks-audit-2026-08-07.md`**. Headline: **the tasks are well written, the
+  tags on them are not.** What is healthy was measured first so the founder does not over-react: only
+  **6** near-duplicate instruction pairs across all 256,686 comparisons (all same-theme, zero
+  cross-theme), 2,355 distinct Leitpunkte of 2,691, **zero** Leitpunkte demanding a non-written act,
+  5 within-task overlaps that are all deliberate parallel pairs, and a demand ladder that does rise
+  (86% → 69% → 27% of tasks carry no justification Leitpunkt at B1 → B2 → C1). Five findings:
+  1. **Branche is a coverage artifact.** All **40** theme×length pools carry exactly **15** distinct
+     sectors, the exact size of the `WorkSector` enum, in pools as small as 11 tasks; the tags run in
+     enum order down the pool index. **199 of 600** tagged tasks (33%) contain no marker of the
+     sector they claim, and in Alltag ~65 briefs name no work-shaped constraint at all, against the
+     founder's own s181 rule (`wt_freizeit_s08` [pharma] is "Sie haben auf einer Feier eine Bekannte
+     wiedergetroffen"). Cause: `tests/moduleScope.test.ts` demands all 15 Branchen on every theme at
+     both lengths, which 11-task Alltag pools cannot satisfy by authoring. Cheap to fix because
+     Branche is SOFT: untagged = universal, so deleting a dishonest tag costs no availability.
+  2. **The Niveau tag scales the word count and the grader's strictness, not the language.** `level`
+     is what builds "Bewerte streng auf X-Niveau" in `evaluate-writing`, yet the brief's specialized
+     vocabulary share runs 2.7% → 2.3% → **1.6%** (inverted), instruction length is flat at 14–16
+     words in every band, and 81/307 B1 tasks outscore the C1 median. Marked SOFT on its own and
+     deliberately not scheduled: the rubric must stay readable.
+  3. **236 tasks are graded for argumentation their brief never asks for** (207 B2, 29 C1). Sharpest:
+     **6 C1 Stellungnahmen at 200 words** whose Leitpunkte are purely descriptive.
+  4. **`exam` is dead metadata that contradicts `words`.** `words` is fully determined by (level,
+     length) though its doc says it follows the exam shape; 61 `goethe_b1`-shaped tasks carry a
+     150-word target, 69 tasks sit outside their shape's band, and nothing reads the field.
+  5. **`source` is unused on all 717 tasks**, so 54 Stellungnahmen and 17 Forumsbeiträge paraphrase
+     the position they react to instead of quoting it.
+  Plus a 19-item tail (5 Textsorte contradictions, 14 Adressat/register mismatches where `du` meets
+  "Frau <Nachname>"). **Two heuristics were corrected mid-audit rather than published:** an
+  opening-verb demand classifier scored 9 of 11 `widerspruch` tasks as unargumentative until hand-
+  reading showed "**Legen** Sie dar, warum …" is exactly the argumentative move (corrected: 1 of 11),
+  and a thin Branche lexicon returned 40% bare until it was widened with `QS`, `Baugruppe`,
+  `Validierung` and similar (corrected: 33%, and generous by construction). Both corrections are
+  recorded in the report's §9 Method so the next session does not re-make them. Prioritised fix list
+  P1–P5 at the end, with the two `lint:content` checks worth keeping named in P1 and P2. **No content
+  or code was changed:** the deliverable is the report, and P1 opens with a founder decision.
+  **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/PROJECT_REFERENCE.md` · this log.
+
+- **Prompt 3 (verbatim):** `go with your recommendation reg branche. I prefer to have Berufsleben and
+  Alltag as the first filter and then themen and only then Branchen filter as the heirarchy of the
+  filter rail all across. When a user selects a thema where there is no branche specific content,
+  just show the options within Branche as locked.`
+  **Response:** took P1 option (a) and then the two rail changes.
+  1. **A Branche tag is EARNED or it is not there.** `scripts/sector-markers.mjs` is the ONE marker
+     lexicon, read by `lint:content` AND `tests/writingScope.test.ts` so the gate and the test cannot
+     drift. **331 unearned tag instances stripped, 220 tasks universal again**, no id changed, no pool
+     renumbered, no task text touched. The two "every Thema serves every Branche" coverage tests are
+     replaced by the property they proxied for, plus a floor keeping Berufsleben real (≥8 of 15
+     sectors per pool) and a test asserting every Branche still draws everywhere, which is why the
+     strip costs no reach. Measured after: Beruf 13.4 of 15 sectors earned on average, Alltag 3.0.
+     A first cut of the lexicon withheld shared words like `charge`, `schicht` and `objekt` to be
+     "strict" and wrongly stripped `wt_safety_s09` ("An Anlage 2 sitzt die Schutzabdeckung locker.
+     Melden Sie das dem Schichtleiter.") from `production`; the shipped lexicon shares a marker
+     wherever the word really is shared, and the mistake is recorded in the file so it is not remade.
+  2. **The hierarchy inverts in all 8 rails:** Lebensbereich → Thema → Unterthema → Branche, then
+     Niveau and Textsorte. Niveau was the one open question (it is not part of the stated hierarchy
+     yet led every rail); "as the first filter" was read literally, so Lebensbereich leads and Niveau
+     follows. The order is applied INSIDE the rails, never by a caller.
+  3. **Branche LOCKS instead of greying**, via a second counting function
+     (`countDedicatedTasks`/`countDedicatedTexts`): the old count could never be zero because the soft
+     fallback serves the universal pool, so the rail printed a healthy number beside an option that
+     changed nothing. A zero now renders a padlock, and when EVERY option is locked one line replaces
+     the control (the normal state on Lesen/Hören, where 4 of 52 texts carry a tag). The engine's
+     fallback is untouched, so nothing became unreachable and deep links still work.
+  **Artifacts:** `scripts/sector-markers.mjs` (new) · `src/data/writingPrompts.ts` ·
+  `scripts/lint-content.mjs` · `tests/writingScope.test.ts` · `src/lib/writingScope.ts` ·
+  `src/lib/moduleScope.ts` · `src/features/shared/ScopeRail.tsx` · `src/features/shared/FilterRail.tsx` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/pruefung/TextModuleHub.tsx` ·
+  `src/features/sprechen/SprechenHub.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx`. Commits `acb21f7`, `7f5c464`.
+
+- **Prompt 4 (verbatim):** `no need of design preview for the above mention rail changes`
+  **Response:** deleted the half-written `preview/filter-hierarchy.html` (two order variants plus
+  three locked-state treatments) and implemented directly. The two sub-decisions the preview existed
+  to settle were made in-session and written into `docs/DECISIONS.md` §s199 so they can be revisited:
+  Niveau moves below the hierarchy, and "locked" is a padlocked row that collapses to one line when
+  every option is locked. Noted in the handoff that the lock lives in ONE place, so restyling it later
+  is a single-file change rather than an eight-rail one.
+
+- **Prompt 5 (verbatim):** `while you're at it, the header and footer of the filter rail seems to look
+  like separate pieces attached to the main body. remove the separator lines and make all the filter
+  rail same shade to look like one piece`
+  **Response:** the cause was compositing, not a colour choice: the tile wears `bg-accent/20` and the
+  header and Üben footer each painted `bg-accent/20` AGAIN on top of it, so both strips resolved to
+  roughly double the wash of the body between them, with a tinted `border-t` underlining each seam.
+  The second fills existed to keep the fixed header/footer opaque while the middle scrolled, and were
+  unnecessary: the rail is a flex column with `overflow-hidden` and the scroll region is `flex-1`, so
+  it already clips its own content. The mobile `layout="panel"` variant had been built without them
+  and was already seamless, which is the proof. Both fills and both rules removed, in `FilterRail` AND
+  in `ScopeRail`, so the two rails stay identical as s189 established. This supersedes the s169 note
+  that such a divider must be tinted rather than grey.
+  **Verified in the real app** (headless Chromium over the built bundle, 1440x1100, light and dark):
+  the new order, the locked line on Freizeit in both Schreiben and the Bibliothek, and no seams in
+  either theme.
+  Gates: lint:content 0 errors · typecheck · lint 0 errors (77 warnings) · 649 tests · build ·
+  check:bundle 128.2 kB · check:contrast.
+  **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/features/shared/ScopeRail.tsx` ·
+  `CLAUDE.md` · `docs/DECISIONS.md` §s199 (three entries) · `docs/areas/BIBLIOTHEK.md` ·
+  `docs/areas/CONTENT.md` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 6 (verbatim):** `document the session. I'll continue with the p2 and others in next session`
+  **Response:** the substance had already shipped inside PR #825 (the session-199 log and handoff in
+  `PROJECT_STATUS.md`, prompts 3-5 in this log, three `DECISIONS.md` §s199 entries, the three
+  replaced `CLAUDE.md` rules, and the three area docs). This pass added only what was not knowable
+  before the merge: the shipping record below, and a handoff rewritten around the founder taking P2
+  themselves next session rather than around a decision they had already made.
+  **How session 199 shipped, end to end:**
+  - **PR #824** (the audit report) → squash-merged **`66061c3`**. Validate content and Deploy site to
+    GitHub Pages both green.
+  - **PR #825** (three commits: `acb21f7` the Branche tag cleanup, `7f5c464` the rail changes,
+    `40176d1` the docs) → squash-merged **`bf9db0b`**. Validate content green on the PR head and
+    again on `main`; Deploy site to GitHub Pages green on `main`, with no self-cancel, so the s197
+    `timeout: 1800000` fix has now held on three consecutive Pages deploys.
+  - **Deploy Supabase functions did NOT run on `bf9db0b`, and that is correct, not a failure**: it is
+    path-filtered to `supabase/functions/**`, `supabase/migrations/**` and its own workflow file, and
+    this session touched none of them. Checked rather than assumed, because "a workflow is missing
+    from the commit" and "a workflow failed" look identical in a run list.
+  - Post-merge housekeeping done after both merges (fetch → reset --hard origin/main →
+    force-with-lease, tree clean).
+  **The founder takes P2 next session**, so the handoff now leads with what a P2 session needs (the
+  six task ids, the replace-don't-append rule for their Leitpunkte, and the gate to add afterwards)
+  instead of the P1 decision that is now closed.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
+## Session 200 (2026-08-07) · branch `claude/whats-next-q992fo`
+
+- **Prompt 1 (verbatim):** `what's next?`
+  **Response:** read the s199 handoff and reported the queue in plain language: audit **P2** (the six
+  C1 Stellungnahmen that punish a learner for following the brief) as the next item, then P3
+  (`exam`), P4 (`source`), P5 (the 19-item tail), with P10 human verification and the Resend/Google
+  items flagged as founder-owned. Recommended running P2 through P5 in one session, since they touch
+  one file and one gate run and P4 depends on P2 landing first.
+  **Artifacts:** none (report only).
+
+- **Prompt 2 (verbatim):** `go ahead`
+  **Response:** shipped P2, P3 and P5; P4 stopped on the founder's challenge (prompt 3).
+  - **P2 (commit `663f993`).** `scripts/justification-markers.mjs` is the ONE classifier, shared by
+    `lint:content` and `tests/writingScope.test.ts` (the s199 `sector-markers.mjs` arrangement). A
+    Leitpunkt counts when it forces a **reason, a consequence or a stance**; matching is phrase-level
+    over the whole clause, never the opening verb. **30 tasks fixed**, each REPLACING its weakest
+    descriptive point (22 Stellungnahmen, 11 Beschwerden, 3 Widersprüche, 1 Forumsbeitrag, including
+    all six acute C1 cases). Gate: an argumentative Textsorte at B2+ must carry such a point; 110
+    tasks gated, all passing, B1 exempt on purpose.
+    - **A design mistake worth keeping:** the first cut demanded a STANCE marker specifically from
+      every Stellungnahme, which failed `wt_safety_l04`, whose points are "Begründen Sie …", "Legen
+      Sie dar …", "Entkräften Sie den Einwand …". A gate that fails the most argumentative task in
+      the pool is measuring the wrong thing, so the two tiers collapsed into one demand.
+  - **P3 (commit `a7dd57a`).** `exam` retired from all 717 tasks, from the `WritingTask` interface
+    and from `src/types/index.ts`; `lint:content` now ERRORS if it reappears (the retired-`sector`
+    guard pattern). The `words` comment states the real rule: the target follows (Niveau, Länge).
+  - **P5 (commit `f9a1e78`).** Five Textsorte re-tags (the tag follows the requested OUTPUT, not the
+    situation) and the 14 du/Sie hybrids, fixed on the Adressat side with first names, because all 14
+    are informal messages and switching them to Sie would thin the bank's scarce du practice.
+    `lint:content` now errors on register `du` with a title-plus-surname Adressat.
+  - Gates on all three: lint:content 0 errors · typecheck · **651 tests** (+2).
+
+- **Prompt 3 (verbatim):** `is Text zur Aufgabe really necessary? in my B2 für Beruf exam  they just gave the topic overview and asked to write a forumsbeitrag. The additional text wasn't provided. can you research what is more realistic and then report to me the findings with recommendations?`
+  **Response:** stopped P4 before a single `source` text reached the bank, fetched the published
+  material, and reported that **the founder is right and the audit's Finding 5 is wrong**:
+  - **Goethe B2 Schreiben Teil 1** is a Forumsbeitrag from a topic sentence plus four Inhaltspunkte,
+    no supplied text; Teil 2 (Nachricht to a supervisor) is the same shape.
+  - **Deutsch-Test für den Beruf B2** has two writing parts: Teil 1 prints a forwarded customer
+    complaint to answer, Teil 2 is a choice of two topics, one a Forumsbeitrag, nothing supplied.
+  - **The supplied text belongs to a GENRE (answering incoming workplace mail), not to an exam.** The
+    audit selected the 54 Stellungnahmen and 17 Forumsbeiträge, precisely the opinion tasks that get
+    no text in either exam. The honest target is the **47 reply-shaped tasks** ("Ein Kunde beschwert
+    sich … Antworten Sie ihm"), which is the DTB B2 Teil 1 shape.
+  - Two further audit claims were false: `source` has **no rendering slot** (read by nothing, not the
+    Aufgabe card, not the exam's Schreiben part, not `evaluate-writing`), so P4 was never a data-only
+    edit. Recommended parking P4 and doing the reply wave as its own session.
+  **Artifacts:** `docs/reports/writing-tasks-audit-2026-08-07.md` (correction blocks under §6 and
+  §8-P4) · `preview/schreiben-source-text.html` + artifact (the A/B/C placement mockup, built before
+  the research and kept for the reply wave) · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `i agree with your assessment on p4 and a gap with Beschwerde. I'd go with your recommendation on this. document the session at this point, push everything live and we pick it up in a new session`
+  **Response:** P4 is closed as "not a defect", the reply wave is queued as the next session's work,
+  and the branch shipped to `main`. The handoff now opens with what that session needs in order: 47
+  authored incoming texts, the rendering slot that does not exist yet (the Aufgabe card, the exam's
+  `SchreibenPart` and the `evaluate-writing` payload all ignore `source`), the two height laws to
+  respect while adding a block to a locked mobile anatomy, and the gate to add afterwards. The A/B/C
+  placement mockup is built and unpicked, so that session starts by asking which one.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log · PR into `main` (see the shipping record).
+  **How session 200 shipped:** PR **#828** → squash-merged **`df101d7`**; Validate content and Deploy
+  site to GitHub Pages green on `main`; Deploy Supabase functions correctly did not run (path-filtered
+  to `supabase/**`, untouched this session). Housekeeping done after the merge.
+
+## Session 201 — 2026-08-07 — branch `claude/ui-polish-consistency-56ja1y`
+
+_(Renumbered from 200: `claude/whats-next-q992fo` ran in parallel, took that number and reached
+`main` first, so this session is 201 wherever it is cited, in the docs and in the code comments.)_
+
+- **Prompt 1 (verbatim):** `[four phone screenshots: /lesen, /hoeren, /simulation, /writing]` `i want
+  you to make these pages consistent and highly polished. Review the exit buttons, toggles, layouts,
+  tile shapes, transition animations, etc - leave no stone unturned. Make it a finished product which
+  is presentable to thousands of audience and investors. I want the highest quality possible like
+  from senior experts of the industry developing billion dollar edutech app. some of the observed
+  bugs:` `- the header bar shouldn't have the aufgabe button - place it somewhere else.` `- shuffle
+  button has a bug where taping it again doesn't deactivate it instead it deactivates when tapped on
+  empty spaces - fix it.` `also make sure to keep the design language consistent with the rest of the
+  app and use the color palette from the brand kit wherever relevant.`
+  **Response:** reproduced every screen in headless Chromium at 360x640 first, which turned the
+  second reported bug into a much bigger finding: **Lesen and Hören were dead pages.** Starting a
+  text or the random draw only wrote the run into `useExamStore`, and the Prüfung hub was the ONLY
+  screen that rendered a run, so nothing happened on `/lesen` and `/hoeren`; what the founder saw as
+  "the shuffle doesn't deactivate" was a stuck touch-`:hover` on a button whose tap led nowhere.
+  Fixes, in the order they matter:
+  1. **The two choosers work.** `TextModuleHub` renders `<MockExamRunner />` while a run exists (the
+     hub's own pattern), `AppShell` gained `STAGE_ROUTES`, and the chooser's `zoneExit` steps aside
+     while the runner owns the exit and only clears an exit that is still its own. Finishing a drill
+     lands back on the list it was picked from. Verified end to end: pick → answer 3 → Teil
+     abschließen → 100 % → Fertig → back on `/lesen`, run cleared, nav restored.
+  2. **The zone's exit was missing on `/lesen` and `/hoeren`**: they were never in `ZONE_ROUTES`, so
+     those two were the only screens in the zone with no way back in the header. Now all four have
+     it, in the same corner.
+  3. **The Aufgabe toggle left the module row** and sits at the right end of the chooser's own
+     toolbar row, level with the count it changes and directly above the panel it opens.
+  4. **Sticky touch-hover is gone app-wide:** `future.hoverOnlyWhenSupported` compiles every
+     `hover:` into `@media (hover: hover)`, so a tapped control no longer stays lit until the next
+     tap somewhere else. (Verified in the minified production CSS, not just in dev.)
+  5. **One chooser, three modules:** `ModulePicker` now owns the toolbar row, `ChooserCard` is the
+     one card anatomy (Sprechen had put the Niveau in the head, rendered a `div onClick` a keyboard
+     could not reach, nested a "Starten" button inside its own click target and wore a
+     `shadow-glow`, a landmine since s136), `ModuleTabs` is the one switcher, and both list
+     animations share one 0.16s stagger. Sprechen's module row moved ABOVE its switcher, so all four
+     pages read module row → switcher → content. Sprechen also gained the random draw the other two
+     always had.
+  **Artifacts:** `src/features/pruefung/{ModulePicker,ChooserCard,ModuleTabs,TextModuleHub}.tsx` ·
+  `src/features/sprechen/SprechenHub.tsx` · `src/components/layout/AppShell.tsx` ·
+  `tailwind.config.ts` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md`.
+
+- **Prompt 2 (verbatim):** `either keep verlauf in every module or remove it from all of the
+  individual modules and just in the prufung hub page`
+  **Prompt 3 (verbatim):** `go with verlauf on all four`
+  **Response:** flagged the cost of the other option before building (removing them would delete the
+  writing corrections and the spoken transcripts from the app, since nothing else renders either),
+  then added the Verlauf tab to Lesen and Hören. The Verlauf card, chart, empty state and delta chip
+  were EXTRACTED from `PruefungHub` into `features/pruefung/verlauf.tsx` rather than rebuilt, and the
+  chooser must not import the hub: that would drag `mockExamAvailability` and the writing-prompt bank
+  into the `/lesen` chunk. The new per-module history (`moduleRuns`) is the Modelltest Verlauf's
+  composition at module scale (last score + delta, Bester, Bestanden, seven bars against the pass
+  line), with the Niveau on each row instead of the module name the page already says, and a
+  Modelltest is never listed there (`isFullMockRun`). The hub keeps the cross-module views only.
+  `ModulePage` gives the Verlauf tab the same columns the Üben tab has, so switching tabs moves no
+  edge sideways.
+  **Artifacts:** `src/features/pruefung/verlauf.tsx` (new) · `PruefungHub.tsx` (now imports it) ·
+  `TextModuleHub.tsx` · `SprechenHub.tsx` · `ModulePicker.tsx` · `tests/pruefungHub.test.ts` ·
+  `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `continue`
+  **Response:** re-verified the whole tree after the `origin/main` merge rather than trusting the
+  pre-merge gates: typecheck, lint (0 errors), 652 tests, build, bundle 128.2 kB of a 400 kB budget,
+  contrast, `lint:content`. Then walked all four pages again in headless Chromium at 360x640 and
+  1280x860, light and dark: the drill loop end to end on `/lesen` (pick → answer → Teil abschließen →
+  Ergebnis → Fertig → back on the list, run cleared, bottom bar restored), the Aufgabe panel opening
+  under its own toggle, the empty scope hiding the draw and naming the one filter to drop, and the
+  new module Verlauf both empty ("Noch kein Ergebnis") and with runs (last score + delta chip, Bester,
+  Bestanden, bars against the pass line, rows, "Alle 4 anzeigen"). Every screen rests at 0 page
+  scroll. Also trimmed `CLAUDE.md` from 391 to 383 lines: the merge had left this session's law and
+  s199's stating the Modelltest-vs-practice rule twice, and the zone bullets carried detail that
+  already lives in `docs/areas/PRUEFUNG.md`. The file is still over the ~350 budget it was over
+  before this session (378 at `66061c3`), so the linter still warns; that debt is older than this
+  work and wants a pass of its own.
+  **Artifacts:** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 5 (verbatim):** `get rid of the streak and account settings wherever the exit or back
+  button is shown`
+  **Response:** one flag in `AppShell`, `quietHeader = exam || !!exit`, now hides the streak pill and
+  the `AccountMenu` on every screen that carries the zone exit, which is what a running Teil had done
+  since s186 while the trainers and choosers kept them. That was the inconsistency: the same corner
+  held three controls on `/writing` and one inside a Teil. The Prüfung HUB is untouched, because it
+  is a nav destination and registers no exit, so it keeps both. Nothing became unreachable: both are
+  one tap away on every screen outside the zone, and the account also lives in Einstellungen. Law
+  restated in `CLAUDE.md` (the one-frame bullet) and `docs/areas/PRUEFUNG.md`.
+  **Artifacts:** `src/components/layout/AppShell.tsx` · `CLAUDE.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/PROJECT_STATUS.md` · this log.
+
+## Session 202 — 2026-08-08 — branch `claude/sprechen-filter-rail-practice-70gydw`
+
+- **Prompt 1 (verbatim):** `for the sprechen part, I'd want you to add a filter rail kind of rail
+  with useful redemittle even in the practice sessions.`
+  **Response:** design work, so previews first (no app code touched). Established what is on screen
+  today: a spoken task names its four Redemittel CATEGORIES on the brief card and ticks them in the
+  debrief, and the phrases behind them (8 per category, 239 in the bank) live only in the
+  Bibliothek, so the learner has category names but no language at the one moment they are speaking.
+  Built `preview/sprechen-redemittel-rail.html` from the real tokens: today's desktop and phone
+  screens, then three placements for the phrases during a practice conversation, each with a desktop
+  and a phone frame and its cost. **A** a 256 px Redemittel rail beside the conversation in the
+  ScopeRail tile (panel over the transcript on a phone), **B** a phrase strip above the microphone,
+  **C** a second tab (Aufgabe | Redemittel) on the collapsed brief drawer. Three content switches
+  ride the page in every option: 3 phrases per intent vs all 8, du/Sie matched to the partner vs
+  everything, English inline vs hold-to-peek. Stated in the preview and in chat: practice only, not
+  the Modelltest (handing a candidate the phrases would grade the reading), and reading a phrase is
+  never a tick, because whether a Redemittel was used stays the model's judgement of what was said.
+  Awaiting the founder's pick before implementing.
+  **Artifacts:** `preview/gen-sprechen-redemittel-rail.mjs` · `preview/sprechen-redemittel-rail.html`
+  · `preview/sprechen-redemittel-rail-artifact.html` (published) · this log.
+
+- **Prompt 2 (verbatim):** `option a's layout for desktop and option c for mobile and also desktop's
+  content`
+  **Response:** built exactly that. `RedemittelHelp` is ONE content (intent dropdown with honest
+  counts, the phrases as white cards, the other three intents as one-tap pills, one `EnPeek` chip for
+  the whole list) rendered in two shells: the `ScopeRail` tile beside the conversation from `lg` up
+  (the stage widens `max-w-2xl` → `lg:max-w-4xl`, so the conversation column keeps its width and the
+  rail takes the space that was empty), and the second tab of the brief drawer below it, **Aufgabe |
+  Redemittel**. One `useMediaQuery` decides, so the phrases can never be on screen twice, and the
+  desktop brief row keeps its single-button form. **Practice only, structurally:** the runner takes
+  the help as a PROP and `SprechenPart` passes nothing, so the Modelltest neither shows a candidate
+  the phrases it grades them on nor carries the phrase bank in its chunk (checked in the build
+  output: `MockExamRunner` has no `redemittel-*.js` import, `SprechenHub` does). The founder answered
+  layout only, so the three content switches took stated defaults: all eight phrases of the chosen
+  intent (curating three needs an authored order the bank has not got), the Anrede matched to the
+  partner, English hold-to-peek. The Anrede is the one thing here that really filters, and
+  `RedemittelPhrase.register` cannot answer it (it is formality, not Anrede), so `src/lib/anrede.ts`
+  derives du/Sie from the phrase TEXT: one rule, one place, `tests/anrede.test.ts` gating both the
+  rule and the promise that every scenario's four intents stay servable in both registers. It never
+  empties a category. `ScopeRail.onReset` became optional for this rail, which browses rather than
+  narrows, so a reset would be a dead control. Verified in a real browser (headless Chromium over
+  CDP) at 1440x900, 1280x800 and 393x852, light and dark: rail beside the conversation on desktop,
+  two-tab drawer on the phone with the intent pills still on screen, every screen at 0 page scroll.
+  Gates: typecheck, lint (0 errors), 662 tests, build, bundle 128.3 kB of 400 kB.
+  **Artifacts:** `src/lib/anrede.ts` (new) · `src/features/sprechen/RedemittelHelp.tsx` (new) ·
+  `src/features/sprechen/ConversationRunner.tsx` · `src/features/sprechen/SprechenHub.tsx` ·
+  `src/features/shared/ScopeRail.tsx` · `tests/anrede.test.ts` (new) · `CLAUDE.md` ·
+  `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 3 (verbatim):** `if we're done here, document the session and merge everything`
+  **Response:** the work itself was already shipped, with its documentation in the same PR: PR **#830**
+  → squash-merged **`9c4ca3b`**, Validate content and Deploy site to GitHub Pages both green on
+  `main` (Deploy Supabase functions correctly did not run: it is path-filtered and nothing under
+  `supabase/` changed), branch reset to `main` and force-with-leased, tree clean. This entry and the
+  shipped-line on the s202 handoff close the paper trail. Nothing is left unmerged.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+
+- **Prompt 4 (verbatim):** `[five phone screenshots of the shipped rail]` `for some reason.. the
+  aufgabe text is being cut off.. it's better if that text is below the toggles. Also, the Redemittel
+  pills at the bottom should be at the top of that tile and the selected pill should also be shown
+  which is not the case at the moment. adapt the same heirarchy for Redemittel in desktop view as
+  well.`
+  **Response:** all three, one hierarchy in both shells. (1) The drawer bar is two lines now: tabs +
+  chevron, then the task title and partner on their own full-width line, so "Projekt termingerecht
+  abschließen · Daniel Krause" reads in full. Without tabs (desktop, the Modelltest) the bar stays
+  the single row it always was. (2) The pills moved from under the phrase list ("Auch im Gespräch",
+  which showed only the OTHER three) to the top of the tile, all four, with the current one lit in
+  brand fill and its honest count. (3) The dropdown went with them: a lit pill states the selection,
+  so keeping it would print the same fact twice, and four options is pill territory by the app's own
+  rule. Same tile, same order, on desktop. Verified in a real browser at 393x852 and 1440x900, both
+  drawer tabs, page scroll 0 everywhere. Shipped as PR **#834**, which merged `origin/main` first:
+  session 203 had landed the documentation-maintenance pass (#832, #833) mid-flight, and its trim of
+  `CLAUDE.md` had already condensed this session's Sprechen law, so the only conflict was this
+  append-only file (prompt 4 belongs above the session 203 heading).
+  **Artifacts:** `src/features/sprechen/RedemittelHelp.tsx` ·
+  `src/features/sprechen/ConversationRunner.tsx` · `docs/areas/SPRECHEN.md` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` · this log.
+
+## Session 203 — 2026-08-08 — branch `claude/documentation-maintenance-0w4ywg`
+
+- **Prompt 1 (verbatim):** `do the documentation maintenance`
+  **Response:** a docs-only session; no app code touched. Two standing debts closed. **(1)
+  `CLAUDE.md` back inside its budget, 399 → 349 lines.** The `lint:content` ratchet warns past ~350
+  and had been warning since s198; s201 noted it and left it. The file was over because rules had
+  accreted their own history, so the trim cut each bullet back to the RULE plus a pointer and moved
+  the rest to where it already lived (`docs/areas/CONTENT.md` for the content measurements,
+  `PRUEFUNG.md` for the zone mechanism, `PROJECT_FOUNDATION.md` for the retention timers,
+  `SPRECHEN.md` for the conversation detail). **No law was dropped**, and the three that had no
+  area-doc home were given one BEFORE the sentence was cut: the "`source` belongs to the reply genre"
+  rule and the "match phrases over the whole clause, never the opening verb" trap went into
+  `CONTENT.md` §Writing prompts, the module card's "no description line" into `PRUEFUNG.md`, and the
+  touch-`:hover` law into the `/design` skill's landmine list as #12, beside the focus-ring law it
+  mirrors. The maintenance rule at the top of `CLAUDE.md` now states what a law looks like, so the
+  shape is written down rather than inferred. **(2) Every bank count in the docs re-measured against
+  `pnpm lint:content`,** because most had drifted silently: grammar drills 195 → **320**, texts
+  42 → **52** (126 → 156 checks), scenarios 30 → **36**, exam sets 15 → **21**, provenance
+  3,457 → **3,604** rows and 3,444 → **3,591** draft, writing pools 20 → **40**. `CONTENT.md` still
+  called the provenance register two array parts (it has been four since s182) and told authors to
+  append to the second, which would have put new rows in the middle of the file; `SPRECHEN.md`
+  counted 15 exam sets in its no-`anruf`-set-yet note. The taxonomy line also claimed 5 domains "all
+  populated" when `pruefung` carries no themes and never has. Every number is now stamped with the
+  date it was measured, and `CLAUDE.md` carries a new workflow rule: a count in a doc is MEASURED,
+  never carried forward. Housekeeping: the s199 and s200 session logs and the s201 handoff moved into
+  the 2026-W32 archive chunk, leaving `PROJECT_STATUS.md` at 187 lines of its ~250 budget. Gates:
+  typecheck · lint · test:unit · build · lint:content (the CLAUDE.md warning is gone, 15 → 14
+  warnings, the remaining 14 being the pre-existing noun/pron content warnings).
+  **Artifacts:** `CLAUDE.md` · `docs/areas/CONTENT.md` · `docs/areas/PRUEFUNG.md` ·
+  `docs/areas/SPRECHEN.md` · `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · this log.
+
+- **Shipped (same prompt):** PR **#832** → squash-merged **`48d250c`**. `origin/main` had moved
+  mid-session (PR #831, the session 202 paper trail), so the branch merged `main` first and resolved
+  one conflict in this file: #831's Prompt 3 entry belongs to the session 202 block, above the
+  session 203 heading. Validate content and Deploy site to GitHub Pages both green on `48d250c`;
+  Deploy Supabase functions correctly did not run, being path-filtered to `supabase/**` which this
+  session did not touch. Post-merge housekeeping done (fetch → reset --hard → force-with-lease),
+  tree clean. **Note for the next session: `CLAUDE.md` now has about one line of headroom**, so a
+  new law costs an old line.
+  **Artifacts:** `docs/PROJECT_STATUS.md` · this log.
+---
+
+## Session 204 — prompt 1 (2026-08-06): the KI-usage task, part A
 
 **Branch:** `claude/ki-usage-task-kg0vix`
 
@@ -5147,7 +5817,7 @@ because the s196 note said 76) · **625 tests** (up from 624, new transform case
 
 ---
 
-## Session 197 — prompts 2-4 (2026-08-06): what "AI usage" should actually mean
+## Session 204 — prompts 2-4 (2026-08-06): what "AI usage" should actually mean
 
 **Branch:** `claude/ki-usage-task-kg0vix`
 
@@ -5189,13 +5859,13 @@ because the s196 note said 76) · **625 tests** (up from 624, new transform case
   $1/$5 Haiku) match Anthropic's current published rates, so those rows are close to right today.
   Founder: "document the session along with your recommendation. We'll continue later."
 
-- **Artifacts (prompts 2-4):** analysis only · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` §s197 ·
+- **Artifacts (prompts 2-4):** analysis only · `docs/PROJECT_STATUS.md` · `docs/DECISIONS.md` §s204 ·
   `docs/areas/SCHREIBEN.md` · this log
 
 
 ---
 
-## Session 197 — prompt 5 (2026-08-06): step 1, and the Sprechen limits
+## Session 204 — prompt 5 (2026-08-06): step 1, and the Sprechen limits
 
 **Branch:** `claude/ki-usage-task-kg0vix`
 
@@ -5246,12 +5916,12 @@ are Deno and outside `tsc`, so they were syntax-checked with esbuild and read li
   `src/features/pruefung/PruefungHub.tsx` · `src/features/legal/PrivacyPolicy.tsx` ·
   `src/lib/{consent,legalMeta}.ts` · `tests/aiUsage.test.ts` · `tests/aiAllowance.test.ts` ·
   `CLAUDE.md` · `docs/PROJECT_FOUNDATION.md` · `docs/areas/{SPRECHEN,LEGAL-ADMIN}.md` ·
-  `docs/DECISIONS.md` §s197 · `docs/PROJECT_STATUS.md` · this log
+  `docs/DECISIONS.md` §s204 · `docs/PROJECT_STATUS.md` · this log
 
 
 ---
 
-## Session 197 — prompt 6 (2026-08-06): ship it
+## Session 204 — prompt 6 (2026-08-08): ship it
 
 **Branch:** `claude/ki-usage-task-kg0vix` → `main`
 

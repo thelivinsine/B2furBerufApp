@@ -130,6 +130,7 @@ function SessionRun({
   };
   const srs = useProgressStore((s) => s.srs);
   const savedWords = useProgressStore((s) => s.savedWords);
+  const textsDone = useProgressStore((s) => s.textsDone);
   const mode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
   const goal = useSettingsStore((s) => s.dailyGoalXp);
@@ -139,6 +140,7 @@ function SessionRun({
   const todayXp = useTodayXp();
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const practiceRedemittel = useProgressStore((s) => s.practiceRedemittel);
+  const completeText = useProgressStore((s) => s.completeText);
   const registerSession = useProgressStore((s) => s.registerSession);
   const showToast = useSessionStore((s) => s.showToast);
   const setFocusMode = useSessionStore((s) => s.setFocusMode);
@@ -178,6 +180,7 @@ function SessionRun({
             grammarTopicId,
             speaking: recognitionEnabled && recognitionSupported(),
             listening: ttsSupported(),
+            textsDone,
           })),
   );
 
@@ -390,6 +393,10 @@ function SessionRun({
     if (answered) return;
     setAnswered(true);
     registerResult(passed);
+    // Record the text as read whether or not the checks were passed: the next
+    // composer should move on to one the learner has not seen (audit §2.2).
+    const b = block as Extract<SessionBlock, { kind: "reading" }>;
+    completeText(b.textId);
   };
 
   const onFlashcardGrade = (correct: boolean, latencyMs?: number) => {

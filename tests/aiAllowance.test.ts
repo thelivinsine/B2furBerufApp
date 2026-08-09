@@ -25,10 +25,10 @@ describe("daily AI allowance", () => {
     vi.resetModules();
   });
 
-  // Sprechen joined in s193 at 2 conversations/day, and s197 split that into 6
+  // Sprechen joined in s193 at 2 conversations/day, and s204 split that into 6
   // practice + 3 Prüfung on the founder's word ("it's very less").
-  // The Umformung joined in s197 on its OWN budget (30 = DAILY_CHECK_LIMIT 10 x
-  // TRANSFORM_VARIANTS 3): it never spends a Fokus Korrektur, and before s197 it
+  // The Umformung joined in s204 on its OWN budget (30 = DAILY_CHECK_LIMIT 10 x
+  // TRANSFORM_VARIANTS 3): it never spends a Fokus Korrektur, and before s204 it
   // was the one AI feature whose daily wall arrived with no warning at all.
   it("keeps the documented defaults (Fokus 10 / Kurz 4 / Lang 2 / Sprechen 6+3 / Umformung 30)", async () => {
     const { DAILY_ALLOWANCE } = await load();
@@ -37,7 +37,7 @@ describe("daily AI allowance", () => {
     });
   });
 
-  // Founder s197 ("it's very less"): Sprechen went from one shared budget of 2
+  // Founder s204 ("it's very less"): Sprechen went from one shared budget of 2
   // to 6 practice + 3 exam, counted apart on `speaking_conversations.exam`.
   it("spends practice and Prüfung conversations from separate budgets", async () => {
     const { reportServerAllowance, readAllowance } = await load();

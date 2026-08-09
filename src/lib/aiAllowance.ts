@@ -27,7 +27,7 @@ import { useAuthStore } from "@/store/useAuthStore";
  *         `TRANSFORM_DAILY_LIMIT`. Only PAID ops land there, so a cached
  *         Umformung is free here exactly as it is on the server.
  *       - Sprechen -> `speaking_conversations` filtered by `exam`, because
-         practice and Prüfung run on separate daily budgets (s197: 6 and 3).
+         practice and Prüfung run on separate daily budgets (s204: 6 and 3).
        - Kurz / Lang -> `writing_evaluations` filtered by `length`, counted
  *         separately per mode so a day of Kurz cannot eat the Lang allowance. A
  *         cached resubmission returns before the row is written, so it is free
@@ -46,13 +46,13 @@ export const DAILY_ALLOWANCE: Record<AiMode, number> = {
   fokus: 10,
   kurz: 4,
   lang: 2,
-  // Founder s197 ("it's very less"): 6 Übungsgespräche and 3 Prüfungsgespräche
+  // Founder s204 ("it's very less"): 6 Übungsgespräche and 3 Prüfungsgespräche
   // per day, counted SEPARATELY against `speaking_conversations.exam`, so a day
   // spent practising can never eat the exam allowance or the other way round.
   // (Was one shared budget of 2 from s193.)
   sprechen: 6,
   sprechenExam: 3,
-  // Founder s197: the Umformung was the one AI feature with NO readout, so a
+  // Founder s204: the Umformung was the one AI feature with NO readout, so a
   // learner hit `TRANSFORM_DAILY_LIMIT` with no warning. It is a SEPARATE
   // budget, not part of Fokus: an Umformung never spends a Korrektur (s167),
   // and 30 is DAILY_CHECK_LIMIT (10) x TRANSFORM_VARIANTS (3).

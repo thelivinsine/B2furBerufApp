@@ -416,7 +416,7 @@ interface LlmOut {
   corrected: string | null;
   score: number | null;
   model: string;
-  // What the provider REPORTED (s197); priced at the call site, one table.
+  // What the provider REPORTED (s204); priced at the call site, one table.
   usage: TokenUsage;
 }
 
@@ -480,7 +480,7 @@ async function callGemini(text: string, lt: LtBuckets | null, sys: string, brief
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    // Free tier prices at $0; the tokens are recorded either way (s197).
+    // Free tier prices at $0; the tokens are recorded either way (s204).
     return { ...parsed, model: GEMINI_MODEL, usage: geminiUsage(data) };
   } catch {
     return null;
@@ -513,7 +513,7 @@ async function callOpenAI(text: string, lt: LtBuckets | null, sys: string, brief
     const raw = data.choices?.[0]?.message?.content ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    // Was a hardcoded flat $0.004 per call until s197.
+    // Was a hardcoded flat $0.004 per call until s204.
     return { ...parsed, model: OPENAI_MODEL, usage: openaiUsage(data) };
   } catch {
     return null;
@@ -690,7 +690,7 @@ Deno.serve(async (req) => {
   const cachedRow = (cacheRes.data as Record<string, unknown> | null) ?? null;
   if (cachedRow) {
     // Recorded as a call that cost nothing, so the cache-hit rate is visible
-    // rather than inferred from an absence of rows (s197).
+    // rather than inferred from an absence of rows (s204).
     await recordAiCall(admin, {
       userId: user.id,
       feature: length === "long" ? "writing_long" : "writing_short",

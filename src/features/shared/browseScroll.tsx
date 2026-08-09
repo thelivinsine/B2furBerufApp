@@ -276,9 +276,16 @@ function ScrollTopMobile({ show, root }: { show: boolean; root?: HTMLElement | n
           onClick={() => scrollToTop(root)}
           aria-label="Nach oben"
           title="Nach oben"
-          className="fixed left-1/2 z-30 rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft backdrop-blur transition-colors hover:text-foreground lg:hidden bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+3.5rem)]"
+          // Clear of the Üben button, not behind it (founder s197). The cluster
+          // puts that button's TOP at nav + 2rem + 2.75rem (its own h-11), and
+          // this sat at nav + 3.5rem, i.e. inside it: the arrow was hidden
+          // behind the CTA at every scroll position. It sits half a rem above
+          // the button now, and is a step smaller (30px, was 36) so the pair
+          // reads as one stack rather than two competing circles. Any change to
+          // the cluster's offset or the CTA's height has to move this with it.
+          className="fixed left-1/2 z-30 rounded-full border border-border bg-surface/95 p-1.5 text-muted-foreground shadow-elevated-soft backdrop-blur transition-colors hover:text-foreground lg:hidden bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+5.25rem)]"
         >
-          <ArrowUp className="h-5 w-5" />
+          <ArrowUp className="h-[18px] w-[18px]" />
         </motion.button>
       )}
     </AnimatePresence>

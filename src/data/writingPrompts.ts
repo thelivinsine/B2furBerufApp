@@ -2,7 +2,6 @@ import type {
   ContentCefr,
   ThemeId,
   WorkSector,
-  WritingExam,
   WritingFormat,
   WritingRegister,
 } from "@/types";
@@ -31,17 +30,31 @@ import type {
  * All 717 tasks carry the full brief, so the draw and the bank are the same
  * set. Every id kept its permanent value and its pool position through the
  * rewrite; only text and tags changed. What the two waves bought:
- * - **Branche:** all 10 Beruf Themen x 15 Branchen x both Längen carry a
- *   dedicated task (was 5 Themen, wave 2). Alltag is tagged too now (founder
- *   decision), with the work context as the REASON the everyday task is hard
- *   (Schichtdienst gegen Öffnungszeiten, Montage ohne Wochentage), never as a
- *   name-drop.
+ * - **Branche:** SUPERSEDED by s199, see below.
  * - **Unterthema:** every declared sub-theme has >= 2 short + >= 2 long.
  * - **Textsorte:** all 16 exist, `bewerbung` included (Bildung, both
  *   sub-themes). The one standing zero is C1 + E-Mail (privat), which has no
  *   exam analogue and greys out honestly.
  * - **Niveau:** B1 307 / B2 302 / C1 108. Kurz tasks stay B1-heavy on purpose:
  *   a 40-word task with three Leitpunkte is B1 work whatever the rail says.
+ *
+ * **Branche: a tag is EARNED or it is not there (s199).** Waves 2-4 chased "all
+ * 15 Branchen on every Thema at both Längen", which `tests/writingScope.test.ts`
+ * enforced for Beruf AND Alltag. An 11-task Alltag pool cannot honestly
+ * represent 15 industries, so the floor was met by handing one sector to each
+ * pool slot in enum order: the s199 audit found 199 of 600 tagged tasks naming
+ * an industry their brief never entered, and every one of the 40 pools carrying
+ * exactly 15 distinct sectors, the exact size of the enum. The floor is gone and
+ * 331 unearned tag instances with it (220 tasks are universal again).
+ *
+ * What a tag means now: the brief contains a marker of that workplace, checked
+ * by `scripts/sector-markers.mjs` and gated by `lint:content`. Beruf Themen keep
+ * Branche as a real axis (13.4 of 15 sectors carry earned content on average,
+ * `travel` lowest at 8, because a Dienstreise is genuinely industry-neutral);
+ * Alltag drops to 3.0, which is the truth about a leaking tap. **Nothing became
+ * unreachable:** Branche is the SOFT axis, so an untagged task is universal and
+ * still serves every Branche. Where a Thema has no sector-specific content at
+ * all, the rail LOCKS those options instead of pretending (founder s199).
  *
  * Provenance: the whole pool rides on the theme's one `wp_<themeId>` register
  * row (the mission pattern). No em dashes in copy.
@@ -81,12 +94,15 @@ export interface WritingTask {
   /** CEFR band this task targets. Absent = shows at every Niveau. */
   level?: ContentCefr;
   format?: WritingFormat;
-  /** Which exam task shape this is modelled on (reference, not reproduction). */
-  exam?: WritingExam;
   /**
-   * Word target for THIS task, taken from the exam shape it follows. Absent
-   * falls back to the mode default. Real exams do not share one number:
-   * Goethe B1 runs 40 to 80, B2 100 to 150, C1 120 to 200.
+   * Word target for THIS task, determined by (Niveau, Länge): B1 40/80, B2
+   * 100/150, C1 120/200. That is Genauly's own convention and a good rule, and
+   * it is what the bank actually does. Absent falls back to the mode default.
+   *
+   * (The former `exam` field claimed the target came from the exam shape the
+   * task follows. It never did: `words` was fully determined by the two tags
+   * above, 61 `goethe_b1` tasks carried a 150-word target, and the field
+   * reached no learner, no filter and no grader. Retired in s200, audit P3.)
    */
   words?: number;
   /** A short text the learner must react to (forum post, incoming mail). */
@@ -118,7 +134,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -134,7 +149,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -150,7 +164,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -165,7 +178,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -180,8 +192,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         addressee: "das Team, zur Ablage im Teamordner",
         register: "sie",
         level: "B1.2",
-        format: "notiz",
-        exam: "goethe_b1",
+        format: "protokoll",
         words: 40,
       },
       {
@@ -197,7 +208,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -214,7 +224,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "notiz",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -230,7 +239,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "uebergabe",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -246,7 +254,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -263,7 +270,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "goethe_b2",
         words: 100,
       },
       {
@@ -280,7 +286,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -297,7 +302,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -314,7 +318,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -331,7 +334,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -348,7 +350,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -365,7 +366,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -382,7 +382,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -399,7 +398,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -416,7 +414,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -433,7 +430,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -450,7 +446,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -467,7 +462,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -484,7 +478,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -501,7 +494,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -518,7 +510,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -535,7 +526,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -554,7 +544,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -571,7 +560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "protokoll",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -587,7 +575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -604,7 +591,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -621,7 +607,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -638,7 +623,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -655,7 +639,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -672,7 +655,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -690,7 +672,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_halbformell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -706,13 +687,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_meetings_l11",
         text: "Nach dem Projekttreffen mit dem Auftraggeber sind technische Entscheidungen gefallen, die verbindlich dokumentiert werden müssen. Verfassen Sie das Protokoll.",
-        sectors: ["engineering"],
         points: [
           "Halten Sie die getroffenen technischen Entscheidungen fest.",
           "Ordnen Sie jeder Entscheidung ihre Begründung zu.",
@@ -723,7 +702,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "protokoll",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -740,7 +718,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -756,7 +733,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -773,7 +749,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -790,7 +765,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -807,7 +781,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -823,8 +796,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         addressee: "Meister und Kollegen",
         register: "sie",
         level: "B2.1",
-        format: "protokoll",
-        exam: "telc_b2_beruf",
+        format: "notiz",
         words: 150,
       },
       {
@@ -841,7 +813,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -858,7 +829,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -875,7 +845,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "uebergabe",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -892,7 +861,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -909,7 +877,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -926,7 +893,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -943,7 +909,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -960,7 +925,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -977,7 +941,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "protokoll",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -994,7 +957,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1011,7 +973,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1028,7 +989,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "uebergabe",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -1044,11 +1004,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Nennen Sie den Grund.",
           "Bieten Sie zwei Alternativen an.",
         ],
-        addressee: "Kollegin, Frau Bauer",
+        addressee: "Kollegin Sabine",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1063,7 +1022,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1078,7 +1036,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1093,7 +1050,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1104,11 +1060,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Bitten Sie um einen kurzen Status.",
           "Bieten Sie Unterstützung an.",
         ],
-        addressee: "Kollege, Herr Vogt",
+        addressee: "Kollege Markus",
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1124,7 +1079,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1140,7 +1094,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1156,7 +1109,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1172,7 +1124,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1188,7 +1139,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1204,7 +1154,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1220,7 +1169,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1236,7 +1184,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1252,7 +1199,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1268,7 +1214,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1283,7 +1228,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -1299,7 +1243,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1315,7 +1258,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -1332,7 +1274,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1349,7 +1290,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1366,7 +1306,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1383,7 +1322,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1400,7 +1338,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1417,7 +1354,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1434,7 +1370,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1451,7 +1386,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1468,7 +1402,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1485,7 +1418,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1502,7 +1434,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1519,7 +1450,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1536,7 +1466,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1553,7 +1482,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -1570,7 +1498,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -1588,7 +1515,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1604,7 +1530,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -1620,7 +1545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -1636,7 +1560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "stellungnahme",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -1652,7 +1575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1670,7 +1592,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -1687,7 +1608,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -1704,7 +1624,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -1720,7 +1639,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -1736,7 +1654,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -1753,7 +1670,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -1770,7 +1686,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1787,7 +1702,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1804,7 +1718,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1821,7 +1734,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1838,7 +1750,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1855,7 +1766,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1872,7 +1782,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1889,7 +1798,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1906,7 +1814,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1923,7 +1830,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1940,7 +1846,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1957,7 +1862,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1974,7 +1878,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -1991,7 +1894,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2008,7 +1910,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -2029,7 +1930,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2045,7 +1945,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2061,7 +1960,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2077,7 +1975,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2093,7 +1990,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2109,7 +2005,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2125,7 +2020,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2141,7 +2035,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2157,7 +2050,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2173,7 +2065,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2190,7 +2081,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2206,7 +2096,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2220,8 +2109,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         addressee: "Lieferant, Firma Bergmann",
         register: "sie",
         level: "B1.2",
-        format: "reklamation",
-        exam: "telc_b2_beruf",
+        format: "nachricht",
         words: 40,
       },
       {
@@ -2238,7 +2126,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2255,7 +2142,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -2271,7 +2157,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2287,7 +2172,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2303,7 +2187,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -2316,13 +2199,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Beschreiben Sie den Engpass mit Zahlen.",
           "Nennen Sie mögliche Ursachen.",
           "Schlagen Sie Maßnahmen zur Versorgung vor.",
-          "Sagen Sie, was Sie den Filialen kommunizieren.",
+          "Empfehlen Sie eine der Maßnahmen und begründen Sie Ihre Wahl.",
         ],
         addressee: "Bereichsleitung Warensteuerung",
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2339,7 +2221,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -2356,7 +2237,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2373,7 +2253,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2391,7 +2270,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -2408,7 +2286,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2425,7 +2302,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2442,7 +2318,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2459,7 +2334,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "uebergabe",
-        exam: "dtb",
         words: 80,
       },
       {
@@ -2476,7 +2350,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2493,7 +2366,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -2510,7 +2382,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2527,7 +2398,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -2544,7 +2414,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "reklamation",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2561,7 +2430,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -2578,7 +2446,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -2596,7 +2463,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -2613,7 +2479,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
     ],
@@ -2634,7 +2499,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2650,7 +2514,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2666,7 +2529,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2683,7 +2545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2699,7 +2560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2715,7 +2575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2731,7 +2590,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2748,7 +2606,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2765,7 +2622,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2782,7 +2638,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2799,7 +2654,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2816,7 +2670,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2832,7 +2685,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -2849,7 +2701,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2866,7 +2717,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -2884,7 +2734,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2902,7 +2751,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2920,7 +2768,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2938,7 +2785,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2956,7 +2802,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2974,7 +2819,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -2992,7 +2836,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3010,7 +2853,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3028,7 +2870,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3046,7 +2887,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3064,7 +2904,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3082,7 +2921,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3100,7 +2938,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3118,7 +2955,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3136,7 +2972,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -3155,7 +2990,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3172,7 +3006,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3182,14 +3015,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Bedanken Sie sich sachlich für die Rückmeldung.",
           "Gehen Sie auf die Kritikpunkte einzeln ein.",
-          "Stellen Sie einen falschen Punkt richtig, ohne anzugreifen.",
+          "Widerlegen Sie einen falschen Punkt sachlich und begründen Sie Ihre Darstellung.",
           "Bieten Sie eine Klärung im direkten Kontakt an.",
         ],
         addressee: "die Öffentlichkeit im Bewertungsportal",
         register: "sie",
         level: "B2.2",
         format: "forumsbeitrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3206,7 +3038,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3223,7 +3054,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3240,7 +3070,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3257,7 +3086,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3275,7 +3103,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3293,7 +3120,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3311,7 +3137,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3329,7 +3154,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3347,7 +3171,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3365,7 +3188,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3383,7 +3205,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3401,7 +3222,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3420,7 +3240,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3438,7 +3257,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -3457,7 +3275,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3476,7 +3293,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3493,7 +3309,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -3510,7 +3325,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3528,7 +3342,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -3546,7 +3359,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3564,7 +3376,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3582,7 +3393,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3600,7 +3410,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3618,7 +3427,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3636,14 +3444,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_customer_l29",
         text: "Eine Kundin fragt, welches Gerät für ihren Bedarf passt. Antworten Sie beratend.",
         sub: "customer.beratung",
-        sectors: ["retail"],
         points: [
           "Danken Sie für die Anfrage.",
           "Stellen Sie zwei Geräte mit ihren Unterschieden vor.",
@@ -3654,7 +3460,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3672,7 +3477,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3690,7 +3494,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3708,7 +3511,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3726,7 +3528,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3744,7 +3545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3762,7 +3562,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3780,7 +3579,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -3798,7 +3596,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -3814,11 +3611,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Erklären Sie Ihre Sicht sachlich.",
           "Schlagen Sie ein kurzes Gespräch vor.",
         ],
-        addressee: "Kollege, Herr Ilić",
+        addressee: "Kollege Marko",
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3829,11 +3625,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Erklären Sie kurz, wie Sie es gemeint haben.",
           "Sagen Sie, wie Sie weiter zusammenarbeiten möchten.",
         ],
-        addressee: "Kollegin, Frau Berger",
+        addressee: "Kollegin Julia",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3848,7 +3643,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3863,7 +3657,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3878,7 +3671,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3889,11 +3681,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Klären Sie, wer was übernimmt.",
           "Schlagen Sie vor, Absprachen künftig kurz schriftlich festzuhalten.",
         ],
-        addressee: "Kollegin, Frau Mensah",
+        addressee: "Kollegin Ama",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3909,7 +3700,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "nachricht",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -3924,7 +3714,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3939,7 +3728,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -3955,7 +3743,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -3971,7 +3758,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -3988,7 +3774,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4005,7 +3790,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4022,7 +3806,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4039,7 +3822,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4056,7 +3838,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -4073,7 +3854,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4090,7 +3870,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4107,7 +3886,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4124,7 +3902,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4141,7 +3918,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4158,7 +3934,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4175,7 +3950,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4184,7 +3958,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sectors: ["pharma"],
         points: [
           "Beschreiben Sie, was nach der Meldung nicht passiert.",
-          "Nennen Sie eine Abweichung als Beispiel.",
+          "Nennen Sie eine Abweichung als Beispiel und benennen Sie das Risiko für die Freigabe.",
           "Schlagen Sie eine Nachverfolgung mit Verantwortlichen vor.",
           "Bitten Sie um eine Entscheidung vor dem Audit.",
         ],
@@ -4192,7 +3966,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4201,7 +3974,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sectors: ["cleaning"],
         points: [
           "Beschreiben Sie, welche Bereiche betroffen sind.",
-          "Nennen Sie, wie oft das vorkam.",
+          "Nennen Sie, wie oft das vorkam und was es für Ihre Arbeitszeit bedeutet.",
           "Schlagen Sie eine klare Zuteilung im Reinigungsplan vor.",
           "Bitten Sie um ein Gespräch.",
         ],
@@ -4209,7 +3982,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4226,7 +3998,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 100,
       },
     ],
@@ -4238,13 +4009,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Schildern Sie die Situation sachlich.",
           "Zeigen Sie Verständnis für beide Seiten.",
           "Schlagen Sie einen Kompromiss vor.",
-          "Sagen Sie, wann die Regel überprüft werden soll.",
+          "Sagen Sie, welche Lösung Sie für die bessere halten, und begründen Sie das.",
         ],
         addressee: "die Teamrunde",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4260,7 +4030,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -4277,7 +4046,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4293,7 +4061,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -4303,13 +4070,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Beschreiben Sie das Problem.",
           "Zeigen Sie Verständnis für beide Seiten.",
           "Schlagen Sie eine klare Regel für die Zukunft vor.",
-          "Sagen Sie, wer die Regel beschließen soll.",
+          "Begründen Sie, warum Ihre Regel gerechter ist als die bisherige Praxis.",
         ],
         addressee: "die Teamleitung und das Team",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4326,7 +4092,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4338,11 +4103,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Schlagen Sie vor, wie ihr das Thema gemeinsam löst.",
           "Bieten Sie einen Termin an.",
         ],
-        addressee: "Kollegin, Frau Petrova",
+        addressee: "Kollegin Elena",
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -4359,7 +4123,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4375,7 +4138,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -4391,7 +4153,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4408,7 +4169,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4425,7 +4185,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4442,7 +4201,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4459,7 +4217,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4469,14 +4226,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie den Konflikt ohne Partei zu ergreifen.",
           "Nennen Sie, an welchen Abenden die Wartezeiten am längsten sind.",
-          "Erklären Sie, was Gäste zurückmelden.",
+          "Sagen Sie, wo aus Ihrer Sicht die Hauptursache liegt, und begründen Sie das.",
           "Schlagen Sie ein gemeinsames Vorgehen vor und bitten Sie um ein moderiertes Gespräch.",
         ],
         addressee: "Restaurantleitung, Frau Costa",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4486,14 +4242,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Konflikt neutral dar.",
           "Beschreiben Sie, welche Arbeiten sich gegenseitig behindern.",
-          "Räumen Sie ein, wo Ihr eigenes Gewerk beteiligt ist.",
+          "Wägen Sie ab, welche Reihenfolge technisch sinnvoller ist, und begründen Sie das.",
           "Schlagen Sie eine Reihenfolge mit Terminen vor und bitten Sie um Entscheidung.",
         ],
         addressee: "Bauleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4503,14 +4258,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie den Konflikt sachlich.",
           "Nennen Sie typische Wartezeiten und ihre Folge für die Lenkzeiten.",
-          "Erklären Sie die Sicht des Lagers.",
+          "Erklären Sie die Sicht des Lagers und sagen Sie, welche Lösung Sie empfehlen.",
           "Schlagen Sie feste Ladefenster vor und bitten Sie um eine Entscheidung.",
         ],
         addressee: "Betriebsleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4527,7 +4281,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4544,7 +4297,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4554,14 +4306,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Streitpunkt neutral dar.",
           "Beschreiben Sie die Abweichungen und ihre Häufigkeit.",
-          "Erklären Sie beide Erklärungsansätze fair.",
+          "Erklären Sie beide Erklärungsansätze fair und begründen Sie, welcher Ihnen plausibler erscheint.",
           "Schlagen Sie eine gemeinsame Messreihe vor und bitten Sie um Freigabe.",
         ],
         addressee: "Werksleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4571,14 +4322,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Konflikt neutral dar.",
           "Beschreiben Sie die derzeitige Verteilung.",
-          "Räumen Sie ein, wo Erfahrung eine Rolle spielt.",
+          "Nehmen Sie Stellung dazu, welche Rolle Erfahrung bei der Verteilung spielen darf.",
           "Schlagen Sie eine transparente Regelung vor und bitten Sie um ein Teamgespräch.",
         ],
         addressee: "Salonleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4587,7 +4337,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sectors: ["sports"],
         points: [
           "Schildern Sie sachlich, was vorgefallen ist.",
-          "Beschreiben Sie, wie Mitglieder reagiert haben.",
+          "Bewerten Sie, wie der Auftritt auf die Mitglieder gewirkt hat.",
           "Räumen Sie ein, dass die Ursache eine Planungsfrage ist.",
           "Schlagen Sie eine Klärung außerhalb der Kurszeiten vor und bitten Sie um Moderation.",
         ],
@@ -4595,7 +4345,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4605,14 +4354,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Streitpunkt neutral dar.",
           "Beschreiben Sie die Abweichung mit Chargennummer.",
-          "Erklären Sie beide Erklärungsansätze sachlich.",
+          "Erklären Sie beide Erklärungsansätze sachlich und begründen Sie, welcher zuerst geprüft werden sollte.",
           "Schlagen Sie eine gemeinsame Untersuchung vor und bitten Sie um Entscheidung.",
         ],
         addressee: "Betriebsleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4622,14 +4370,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Streitpunkt neutral dar.",
           "Beschreiben Sie die Position der Qualitätssicherung.",
-          "Beschreiben Sie die Position der Produktion fair.",
+          "Wägen Sie beide Positionen ab und sagen Sie, welcher Position Sie folgen.",
           "Schlagen Sie ein Vorgehen vor und bitten Sie um eine dokumentierte Entscheidung.",
         ],
         addressee: "Betriebsleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4639,14 +4386,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Schildern Sie die Beschwerde des Kunden sachlich.",
           "Beschreiben Sie die Sicht des Reinigungsteams.",
-          "Erklären Sie, wo die Erwartungen auseinandergehen.",
+          "Bewerten Sie, welche Erwartung berechtigt ist, und begründen Sie das.",
           "Schlagen Sie eine gemeinsame Begehung vor und bitten Sie um einen Termin.",
         ],
         addressee: "Objektleitung",
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -4656,14 +4402,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Stellen Sie den Ablauf neutral dar.",
           "Beschreiben Sie, wann die Meldung hätte erfolgen müssen.",
-          "Räumen Sie ein, wo die Übergabe unklar war.",
+          "Sagen Sie, warum eine Schuldzuweisung hier nicht weiterhilft.",
           "Schlagen Sie eine verbindliche Meldekette vor und bitten Sie um Entscheidung.",
         ],
         addressee: "Einsatzleitung",
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -4674,7 +4419,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       {
         id: "wt_project_s01",
         text: "Die Projektleitung erwartet freitags einen kurzen Statusbericht zu Ihrem Arbeitspaket. Schreiben Sie ihn.",
-        sectors: ["care"],
         points: [
           "Sagen Sie, was diese Woche fertig wurde.",
           "Nennen Sie den aktuellen Stand in Prozent.",
@@ -4684,7 +4428,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4700,13 +4443,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_project_s03",
         text: "Eine Aufgabe in Ihrem Projekt verzögert sich um eine Woche. Warnen Sie die Projektleitung rechtzeitig.",
-        sectors: ["hospitality"],
         points: [
           "Nennen Sie die betroffene Aufgabe.",
           "Nennen Sie den Grund der Verzögerung.",
@@ -4716,7 +4457,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4732,13 +4472,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_project_s05",
         text: "Für das Projektboard soll jede Woche eine kurze Zusammenfassung hinterlegt werden. Schreiben Sie den Eintrag.",
-        sectors: ["retail"],
         points: [
           "Sagen Sie, was diese Woche erledigt wurde.",
           "Nennen Sie, was als Nächstes ansteht.",
@@ -4748,7 +4486,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4764,7 +4501,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4780,7 +4516,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4796,7 +4531,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4811,7 +4545,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4827,7 +4560,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4843,7 +4575,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -4859,7 +4590,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4875,7 +4605,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4891,7 +4620,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4907,7 +4635,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -4923,7 +4650,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4939,7 +4665,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -4955,7 +4680,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -4963,7 +4687,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       {
         id: "wt_project_l01",
         text: "Ihr Projekt liegt hinter dem Zeitplan, und die Leitung erwartet einen belastbaren Zwischenbericht. Verfassen Sie ihn.",
-        sectors: ["it"],
         points: [
           "Beschreiben Sie den aktuellen Stand.",
           "Nennen Sie Risiken und Verzögerungen.",
@@ -4974,13 +4697,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_project_l02",
         text: "Ein kleines Projekt in Ihrem Bereich ist abgeschlossen. Verfassen Sie den Abschlussbericht.",
-        sectors: ["engineering"],
         points: [
           "Fassen Sie Ziel und Ergebnis zusammen.",
           "Bewerten Sie, was gut lief.",
@@ -4991,13 +4712,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_project_l03",
         text: "Ihr Projekt braucht mehr Budget, weil sich der Umfang geändert hat. Schreiben Sie an den Auftraggeber.",
-        sectors: ["production"],
         points: [
           "Erklären Sie die Gründe für den Mehrbedarf.",
           "Beziffern Sie den zusätzlichen Betrag.",
@@ -5009,13 +4728,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_project_l04",
         text: "Sie haben eine Idee, die Ihrem Bereich Arbeit sparen würde. Verfassen Sie einen Projektvorschlag für Ihre Führungskraft.",
-        sectors: ["care"],
         points: [
           "Beschreiben Sie die Idee.",
           "Erklären Sie den Nutzen für den Betrieb.",
@@ -5026,13 +4743,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_project_l05",
         text: "Ihr Projekt startet nächste Woche. Schreiben Sie die Auftakt-Mail an das Projektteam.",
-        sectors: ["trades"],
         points: [
           "Stellen Sie das Ziel des Projekts vor.",
           "Erklären Sie die Rollen und Verantwortlichkeiten.",
@@ -5043,7 +4758,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5060,7 +4774,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "protokoll",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5077,7 +4790,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5095,7 +4807,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5111,7 +4822,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5127,7 +4837,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5144,7 +4853,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5161,7 +4869,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5178,7 +4885,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5195,7 +4901,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "uebergabe",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5212,7 +4917,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5230,7 +4934,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "uebergabe",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5247,7 +4950,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -5264,7 +4966,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
     ],
@@ -5285,7 +4986,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5301,7 +5001,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5317,7 +5016,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5333,7 +5031,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5349,7 +5046,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5365,7 +5061,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5381,7 +5076,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5398,7 +5092,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -5413,7 +5106,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5430,7 +5122,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -5446,7 +5137,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -5462,7 +5152,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5478,7 +5167,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5494,7 +5182,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5510,7 +5197,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5526,7 +5212,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5542,7 +5227,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5558,7 +5242,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -5566,7 +5249,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       {
         id: "wt_technology_l01",
         text: "In Ihrem Betrieb soll eine neue Software eingeführt werden, und die Belegschaft ist geteilter Meinung. Verfassen Sie eine Stellungnahme.",
-        sectors: ["care"],
         points: [
           "Nennen Sie die Vorteile der Einführung.",
           "Nennen Sie die Nachteile und Risiken.",
@@ -5577,7 +5259,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5594,7 +5275,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5611,13 +5291,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_technology_l04",
         text: "Im Homeoffice fehlen in Ihrem Team technische Voraussetzungen für sicheres Arbeiten. Verfassen Sie eine Stellungnahme.",
-        sectors: ["production"],
         points: [
           "Beschreiben Sie, was technisch fehlt.",
           "Legen Sie die Risiken dar.",
@@ -5629,7 +5307,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5646,13 +5323,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_technology_l06",
         text: "Ein Dienst war gestern zwei Stunden nicht erreichbar. Verfassen Sie die Zusammenfassung des Vorfalls für Ihr Team.",
-        sectors: ["it"],
         points: [
           "Beschreiben Sie, welcher Dienst ausgefallen ist.",
           "Legen Sie die Ursache dar.",
@@ -5664,7 +5339,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5681,7 +5355,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5698,7 +5371,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5714,7 +5386,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -5730,13 +5401,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
         id: "wt_technology_l11",
         text: "Der Einsatz digitaler Werkzeuge steigert die Produktivität, erhöht aber auch die Belastung. Verfassen Sie einen Diskussionsbeitrag.",
-        sectors: ["it", "engineering"],
+        sectors: ["it"],
         points: [
           "Beschreiben Sie den Zusammenhang.",
           "Analysieren Sie, wie sich Arbeitsverdichtung bemerkbar macht.",
@@ -5748,7 +5418,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5765,7 +5434,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5782,7 +5450,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5799,7 +5466,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5817,7 +5483,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -5834,7 +5499,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5851,7 +5515,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -5868,7 +5531,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "stellungnahme",
-        exam: "goethe_b1",
         words: 80,
       },
     ],
@@ -5889,7 +5551,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5905,7 +5566,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5921,13 +5581,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_sustainability_s04",
         text: "Ihr Haus beteiligt sich am Freitag an einer Aufräumaktion im Viertel. Schreiben Sie die Einladung an das Team.",
-        sectors: ["hospitality"],
         points: [
           "Nennen Sie Anlass, Zeit und Treffpunkt.",
           "Sagen Sie, was mitzubringen ist.",
@@ -5937,7 +5595,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5953,7 +5610,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -5969,13 +5625,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_sustainability_s07",
         text: "Sie möchten in der Kantine einen festen vegetarischen Tag anregen. Schreiben Sie an die Kantinenleitung.",
-        sectors: ["it"],
         points: [
           "Machen Sie den Vorschlag.",
           "Begründen Sie ihn kurz.",
@@ -5985,7 +5639,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6001,7 +5654,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6016,7 +5668,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6032,7 +5683,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -6048,7 +5698,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -6064,7 +5713,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6080,7 +5728,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6096,7 +5743,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6112,7 +5758,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6128,7 +5773,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6144,7 +5788,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6160,7 +5803,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -6168,7 +5810,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       {
         id: "wt_sustainability_l01",
         text: "Ihr Haus möchte beim Thema Nachhaltigkeit vorankommen und bittet um Vorschläge. Verfassen Sie eine Stellungnahme.",
-        sectors: ["hospitality"],
         points: [
           "Begründen Sie, warum das Thema für den Betrieb wichtig ist.",
           "Schlagen Sie drei konkrete Maßnahmen vor.",
@@ -6179,13 +5820,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_sustainability_l02",
         text: "Ihr Betrieb schickt Mitarbeitende häufig für Termine quer durch Deutschland. Schreiben Sie an die Geschäftsführung.",
-        sectors: ["it"],
         points: [
           "Schlagen Sie vor, Dienstreisen häufiger durch Videokonferenzen zu ersetzen.",
           "Erklären Sie die Vorteile für Umwelt und Kosten.",
@@ -6196,13 +5835,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_sustainability_l03",
         text: "Ihre Abteilung hat im letzten Halbjahr mehrere Umweltmaßnahmen umgesetzt. Verfassen Sie den Bericht.",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie, was umgesetzt wurde.",
           "Sagen Sie, was es gebracht hat.",
@@ -6213,7 +5850,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -6230,13 +5866,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_sustainability_l05",
         text: "Ihr Betrieb führt ein Jobrad-Angebot ein. Schreiben Sie die Mitteilung an alle Mitarbeitenden.",
-        sectors: ["construction"],
         points: [
           "Stellen Sie das Angebot vor.",
           "Erklären Sie die Bedingungen.",
@@ -6247,7 +5881,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -6264,7 +5897,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6281,7 +5913,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -6298,7 +5929,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6314,7 +5944,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -6330,7 +5959,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
@@ -6347,7 +5975,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -6364,7 +5991,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6381,7 +6007,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -6399,7 +6024,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -6416,7 +6040,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6433,7 +6056,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6450,7 +6072,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6467,7 +6088,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
     ],
@@ -6487,7 +6107,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6502,7 +6121,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6517,7 +6135,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6532,7 +6149,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6547,7 +6163,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6563,7 +6178,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6579,7 +6193,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6595,7 +6208,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6611,7 +6223,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -6628,7 +6239,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -6645,7 +6255,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 120,
       },
       {
@@ -6660,7 +6269,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "dtb",
         words: 40,
       },
       {
@@ -6677,13 +6285,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
         id: "wt_safety_s14",
         text: "Nach einem Beinaheunfall wurde keine Meldung erfasst. Schreiben Sie an die Werksleitung.",
-        sectors: ["production", "construction"],
+        sectors: ["production"],
         points: [
           "Schildern Sie den Vorfall sachlich.",
           "Erklären Sie, warum auch Beinaheunfälle erfasst werden müssen.",
@@ -6694,7 +6301,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -6711,7 +6317,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6728,7 +6333,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "nachricht",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6745,7 +6349,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6762,7 +6365,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6779,7 +6381,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6796,7 +6397,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6813,7 +6413,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6830,7 +6429,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6847,7 +6445,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6864,7 +6461,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6881,7 +6477,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6898,7 +6493,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6915,7 +6509,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6932,7 +6525,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
       {
@@ -6949,7 +6541,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "dtb",
         words: 100,
       },
     ],
@@ -6960,14 +6551,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Beschreiben Sie sachlich, was passiert ist.",
           "Benennen Sie die Ursachen.",
-          "Nennen Sie die Maßnahmen, die jetzt nötig sind.",
+          "Begründen Sie, welche Maßnahme jetzt Vorrang hat.",
           "Erklären Sie, wie sich der Vorfall künftig vermeiden lässt.",
         ],
         addressee: "Geschäftsleitung und Sicherheitsausschuss",
         register: "sie",
         level: "B2.2",
         format: "stellungnahme",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -6983,7 +6573,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -6999,7 +6588,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7016,7 +6604,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7032,7 +6619,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7049,7 +6635,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -7066,7 +6651,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.2",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7082,7 +6666,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7099,7 +6682,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7116,7 +6698,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "notiz",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7134,7 +6715,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bericht",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7152,7 +6732,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "notiz",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7168,7 +6747,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7184,7 +6762,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7201,7 +6778,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7218,7 +6794,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7235,7 +6810,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7252,7 +6826,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7269,7 +6842,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7286,13 +6858,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_safety_l21",
         text: "Nach einem Vorfall beim Rangieren auf dem Hof sollen Sie einen Bericht schreiben.",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie den Hergang mit Zeit und Ort.",
           "Nennen Sie beteiligte Fahrzeuge und Personen.",
@@ -7303,7 +6873,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7320,7 +6889,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7337,7 +6905,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7354,7 +6921,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7371,7 +6937,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7388,7 +6953,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7405,7 +6969,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7422,7 +6985,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7439,7 +7001,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -7456,7 +7017,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "dtb",
         words: 150,
       },
     ],
@@ -7467,7 +7027,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       {
         id: "wt_travel_s01",
         text: "Sie sollen für Ihr Team eine Dienstreise zu einem Kunden organisieren. Schreiben Sie die E-Mail.",
-        sectors: ["it"],
         points: [
           "Nennen Sie Termin und Ziel.",
           "Erklären Sie den Zweck der Reise.",
@@ -7477,13 +7036,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_travel_s02",
         text: "Für eine Werksbesichtigung brauchen Sie ein Hotelzimmer. Schreiben Sie an das Hotel.",
-        sectors: ["engineering"],
         points: [
           "Reservieren Sie ein Einzelzimmer für zwei Nächte.",
           "Nennen Sie die Daten.",
@@ -7493,13 +7050,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_travel_s03",
         text: "Ihr Zug fällt aus, und Sie erreichen den Termin im Werk später. Schreiben Sie Ihrer Chefin.",
-        sectors: ["production"],
         points: [
           "Sagen Sie, was passiert ist.",
           "Nennen Sie Ihre neue Ankunftszeit.",
@@ -7509,7 +7064,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7525,13 +7079,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_travel_s05",
         text: "Sie sind drei Tage auf einer Fachtagung. Schreiben Sie Ihre Abwesenheitsnotiz für E-Mails.",
-        sectors: ["transport"],
         points: [
           "Nennen Sie den Zeitraum Ihrer Abwesenheit.",
           "Sagen Sie, wer Sie vertritt.",
@@ -7541,7 +7093,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "notiz",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7557,29 +7108,25 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_travel_s07",
         text: "Sie fahren morgen mit einem Kollegen gemeinsam zu einem Kongress. Schreiben Sie ihm eine Nachricht.",
-        sectors: ["pharma"],
         points: [
           "Schlagen Sie einen Treffpunkt am Bahnhof vor.",
           "Nennen Sie die Abfahrtszeit.",
           "Sagen Sie, was er mitbringen soll.",
         ],
-        addressee: "Kollege, Herr Sperling",
+        addressee: "Kollege Tobias",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_travel_s08",
         text: "Sie besuchen am Dienstag das Werk eines Kunden. Melden Sie Ihren Besuch beim Empfang an.",
-        sectors: ["chemicals"],
         points: [
           "Melden Sie Ihren Besuch mit Datum und Uhrzeit an.",
           "Nennen Sie Ihren Ansprechpartner im Haus.",
@@ -7589,7 +7136,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7604,7 +7150,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7620,7 +7165,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -7636,7 +7180,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 120,
       },
       {
@@ -7652,13 +7195,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_travel_s13",
         text: "Für eine Schulung an einem anderen Standort brauchen Sie eine Anfahrtsbeschreibung. Schreiben Sie an das dortige Büro.",
-        sectors: ["cleaning"],
         points: [
           "Sagen Sie, wann Sie kommen.",
           "Fragen Sie nach der besten Anfahrt.",
@@ -7668,7 +7209,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7684,7 +7224,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7700,7 +7239,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7716,7 +7254,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7732,7 +7269,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -7748,7 +7284,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
     ],
@@ -7756,7 +7291,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       {
         id: "wt_travel_l01",
         text: "Sie waren zwei Tage bei einem Kunden im Ausland. Verfassen Sie den Reisebericht.",
-        sectors: ["engineering"],
         points: [
           "Fassen Sie die wichtigsten Ergebnisse zusammen.",
           "Bewerten Sie den Nutzen der Reise.",
@@ -7767,13 +7301,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_travel_l02",
         text: "Nach Ihrer Dienstreise reichen Sie die Reisekosten ein, darunter eine ungewöhnliche Position. Schreiben Sie an die Buchhaltung.",
-        sectors: ["it"],
         points: [
           "Listen Sie die wichtigsten Ausgaben auf.",
           "Erklären Sie die ungewöhnliche Position.",
@@ -7784,13 +7316,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_travel_l03",
         text: "Sie besuchen kommenden Monat einen Geschäftspartner im Ausland. Kündigen Sie Ihren Besuch an.",
-        sectors: ["retail"],
         points: [
           "Kündigen Sie Ihren Besuch an.",
           "Schlagen Sie ein Programm für die zwei Tage vor.",
@@ -7801,7 +7331,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -7819,13 +7348,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_travel_l05",
         text: "Ihr Flug zur Messe hatte mehrere Stunden Verspätung, und Ihr Gepäck kam beschädigt an. Schreiben Sie an die Fluggesellschaft.",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie den Ablauf mit Flugnummer und Datum.",
           "Nennen Sie die Folgen für Ihren Termin.",
@@ -7836,13 +7363,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_travel_l06",
         text: "Sie planen eine zweitägige Dienstreise nach München. Bitten Sie die Assistenz um die Buchung.",
-        sectors: ["pharma"],
         points: [
           "Nennen Sie die Termine vor Ort.",
           "Nennen Sie die gewünschten Zugzeiten.",
@@ -7853,7 +7378,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7870,13 +7394,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_travel_l08",
         text: "Ihr Team reist erstmals zu einem Kunden im Ausland. Verfassen Sie einen kurzen Leitfaden.",
-        sectors: ["chemicals"],
         points: [
           "Beschreiben Sie die übliche Begrüßung.",
           "Erklären Sie, wie wichtig Pünktlichkeit ist.",
@@ -7887,7 +7409,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "notiz",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7903,7 +7424,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7919,7 +7439,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7936,7 +7455,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -7953,7 +7471,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -7970,7 +7487,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -7987,13 +7503,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_travel_l15",
         text: "Ihr Betrieb prüft, Monteure für längere Auswärtseinsätze fest unterzubringen statt jeden Tag zu fahren. Verfassen Sie eine Stellungnahme.",
-        sectors: ["construction"],
         points: [
           "Beschreiben Sie die heutige Praxis.",
           "Legen Sie die Belastung für die Kolonne dar.",
@@ -8005,7 +7519,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -8022,7 +7535,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bericht",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
@@ -8039,7 +7551,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -8056,7 +7567,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bericht",
-        exam: "goethe_b1",
         words: 80,
       },
     ],
@@ -8068,7 +7578,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_behoerde_s01",
         text: "Sie arbeiten auf Montage und sind unter der Woche selten in der Stadt. Trotzdem müssen Sie Ihren neuen Wohnsitz anmelden. Schreiben Sie an das Bürgeramt.",
         sub: "behoerde.meldewesen",
-        sectors: ["construction", "trades"],
+        sectors: ["trades"],
         points: [
           "Bitten Sie um einen Termin zur Anmeldung.",
           "Nennen Sie Ihre Verfügbarkeit.",
@@ -8078,14 +7588,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s02",
         text: "Ihr Personalausweis läuft ab, und Sie brauchen ihn für die Werkszufahrt. Schreiben Sie an das Bürgeramt.",
         sub: "behoerde.antrag",
-        sectors: ["production", "security"],
         points: [
           "Fragen Sie, welche Unterlagen Sie brauchen.",
           "Fragen Sie, wie lange die Ausstellung dauert.",
@@ -8095,14 +7603,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s03",
         text: "Sie sind kurzfristig für eine erkrankte Kollegin eingesprungen und können Ihren Behördentermin nicht wahrnehmen. Schreiben Sie an das Amt.",
         sub: "behoerde.meldewesen",
-        sectors: ["care", "cleaning"],
         points: [
           "Sagen Sie den Termin ab.",
           "Entschuldigen Sie sich und nennen Sie den Grund.",
@@ -8112,14 +7618,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s04",
         text: "Das Amt hat Unterlagen nachgefordert, die Sie erst nach der Saison beschaffen können. Antworten Sie auf das Schreiben.",
         sub: "behoerde.antrag",
-        sectors: ["hospitality", "retail"],
         points: [
           "Bestätigen Sie den Erhalt des Schreibens.",
           "Nennen Sie das Aktenzeichen.",
@@ -8129,14 +7633,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s05",
         text: "Für Ihren Elterngeldantrag brauchen Sie eine Geburtsurkunde. Schreiben Sie an das Standesamt.",
         sub: "behoerde.antrag",
-        sectors: ["beauty", "sports"],
         points: [
           "Fragen Sie, wie Sie die Urkunde beantragen.",
           "Fragen Sie nach den Kosten.",
@@ -8146,14 +7648,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s06",
         text: "Ihr Betrieb hat Sie an einen anderen Standort versetzt, und Sie sind umgezogen. Schreiben Sie an das Bürgeramt.",
         sub: "behoerde.meldewesen",
-        sectors: ["it", "engineering"],
         points: [
           "Sagen Sie, dass Sie umgezogen sind.",
           "Fragen Sie, ob Sie für die Ummeldung einen Termin brauchen.",
@@ -8163,7 +7663,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8180,14 +7679,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s08",
         text: "Sie sind wegen eines neuen Arbeitsplatzes umgezogen und müssen Ihre Adresse melden. Schreiben Sie an die Ausländerbehörde.",
         sub: "behoerde.aufenthalt",
-        sectors: ["transport"],
         points: [
           "Teilen Sie Ihre neue Adresse mit.",
           "Nennen Sie Ihr Aktenzeichen.",
@@ -8197,14 +7694,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s09",
         text: "In Ihrem Bescheid ist Ihr Name falsch geschrieben, und Sie brauchen ihn für die Personalakte. Schreiben Sie an das Amt.",
         sub: "behoerde.bescheid",
-        sectors: ["care"],
         points: [
           "Nennen Sie Aktenzeichen und Datum des Bescheids.",
           "Beschreiben Sie den Fehler.",
@@ -8214,14 +7709,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s10",
         text: "In Ihrem Bescheid steht eine Formulierung, die Sie nicht verstehen, und die Frist läuft. Schreiben Sie an die Behörde.",
         sub: "behoerde.bescheid",
-        sectors: ["cleaning"],
         points: [
           "Nennen Sie das Aktenzeichen.",
           "Zitieren Sie die unklare Stelle.",
@@ -8231,14 +7724,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s11",
         text: "Sie können Ihren Termin bei der Ausländerbehörde nicht wahrnehmen. Schreiben Sie eine kurze E-Mail.",
         sub: "behoerde.aufenthalt",
-        sectors: ["hospitality"],
         points: [
           "Nennen Sie Ihren Termin mit Datum und Uhrzeit.",
           "Sagen Sie den Termin ab und entschuldigen Sie sich.",
@@ -8248,14 +7739,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_behoerde_s12",
         text: "Sie haben Unterlagen eingereicht, aber seit Wochen keine Antwort erhalten. Schreiben Sie eine Sachstandsanfrage.",
         sub: "behoerde.antrag",
-        sectors: ["construction"],
         points: [
           "Schreiben Sie eine Betreffzeile mit Ihrem Aktenzeichen.",
           "Nennen Sie, was Sie wann eingereicht haben.",
@@ -8266,14 +7755,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_behoerde_s13",
         text: "Sie haben einen Bescheid erhalten, mit dem Sie nicht einverstanden sind. Schreiben Sie einen Widerspruch.",
         sub: "behoerde.bescheid",
-        sectors: ["it"],
         points: [
           "Nennen Sie im Betreff den Bescheid, sein Datum und das Aktenzeichen.",
           "Erklären Sie ausdrücklich, dass Sie Widerspruch einlegen.",
@@ -8285,7 +7772,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -8294,7 +7780,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_behoerde_l01",
         text: "Ihr Aufenthaltstitel läuft in drei Monaten ab, und Ihr Arbeitsvertrag auf Station läuft weiter. Schreiben Sie an die Ausländerbehörde.",
         sub: "behoerde.aufenthalt",
-        sectors: ["care", "pharma"],
+        sectors: ["care"],
         points: [
           "Erklären Sie, dass Sie verlängern möchten.",
           "Beschreiben Sie kurz Ihre Beschäftigung.",
@@ -8305,14 +7791,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_behoerde_l02",
         text: "Sie haben einen Bescheid bekommen, den Sie für falsch halten. Verfassen Sie einen Widerspruch.",
         sub: "behoerde.bescheid",
-        sectors: ["construction", "trades"],
         points: [
           "Nennen Sie Betreff, Aktenzeichen und das Datum des Bescheids.",
           "Erklären Sie höflich, warum Sie die Entscheidung für falsch halten.",
@@ -8323,14 +7807,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "widerspruch",
-        exam: "alltag",
         words: 80,
       },
       {
         id: "wt_behoerde_l03",
         text: "Ihre Stelle im Verkauf wurde auf wenige Stunden reduziert. Schreiben Sie an das Jobcenter.",
         sub: "behoerde.antrag",
-        sectors: ["retail", "cleaning"],
         points: [
           "Erklären Sie Ihre aktuelle Situation.",
           "Fragen Sie, welche Leistungen Ihnen zustehen.",
@@ -8341,14 +7823,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_behoerde_l04",
         text: "Sie brauchen für den Arbeitsweg in die Frühschicht ein eigenes Auto und wollen es anmelden. Schreiben Sie an die Zulassungsstelle.",
         sub: "behoerde.antrag",
-        sectors: ["transport", "security"],
+        sectors: ["security"],
         points: [
           "Sagen Sie, dass Sie ein Fahrzeug anmelden möchten.",
           "Fragen Sie nach den nötigen Unterlagen.",
@@ -8359,14 +7840,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_behoerde_l05",
         text: "Ihr Elterngeldantrag ist seit acht Wochen in Bearbeitung, und Ihre Elternzeit hat begonnen. Schreiben Sie an die Elterngeldstelle.",
         sub: "behoerde.bescheid",
-        sectors: ["beauty", "sports"],
         points: [
           "Fragen Sie höflich nach dem Stand.",
           "Nennen Sie Ihr Aktenzeichen und das Antragsdatum.",
@@ -8377,14 +7856,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_behoerde_l06",
         text: "Ihr Vermieter verlangt eine Meldebescheinigung, die Sie bis Monatsende vorlegen müssen. Schreiben Sie an das Bürgeramt.",
         sub: "behoerde.meldewesen",
-        sectors: ["hospitality"],
         points: [
           "Erklären Sie, wofür Sie die Bescheinigung brauchen.",
           "Fragen Sie nach Kosten und Ablauf.",
@@ -8395,14 +7872,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_behoerde_l07",
         text: "Bei Ihrer Anmeldung wurde das Einzugsdatum falsch erfasst, was Ihre Anmeldung beim Arbeitgeber verzögert. Schreiben Sie an das Bürgeramt.",
         sub: "behoerde.meldewesen",
-        sectors: ["it"],
         points: [
           "Beschreiben Sie den Fehler.",
           "Nennen Sie das richtige Datum und Ihren Nachweis.",
@@ -8413,14 +7888,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_behoerde_l08",
         text: "Ihr Termin bei der Ausländerbehörde liegt nach Ablauf Ihres Aufenthaltstitels, und Ihr Arbeitgeber verlangt einen Nachweis. Schreiben Sie an die Behörde.",
         sub: "behoerde.aufenthalt",
-        sectors: ["engineering"],
         points: [
           "Stellen Sie die Fristenlage nachvollziehbar dar.",
           "Legen Sie dar, welche Folgen der späte Termin für Ihre Beschäftigung hat.",
@@ -8432,14 +7905,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "alltag",
         words: 200,
       },
       {
         id: "wt_behoerde_l09",
         text: "Sie sind umgezogen und müssen sich anmelden. Schreiben Sie eine E-Mail an das Bürgeramt.",
         sub: "behoerde.meldewesen",
-        sectors: ["production"],
         points: [
           "Sagen Sie, dass Sie umgezogen sind.",
           "Nennen Sie Ihre neue Adresse und das Datum des Umzugs.",
@@ -8450,32 +7921,28 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_behoerde_l10",
         text: "Ihr Antrag wurde abgelehnt, weil angeblich eine Unterlage fehlte, die Sie eingereicht hatten. Schreiben Sie an die Behörde.",
         sub: "behoerde.bescheid",
-        sectors: ["chemicals"],
         points: [
           "Nennen Sie Betreff, Aktenzeichen und das Datum des Bescheids.",
           "Stellen Sie dar, wann und wie Sie die Unterlage eingereicht haben.",
-          "Bitten Sie um Überprüfung der Entscheidung.",
+          "Begründen Sie, warum die Ablehnung damit unbegründet ist, und bitten Sie um Überprüfung.",
           "Kündigen Sie an, die Unterlage erneut beizufügen, und bitten Sie um eine Eingangsbestätigung.",
         ],
         addressee: "Sachbearbeitung des Amtes",
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 200,
       },
       {
         id: "wt_behoerde_l11",
         text: "Sie benötigen mehr Zeit, um geforderte Nachweise einzureichen. Schreiben Sie einen begründeten Antrag auf Fristverlängerung.",
         sub: "behoerde.antrag",
-        sectors: ["engineering", "it"],
         points: [
           "Nehmen Sie mit Aktenzeichen auf die Aufforderung und ihr Datum Bezug.",
           "Legen Sie nachvollziehbar dar, warum die Unterlagen noch fehlen.",
@@ -8487,7 +7954,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "alltag",
         words: 200,
       },
     ],
@@ -8509,14 +7975,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s02",
         text: "Sie müssen am Montag eine Doppelschicht übernehmen und können Ihren Arzttermin nicht wahrnehmen. Schreiben Sie an die Praxis.",
         sub: "arzt.termin",
-        sectors: ["hospitality", "retail"],
+        sectors: ["hospitality"],
         points: [
           "Sagen Sie den Termin am Montag ab.",
           "Nennen Sie kurz den Grund.",
@@ -8526,14 +7991,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s03",
         text: "Sie sind mehrere Tage auf Tour und Ihr Dauermedikament geht zur Neige. Schreiben Sie an Ihre Hausärztin.",
         sub: "arzt.behandlung",
-        sectors: ["transport", "security"],
+        sectors: ["transport"],
         points: [
           "Bitten Sie um ein Wiederholungsrezept.",
           "Nennen Sie das Medikament.",
@@ -8543,14 +8007,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s04",
         text: "Sie sind krank geworden und können heute nicht auf die Baustelle. Schreiben Sie Ihrem Arbeitgeber.",
         sub: "arzt.symptome",
-        sectors: ["construction", "trades"],
+        sectors: ["construction"],
         points: [
           "Melden Sie sich für heute krank.",
           "Beschreiben Sie kurz, was Ihnen fehlt.",
@@ -8560,14 +8023,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s05",
         text: "Am Freitag steht eine Blutabnahme an, und Sie müssen anschließend in die Frühschicht. Schreiben Sie an die Praxis.",
         sub: "arzt.behandlung",
-        sectors: ["production", "chemicals"],
+        sectors: ["production"],
         points: [
           "Fragen Sie, ob Sie nüchtern kommen müssen.",
           "Fragen Sie, ob Sie früher kommen können.",
@@ -8577,14 +8039,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s06",
         text: "Sie haben seit drei Tagen eine Erkältung und arbeiten im Büro mit Kundenkontakt. Schreiben Sie an Ihre Hausärztin.",
         sub: "arzt.symptome",
-        sectors: ["it", "engineering"],
         points: [
           "Beschreiben Sie Ihre Symptome.",
           "Sagen Sie, seit wann sie bestehen.",
@@ -8594,14 +8054,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s07",
         text: "Seit der neuen Tablette haben Sie Kopfschmerzen, die Ihre Arbeit am Kunden erschweren. Schreiben Sie an die Praxis.",
         sub: "arzt.symptome",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie die Beschwerden.",
           "Sagen Sie, seit wann sie auftreten.",
@@ -8611,14 +8069,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s08",
         text: "Ihre Versichertenkarte ist im Dienst verloren gegangen, und Sie brauchen sie für einen Termin. Schreiben Sie an Ihre Krankenkasse.",
         sub: "arzt.versicherung",
-        sectors: ["pharma"],
         points: [
           "Melden Sie den Verlust.",
           "Nennen Sie Ihre Versichertennummer.",
@@ -8628,14 +8084,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s09",
         text: "Sie sind vor der Nachtschicht noch kurz in der Stadt und wollen ein Medikament abholen. Schreiben Sie an die Apotheke.",
         sub: "arzt.versicherung",
-        sectors: ["transport"],
         points: [
           "Fragen Sie, ob Ihr Medikament vorrätig ist.",
           "Fragen Sie, was es mit Rezept kostet.",
@@ -8645,14 +8099,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_arzt_s10",
         text: "Sie sind krank und können nicht zur Arbeit kommen. Schreiben Sie eine kurze Nachricht.",
         sub: "arzt.termin",
-        sectors: ["hospitality"],
         points: [
           "Sagen Sie, dass Sie krank sind.",
           "Nennen Sie, wie lange Sie voraussichtlich ausfallen.",
@@ -8662,14 +8114,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
         id: "wt_arzt_s11",
         text: "Sie brauchen für Ihren Arbeitgeber eine Bescheinigung von Ihrer Praxis. Schreiben Sie eine E-Mail.",
         sub: "arzt.behandlung",
-        sectors: ["construction"],
         points: [
           "Nennen Sie Ihren Namen und Ihr Geburtsdatum.",
           "Beschreiben Sie, welche Bescheinigung Sie benötigen und wofür.",
@@ -8680,14 +8130,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_arzt_s12",
         text: "Ihre Krankenkasse hat eine Leistung abgelehnt, die Ihnen Ihre Ärztin empfohlen hat. Schreiben Sie einen Widerspruch.",
         sub: "arzt.versicherung",
-        sectors: ["it"],
         points: [
           "Nennen Sie im Betreff Versichertennummer, Bescheid und dessen Datum.",
           "Erklären Sie ausdrücklich, dass Sie Widerspruch einlegen.",
@@ -8699,7 +8147,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -8708,7 +8155,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_arzt_l01",
         text: "Sie haben eine Behandlung selbst bezahlt und möchten die Kosten erstattet bekommen. Schreiben Sie an Ihre Krankenkasse.",
         sub: "arzt.versicherung",
-        sectors: ["care", "pharma"],
         points: [
           "Erklären Sie, dass Sie eine Rechnung einreichen.",
           "Beschreiben Sie die Behandlung.",
@@ -8719,14 +8165,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_arzt_l02",
         text: "Sie haben erst in drei Monaten einen Facharzttermin, arbeiten aber körperlich und haben starke Schmerzen. Schreiben Sie an die Praxis.",
         sub: "arzt.termin",
-        sectors: ["construction", "trades"],
         points: [
           "Erklären Sie Ihre Beschwerden.",
           "Beschreiben Sie, wie sie Ihre Arbeit beeinträchtigen.",
@@ -8737,14 +8181,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_arzt_l03",
         text: "Sie sitzen beruflich viel und möchten einen Rückenkurs besuchen. Schreiben Sie an Ihre Krankenkasse.",
         sub: "arzt.versicherung",
-        sectors: ["it", "engineering"],
         points: [
           "Fragen Sie nach der Kostenübernahme.",
           "Beschreiben Sie den Kurs.",
@@ -8755,14 +8197,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_arzt_l04",
         text: "Ihr Klinikaufenthalt ist nicht gut verlaufen, und Sie möchten das der Klinik mitteilen. Verfassen Sie eine höfliche Beschwerde.",
         sub: "arzt.behandlung",
-        sectors: ["hospitality", "retail"],
         points: [
           "Beschreiben Sie sachlich, was nicht gut lief.",
           "Nennen Sie Datum und Station.",
@@ -8773,14 +8213,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_arzt_l05",
         text: "Auf Ihrer Praxisrechnung steht eine Leistung, die Sie nie erhalten haben. Schreiben Sie an die Praxis.",
         sub: "arzt.versicherung",
-        sectors: ["beauty", "sports"],
         points: [
           "Nennen Sie Rechnungsnummer und Datum.",
           "Benennen Sie die beanstandete Position genau.",
@@ -8792,14 +8230,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "reklamation",
-        exam: "alltag",
         words: 200,
       },
       {
         id: "wt_arzt_l06",
         text: "Vor Ihrem Termin möchten Sie Ihre Beschwerden vorab beschreiben, weil die Sprechzeit knapp ist. Schreiben Sie an die Hausarztpraxis.",
         sub: "arzt.symptome",
-        sectors: ["cleaning"],
         points: [
           "Beschreiben Sie, seit wann die Beschwerden bestehen.",
           "Sagen Sie, wie oft sie auftreten.",
@@ -8810,14 +8246,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_arzt_l07",
         text: "Sie heben im Beruf täglich schwer und haben seit Wochen Rückenschmerzen. Schreiben Sie an eine Fachärztin.",
         sub: "arzt.symptome",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie die Schmerzen genau.",
           "Erklären Sie, was Sie schon versucht haben.",
@@ -8828,7 +8262,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
@@ -8846,14 +8279,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_arzt_l09",
         text: "Nach einer Untersuchung haben Sie einen Befund erhalten, den Sie nicht verstehen. Schreiben Sie an Ihre Ärztin.",
         sub: "arzt.behandlung",
-        sectors: ["chemicals"],
         points: [
           "Bitten Sie um eine verständliche Erklärung des Befunds.",
           "Fragen Sie, welche Behandlung sie empfiehlt.",
@@ -8864,14 +8295,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_arzt_l10",
         text: "Sie möchten einen Termin bei einer neuen Praxis. Schreiben Sie eine E-Mail.",
         sub: "arzt.termin",
-        sectors: ["security"],
         points: [
           "Stellen Sie sich kurz vor.",
           "Beschreiben Sie, warum Sie einen Termin brauchen.",
@@ -8882,14 +8311,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_arzt_l11",
         text: "Sie warten seit Wochen auf einen Facharzttermin und Ihre Beschwerden werden schlimmer. Schreiben Sie an die Praxis.",
         sub: "arzt.symptome",
-        sectors: ["care"],
         points: [
           "Nehmen Sie auf Ihre Terminanfrage und deren Datum Bezug.",
           "Beschreiben Sie sachlich, wie sich Ihre Beschwerden verändert haben.",
@@ -8900,14 +8327,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_arzt_l12",
         text: "In einem Gesundheitsforum wird diskutiert, ob Videosprechstunden persönliche Arztbesuche ersetzen können. Schreiben Sie einen Beitrag.",
         sub: "arzt.behandlung",
-        sectors: ["it", "engineering"],
         points: [
           "Beschreiben Sie, wofür sich Videosprechstunden eignen.",
           "Analysieren Sie, was bei einer Untersuchung aus der Ferne fehlt.",
@@ -8919,7 +8344,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -8931,7 +8355,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_wohnen_s01",
         text: "Sie wechseln den Arbeitsplatz und suchen eine Wohnung in der Nähe des neuen Standorts. Schreiben Sie an den Vermieter.",
         sub: "wohnen.suche",
-        sectors: ["it", "engineering"],
         points: [
           "Zeigen Sie Interesse an der Wohnung.",
           "Bitten Sie um einen Besichtigungstermin.",
@@ -8941,7 +8364,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8954,11 +8376,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
           "Nennen Sie die Uhrzeit.",
           "Entschuldigen Sie sich im Voraus.",
         ],
-        addressee: "Nachbar, Herr Vogel",
+        addressee: "Nachbar Stefan",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8975,7 +8396,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -8992,14 +8412,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_wohnen_s05",
         text: "Sie ziehen wegen einer neuen Stelle um und brauchen ein Angebot für den Umzug. Schreiben Sie an den Umzugsservice.",
         sub: "wohnen.suche",
-        sectors: ["construction"],
         points: [
           "Fragen Sie nach einem Angebot.",
           "Nennen Sie das Umzugsdatum.",
@@ -9009,14 +8427,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_wohnen_s06",
         text: "Sie arbeiten in der Saison in einer anderen Stadt und suchen ein WG-Zimmer. Schreiben Sie an die WG.",
         sub: "wohnen.suche",
-        sectors: ["hospitality"],
         points: [
           "Stellen Sie sich in zwei Sätzen vor.",
           "Fragen Sie, ob das Zimmer noch frei ist.",
@@ -9026,7 +8442,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9043,7 +8458,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9060,7 +8474,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9077,14 +8490,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_wohnen_s10",
         text: "Sie brauchen die Nebenkostenabrechnung des letzten Jahres für Ihre Steuererklärung. Schreiben Sie Ihrem Vermieter.",
         sub: "wohnen.nebenkosten",
-        sectors: ["security"],
         points: [
           "Bitten Sie um die Abrechnung.",
           "Nennen Sie den Zeitraum.",
@@ -9094,14 +8505,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_wohnen_s11",
         text: "Die Heizung wird nicht warm, und Sie schlafen nach der Nachtschicht tagsüber. Melden Sie das der Hausverwaltung.",
         sub: "wohnen.probleme",
-        sectors: ["chemicals"],
         points: [
           "Beschreiben Sie das Problem.",
           "Sagen Sie, seit wann es besteht.",
@@ -9111,14 +8520,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_wohnen_s12",
         text: "In Ihrer Wohnung tropft seit gestern der Wasserhahn im Bad. Schreiben Sie eine kurze Nachricht an die Hausverwaltung.",
         sub: "wohnen.probleme",
-        sectors: ["beauty"],
         points: [
           "Nennen Sie Ihre Adresse und Wohnungsnummer.",
           "Beschreiben Sie den Schaden.",
@@ -9128,32 +8535,28 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
         id: "wt_wohnen_s13",
         text: "Seit drei Wochen ist die Heizung in Ihrer Wohnung defekt, trotz Meldung ist nichts passiert. Schreiben Sie eine Mängelanzeige.",
         sub: "wohnen.probleme",
-        sectors: ["sports"],
         points: [
           "Nennen Sie im Betreff Ihre Adresse und den Mangel.",
           "Beschreiben Sie den Mangel und seit wann er besteht.",
-          "Nehmen Sie auf Ihre erste Meldung mit Datum Bezug.",
+          "Nehmen Sie auf Ihre erste Meldung Bezug und erklären Sie, was die kalte Wohnung für Sie bedeutet.",
           "Fordern Sie die Beseitigung bis zu einem von Ihnen gesetzten Datum.",
         ],
         addressee: "Vermieterin, Frau Schuster",
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_wohnen_s14",
         text: "Ihre Betriebskostenabrechnung enthält einen Posten, den Sie für nicht nachvollziehbar halten. Schreiben Sie an die Hausverwaltung.",
         sub: "wohnen.nebenkosten",
-        sectors: ["pharma"],
         points: [
           "Nennen Sie im Betreff das Abrechnungsjahr und Ihre Wohnung.",
           "Benennen Sie den strittigen Posten genau.",
@@ -9165,7 +8568,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -9174,10 +8576,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_wohnen_l01",
         text: "In Ihrer Wohnung hat sich Schimmel gebildet, und die Hausverwaltung reagiert nicht. Schreiben Sie eine formelle Mängelanzeige.",
         sub: "wohnen.probleme",
-        sectors: ["care", "cleaning"],
         points: [
           "Beschreiben Sie den Mangel mit Ort und Ausmaß.",
-          "Nennen Sie, wann Sie ihn zuerst gemeldet haben.",
+          "Nennen Sie, wann Sie ihn gemeldet haben, und erklären Sie die Folgen für Ihre Gesundheit.",
           "Bitten Sie um Reparatur mit Frist.",
           "Weisen Sie höflich auf Ihre Rechte als Mieter hin.",
         ],
@@ -9185,14 +8586,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_wohnen_l02",
         text: "Sie haben eine Mieterhöhung erhalten, deren Begründung Sie nicht nachvollziehen können. Antworten Sie schriftlich.",
         sub: "wohnen.nebenkosten",
-        sectors: ["retail", "hospitality"],
         points: [
           "Bestätigen Sie den Erhalt des Schreibens.",
           "Stellen Sie sachliche Rückfragen zur Begründung.",
@@ -9203,14 +8602,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "widerspruch",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_wohnen_l03",
         text: "Sie ziehen wegen einer neuen Stelle um und möchten Ihre Wohnung kündigen. Verfassen Sie die Kündigung.",
         sub: "wohnen.vertrag",
-        sectors: ["it", "engineering"],
         points: [
           "Kündigen Sie fristgerecht zum nächsten möglichen Termin.",
           "Nennen Sie das Datum Ihres Auszugs.",
@@ -9221,14 +8618,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "kuendigung",
-        exam: "alltag",
         words: 80,
       },
       {
         id: "wt_wohnen_l04",
         text: "Im Haus gibt es wiederholt nachts Lärm, und Sie müssen früh zur Schicht. Schreiben Sie an die Hausverwaltung.",
         sub: "wohnen.probleme",
-        sectors: ["production", "chemicals"],
+        sectors: ["production"],
         points: [
           "Beschreiben Sie die Störungen mit Tagen und Zeiten.",
           "Erklären Sie die Folgen für Sie.",
@@ -9239,14 +8635,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_wohnen_l05",
         text: "Für eine begehrte Wohnung sollen Sie sich schriftlich vorstellen. Verfassen Sie Ihre Bewerbung um die Wohnung.",
         sub: "wohnen.suche",
-        sectors: ["construction", "trades"],
         points: [
           "Stellen Sie sich und Ihre Situation kurz vor.",
           "Beschreiben Sie Ihre berufliche Lage.",
@@ -9256,15 +8650,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         addressee: "Vermieterin, Frau Sattler",
         register: "sie",
         level: "B2.1",
-        format: "email_formell",
-        exam: "goethe_b1",
+        format: "bewerbung",
         words: 150,
       },
       {
         id: "wt_wohnen_l06",
         text: "Sie suchen eine Wohnung mit guter Anbindung an Ihren Betriebshof. Schreiben Sie an einen Makler.",
         sub: "wohnen.suche",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie, welche Wohnung Sie suchen.",
           "Nennen Sie Größe, Lage und Budget.",
@@ -9275,14 +8667,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_wohnen_l07",
         text: "Vor der Vertragsunterschrift sind Ihnen drei Punkte im Mietvertrag unklar. Schreiben Sie an den Vermieter.",
         sub: "wohnen.vertrag",
-        sectors: ["security"],
         points: [
           "Stellen Sie Ihre Frage zur Kündigungsfrist.",
           "Stellen Sie Ihre Frage zur Kaution.",
@@ -9293,14 +8683,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_wohnen_l08",
         text: "Ihre Nebenkostenabrechnung enthält Posten, die Ihnen zu hoch erscheinen. Verfassen Sie eine Reklamation.",
         sub: "wohnen.nebenkosten",
-        sectors: ["beauty"],
         points: [
           "Nennen Sie den Abrechnungszeitraum.",
           "Benennen Sie die strittigen Posten.",
@@ -9311,14 +8699,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_wohnen_l09",
         text: "Sie interessieren sich für eine Wohnung aus einer Anzeige. Schreiben Sie eine E-Mail.",
         sub: "wohnen.suche",
-        sectors: ["sports"],
         points: [
           "Sagen Sie, auf welche Anzeige Sie sich beziehen.",
           "Stellen Sie sich und Ihre Situation kurz vor.",
@@ -9329,17 +8715,15 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_wohnen_l10",
         text: "Ihre Nachbarn verursachen regelmäßig nachts Lärm. Schreiben Sie an die Hausverwaltung.",
         sub: "wohnen.probleme",
-        sectors: ["pharma"],
         points: [
           "Nennen Sie Ihre Wohnung und die betroffene Nachbarwohnung.",
-          "Beschreiben Sie den Lärm mit Uhrzeiten und Häufigkeit.",
+          "Beschreiben Sie den Lärm mit Uhrzeiten und erklären Sie, was der Schlafmangel für Ihren Arbeitsalltag bedeutet.",
           "Schildern Sie, was Sie bereits selbst unternommen haben.",
           "Bitten Sie um ein Einschreiten und um eine Rückmeldung.",
         ],
@@ -9347,14 +8731,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_wohnen_l11",
         text: "Sie möchten Ihren Mietvertrag ordentlich kündigen. Verfassen Sie das Kündigungsschreiben.",
         sub: "wohnen.vertrag",
-        sectors: ["it", "care"],
+        sectors: ["care"],
         points: [
           "Nennen Sie im Betreff die Wohnung mit vollständiger Adresse.",
           "Erklären Sie eindeutig, dass Sie das Mietverhältnis kündigen.",
@@ -9366,7 +8749,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "kuendigung",
-        exam: "alltag",
         words: 200,
       },
     ],
@@ -9378,7 +8760,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_bank_s01",
         text: "Sie fangen auf Station an und brauchen für das Gehalt ein Girokonto. Schreiben Sie an die Bank.",
         sub: "bank.konto",
-        sectors: ["care", "cleaning"],
+        sectors: ["care"],
         points: [
           "Bitten Sie um einen Beratungstermin.",
           "Fragen Sie, welche Unterlagen Sie mitbringen müssen.",
@@ -9388,14 +8770,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s02",
         text: "Ihre Bankkarte ist während der Spätschicht verloren gegangen. Schreiben Sie an Ihre Bank.",
         sub: "bank.karte",
-        sectors: ["hospitality", "retail"],
+        sectors: ["hospitality"],
         points: [
           "Melden Sie den Verlust.",
           "Bitten Sie um die Sperrung der Karte.",
@@ -9405,14 +8786,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s03",
         text: "Sie überweisen jeden Monat Geld an Ihre Familie im Ausland. Schreiben Sie an Ihre Bank.",
         sub: "bank.zahlung",
-        sectors: ["construction", "trades"],
         points: [
           "Fragen Sie nach den Gebühren für Auslandsüberweisungen.",
           "Fragen Sie, wie lange eine Überweisung dauert.",
@@ -9422,14 +8801,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s04",
         text: "Sie sind wegen einer Versetzung umgezogen. Teilen Sie Ihrer Bank die neue Adresse mit.",
         sub: "bank.konto",
-        sectors: ["it", "engineering"],
         points: [
           "Teilen Sie die neue Adresse mit.",
           "Nennen Sie Ihre Kontonummer.",
@@ -9439,14 +8816,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s05",
         text: "Sie kaufen für den Salon regelmäßig Material auf Rechnung und möchten Ihr Kreditkartenlimit erhöhen. Schreiben Sie an die Bank.",
         sub: "bank.karte",
-        sectors: ["beauty", "sports"],
+        sectors: ["beauty"],
         points: [
           "Nennen Sie den gewünschten Betrag.",
           "Begründen Sie den Wunsch kurz.",
@@ -9456,14 +8832,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s06",
         text: "Eine Überweisung von letzter Woche ist beim Empfänger nicht angekommen. Schreiben Sie an Ihre Bank.",
         sub: "bank.zahlung",
-        sectors: ["transport", "security"],
         points: [
           "Beschreiben Sie die Überweisung mit Datum und Betrag.",
           "Sagen Sie, dass sie nicht angekommen ist.",
@@ -9473,14 +8847,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s07",
         text: "Sie arbeiten in Schichten und möchten jeden Monat etwas zurücklegen. Schreiben Sie an Ihre Bank.",
         sub: "bank.finanzen",
-        sectors: ["production", "chemicals"],
+        sectors: ["production"],
         points: [
           "Sagen Sie, dass Sie regelmäßig sparen möchten.",
           "Nennen Sie den monatlichen Betrag.",
@@ -9490,14 +8863,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s08",
         text: "Sie haben eine Prämie erhalten und möchten sie anlegen. Schreiben Sie an Ihre Bank.",
         sub: "bank.finanzen",
-        sectors: ["pharma"],
         points: [
           "Fragen Sie nach den Zinsen für Tagesgeld.",
           "Fragen Sie nach den Zinsen für Festgeld.",
@@ -9507,14 +8878,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bank_s09",
         text: "Sie haben Ihre Bankkarte verloren. Schreiben Sie eine kurze Nachricht an Ihre Bank.",
         sub: "bank.karte",
-        sectors: ["care"],
         points: [
           "Sagen Sie, dass Sie Ihre Karte verloren haben.",
           "Nennen Sie Ihren Namen und Ihre Kontonummer.",
@@ -9524,14 +8893,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
         id: "wt_bank_s10",
         text: "Auf Ihrem Kontoauszug steht eine Abbuchung, die Sie nicht zuordnen können. Schreiben Sie an Ihre Bank.",
         sub: "bank.zahlung",
-        sectors: ["it"],
         points: [
           "Nennen Sie Ihre Kontonummer und den Buchungstag.",
           "Beschreiben Sie die Buchung mit Betrag und Empfänger.",
@@ -9542,14 +8909,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_bank_s11",
         text: "Ihre Bank hat Gebühren erhöht, über die Sie sich nicht ausreichend informiert fühlen. Schreiben Sie eine Beschwerde.",
         sub: "bank.konto",
-        sectors: ["retail"],
         points: [
           "Nennen Sie im Betreff Ihre Kundennummer und das Thema.",
           "Stellen Sie dar, wann und wie Sie von der Änderung erfahren haben.",
@@ -9561,7 +8926,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -9570,7 +8934,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_bank_l01",
         text: "Von Ihrem Konto wurde eine Lastschrift abgebucht, die Sie nie erteilt haben. Schreiben Sie an Ihre Bank.",
         sub: "bank.zahlung",
-        sectors: ["care", "pharma"],
         points: [
           "Beschreiben Sie die Buchung mit Datum und Betrag.",
           "Erklären Sie, warum sie unberechtigt ist.",
@@ -9581,14 +8944,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_bank_l02",
         text: "Sie brauchen für den Weg zur Baustelle ein gebrauchtes Auto und möchten es finanzieren. Schreiben Sie an Ihre Bank.",
         sub: "bank.finanzen",
-        sectors: ["construction", "trades"],
+        sectors: ["construction"],
         points: [
           "Beantragen Sie einen Kredit und nennen Sie den Betrag.",
           "Beschreiben Sie Ihre Einkommenssituation.",
@@ -9599,14 +8961,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_bank_l03",
         text: "Sie haben ein neues Konto und möchten das alte auflösen. Verfassen Sie die Kündigung.",
         sub: "bank.konto",
-        sectors: ["it", "engineering"],
         points: [
           "Kündigen Sie das Konto zum gewünschten Datum.",
           "Nennen Sie Ihre Kontonummer.",
@@ -9617,14 +8977,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "kuendigung",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_bank_l04",
         text: "Sie haben sich für einen Termin in der Filiale extra freinehmen müssen und trotzdem lange gewartet, ohne klare Auskunft zu bekommen. Beschweren Sie sich.",
         sub: "bank.konto",
-        sectors: ["hospitality", "retail"],
+        sectors: ["retail"],
         points: [
           "Beschreiben Sie den Ablauf des Termins.",
           "Nennen Sie, was Sie erwartet hatten.",
@@ -9635,14 +8994,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_bank_l05",
         text: "Auf Ihrem Konto steht eine Abbuchung, die Sie nicht zuordnen können. Schreiben Sie an Ihre Bank.",
         sub: "bank.zahlung",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie die verdächtige Buchung.",
           "Fragen Sie nach dem Empfänger.",
@@ -9653,14 +9010,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_bank_l06",
         text: "Sie und Ihre Partnerin möchten gemeinsam wirtschaften und das Konto umstellen. Schreiben Sie an Ihre Bank.",
         sub: "bank.konto",
-        sectors: ["cleaning"],
         points: [
           "Erklären Sie, dass Sie ein Gemeinschaftskonto möchten.",
           "Beschreiben Sie Ihre Situation.",
@@ -9671,14 +9026,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_bank_l07",
         text: "Auf einer Fahrt ins Ausland wurde Ihre Kartenzahlung abgelehnt, obwohl das Konto gedeckt war. Schreiben Sie an Ihre Bank.",
         sub: "bank.karte",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie die Situation mit Ort und Datum.",
           "Sagen Sie, dass das Konto gedeckt war.",
@@ -9689,14 +9042,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_bank_l08",
         text: "Sie kommen nicht mehr ins Online-Banking, und die App verlangt eine neue Freigabe. Schreiben Sie an den Support.",
         sub: "bank.karte",
-        sectors: ["production"],
         points: [
           "Beschreiben Sie das Problem.",
           "Sagen Sie, was Sie schon versucht haben.",
@@ -9707,14 +9058,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_bank_l09",
         text: "Sie möchten für Ihre Kinder langfristig Geld anlegen und arbeiten im Schichtbetrieb mit schwankendem Einkommen. Schreiben Sie an Ihre Beraterin.",
         sub: "bank.finanzen",
-        sectors: ["chemicals"],
         points: [
           "Beschreiben Sie Ihre Situation und Ihr Ziel.",
           "Nennen Sie den monatlichen Betrag.",
@@ -9726,14 +9075,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "alltag",
         words: 200,
       },
       {
         id: "wt_bank_l10",
         text: "Sie möchten ein Konto eröffnen. Schreiben Sie eine E-Mail an die Bank.",
         sub: "bank.konto",
-        sectors: ["security"],
         points: [
           "Sagen Sie, welches Konto Sie möchten.",
           "Stellen Sie sich kurz vor.",
@@ -9744,14 +9091,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_bank_l11",
         text: "Sie möchten Ihr Konto bei Ihrer bisherigen Bank auflösen. Verfassen Sie das Kündigungsschreiben.",
         sub: "bank.konto",
-        sectors: ["care"],
         points: [
           "Nennen Sie im Betreff Ihre Kontonummer.",
           "Erklären Sie eindeutig, dass Sie das Konto kündigen.",
@@ -9763,14 +9108,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "kuendigung",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_bank_l12",
         text: "In einem Forum wird diskutiert, ob Bargeld langfristig verschwinden sollte. Schreiben Sie einen Beitrag.",
         sub: "bank.finanzen",
-        sectors: ["it", "engineering"],
         points: [
           "Beschreiben Sie die Entwicklung des bargeldlosen Bezahlens.",
           "Analysieren Sie, welche Gruppen ein Ende des Bargelds benachteiligen würde.",
@@ -9782,7 +9125,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -9804,14 +9146,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s02",
         text: "Sie sind am Donnerstag zu einem Einsatz eingeteilt und verpassen den Unterricht. Schreiben Sie an Ihre Kursleiterin.",
         sub: "bildung.sprachkurs",
-        sectors: ["cleaning"],
         points: [
           "Sagen Sie, dass Sie am Donnerstag fehlen.",
           "Nennen Sie den Grund.",
@@ -9821,14 +9161,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s03",
         text: "Sie arbeiten in der Saison und möchten im Winter einen Kurs besuchen. Schreiben Sie an die Volkshochschule.",
         sub: "bildung.sprachkurs",
-        sectors: ["hospitality"],
         points: [
           "Fragen Sie, ob im Kurs noch Plätze frei sind.",
           "Fragen Sie, wie Sie sich anmelden können.",
@@ -9838,14 +9176,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s04",
         text: "Sie brauchen ein B2-Zertifikat für Ihre Bewerbung im Verkauf. Schreiben Sie an das Prüfungszentrum.",
         sub: "bildung.pruefung",
-        sectors: ["retail"],
         points: [
           "Fragen Sie nach dem nächsten Prüfungstermin.",
           "Fragen Sie nach den Kosten.",
@@ -9855,7 +9191,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9872,14 +9207,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "antrag",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s06",
         text: "Ihr Anerkennungsverfahren läuft seit Monaten, und Ihr Betrieb wartet auf das Ergebnis. Schreiben Sie an die Anerkennungsstelle.",
         sub: "bildung.anerkennung",
-        sectors: ["trades"],
         points: [
           "Fragen Sie nach dem Stand des Verfahrens.",
           "Nennen Sie Ihr Aktenzeichen.",
@@ -9889,14 +9222,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s07",
         text: "Sie stellen die Unterlagen für Ihre Anerkennung zusammen. Schreiben Sie an die Anerkennungsstelle.",
         sub: "bildung.anerkennung",
-        sectors: ["it"],
         points: [
           "Fragen Sie, ob Ihr Zeugnis übersetzt sein muss.",
           "Fragen Sie, ob es beglaubigt werden muss.",
@@ -9906,14 +9237,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s08",
         text: "Sie waren am Prüfungstag krank und konnten nicht antreten. Schreiben Sie an das Prüfungszentrum.",
         sub: "bildung.pruefung",
-        sectors: ["engineering"],
         points: [
           "Erklären Sie, warum Sie gefehlt haben.",
           "Fragen Sie, ob Sie die Prüfung nachholen können.",
@@ -9923,24 +9252,21 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s09",
         text: "Eine Kollegin überlegt, einen Computerkurs zu machen. Schreiben Sie ihr eine Nachricht.",
         sub: "bildung.weiterbildung",
-        sectors: ["beauty"],
         points: [
           "Empfehlen Sie ihr den Kurs.",
           "Erklären Sie in einem Satz, warum er sich lohnt.",
           "Sagen Sie, wo sie sich anmelden kann.",
         ],
-        addressee: "Kollegin, Frau Wieczorek",
+        addressee: "Kollegin Magda",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -9957,14 +9283,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s11",
         text: "Sie möchten sich für eine Weiterbildung anmelden, die Ihr Arbeitgeber bezahlen soll. Schreiben Sie an die Personalabteilung.",
         sub: "bildung.weiterbildung",
-        sectors: ["production"],
         points: [
           "Nennen Sie die Weiterbildung mit Titel und Zeitraum.",
           "Begründen Sie den Nutzen für Ihre Tätigkeit.",
@@ -9975,14 +9299,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
         id: "wt_bildung_s12",
         text: "Ihr im Ausland erworbener Abschluss wurde nur teilweise anerkannt. Schreiben Sie an die Anerkennungsstelle.",
         sub: "bildung.anerkennung",
-        sectors: ["chemicals"],
         points: [
           "Nennen Sie im Betreff das Aktenzeichen und den Bescheid mit Datum.",
           "Stellen Sie Ihren Abschluss und Ihre Berufserfahrung sachlich dar.",
@@ -9994,7 +9316,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
       {
@@ -10011,14 +9332,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bewerbung",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_bildung_s14",
         text: "Sie bewerben sich intern auf eine Stelle als Disponentin. Verfassen Sie das kurze Anschreiben.",
         sub: "bildung.weiterbildung",
-        sectors: ["transport"],
         points: [
           "Nennen Sie die interne Stelle.",
           "Beschreiben Sie Ihre bisherige Erfahrung im Betrieb.",
@@ -10029,7 +9348,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bewerbung",
-        exam: "telc_b2_beruf",
         words: 100,
       },
       {
@@ -10047,7 +9365,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bewerbung",
-        exam: "goethe_c1",
         words: 120,
       },
     ],
@@ -10056,7 +9373,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_bildung_l01",
         text: "Sie haben im Ausland eine Ausbildung abgeschlossen und möchten sie anerkennen lassen. Schreiben Sie an die zuständige Stelle.",
         sub: "bildung.anerkennung",
-        sectors: ["care"],
         points: [
           "Bitten Sie um die Anerkennung Ihres Abschlusses.",
           "Beschreiben Sie Ihren bisherigen Werdegang.",
@@ -10067,14 +9383,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_bildung_l02",
         text: "Ihr Kurs ist abgeschlossen, und Sie brauchen das Zertifikat für Ihre Personalakte. Schreiben Sie an die Bildungseinrichtung.",
         sub: "bildung.pruefung",
-        sectors: ["cleaning"],
         points: [
           "Bitten Sie um das Zertifikat.",
           "Nennen Sie Kurs und Zeitraum.",
@@ -10085,14 +9399,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_bildung_l03",
         text: "Sie möchten sich neben der Arbeit weiterqualifizieren und brauchen dafür eine Förderung. Verfassen Sie Ihre Bewerbung.",
         sub: "bildung.weiterbildung",
-        sectors: ["hospitality"],
         points: [
           "Stellen Sie sich und Ihre Situation vor.",
           "Beschreiben Sie Ihre beruflichen Ziele.",
@@ -10102,15 +9414,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         addressee: "Förderstelle, Auswahlkommission",
         register: "sie",
         level: "C1",
-        format: "antrag",
-        exam: "goethe_c1",
+        format: "bewerbung",
         words: 200,
       },
       {
         id: "wt_bildung_l04",
         text: "Sie möchten eine Weiterbildung machen, die Ihr Betrieb bezahlen soll. Schreiben Sie an Ihren Arbeitgeber.",
         sub: "bildung.weiterbildung",
-        sectors: ["retail"],
         points: [
           "Beschreiben Sie Inhalt und Dauer der Weiterbildung.",
           "Nennen Sie die Kosten.",
@@ -10121,14 +9431,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_bildung_l05",
         text: "Ihr Sprachkurs ist mehrfach ausgefallen, und Ersatzunterricht gab es nicht. Beschweren Sie sich bei der Sprachschule.",
         sub: "bildung.sprachkurs",
-        sectors: ["construction"],
         points: [
           "Beschreiben Sie, wie oft der Kurs ausgefallen ist.",
           "Erklären Sie, was das für Ihr Lernziel bedeutet.",
@@ -10139,7 +9447,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10157,14 +9464,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_bildung_l07",
         text: "Sie haben die Prüfung knapp nicht bestanden und möchten Ihre Arbeit einsehen. Schreiben Sie an das Prüfungszentrum.",
         sub: "bildung.pruefung",
-        sectors: ["it"],
         points: [
           "Beantragen Sie Einsicht in Ihre Prüfung.",
           "Begründen Sie Ihren Wunsch.",
@@ -10175,14 +9480,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_bildung_l08",
         text: "Ihr Sprachkurs ist für Sie zu leicht geworden. Schreiben Sie an die Sprachschule.",
         sub: "bildung.sprachkurs",
-        sectors: ["engineering"],
         points: [
           "Beschreiben Sie, was Sie schon können.",
           "Erklären Sie, warum der Kurs zu leicht ist.",
@@ -10193,14 +9496,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_bildung_l09",
         text: "Eine Freundin möchte auch Deutsch lernen. Schreiben Sie ihr eine E-Mail über Ihren Kurs.",
         sub: "bildung.sprachkurs",
-        sectors: ["beauty"],
         points: [
           "Erzählen Sie, wo Sie lernen.",
           "Beschreiben Sie, wie der Unterricht abläuft.",
@@ -10211,7 +9512,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
@@ -10220,7 +9520,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         sub: "bildung.sprachkurs",
         sectors: ["sports"],
         points: [
-          "Äußern Sie Ihre Meinung.",
+          "Äußern Sie Ihre Meinung und begründen Sie sie.",
           "Beschreiben Sie, wie Sie Arbeit und Lernen verbinden.",
           "Nennen Sie die größte Schwierigkeit.",
           "Geben Sie zwei konkrete Tipps. Denken Sie an Einleitung und Schluss.",
@@ -10229,14 +9529,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_bildung_l11",
         text: "Berufliche Weiterbildung wird gefordert, findet aber meist in der Freizeit statt. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "bildung.weiterbildung",
-        sectors: ["production"],
         points: [
           "Beschreiben Sie die Erwartung an lebenslanges Lernen.",
           "Analysieren Sie, wer Zeit und Kosten trägt.",
@@ -10248,7 +9546,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
@@ -10267,14 +9564,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "bewerbung",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_bildung_l13",
         text: "Sie bewerben sich nach Ihrer Weiterbildung auf eine Stelle als Pflegefachkraft mit Zusatzqualifikation. Verfassen Sie das Bewerbungsschreiben.",
         sub: "bildung.weiterbildung",
-        sectors: ["pharma", "care"],
+        sectors: ["care"],
         points: [
           "Nennen Sie die Stelle.",
           "Beschreiben Sie Ihre Qualifikation und Weiterbildung.",
@@ -10286,14 +9582,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "bewerbung",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_bildung_l14",
         text: "Sie bewerben sich auf eine Leitungsstelle und wechseln dafür die Branche. Verfassen Sie das Bewerbungsschreiben.",
         sub: "bildung.weiterbildung",
-        sectors: ["transport", "security"],
         points: [
           "Nennen Sie die Stelle und Ihre Motivation für den Wechsel.",
           "Übertragen Sie Ihre Erfahrung überzeugend auf das neue Feld.",
@@ -10305,7 +9599,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "bewerbung",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -10317,7 +9610,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_einkaufen_s01",
         text: "Ein online bestellter Artikel ist beschädigt angekommen. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.umtausch",
-        sectors: ["care", "cleaning"],
         points: [
           "Beschreiben Sie den Schaden.",
           "Nennen Sie die Bestellnummer.",
@@ -10327,14 +9619,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s02",
         text: "Ihre Bestellung ist seit zwei Wochen unterwegs, und Sie brauchen die Ware für den Dienst. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.online",
-        sectors: ["hospitality", "retail"],
+        sectors: ["hospitality"],
         points: [
           "Fragen Sie nach dem Stand Ihrer Bestellung.",
           "Nennen Sie die Bestellnummer.",
@@ -10344,14 +9635,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s03",
         text: "Sie kommen erst nach Feierabend in die Stadt und möchten sicher sein, dass ein Artikel da ist. Schreiben Sie an das Geschäft.",
         sub: "einkaufen.supermarkt",
-        sectors: ["construction", "trades"],
         points: [
           "Fragen Sie, ob der Artikel vorrätig ist.",
           "Fragen Sie, ob er zurückgelegt werden kann.",
@@ -10361,14 +9650,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s04",
         text: "Sie möchten eine Bestellung stornieren, weil Ihr Betrieb die Ware doch stellt. Schreiben Sie an den Kundenservice.",
         sub: "einkaufen.online",
-        sectors: ["it", "engineering"],
         points: [
           "Sagen Sie, dass Sie stornieren möchten.",
           "Nennen Sie die Bestellnummer.",
@@ -10378,14 +9665,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s05",
         text: "Ein Gutscheincode aus dem Mitarbeiterprogramm funktioniert im Shop nicht. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.online",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie das Problem.",
           "Nennen Sie den Code und den Warenkorb.",
@@ -10395,14 +9680,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s06",
         text: "Ein Produkt, das Sie für die Pausenverpflegung im Schichtbetrieb immer gekauft haben, gibt es nicht mehr. Schreiben Sie an den Supermarkt.",
         sub: "einkaufen.supermarkt",
-        sectors: ["production", "chemicals"],
+        sectors: ["production"],
         points: [
           "Fragen Sie, ob das Produkt zurückkommt.",
           "Beschreiben Sie, welches Produkt Sie meinen.",
@@ -10412,14 +9696,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s07",
         text: "An der Kasse wurde der Angebotspreis nicht berechnet, und Sie haben es erst zu Hause gemerkt. Schreiben Sie an den Markt.",
         sub: "einkaufen.supermarkt",
-        sectors: ["transport", "security"],
         points: [
           "Beschreiben Sie, was passiert ist.",
           "Nennen Sie Datum und Betrag.",
@@ -10429,14 +9711,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s08",
         text: "Sie brauchen für einen Kundentermin eine passende Jacke. Schreiben Sie an das Modegeschäft.",
         sub: "einkaufen.kleidung",
-        sectors: ["pharma"],
         points: [
           "Fragen Sie nach der Jacke aus dem Schaufenster.",
           "Fragen Sie, ob es sie in Größe M gibt.",
@@ -10446,14 +9726,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s09",
         text: "Sie bestellen eine Hose für die Arbeit und sind bei der Größe unsicher. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.kleidung",
-        sectors: ["care"],
         points: [
           "Fragen Sie, wie die Hose ausfällt.",
           "Nennen Sie Ihre Maße.",
@@ -10463,14 +9741,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s10",
         text: "Sie möchten ein Geschenk umtauschen, haben aber keinen Kassenbon. Schreiben Sie an das Geschäft.",
         sub: "einkaufen.umtausch",
-        sectors: ["it"],
         points: [
           "Fragen Sie, ob ein Umtausch ohne Bon möglich ist.",
           "Beschreiben Sie den Artikel.",
@@ -10480,7 +9756,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10497,14 +9772,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_einkaufen_s12",
         text: "Ein gekauftes Gerät ist nach kurzer Zeit defekt. Schreiben Sie eine Reklamation.",
         sub: "einkaufen.umtausch",
-        sectors: ["construction"],
         points: [
           "Nennen Sie Rechnungsnummer und Kaufdatum.",
           "Beschreiben Sie den Defekt genau.",
@@ -10515,18 +9788,16 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_einkaufen_s13",
         text: "Sie möchten einen Online-Kauf widerrufen, der Shop reagiert nicht. Schreiben Sie ein förmliches Schreiben.",
         sub: "einkaufen.online",
-        sectors: ["transport"],
         points: [
           "Nennen Sie im Betreff Bestellnummer und Bestelldatum.",
           "Erklären Sie ausdrücklich, dass Sie den Kauf widerrufen.",
-          "Nehmen Sie auf Ihre bisherigen erfolglosen Kontaktversuche Bezug.",
+          "Begründen Sie Ihren Widerruf mit der Frist und Ihren bisherigen erfolglosen Kontaktversuchen.",
           "Fordern Sie die Rückzahlung bis zu einem konkreten Datum.",
           "Bitten Sie um eine Bestätigung des Widerrufs.",
         ],
@@ -10534,7 +9805,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -10543,7 +9813,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_einkaufen_l01",
         text: "Eine Onlinebestellung ist unvollständig und teilweise beschädigt angekommen. Verfassen Sie eine Reklamation.",
         sub: "einkaufen.umtausch",
-        sectors: ["care", "pharma"],
         points: [
           "Nennen Sie Artikel und Bestellnummer.",
           "Beschreiben Sie, was mit der Lieferung nicht stimmt.",
@@ -10554,14 +9823,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_einkaufen_l02",
         text: "Sie haben einen Artikel zurückgeschickt und warten seit drei Wochen auf Ihr Geld. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.online",
-        sectors: ["it", "engineering"],
         points: [
           "Beschreiben Sie den Fall mit Daten.",
           "Nennen Sie Bestell- und Sendungsnummer.",
@@ -10572,31 +9839,28 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_einkaufen_l03",
         text: "An der Kasse wurde Ihnen ein falscher Preis berechnet, und das Personal war unfreundlich. Beschweren Sie sich beim Supermarkt.",
         sub: "einkaufen.supermarkt",
-        sectors: ["retail", "hospitality"],
+        sectors: ["retail"],
         points: [
           "Beschreiben Sie die Situation sachlich.",
           "Nennen Sie Datum und Uhrzeit.",
-          "Erklären Sie, was Sie gestört hat.",
+          "Begründen Sie, warum Sie das Verhalten an der Kasse nicht akzeptieren.",
           "Formulieren Sie, was Sie erwarten.",
         ],
         addressee: "Supermarkt, Marktleitung",
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_einkaufen_l04",
         text: "Sie interessieren sich für eine Einbauküche und möchten beraten werden. Schreiben Sie an das Möbelhaus.",
-        sectors: ["construction", "trades"],
         points: [
           "Beschreiben Sie Ihre Wohnung und die Maße.",
           "Nennen Sie Ihre Wünsche.",
@@ -10607,14 +9871,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_einkaufen_l05",
         text: "Ein vor vier Monaten gekauftes Gerät ist kaputt. Schreiben Sie an den Händler.",
         sub: "einkaufen.umtausch",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie den Defekt.",
           "Nennen Sie Kaufdatum und Belegnummer.",
@@ -10625,7 +9887,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 150,
       },
       {
@@ -10643,7 +9904,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
@@ -10661,14 +9921,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_einkaufen_l08",
         text: "Ein Pullover ist nach der ersten Wäsche eingelaufen, obwohl Sie die Pflegehinweise beachtet haben. Verfassen Sie eine Reklamation.",
         sub: "einkaufen.kleidung",
-        sectors: ["production"],
         points: [
           "Beschreiben Sie den Kauf mit Datum.",
           "Beschreiben Sie den Schaden.",
@@ -10679,14 +9937,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_einkaufen_l09",
         text: "Bestellte Arbeitsschuhe drücken trotz richtiger Größe. Schreiben Sie an den Händler.",
         sub: "einkaufen.kleidung",
-        sectors: ["chemicals"],
         points: [
           "Beschreiben Sie das Problem.",
           "Nennen Sie Bestellnummer und Modell.",
@@ -10697,14 +9953,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_einkaufen_l10",
         text: "Sie haben im Supermarkt etwas Wichtiges nicht gefunden. Schreiben Sie eine E-Mail an den Markt.",
         sub: "einkaufen.supermarkt",
-        sectors: ["security"],
         points: [
           "Sagen Sie, in welchem Markt Sie waren.",
           "Beschreiben Sie, was Sie gesucht haben.",
@@ -10715,14 +9969,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_einkaufen_l11",
         text: "Eine Lieferung ist beschädigt angekommen. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.online",
-        sectors: ["care"],
         points: [
           "Nennen Sie Bestellnummer und Lieferdatum.",
           "Beschreiben Sie den Schaden an Verpackung und Ware.",
@@ -10733,14 +9985,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_einkaufen_l12",
         text: "Der Onlinehandel verdrängt Geschäfte in den Innenstädten. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "einkaufen.online",
-        sectors: ["it", "retail"],
         points: [
           "Beschreiben Sie die Entwicklung.",
           "Analysieren Sie die Folgen für kleinere Städte.",
@@ -10752,7 +10002,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -10774,14 +10023,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s02",
         text: "Sie müssen kurzfristig einspringen und können heute Abend nicht essen gehen. Schreiben Sie an das Restaurant.",
         sub: "essen.restaurant",
-        sectors: ["hospitality", "retail"],
+        sectors: ["hospitality"],
         points: [
           "Sagen Sie die Reservierung ab.",
           "Nennen Sie Namen und Uhrzeit der Reservierung.",
@@ -10791,14 +10039,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s03",
         text: "Das Essen für die Pause auf der Baustelle kam kalt und unvollständig an. Schreiben Sie an den Lieferdienst.",
         sub: "essen.bestellen",
-        sectors: ["construction", "trades"],
+        sectors: ["construction"],
         points: [
           "Beschreiben Sie, was nicht in Ordnung war.",
           "Nennen Sie die Bestellnummer.",
@@ -10808,14 +10055,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s04",
         text: "Sie gehen am Samstag mit vier Personen essen, eine davon verträgt kein Gluten. Schreiben Sie an das Restaurant.",
         sub: "essen.bestellen",
-        sectors: ["it", "engineering"],
         points: [
           "Fragen Sie nach Gerichten ohne Gluten.",
           "Nennen Sie Datum und Personenzahl.",
@@ -10825,14 +10070,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s05",
         text: "Ihre Betriebsfeier im Restaurant ist gut gelaufen. Schreiben Sie eine kurze Dankesnachricht.",
         sub: "essen.restaurant",
-        sectors: ["beauty", "sports"],
         points: [
           "Bedanken Sie sich für den Abend.",
           "Loben Sie Essen und Service konkret.",
@@ -10842,14 +10085,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s06",
         text: "Auf Ihrer Rechnung steht ein Gericht, das niemand bestellt hat. Schreiben Sie an das Restaurant.",
         sub: "essen.bezahlen",
-        sectors: ["production", "chemicals"],
         points: [
           "Beschreiben Sie den Fehler auf der Rechnung.",
           "Nennen Sie Datum und Rechnungsnummer.",
@@ -10859,14 +10100,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s07",
         text: "Sie kommen am Freitag mit acht Kolleginnen und Kollegen. Schreiben Sie an das Restaurant.",
         sub: "essen.bezahlen",
-        sectors: ["transport", "security"],
         points: [
           "Fragen Sie, ob man getrennt zahlen kann.",
           "Fragen Sie, ob Kartenzahlung möglich ist.",
@@ -10876,14 +10115,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s08",
         text: "Ein Freund hat am Wochenende eine Lasagne gekocht, die Ihnen sehr geschmeckt hat. Schreiben Sie ihm.",
         sub: "essen.kochen",
-        sectors: ["pharma"],
         points: [
           "Bitten Sie um das Rezept.",
           "Fragen Sie nach den wichtigsten Zutaten.",
@@ -10893,14 +10130,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s09",
         text: "Ihnen fehlt eine Zutat fürs Abendessen, und die Geschäfte haben zu. Schreiben Sie in die Nachbarschaftsgruppe.",
         sub: "essen.kochen",
-        sectors: ["care"],
         points: [
           "Sagen Sie, was Ihnen fehlt.",
           "Fragen Sie, ob jemand aushelfen kann.",
@@ -10910,7 +10145,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
@@ -10927,32 +10161,28 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_essen_s11",
         text: "Bei einer Feier in einem Restaurant wurde eine bestellte Leistung nicht erbracht. Schreiben Sie eine Beschwerde.",
         sub: "essen.bezahlen",
-        sectors: ["it"],
         points: [
           "Nennen Sie Datum und Anlass Ihres Besuchs.",
           "Beschreiben Sie sachlich, was nicht wie vereinbart war.",
-          "Erklären Sie, wie Sie vor Ort reagiert haben.",
+          "Begründen Sie, warum die Feier dadurch beeinträchtigt wurde.",
           "Formulieren Sie, welche Lösung Sie erwarten.",
         ],
         addressee: "Restaurantleitung",
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_essen_s12",
         text: "Sie organisieren ein Essen für Kolleginnen und Kollegen mit sehr unterschiedlichen Ernährungsweisen. Schreiben Sie an das Restaurant.",
         sub: "essen.bestellen",
-        sectors: ["production"],
         points: [
           "Nennen Sie Termin, Personenzahl und Anlass.",
           "Legen Sie die Anforderungen an das Menü präzise dar.",
@@ -10963,7 +10193,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "email_formell",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -10972,7 +10201,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_essen_l01",
         text: "Sie organisieren eine Feier für Ihr Team in einem Restaurant. Schreiben Sie die Anfrage.",
         sub: "essen.restaurant",
-        sectors: ["care", "pharma"],
         points: [
           "Nennen Sie Anlass, Datum und Personenzahl.",
           "Fragen Sie nach einem Menü mit vegetarischen und veganen Optionen.",
@@ -10983,14 +10211,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_essen_l02",
         text: "Für die Firmenfeier mit 30 Personen brauchen Sie ein Catering-Angebot. Schreiben Sie an den Caterer.",
         sub: "essen.bestellen",
-        sectors: ["it", "engineering"],
         points: [
           "Beschreiben Sie Anlass, Ort und Termin.",
           "Nennen Sie die Personenzahl.",
@@ -11001,32 +10227,29 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_essen_l03",
         text: "Bei Ihrem Restaurantbesuch gestern haben Sie sehr lange gewartet, und ein Gericht war nicht in Ordnung. Beschweren Sie sich.",
         sub: "essen.restaurant",
-        sectors: ["retail", "hospitality"],
+        sectors: ["hospitality"],
         points: [
           "Beschreiben Sie den Abend sachlich.",
           "Nennen Sie Datum und Uhrzeit.",
           "Erklären Sie, was mit dem Gericht nicht stimmte.",
-          "Formulieren Sie Ihre Erwartung.",
+          "Begründen Sie, welche Wiedergutmachung Sie für angemessen halten.",
         ],
         addressee: "Restaurantleitung",
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_essen_l04",
         text: "Ihr Team geht nach einem anstrengenden Quartal gemeinsam essen. Schreiben Sie die Einladung.",
         sub: "essen.restaurant",
-        sectors: ["construction", "trades"],
         points: [
           "Nennen Sie Anlass, Restaurant, Datum und Uhrzeit.",
           "Erklären Sie, wer die Kosten übernimmt.",
@@ -11037,14 +10260,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B2.1",
         format: "email_informell",
-        exam: "telc_b2_beruf",
         words: 150,
       },
       {
         id: "wt_essen_l05",
         text: "Ein Lieferdienst hat Ihre Bestellung doppelt abgebucht. Schreiben Sie an den Kundenservice.",
         sub: "essen.bezahlen",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie die Bestellung mit Datum.",
           "Nennen Sie die beiden Buchungen.",
@@ -11055,14 +10276,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_essen_l06",
         text: "Für eine Schulung im Betrieb bestellen Sie Fingerfood für 15 Personen. Schreiben Sie an den Partyservice.",
         sub: "essen.bestellen",
-        sectors: ["transport"],
         points: [
           "Bestellen Sie Fingerfood für 15 Personen.",
           "Nennen Sie Datum und Uhrzeit.",
@@ -11073,14 +10292,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_essen_l07",
         text: "Die Buchhaltung akzeptiert die Rechnung Ihrer Firmenfeier nicht. Schreiben Sie an das Restaurant.",
         sub: "essen.bezahlen",
-        sectors: ["cleaning"],
         points: [
           "Bitten Sie um eine korrigierte Rechnung.",
           "Nennen Sie die vollständige Firmenanschrift.",
@@ -11091,14 +10308,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_essen_l08",
         text: "Sie möchten Ihre Freundesgruppe zu einem gemeinsamen Kochabend einladen. Schreiben Sie die Einladung.",
         sub: "essen.kochen",
-        sectors: ["production"],
         points: [
           "Laden Sie zum Kochabend ein.",
           "Schlagen Sie ein Menü vor.",
@@ -11109,14 +10324,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_essen_l09",
         text: "Sie möchten deutsche Küche kochen lernen, arbeiten aber in wechselnden Schichten. Schreiben Sie an eine Kochschule.",
         sub: "essen.kochen",
-        sectors: ["chemicals"],
         points: [
           "Fragen Sie nach einem Anfängerkurs für deutsche Küche.",
           "Fragen Sie nach Terminen, die zu Schichtarbeit passen.",
@@ -11127,14 +10340,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_essen_l10",
         text: "Sie möchten Freunde zum Essen einladen. Schreiben Sie eine E-Mail.",
         sub: "essen.restaurant",
-        sectors: ["security"],
         points: [
           "Laden Sie ein und nennen Sie den Anlass.",
           "Nennen Sie Tag, Uhrzeit und Ort.",
@@ -11145,14 +10356,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_essen_l11",
         text: "In einem Forum wird über Trinkgeld in Deutschland diskutiert. Schreiben Sie einen Beitrag.",
         sub: "essen.bezahlen",
-        sectors: ["care"],
         points: [
           "Äußern Sie Ihre Meinung zum Trinkgeld.",
           "Begründen Sie Ihre Position.",
@@ -11163,14 +10372,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
         id: "wt_essen_l12",
         text: "Lieferdienste verändern, wie und wo wir essen. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "essen.kochen",
-        sectors: ["it", "hospitality"],
+        sectors: ["hospitality"],
         points: [
           "Beschreiben Sie die Entwicklung.",
           "Analysieren Sie die Folgen für Restaurants und für Fahrerinnen und Fahrer.",
@@ -11182,7 +10390,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -11204,14 +10411,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s02",
         text: "Sie wechseln den Arbeitsort und brauchen Ihr Monatsticket nicht mehr. Schreiben Sie an den Kundenservice.",
         sub: "mobilitaet.ticket",
-        sectors: ["hospitality", "retail"],
+        sectors: ["hospitality"],
         points: [
           "Fragen Sie, wie Sie das Monatsticket kündigen.",
           "Nennen Sie Ihre Kundennummer.",
@@ -11221,14 +10427,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s03",
         text: "Für die Fahrten zu wechselnden Baustellen brauchen Sie den Führerschein. Schreiben Sie an eine Fahrschule.",
         sub: "mobilitaet.auto",
-        sectors: ["construction", "trades"],
+        sectors: ["construction"],
         points: [
           "Fragen Sie nach den Preisen für Klasse B.",
           "Fragen Sie nach freien Terminen.",
@@ -11238,14 +10443,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s04",
         text: "Ihr Auto muss zur Inspektion, und Sie brauchen es für den Arbeitsweg. Schreiben Sie an die Werkstatt.",
         sub: "mobilitaet.auto",
-        sectors: ["it", "engineering"],
         points: [
           "Bitten Sie um einen Termin für die Inspektion.",
           "Nennen Sie Ihr Automodell.",
@@ -11255,14 +10458,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s05",
         text: "Der Fahrkartenautomat am Bahnhof ist defekt, und viele Fahrgäste stehen ohne Ticket da. Melden Sie das.",
         sub: "mobilitaet.ticket",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie das Problem.",
           "Nennen Sie Bahnhof und Standort des Automaten.",
@@ -11272,14 +10473,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s06",
         text: "Sie haben am Wochenende Dienst am Flughafen und müssen früh dort sein. Schreiben Sie an den Verkehrsverbund.",
         sub: "mobilitaet.oepnv",
-        sectors: ["production", "chemicals"],
+        sectors: ["production"],
         points: [
           "Fragen Sie, welche Linie am Wochenende zum Flughafen fährt.",
           "Fragen Sie, wie oft sie fährt.",
@@ -11289,14 +10489,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s07",
         text: "Ein Besucher kommt zum ersten Mal zu Ihnen. Beschreiben Sie ihm den Weg vom Bahnhof.",
         sub: "mobilitaet.wegbeschreibung",
-        sectors: ["transport", "security"],
         points: [
           "Beschreiben Sie den Weg in drei einfachen Schritten.",
           "Nennen Sie einen Orientierungspunkt.",
@@ -11306,31 +10504,27 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s08",
         text: "Eine Kollegin kommt zum ersten Mal in Ihr Gebäude. Erklären Sie ihr den Weg.",
         sub: "mobilitaet.wegbeschreibung",
-        sectors: ["pharma"],
         points: [
           "Sagen Sie, wo sie klingeln muss.",
           "Erklären Sie, wie sie den Besprechungsraum findet.",
           "Nennen Sie, wen sie fragen kann.",
         ],
-        addressee: "Kollegin, Frau Wieczorek",
+        addressee: "Kollegin Magda",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s09",
         text: "Sie haben im Zug Ihre Tasche vergessen. Schreiben Sie eine kurze E-Mail an den Fundservice.",
         sub: "mobilitaet.oepnv",
-        sectors: ["care"],
         points: [
           "Nennen Sie Zug, Datum und Uhrzeit.",
           "Beschreiben Sie die Tasche.",
@@ -11340,14 +10534,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_mobilitaet_s10",
         text: "Ihr Zug hatte erhebliche Verspätung und Sie haben einen Anschluss verpasst. Schreiben Sie an den Kundenservice.",
         sub: "mobilitaet.ticket",
-        sectors: ["it"],
         points: [
           "Nennen Sie Verbindung, Datum und Buchungsnummer.",
           "Beschreiben Sie den Verlauf der Verspätung.",
@@ -11358,14 +10550,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "reklamation",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_mobilitaet_s11",
         text: "Sie haben ein erhöhtes Beförderungsentgelt erhalten, obwohl Sie eine gültige Zeitkarte besitzen. Schreiben Sie einen Einspruch.",
         sub: "mobilitaet.ticket",
-        sectors: ["retail"],
         points: [
           "Nennen Sie im Betreff Vorgangsnummer und Datum der Kontrolle.",
           "Schildern Sie den Ablauf der Kontrolle sachlich.",
@@ -11377,7 +10567,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "widerspruch",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -11386,7 +10575,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_mobilitaet_l01",
         text: "Eine Verspätung hat Sie den Anschluss und damit den Beginn Ihrer Schicht gekostet. Schreiben Sie an das Verkehrsunternehmen.",
         sub: "mobilitaet.oepnv",
-        sectors: ["care", "pharma"],
+        sectors: ["care"],
         points: [
           "Beschreiben Sie die geplante Verbindung.",
           "Erklären Sie, wie es zur Verspätung kam.",
@@ -11397,14 +10586,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "beschwerde",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_mobilitaet_l02",
         text: "Ihr Zug fiel aus, und Sie mussten ein Taxi nehmen, um pünktlich zur Schicht zu kommen. Beantragen Sie die Erstattung.",
         sub: "mobilitaet.ticket",
-        sectors: ["it", "engineering"],
         points: [
           "Beschreiben Sie die Verbindung mit Datum und Zugnummer.",
           "Erklären Sie, warum Sie ein Taxi genommen haben.",
@@ -11415,14 +10602,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "antrag",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_mobilitaet_l03",
         text: "Nach der Reparatur ist der Fehler an Ihrem Auto wieder aufgetreten. Schreiben Sie an die Werkstatt.",
         sub: "mobilitaet.auto",
-        sectors: ["construction", "trades"],
+        sectors: ["trades"],
         points: [
           "Beschreiben Sie den Mangel.",
           "Verweisen Sie auf Rechnung und Reparaturdatum.",
@@ -11433,14 +10619,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_mobilitaet_l04",
         text: "Für Ihren Umzug brauchen Sie einen Transporter. Schreiben Sie an die Autovermietung.",
         sub: "mobilitaet.auto",
-        sectors: ["retail", "hospitality"],
+        sectors: ["hospitality"],
         points: [
           "Nennen Sie Datum und Mietdauer.",
           "Beschreiben Sie, was Sie transportieren.",
@@ -11451,14 +10636,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_mobilitaet_l05",
         text: "Die Busverbindung in Ihrem Viertel passt nicht zu den Schichtzeiten vieler Anwohner. Schreiben Sie an die Stadtverwaltung.",
         sub: "mobilitaet.oepnv",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie die Probleme mit der Verbindung.",
           "Erklären Sie die Folgen für die Anwohner.",
@@ -11469,14 +10652,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "stellungnahme",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_mobilitaet_l06",
         text: "Sie wurden trotz gültigem Abo kontrolliert und sollen eine erhöhte Gebühr zahlen. Schreiben Sie an den Verkehrsverbund.",
         sub: "mobilitaet.ticket",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie die Kontrolle mit Datum und Linie.",
           "Verweisen Sie auf Ihre Abo-Nummer.",
@@ -11487,14 +10668,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "widerspruch",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_mobilitaet_l07",
         text: "Zu einem Treffen in Ihrem Haus kommen Teilnehmende von auswärts. Schreiben Sie die Anfahrtsbeschreibung.",
         sub: "mobilitaet.wegbeschreibung",
-        sectors: ["cleaning"],
         points: [
           "Beschreiben Sie die Anreise mit der Bahn.",
           "Beschreiben Sie die Anreise mit dem Auto.",
@@ -11505,14 +10684,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_mobilitaet_l08",
         text: "Eine Freundin besucht Sie zum ersten Mal und kommt aus einer anderen Stadt. Schreiben Sie ihr.",
         sub: "mobilitaet.wegbeschreibung",
-        sectors: ["production"],
         points: [
           "Beschreiben Sie die beste Verbindung.",
           "Sagen Sie, wo sie umsteigen muss.",
@@ -11523,14 +10700,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_mobilitaet_l09",
         text: "Ein Freund besucht Sie und weiß nicht, wie er zu Ihnen kommt. Schreiben Sie ihm eine E-Mail.",
         sub: "mobilitaet.wegbeschreibung",
-        sectors: ["chemicals"],
         points: [
           "Erklären Sie, welche Bahn er nehmen soll.",
           "Beschreiben Sie, wo er umsteigen muss.",
@@ -11541,14 +10716,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_mobilitaet_l10",
         text: "In Ihrer Stadt soll eine Buslinie gestrichen werden. Schreiben Sie an die Stadtverwaltung.",
         sub: "mobilitaet.oepnv",
-        sectors: ["security"],
         points: [
           "Nennen Sie die betroffene Linie.",
           "Beschreiben Sie, wer die Linie nutzt.",
@@ -11559,14 +10732,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_mobilitaet_l11",
         text: "Städte schränken den Autoverkehr in Innenstädten zunehmend ein. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "mobilitaet.auto",
-        sectors: ["care", "it"],
         points: [
           "Beschreiben Sie die Maßnahmen kurz.",
           "Analysieren Sie, wen sie entlasten und wen sie belasten.",
@@ -11578,7 +10749,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
     ],
@@ -11590,7 +10760,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_freizeit_s01",
         text: "Sie haben am Wochenende endlich frei und möchten etwas unternehmen. Schreiben Sie einem Freund.",
         sub: "freizeit.verabredung",
-        sectors: ["care", "cleaning"],
         points: [
           "Laden Sie ihn zu einem Ausflug ein.",
           "Schlagen Sie Zeit und Treffpunkt vor.",
@@ -11600,14 +10769,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s02",
         text: "Sie müssen am Samstag einspringen und können sich nicht treffen. Schreiben Sie Ihrer Freundin.",
         sub: "freizeit.verabredung",
-        sectors: ["hospitality", "retail"],
         points: [
           "Sagen Sie für Samstag ab.",
           "Entschuldigen Sie sich und nennen Sie den Grund.",
@@ -11617,14 +10784,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s03",
         text: "Sie möchten nach der Arbeit wieder Sport machen. Schreiben Sie an einen Sportverein.",
         sub: "freizeit.hobbys",
-        sectors: ["construction", "trades"],
         points: [
           "Fragen Sie nach einem Probetraining.",
           "Fragen Sie nach den Mitgliedsbeiträgen.",
@@ -11634,31 +10799,27 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s04",
         text: "Eine Kollegin hat Sie zu ihrer Einweihungsfeier eingeladen. Antworten Sie ihr.",
         sub: "freizeit.verabredung",
-        sectors: ["it", "engineering"],
         points: [
           "Bedanken Sie sich für die Einladung.",
           "Sagen Sie zu.",
           "Fragen Sie, ob Sie etwas mitbringen sollen.",
         ],
-        addressee: "Kollegin, Frau Mensah",
+        addressee: "Kollegin Ama",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s05",
         text: "Sie organisieren ein Sommerfest im Hof Ihres Hauses. Schreiben Sie in die Nachbarschaftsgruppe.",
         sub: "freizeit.veranstaltung",
-        sectors: ["beauty", "sports"],
         points: [
           "Nennen Sie Datum und Uhrzeit.",
           "Bitten Sie um Helferinnen und Helfer.",
@@ -11668,14 +10829,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s06",
         text: "Sie interessieren sich für einen Fotokurs am Wochenende. Schreiben Sie an den Anbieter.",
         sub: "freizeit.hobbys",
-        sectors: ["production", "chemicals"],
         points: [
           "Fragen Sie, ob der Kurs für Anfänger geeignet ist.",
           "Fragen Sie, welche Kamera Sie brauchen.",
@@ -11685,14 +10844,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s07",
         text: "In Ihr Haus ist ein neuer Nachbar eingezogen. Schreiben Sie ihm eine kurze Nachricht.",
         sub: "freizeit.smalltalk",
-        sectors: ["transport", "security"],
         points: [
           "Stellen Sie sich vor.",
           "Heißen Sie ihn willkommen.",
@@ -11702,31 +10859,27 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s08",
         text: "Sie haben auf einer Feier eine Bekannte wiedergetroffen. Schreiben Sie ihr am nächsten Tag.",
         sub: "freizeit.smalltalk",
-        sectors: ["pharma"],
         points: [
           "Bedanken Sie sich für den netten Abend.",
           "Nehmen Sie ein Thema von gestern auf.",
           "Schlagen Sie vor, in Kontakt zu bleiben.",
         ],
-        addressee: "Bekannte, Frau Kranz",
+        addressee: "Bekannte Nadine",
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s09",
         text: "Sie möchten am Samstag zu einem Konzert, haben aber noch keine Karten. Schreiben Sie an das Konzertbüro.",
         sub: "freizeit.veranstaltung",
-        sectors: ["care"],
         points: [
           "Fragen Sie, ob es noch Karten für Samstag gibt.",
           "Fragen Sie, ab wann Einlass ist.",
@@ -11736,14 +10889,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s10",
         text: "Sie können sich am Wochenende nicht mit Ihrer Freundin treffen. Schreiben Sie eine kurze Nachricht.",
         sub: "freizeit.verabredung",
-        sectors: ["it"],
         points: [
           "Sagen Sie ab und entschuldigen Sie sich.",
           "Nennen Sie den Grund.",
@@ -11753,14 +10904,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_freizeit_s11",
         text: "Sie möchten in einem Verein mitmachen. Schreiben Sie eine E-Mail an den Vorstand.",
         sub: "freizeit.hobbys",
-        sectors: ["retail"],
         points: [
           "Stellen Sie sich kurz vor.",
           "Erklären Sie, warum Sie mitmachen möchten.",
@@ -11771,18 +10920,16 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_halbformell",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_freizeit_s12",
         text: "Eine gebuchte Veranstaltung wurde kurzfristig abgesagt und Sie haben kein Geld zurückerhalten. Schreiben Sie an den Veranstalter.",
         sub: "freizeit.veranstaltung",
-        sectors: ["transport"],
         points: [
           "Nennen Sie im Betreff Veranstaltung, Datum und Buchungsnummer.",
           "Stellen Sie den Ablauf der Absage sachlich dar.",
-          "Nehmen Sie auf Ihre bisherigen Anfragen Bezug.",
+          "Begründen Sie Ihren Erstattungsanspruch und nehmen Sie auf Ihre bisherigen Anfragen Bezug.",
           "Fordern Sie die Erstattung bis zu einem konkreten Datum.",
           "Bitten Sie um eine schriftliche Bestätigung.",
         ],
@@ -11790,7 +10937,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "beschwerde",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -11799,7 +10945,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_freizeit_l01",
         text: "Sie feiern einen runden Geburtstag und möchten Freunde einladen. Verfassen Sie die Einladung.",
         sub: "freizeit.veranstaltung",
-        sectors: ["care", "pharma"],
         points: [
           "Nennen Sie Anlass, Datum und Ort.",
           "Beschreiben Sie kurz, was geplant ist.",
@@ -11810,14 +10955,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l02",
         text: "Sie schaffen es wegen wechselnder Schichten kaum noch ins Fitnessstudio und möchten kündigen. Verfassen Sie die Kündigung.",
         sub: "freizeit.hobbys",
-        sectors: ["it", "engineering"],
         points: [
           "Kündigen Sie fristgerecht.",
           "Nennen Sie Ihre Mitgliedsnummer.",
@@ -11828,14 +10971,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "kuendigung",
-        exam: "alltag",
         words: 80,
       },
       {
         id: "wt_freizeit_l03",
         text: "Eine alte Freundin wohnt weit weg, und Sie haben lange nichts gehört. Schreiben Sie ihr.",
         sub: "freizeit.verabredung",
-        sectors: ["construction", "trades"],
         points: [
           "Erzählen Sie, was sich bei Ihnen verändert hat.",
           "Fragen Sie nach ihrem Leben.",
@@ -11846,13 +10987,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l04",
         text: "Sie möchten mit Freunden ein Wochenende in einem Ferienhaus verbringen. Schreiben Sie die Anfrage.",
-        sectors: ["retail", "hospitality"],
         points: [
           "Nennen Sie Zeitraum und Personenzahl.",
           "Fragen Sie nach dem Preis.",
@@ -11863,14 +11002,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_freizeit_l05",
         text: "Sie möchten mit zwei Freunden an einem Volkslauf teilnehmen. Schreiben Sie an die Organisatoren.",
         sub: "freizeit.veranstaltung",
-        sectors: ["beauty", "sports"],
         points: [
           "Melden Sie sich und zwei Freunde an.",
           "Fragen Sie nach dem Ablauf.",
@@ -11881,14 +11018,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l06",
         text: "Sie möchten Mitglied in einem Verein werden und bringen Erfahrung aus Ihrer Heimat mit. Schreiben Sie an den Verein.",
         sub: "freizeit.hobbys",
-        sectors: ["transport"],
         points: [
           "Stellen Sie sich kurz vor.",
           "Beschreiben Sie Ihre Erfahrung.",
@@ -11899,14 +11034,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l07",
         text: "Ihre Freundesgruppe hat sich lange nicht gesehen. Organisieren Sie ein Wiedersehen.",
         sub: "freizeit.verabredung",
-        sectors: ["cleaning"],
         points: [
           "Schlagen Sie zwei Termine vor.",
           "Schlagen Sie einen Ort vor.",
@@ -11917,50 +11050,44 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l08",
         text: "Ein Arbeitskollege ist in eine andere Stadt gezogen. Schreiben Sie ihm.",
         sub: "freizeit.smalltalk",
-        sectors: ["production"],
         points: [
           "Fragen Sie, wie das Einleben läuft.",
           "Erzählen Sie Neuigkeiten aus dem Team.",
           "Wünschen Sie ihm alles Gute.",
           "Schlagen Sie einen Besuch vor.",
         ],
-        addressee: "ehemaliger Kollege, Herr Novak",
+        addressee: "ehemaliger Kollege Tomas",
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l09",
         text: "Sie schreiben Ihrer Sprachpartnerin, mit der Sie jede Woche Deutsch üben. Schreiben Sie ihr.",
         sub: "freizeit.smalltalk",
-        sectors: ["chemicals"],
         points: [
           "Erzählen Sie, was Sie am Wochenende gemacht haben.",
           "Stellen Sie ihr zwei Fragen dazu.",
           "Schlagen Sie das nächste Treffen vor.",
           "Sagen Sie, woran Sie üben möchten.",
         ],
-        addressee: "Sprachpartnerin, Frau Duarte",
+        addressee: "Sprachpartnerin Marta",
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l10",
         text: "Sie waren am Wochenende auf einem Fest. Schreiben Sie einem Freund eine E-Mail.",
         sub: "freizeit.veranstaltung",
-        sectors: ["security"],
         points: [
           "Erzählen Sie, wo Sie waren.",
           "Beschreiben Sie, was Ihnen gefallen hat.",
@@ -11971,14 +11098,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "du",
         level: "B1.2",
         format: "email_informell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_freizeit_l11",
         text: "In einem Forum wird gefragt, wie man als Zugezogener neue Leute kennenlernt. Schreiben Sie einen Beitrag.",
         sub: "freizeit.smalltalk",
-        sectors: ["care"],
         points: [
           "Äußern Sie Ihre Meinung dazu, was am besten funktioniert.",
           "Beschreiben Sie eine eigene Erfahrung.",
@@ -11989,14 +11114,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "forumsbeitrag",
-        exam: "goethe_b2",
         words: 150,
       },
       {
         id: "wt_freizeit_l12",
         text: "Vereine finden immer schwerer ehrenamtliche Mitglieder. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "freizeit.hobbys",
-        sectors: ["it", "sports"],
+        sectors: ["sports"],
         points: [
           "Beschreiben Sie die Entwicklung.",
           "Analysieren Sie mögliche Ursachen.",
@@ -12008,14 +11132,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "stellungnahme",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_freizeit_l13",
         text: "In einem Online-Forum fragt jemand, wie man nach einem Umzug in einer neuen Stadt Anschluss findet. Schreiben Sie einen Beitrag.",
         sub: "freizeit.smalltalk",
-        sectors: ["hospitality"],
         points: [
           "Sagen Sie, was Sie von dem Thema halten.",
           "Berichten Sie von Ihrer eigenen Erfahrung.",
@@ -12026,7 +11148,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "forumsbeitrag",
-        exam: "goethe_b1",
         words: 80,
       },
     ],
@@ -12038,7 +11159,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_digitales_s01",
         text: "Ihre Internetverbindung fällt ständig aus, und Sie arbeiten abends von zu Hause. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.internet",
-        sectors: ["care", "cleaning"],
         points: [
           "Beschreiben Sie das Problem.",
           "Sagen Sie, seit wann es besteht.",
@@ -12048,14 +11168,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s02",
         text: "Ihre Mobilfunkrechnung ist diesen Monat deutlich höher als sonst. Schreiben Sie an den Anbieter.",
         sub: "digitales.vertrag",
-        sectors: ["hospitality", "retail"],
+        sectors: ["hospitality"],
         points: [
           "Fragen Sie, warum die Rechnung höher ist.",
           "Nennen Sie Kundennummer und Rechnungsmonat.",
@@ -12065,14 +11184,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s03",
         text: "Sie kommen nicht mehr in Ihr Konto bei einem Onlinedienst. Schreiben Sie an den Support.",
         sub: "digitales.konto",
-        sectors: ["construction", "trades"],
         points: [
           "Beschreiben Sie das Problem.",
           "Nennen Sie Ihre Benutzerkennung.",
@@ -12082,14 +11199,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s04",
         text: "Sie ziehen wegen einer neuen Stelle um und möchten Ihren Anschluss mitnehmen. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.vertrag",
-        sectors: ["it", "engineering"],
         points: [
           "Sagen Sie, dass Sie umziehen.",
           "Nennen Sie die neue Adresse und das Datum.",
@@ -12099,14 +11214,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s05",
         text: "Ihr neues Handy hängt sich mehrmals täglich auf, und Sie brauchen es für den Dienstplan. Schreiben Sie an den Handyshop.",
         sub: "digitales.geraete",
-        sectors: ["beauty", "sports"],
         points: [
           "Beschreiben Sie das Problem.",
           "Nennen Sie Kaufdatum und Modell.",
@@ -12116,14 +11229,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "reklamation",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s06",
         text: "Ihr WLAN ist abends sehr langsam, wenn Sie nach der Schicht Videos mit der Familie anschauen. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.internet",
-        sectors: ["production", "chemicals"],
+        sectors: ["production"],
         points: [
           "Beschreiben Sie, wann es langsam ist.",
           "Sagen Sie, was Sie schon versucht haben.",
@@ -12133,14 +11245,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s07",
         text: "Das Display Ihres Handys ist auf der Tour heruntergefallen und gesprungen. Schreiben Sie an einen Reparaturservice.",
         sub: "digitales.geraete",
-        sectors: ["transport", "security"],
+        sectors: ["transport"],
         points: [
           "Nennen Sie Ihr Handymodell.",
           "Fragen Sie, was ein neues Display kostet.",
@@ -12150,14 +11261,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s08",
         text: "Sie bekommen täglich viele Werbe-Mails und übersehen darin wichtige Nachrichten. Schreiben Sie an den Support.",
         sub: "digitales.konto",
-        sectors: ["pharma"],
         points: [
           "Beschreiben Sie das Problem.",
           "Fragen Sie, wie Sie die Werbung abbestellen.",
@@ -12167,14 +11276,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.1",
         format: "nachricht",
-        exam: "goethe_b1",
         words: 40,
       },
       {
         id: "wt_digitales_s09",
         text: "Ihr Internet funktioniert seit zwei Tagen nicht. Schreiben Sie eine kurze Nachricht an Ihren Anbieter.",
         sub: "digitales.internet",
-        sectors: ["care"],
         points: [
           "Nennen Sie Ihre Kundennummer.",
           "Beschreiben Sie das Problem.",
@@ -12184,7 +11291,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "nachricht",
-        exam: "alltag",
         words: 40,
       },
       {
@@ -12195,21 +11301,19 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         points: [
           "Nennen Sie Kundennummer und Tarif.",
           "Beschreiben Sie die tatsächliche Leistung im Vergleich zur vereinbarten.",
-          "Nehmen Sie auf frühere Störungsmeldungen Bezug.",
+          "Nehmen Sie auf frühere Störungsmeldungen Bezug und erklären Sie die Folgen für Ihren Alltag.",
           "Fordern Sie eine Behebung bis zu einem konkreten Datum.",
         ],
         addressee: "Kundenservice des Anbieters",
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "alltag",
         words: 100,
       },
       {
         id: "wt_digitales_s11",
         text: "Sie möchten Ihren Mobilfunkvertrag kündigen. Verfassen Sie das Kündigungsschreiben.",
         sub: "digitales.vertrag",
-        sectors: ["retail"],
         points: [
           "Nennen Sie im Betreff Kundennummer und Rufnummer.",
           "Erklären Sie eindeutig, dass Sie den Vertrag kündigen.",
@@ -12221,7 +11325,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "kuendigung",
-        exam: "alltag",
         words: 120,
       },
     ],
@@ -12230,25 +11333,23 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         id: "wt_digitales_l01",
         text: "Ihre Verbindung ist seit Wochen gestört, und Sie brauchen sie für Schichtpläne und Behördenpost. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.internet",
-        sectors: ["care", "pharma"],
+        sectors: ["care"],
         points: [
           "Erklären Sie, seit wann und wie oft die Störung auftritt.",
           "Beschreiben Sie, was Sie schon versucht haben.",
           "Nennen Sie Ihre Kundennummer.",
-          "Fordern Sie eine Lösung oder eine Minderung mit klarer Frist.",
+          "Begründen Sie Ihre Forderung nach einer Minderung und setzen Sie eine klare Frist.",
         ],
         addressee: "Anbieter, Kundenservice",
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_digitales_l02",
         text: "Ihr Handyvertrag läuft aus, und Sie möchten ihn nicht verlängern. Verfassen Sie die Kündigung.",
         sub: "digitales.vertrag",
-        sectors: ["it", "engineering"],
         points: [
           "Kündigen Sie fristgerecht zum Vertragsende.",
           "Nennen Sie Ihre Rufnummer und Kundennummer.",
@@ -12259,32 +11360,28 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "kuendigung",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_digitales_l03",
         text: "Auf Ihrer Rechnung steht ein Dienst, den Sie nie bestellt haben. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.vertrag",
-        sectors: ["construction", "trades"],
         points: [
           "Beschreiben Sie die beanstandete Position.",
           "Nennen Sie Rechnungsnummer und Betrag.",
-          "Verlangen Sie eine Korrektur.",
+          "Begründen Sie, warum Sie diese Position nicht schulden, und verlangen Sie eine Korrektur.",
           "Bitten Sie um eine Erklärung, wie es dazu kam.",
         ],
         addressee: "Anbieter, Rechnungsabteilung",
         register: "sie",
         level: "B2.1",
         format: "widerspruch",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_digitales_l04",
         text: "Sie möchten Ihren Tarif wechseln und schwanken zwischen zwei Angeboten. Schreiben Sie an den Anbieter.",
         sub: "digitales.vertrag",
-        sectors: ["retail", "hospitality"],
         points: [
           "Beschreiben Sie Ihr Nutzungsverhalten.",
           "Nennen Sie die beiden Tarife.",
@@ -12295,14 +11392,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_digitales_l05",
         text: "Sie nutzen einen alten Onlinedienst nicht mehr und möchten wissen, welche Daten dort liegen. Schreiben Sie an den Datenschutzbeauftragten.",
         sub: "digitales.konto",
-        sectors: ["beauty", "sports"],
         points: [
           "Bitten Sie um Auskunft über die gespeicherten Daten.",
           "Nennen Sie Ihre Kontodaten.",
@@ -12314,14 +11409,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "antrag",
-        exam: "alltag",
         words: 200,
       },
       {
         id: "wt_digitales_l06",
         text: "Nach dem Technikertermin ist Ihr Internet weiterhin instabil. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.internet",
-        sectors: ["transport"],
         points: [
           "Beschreiben Sie die Messwerte.",
           "Verweisen Sie auf den ersten Termin.",
@@ -12332,14 +11425,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "beschwerde",
-        exam: "dtb",
         words: 150,
       },
       {
         id: "wt_digitales_l07",
         text: "Ihr Laptop wird sehr heiß und schaltet sich ab, oft mitten in der Arbeit. Schreiben Sie an den Hersteller-Support.",
         sub: "digitales.geraete",
-        sectors: ["cleaning"],
         points: [
           "Beschreiben Sie, wann das Problem auftritt.",
           "Sagen Sie, was Sie schon versucht haben.",
@@ -12350,14 +11441,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_digitales_l08",
         text: "Sie suchen ein Tablet für Videotelefonie mit der Familie und für Lern-Apps. Schreiben Sie an einen Elektromarkt.",
         sub: "digitales.geraete",
-        sectors: ["production"],
         points: [
           "Beschreiben Sie, wofür Sie das Tablet brauchen.",
           "Nennen Sie Ihr Budget.",
@@ -12368,14 +11457,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "email_halbformell",
-        exam: "goethe_b1",
         words: 80,
       },
       {
         id: "wt_digitales_l09",
         text: "Ihr Konto bei einem Onlinedienst wurde ohne Erklärung gesperrt. Schreiben Sie an den Anbieter.",
         sub: "digitales.konto",
-        sectors: ["chemicals"],
         points: [
           "Beschreiben Sie, was passiert ist.",
           "Sagen Sie, wann Sie sich zuletzt eingeloggt haben.",
@@ -12386,14 +11473,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_digitales_l10",
         text: "Ihr Handy ist kaputt. Schreiben Sie eine E-Mail an den Laden, in dem Sie es gekauft haben.",
         sub: "digitales.geraete",
-        sectors: ["security"],
         points: [
           "Nennen Sie, wann Sie das Handy gekauft haben.",
           "Beschreiben Sie, was nicht funktioniert.",
@@ -12404,14 +11489,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "goethe_b1",
         words: 150,
       },
       {
         id: "wt_digitales_l11",
         text: "Sie vermuten, dass Ihr E-Mail-Konto von einer fremden Person genutzt wurde. Schreiben Sie an den Anbieter.",
         sub: "digitales.konto",
-        sectors: ["care"],
         points: [
           "Nennen Sie Ihre Kontodaten ohne Ihr Passwort.",
           "Beschreiben Sie die auffälligen Vorgänge mit Datum.",
@@ -12422,14 +11505,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B2.1",
         format: "email_formell",
-        exam: "alltag",
         words: 150,
       },
       {
         id: "wt_digitales_l12",
         text: "Immer mehr Dienste sind nur noch digital erreichbar. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "digitales.vertrag",
-        sectors: ["it", "retail"],
+        sectors: ["it"],
         points: [
           "Beschreiben Sie die Entwicklung.",
           "Analysieren Sie, wer dadurch ausgeschlossen wird.",
@@ -12441,14 +11523,12 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "C1",
         format: "forumsbeitrag",
-        exam: "goethe_c1",
         words: 200,
       },
       {
         id: "wt_digitales_l13",
         text: "In einem Online-Forum wird gefragt, ob man ohne Smartphone im Alltag noch zurechtkommt. Schreiben Sie einen Beitrag.",
         sub: "digitales.geraete",
-        sectors: ["sports"],
         points: [
           "Sagen Sie Ihre Meinung zu der Frage.",
           "Berichten Sie von Ihrer eigenen Erfahrung.",
@@ -12459,7 +11539,6 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         register: "sie",
         level: "B1.2",
         format: "forumsbeitrag",
-        exam: "goethe_b1",
         words: 80,
       },
     ],

@@ -1,7 +1,7 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ChevronDown, Clock, Play, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronDown, Clock, Play } from "lucide-react";
 import {
   HUB_LEVELS,
   MOCK_PART_ORDER,
@@ -23,7 +23,15 @@ import {
 } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
-import { useStagePanel } from "@/features/shared/useStagePanel";
+import {
+  CHART_RUNS,
+  DeltaChip,
+  NoScoreYet,
+  ScoreChart,
+  VERLAUF_REST_ROWS,
+  VerlaufCard,
+  shortDate,
+} from "./verlauf";
 import { LevelSelect, type LevelOption } from "./LevelSelect";
 import { TabSwitcher, TABS, panelId, type Tab } from "./hubSwitcher";
 import { Button } from "@/components/ui/button";
@@ -58,11 +66,20 @@ import { MockExamRunner } from "@/features/exam/MockExamRunner";
 
 type ClockMode = "free" | "timed";
 
-/** Runs listed before the learner asks for the rest (desktop; a phone rests at 0). */
-const VERLAUF_REST_ROWS = 3;
-
-/** How many past runs the development chart plots. */
-const CHART_RUNS = 7;
+/**
+ * The hub's ONE column width (founder pick C at "medium", s197).
+ *
+ * Every block on the page is this wide: the switcher row, the scope row, the
+ * module grid and the Verlauf card. It replaces the three separately centred
+ * widths the page carried until s197 (a `max-w-4xl` panel column holding a
+ * `max-w-[30rem]` module grid holding a `max-w-[26rem]` Stärkeprofil), which is
+ * why nothing on the page shared an edge with anything else.
+ *
+ * 40rem is chosen from the module tiles, not the other way round: s196 capped
+ * the GRID narrower than the column to stop the tiles reading as wide empty
+ * strips, and at this column width they are that shape without a cap.
+ */
+const HUB_COL = "max-w-[40rem]";
 
 /**
  * Where a module goes when it is started without a clock.
@@ -239,15 +256,14 @@ export function PruefungHub() {
         !verlaufOpen && "h-pruefung-stage min-h-0",
       )}
     >
-      {/* Mobile: the switcher IS the page header here too (no HubHero, no h1),
-          and the scope controls sit BELOW it, centred (founder s189). Desktop:
-          the switcher moved into the AppShell header next to the "Prüfung"
-          title (founder, this session), so it is `lg:hidden` below and this
-          block holds only the scope row from lg up. */}
-      <div className="mx-auto flex w-full flex-col items-center gap-3 lg:max-w-4xl">
-        <div className="lg:hidden">
-          <TabSwitcher tab={tab} onSelect={selectTab} />
-        </div>
+      {/* The switcher IS the page header, at EVERY width (founder pick C, s197;
+          no HubHero, no h1), with the scope controls centred below it. s196 had
+          moved a desktop copy into the AppShell header beside a "Prüfung"
+          title, which parked it on the app's left gutter while the page stayed
+          centred, so the title lined up with nothing. This is the same answer
+          the Bibliothek and Schreiben headers already give. */}
+      <div className={cn("mx-auto flex w-full flex-col items-center gap-3", HUB_COL)}>
+        <TabSwitcher tab={tab} onSelect={selectTab} />
         {/* Fixed height: the Modelltest tab hides the clock switch, and without
             it the row would change height and shift the page on every switch. */}
         <div className="flex h-9 items-center justify-center gap-2">
@@ -284,7 +300,7 @@ export function PruefungHub() {
             role="tabpanel"
             id={panelId(tab)}
             aria-label={TABS.find((t) => t.id === tab)?.label}
-            className="mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5 lg:max-w-4xl"
+            className={cn("mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 sm:gap-5", HUB_COL)}
           >
             {/* The Verlauf card is on the page from the FIRST visit (founder
                 s195, option 2): both tabs hold a one-viewport frame, and until
@@ -417,10 +433,13 @@ function ModuleGrid({
 }) {
   return (
     // 2x2 at EVERY width (founder s189): four across a 1152px column left the
-    // cards narrow and cramped against all that empty page. Capped narrower
-    // than the 4xl column this session (founder: the tiles "look empty"), so
-    // each card reads closer to square instead of a wide, half-empty strip.
-    <div className="mx-auto grid w-full max-w-[26rem] flex-none grid-cols-2 gap-3 sm:max-w-[30rem] sm:gap-4">
+    // cards narrow and cramped against all that empty page. No cap of its own
+    // since s197: the tiles fill the hub's column, because the column came down
+    // to THEM (`HUB_COL`). s196's `max-w-[30rem]` cap answered the same
+    // complaint ("the tiles look empty") by narrowing the grid inside a much
+    // wider column, which is what left a narrow tile island floating over a
+    // full-width Verlauf card.
+    <div className="grid w-full flex-none grid-cols-2 gap-3 sm:gap-4">
       {MOCK_PART_ORDER.map((part, i) => {
         const meta = PART_META[part];
         const Icon = meta.icon;
@@ -649,7 +668,7 @@ function PartLadder() {
 function AiBudgetNote({ level }: { level: HubLevel }) {
   const writing = useDailyAllowance(level === "B1" ? "kurz" : "lang");
   // A Modelltest's Teil Sprechen is an EXAM conversation, so it spends the exam
-  // budget (3/day since s197), never the practice one.
+  // budget (3/day since s204), never the practice one.
   const speaking = useDailyAllowance("sprechenExam");
   if (!writing.known || !speaking.known) return null;
 
@@ -693,119 +712,6 @@ function ExamCountdown({ examDate }: { examDate: string | null }) {
 }
 
 /* --------------------------------- Verlauf -------------------------------- */
-
-/**
- * The shell every Verlauf shares: one card, one expandable list, one rule.
- *
- * `split` puts the summary and the list SIDE BY SIDE from lg up. The Module tab
- * needs it: a 2x2 grid, a four-column profile and a list stacked come to 930px,
- * which scrolls a 900px laptop on a page that is supposed to rest. Side by side
- * they come to 750px, and the card stops wasting the 400px of width the profile
- * does not use. The Modelltest tab's summary is already a left/right
- * composition and its page fits, so it stays stacked.
- */
-function VerlaufCard({
-  count,
-  open,
-  onToggle,
-  head,
-  rows,
-  restRows,
-  moreLabel,
-  split = false,
-}: {
-  count: string;
-  open: boolean;
-  onToggle: () => void;
-  head: React.ReactNode;
-  rows: React.ReactNode[];
-  restRows: number;
-  moreLabel: string;
-  split?: boolean;
-}) {
-  const panelRef = useStagePanel<HTMLDivElement>(open);
-  const listId = useId();
-  const shown = open ? rows : rows.slice(0, restRows);
-  const hidden = rows.length - shown.length;
-  // An empty Verlauf has no list and nothing to expand: it is the promise of
-  // one (founder s195, option 2), so it holds the head alone and takes the room
-  // the tab has left rather than leaving the lower half of the stage bare.
-  const empty = rows.length === 0;
-  const more = !empty && (hidden > 0 || open);
-  const asSplit = split && !empty;
-
-  return (
-    <Card
-      ref={panelRef}
-      className={cn(
-        // The scroll margins are what keep the tile's own borders visible when
-        // it is scrolled into view: `scrollIntoView` knows nothing about the
-        // sticky header or the fixed bottom bar, so without them the expanded
-        // tile parks its lower edge underneath the tab bar.
-        "flex scroll-mb-24 scroll-mt-20 flex-col overflow-hidden lg:scroll-mb-8",
-        open ? "max-h-panel-stage" : empty ? "min-h-0 flex-1" : "flex-none",
-      )}
-    >
-      <div className="flex flex-none items-baseline justify-between gap-3 px-4 pt-3 sm:px-5 lg:px-6">
-        <p className="text-eyebrow text-muted-foreground">Verlauf</p>
-        <p className="text-xs tabular-nums text-muted-foreground">{count}</p>
-      </div>
-
-      <div
-        className={cn(
-          "flex min-h-0 flex-1 flex-col",
-          asSplit && "lg:grid lg:grid-cols-[minmax(0,26rem)_1px_minmax(0,1fr)] lg:items-stretch",
-        )}
-      >
-        <div className={cn(
-            // Tightened this session (founder: the tile "looks unnecessarily
-            // big"): the head no longer carries the card's tallest padding.
-            "px-4 pb-2.5 pt-2 sm:px-5 sm:pb-3 lg:px-6",
-            empty ? "flex min-h-0 flex-1 flex-col justify-center" : "flex-none",
-            asSplit && "lg:flex lg:flex-col lg:justify-center lg:pb-3.5",
-          )}>
-          {head}
-        </div>
-
-        {asSplit && <div aria-hidden className="hidden bg-border lg:block" />}
-
-        {!empty && (
-          <div className={cn("flex min-h-0 flex-1 flex-col", asSplit && "lg:justify-center")}>
-            {/* At rest a phone shows the summary only, because a 2x2 grid plus a
-                summary plus a list does not fit one phone screen; from sm up the
-                newest rows are listed too. Opening is what lets the page grow. */}
-            <div
-              id={listId}
-              className={cn(
-                "slim-scrollbar min-h-0 divide-y divide-border border-t border-border",
-                asSplit && "lg:border-t-0",
-                open ? "flex-1 overflow-y-auto" : "hidden flex-none sm:block",
-              )}
-            >
-              {shown}
-            </div>
-
-            {more && (
-              <button
-                type="button"
-                onClick={onToggle}
-                aria-expanded={open}
-                aria-controls={listId}
-                className={cn(
-                  "flex flex-none items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-semibold text-primary transition-colors hover:bg-muted/60",
-                  asSplit && "lg:border-t-0",
-                )}
-              >
-                {open ? "Weniger anzeigen" : moreLabel}
-                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-}
 
 /* ---------------------------- Modelltest Verlauf --------------------------- */
 
@@ -855,22 +761,7 @@ function RunVerlauf({
                 <span className="text-display text-[2rem] leading-none tabular-nums">
                   {last} %
                 </span>
-                {delta != null && delta !== 0 && (
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-bold tabular-nums",
-                      delta > 0
-                        ? "bg-success/15 text-success"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    <TrendingUp
-                      className={cn("h-3 w-3", delta < 0 && "-scale-y-100")}
-                      aria-hidden
-                    />
-                    {delta > 0 ? `+${delta}` : delta}
-                  </span>
-                )}
+                {delta != null && delta !== 0 && <DeltaChip delta={delta} />}
               </p>
               <div className="mt-2 flex gap-5">
                 <p className="text-xs text-muted-foreground">
@@ -898,73 +789,13 @@ function RunVerlauf({
   );
 }
 
-/**
- * The run history as bars against the pass line. The last bar is the gradient
- * one (it is the figure printed beside the chart), the best is outlined, and the
- * pass threshold is a dashed rule named in the caption rather than labelled on
- * the chart, where the label sat on top of the early bars.
- */
-function ScoreChart({ series, best }: { series: number[]; best: number }) {
-  const H = 52;
-  return (
-    <div className="flex flex-col items-start">
-      <div
-        className="relative flex h-[52px] w-fit items-end gap-2"
-        role="img"
-        aria-label={
-          series.length
-            ? `Deine letzten ${series.length} Ergebnisse: ${series.join(" %, ")} %. Bestanden ab ${PASS_PCT} %.`
-            : "Noch keine Ergebnisse"
-        }
-      >
-        <span
-          aria-hidden
-          className="absolute -left-1.5 -right-1.5 border-t border-dashed border-success/70"
-          style={{ bottom: (PASS_PCT / 100) * H }}
-        />
-        {series.map((t, i) => {
-          const isNow = i === series.length - 1;
-          const isTop = t === best && !isNow;
-          return (
-            <span
-              key={i}
-              className={cn(
-                "w-8 rounded-t-[4px] sm:w-9",
-                isNow
-                  ? "bg-gradient-to-b from-primary to-[hsl(var(--gradient-to))]"
-                  : isTop
-                    ? "bg-primary/[0.16] ring-[1.5px] ring-inset ring-primary/55 dark:bg-primary/20 dark:ring-primary/70"
-                    : "bg-primary/30 dark:bg-primary/40",
-              )}
-              style={{ height: Math.max(3, (t / 100) * H) }}
-            />
-          );
-        })}
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        <span
-          aria-hidden
-          className="mr-1.5 inline-block w-3.5 border-t border-dashed border-success align-middle"
-        />
-        bestanden ab {PASS_PCT} %
-      </p>
-    </div>
-  );
-}
-
 /** One Modelltest run: date, the four parts as segments, the total. */
 function RunRow({ record }: { record: MockExamRecord }) {
   const [expanded, setExpanded] = useState(false);
   // A run that produced no score at all: four empty tracks read as a loading
   // skeleton, so the row states the fact instead of drawing nothing.
   const unscored = MOCK_PART_ORDER.every((p) => record.parts[p] == null);
-  const date = useMemo(
-    () =>
-      new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(
-        new Date(`${record.date}T00:00:00`),
-      ),
-    [record.date],
-  );
+  const date = shortDate(record.date);
 
   return (
     <div>
@@ -1007,7 +838,10 @@ function RunRow({ record }: { record: MockExamRecord }) {
         )}
         <span className="ml-auto flex shrink-0 items-center gap-2">
           {record.total != null && (
-            <Badge variant={record.total >= PASS_PCT ? "success" : "muted"} className="tabular-nums">
+            <Badge
+              variant={record.total >= PASS_PCT ? "success" : "muted"}
+              className="whitespace-nowrap tabular-nums"
+            >
               {record.total} %
             </Badge>
           )}
@@ -1040,21 +874,6 @@ function RunRow({ record }: { record: MockExamRecord }) {
           })}
         </div>
       )}
-    </div>
-  );
-}
-
-/** A run exists but produced no score (abandoned, or nothing gradeable). */
-function NoScoreYet() {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-        <Clock className="h-[17px] w-[17px]" />
-      </span>
-      <p className="text-[13px] leading-snug text-muted-foreground">
-        <span className="block text-sm font-semibold text-foreground">Noch keine Bewertung</span>
-        Sitze einen Durchlauf zu Ende, dann steht hier dein Ergebnis.
-      </p>
     </div>
   );
 }
@@ -1110,7 +929,7 @@ function ModuleVerlauf({
                 option 2): with none they stand empty at "–", which is what
                 shows a first-time learner the shape of what practising builds.
                 Only the caption below changes. */}
-            <div className="mx-auto grid w-full max-w-[26rem] grid-cols-4 gap-2.5 sm:gap-3">
+            <div className="grid w-full grid-cols-4 gap-2.5 sm:gap-3">
               {MOCK_PART_ORDER.map((part) => {
                 const list = byPart[part];
                 const first = list[0] ?? null;
@@ -1130,11 +949,14 @@ function ModuleVerlauf({
                     </span>
                     <span
                       className={cn(
-                        // Shorter this session (founder: the Verlauf tile
-                        // "looks unnecessarily big"): the bars carried most of
-                        // the card's height for very little information.
-                        "relative h-10 w-full overflow-hidden rounded-md sm:h-16",
-                        last == null ? "bg-muted/40" : "bg-muted/80",
+                        // Shorter since s196 (founder: the Verlauf tile "looks
+                        // unnecessarily big"): the bars carried most of the
+                        // card's height for very little information. An EMPTY
+                        // column is shorter again (s197): at full height, four
+                        // grey slabs at "–" read as a chart that failed to
+                        // render rather than as the shape of what is coming.
+                        "relative w-full overflow-hidden rounded-md",
+                        last == null ? "h-6 bg-muted/40 sm:h-8" : "h-10 bg-muted/80 sm:h-16",
                       )}
                     >
                       {last != null && (
@@ -1147,7 +969,11 @@ function ModuleVerlauf({
                         </span>
                       )}
                     </span>
-                    <span className="flex flex-col items-center gap-1 text-[11px] font-semibold sm:flex-row sm:gap-1.5 sm:text-xs">
+                    {/* Mark ABOVE the name at every width since s197: in the
+                        split card each of the four columns is ~80px wide now,
+                        and the side-by-side form pushed "Schreiben" straight
+                        through the divider into the list beside it. */}
+                    <span className="flex flex-col items-center gap-1 text-[11px] font-semibold sm:text-xs">
                       <span
                         className={cn(
                           "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md",
@@ -1168,8 +994,7 @@ function ModuleVerlauf({
                   <span className="block text-sm font-semibold text-foreground">
                     Dein Stärkeprofil
                   </span>
-                  Übe ein Modul, dann steht hier, wie du gestartet bist und was du seitdem
-                  dazugewonnen hast.
+                  Übe ein Modul, dann siehst du hier deinen Fortschritt.
                 </>
               ) : (
                 "Blass: dein erster Versuch · Kräftig: dein Fortschritt"
@@ -1186,19 +1011,15 @@ function ModuleVerlauf({
 function PracticeRow({ entry }: { entry: ModulePractice }) {
   const meta = PART_META[entry.part];
   const Icon = meta.icon;
-  const date = useMemo(
-    () =>
-      new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(
-        new Date(`${entry.date}T00:00:00`),
-      ),
-    [entry.date],
-  );
+  const date = shortDate(entry.date);
 
   return (
-    <div className="flex w-full items-center gap-3 px-4 py-2 sm:gap-4 sm:px-5 lg:px-6">
-      <span className="w-[62px] shrink-0 text-sm font-semibold tabular-nums sm:w-[76px]">
-        {date}
-      </span>
+    // One padding and one gap at every width since s197: this row sits in the
+    // RIGHT half of a 40rem card now (~296px), and the old `sm:gap-4 lg:px-6`
+    // spent 24px of that on air. The row then had exactly 0px spare, so the
+    // score badge wrapped its "%" and the module name truncated to "Schre...".
+    <div className="flex w-full items-center gap-3 px-4 py-2">
+      <span className="w-[72px] shrink-0 text-sm font-semibold tabular-nums">{date}</span>
       <span
         className={cn(
           "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
@@ -1207,11 +1028,11 @@ function PracticeRow({ entry }: { entry: ModulePractice }) {
       >
         <Icon className={cn("h-[15px] w-[15px]", meta.ink)} />
       </span>
-      <span className="text-sm font-semibold">{PART_LABEL[entry.part]}</span>
+      <span className="truncate text-sm font-semibold">{PART_LABEL[entry.part]}</span>
       {entry.pct != null && (
         <Badge
           variant={entry.pct >= PASS_PCT ? "success" : "muted"}
-          className="ml-auto tabular-nums"
+          className="ml-auto shrink-0 whitespace-nowrap tabular-nums"
         >
           {entry.pct} %
         </Badge>
