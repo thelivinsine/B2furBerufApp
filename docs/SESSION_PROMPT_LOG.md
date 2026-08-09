@@ -5983,4 +5983,21 @@ ships as a preview file only, nothing implemented from it.
 **Flagged, not decided:** the consent bump re-prompts every signed-in learner on their next visit,
 and reverting it is one line.
 
-- **Artifacts:** **PR #835**, squash-merged · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+**How it actually shipped.** Two surprises, both handled before the merge rather than after:
+1. **`main` had moved 20 commits** (sessions 197-203) while this branch was open, so the branch was
+   merged with `main` twice (a second time when two more doc commits landed mid-merge) and every gate
+   was re-run on the merged tree: typecheck · lint 0 errors · **675 tests** · build ·
+   check:bundle 128.3 kB · check:contrast · lint:content · lint:migrations. Conflicts were resolved
+   by keeping BOTH sessions' facts in the append-only logs, taking main's compressed CLAUDE.md (s203
+   had just brought it back under budget) and paying for the new invariant by trimming elsewhere, and
+   taking **main's** `pages.yml`, which had already raised the deploy timeout as #821 with a better
+   split than this branch's own attempt. **This session is renumbered 204**: two parallel sessions
+   had already used 197 while it was open.
+2. **GitHub never queued a CI run for PR #835.** Other branches' runs were queuing normally
+   throughout, so this is the same "no checks on this PR" behaviour s196 recorded, not an outage. The
+   merge went ahead on the LOCAL gate run, said so in the merge commit, and `main`'s own push-triggered
+   workflows then ran: **Deploy Supabase functions** (migration 0018 + the four Edge Functions) and
+   **Deploy site to GitHub Pages**.
+
+- **Artifacts:** **PR #835**, squash-merged as `ad8fead` · merge commits `3f31172` and `bcfb3f7` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
