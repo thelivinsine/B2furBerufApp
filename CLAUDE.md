@@ -119,9 +119,8 @@ after pulling.
   anatomy (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
 - **The nav runs ONE order and setup ends in the Bibliothek** (founder s207, `PRAKTISCH-NAV.md`):
   Bibliothek · Prüfung · Fortschritt · Praktisch (**Beta**) · Einstellungen, bar and sidebar alike,
-  from the single `navItems`. Bibliothek, Praktisch and Einstellungen are the fixed slots
-  (`NEVER_HIDEABLE`), only Prüfung + Fortschritt reorder. Onboarding hands over to `/library`, and
-  the ~90s taster session it used to start is gone.
+  from the single `navItems`; Bibliothek, Praktisch and Einstellungen are the fixed slots
+  (`NEVER_HIDEABLE`), only Prüfung + Fortschritt reorder. Onboarding hands over to `/library`.
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and
@@ -274,10 +273,9 @@ rejected-then-reverted landmine list. The bullets below are only the always-on s
   section-description sentence under a header (`SectionHeading`/`HubHero` `description` stays unset).
   Learning content is display-size and exempt; functional strings (EmptyState, form helpers, the
   session preview line) are kept.
-- **In-app UI language follows the LEVEL** (founder s207): A2/B1 English, B2/C1 German, and **the
-  learning material is German at every level** (hold-to-peek gloss unchanged). One fold
-  `src/lib/uiLang.ts`, all English in `uiStrings.ts` keyed by the German string so an unconverted
-  one still renders; coverage so far + what is still German: `UI-LANGUAGE.md`. Landing stays EN.
+- **In-app UI language follows the LEVEL** (founder s207): A2/B1 English, B2/C1 German, **the
+  learning material German at every level** (gloss unchanged). One fold `src/lib/uiLang.ts`, all
+  English in `uiStrings.ts` keyed by the German string; coverage + exceptions: `UI-LANGUAGE.md`.
 - **Everything the FOUNDER reads is ENGLISH** (founder rule, restated s187): chat, PR bodies, docs,
   and every `preview/*.html` mockup or artifact, including headings, option names, notes, tables and
   switch labels. The interface-language rule above is about the product, not review material: the

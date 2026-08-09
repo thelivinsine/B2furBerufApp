@@ -6214,14 +6214,34 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   surfaced: the AI disclaimer under both writing trainers was one sentence split across two JSX
   lines, so half of it was translated and the join lost its space; it is one key per trainer now.
 
-- **Artifacts:** `src/lib/uiLang.ts` · `src/lib/uiStrings.ts` · `docs/areas/UI-LANGUAGE.md` ·
-  `tests/uiLang.test.ts` · `tests/nav.test.tsx` · `docs/areas/PRAKTISCH-NAV.md` · `CLAUDE.md`
-  (nav-order law, interface-language law, back under its line budget) · `docs/PROJECT_STATUS.md`
+- **Artifacts:** **PR #843**, squash-merged as `c334b65` · `src/lib/uiLang.ts` ·
+  `src/lib/uiStrings.ts` · `docs/areas/UI-LANGUAGE.md` (new) · `tests/uiLang.test.ts` ·
+  `tests/nav.test.tsx` · `docs/areas/PRAKTISCH-NAV.md` · `CLAUDE.md` (nav-order law,
+  interface-language law, back under its line budget) · `docs/PROJECT_STATUS.md`
 
 ### Prompt 5 (2026-08-09)
 
 > merge to main and document the session when done
 
-- **Response summary:** Ran the full gate set (typecheck, 701 unit tests, lint 0 errors, build,
-  check:bundle 153.2 kB, check:contrast, lint:content), documented the session in
-  `PROJECT_STATUS.md` + this log + the two area docs, then opened and squash-merged the PR.
+- **Response summary:** Ran the full gate set locally, then found `origin/main` had moved under the
+  branch while it was open (#840, #841, #842 — sessions 205 and 206 ran in PARALLEL with this one,
+  which is why this session is numbered **207**). Merged `main` in and re-ran every gate on the
+  MERGED tree: typecheck · **701 tests** · lint 0 errors · build · check:bundle 153.2 kB ·
+  check:contrast · lint:content · lint:migrations. Every conflict was in the docs: `CLAUDE.md` took
+  main's compressions of the shared laws PLUS this session's two new ones, `PROJECT_STATUS.md`
+  interleaved the three session blocks under one header, and the two append-only logs kept both
+  sides. Renumbered this session's own markers from s205 to s207 across source comments, tests and
+  docs, since main had already used both numbers. Opened **PR #843**, waited for the CI run on the
+  merge commit (`18a909f`, all 15 steps green), squash-merged as `c334b65`, then did the post-merge
+  housekeeping (`fetch` → `reset --hard origin/main` → `push --force-with-lease`, clean).
+
+### Prompt 6 (2026-08-09)
+
+> document the session
+
+- **Response summary:** Closed the paper trail the merge itself could not carry: the PR number
+  (**#843**), the squash SHA (**`c334b65`**) and the CI-green merge commit are now in the
+  `PROJECT_STATUS.md` header for session 207, and this entry records the merge round (the parallel
+  sessions, the renumbering, the doc conflicts and how each was resolved) plus this prompt.
+
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
