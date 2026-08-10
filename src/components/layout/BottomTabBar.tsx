@@ -15,10 +15,10 @@ const IZ = 29; // icon size
 // The bar's three fixed slots and its reorderable middle.
 //
 // Until s207 Home ("/") was the fixed first slot. The founder reordered the
-// rail: **Bibliothek opens it and Praktisch sits directly left of
+// rail: **Bibliothek opens it and Spielplatz sits directly left of
 // Einstellungen**, because onboarding now hands a new learner straight to the
-// library and the Praktisch zone is still Beta. So the ends are Bibliothek and
-// Praktisch + Einstellungen, and the middle that reorders (the long-press
+// library and the Spielplatz zone is still Beta. So the ends are Bibliothek and
+// Spielplatz + Einstellungen, and the middle that reorders (the long-press
 // easter egg) is Prüfung · Fortschritt.
 //
 // `/writing` keeps its route and every deep link; it is a card in the Prüfung
@@ -39,7 +39,7 @@ function TabIcon({ path }: { path: string }) {
  *
  * The active state comes from `navZoneOf`, NOT from NavLink's own `isActive`:
  * a zone owns more routes than its own path (the Schreibtrainer is Prüfung, a
- * running session is Praktisch), and matching the URL alone left the bar with
+ * running session is Spielplatz), and matching the URL alone left the bar with
  * nothing lit on every page one level below a hub (founder s192).
  */
 function BarTab({ path, active, moreHidden }: { path: string; active: boolean; moreHidden?: boolean }) {
@@ -94,7 +94,7 @@ function BarTab({ path, active, moreHidden }: { path: string; active: boolean; m
           aria-hidden={!showActive}
         >
           {label}
-          {/* Beta suffix (founder s207, Praktisch): a plain lighter suffix, not
+          {/* Beta suffix (founder s207, Spielplatz): a plain lighter suffix, not
               a chip — the label slot is a fixed 12px line, and a bordered chip
               would grow it and shift the icon rail the slot exists to hold
               still. It rides inside the truncate like the label itself. */}
@@ -127,13 +127,13 @@ export function BottomTabBar() {
   // Steuerung H2: hide middle tabs from the RAIL only (routes stay mounted, and
   // edit-mode reorder keeps operating on the full `middle` so hidden tabs are
   // never dropped from the persisted pins). The three fixed slots (Bibliothek,
-  // Praktisch, Einstellungen) are never hideable (locked bar structure).
+  // Spielplatz, Einstellungen) are never hideable (locked bar structure).
   const hiddenTabs = useAppConfigStore(s => s.config.hiddenTabs);
   const shownMiddle = middle.filter(p => !hiddenTabs.includes(p));
 
   // Which tab is lit: the ZONE the current route belongs to, so a page one
   // level below a hub (the Schreibtrainer under Prüfung, a session under
-  // Praktisch) still marks its section instead of leaving the bar blank.
+  // Spielplatz) still marks its section instead of leaving the bar blank.
   const activeZone = navZoneOf(pathname);
 
   // Navigating anywhere ends the reorder easter egg (there is no sheet to close).
@@ -218,7 +218,7 @@ export function BottomTabBar() {
                 ))}
               </Reorder.Group>
 
-              {/* Praktisch — pinned left of Einstellungen, not reorderable
+              {/* Spielplatz — pinned left of Einstellungen, not reorderable
                   (founder, s207), so it renders as a still tile like the ends. */}
               <div className="flex flex-1 p-1">
                 <div className="flex flex-1 items-center justify-center rounded-xl">
@@ -234,7 +234,7 @@ export function BottomTabBar() {
               </div>
             </>
           ) : (
-            /* Normal mode: Bibliothek · content sections · Praktisch · Einstellungen */
+            /* Normal mode: Bibliothek · content sections · Spielplatz · Einstellungen */
             <>
               <BarTab path={FIXED_FIRST} active={activeZone === FIXED_FIRST} />
               {shownMiddle.map(path => (

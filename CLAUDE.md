@@ -24,8 +24,7 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
   targeted `scripts/*.mjs` gates.
 
 ## Commands (index — full detail in `docs/areas/COMMANDS.md`)
-**Package manager is `pnpm`** (pinned; lockfile `pnpm-lock.yaml`). Never npm/yarn. `pnpm install`
-after pulling.
+**Package manager is `pnpm`** (pinned; lockfile `pnpm-lock.yaml`). Never npm/yarn. `pnpm install` after pulling.
 - `pnpm dev` · `pnpm build` (tsc + vite + help prerender; run before pushing) · `pnpm typecheck` ·
   `pnpm preview` · `pnpm audit`
 - CI gates: `pnpm lint:content` (after ANY content edit) · `pnpm lint:migrations` (after ANY new
@@ -94,9 +93,8 @@ after pulling.
   every one servable**, ≥2 per Unterthema per length, all 16 Textsorten live. A `du` brief never
   names a title + surname (s200): the Adressat drives the Anrede. `tests/writingScope.test.ts` and
   `tests/moduleScope.test.ts` gate it.
-- **A TAG IS EARNED, and a brief ASKS for what it is graded on.** Two rules, one arrangement: ONE
-  lexicon per rule in `scripts/`, shared by `lint:content` AND `tests/writingScope.test.ts`, so gate
-  and test cannot drift.
+- **A TAG IS EARNED, and a brief ASKS for what it is graded on.** ONE lexicon per rule in
+  `scripts/`, shared by `lint:content` AND `tests/writingScope.test.ts`, so gate and test cannot drift.
   - **Branche** (`sector-markers.mjs`, founder s199): the brief must name that workplace (Beruf keeps
     ≥8 of 15 earned, Alltag few and honestly). Dropping a false tag costs no reach, Branche being
     soft: add the missing word to the lexicon, or drop the tag.
@@ -118,9 +116,11 @@ after pulling.
   sliding-pill switcher (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card
   (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
 - **The nav runs ONE order and setup ends in the Bibliothek** (founder s207, `PRAKTISCH-NAV.md`):
-  Bibliothek · Prüfung · Fortschritt · Praktisch (**Beta**) · Einstellungen, bar and sidebar alike,
-  from the single `navItems`; Bibliothek, Praktisch and Einstellungen are the fixed slots
+  Bibliothek · Prüfung · Fortschritt · **Spielplatz** (**Beta**) · Einstellungen, bar and sidebar
+  alike, from the single `navItems`; Bibliothek, Spielplatz and Einstellungen are the fixed slots
   (`NEVER_HIDEABLE`), only Prüfung + Fortschritt reorder. Onboarding hands over to `/library`.
+  Named Praktisch through s209; renamed **Spielplatz** (founder s210, "Simulation" and "Alltag"
+  both already taken elsewhere); the area guide keeps its old filename, `PRAKTISCH-NAV.md`.
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and

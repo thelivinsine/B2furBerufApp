@@ -20,7 +20,7 @@ export function Sidebar({
 }) {
   // Steuerung H1/H2: remote nav-label overrides + middle-tab hiding (routes
   // stay mounted; the three fixed slots in NEVER_HIDEABLE — Bibliothek,
-  // Praktisch, Einstellungen — are never hideable, so remote config can't empty
+  // Spielplatz, Einstellungen — are never hideable, so remote config can't empty
   // a slot here that the bottom bar keeps drawing).
   const { navLabels, hiddenTabs } = useAppConfig();
   const shownNav = navItems.filter(
@@ -31,7 +31,7 @@ export function Sidebar({
   // copy and is taken verbatim; only the built-in label is translated.
   const t = useT();
   // Same zone fold as the bottom bar (s192): the Schreibtrainer marks Prüfung,
-  // a running session marks Praktisch, the Sammlung marks Fortschritt.
+  // a running session marks Spielplatz, the Sammlung marks Fortschritt.
   const activeZone = navZoneOf(useLocation().pathname);
   return (
     <div className="flex h-full flex-col gap-1 p-4">
@@ -86,7 +86,7 @@ export function Sidebar({
                   gradient + bold text). */}
               <RouteIcon path={to} size={18} active={active} />
               {navLabels[to] ?? t(label)}
-              {/* Beta suffix (founder s207, Praktisch). Same neutral chip as the
+              {/* Beta suffix (founder s207, Spielplatz). Same neutral chip as the
                   Neuland heading: bordered, muted, never the accent colour. */}
               {beta && (
                 <span className="ml-auto rounded-full border border-border px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-muted-foreground">

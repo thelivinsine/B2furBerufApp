@@ -1,6 +1,6 @@
 ---
 name: design
-description: Genauly design system + design-work process. MUST be loaded BEFORE creating or restyling ANY user-facing page, section, view, component, mockup, or preview (new surface, redesign, "make it prettier", layout, colors, spacing, motion, copy on chrome). Encodes the founder's locked visual language, the preview-first workflow, per-section rules (Bibliothek, Schreiben, Praktisch), and the pre-flight checklist that prevents rework rounds.
+description: Genauly design system + design-work process. MUST be loaded BEFORE creating or restyling ANY user-facing page, section, view, component, mockup, or preview (new surface, redesign, "make it prettier", layout, colors, spacing, motion, copy on chrome). Encodes the founder's locked visual language, the preview-first workflow, per-section rules (Bibliothek, Schreiben, Spielplatz), and the pre-flight checklist that prevents rework rounds.
 ---
 
 # Genauly design work: process + system
@@ -252,7 +252,8 @@ milestone dots) replaces XP as the headline, XP stays in Details. Dranbleiben = 
 (countdown + last simulation, only while the exam date is ahead) + a writing-aware Diagnose +
 Nächste Quest. The curve card shows the direction only; absolute counts stay on the tiles.
 
-**Praktisch (`/`).** One centered column all breakpoints (two-column desktop was rejected);
+**Spielplatz (`/`, called Praktisch before s210).** One centered column all breakpoints
+(two-column desktop was rejected);
 Üben = the soft SVG city map in a white `bg-surface` mat with neutral grey border, Spielen = the
 compact NeulandHub in the SAME mat geometry; both tiles land at the same screen position, page
 fits a phone viewport without scrolling. The Trainieren/Spielen toggle shares the squircle-track +
@@ -275,7 +276,7 @@ marks at full opacity. Structure is locked; don't touch without an explicit foun
 - Scale animations on framer `layout`/`Reorder` elements (s26).
 - Theme-picker interstitial before writing tasks (s147); section-description filler sentences;
   repeated Ziel/word-count labels.
-- Colored per-section mat borders on Praktisch tiles (neutral grey won, s90); two-column desktop
+- Colored per-section mat borders on Spielplatz tiles (neutral grey won, s90); two-column desktop
   dashboard (s90).
 - Backdrop-blur / flat-black modal overlays (locked dialog recipe instead).
 - **Accent-colored borders anywhere** (s168) AND grey outlines on accent rails (s169): the accent

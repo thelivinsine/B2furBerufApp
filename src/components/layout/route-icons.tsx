@@ -40,7 +40,7 @@ const graduationCap: Render = c => (
 );
 
 const RENDERERS: Record<string, Render> = {
-  // Praktisch (using German in real life) — a signpost (Wegweiser): two
+  // Spielplatz (using German in real life) — a signpost (Wegweiser): two
   // direction boards on a post, blue + neon cyan. Keeps the old compass's
   // "finding your way in real situations" motif as a solid upright mark.
   // Founder pick I, session 158 (replaced the compass).

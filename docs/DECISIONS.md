@@ -2394,3 +2394,39 @@ which is the only form that would have caught these two files.
 
 The debrief screen carried the identical line and was fixed with it, unreported: a bug found while
 standing in front of it is cheaper to fix than to schedule.
+
+## s210 — "Praktisch" becomes "Spielplatz"
+
+**The ask.** "rename practice or praktsich as simulation." The tab in question is the one labelled
+"Praktisch" in the nav (route `/`, holding the Üben/Spielen toggle and the daily dashboard).
+
+**Why "Simulation" was refused rather than applied.** The name was already load-bearing elsewhere:
+`/simulation` is the route for the Sprechen speaking-practice chooser, and "Prüfungssimulation" is
+the standing term for an exam set. Applying it to a second, unrelated tab would have made two
+different things answer to the same name in the same app, which is a worse outcome than the
+founder's actual complaint (a tab named after an adjective, "practical", rather than a noun). Refused
+before implementing, not after, because a naming collision is expensive to notice later: it would
+have shown up as confusion in support conversations and future prompts ("which Simulation do you
+mean"), not as a test failure.
+
+**The name-suggestion pass, and why it took two rounds.** The first offered set (Training, Praxis,
+Start) was collision-free but generic. The founder's actual want, surfaced only once asked to react
+to that set, was for the name to hint at the Neuland game living inside the same tab (Üben AND
+Spielen share this one tab). That ruled out "Mission" (the game's own unit of content, `mission.ts`
+and the `?mission=` param), "Quest" ("Nächste Quest" is a specific, named element on the Fortschritt
+page), "Level" (already the English translation of Niveau/Stufe in `uiStrings.ts`), and "Welt" (the
+game's own route, `/welt`). **Spielplatz** was picked from what was left (Arena, Spielplatz,
+Abenteuer), because it reads as literally true for both halves of the tab: a playground is somewhere
+you go to practise AND somewhere you go to play.
+
+**The rule this generalises to.** Before proposing a name for anything nav-facing, grep the
+candidate against routes, `nav-items.ts`, life-area labels, and any single-purpose term already doing
+work elsewhere in the product (a game mechanic, a chart label, a translation-table key). A name that
+reads well in isolation can still collide with a name the app already depends on; the two other
+options rejected in this same session (Simulation, Alltag) prove it is not a rare failure mode.
+
+**What did NOT change.** The route (`/`), the internal `dashboardStartTab` values (`"ueben"` /
+`"spielen"`), the remote-config `navLabels` override mechanism (still empty by default, so an
+already-configured founder override is unaffected), and the filename `docs/areas/PRAKTISCH-NAV.md`
+(kept as a stable identifier; six other docs link to it by name, and renaming a doc file returns less
+value than the churn of updating every cross-reference).

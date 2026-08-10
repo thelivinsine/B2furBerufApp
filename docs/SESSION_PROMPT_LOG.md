@@ -6420,3 +6420,42 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   detail already lives in `docs/areas/*` (no rule was dropped): 349 lines, linter quiet.
 - **Artifacts:** `docs/DECISIONS.md` (§s209, §s209b) · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/SESSION_PROMPT_LOG.md`
+
+## Session 210 (branch `claude/microphone-bug-fix-jc70vs`)
+
+### Prompt 1 (2026-08-10)
+
+> rename practice or praktsich as simulation
+
+- **Response summary:** Flagged a naming collision before implementing: "Simulation" is already the
+  route/label for the Sprechen speaking-practice chooser (`/simulation`) and "Prüfungssimulation" is
+  the standing term for an exam set, so renaming the "Praktisch" nav tab to "Simulation" too would
+  put two unrelated things under the same name. Asked the founder how to proceed via `AskUserQuestion`
+  rather than guessing; the founder asked for name suggestions instead of resolving the collision
+  another way.
+  Offered Training / Praxis / Start, checked collision-free by grep against routes, `nav-items.ts`
+  and life-area labels. The founder redirected: wanted a name hinting at the Neuland game that lives
+  in the same tab (alongside the daily Üben training). Checked the obvious game-flavoured words
+  first and ruled out "Mission" (already the game's own content unit, `mission.ts` + `?mission=`),
+  "Quest" (a named Fortschritt-page element, "Nächste Quest"), "Level" (already the English
+  translation of Niveau/Stufe in `uiStrings.ts`), and "Welt" (the game's own route). Offered Arena /
+  Spielplatz / Abenteuer, collision-checked the same way. Founder picked **Spielplatz**.
+  Renamed every user-facing instance: the nav label (`nav-items.ts`), its English translation
+  (`uiStrings.ts`, "Spielplatz" → "Playground"), the Session page eyebrow, the help-center copy
+  naming the home screen, three Admin Steuerung strings (DE + EN), and every code comment describing
+  the tab across six files. Updated the docs the rename made stale: `CLAUDE.md` (nav-order law +
+  lineage note, compressed elsewhere to hold the 350-line budget), `docs/areas/PRAKTISCH-NAV.md`
+  (content renamed throughout, filename deliberately kept as the stable identifier six other docs
+  link to), `docs/areas/SESSION.md`, `.claude/skills/design/SKILL.md`, `tests/nav.test.tsx` (its
+  founder-quote comment kept verbatim, since that is literally what was typed in an earlier session).
+  Left every dated/historical doc alone (`docs/plans/*`, `docs/branding/*`, `docs/DEMO_RUNBOOK.md`),
+  same treatment as any other past-tense record. Verified in a real browser at 430×932 (bottom bar:
+  "Spielplatz Beta") and 1280×900 (sidebar: "Spielplatz" + BETA chip). Gates: typecheck · 719 tests
+  (59 files, unchanged count) · lint 0 errors · build · check:bundle 153.3 kB · lint:content
+  (CLAUDE.md 349 lines).
+- **Artifacts:** `src/components/layout/nav-items.ts` · `BottomTabBar.tsx` · `Sidebar.tsx` ·
+  `route-icons.tsx` · `FeedbackButton.tsx` · `src/lib/uiStrings.ts` ·
+  `src/features/session/Session.tsx` · `src/features/help/content.ts` ·
+  `src/features/admin/AdminSteuerung.tsx` · `src/features/library/LibraryHub.tsx` · `src/index.css` ·
+  `tests/nav.test.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/areas/SESSION.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` (§s210) · `docs/PROJECT_STATUS.md`

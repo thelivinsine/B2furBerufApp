@@ -116,7 +116,7 @@ export function FeedbackDialog() {
  * shortened so it no longer overlaps). On mobile the feedback affordance is the
  * compact icon inside each Üben action bar / the in-session button instead, so
  * the pill never floats over content cards. Skipped on the dashboard `/`
- * (Praktisch → Üben/Spielen), a sparse page.
+ * (Spielplatz → Üben/Spielen), a sparse page.
  *
  * Desktop horizontal position (founder, 2026-07-13): centered under the
  * Bibliothek `FilterRail` column, not flush against the viewport edge. The

@@ -65,7 +65,7 @@ export function LibraryHub() {
 
   // Direction of the tab move (index of the target vs. where we came from) so a
   // tab to the right slides the new panel in from the right and the old one out
-  // to the left, and vice-versa, matching the Praktisch (Dashboard) toggle. We
+  // to the left, and vice-versa, matching the Spielplatz (Dashboard) toggle. We
   // read the previous index during render and advance it in an effect, so the
   // change-render computes the right direction while the ref is only WRITTEN in
   // the effect (no ref mutation during render).
@@ -77,7 +77,7 @@ export function LibraryHub() {
   }, [index]);
 
   // Only the CONTENT slides; the tab bar is hoisted here and stays put (true
-  // Praktisch parity, where the toggle is static and the panel slides). Because
+  // Spielplatz parity, where the toggle is static and the panel slides). Because
   // the switcher never unmounts, its shared-layout pill also glides between tabs
   // instead of re-appearing.
   //

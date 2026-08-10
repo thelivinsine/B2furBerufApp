@@ -947,3 +947,28 @@ values, Neuland place/mission names, Pl./Perf. abbreviations); any NEW surface m
 
 Sessions 204-206 (the KI-usage measurement + reconciliation, and the Sprechen "AI doesn't work" fix)
 are archived in full in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`.
+
+---
+
+## Session 208 (archived from PROJECT_STATUS.md by session 210)
+
+**Session 208 (2026-08-09, branch `claude/filter-persistence-error-yr2716`): the CEFR level-band
+chip kept coming back.** Shipped as PR **#847** → **`de70c9b`**, squash-merged.
+Founder report, with a screenshot of the Wörter tab: "there seems to be an error with the filter
+here. Even if I remove and refresh it's still appearing. Fix it."
+- **Root cause:** the "Level: up to …" `ActiveFilterChip` (the removable UI for the default
+  CEFR-band cut on Wörter/Kollokationen/Redemittel, `defaultVisibleBands`) tracked its dismissal in
+  a plain `useState(false)` per trainer. A full page refresh always remounts the component, so the
+  flag reset to `false` and the chip reappeared even immediately after being dismissed.
+- **Fix:** moved the flag into `useSettingsStore` as a new persisted field, `showAllCefrLevels`
+  (default `false`), the same pattern already used for `artikelLegendDismissed` and
+  `signInBannerDismissed`. All three trainers (`VocabularyTrainer.tsx`, `CollocationsBrowser.tsx`,
+  `RedemittelTrainer.tsx`) now read/write that one store field instead of local state, so dismissing
+  the chip on any of the three tabs sticks across refreshes and rides cloudSync like the other
+  settings-store flags.
+- Gates: typecheck · lint 0 errors (78 warnings, pre-existing baseline, unrelated to this change) ·
+  build. No new test added (no test framework covers this UI interaction path today); verification
+  was a targeted code read of the three call sites plus the settings-store persistence contract.
+- **Not verified in a browser from the sandbox**: same network-policy limits as prior sessions.
+  Worth a founder check on the live site: open Wörter, dismiss the "Level: up to …" chip, hard-refresh
+  the page, confirm the chip stays gone.
