@@ -265,6 +265,14 @@ Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
 - **An automatic end of the recogniser does not end the utterance.** Chrome stops after a silence
   and mobile Chrome ignores `continuous`; `useSpeechInput` re-opens and keeps the finals, because
   the old behaviour reset the transcript on the learner's next press.
+- **A transcript is ASSIGNED, never appended** (s209). `listen()` rebuilds the whole transcript
+  from the full `results` list on every event and reports THAT, so a result the browser sends again
+  overwrites itself. Appending each event is what printed a sentence back word by word on iOS
+  ("hallo hallo hallo Petra hallo Petra ich finde …"): Safari re-delivers a growing utterance as a
+  longer version of itself AND flags interim results as final, so `resultIndex` plus `isFinal`
+  cannot be trusted to mark new text. `joinTranscript` drops a segment that merely restates the one
+  before it, and the hook accumulates in exactly ONE place: a recogniser session that has ENDED and
+  therefore cannot change. Gated by `tests/speech.test.ts`.
 - **Whether a Redemittel was used is asked of the model**, not matched against the transcript: a
   learner making a suggestion does not say the words "Vorschläge machen".
 - **The exam part completes on EXIT, carrying the score**, not when the debrief arrives. Firing on

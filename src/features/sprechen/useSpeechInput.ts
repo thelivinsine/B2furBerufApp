@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/speech";
+import {
+  joinTranscript,
+  listen,
+  recognitionSupported,
+  type RecognitionHandle,
+} from "@/engine/speech";
 
 /**
  * The microphone, as a hook (s193).
@@ -13,9 +18,12 @@ import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/s
  *
  *  - **Partial text is shown while speaking.** A microphone that shows nothing
  *    until you stop reads as frozen.
- *  - **The final transcript is assembled from every final chunk**, not just the
- *    last one. Recognition emits a stream of finals for a long utterance;
- *    keeping only the newest silently truncates what the learner said.
+ *  - **The transcript of one recogniser session is ASSIGNED, never appended**
+ *    (s209). `listen()` reports the whole transcript heard so far on every
+ *    event, precisely because a browser re-delivers a result it has already
+ *    sent; accumulating those here is what printed the learner's sentence back
+ *    to them word by word, over and over. Only the text of a recogniser session
+ *    that has ENDED is committed, and only a restart can append.
  *  - **The recogniser ending on its own does not end the utterance.** Chrome
  *    stops after a silence and mobile Chrome routinely ignores `continuous`,
  *    which used to drop the learner back to a "Sprechen" button whose next press
@@ -50,13 +58,15 @@ export interface SpeechInput {
 export function useSpeechInput(): SpeechInput {
   const supported = recognitionSupported();
   const [state, setState] = useState<MicState>(supported ? "idle" : "unsupported");
-  const [finals, setFinals] = useState("");
-  const [partial, setPartial] = useState("");
+  const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const handle = useRef<RecognitionHandle | null>(null);
-  // Read synchronously by `stop()`, which must return the transcript in the
-  // same tick: React state would still hold the previous render's value.
-  const finalsRef = useRef("");
+  // Both are read synchronously by `stop()`, which must return the transcript
+  // in the same tick: React state would still hold the previous render's value.
+  /** Transcripts of recogniser sessions that have already ended this utterance. */
+  const committedRef = useRef("");
+  /** The live transcript of the running recogniser session, replaced on every event. */
+  const sessionRef = useRef("");
   /**
    * True from the moment the learner opens the microphone until they stop or
    * reset it. An automatic end from the recogniser does NOT close it, which is
@@ -81,14 +91,19 @@ export function useSpeechInput(): SpeechInput {
     };
   }, []);
 
+  /** Everything heard this utterance: the ended sessions plus the running one. */
+  const heard = useCallback(
+    () => joinTranscript([committedRef.current, sessionRef.current]),
+    [],
+  );
+
   const open = useCallback<() => boolean>(() => {
     const h = listen({
-      onPartial: (t) => setPartial(t),
-      onFinal: (t) => {
-        // Append: one utterance can produce several final chunks.
-        finalsRef.current = `${finalsRef.current} ${t}`.trim();
-        setFinals(finalsRef.current);
-        setPartial("");
+      // ASSIGN: `t` is the whole transcript of this recogniser session, so a
+      // re-delivered result overwrites itself instead of doubling the sentence.
+      onPartial: (t) => {
+        sessionRef.current = t;
+        setText(heard());
       },
       onError: (err) => {
         // "no-speech" and "aborted" are routine and not worth a message.
@@ -102,6 +117,10 @@ export function useSpeechInput(): SpeechInput {
       },
       onEnd: () => {
         handle.current = null;
+        // This session is over, so its text can no longer change: bank it and
+        // start the next one empty. This is the ONE place text accumulates.
+        committedRef.current = heard();
+        sessionRef.current = "";
         // The recogniser stopped by itself while the learner is still speaking
         // (a silence, or mobile Chrome ignoring `continuous`). Re-open it and
         // keep everything heard so far; the learner never sees an interruption.
@@ -117,7 +136,7 @@ export function useSpeechInput(): SpeechInput {
     handle.current = h;
     setState("listening");
     return true;
-  }, []);
+  }, [heard]);
 
   useEffect(() => {
     reopen.current = open;
@@ -127,10 +146,10 @@ export function useSpeechInput(): SpeechInput {
     if (!supported || handle.current) return;
     // A fresh utterance clears the buffer; re-opening after an automatic end
     // never reaches here, because `openRef` keeps the handle path alive.
-    setFinals("");
-    setPartial("");
+    setText("");
     setError(null);
-    finalsRef.current = "";
+    committedRef.current = "";
+    sessionRef.current = "";
     openRef.current = true;
     restarts.current = 0;
     if (!open()) {
@@ -144,20 +163,20 @@ export function useSpeechInput(): SpeechInput {
     handle.current?.stop();
     handle.current = null;
     setState((s) => (s === "denied" ? s : "idle"));
-    const said = `${finalsRef.current} ${partial}`.trim();
-    setFinals("");
-    setPartial("");
-    finalsRef.current = "";
+    const said = heard();
+    setText("");
+    committedRef.current = "";
+    sessionRef.current = "";
     return said;
-  }, [partial]);
+  }, [heard]);
 
   const reset = useCallback(() => {
     openRef.current = false;
     handle.current?.stop();
     handle.current = null;
-    setFinals("");
-    setPartial("");
-    finalsRef.current = "";
+    setText("");
+    committedRef.current = "";
+    sessionRef.current = "";
     setError(null);
     setState((s) => (s === "denied" ? s : supported ? "idle" : "unsupported"));
   }, [supported]);
@@ -166,7 +185,7 @@ export function useSpeechInput(): SpeechInput {
     state,
     listening: state === "listening",
     supported,
-    text: `${finals} ${partial}`.trim(),
+    text,
     start,
     stop,
     reset,

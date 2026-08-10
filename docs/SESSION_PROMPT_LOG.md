@@ -6320,3 +6320,37 @@ the backend, which the sandbox cannot reach. The founder verifies live.
 - **Artifacts:** PR **#847** (`de70c9b`) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (sessions 204-206 archived off the
   main status file to stay under its line budget) · `docs/SESSION_PROMPT_LOG.md`
+
+## Session 209 (branch `claude/microphone-bug-fix-jc70vs`)
+
+### Prompt 1 (2026-08-10)
+
+> [screenshot of a running Sprechen conversation, "Homeoffice-Regelung einführen · Petra Sommer",
+> the learner's bubble reading "hallo hallo hallo hallo Petra hallo Petra ich hallo Petra ich finde
+> ich ich ich ich finde ich finde …", mic open, caption "Ich höre zu … tippe zum Stoppen"] there
+> seems to be some bug with the microphone feature. fix it
+
+- **Response summary:** The transcript was being ACCUMULATED on the caller's side.
+  `engine/speech.ts` walked each `onresult` event from `e.resultIndex` and handed the pieces on as
+  new text, and `useSpeechInput` appended every final chunk it received. Neither assumption holds on
+  iOS Safari, which grows an utterance by re-delivering it as a longer version of itself and flags
+  interim results as final, so every snapshot of the growing sentence was concatenated onto the last
+  ("hallo" · "hallo Petra" · "hallo Petra ich" …), which is the exact string in the screenshot. The
+  transcript sent to the conversation partner and to the grader was that same repeated text, so
+  Sprechen was unusable on an iPhone rather than merely ugly.
+  Fixed at the engine, so both consumers benefit (the Sprechen mic and the Übungs-Sprechdrill in
+  `SessionPlayer`): `listen()` now rebuilds the whole transcript from the full `results` list on
+  every event and reports THAT (both text callbacks carry the whole transcript so far, never a
+  delta), a re-delivered result overwrites itself, a new exported `joinTranscript` drops a segment
+  that merely restates the one before it, and `onFinal` fires only when the settled text actually
+  changes so the drill cannot grade one sentence twice. `useSpeechInput` now ASSIGNS the running
+  session's text and accumulates in exactly ONE place: a recogniser session that has ENDED (the
+  mobile-Chrome restart path, behaviour unchanged). Added `tests/speech.test.ts` (14 tests) covering
+  the screenshot's event sequence, the spec-compliant path, a duplicate delivery, the restart, an
+  unsettled tail and a denied microphone. Gates: typecheck · 715 tests (58 files, up from 701) ·
+  lint 0 errors · build · check:bundle 153.3 kB. Not verifiable on a device from the sandbox; the
+  founder checks it on an iPhone.
+- **Artifacts:** `src/engine/speech.ts` · `src/features/sprechen/useSpeechInput.ts` ·
+  `tests/speech.test.ts` · `docs/areas/SPRECHEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (session 207 archived off the main
+  status file to stay under its line budget) · `docs/SESSION_PROMPT_LOG.md`
