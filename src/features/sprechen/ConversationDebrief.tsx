@@ -13,6 +13,7 @@ import {
 } from "@/features/writing/correction";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useEdgeFade } from "@/features/shared/browseScroll";
 import { redemittelCategories } from "@/data/redemittel";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,8 @@ export function ConversationDebrief({
     result.corrected ?? result.original ?? "",
   );
 
+  const [scroller, setScroller] = useState<HTMLElement | null>(null);
+  const edge = useEdgeFade(scroller);
   const goalsMet = result.goalsMet ?? brief.goals.map(() => false);
   const redemittelUsed = result.redemittelUsed ?? brief.targetRedemittel.map(() => false);
 
@@ -65,8 +68,18 @@ export function ConversationDebrief({
       </div>
 
       {/* ONE inner region scrolls; the header above and the actions below are
-          pinned, which is the exam's stage treatment. */}
-      <div className="slim-scrollbar mask-fade-y flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+          pinned, which is the exam's stage treatment. The fade marks an edge
+          content actually continues past, never a region resting at its top
+          (s209): unconditional, it shaded the first card under the header. */}
+      <div
+        ref={setScroller}
+        className={cn(
+          "slim-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto",
+          edge.top && edge.bottom && "mask-fade-y",
+          edge.top && !edge.bottom && "mask-fade-top",
+          !edge.top && edge.bottom && "mask-fade-bottom",
+        )}
+      >
         <Card>
           <CardContent className="space-y-2.5 p-4">
             <p className="text-eyebrow text-muted-foreground">{t("Deine Ziele")}</p>

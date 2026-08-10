@@ -111,8 +111,40 @@ export interface RecognitionHandle {
   stop: () => void;
 }
 
+/**
+ * Fold the result list into one transcript (s209).
+ *
+ * A segment that RESTATES the previous one and extends it replaces it instead
+ * of being appended. iOS Safari grows an utterance by re-delivering it as a
+ * longer prefix ("hallo" · "hallo Petra" · "hallo Petra ich"), so appending
+ * every piece is what wrote a sentence out word by word, over and over.
+ * Comparison is case-insensitive because a browser may capitalise the segment
+ * only once it settles.
+ */
+export function joinTranscript(chunks: string[]): string {
+  const out: string[] = [];
+  for (const raw of chunks) {
+    const chunk = raw.trim();
+    if (!chunk) continue;
+    const prev = out[out.length - 1];
+    if (prev && chunk.toLowerCase().startsWith(prev.toLowerCase())) out[out.length - 1] = chunk;
+    else out.push(chunk);
+  }
+  return out.join(" ");
+}
+
+/**
+ * Open the microphone. Both text callbacks report the WHOLE transcript heard
+ * since this call, never a delta, and both are safe to re-deliver: each event
+ * rebuilds the transcript from the full result list rather than accumulating
+ * on the caller's side. That is what a browser re-sending a result it has
+ * already sent requires (iOS Safari does exactly that, and also flags interim
+ * results as final), and it is why a caller must ASSIGN what it receives here.
+ */
 export function listen(handlers: {
+  /** The full transcript so far, including the live, still-changing tail. */
   onPartial?: (text: string) => void;
+  /** The full settled transcript so far. Fires only when that text changes. */
   onFinal?: (text: string) => void;
   onError?: (err: string) => void;
   onEnd?: () => void;
@@ -124,16 +156,24 @@ export function listen(handlers: {
   rec.continuous = true;
   rec.interimResults = true;
 
+  let lastFinal = "";
+
   rec.onresult = (e: any) => {
-    let interim = "";
-    let final = "";
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const r = e.results[i];
-      if (r.isFinal) final += r[0].transcript;
-      else interim += r[0].transcript;
+    const finals: string[] = [];
+    const interims: string[] = [];
+    for (let i = 0; i < e.results.length; i++) {
+      const r = e.results?.[i];
+      const text = r?.[0]?.transcript;
+      if (typeof text !== "string") continue;
+      (r.isFinal ? finals : interims).push(text);
     }
-    if (interim) handlers.onPartial?.(interim);
-    if (final) handlers.onFinal?.(final);
+    const final = joinTranscript(finals);
+    const live = joinTranscript([final, ...interims]);
+    handlers.onPartial?.(live);
+    if (final !== lastFinal) {
+      lastFinal = final;
+      handlers.onFinal?.(final);
+    }
   };
   rec.onerror = (e: any) => handlers.onError?.(e?.error ?? "unknown");
   rec.onend = () => handlers.onEnd?.();

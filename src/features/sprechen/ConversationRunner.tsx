@@ -28,6 +28,7 @@ import { useDailyAllowance } from "@/lib/aiAllowance";
 import { useMediaQuery } from "@/lib/hooks";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { AuthDialog } from "@/features/auth/AuthDialog";
+import { useEdgeFade } from "@/features/shared/browseScroll";
 import { useLiveWork } from "@/lib/liveWork";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -397,14 +398,29 @@ export function ConversationRunner({
             : speech.error;
 
   const goalList = (
-    <ol className="space-y-1.5">
-      {brief.goals.map((g, i) => (
-        <li key={i} className="flex items-start gap-2 text-[13px] leading-snug">
-          <span className="mt-0.5 text-xs font-bold tabular-nums text-accent-ink">{i + 1}.</span>
-          <span>{g}</span>
-        </li>
-      ))}
-    </ol>
+    <>
+      {/* The task, in the learner's own words, carried from the chooser card
+          (founder s209: "the explanation here is missing in later pages"). It
+          was on the card, then vanished the moment the task was opened, so a
+          learner who had lost the thread could re-read their Leitpunkte but not
+          what the conversation was actually about. */}
+      {brief.situation && (
+        <>
+          {/* Muted, like the same text on the chooser card, so the Leitpunkte
+              under it stay the loudest thing in the tile. */}
+          <p className="text-[13px] leading-snug text-muted-foreground">{brief.situation}</p>
+          <div className="my-2.5 h-px bg-accent-ink/10" />
+        </>
+      )}
+      <ol className="space-y-1.5">
+        {brief.goals.map((g, i) => (
+          <li key={i} className="flex items-start gap-2 text-[13px] leading-snug">
+            <span className="mt-0.5 text-xs font-bold tabular-nums text-accent-ink">{i + 1}.</span>
+            <span>{g}</span>
+          </li>
+        ))}
+      </ol>
+    </>
   );
 
   /**
@@ -623,6 +639,14 @@ function ThreadStage({
 }) {
   const tr = useT();
   const endRef = useRef<HTMLDivElement>(null);
+  // The fade is a hint that content CONTINUES past an edge, so it is applied
+  // per edge and only when it does (founder s209, the same report s206 fixed
+  // for the Redemittel list: "an unnecessary shadow below the top tile which
+  // overshadows the chat transcripts"). It was unconditional, so a conversation
+  // resting at its top faded its first line out under the Aufgabe tile and read
+  // as a shadow cast by it.
+  const [scroller, setScroller] = useState<HTMLElement | null>(null);
+  const edge = useEdgeFade(scroller);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   }, [state.turns.length, live]);
@@ -630,7 +654,15 @@ function ThreadStage({
   const lastLearnerIdx = state.turns.map((t) => t.role).lastIndexOf("learner");
 
   return (
-    <div className="slim-scrollbar mask-fade-y flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+    <div
+      ref={setScroller}
+      className={cn(
+        "slim-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto",
+        edge.top && edge.bottom && "mask-fade-y",
+        edge.top && !edge.bottom && "mask-fade-top",
+        !edge.top && edge.bottom && "mask-fade-bottom",
+      )}
+    >
       {state.turns.map((t, i) =>
         t.role === "partner" ? (
           <div key={i} className="flex max-w-[88%] gap-2">
