@@ -28,7 +28,7 @@ export const UI_EN: Record<string, string> = {
   Bibliothek: "Library",
   "Prüfung": "Exam",
   Fortschritt: "Progress",
-  Praktisch: "Practice",
+  Spielplatz: "Playground",
   Einstellungen: "Settings",
   Kontrollzentrum: "Control center",
   Suche: "Search",

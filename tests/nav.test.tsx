@@ -12,11 +12,11 @@ afterEach(cleanup);
  * beside the settings; praktisch should be labeled as beta").
  *
  * The bar is FIVE slots and stays five, reordered: Bibliothek · Prüfung ·
- * Fortschritt · Praktisch · Einstellungen. Bibliothek opens the rail (onboarding
- * hands straight over to it), Praktisch sits directly left of Einstellungen and
- * carries a Beta suffix. Schreiben is a card inside the Prüfung hub, not a tab,
- * and `/writing` keeps its route so every deep link and every resumed draft
- * still resolves.
+ * Fortschritt · Spielplatz · Einstellungen. Bibliothek opens the rail (onboarding
+ * hands straight over to it), Spielplatz (named Praktisch until s210) sits
+ * directly left of Einstellungen and carries a Beta suffix. Schreiben is a card
+ * inside the Prüfung hub, not a tab, and `/writing` keeps its route so every
+ * deep link and every resumed draft still resolves.
  */
 const barPaths = () =>
   Array.from(document.querySelectorAll("nav a")).map((a) => a.getAttribute("href"));
@@ -61,16 +61,16 @@ describe("bottom tab bar: five slots, in order", () => {
     useSettingsStore.getState().resetSettings();
   });
 
-  it("marks Praktisch as Beta", () => {
+  it("marks Spielplatz as Beta", () => {
     useSettingsStore.getState().resetSettings();
     render(
       <MemoryRouter initialEntries={["/"]}>
         <BottomTabBar />
       </MemoryRouter>,
     );
-    const praktisch = document.querySelector('nav a[href="/"]');
-    expect(praktisch?.getAttribute("aria-label")).toBe("Praktisch (Beta)");
-    expect(praktisch?.textContent).toContain("Beta");
+    const spielplatz = document.querySelector('nav a[href="/"]');
+    expect(spielplatz?.getAttribute("aria-label")).toBe("Spielplatz (Beta)");
+    expect(spielplatz?.textContent).toContain("Beta");
   });
 });
 
@@ -90,7 +90,7 @@ describe("nav registry", () => {
       expect(navItems.some((i) => i.to === path), path).toBe(true);
   });
 
-  it("Bibliothek leads the registry and Praktisch sits beside Einstellungen", () => {
+  it("Bibliothek leads the registry and Spielplatz sits beside Einstellungen", () => {
     const order = navItems.map((i) => i.to);
     expect(order[0]).toBe("/library");
     expect(order.slice(-2)).toEqual(["/", "/settings"]);

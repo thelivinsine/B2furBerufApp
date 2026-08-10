@@ -1,15 +1,18 @@
-# Praktisch dashboard, navigation & header — current state
+# Spielplatz dashboard, navigation & header — current state
 
 Structure here is **locked**: do not change bar structure, edit-mode behavior, or icon rules
-without an explicit founder request. Mechanism history + mockups: `docs/DECISIONS.md`.
+without an explicit founder request. Mechanism history + mockups: `docs/DECISIONS.md`. (This tab
+was called "Praktisch" through s209; renamed "Spielplatz" s210 because "Simulation" and "Alltag"
+were both already taken elsewhere in the app. The file keeps its old name, `PRAKTISCH-NAV.md`, as a
+stable identifier every other doc links to.)
 
 ## Nav zones
 Tabs, in the ONE order both surfaces draw (s205, founder: "keep bibliothek on the top, and the
 praktisch beside the settings; praktisch should be labeled as beta"):
 **Bibliothek** (`/library`, fixed FIRST slot), **Prüfung** (`/anwenden`, orange Absolventenhut),
-**Fortschritt** (`/analytics`), **Praktisch** (`/`, fixed directly left of Einstellungen, wearing a
+**Fortschritt** (`/analytics`), **Spielplatz** (`/`, fixed directly left of Einstellungen, wearing a
 **Beta** suffix), + **Einstellungen** (fixed last slot). Bibliothek took the opening slot because
-onboarding now hands a new learner straight to it (no taster session), and Praktisch moved to the
+onboarding now hands a new learner straight to it (no taster session), and Spielplatz moved to the
 far end because that zone is still being built. `/` is unchanged as a route: still the Dashboard,
 still the app root and the catch-all target, just not the first tab.
 **The transfer zone came back and absorbed Schreiben in s182.** Audit P4 found the Sprechsimulation
@@ -31,7 +34,7 @@ config may hide only a middle tab, and both the bar and the sidebar enforce it, 
 `HIDEABLE` in admin Steuerung is therefore Fortschritt alone. Every slot carries `min-w-0` so the name under the
 active tab truncates instead of setting a width floor (s182: "Einstellungen" was forcing a 73px
 slot). Route marks
-(founder picks, s158; Bibliothek, Fortschritt + Schreiben swapped s170): Praktisch = Wegweiser
+(founder picks, s158; Bibliothek, Fortschritt + Schreiben swapped s170): Spielplatz = Wegweiser
 signpost, Bibliothek = stack of three books, Prüfung = Absolventenhut (orange cap + amber base,
 founder pick D s183; it replaced the target rings, the bar's ONLY outline mark among filled
 two-tone shapes, which is why it read thinner than its neighbours), Fortschritt = Pokal
@@ -43,7 +46,7 @@ learners' history, in the dashboard recommendation and in ⌘K.
 **A tab is lit by its ZONE, not by its URL** (s192, founder: "the prufung bottom bar isn't selected
 here", on `/writing`). A zone owns more routes than its own path, so `navZoneOf(pathname)`
 (`nav-items.ts`) folds them: `/writing`, `/simulation`, `/exam` → Prüfung; `/quiz` and the retired
-per-tool routes → Bibliothek; `/session`, `/revision`, `/welt` → Praktisch; `/sammlung` →
+per-tool routes → Bibliothek; `/session`, `/revision`, `/welt` → Spielplatz; `/sammlung` →
 Fortschritt; everything else (`/sources`, `/hilfe`, the legal pages, `/admin`) lights nothing. The
 bar and the sidebar both read it, and both render a plain `Link`: `NavLink` would re-decide the
 state from the URL and it also SWALLOWS `aria-current` (it reads that prop as "the value to use when
@@ -250,7 +253,7 @@ room left from where the tile actually sits, not a constant screen height.
   Lesen and Hören each, all at **0 px** page overflow with the question fully visible. The hub is a
   menu, not a Teil, and scrolls
   like every other hub (95-151 px on a 667 px phone, against 237 px for `/anwenden` and 253 px for
-  Praktisch); it is deliberately NOT on the stage.
+  Spielplatz); it is deliberately NOT on the stage.
 **Those cards wear the branded route marks, not lucide icons** (founder pick 2, s183): each card
 renders `RouteIcon` for its own route on a 48px `rounded-xl` tile tinted in that mark's colour
 (cyan / brand blue / orange at 10%, 15% in dark). So the Schreiben card carries the exact pencil
@@ -266,18 +269,18 @@ match the above.
 
 ## Bottom tab bar (mobile)
 - Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots (s207 order): Bibliothek
-  (fixed slot 1) + 2 middle (Prüfung · Fortschritt) + Praktisch + Einstellungen (both fixed last,
+  (fixed slot 1) + 2 middle (Prüfung · Fortschritt) + Spielplatz + Einstellungen (both fixed last,
   plain links). The More sheet is retired (`MoreSheet.tsx` deleted); no add/remove — the middle
   sections are always visible and only Prüfung + Fortschritt REORDER via a hidden long-press easter
   egg (600ms, haptic; jiggle + drag; transparent full-screen layer = "tap anywhere to finish";
   navigating also ends it).
-  Bibliothek, Praktisch and Einstellungen never move.
-- **Beta suffix:** `NavItem.beta` marks a zone as unfinished; only Praktisch carries it today.
+  Bibliothek, Spielplatz and Einstellungen never move.
+- **Beta suffix:** `NavItem.beta` marks a zone as unfinished; only Spielplatz carries it today.
   The sidebar draws the neutral bordered chip (the Neuland heading's chip); the bar appends a
   lighter bold "Beta" INSIDE the label span, never a bordered chip, because the label slot is a
   fixed 12px line and a chip would grow it and shift the icon rail that slot exists to hold still.
   The bar's label shows on the selected tab only (locked anatomy), so the always-visible mark is
-  the sidebar's; `aria-label` says "Praktisch (Beta)" on both.
+  the sidebar's; `aria-label` says "Spielplatz (Beta)" on both.
 - **Active-tab labels:** each tab shows its section name under the icon, visible ONLY on the
   selected tab. The label slot is a reserved fixed-height row on every tab (selection never
   shifts the icon rail); the label is neutral theme-aware dark grey
@@ -317,7 +320,7 @@ Carries only **logo · streak · account**. Theme toggle lives in the `AccountMe
 the wordmark drops on mobile (g mark stays); the streak pill has no goal-gauge ring and rides
 the Koralle reward tokens (streak = celebration).
 
-## Praktisch dashboard (`/`)
+## Spielplatz dashboard (`/`)
 One column on ALL sizes (two-column desktop was rejected). Heute → **Trainieren/Spielen toggle**
 (`Dashboard.tsx`; "Üben" → "Lernen" s105, → "Trainieren" with the dumbbell restored s158, both
 founder requests): since s170 it shares the squircle-track + sliding-pill language with

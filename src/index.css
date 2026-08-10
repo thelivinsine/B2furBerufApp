@@ -362,7 +362,7 @@ input:-webkit-autofill {
 }
 
 /* The Bibliothek tab-switch slide moved to framer-motion (LibraryHub uses an
-   AnimatePresence mode="wait" directional slide, matching the Praktisch toggle).
+   AnimatePresence mode="wait" directional slide, matching the Spielplatz toggle).
    The old `.lib-slide-in-*` keyframes were removed with it. */
 
 @layer utilities {

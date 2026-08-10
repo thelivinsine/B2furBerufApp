@@ -1,11 +1,41 @@
 # Project Status
 
-_Last updated: 2026-08-10 (session 209 fixed the Sprechen microphone printing the learner's sentence
-back to them word by word on iOS. Session 208 fixed the CEFR level-band filter chip reappearing after
-a dismiss + refresh on the Bibliothek trainers. Sessions 204-207 (the KI-usage task, its
-reconciliation, the Sprechen "AI doesn't work" fix, and the nav-order + interface-language work) are
-archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`. All handoffs under their
-own "Resume here")._
+_Last updated: 2026-08-10 (session 210 renamed the "Praktisch" nav tab to "Spielplatz". Session 209
+fixed the Sprechen microphone printing the learner's sentence back to them word by word on iOS.
+Sessions 204-208 (the KI-usage task, its reconciliation, the Sprechen "AI doesn't work" fix, the
+nav-order + interface-language work, and the CEFR filter-chip fix) are archived in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`. All handoffs under their own "Resume
+here")._
+
+**Session 210 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): "Praktisch" renamed
+"Spielplatz".**
+Founder: "rename practice or praktsich as simulation." The nav tab's actual name is "Praktisch", not
+"Practice"; flagged that "Simulation" was already the route/label for the Sprechen practice chooser
+(`/simulation`) and "Prüfungssimulation" for exam sets, so reusing it would create two unrelated
+things with the same name. The founder agreed and asked for name suggestions instead; "Alltag" was
+also ruled out (already the Berufsleben/Alltag life-area split, used throughout Bibliothek/Prüfung
+filters). The founder then asked for a name that hints at the Neuland game living inside the same
+tab; "Mission", "Quest", "Level" and "Welt" were all already taken by the game or other UI elsewhere,
+so those were ruled out too. Picked from three collision-free options: **Spielplatz**.
+- **Every user-facing instance renamed**, code and copy: the nav label (`nav-items.ts`), its English
+  translation in `uiStrings.ts` ("Spielplatz" → "Playground", replacing "Praktisch" → "Practice"),
+  the Session page eyebrow, the help-center line naming the home screen, three Admin Steuerung
+  strings (DE + EN), and every code comment describing the tab across `BottomTabBar.tsx`,
+  `Sidebar.tsx`, `route-icons.tsx`, `FeedbackButton.tsx`, `LibraryHub.tsx`, `nav-items.ts`,
+  `index.css`. The route (`/`) is unchanged, as are the internal `dashboardStartTab` values
+  (`"ueben"`/`"spielen"`).
+- **Docs updated in the same PR**, per the doc rule: `CLAUDE.md` (the nav-order law + a lineage
+  note), `docs/areas/PRAKTISCH-NAV.md` (content renamed throughout; the FILE keeps its old name as
+  the stable identifier every other doc links to, noted at the top), `docs/areas/SESSION.md`, and
+  `.claude/skills/design/SKILL.md`. `docs/DECISIONS.md` gets a new §s210 recording the naming
+  process; historical/dated docs (`docs/plans/*`, `docs/branding/*`, `docs/DEMO_RUNBOOK.md`) are
+  left untouched, same as any other past-tense record.
+- `tests/nav.test.tsx` updated (its founder-quote comment kept verbatim, lowercase "praktisch"
+  intact, since that is what the founder actually typed in s207).
+- Gates (measured 2026-08-10): typecheck · **719 tests** (59 files, unchanged count) · lint 0 errors
+  · build · check:bundle 153.3 kB · lint:content (including the CLAUDE.md size ratchet: 349 lines).
+- **Verified in a real browser** at both breakpoints: the bottom tab bar reads "Spielplatz Beta" and
+  the desktop sidebar reads "Spielplatz" with the BETA chip, both at 430×932 and 1280×900.
 
 **Session 209 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): the microphone repeated
 everything the learner said, plus two Sprechen-screen corrections.**
@@ -52,31 +82,11 @@ Petra ich hallo Petra ich finde ich ich ich ich finde …"* for a single spoken 
   MICROPHONE fix cannot be verified without a device, so it stays a founder check on an iPhone: open
   a Sprechen conversation, speak one long sentence, confirm the bubble shows it ONCE.
 
-**Session 208 (2026-08-09, branch `claude/filter-persistence-error-yr2716`): the CEFR level-band
-chip kept coming back.** Shipped as PR **#847** → **`de70c9b`**, squash-merged.
-Founder report, with a screenshot of the Wörter tab: "there seems to be an error with the filter
-here. Even if I remove and refresh it's still appearing. Fix it."
-- **Root cause:** the "Level: up to …" `ActiveFilterChip` (the removable UI for the default
-  CEFR-band cut on Wörter/Kollokationen/Redemittel, `defaultVisibleBands`) tracked its dismissal in
-  a plain `useState(false)` per trainer. A full page refresh always remounts the component, so the
-  flag reset to `false` and the chip reappeared even immediately after being dismissed.
-- **Fix:** moved the flag into `useSettingsStore` as a new persisted field, `showAllCefrLevels`
-  (default `false`), the same pattern already used for `artikelLegendDismissed` and
-  `signInBannerDismissed`. All three trainers (`VocabularyTrainer.tsx`, `CollocationsBrowser.tsx`,
-  `RedemittelTrainer.tsx`) now read/write that one store field instead of local state, so dismissing
-  the chip on any of the three tabs sticks across refreshes and rides cloudSync like the other
-  settings-store flags.
-- Gates: typecheck · lint 0 errors (78 warnings, pre-existing baseline, unrelated to this change) ·
-  build. No new test added (no test framework covers this UI interaction path today); verification
-  was a targeted code read of the three call sites plus the settings-store persistence contract.
-- **Not verified in a browser from the sandbox**: same network-policy limits as prior sessions.
-  Worth a founder check on the live site: open Wörter, dismiss the "Level: up to …" chip, hard-refresh
-  the page, confirm the chip stays gone.
-
 ## Where things stand
 
-The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the four-zone nav
-(Praktisch · Bibliothek · **Prüfung** · Fortschritt, s182: Schreiben moved into the Prüfung hub),
+The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the five-slot nav
+(Bibliothek · **Prüfung** · Fortschritt · Spielplatz, named Praktisch until s210 · Einstellungen,
+s182: Schreiben moved into the Prüfung hub),
 the Neuland game layer (`/welt`, Kapitel 1
 complete), Supabase auth + cloud sync, and the AI writing coach. **The shipped architecture, locked
 architectural decisions, and backend/infra setup are documented in `docs/PROJECT_FOUNDATION.md`** —
@@ -131,6 +141,30 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 210 (2026-08-10): the "Praktisch" tab is "Spielplatz" everywhere.**
+Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209; not yet merged as of this
+handoff).
+Founder: "rename practice or praktsich as simulation."
+
+- **The name is "Spielplatz", not "Simulation".** "Simulation" collides with the existing
+  `/simulation` route (Sprechen practice) and "Prüfungssimulation"; "Alltag" collides with the
+  Berufsleben/Alltag life-area split. Both were ruled out before asking the founder to pick, and the
+  founder then asked for a name hinting at the game, which "Mission"/"Quest"/"Level"/"Welt" all
+  already meant something else for. **Before naming anything else in this nav, grep for the
+  candidate name first** — this is the second time a proposed name collided with something already
+  shipped (first was "Simulation" itself).
+- **The route stayed `/`.** Only the label, its English translation, and every comment/string
+  naming the tab changed. `docs/areas/PRAKTISCH-NAV.md` deliberately kept its OLD filename: renaming
+  a doc file is a bigger churn (six other docs link to it by name) than the value it returns, so the
+  content was renamed but the identifier was not. If a future session renames this tab again, decide
+  the filename question fresh rather than assuming the precedent.
+- **Verified in a real browser**, not just by grep: both the mobile bottom bar and the desktop
+  sidebar were screenshotted after the change (430×932 and 1280×900).
+- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
+  Supabase; the next content job is the reply-task wave (writing-audit P4), 47 authored `source`
+  texts plus a rendering slot that does not exist yet, waiting on a founder placement pick from
+  `preview/schreiben-source-text.html`.
 
 **Handoff after session 209 (2026-08-10): the Sprechen microphone no longer repeats the learner.**
 Branch `claude/microphone-bug-fix-jc70vs`, PR **#850** → **`ca974d5`**, squash-merged and deployed

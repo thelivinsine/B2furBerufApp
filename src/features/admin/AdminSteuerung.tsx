@@ -25,7 +25,7 @@ import { useAdminLang } from "./adminI18n";
  */
 
 // Only middle tabs may be hidden. The locked bar keeps three slots fixed, and
-// since s207 those are Bibliothek (first), Praktisch (beside Einstellungen) and
+// since s207 those are Bibliothek (first), Spielplatz (beside Einstellungen) and
 // Einstellungen, so Fortschritt is what is left to hide. Bibliothek dropped off
 // this list when it became the fixed first slot: hiding it would have emptied
 // the slot the rail opens with.
@@ -133,8 +133,8 @@ export function AdminSteuerung() {
       <Section
         title={t("Menü-Sichtbarkeit", "Nav visibility")}
         note={t(
-          "Blendet nur die Menü-Kachel aus. Die Route bleibt aktiv (Deep-Links funktionieren weiter). Bibliothek, Praktisch und Einstellungen sind fest.",
-          "Hides only the menu tile. The route stays live (deep links keep working). Bibliothek, Praktisch and Einstellungen are fixed.",
+          "Blendet nur die Menü-Kachel aus. Die Route bleibt aktiv (Deep-Links funktionieren weiter). Bibliothek, Spielplatz und Einstellungen sind fest.",
+          "Hides only the menu tile. The route stays live (deep links keep working). Bibliothek, Spielplatz and Einstellungen are fixed.",
         )}
       >
         <div className="space-y-2">
@@ -214,7 +214,7 @@ export function AdminSteuerung() {
       </Section>
 
       {/* H8 dashboard start tab */}
-      <Section title={t("Start-Tab auf „Praktisch“", "Start tab on 'Praktisch'")}>
+      <Section title={t("Start-Tab auf „Spielplatz“", "Start tab on 'Spielplatz'")}>
         <div className="flex gap-1.5">
           {(["ueben", "spielen"] as const).map((tab) => (
             <button
