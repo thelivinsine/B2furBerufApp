@@ -44,7 +44,7 @@ Petra ich hallo Petra ich finde ich ich ich ich finde …"* for a single spoken 
     a shadow that tile was casting. Both now apply the fade per edge via `useEdgeFade`, exactly the
     fix s206 already made for the Redemittel list ("the first Redemittel is literally
     overshadowed"), which those two files never picked up.
-- Gates: typecheck · **719 tests** (59 files, up from 701) · lint 0 errors (84 warnings, the
+- Gates (measured 2026-08-10): typecheck · **719 tests** (59 files, up from 701) · lint 0 errors (84 warnings, the
   pre-existing baseline plus 6 `any` in the new speech test, matching how `engine/speech.ts` already
   types the Web Speech API) · build · check:bundle 153.3 kB · lint:content.
 - **Both UI fixes verified in a real browser** at 430x932, against a stubbed backend: the brief card

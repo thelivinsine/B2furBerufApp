@@ -99,11 +99,11 @@ after pulling.
   and test cannot drift.
   - **Branche** (`sector-markers.mjs`, founder s199): the brief must name that workplace (Beruf keeps
     ≥8 of 15 earned, Alltag few and honestly). Dropping a false tag costs no reach, Branche being
-    soft, so add the missing word to the lexicon or drop the tag.
+    soft: add the missing word to the lexicon, or drop the tag.
   - **Argumentation** (`justification-markers.mjs`, s200): a `stellungnahme`, `forumsbeitrag`,
     `widerspruch` or `beschwerde` at B2+ carries ≥1 Leitpunkt demanding a **reason, a consequence or
-    a stance**, because `level` is what tells `evaluate-writing` to mark strictly. Fix by REPLACING
-    the weakest descriptive point, never a fifth. B1 exempt.
+    a stance**, because `level` tells `evaluate-writing` to mark strictly. Fix by REPLACING the
+    weakest descriptive point, never a fifth. B1 exempt.
   - **A supplied `source` text belongs to the REPLY genre, never to an opinion task** (s200), and
     `source` is currently read by nothing.
   (Detail → `docs/areas/CONTENT.md`; why → `DECISIONS.md` §s199/§s200.)
@@ -115,8 +115,8 @@ after pulling.
   (`PRAKTISCH-NAV.md`), the dialog/overlay recipe (`BRAND.md` §Dialog), the in-mission pixel chrome +
   "failure is content, never lockout" + the ungated boss mission 1.6 (`GAME.md`), the
   Himmelblau-fill/white-controls FilterRail and Aufgabe-rail answer (s189/s196, `ScopeRail.tsx`), the
-  sliding-pill switcher (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card's
-  anatomy (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
+  sliding-pill switcher (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card
+  (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
 - **The nav runs ONE order and setup ends in the Bibliothek** (founder s207, `PRAKTISCH-NAV.md`):
   Bibliothek · Prüfung · Fortschritt · Praktisch (**Beta**) · Einstellungen, bar and sidebar alike,
   from the single `navItems`; Bibliothek, Praktisch and Einstellungen are the fixed slots
@@ -124,23 +124,25 @@ after pulling.
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and
-  nothing else (a proxy field sent every account back through onboarding). A not-onboarded visitor
-  goes to `/welcome` signed out, `/start` signed in (`docs/DECISIONS.md` §s174).
+  nothing else. Not onboarded: `/welcome` signed out, `/start` signed in (`DECISIONS.md` §s174).
 - **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief, a
-  conversation, the EXISTING `features/writing/correction.tsx` card as the debrief (never a new
-  copy), and its own Verlauf. **Deliberately NOT an open chatbot:** the brief makes it an exercise,
-  the partner never corrects mid-flow. **Layout is a property of the TASK** (`gespraech` / `buehne` /
-  `anruf`). **The row is written when a conversation STARTS** (s194), so the daily limit counts what
-  costs money; **the practice counts once the learner has SPOKEN, not once the AI has graded**
+  conversation, `features/writing/correction.tsx` as the debrief (never a new copy), and its own
+  Verlauf. **Deliberately NOT an open chatbot:** the brief makes it an exercise, the partner never
+  corrects mid-flow. **Layout is a property of the TASK** (`gespraech` / `buehne` / `anruf`), and the
+  task TRAVELS: `brief.situation` is stated on the brief and in the running Aufgabe panel, not only
+  on the chooser card (founder s209). **A speech transcript is ASSIGNED, never appended** (s209): iOS
+  Safari re-sends an utterance as a longer copy of itself and flags interim results final, so
+  `listen()` reports the whole transcript every event and a caller that appends repeats the sentence
+  word by word. **The row is written when a conversation STARTS** (s194), so the daily limit counts
+  what costs money; **the practice counts once the learner has SPOKEN, not once the AI has graded**
   (s196), so a failed debrief is retryable. **A practice conversation carries its Redemittel**
   (founder s202) **structurally**: the runner takes them as a PROP and the Modelltest passes nothing,
-  so a candidate never reads the phrases they are graded on, and the rail shows at most FIVE, the
-  easiest by CEFR (s206). Anrede follows `lib/anrede.ts`. Detail: `docs/areas/SPRECHEN.md`.
+  so a candidate never reads what they are graded on; the rail shows at most FIVE, easiest by CEFR
+  (s206). Anrede follows `lib/anrede.ts`. Detail: `docs/areas/SPRECHEN.md`.
 - **A wall is stated BEFORE the commitment, and a wall with a remedy IS its remedy** (s194, widened
   s206): allowance, account and connection are gates on the start, never a caption after the learner
-  has committed, ONE rule serves both the guard and the gate, and a failure never renders in the
-  grey a status uses. **Every provider call carries a deadline** and a losing leg logs provider,
-  status and code (a thinking model given a 500-token turn budget returns nothing). → `SPRECHEN.md`.
+  has committed, ONE rule serves both guard and gate, and a failure never renders in the grey a
+  status uses. **Every provider call carries a deadline**, a losing leg logs it. → `SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195; mechanism in `docs/areas/PRUEFUNG.md`). ONE exit,
   the LAST control in the header, top right, on every screen of the zone and at every width
   (`useSessionStore.zoneExit`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever
@@ -148,19 +150,17 @@ after pulling.
   streak pill and the account menu. **A confirm is about losing work, never about the clock**
   (`hasProgress(run)`; the Schreibtrainer never asks, its draft autosaving). **The word Zurück
   belongs to that exit alone**, so the question stepper is a chevron. A phone carries the module row
-  on every screen (`ModuleHeader`, `lg:hidden`; in a
-  Teil that row IS the `RunBar`), and **that row NAMES the module and carries no control** (founder
-  s201: the Aufgabe toggle lives on the chooser's own toolbar row). ONE Niveau control per screen.
-  Widths: the HUB is `HUB_COL` (`max-w-[40rem]`), a chooser wears Schreiben's
-  content-plus-16rem-rail grid, and only a RUNNING Teil gets the wide `lg:max-w-6xl` stage.
+  on every screen (`ModuleHeader`, `lg:hidden`; in a Teil that row IS the `RunBar`), and **that row
+  NAMES the module and carries no control** (founder s201: the Aufgabe toggle lives on the chooser's
+  own toolbar row). ONE Niveau control per screen. Widths: the HUB is `HUB_COL` (`max-w-[40rem]`), a
+  chooser wears Schreiben's content-plus-16rem-rail grid, only a RUNNING Teil gets `lg:max-w-6xl`.
 - **An exercise the app scores can always be handed in, and every score it produces is reachable**
   (s194 audit). A clock is never the ONLY way a part ends ("Teil abschließen" sits on the last
   question unconditionally, blanks cost a confirm) and a clock is measured against a DEADLINE, never
   by decrementing, or a background tab pauses the exam. Every correction the evaluator returns is
   rendered, and a result surfaces in exactly ONE Verlauf: **a Modelltest sat all four parts, a run
   that sat one is module practice** (`isFullMockRun`, bank-free; `examsDone` is retired). **Every
-  module page carries that Verlauf** (founder s201), empty state from visit one; the hub keeps the
-  CROSS-module view only.
+  module page carries that Verlauf** (s201) from visit one; the hub keeps the CROSS-module view.
 - **A failed cloud write is never silent** (s185). supabase-js returns `{ error }` instead of
   throwing, so an ignored result makes a broken sync look exactly like a working one: every push
   reads its error, retries with backoff, and after 3 failures flips `useAuthStore.syncHealth` to
@@ -172,8 +172,7 @@ after pulling.
   describing it ship in the SAME change**, never resolved by editing the copy alone.
 - **AI usage is MEASURED; only the cost is derived** (s204): every call writes an `ai_calls` row with
   the provider's own token counts, priced from ONE table (`functions/_shared/aiUsage.ts`, overridable
-  via `app_config.ai_rates`) and checked against the provider's own bill (s205). Never re-hardcode
-  a price in a function.
+  via `app_config.ai_rates`) and checked against the real bill (s205). Never re-hardcode a price.
 - **Never reload over a learner's unsaved work:** every automatic reload is gated on `hasLiveWork()`
   (`src/lib/liveWork.ts`) and retries at a later resume; a new surface holding in-memory work claims
   it with `useLiveWork(active, label, flush)` AND persists itself.
@@ -197,8 +196,9 @@ after pulling.
   own class, never a hover fill**.
 - **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
   hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
-  assumption. A scroll container also SLICES what crosses its edge (`useEdgeFade`), and a rail
-  beside it needs `self-start` or the grid stretches it to its cap.
+  assumption. A scroll container SLICES what crosses its edge, so it fades PER EDGE and only where
+  content continues (`useEdgeFade`; never a hardcoded `mask-fade-*`, s206/s209), and a rail beside
+  it needs `self-start` or the grid stretches it to its cap.
 - **Design landmines:** never reintroduce anything on the `/design` skill's §7 reverted list.
 - The remote-config contract: empty/unreachable `app_config` must equal today's behavior
   byte-for-byte (`tests/appConfig.test.ts`). Admin RPCs return aggregates only (exception: `feedback`).
