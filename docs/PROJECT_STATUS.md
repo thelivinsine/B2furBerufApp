@@ -8,7 +8,7 @@ archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`. All ha
 own "Resume here")._
 
 **Session 209 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): the microphone repeated
-everything the learner said.**
+everything the learner said, plus two Sprechen-screen corrections.**
 Founder report, with a screenshot of a running Sprechen conversation: "there seems to be some bug
 with the microphone feature. fix it." The learner's bubble read *"hallo hallo hallo hallo Petra hallo
 Petra ich hallo Petra ich finde ich ich ich ich finde …"* for a single spoken sentence.
@@ -29,11 +29,26 @@ Petra ich hallo Petra ich finde ich ich ich ich finde …"* for a single spoken 
   sentence twice.
 - **New gate:** `tests/speech.test.ts` (14 tests) replays the screenshot's exact event sequence plus
   the spec-compliant, duplicate-delivery, restart, unsettled-tail and denied-permission paths.
-- Gates: typecheck · **715 tests** (58 files, up from 701) · lint 0 errors (84 warnings, the
-  pre-existing baseline plus 6 `any` in the new test, matching how `engine/speech.ts` already types
-  the Web Speech API) · build · check:bundle 153.3 kB.
-- **Not verified on a device from the sandbox.** Worth a founder check on an iPhone: open a Sprechen
-  conversation, speak one long sentence, confirm the bubble shows it ONCE.
+- **Two follow-up reports, same screen, both fixed in this PR.**
+  - *"a 2-line explanation of the task from previous page is missing … the explanation here is
+    missing in later pages."* `brief.situation` was in the brief object all along, sent to the AI
+    partner and rendered by nothing: the chooser card explained the task in two lines and every
+    screen after it dropped the explanation. It is now stated on the brief card (under the partner
+    row) and at the top of the running Aufgabe panel, above the Leitpunkte. Muted, one statement per
+    screen, no second "Situation" label. Gated by `tests/sprechenBrief.test.tsx`.
+  - *"an unnecessary shadow below the top tile which overshadows the chat transcripts"* (with the
+    area circled). `ThreadStage` and `ConversationDebrief` hardcoded `mask-fade-y`, so a
+    conversation resting at its top faded its own first line out under the Aufgabe tile and read as
+    a shadow that tile was casting. Both now apply the fade per edge via `useEdgeFade`, exactly the
+    fix s206 already made for the Redemittel list ("the first Redemittel is literally
+    overshadowed"), which those two files never picked up.
+- Gates: typecheck · **719 tests** (59 files, up from 701) · lint 0 errors (84 warnings, the
+  pre-existing baseline plus 6 `any` in the new speech test, matching how `engine/speech.ts` already
+  types the Web Speech API) · build · check:bundle 153.3 kB · lint:content.
+- **Both UI fixes verified in a real browser** at 430x932, against a stubbed backend: the brief card
+  now states the situation, and the running conversation's first line is crisp at rest. The
+  MICROPHONE fix cannot be verified without a device, so it stays a founder check on an iPhone: open
+  a Sprechen conversation, speak one long sentence, confirm the bubble shows it ONCE.
 
 **Session 208 (2026-08-09, branch `claude/filter-persistence-error-yr2716`): the CEFR level-band
 chip kept coming back.** Shipped as PR **#847** → **`de70c9b`**, squash-merged.
@@ -128,6 +143,12 @@ microphone feature. fix it."
   gated by `tests/speech.test.ts`.
 - **`resultIndex` and `isFinal` are not trustworthy signals of new text** on mobile Safari. Do not
   reintroduce a call site that walks the result list from `e.resultIndex`.
+- **Two more Sprechen laws landed with it:** the task explanation (`brief.situation`) is stated on
+  every screen the learner meets it on, not just the chooser card; and an edge fade is applied PER
+  EDGE via `useEdgeFade`, never hardcoded, or a region resting at its top shades its own first line
+  and reads as a shadow. The second was already fixed once (s206, the Redemittel list) and two
+  files never picked it up, so **grep for a hardcoded `mask-fade-*` before assuming a fade rule is
+  applied everywhere**.
 - **Worth a founder check on an iPhone**, since the sandbox has no device: open a Sprechen
   conversation, speak one long sentence, confirm the bubble shows it ONCE and that the partner
   answers what was actually said.

@@ -6354,3 +6354,40 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `tests/speech.test.ts` · `docs/areas/SPRECHEN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` (session 207 archived off the main
   status file to stay under its line budget) · `docs/SESSION_PROMPT_LOG.md`
+
+### Prompt 2 (2026-08-10)
+
+> [screenshot of the Sprechen chooser, three task cards each with a two-line explanation] a 2-line
+> explanation of the task from previous page is missing in the screenshot shown when the task is
+> opened . finally, there's an unnecessary shadow below the top tile which overshdows the chat
+> transcripts. fix these two
+>
+> [follow-up, same turn] the explanation here is missing in later pages
+>
+> [follow-up, same turn, screenshot of a running conversation with the area circled] here is the
+> blur/shadow
+
+- **Response summary:** Two separate defects on the Sprechen screens, both fixed.
+  **(1) The missing explanation.** `ConversationBrief` has carried a `situation` field since s193.
+  It is sent to the AI partner on every turn and was rendered by nothing, so the explanation the
+  chooser card shows ("Ihr Unternehmen möchte Homeoffice einführen …") disappeared the moment the
+  task was opened. It is now stated on the brief card, under the partner row and above the
+  Leitpunkte it motivates, and again at the top of the running Aufgabe panel. Muted grey like the
+  chooser card so the Leitpunkte stay the loudest thing in the tile, tinted hairline inside the
+  accent panel, and no second "Situation" label, since the brief card's head already carries that
+  eyebrow once.
+  **(2) The shadow.** `ThreadStage` and `ConversationDebrief` hardcoded `mask-fade-y`, which fades
+  BOTH edges of a scroll region unconditionally. A conversation resting at its top therefore faded
+  its own first line out directly under the Aufgabe tile, which is what reads as a shadow the tile
+  is casting. Both now apply the fade per edge through `useEdgeFade`, so it appears only where
+  content actually continues. This is the identical fix s206 made after the founder reported "the
+  first Redemittel is literally overshadowed"; those two files never picked it up.
+  Verified both in a real browser (Chromium, 430x932, stubbed backend): screenshots of the brief
+  card, the running conversation at rest and its opened Aufgabe panel. Gates: typecheck · 719 tests
+  (59 files) · lint 0 errors · build · check:bundle 153.3 kB · lint:content. Added
+  `tests/sprechenBrief.test.tsx` (4 tests). Pushed onto the same branch, so PR **#850** now carries
+  all three fixes.
+- **Artifacts:** `src/features/sprechen/ConversationRunner.tsx` ·
+  `src/features/sprechen/ConversationBriefCard.tsx` · `src/features/sprechen/ConversationDebrief.tsx` ·
+  `tests/sprechenBrief.test.tsx` · `docs/areas/SPRECHEN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/SESSION_PROMPT_LOG.md` · PR **#850**

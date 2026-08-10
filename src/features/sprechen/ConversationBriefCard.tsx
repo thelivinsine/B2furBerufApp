@@ -84,6 +84,18 @@ export function ConversationBriefCard({
               </p>
             </div>
           </div>
+          {/* What the conversation is about, carried from the chooser card
+              (founder s209). The eyebrow above this card promises a Situation
+              and the card went straight to the Leitpunkte without ever stating
+              one; it was in the brief object all along, read by the AI partner
+              and by nobody else. No second "Situation" label here: the head
+              above already carries it once. */}
+          {brief.situation && (
+            <>
+              <div className="h-px bg-border" />
+              <p className="text-sm leading-snug text-muted-foreground">{brief.situation}</p>
+            </>
+          )}
           <div className="h-px bg-border" />
           <div>
             <p className="text-eyebrow text-muted-foreground">{t("Das musst du schaffen")}</p>
