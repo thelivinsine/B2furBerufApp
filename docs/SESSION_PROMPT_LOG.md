@@ -6397,3 +6397,26 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   attempt 1. `supabase.yml` did not run, correctly: this change touches no migration and no Edge
   Function. Verified by the workflow runs rather than by claiming it, since the sandbox cannot reach
   the live site.
+
+### Prompt 3 (2026-08-10)
+
+> document the session
+
+- **Response summary:** Closed the documentation. Most of it was already written during the session
+  (the `PROJECT_STATUS.md` session-209 entry and handoff, the `docs/areas/SPRECHEN.md` laws, prompts
+  1-2 here, and the merge/deploy note); this pass added what was missing and re-measured what a doc
+  is not allowed to carry forward.
+  **Counts re-measured today (2026-08-10), not copied:** `pnpm test:unit` = **719 tests across 59
+  files** (701/58 before this session), `pnpm lint:content` = pass, **3604 provenance rows**.
+  **`docs/DECISIONS.md`** gained the "why" the area guides only point at: **§s209** (why the Web
+  Speech API's `resultIndex`/`isFinal` invite exactly the bug that shipped, why the fix is
+  assignment rather than a Safari special case, and why each supporting piece exists) and **§s209b**
+  (the fade being the third report of one shape and the second identical fix, so the rule was
+  restated as "never hardcode `mask-fade-*`", which is greppable and would have caught both files).
+  **`CLAUDE.md`** now carries both laws as current law: the transcript rule folded into the Sprechen
+  bullet, and the existing s190 scroll-edge line sharpened from "a scroll container SLICES what
+  crosses its edge" to fading PER EDGE via `useEdgeFade`, never a hardcoded `mask-fade-*`. The file
+  was at exactly its 350-line budget, so the additions were paid for by compressing prose whose
+  detail already lives in `docs/areas/*` (no rule was dropped): 349 lines, linter quiet.
+- **Artifacts:** `docs/DECISIONS.md` (§s209, §s209b) · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/SESSION_PROMPT_LOG.md`

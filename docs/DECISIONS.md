@@ -2328,3 +2328,69 @@ row makes it look far cheaper. Both directions are wrong in a way that would sur
 
 **What this does NOT do.** It does not make the cost measured. It makes the derived cost
 *checkable*, which is the honest ceiling until every provider publishes a bill we can read.
+
+## s209 — a speech transcript is assigned, never appended
+
+**The report.** A screenshot of a running Sprechen conversation in which one spoken sentence had
+become *"hallo hallo hallo hallo Petra hallo Petra ich hallo Petra ich finde ich ich ich ich finde
+…"*. "There seems to be some bug with the microphone feature."
+
+**Why it happened.** The Web Speech API's shape invites the bug. `onresult` hands you a
+`results` list plus a `resultIndex`, which reads like "start here for what is new", and `isFinal`
+reads like "this piece is settled and will not be sent again". So the obvious implementation, the
+one shipped in s193, walks from `resultIndex` and appends each final piece to a running buffer.
+
+Both readings are wrong on iOS Safari, in two independent ways: it grows an utterance by
+**re-delivering it as a longer copy of itself** rather than by sending only the new words, and it
+**flags interim results as final**. Every snapshot of the growing sentence therefore arrived looking
+like new settled text and was concatenated onto the last. The result is not merely a display bug:
+the same string is what gets sent to the AI partner and to the grader, so an iPhone learner was
+being answered and scored on repeated gibberish. The feature was not degraded on iOS, it was dead,
+and nothing in the codebase could have told us, because the sandbox has no iPhone.
+
+**The decision.** The transcript is **assigned, never appended**. `listen()` rebuilds it from the
+FULL `results` list on every event and reports the whole transcript so far, never a delta. That is
+idempotent by construction: a result the browser sends twice overwrites itself instead of doubling,
+so no caller needs to know which browser it is running on. `resultIndex` is not read at all, and
+`isFinal` now only decides settled-versus-live text, never whether text is NEW.
+
+Three supporting pieces, each for a reason:
+- **`joinTranscript` drops a segment that restates the one before it.** This is what folds Safari's
+  growing snapshots ("hallo" · "hallo Petra" · "hallo Petra ich") back into one sentence. Compared
+  case-insensitively, because a browser may capitalise a segment only once it settles. The test is
+  against the PREVIOUS segment rather than the whole transcript, so a genuine repetition later in a
+  sentence ("Ja genau ja") survives.
+- **`onFinal` fires only when the settled text changes.** The pronunciation drill in `SessionPlayer`
+  grades the first final it receives; without this it would grade the same sentence twice.
+- **The hook accumulates in exactly ONE place:** a recogniser session that has ENDED. Chrome stops
+  after a silence and mobile Chrome ignores `continuous`, so an utterance spans several recogniser
+  sessions (s194); a session that has ended can no longer change, which makes it the only safe
+  moment to bank text.
+
+**The rule that generalises.** When a browser API's contract is "here is the current state", the
+caller must ASSIGN it. Accumulating turns any re-delivery into duplication, and re-delivery is
+exactly what a vendor is free to do without breaking the spec.
+
+## s209b — an edge fade marks continuation, and the same bug had already been fixed once
+
+The founder circled the area under the Aufgabe tile: "there's an unnecessary shadow below the top
+tile which overshadows the chat transcripts."
+
+There is no shadow there. `ThreadStage` wore `mask-fade-y`, which fades the top AND bottom of a
+scroll region unconditionally, so a conversation resting at its top faded out its own first line.
+Sitting directly under a filled tile, that fade reads as a shadow the tile is casting.
+
+This is the third time the same shape has been reported (s190 "the area surrounding the Wörter cards
+look abruptly cut", s206 "the first Redemittel is literally overshadowed") and the second time the
+answer has been the same: `useEdgeFade`, which applies the fade PER EDGE and only where content
+actually continues. The rule was already written down, in `index.css` directly above the class
+definition. It was applied to the Bibliothek columns and to the Redemittel list, and two files that
+predate the rule never picked it up.
+
+**So the rule changed shape rather than content:** it is no longer "fade the edges of a scroll
+region", it is "**never hardcode `mask-fade-*`**". A hardcoded fade cannot know whether content
+continues, so it is wrong roughly half the time by construction. Stated that way it is greppable,
+which is the only form that would have caught these two files.
+
+The debrief screen carried the identical line and was fixed with it, unreported: a bug found while
+standing in front of it is cheaper to fix than to schedule.
