@@ -9,6 +9,8 @@ own "Resume here")._
 
 **Session 209 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): the microphone repeated
 everything the learner said, plus two Sprechen-screen corrections.**
+Shipped as PR **#850** → **`ca974d5`**, squash-merged; the Pages deploy succeeded on attempt 1, so
+all three fixes are live.
 Founder report, with a screenshot of a running Sprechen conversation: "there seems to be some bug
 with the microphone feature. fix it." The learner's bubble read *"hallo hallo hallo hallo Petra hallo
 Petra ich hallo Petra ich finde ich ich ich ich finde …"* for a single spoken sentence.
@@ -131,7 +133,8 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 209 (2026-08-10): the Sprechen microphone no longer repeats the learner.**
-Branch `claude/microphone-bug-fix-jc70vs`.
+Branch `claude/microphone-bug-fix-jc70vs`, PR **#850** → **`ca974d5`**, squash-merged and deployed
+green on attempt 1. Post-merge housekeeping done, tree clean.
 Founder report, with a screenshot of a live conversation: "there seems to be some bug with the
 microphone feature. fix it."
 

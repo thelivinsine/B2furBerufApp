@@ -6391,3 +6391,9 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `src/features/sprechen/ConversationBriefCard.tsx` · `src/features/sprechen/ConversationDebrief.tsx` ·
   `tests/sprechenBrief.test.tsx` · `docs/areas/SPRECHEN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/SESSION_PROMPT_LOG.md` · PR **#850**
+
+- **Merge + deploy (recorded after the fact):** PR **#850** squash-merged to `main` as **`ca974d5`**;
+  **Validate content** and **Deploy site to GitHub Pages** both green on that SHA, the deploy on
+  attempt 1. `supabase.yml` did not run, correctly: this change touches no migration and no Edge
+  Function. Verified by the workflow runs rather than by claiming it, since the sandbox cannot reach
+  the live site.
