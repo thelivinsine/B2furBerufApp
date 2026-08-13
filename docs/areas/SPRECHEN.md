@@ -202,6 +202,36 @@ fixed:
    and the streak day. It now fires once per conversation either way, and the failure screen says
    the conversation is stored and offers the retry instead of one lone "Zurück".
 
+## The debrief leads on the strong model, and the whole cascade is bounded (s211)
+
+The founder came back to the same screen: *"it spins for a long time and says the feedback cannot be
+generated or something like that and then asks me to try again later but then the progress is
+lost."* Three separate faults, all of them structural rather than a bad model day.
+
+1. **The debrief LED on the free leg, which is the one call it cannot serve.** `gemini-2.5-flash`
+   spends output tokens thinking before it writes a character, and the debrief's answer is a whole
+   JSON object over the transcript, so the leg reliably came back at `finishReason: "MAX_TOKENS"`
+   with no text. s206 fixed exactly this for TURNS (`think: false`) and left the debrief thinking.
+   Every debrief therefore waited out a leg that could not succeed before the model that could was
+   asked, and if the paid leg was having a bad minute the learner got nothing for the whole wait.
+   The debrief now leads on the paid model (`lead: "paid"`), with Gemini kept behind it, thinking
+   off, as a real fallback: a dead paid provider degrades the debrief instead of removing it.
+2. **A per-leg deadline is not a budget.** Three 60-second legs in series is a three-minute
+   spinner, longer than the platform's own request ceiling, so a bad run could be killed before it
+   ever reached its failure path. `DEBRIEF_BUDGET_MS` (100 s) and `TURN_BUDGET_MS` (45 s) bound the
+   whole cascade; `legDeadline` caps each leg by what is left and refuses to start one that cannot
+   finish (`MIN_LEG_MS`, 8 s). Order and budget live in `_shared/aiCascade.ts` so they are unit-
+   gated (`tests/aiCascade.test.ts`), not buried in a Deno file nothing can import.
+3. **The failure now says WHICH failure it was.** `cascade` returns a reason with the empty result
+   (`unavailable` no provider answered · `unreadable` one answered unusably · `timeout` the budget
+   ran out; the client adds `network` when the request never returned), the function logs it, and
+   the failure screen prints it small as `Code: …`. The founder's report was one sentence covering
+   four causes that need four different fixes.
+
+`DEBRIEF_MAX_TOKENS` also rose 4096 → 8192: both fallback legs spend that budget on reasoning
+BEFORE writing an answer, so on a fourteen-turn transcript the headroom is what decides whether
+they can answer at all. Only generated tokens are billed, so a ceiling nobody reaches costs nothing.
+
 ## Signing in is a WALL, not a caption (s206)
 
 The founder: "there is an error with speaking exercises, the ai feature doesn't work ... I say
@@ -225,7 +255,7 @@ header drops the account menu (s201). It reads as the app doing nothing.
   fallback prints the caption at all now: on a browser with no speech recognition a refused turn
   showed the learner literally nothing.
 
-## Every leg of the cascade has a deadline (s206)
+## Every leg of the cascade has a deadline (s206), inside a total budget (s211)
 
 There was no timeout on any provider call, in any Edge Function here. A provider that answers slowly
 or hangs therefore held the whole request open, which on the one AI surface a learner waits at
@@ -253,6 +283,15 @@ It is deliberately Schreiben's Verlauf row, not a new one: the same compact disc
 A conversation whose debrief never arrived **still appears**, with its transcript and an "Ohne
 Bewertung" badge. That is the point: the work is on record even when the grader was not reachable.
 Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
+
+**What the learner SAID is written as they say it** (s211). `learner_text` used to be written by the
+successful debrief and by nothing else, and the Verlauf reads `learner_text`, never `turns`: a
+conversation whose grade failed therefore expanded to *"Das Transkript wurde inzwischen gelöscht."*
+over a row that held every word, so the app told the learner their speaking was gone while the
+failure screen promised it was saved. That contradiction is the founder's "the progress is lost".
+Each turn now writes it alongside `turns` (so an ABANDONED conversation is on record too), and the
+debrief's failure path re-asserts it before returning. The retention purge still NULLs it on the
+same clock, which is the one case that copy is true.
 
 ## Rules that are easy to break
 
@@ -318,4 +357,5 @@ Deletion is per row (`speaking_delete_own`, GDPR per-item erasure).
 | `features/exam/SprechenPart.tsx` | Teil Sprechen of the Modelltest. |
 | `lib/speaking.ts` | Edge Function client. |
 | `supabase/functions/converse/` | Turns + debrief, all secrets, all guards. |
+| `supabase/functions/_shared/aiCascade.ts` | Which provider leads, and how long the whole cascade may take (s211). Unit-gated by `tests/aiCascade.test.ts`. |
 | `supabase/migrations/0017_speaking_conversations.sql` | The row, RLS, retention. |

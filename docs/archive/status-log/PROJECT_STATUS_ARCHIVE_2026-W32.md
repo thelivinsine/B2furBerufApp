@@ -972,3 +972,22 @@ here. Even if I remove and refresh it's still appearing. Fix it."
 - **Not verified in a browser from the sandbox**: same network-policy limits as prior sessions.
   Worth a founder check on the live site: open Wörter, dismiss the "Level: up to …" chip, hard-refresh
   the page, confirm the chip stays gone.
+
+**Handoff after session 208 (2026-08-09): the CEFR level-band chip now stays dismissed.**
+Branch `claude/filter-persistence-error-yr2716`, PR **#847** → **`de70c9b`**, squash-merged.
+Post-merge housekeeping done, tree clean.
+Founder report, with a screenshot: "there seems to be an error with the filter here. Even if I
+remove and refresh it's still appearing. Fix it."
+
+- **The fix is small and the pattern is worth remembering.** `showAllLevels` was local `useState`
+  in three trainers, so every dismiss of the "Level: up to …" chip was wiped by the next page load.
+  It now lives in `useSettingsStore.showAllCefrLevels`, persisted like `artikelLegendDismissed` and
+  `signInBannerDismissed`. **Any future "dismiss this and remember it" UI should go straight into
+  the settings store**, never local `useState`, or it will resurface the same bug.
+- **Not verified in a browser from the sandbox** (same network-policy limits as prior sessions).
+  Worth a founder check on the live site: open Wörter, dismiss the "Level: up to …" chip, hard-
+  refresh, confirm it stays gone; repeat on Kollokationen and Redemittel.
+- **Still open, unchanged from prior sessions:** the Sprechen/Schreiben Verlauf spinner has no
+  timeout on an unreachable Supabase (client-side fetch, no deadline); the next content job is the
+  reply-task wave (writing-audit P4), 47 authored `source` texts plus a rendering slot that does not
+  exist yet, waiting on a founder placement pick from `preview/schreiben-source-text.html`.

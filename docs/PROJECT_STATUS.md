@@ -1,11 +1,47 @@
 # Project Status
 
-_Last updated: 2026-08-10 (session 210 renamed the "Praktisch" nav tab to "Spielplatz". Session 209
-fixed the Sprechen microphone printing the learner's sentence back to them word by word on iOS.
-Sessions 204-208 (the KI-usage task, its reconciliation, the Sprechen "AI doesn't work" fix, the
-nav-order + interface-language work, and the CEFR filter-chip fix) are archived in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md`. All handoffs under their own "Resume
-here")._
+_Last updated: 2026-08-13 (session 211 fixed the Sprechen debrief: it no longer waits out a leg that
+cannot answer, and a failed grade no longer loses the transcript. Session 210 renamed the "Praktisch"
+nav tab to "Spielplatz". Session 209 (the microphone repeat) is archived in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`, sessions 204-208 in the `W32` file
+beside it. All handoffs under their own "Resume here")._
+
+**Session 211 (2026-08-13, branch `claude/speaking-drills-review-issue-3589zm`): the Sprechen
+debrief waited three minutes on a leg that could not answer, then lost the conversation.**
+Founder: "the review of speaking drills still doesn't work. check what's the issue." Asked what the
+screen actually does, since four different faults produce that sentence; the answer named the
+symptom exactly: *"it spins for a long time and says the feedback cannot be generated or something
+like that and then asks me to try again later but then the progress is lost."* Practice
+conversations (`/simulation`), not the Modelltest. Third report of this screen (s196, s206, now).
+- **Root cause 1, the long spin.** The debrief LED on the free Gemini leg, which is the one call in
+  `converse` it cannot serve: `gemini-2.5-flash` reasons by default and Google bills thoughts as
+  output, so a whole-JSON answer over a fourteen-turn transcript comes back `MAX_TOKENS` with no
+  text. s206 fixed exactly this for TURNS (`think: false`) and left the debrief thinking. Every
+  debrief therefore paid a full leg's deadline before the model that could answer was even asked.
+  The debrief now leads on the paid model (`lead: "paid"`), Gemini stays behind it with thinking off
+  as a real fallback, so a dead paid provider degrades the debrief instead of removing it.
+- **Root cause 2, the failure at the end of the spin.** Per-leg deadlines (s206) do not bound a
+  cascade: three 60-second legs in series is a three-minute request, longer than the platform's own
+  ceiling, so the worst runs could be killed before reaching their own failure path. Added a TOTAL
+  budget (`DEBRIEF_BUDGET_MS` 100 s, `TURN_BUDGET_MS` 45 s); each leg is capped by what is left and
+  a leg that cannot finish in it is never started. Order and budget live in
+  `supabase/functions/_shared/aiCascade.ts` so they are unit-gated, not buried in a Deno file no
+  test can import. `DEBRIEF_MAX_TOKENS` 4096 → 8192, because both fallback legs spend that budget
+  reasoning before they write anything.
+- **Root cause 3, "the progress is lost", which was literally true.** `learner_text` was written by
+  the successful debrief and by nothing else, while the Verlauf reads `learner_text` and never
+  `turns`: a conversation whose grade failed rendered as "Das Transkript wurde inzwischen gelöscht."
+  over a row holding every word. It is now written turn by turn (so an abandoned conversation is on
+  record too) and re-asserted on the debrief's failure path.
+- **The next report will name its own cause.** `cascade` returns a reason with an empty result
+  (`unavailable` · `unreadable` · `timeout`; the client adds `network`), it is logged, and the
+  failure screen prints it as a small `Code: …` line.
+- New gate `tests/aiCascade.test.ts` (8 tests). Gates (measured 2026-08-13): typecheck · **727
+  tests** (60 files, up from 719) · lint 0 errors (84 warnings, unchanged baseline) · build ·
+  check:bundle 153.3 kB · lint:content (CLAUDE.md 349 lines).
+- **Not verifiable from the sandbox:** the network policy blocks the Supabase project, so the
+  provider-side behaviour of the founder's failing runs cannot be observed from here. The founder
+  confirms after the deploy.
 
 **Session 210 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): "Praktisch" renamed
 "Spielplatz".**
@@ -36,51 +72,6 @@ so those were ruled out too. Picked from three collision-free options: **Spielpl
   · build · check:bundle 153.3 kB · lint:content (including the CLAUDE.md size ratchet: 349 lines).
 - **Verified in a real browser** at both breakpoints: the bottom tab bar reads "Spielplatz Beta" and
   the desktop sidebar reads "Spielplatz" with the BETA chip, both at 430×932 and 1280×900.
-
-**Session 209 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): the microphone repeated
-everything the learner said, plus two Sprechen-screen corrections.**
-Shipped as PR **#850** → **`ca974d5`**, squash-merged; the Pages deploy succeeded on attempt 1, so
-all three fixes are live.
-Founder report, with a screenshot of a running Sprechen conversation: "there seems to be some bug
-with the microphone feature. fix it." The learner's bubble read *"hallo hallo hallo hallo Petra hallo
-Petra ich hallo Petra ich finde ich ich ich ich finde …"* for a single spoken sentence.
-- **Root cause:** `engine/speech.ts` treated every recognition event as NEW text and
-  `useSpeechInput` APPENDED it. Neither holds on iOS Safari, which grows an utterance by
-  re-delivering it as a longer version of itself and flags interim results as final, so each
-  snapshot of the growing sentence was concatenated onto the last: the sentence was written out
-  word by word, over and over. The transcript that reached the AI partner and the grader was that
-  same garbage, so the whole speaking feature was unusable on an iPhone, not just ugly.
-- **Fix:** the transcript is now ASSIGNED, never appended. `listen()` rebuilds the whole transcript
-  from the full `results` list on every event and reports THAT (both callbacks now carry the whole
-  transcript so far, never a delta), so a re-delivered result overwrites itself instead of doubling
-  the sentence. A new exported `joinTranscript` drops a segment that merely restates the one before
-  it, which is what folds Safari's growing snapshots back into one sentence. `useSpeechInput`
-  accumulates in exactly ONE place: a recogniser session that has ENDED and therefore cannot change
-  (the mobile-Chrome restart path, unchanged in behaviour). `onFinal` now fires only when the
-  settled text actually changes, so the Übungs-Sprechdrill in `SessionPlayer` cannot grade the same
-  sentence twice.
-- **New gate:** `tests/speech.test.ts` (14 tests) replays the screenshot's exact event sequence plus
-  the spec-compliant, duplicate-delivery, restart, unsettled-tail and denied-permission paths.
-- **Two follow-up reports, same screen, both fixed in this PR.**
-  - *"a 2-line explanation of the task from previous page is missing … the explanation here is
-    missing in later pages."* `brief.situation` was in the brief object all along, sent to the AI
-    partner and rendered by nothing: the chooser card explained the task in two lines and every
-    screen after it dropped the explanation. It is now stated on the brief card (under the partner
-    row) and at the top of the running Aufgabe panel, above the Leitpunkte. Muted, one statement per
-    screen, no second "Situation" label. Gated by `tests/sprechenBrief.test.tsx`.
-  - *"an unnecessary shadow below the top tile which overshadows the chat transcripts"* (with the
-    area circled). `ThreadStage` and `ConversationDebrief` hardcoded `mask-fade-y`, so a
-    conversation resting at its top faded its own first line out under the Aufgabe tile and read as
-    a shadow that tile was casting. Both now apply the fade per edge via `useEdgeFade`, exactly the
-    fix s206 already made for the Redemittel list ("the first Redemittel is literally
-    overshadowed"), which those two files never picked up.
-- Gates (measured 2026-08-10): typecheck · **719 tests** (59 files, up from 701) · lint 0 errors (84 warnings, the
-  pre-existing baseline plus 6 `any` in the new speech test, matching how `engine/speech.ts` already
-  types the Web Speech API) · build · check:bundle 153.3 kB · lint:content.
-- **Both UI fixes verified in a real browser** at 430x932, against a stubbed backend: the brief card
-  now states the situation, and the running conversation's first line is crisp at rest. The
-  MICROPHONE fix cannot be verified without a device, so it stays a founder check on an iPhone: open
-  a Sprechen conversation, speak one long sentence, confirm the bubble shows it ONCE.
 
 ## Where things stand
 
@@ -142,6 +133,32 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 211 (2026-08-13): the Sprechen debrief no longer waits on a leg that cannot
+answer, and a failed grade no longer looks like lost work.**
+Branch `claude/speaking-drills-review-issue-3589zm`.
+Founder: "the review of speaking drills still doesn't work. check what's the issue." → *"it spins for
+a long time and says the feedback cannot be generated ... and then the progress is lost."*
+
+- **The law to remember: a cascade has an ORDER and a TOTAL budget, and both are properties of the
+  CALL.** Free-first is right for a spoken turn and wrong for the debrief, whose answer is a whole
+  JSON object the free leg spends its output budget thinking about. Per-leg deadlines do not bound a
+  three-leg cascade. Both rules now live in `supabase/functions/_shared/aiCascade.ts`, gated by
+  `tests/aiCascade.test.ts` — put sequence rules there, not inside a Deno file no test can import.
+- **A learner's work is written when they DO it, never when a grade succeeds.** `learner_text` is
+  written turn by turn now. Before touching any Verlauf, check which COLUMN it reads: this one read
+  `learner_text` and never `turns`, so the app told the learner their transcript was deleted while
+  the failure screen promised it was saved.
+- **This needs a backend deploy to take effect:** merging to `main` runs `supabase.yml`, which
+  applies migrations (none here) and deploys every Edge Function. A feature-branch push changes
+  nothing live.
+- **Founder check after the deploy:** hold a short practice conversation at `/simulation`, press
+  Beenden, and confirm the feedback arrives in well under a minute. If it still fails, the screen now
+  prints `Code: …` under the message — that word is the diagnosis, so send it.
+- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
+  Supabase (client-side fetch, no deadline); the next content job is the reply-task wave
+  (writing-audit P4), 47 authored `source` texts plus a rendering slot that does not exist yet,
+  waiting on a founder placement pick from `preview/schreiben-source-text.html`.
+
 **Handoff after session 210 (2026-08-10): the "Praktisch" tab is "Spielplatz" everywhere.**
 Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209; not yet merged as of this
 handoff).
@@ -165,50 +182,3 @@ Founder: "rename practice or praktsich as simulation."
   Supabase; the next content job is the reply-task wave (writing-audit P4), 47 authored `source`
   texts plus a rendering slot that does not exist yet, waiting on a founder placement pick from
   `preview/schreiben-source-text.html`.
-
-**Handoff after session 209 (2026-08-10): the Sprechen microphone no longer repeats the learner.**
-Branch `claude/microphone-bug-fix-jc70vs`, PR **#850** → **`ca974d5`**, squash-merged and deployed
-green on attempt 1. Post-merge housekeeping done, tree clean.
-Founder report, with a screenshot of a live conversation: "there seems to be some bug with the
-microphone feature. fix it."
-
-- **The law to remember: a transcript is ASSIGNED, never appended.** `listen()` rebuilds the whole
-  transcript from the full `results` list on every event, so a browser re-sending a result it has
-  already sent (iOS Safari does exactly that, and also flags interim results as final) cannot
-  double the sentence. Anything reading `listen()` must ASSIGN what it receives; the ONE place text
-  accumulates is a recogniser session that has already ENDED. Detail in `docs/areas/SPRECHEN.md`,
-  gated by `tests/speech.test.ts`.
-- **`resultIndex` and `isFinal` are not trustworthy signals of new text** on mobile Safari. Do not
-  reintroduce a call site that walks the result list from `e.resultIndex`.
-- **Two more Sprechen laws landed with it:** the task explanation (`brief.situation`) is stated on
-  every screen the learner meets it on, not just the chooser card; and an edge fade is applied PER
-  EDGE via `useEdgeFade`, never hardcoded, or a region resting at its top shades its own first line
-  and reads as a shadow. The second was already fixed once (s206, the Redemittel list) and two
-  files never picked it up, so **grep for a hardcoded `mask-fade-*` before assuming a fade rule is
-  applied everywhere**.
-- **Worth a founder check on an iPhone**, since the sandbox has no device: open a Sprechen
-  conversation, speak one long sentence, confirm the bubble shows it ONCE and that the partner
-  answers what was actually said.
-- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
-  Supabase (client-side fetch, no deadline); the next content job is the reply-task wave
-  (writing-audit P4), 47 authored `source` texts plus a rendering slot that does not exist yet,
-  waiting on a founder placement pick from `preview/schreiben-source-text.html`.
-
-**Handoff after session 208 (2026-08-09): the CEFR level-band chip now stays dismissed.**
-Branch `claude/filter-persistence-error-yr2716`, PR **#847** → **`de70c9b`**, squash-merged.
-Post-merge housekeeping done, tree clean.
-Founder report, with a screenshot: "there seems to be an error with the filter here. Even if I
-remove and refresh it's still appearing. Fix it."
-
-- **The fix is small and the pattern is worth remembering.** `showAllLevels` was local `useState`
-  in three trainers, so every dismiss of the "Level: up to …" chip was wiped by the next page load.
-  It now lives in `useSettingsStore.showAllCefrLevels`, persisted like `artikelLegendDismissed` and
-  `signInBannerDismissed`. **Any future "dismiss this and remember it" UI should go straight into
-  the settings store**, never local `useState`, or it will resurface the same bug.
-- **Not verified in a browser from the sandbox** (same network-policy limits as prior sessions).
-  Worth a founder check on the live site: open Wörter, dismiss the "Level: up to …" chip, hard-
-  refresh, confirm it stays gone; repeat on Kollokationen and Redemittel.
-- **Still open, unchanged from prior sessions:** the Sprechen/Schreiben Verlauf spinner has no
-  timeout on an unreachable Supabase (client-side fetch, no deadline); the next content job is the
-  reply-task wave (writing-audit P4), 47 authored `source` texts plus a rendering slot that does not
-  exist yet, waiting on a founder placement pick from `preview/schreiben-source-text.html`.
