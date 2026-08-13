@@ -2430,3 +2430,54 @@ options rejected in this same session (Simulation, Alltag) prove it is not a rar
 already-configured founder override is unaffected), and the filename `docs/areas/PRAKTISCH-NAV.md`
 (kept as a stable identifier; six other docs link to it by name, and renaming a doc file returns less
 value than the churn of updating every cross-reference).
+
+## s211 — the debrief leads on the strong model, and a cascade gets a total budget
+
+**The report.** "the review of speaking drills still doesn't work" → asked what the screen actually
+does → *"it spins for a long time and says the feedback cannot be generated or something like that
+and then asks me to try again later but then the progress is lost."* The third report of the same
+screen (s196, s206, now this), which is the signal that the fix each time addressed a real cause but
+not the structural one.
+
+**Why the free leg leading was the fault, not a slow model.** s206 established that
+`gemini-2.5-flash` reasons by default and Google bills thoughts as OUTPUT, and it disabled thinking
+for TURNS (`think: false`), where the answer is two sentences. The DEBRIEF, whose answer is a whole
+JSON object over a fourteen-turn transcript, was left thinking on the same budget, so it reliably
+came back at `finishReason: "MAX_TOKENS"` with no text. That leg cannot succeed, and it was FIRST:
+every debrief in the app spent a leg's worth of waiting before the model that could answer was even
+asked, and any wobble in the paid leg behind it turned the whole wait into a failure. The order is
+now a property of the call (`lead: "paid"` for the debrief), which also restores what s196 intended
+in the first place: "the debrief is where the pedagogy is and gets the stronger one." Gemini stays
+in the order, thinking off, as the fallback, so a dead paid provider degrades the debrief rather
+than removing it. Cost is unchanged in practice, because the leg it replaces was never succeeding.
+
+**Why a per-leg deadline was not enough.** s206 gave each leg an `AbortSignal.timeout` and called the
+problem solved. Three 60-second legs in series is still a three-minute request: longer than the
+learner will sit through, and longer than the platform's own ceiling, so the worst runs could be
+killed before reaching their own failure path (which is why the founder saw a long spin ending in a
+generic message). A cascade therefore has a TOTAL budget as well: `legDeadline` caps each leg by what
+is left and refuses to start one that cannot finish in it. The rule lives in
+`supabase/functions/_shared/aiCascade.ts` rather than inside the function, because a Deno file that
+reads `Deno.env` at module load cannot be imported by a test, and this is the second time a sequence
+rule has been wrong in a way only a test would have caught.
+
+**Why "the progress is lost" was literally true.** `learner_text` was written by the successful
+debrief and by nothing else, while `SprechenHistory` reads `learner_text` and never `turns`. So a
+conversation whose grade failed left a row holding every word the learner said, which the Verlauf
+rendered as *"Das Transkript wurde inzwischen gelöscht."* The app told them their speaking was gone
+on one screen while the failure screen promised it was saved on the other, and the founder believed
+the screen that was wrong. It is now written turn by turn (an abandoned conversation is on record
+too) and re-asserted on the debrief's failure path. The retention purge still NULLs it on the same
+clock, which is the one case that copy was ever true.
+
+**Why the failure now prints a code.** One founder sentence covered four different causes
+(`unavailable`, `unreadable`, `timeout`, `network`), each with a different fix, and the sandbox
+cannot reach the production project to read a log. A short `Code: …` under the failure message costs
+one muted line and turns the next report into a diagnosis. The detail (provider, HTTP status, the
+provider's own error code) stays in the function logs, where it has been since s206.
+
+**What this does NOT claim.** The provider-side cause behind the founder's specific failed runs is
+not observable from here: the fixes above remove the structural reasons a debrief waits three
+minutes and then loses the work, but if the Anthropic key itself is refused (an expired key, a spent
+quota), the answer arrives as a fallback from Gemini rather than as an error, and the code on the
+failure screen names it the next time it happens.

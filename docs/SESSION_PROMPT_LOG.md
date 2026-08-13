@@ -6459,3 +6459,55 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `src/features/admin/AdminSteuerung.tsx` · `src/features/library/LibraryHub.tsx` · `src/index.css` ·
   `tests/nav.test.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/areas/SESSION.md` ·
   `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` (§s210) · `docs/PROJECT_STATUS.md`
+
+## Session 211 (branch `claude/speaking-drills-review-issue-3589zm`)
+
+### Prompt 1 (2026-08-13)
+
+> the review of speaking drills still doesn't work. check what's the issue
+
+- **Response summary:** "The review" is one sentence covering four different failures on the Sprechen
+  debrief screen, each with a different fix, so the flow was traced end to end first (client →
+  `converse` → the three provider legs → the Verlauf) and then the founder was asked, with the four
+  candidate symptoms spelled out, which one they see. Answer: **"it spins for a long time and says
+  the feedback cannot be generated or something like that and then asks me to try again later but
+  then the progress is lost"**, in Sprechen practice (not the Modelltest). That named three faults,
+  all structural, all fixed here.
+  **(1) The debrief led on the leg that cannot serve it.** `gemini-2.5-flash` reasons by default and
+  Google bills thoughts as OUTPUT; the debrief's answer is a whole JSON object over a fourteen-turn
+  transcript, so the leg reliably returned `finishReason: "MAX_TOKENS"` with no text. s206 disabled
+  thinking for TURNS and left the debrief thinking, so every debrief in the app waited out a leg that
+  could not succeed before the model that could was asked. The debrief now leads on the paid model
+  (`lead: "paid"`, restoring the s196 intent that the debrief gets the stronger model), with Gemini
+  behind it, thinking off, as a genuine fallback.
+  **(2) Per-leg deadlines are not a budget.** Three 60-second legs in series is a three-minute
+  request, longer than the platform's own ceiling, so a bad run could be killed before reaching its
+  own failure path. Added `DEBRIEF_BUDGET_MS` (100 s) and `TURN_BUDGET_MS` (45 s): `legDeadline`
+  caps each leg by what remains and refuses to start one that cannot finish (`MIN_LEG_MS` 8 s). The
+  order and the budget were extracted to `supabase/functions/_shared/aiCascade.ts` so they can be
+  unit-gated (`tests/aiCascade.test.ts`, 8 tests) instead of living in a Deno file no test can
+  import. `DEBRIEF_MAX_TOKENS` raised 4096 → 8192, since both fallback legs spend that budget
+  reasoning before writing an answer.
+  **(3) "The progress is lost" was literally true.** `learner_text` was written only by a successful
+  debrief, and `SprechenHistory` reads `learner_text`, never `turns`, so a conversation whose grade
+  failed expanded to "Das Transkript wurde inzwischen gelöscht." over a row that held every word: the
+  app contradicted its own failure screen, and the founder believed the wrong one. It is now written
+  turn by turn (an abandoned conversation is on record too) and re-asserted on the debrief's failure
+  path.
+  **Plus diagnosability:** `cascade` returns a reason with an empty result (`unavailable` ·
+  `unreadable` · `timeout`; the client adds `network`), the function logs it, and the failure screen
+  prints it as a small `Code: …` line, so the next report of this sentence carries its own diagnosis.
+  **What was ruled out and stated as such:** the backend is deployed current (last `supabase.yml` run
+  2026-08-09, green), RLS on `speaking_conversations` is intact, and the client's debrief request,
+  retry and rendering paths are sound. The provider-side behaviour of the founder's specific failed
+  runs is NOT observable from the sandbox: the network policy blocks the Supabase project, so no
+  live probe and no function logs. Gates (measured 2026-08-13): typecheck · 727 tests (60 files, up
+  from 719) · lint 0 errors (84 warnings, unchanged baseline) · build · check:bundle 153.3 kB ·
+  lint:content (CLAUDE.md back to 349 lines, the new law paid for by compressing prose whose detail
+  lives in `docs/areas/SPRECHEN.md`).
+- **Artifacts:** `supabase/functions/_shared/aiCascade.ts` (new) ·
+  `supabase/functions/converse/index.ts` · `src/lib/speaking.ts` ·
+  `src/features/sprechen/ConversationRunner.tsx` · `tests/aiCascade.test.ts` (new) ·
+  `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` (§s211) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (new) ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · `docs/SESSION_PROMPT_LOG.md`

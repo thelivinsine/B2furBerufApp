@@ -125,24 +125,24 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and
   nothing else. Not onboarded: `/welcome` signed out, `/start` signed in (`DECISIONS.md` §s174).
-- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief, a
-  conversation, `features/writing/correction.tsx` as the debrief (never a new copy), and its own
-  Verlauf. **Deliberately NOT an open chatbot:** the brief makes it an exercise, the partner never
-  corrects mid-flow. **Layout is a property of the TASK** (`gespraech` / `buehne` / `anruf`), and the
-  task TRAVELS: `brief.situation` is stated on the brief and in the running Aufgabe panel, not only
-  on the chooser card (founder s209). **A speech transcript is ASSIGNED, never appended** (s209): iOS
-  Safari re-sends an utterance as a longer copy of itself and flags interim results final, so
-  `listen()` reports the whole transcript every event and a caller that appends repeats the sentence
-  word by word. **The row is written when a conversation STARTS** (s194), so the daily limit counts
-  what costs money; **the practice counts once the learner has SPOKEN, not once the AI has graded**
-  (s196), so a failed debrief is retryable. **A practice conversation carries its Redemittel**
-  (founder s202) **structurally**: the runner takes them as a PROP and the Modelltest passes nothing,
-  so a candidate never reads what they are graded on; the rail shows at most FIVE, easiest by CEFR
-  (s206). Anrede follows `lib/anrede.ts`. Detail: `docs/areas/SPRECHEN.md`.
+- **Sprechen is Schreiben with a microphone** (s193): a chooser with the one Aufgabe rail, a brief,
+  a conversation, `features/writing/correction.tsx` as the debrief (never a new copy), a Verlauf.
+  **Deliberately NOT an open chatbot:** the brief makes it an exercise; no correction mid-flow.
+  **Layout is a property of the TASK** (`gespraech` / `buehne` / `anruf`), and the task TRAVELS:
+  `brief.situation` is stated on the brief and in the running Aufgabe panel (founder s209). **A
+  speech transcript is ASSIGNED, never appended** (s209): `listen()` reports the whole transcript
+  every event. **The row is written when a conversation STARTS** (s194), so the daily limit counts
+  what costs money, **the practice counts once the learner has SPOKEN, not once the AI has graded**
+  (s196), the debrief retryable and free. **A practice conversation carries its Redemittel
+  structurally** (founder s202): the runner takes them as a PROP, the Modelltest passes nothing, so
+  a candidate never reads what they are graded on; at most FIVE, easiest by CEFR (s206).
 - **A wall is stated BEFORE the commitment, and a wall with a remedy IS its remedy** (s194, widened
-  s206): allowance, account and connection are gates on the start, never a caption after the learner
-  has committed, ONE rule serves both guard and gate, and a failure never renders in the grey a
-  status uses. **Every provider call carries a deadline**, a losing leg logs it. → `SPRECHEN.md`.
+  s206): allowance, account and connection are gates on the start, never a caption after the
+  commitment; ONE rule serves guard and gate; a failure never renders in the grey a status uses.
+  **Every provider call carries a deadline and every cascade a TOTAL budget; the debrief LEADS on
+  the strong model** (s211): a leg that cannot finish in what remains is never started, a losing leg
+  logs it, the failure carries its reason, and **what the learner SAID is stored as it is said**, so
+  a failed grade never empties the Verlauf. → `SPRECHEN.md`.
 - **The Prüfung zone has ONE frame** (founder s195; mechanism in `docs/areas/PRUEFUNG.md`). ONE exit,
   the LAST control in the header, top right, on every screen of the zone and at every width
   (`useSessionStore.zoneExit`): grey **Zurück**, or red **Verlassen** while a clock runs. **Wherever
@@ -189,11 +189,11 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
   uses `h-pruefung-stage` (s196), which keeps a real ceiling from `lg` up too.
 - **A focus ring answers the KEYBOARD only, and a hover style answers a POINTER only** (founder
   s190/s201). `trackInputMode()` marks `<html data-input="pointer|keyboard">` and one rule in
-  `index.css` drops the ring while the pointer is in charge, so WCAG 2.4.7 holds without a stray ring
-  (`:focus-visible` alone does not settle it, and the indicator is never deleted to fix one).
-  `future.hoverOnlyWhenSupported` compiles every `hover:` into `@media (hover: hover)`, because a
-  touch browser keeps `:hover` on the last element tapped, so **a control's ON state is always its
-  own class, never a hover fill**.
+  `index.css` drops the ring while the pointer is in charge, so WCAG 2.4.7 holds without a stray
+  ring (`:focus-visible` alone does not settle it; the indicator is never deleted to fix one).
+  `future.hoverOnlyWhenSupported` compiles every `hover:` into `@media (hover: hover)`, a touch
+  browser keeping `:hover` on the last element tapped, so **a control's ON state is always its own
+  class, never a hover fill**.
 - **When a page changes WHAT scrolls, everything reading the window has to move with it** (s190):
   hooks take the scroll root (`useScrollDirection(root)`, `ScrollRootProvider`), never the window by
   assumption. A scroll container SLICES what crosses its edge, so it fades PER EDGE and only where

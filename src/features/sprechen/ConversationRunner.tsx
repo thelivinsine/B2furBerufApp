@@ -341,6 +341,15 @@ export function ConversationRunner({
             <p className="text-xs text-muted-foreground">
               {tr("Dein Gespräch ist gespeichert und steht in deinem Verlauf.")}
             </p>
+            {/* The cause, in one token (s211). The founder's report of this
+                screen was "it says the feedback cannot be generated ... and then
+                the progress is lost", and the four causes behind that sentence
+                need four different fixes, none of which the message above can
+                distinguish. Small and last, so it never competes with the two
+                things the learner actually has to do. */}
+            {debrief.reason && (
+              <p className="text-[11px] text-muted-foreground">Code: {debrief.reason}</p>
+            )}
           </div>
           <div className="flex flex-wrap justify-center gap-2.5">
             <Button variant="gradient" onClick={() => void runDebrief()}>
