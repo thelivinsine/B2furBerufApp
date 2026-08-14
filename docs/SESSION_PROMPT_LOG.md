@@ -6459,3 +6459,37 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `src/features/admin/AdminSteuerung.tsx` · `src/features/library/LibraryHub.tsx` · `src/index.css` ·
   `tests/nav.test.tsx` · `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/areas/SESSION.md` ·
   `.claude/skills/design/SKILL.md` · `docs/DECISIONS.md` (§s210) · `docs/PROJECT_STATUS.md`
+
+- **Merge + deploy (recorded after the fact):** PR **#853** squash-merged to `main` as **`53dc2e3`**;
+  **Validate content** green on that SHA. Verified by the workflow's check run rather than by
+  claiming it, since the sandbox cannot reach the live site.
+
+### Prompt 2 (2026-08-10)
+
+> what's the iPhone microphone thing?
+
+- **Response summary:** A context-window summary had compressed the earlier PR #850 work down to a
+  bare mention, so the founder asked what it referred to. Explained in plain terms: the microphone
+  bug from earlier this session (a spoken sentence repeating itself word by word on iOS Safari,
+  fixed in #850, already merged and live) and the one open item that fix left behind, an iPhone
+  check that the sandbox has no device to perform itself. No code change; a chat-only answer.
+
+### Prompt 3 (2026-08-10)
+
+> that's already fixed
+
+- **Response summary:** Founder confirmed the iPhone check from #850 passed on a real device.
+  Acknowledged; nothing left open from sessions 209 or 210.
+
+### Prompt 4 (2026-08-10)
+
+> document the session
+
+- **Response summary:** Closed session 210's documentation. Prompt 1's PR body already carried the
+  full account of the naming search and the founder's picks, so this pass recorded what only exists
+  after the fact: the merge SHA (PR **#853** → **`53dc2e3`**, squash-merged, `Validate content`
+  green) in both the `PROJECT_STATUS.md` header entry and its handoff (replacing "not yet merged as
+  of this handoff"), plus the founder's own confirmation that the #850 iPhone check passed, closing
+  the one item session 209's handoff had left open. No further doc was made stale: `docs/areas/*`
+  and `CLAUDE.md` were already updated inside PR #853 itself, not deferred to this pass.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

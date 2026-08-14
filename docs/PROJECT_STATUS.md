@@ -8,7 +8,7 @@ nav-order + interface-language work, and the CEFR filter-chip fix) are archived 
 here")._
 
 **Session 210 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): "Praktisch" renamed
-"Spielplatz".**
+"Spielplatz".** Shipped as PR **#853** → **`53dc2e3`**, squash-merged; deployed.
 Founder: "rename practice or praktsich as simulation." The nav tab's actual name is "Praktisch", not
 "Practice"; flagged that "Simulation" was already the route/label for the Sprechen practice chooser
 (`/simulation`) and "Prüfungssimulation" for exam sets, so reusing it would create two unrelated
@@ -143,8 +143,8 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 210 (2026-08-10): the "Praktisch" tab is "Spielplatz" everywhere.**
-Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209; not yet merged as of this
-handoff).
+Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209), PR **#853** → **`53dc2e3`**,
+squash-merged and deployed. Post-merge housekeeping done, tree clean.
 Founder: "rename practice or praktsich as simulation."
 
 - **The name is "Spielplatz", not "Simulation".** "Simulation" collides with the existing
