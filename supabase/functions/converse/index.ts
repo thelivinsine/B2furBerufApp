@@ -31,6 +31,9 @@ import {
   anthropicUsage, geminiUsage, openaiUsage, loadRates, priceCall, providerOf,
   recordAiCall, type TokenUsage,
 } from "../_shared/aiUsage.ts";
+import {
+  legDeadline, legOrder, type CascadeFailure, type CascadeLead,
+} from "../_shared/aiCascade.ts";
 
 /* --------------------------------- CORS ---------------------------------- */
 
@@ -116,10 +119,17 @@ const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
  * the learner got "Die Rückmeldung konnte nicht gelesen werden" over a
  * conversation that had gone perfectly (founder s196). Gemini 2.5 Flash made it
  * worse, because it spends output tokens on thinking before it writes a
- * character. 4096 matches what every other function here already uses.
+ * character.
+ *
+ * 8192 rather than 4096 since s211, because the two reasoning legs spend this
+ * budget BEFORE they write a character of the answer (Gemini bills thoughts as
+ * output, GPT-5 spends reasoning tokens out of `max_completion_tokens`), so on a
+ * fourteen-turn transcript the headroom is what decides whether the fallback
+ * legs can answer at all. Only tokens actually generated are billed, so a
+ * ceiling nobody reaches costs nothing.
  */
 const TURN_MAX_TOKENS = 500;
-const DEBRIEF_MAX_TOKENS = 4096;
+const DEBRIEF_MAX_TOKENS = 8192;
 
 /**
  * How long one leg of the cascade may take before it is abandoned and the next
@@ -139,6 +149,33 @@ const DEBRIEF_MAX_TOKENS = 4096;
  */
 const TURN_TIMEOUT_MS = 20_000;
 const DEBRIEF_TIMEOUT_MS = 60_000;
+
+/**
+ * How long the WHOLE cascade may take, per mode (s211).
+ *
+ * A per-leg deadline stops one hung provider; three of them in series still add
+ * up to three times the wait. That is what the founder sat through on the
+ * debrief: "it spins for a long time and says the feedback cannot be generated
+ * ... and then the progress is lost". Three 60-second legs is a three-minute
+ * spinner, longer than the platform's own request ceiling, so the request could
+ * be killed before it ever reached its own failure path.
+ *
+ * The budget is what the LEARNER is waiting through, so it is measured from the
+ * first provider call, and a leg that cannot finish inside what is left is never
+ * started (`legDeadline`). The debrief is allowed the longer one: it is asked
+ * once, at the end, and it is the reason the feature exists.
+ */
+const TURN_BUDGET_MS = 45_000;
+const DEBRIEF_BUDGET_MS = 100_000;
+
+/**
+ * Everything the learner said, joined, exactly as the debrief and the Verlauf
+ * read it. One definition, because the turn path and the debrief path both write
+ * it now and the two must not disagree about what "what you said" means.
+ */
+function learnerSaidIn(turns: { role: string; text: string }[]): string {
+  return turns.filter((t) => t.role === "learner").map((t) => t.text).join("\n");
+}
 
 function monthKey(d = new Date()): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
@@ -298,6 +335,20 @@ interface CallOpts {
   json?: boolean;
   /** Milliseconds one leg may take before the next model is asked. */
   timeoutMs: number;
+  /** Milliseconds the WHOLE cascade may take, across every leg (s211). */
+  budgetMs: number;
+  /**
+   * Which provider is asked FIRST (s211).
+   *
+   * "free" for a spoken turn: Gemini Flash writes two sentences well and costs
+   * nothing. "paid" for the debrief, which s196 deliberately put on the stronger
+   * model: leading with a free leg there meant the intended model was only ever
+   * reached AFTER a leg that had to fail first, so the learner paid its whole
+   * deadline in waiting and got nothing for it. Gemini stays in the order as the
+   * FALLBACK either way, so a dead paid provider degrades the debrief instead of
+   * removing it.
+   */
+  lead?: CascadeLead;
   /**
    * Whether the Gemini leg may think before it writes (s206).
    *
@@ -478,13 +529,19 @@ async function callOpenAI(
 }
 
 /**
- * Free tier first, then the paid legs.
+ * Ask the providers in turn until one gives an answer the caller can use.
  *
  * `accept` is what makes the cascade a real cascade for the debrief (s196). It
  * used to take the first leg that returned ANY text, so a Gemini answer that
  * was truncated mid-JSON was accepted, the parse failed downstream and Claude
  * was never asked. A leg whose output the caller cannot use is a leg that
  * FAILED, so the next one gets its turn.
+ *
+ * The ORDER and the total BUDGET are decided in `_shared/aiCascade.ts` (s211),
+ * where they are unit-gated. Two things follow from the budget: a leg that
+ * cannot finish inside what is left is never started, and the reason the
+ * cascade produced nothing comes back with it, so a failure the learner reports
+ * ("it just says it cannot be generated") is diagnosable without reproducing it.
  */
 async function cascade(
   system: string,
@@ -492,18 +549,32 @@ async function cascade(
   paidModel: string,
   opts: CallOpts,
   accept: (out: ModelOut) => boolean = () => true,
-): Promise<ModelOut | null> {
-  const legs = [
-    () => callGemini(system, turns, opts),
-    () => callAnthropic(system, turns, paidModel, opts),
-    () => callOpenAI(system, turns, opts),
-  ];
-  for (const leg of legs) {
-    const out = await leg();
-    if (out && accept(out)) return out;
-    if (out) console.error("converse: unusable output from", out.model);
+): Promise<{ out: ModelOut | null; reason: CascadeFailure | null }> {
+  const startedAt = Date.now();
+  let sawOutput = false;
+  let ranOut = false;
+
+  for (const name of legOrder(opts.lead ?? "free")) {
+    const timeoutMs = legDeadline(opts.timeoutMs, Date.now() - startedAt, opts.budgetMs);
+    if (timeoutMs === null) {
+      ranOut = true;
+      console.error(`converse: skipped ${name}, cascade budget spent`);
+      break;
+    }
+    const legOpts: CallOpts = { ...opts, timeoutMs };
+    const out =
+      name === "gemini"
+        ? await callGemini(system, turns, legOpts)
+        : name === "anthropic"
+          ? await callAnthropic(system, turns, paidModel, legOpts)
+          : await callOpenAI(system, turns, legOpts);
+    if (out && accept(out)) return { out, reason: null };
+    if (out) {
+      sawOutput = true;
+      console.error("converse: unusable output from", out.model);
+    }
   }
-  return null;
+  return { out: null, reason: ranOut ? "timeout" : sawOutput ? "unreadable" : "unavailable" };
 }
 
 /* ------------------------------ The handler ------------------------------- */
@@ -746,9 +817,10 @@ Deno.serve(async (req) => {
     if (wire.length === 0 || wire[0].role !== "user")
       wire.unshift({ role: "user", text: "(Das Gespräch beginnt.)" });
 
-    const out = await cascade(turnSystemPrompt(brief), wire, TURN_MODEL, {
+    const { out } = await cascade(turnSystemPrompt(brief), wire, TURN_MODEL, {
       maxTokens: TURN_MAX_TOKENS,
       timeoutMs: TURN_TIMEOUT_MS,
+      budgetMs: TURN_BUDGET_MS,
       think: false,
     });
     if (!out) {
@@ -780,6 +852,15 @@ Deno.serve(async (req) => {
       .from("speaking_conversations")
       .update({
         turns: nextTurns,
+        // Written AS THE LEARNER SPEAKS since s211, not only by a successful
+        // debrief. The Verlauf reads `learner_text`, never `turns`, so a
+        // conversation whose grade failed used to expand to "Das Transkript
+        // wurde inzwischen gelöscht." over a row that held every word: the app
+        // told the learner their speaking was gone while the failure screen
+        // promised it was saved. That contradiction is the founder's "then the
+        // progress is lost". A conversation abandoned mid-run is now on record
+        // too, for the same reason.
+        learner_text: learnerSaidIn(nextTurns) || null,
         cost_estimate: spentSoFar + turnCost,
         model: out.model,
       })
@@ -808,10 +889,7 @@ Deno.serve(async (req) => {
 
   /* ------------------------------ debrief mode ---------------------------- */
 
-  const learnerSaid = storedTurns
-    .filter((t) => t.role === "learner")
-    .map((t) => t.text)
-    .join("\n");
+  const learnerSaid = learnerSaidIn(storedTurns);
   if (!learnerSaid.trim()) {
     return json({
       ok: false,
@@ -826,17 +904,48 @@ Deno.serve(async (req) => {
   // The debrief is only usable if it PARSES, so parsing is the accept test and
   // an unparsable leg falls through to the next model instead of failing the
   // whole request (s196).
-  const out = await cascade(
+  //
+  // It LEADS on the strong model since s211. The free leg used to lead here, and
+  // it is the one call in this function it cannot serve: the debrief writes a
+  // whole JSON object over the transcript, and `gemini-2.5-flash` spends output
+  // tokens thinking before it writes a character, so the leg reliably came back
+  // at its `finishReason: "MAX_TOKENS"` with no text. Every debrief therefore
+  // waited out a leg that could not succeed before the model that could was even
+  // asked. Gemini is still in the order, now with its thinking off and behind
+  // the paid leg, so it is a real fallback rather than a tax.
+  const { out, reason } = await cascade(
     debriefSystemPrompt(brief),
     [{ role: "user", text: `TRANSKRIPT:\n${transcript}` }],
     DEBRIEF_MODEL,
-    { maxTokens: DEBRIEF_MAX_TOKENS, json: true, timeoutMs: DEBRIEF_TIMEOUT_MS },
+    {
+      maxTokens: DEBRIEF_MAX_TOKENS,
+      json: true,
+      timeoutMs: DEBRIEF_TIMEOUT_MS,
+      budgetMs: DEBRIEF_BUDGET_MS,
+      think: false,
+      lead: "paid",
+    },
     (o) => parseJson(o.text) !== null,
   );
   const parsed = out ? parseJson(out.text) : null;
   if (!out || !parsed) {
+    // The conversation is NOT lost with the grade. `learner_text` is written
+    // turn by turn (s211), so the row already holds every word; this only makes
+    // sure a row written before that change, or one whose last turn update
+    // failed, still carries the transcript the Verlauf prints.
+    const { error: keepErr } = await admin
+      .from("speaking_conversations")
+      .update({ learner_text: learnerSaid })
+      .eq("id", conversationId)
+      .eq("user_id", user.id);
+    if (keepErr) console.error("speaking_conversations keep-transcript failed", keepErr.message);
+    console.error(`converse: debrief produced nothing (${reason})`);
     return json({
       ok: false,
+      // The reason travels with the failure (s211), so the next report of "it
+      // says the feedback cannot be generated" names which of the three it was
+      // without anyone having to reproduce it.
+      reason,
       // Says what to do next, because the retry really does work: the
       // transcript is already stored, so asking again costs no allowance.
       message:

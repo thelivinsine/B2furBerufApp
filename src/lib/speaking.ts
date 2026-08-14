@@ -50,6 +50,18 @@ export interface DebriefResult {
   /** The call was refused because nobody is signed in; the learner must act. */
   needsAuth?: boolean;
   message?: string;
+  /**
+   * Why no grade came back, in one token (s211): "unavailable" (no provider
+   * answered), "unreadable" (one answered in a shape we cannot use), "timeout"
+   * (the budget ran out), or "network" when the request never returned at all.
+   *
+   * It is printed small on the failure screen for one reason: the founder's
+   * report was "it spins for a long time and says the feedback cannot be
+   * generated", and the four causes behind that sentence need four different
+   * fixes. The detail stays in the function logs; this is the part they can
+   * quote without reproducing it.
+   */
+  reason?: string;
 }
 
 /** The bounded subset of the brief the function needs to build its prompt. */
@@ -254,6 +266,7 @@ export async function requestDebrief(input: {
     if (error) {
       return {
         ok: false,
+        reason: "network",
         message: "Die Rückmeldung ist momentan nicht verfügbar. Bitte versuche es später erneut.",
       };
     }
@@ -266,10 +279,11 @@ export async function requestDebrief(input: {
         data.dailyRemaining,
       );
     }
-    return data ?? { ok: false, message: "Keine Antwort erhalten." };
+    return data ?? { ok: false, reason: "network", message: "Keine Antwort erhalten." };
   } catch {
     return {
       ok: false,
+      reason: "network",
       message: "Verbindung fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.",
     };
   }
