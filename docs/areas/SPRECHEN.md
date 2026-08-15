@@ -290,8 +290,16 @@ conversation whose grade failed therefore expanded to *"Das Transkript wurde inz
 over a row that held every word, so the app told the learner their speaking was gone while the
 failure screen promised it was saved. That contradiction is the founder's "the progress is lost".
 Each turn now writes it alongside `turns` (so an ABANDONED conversation is on record too), and the
-debrief's failure path re-asserts it before returning. The retention purge still NULLs it on the
-same clock, which is the one case that copy is true.
+debrief's failure path re-asserts it before returning. **The rows that already existed were
+backfilled from `turns`** (migration `0021`, idempotent): nothing was ever actually lost, it was
+written to a column nothing displayed, so the founder's eight "deleted" conversations came back with
+their transcripts. The backfill cannot touch a purged row, because retention empties `turns` in the
+same statement it NULLs the text.
+
+**And the copy tells the two apart** (s211). "Das Transkript wurde inzwischen gelöscht." is only
+true past `LEARNER_TEXT_RETAIN_DAYS` (730, the `purge_old_learner_text` clock); a younger row with no
+transcript never had one written, and says so. Telling a learner their speaking was deleted when the
+app simply failed to save it is the harsher of the two errors, so the age decides which one prints.
 
 ## Rules that are easy to break
 

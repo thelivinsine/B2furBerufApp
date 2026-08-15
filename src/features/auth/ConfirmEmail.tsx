@@ -123,8 +123,9 @@ export function ConfirmEmail() {
             <MailWarning className="mx-auto mb-4 h-8 w-8 text-danger" />
             <h1 className="text-lg font-semibold text-foreground">{t("Link nicht mehr gültig")}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              {t("Bestätigungs-Links laufen ab und lassen sich nur einmal öffnen. Melde dich an, dann")}
-              schicken wir dir einen neuen.
+              {/* ONE string: split, the English rendered as "Sign in,
+                  thenschicken wir dir einen neuen." (s211). */}
+              {t("Bestätigungs-Links laufen ab und lassen sich nur einmal öffnen. Melde dich an, dann schicken wir dir einen neuen.")}
             </p>
             <Button variant="gradient" className="mt-5 w-full" onClick={() => navigate("/")}>
               Zur Anmeldung
