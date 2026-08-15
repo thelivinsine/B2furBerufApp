@@ -303,7 +303,8 @@ export const UI_EN: Record<string, string> = {
   Bestanden: "Passed",
   Bester: "Best",
   "Bestätigt": "Confirmed",
-  "Bestätigungs-Links laufen ab und lassen sich nur einmal öffnen. Melde dich an, dann": "Confirmation links expire and open only once. Sign in, then",
+  "Bestätigungs-Links laufen ab und lassen sich nur einmal öffnen. Melde dich an, dann schicken wir dir einen neuen.":
+    "Confirmation links expire and open only once. Sign in and we will send you a new one.",
   "Bewertet wird:": "Marked on:",
   "Blass: dein erster Versuch · Kräftig: dein Fortschritt": "Pale: your first attempt · Solid: your progress",
   "Das Transkript wurde inzwischen gelöscht.": "The transcript has since been deleted.",
@@ -346,7 +347,10 @@ export const UI_EN: Record<string, string> = {
   Fertig: "Done",
   "Führe dein erstes Gespräch, dann steht hier deine Rückmeldung.": "Have your first conversation and your feedback appears here.",
   "Für diesen Text gibt es keine Korrektur.": "There is no correction for this text.",
-  "Für dieses Gespräch gibt es keine Rückmeldung. Dein Gespräch ist trotzdem": "There is no feedback for this conversation. Your conversation is still",
+  "Für dieses Gespräch gibt es keine Rückmeldung. Dein Gespräch ist trotzdem gespeichert.":
+    "There is no feedback for this conversation. Your conversation is still saved.",
+  "Für dieses Gespräch wurde kein Transkript gespeichert.":
+    "No transcript was saved for this conversation.",
   "Für dieses Thema gibt es keine Aufgaben nach Branche. Du übst hier alle.": "There are no sector-specific tasks for this topic. You practise them all here.",
   "Für dieses Thema gibt es keine Texte nach Branche. Du übst hier alle.": "There are no sector-specific texts for this topic. You practise them all here.",
   "Für dieses Thema gibt es noch keine Einträge.": "There are no entries for this topic yet.",
@@ -395,8 +399,8 @@ export const UI_EN: Record<string, string> = {
   Notizen: "Notes",
   "Nächste Quest": "Next quest",
   "Nützliche Redemittel": "Useful phrases",
-  "Ohne Bewertung": "Without marking",
-  "Ohne Bewertung fortfahren": "Continue without marking",
+  "Ohne Bewertung": "Not assessed",
+  "Ohne Bewertung fortfahren": "Continue without assessment",
   "Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.": "Check your sentence first, then the AI detects active/passive, tense and mood.",
   "Prüfen": "Check",
   "Prüfung starten": "Start the exam",

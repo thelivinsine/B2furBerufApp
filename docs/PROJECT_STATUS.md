@@ -158,7 +158,8 @@ Founder: "can you make sure when the app opens the user sees the library instead
   Supabase; the next content job is the reply-task wave (writing-audit P4).
 
 **Handoff after session 211 (2026-08-13): the Sprechen debrief no longer waits on a leg that cannot
-answer, and a failed grade no longer looks like lost work.**
+answer, a failed grade no longer looks like lost work, and the eight conversations that read as
+deleted were backfilled.**
 Branch `claude/speaking-drills-review-issue-3589zm`.
 Founder: "the review of speaking drills still doesn't work. check what's the issue." → *"it spins for
 a long time and says the feedback cannot be generated ... and then the progress is lost."*
@@ -172,6 +173,16 @@ a long time and says the feedback cannot be generated ... and then the progress 
   written turn by turn now. Before touching any Verlauf, check which COLUMN it reads: this one read
   `learner_text` and never `turns`, so the app told the learner their transcript was deleted while
   the failure screen promised it was saved.
+- **The transcripts were never gone, and the old rows were recovered.** `turns` held every word;
+  only `learner_text`, the column the Verlauf reads, was empty. Migration `0021` backfills it from
+  `turns` for every existing row (idempotent). **Before assuming learner data is lost, check whether
+  it is simply in a column nothing displays.**
+- **Three copy bugs from the same screenshot are fixed:** the split sentence that rendered as
+  "Your conversation is stillgespeichert." (and its twin in `ConfirmEmail`), now gated by
+  `tests/uiStringSplit.test.ts` — **ONE `t()` per sentence, never a translated head with a literal
+  tail**, since the bug is invisible in German; "Das Transkript wurde inzwischen gelöscht." now
+  prints only past the 730-day retention clock, and a younger row says no transcript was saved; and
+  "Ohne Bewertung" reads "Not assessed" in English, not "Without marking".
 - **This needs a backend deploy to take effect:** merging to `main` runs `supabase.yml`, which
   applies migrations (none here) and deploys every Edge Function. A feature-branch push changes
   nothing live.
