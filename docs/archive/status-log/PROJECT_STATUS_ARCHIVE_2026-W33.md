@@ -77,3 +77,36 @@ microphone feature. fix it."
   (writing-audit P4), 47 authored `source` texts plus a rendering slot that does not exist yet,
   waiting on a founder placement pick from `preview/schreiben-source-text.html`.
 
+---
+
+## Session 210 (archived from PROJECT_STATUS.md by session 212)
+
+**Session 210 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): "Praktisch" renamed
+"Spielplatz".** Shipped as PR **#853** → **`53dc2e3`**, squash-merged; deployed.
+Founder: "rename practice or praktsich as simulation." The nav tab's actual name is "Praktisch", not
+"Practice"; flagged that "Simulation" was already the route/label for the Sprechen practice chooser
+(`/simulation`) and "Prüfungssimulation" for exam sets, so reusing it would create two unrelated
+things with the same name. The founder agreed and asked for name suggestions instead; "Alltag" was
+also ruled out (already the Berufsleben/Alltag life-area split, used throughout Bibliothek/Prüfung
+filters). The founder then asked for a name that hints at the Neuland game living inside the same
+tab; "Mission", "Quest", "Level" and "Welt" were all already taken by the game or other UI elsewhere,
+so those were ruled out too. Picked from three collision-free options: **Spielplatz**.
+- **Every user-facing instance renamed**, code and copy: the nav label (`nav-items.ts`), its English
+  translation in `uiStrings.ts` ("Spielplatz" → "Playground", replacing "Praktisch" → "Practice"),
+  the Session page eyebrow, the help-center line naming the home screen, three Admin Steuerung
+  strings (DE + EN), and every code comment describing the tab across `BottomTabBar.tsx`,
+  `Sidebar.tsx`, `route-icons.tsx`, `FeedbackButton.tsx`, `LibraryHub.tsx`, `nav-items.ts`,
+  `index.css`. The route (`/`) is unchanged, as are the internal `dashboardStartTab` values
+  (`"ueben"`/`"spielen"`).
+- **Docs updated in the same PR**, per the doc rule: `CLAUDE.md` (the nav-order law + a lineage
+  note), `docs/areas/PRAKTISCH-NAV.md` (content renamed throughout; the FILE keeps its old name as
+  the stable identifier every other doc links to, noted at the top), `docs/areas/SESSION.md`, and
+  `.claude/skills/design/SKILL.md`. `docs/DECISIONS.md` gets a new §s210 recording the naming
+  process; historical/dated docs (`docs/plans/*`, `docs/branding/*`, `docs/DEMO_RUNBOOK.md`) are
+  left untouched, same as any other past-tense record.
+- `tests/nav.test.tsx` updated (its founder-quote comment kept verbatim, lowercase "praktisch"
+  intact, since that is what the founder actually typed in s207).
+- Gates (measured 2026-08-10): typecheck · **719 tests** (59 files, unchanged count) · lint 0 errors
+  · build · check:bundle 153.3 kB · lint:content (including the CLAUDE.md size ratchet: 349 lines).
+- **Verified in a real browser** at both breakpoints: the bottom tab bar reads "Spielplatz Beta" and
+  the desktop sidebar reads "Spielplatz" with the BETA chip, both at 430×932 and 1280×900.

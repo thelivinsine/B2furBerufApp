@@ -6545,3 +6545,46 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` (§s211) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (new) ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · `docs/SESSION_PROMPT_LOG.md`
+
+## Session 212 (branch `claude/microphone-bug-fix-jc70vs`)
+
+### Prompt 1 (2026-08-14)
+
+> can you make sure when the app opens the user sees the library instead of the playground?
+
+- **Response summary:** `/` is both the Spielplatz dashboard's route AND the Spielplatz nav tab's
+  link target, so redirecting `/` itself at the router level would have made tapping the tab bounce
+  straight back to the Bibliothek, breaking it. The fix needed to distinguish a COLD open (the PWA's
+  `start_url`, a bookmark of the bare domain, a hard reload) from an in-app navigation to the same
+  URL (a `<Link>` click, no reload), and only redirect the first.
+  Landed on the fact that a JS module evaluates exactly once per real page load and never again on a
+  client-side route change, which is precisely that distinction. New `src/lib/appEntry.ts`, imported
+  second in `main.tsx` right after `lib/authCallback.ts` (an existing module that already runs at
+  module-eval time, before React Router mounts, for the identical reason: reading the URL before
+  anything rewrites it). At import time it checks `window.location.pathname === "/"` and, if so,
+  calls `history.replaceState` to `/library`, search and hash preserved, before the router is even
+  created.
+  Preserving the search/hash mattered concretely: `grep`-ing for `redirectTo` before assuming the
+  bare root was free to repoint surfaced that Google's OAuth callback lands there by design
+  (`useAuthStore.ts`: `redirectTo: origin + "/"`, landing as a bare `?code=…`), and
+  `lib/authCallback.ts`'s own doc comment surfaced that a legacy Supabase "Confirm signup" email
+  template also lands there (`#access_token=…`). Neither reads the URL's PATH, only its query/hash,
+  and `authCallback.ts` (which runs first) had already snapshotted the hash into memory before this
+  module touches the URL, so relocating the path is safe for both. `public/spa-redirect.js` (runs
+  before any module, restores a GitHub-Pages-mangled deep link like `/?/settings` → `/settings`)
+  guarantees a real deep link never reaches `appEntry.ts` with pathname still `"/"`.
+  `tests/appEntry.test.ts` (7 tests) covers the pure decision function plus the live module-eval
+  redirect, same split as `authCallback.ts`/its own test. Verified in a real browser (Chromium,
+  430×932) against both the dev server and the production `preview` build, checking rendered content
+  and not just the resolved URL: cold open shows the actual Bibliothek, tapping Spielplatz afterward
+  shows the actual Dashboard, a deep link to `/anwenden` is untouched, a reload while on Spielplatz
+  bounces back to the Bibliothek. Not verifiable from the sandbox: an actual Google OAuth round trip
+  or a real PWA install; the safety argument there rests on reading `supabase-js`'s behaviour rather
+  than exercising it, flagged in the handoff for a founder check post-deploy.
+  Gates: typecheck · 734 tests (61 files, up from 727) · lint 0 errors · build · check:bundle
+  153.5 kB · lint:content (CLAUDE.md 349 lines, compressed to hold budget: dropped a redundant
+  `(s195)` cross-reference the file already states in full two bullets earlier).
+- **Artifacts:** `src/lib/appEntry.ts` (new) · `src/main.tsx` · `tests/appEntry.test.ts` (new) ·
+  `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` (§s212) ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session
+  210 archived off to stay under the status file's line budget) · `docs/SESSION_PROMPT_LOG.md`

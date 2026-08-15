@@ -1,10 +1,44 @@
 # Project Status
 
-_Last updated: 2026-08-13 (session 211 fixed the Sprechen debrief: it no longer waits out a leg that
-cannot answer, and a failed grade no longer loses the transcript. Session 210 renamed the "Praktisch"
-nav tab to "Spielplatz". Session 209 (the microphone repeat) is archived in
+_Last updated: 2026-08-14 (session 212 made a cold app-open land on the Bibliothek instead of the
+Spielplatz dashboard. Session 211 fixed the Sprechen debrief: it no longer waits out a leg that
+cannot answer, and a failed grade no longer loses the transcript. Sessions 209-210 (the microphone
+repeat, the Spielplatz rename) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`, sessions 204-208 in the `W32` file
 beside it. All handoffs under their own "Resume here")._
+
+**Session 212 (2026-08-14, branch `claude/microphone-bug-fix-jc70vs`): the app now opens on the
+Bibliothek, not Spielplatz.**
+Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
+- **`/` stays the Spielplatz route** (the nav tab still links to it and must keep working), so the
+  fix could not redirect `/` itself — it had to distinguish a COLD open (the PWA's `start_url`, a
+  bookmark, a hard reload) from an in-app navigation to the same URL (tapping the Spielplatz tab).
+  New `src/lib/appEntry.ts`, imported second in `main.tsx` right after `lib/authCallback.ts` (same
+  "must run before React mounts" pattern, same reason): at module-eval time, which happens exactly
+  once per real page load and never on a client-side route change, it `history.replaceState`s a
+  bare `"/"` to `/library` before React Router ever sees the URL. A tab click afterward is a
+  `<Link>`, no reload, so the module never re-runs and Spielplatz still opens normally.
+- **Search and hash are carried over untouched**, because two things legitimately land on the bare
+  root and neither reads its PATH: Google's OAuth PKCE callback (`redirectTo: origin + "/"` in
+  `useAuthStore.ts`, a bare `?code=…` `supabase-js` consumes regardless of path) and a legacy
+  Supabase "Confirm signup" link (`#access_token=…`, already snapshotted by `authCallback.ts` before
+  this runs). Verified by reading the source, not assumed: losing either silently would have been a
+  sign-in regression hiding behind a UX polish. `public/spa-redirect.js` has already restored any
+  GitHub-Pages-mangled deep link before this evaluates, so a real deep link never reaches here with
+  pathname `"/"`. `/library` carries the same `RequireOnboarding` gate `/` did, so a not-yet-onboarded
+  visitor still lands on `/welcome`, one hop earlier than before.
+- New `tests/appEntry.test.ts` (7 tests): the pure decision function plus the live module-eval
+  redirect. **Verified in a real browser** (Chromium, 430×932, dev AND the production `preview`
+  build) that content renders correctly, not just that the URL resolves right: a cold open shows the
+  actual Bibliothek, tapping Spielplatz afterward shows the actual Dashboard, a deep link to
+  `/anwenden` is untouched, and a reload while on Spielplatz bounces back to the Bibliothek (a reload
+  is a cold open too).
+- Docs: `CLAUDE.md` (the nav-order law, compressed elsewhere to hold the 350-line budget: dropped a
+  redundant `(s195)` cross-reference to a rule the file already states in full two bullets earlier),
+  `docs/areas/PRAKTISCH-NAV.md` (the full mechanism), `docs/DECISIONS.md` (§s212).
+- Gates (measured 2026-08-14): typecheck · **734 tests** (61 files, up from 727) · lint 0 errors
+  (84 warnings, unchanged baseline) · build · check:bundle 153.5 kB · lint:content (CLAUDE.md 349
+  lines / linter-counted 350).
 
 **Session 211 (2026-08-13, branch `claude/speaking-drills-review-issue-3589zm`): the Sprechen
 debrief waited three minutes on a leg that could not answer, then lost the conversation.**
@@ -42,36 +76,6 @@ conversations (`/simulation`), not the Modelltest. Third report of this screen (
 - **Not verifiable from the sandbox:** the network policy blocks the Supabase project, so the
   provider-side behaviour of the founder's failing runs cannot be observed from here. The founder
   confirms after the deploy.
-
-**Session 210 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): "Praktisch" renamed
-"Spielplatz".** Shipped as PR **#853** → **`53dc2e3`**, squash-merged; deployed.
-Founder: "rename practice or praktsich as simulation." The nav tab's actual name is "Praktisch", not
-"Practice"; flagged that "Simulation" was already the route/label for the Sprechen practice chooser
-(`/simulation`) and "Prüfungssimulation" for exam sets, so reusing it would create two unrelated
-things with the same name. The founder agreed and asked for name suggestions instead; "Alltag" was
-also ruled out (already the Berufsleben/Alltag life-area split, used throughout Bibliothek/Prüfung
-filters). The founder then asked for a name that hints at the Neuland game living inside the same
-tab; "Mission", "Quest", "Level" and "Welt" were all already taken by the game or other UI elsewhere,
-so those were ruled out too. Picked from three collision-free options: **Spielplatz**.
-- **Every user-facing instance renamed**, code and copy: the nav label (`nav-items.ts`), its English
-  translation in `uiStrings.ts` ("Spielplatz" → "Playground", replacing "Praktisch" → "Practice"),
-  the Session page eyebrow, the help-center line naming the home screen, three Admin Steuerung
-  strings (DE + EN), and every code comment describing the tab across `BottomTabBar.tsx`,
-  `Sidebar.tsx`, `route-icons.tsx`, `FeedbackButton.tsx`, `LibraryHub.tsx`, `nav-items.ts`,
-  `index.css`. The route (`/`) is unchanged, as are the internal `dashboardStartTab` values
-  (`"ueben"`/`"spielen"`).
-- **Docs updated in the same PR**, per the doc rule: `CLAUDE.md` (the nav-order law + a lineage
-  note), `docs/areas/PRAKTISCH-NAV.md` (content renamed throughout; the FILE keeps its old name as
-  the stable identifier every other doc links to, noted at the top), `docs/areas/SESSION.md`, and
-  `.claude/skills/design/SKILL.md`. `docs/DECISIONS.md` gets a new §s210 recording the naming
-  process; historical/dated docs (`docs/plans/*`, `docs/branding/*`, `docs/DEMO_RUNBOOK.md`) are
-  left untouched, same as any other past-tense record.
-- `tests/nav.test.tsx` updated (its founder-quote comment kept verbatim, lowercase "praktisch"
-  intact, since that is what the founder actually typed in s207).
-- Gates (measured 2026-08-10): typecheck · **719 tests** (59 files, unchanged count) · lint 0 errors
-  · build · check:bundle 153.3 kB · lint:content (including the CLAUDE.md size ratchet: 349 lines).
-- **Verified in a real browser** at both breakpoints: the bottom tab bar reads "Spielplatz Beta" and
-  the desktop sidebar reads "Spielplatz" with the BETA chip, both at 430×932 and 1280×900.
 
 ## Where things stand
 
@@ -132,6 +136,26 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 212 (2026-08-14): a cold app-open lands on the Bibliothek.**
+Branch `claude/microphone-bug-fix-jc70vs` (same branch as sessions 209-210), PR still pending as of
+this handoff.
+Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
+
+- **The law to remember: a JS module runs once per real page load, never on a client-side route
+  change.** That is the ONLY reason `/` could be redirected on a cold open without breaking the
+  Spielplatz tab, which links to the same URL. `lib/appEntry.ts` is the second import in `main.tsx`,
+  right after `lib/authCallback.ts` — the same slot, for the same reason: something that has to see
+  the URL before React Router rewrites it.
+- **Never drop the search/hash when relocating a URL a real feature depends on.** The bare root
+  carries Google's OAuth `?code=…` and a legacy Supabase `#access_token=…` by design (`grep` for
+  `redirectTo` before assuming a path is free to repoint). `appEntry.ts` preserves both.
+- **Not verified live** (the sandbox has no way to test a real Google OAuth round trip or a real PWA
+  install), but reasoned through and documented in `docs/DECISIONS.md` §s212: neither consumer reads
+  the URL's path, only its query/hash, so relocating the path alone is safe. Worth a founder check on
+  an actual Google sign-in after this deploys, since that path could not be exercised here.
+- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
+  Supabase; the next content job is the reply-task wave (writing-audit P4).
 
 **Handoff after session 211 (2026-08-13): the Sprechen debrief no longer waits on a leg that cannot
 answer, and a failed grade no longer looks like lost work.**

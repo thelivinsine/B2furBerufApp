@@ -3,6 +3,11 @@
 // in the URL *hash*, and React Router wipes that as it mounts, so the read has to
 // happen before createRoot(). See src/lib/authCallback.ts.
 import "./lib/authCallback";
+// SECOND on purpose, for the same reason: a cold open of the bare root ("/")
+// is redirected to /library before React Router ever sees it, so a client-side
+// navigation back to "/" (the Spielplatz tab) is untouched. See
+// src/lib/appEntry.ts.
+import "./lib/appEntry";
 import { Component, StrictMode } from "react";
 import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
