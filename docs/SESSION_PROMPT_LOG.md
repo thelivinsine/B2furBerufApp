@@ -6545,3 +6545,39 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `docs/areas/SPRECHEN.md` · `CLAUDE.md` · `docs/DECISIONS.md` (§s211) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (new) ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W32.md` · `docs/SESSION_PROMPT_LOG.md`
+
+### Prompt 2 (2026-08-13)
+
+> [screenshot of the Sprechen Verlauf: eight conversations, every one badged "Without marking"; the
+> expanded row reads "WAS DU GESAGT HAST — The transcript has since been deleted." and under it
+> "There is no feedback for this conversation. Your conversation is stillgespeichert."]
+
+- **Response summary:** Three defects in one screenshot, and the most important one was recoverable.
+  **(1) The transcripts were never deleted.** `turns` held every word of all eight conversations;
+  only `learner_text`, the column the Verlauf reads, was empty, because before this session nothing
+  but a successful debrief wrote it. Migration **`0021`** backfills `learner_text` from `turns` for
+  every row that still has one (idempotent, `lint:migrations` green), so the founder's history comes
+  back with its transcripts. A retention-purged row is untouched: that job empties `turns` in the
+  same statement it NULLs the text, so there is nothing to reconstruct and nothing to claim.
+  **(2) "Your conversation is stillgespeichert."** The sentence was written as
+  `{t("… Dein Gespräch ist trotzdem")}gespeichert.`, so the head went through the interface-language
+  fold and the tail stayed German and lost its space. It is invisible in German, which is the
+  language the app is authored in, and `ConfirmEmail` carried the identical construction ("Melde
+  dich an, dann" + "schicken wir dir einen neuen"). Both are ONE string now, and
+  `tests/uiStringSplit.test.ts` scans every `.tsx` for a `t()` used as JSX children followed by
+  literal letters, so the class cannot come back.
+  **(3) The copy blamed a deletion for the app's own gap.** "Das Transkript wurde inzwischen
+  gelöscht." is only true past `LEARNER_TEXT_RETAIN_DAYS` (730 days); a younger row never had a
+  transcript written, and now says exactly that. Also fixed "Ohne Bewertung" → **"Not assessed"**
+  (it read "Without marking", an instruction about printing rather than a statement about grading),
+  and its sibling "Ohne Bewertung fortfahren" → "Continue without assessment", so one German term
+  does not produce two unrelated English ones.
+  **What the screenshot also confirmed:** all eight conversations, 8-10 Aug, are ungraded. That is
+  the s211 debrief failure, from before this session's deploy, exactly as diagnosed.
+  Gates (measured 2026-08-13): typecheck · **728 tests** (61 files) · lint 0 errors (84 warnings,
+  unchanged baseline) · build · check:bundle 153.5 kB · lint:content · lint:migrations.
+- **Artifacts:** `supabase/migrations/0021_backfill_learner_text.sql` (new) ·
+  `src/features/sprechen/SprechenHistory.tsx` · `src/features/auth/ConfirmEmail.tsx` ·
+  `src/lib/uiStrings.ts` · `tests/uiStringSplit.test.ts` (new) · `docs/areas/SPRECHEN.md` ·
+  `docs/DECISIONS.md` (§s211b) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+

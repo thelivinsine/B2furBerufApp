@@ -71,6 +71,22 @@ function formatDateShort(iso: string): string {
   );
 }
 
+/**
+ * Whether a row is old enough for retention to have taken its transcript
+ * (`purge_old_learner_text`, migration 0015, run nightly at 730 days).
+ *
+ * The distinction matters because the two states read completely differently to
+ * a learner: "deleted" says the app had your words and let them go, which is the
+ * copy the founder saw over eight conversations that were never written at all
+ * (s211). Anything younger than the window has a gap, not a deletion.
+ */
+const LEARNER_TEXT_RETAIN_DAYS = 730;
+
+function purged(entry: SpeakingHistoryEntry): boolean {
+  const age = Date.now() - new Date(entry.created_at).getTime();
+  return age > LEARNER_TEXT_RETAIN_DAYS * 24 * 60 * 60 * 1000;
+}
+
 /** The Aufgabe a recorded conversation was held against, resolved by its id. */
 function briefOf(entry: SpeakingHistoryEntry): { title: string; goals: string[] } | null {
   if (!entry.brief_id) return null;
@@ -212,7 +228,15 @@ function ConversationRow({
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  {t("Das Transkript wurde inzwischen gelöscht.")}
+                  {/* Two different facts, and printing the wrong one is how this
+                      screen told the founder their speaking was gone (s211).
+                      Retention NULLs the text and empties `turns` together, and
+                      only past `LEARNER_TEXT_RETAIN_DAYS`; anything younger than
+                      that never had its transcript written in the first place,
+                      which is a gap, not a deletion. */}
+                  {purged(entry)
+                    ? t("Das Transkript wurde inzwischen gelöscht.")
+                    : t("Für dieses Gespräch wurde kein Transkript gespeichert.")}
                 </p>
               )}
             </div>
@@ -238,8 +262,10 @@ function ConversationRow({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {t("Für dieses Gespräch gibt es keine Rückmeldung. Dein Gespräch ist trotzdem")}
-                gespeichert.
+                {/* ONE string, not a translated head with a German tail welded
+                    on: split, it rendered as "Your conversation is
+                    stillgespeichert." in English (founder screenshot, s211). */}
+                {t("Für dieses Gespräch gibt es keine Rückmeldung. Dein Gespräch ist trotzdem gespeichert.")}
               </p>
             )}
 

@@ -2481,3 +2481,36 @@ not observable from here: the fixes above remove the structural reasons a debrie
 minutes and then loses the work, but if the Anthropic key itself is refused (an expired key, a spent
 quota), the answer arrives as a fallback from Gemini rather than as an error, and the code on the
 failure screen names it the next time it happens.
+
+## s211b — the Verlauf told the learner their speaking was deleted
+
+The founder's screenshot, after the s211 deploy: eight conversations, every one "Without marking",
+the expanded one reading *"The transcript has since been deleted."* and, under it, *"There is no
+feedback for this conversation. Your conversation is stillgespeichert."*
+
+**The transcripts were never gone.** `turns` held every word of all eight; only `learner_text`, the
+column the Verlauf reads, was empty, because before s211 nothing but a successful debrief wrote it.
+So the honest fix was not better copy but a BACKFILL (migration `0021`): the text is reconstructed
+from `turns` for every row that has one, idempotently, and the founder's history came back. A row
+the retention job has purged is untouched, because that job empties `turns` in the same statement it
+NULLs the text, so there is nothing to reconstruct from and nothing to claim.
+
+**The copy now distinguishes two facts it used to conflate.** "Deleted" says the app had your words
+and let them go; "not saved" says it never wrote them. Only the first is true past
+`LEARNER_TEXT_RETAIN_DAYS` (730 days, `purge_old_learner_text`), and the founder was shown it over
+rows that were days old. When the app is at fault, the copy says so rather than blaming a retention
+policy that had not run.
+
+**"stillgespeichert" is a class of bug, not a typo.** The sentence was written as
+`{t("… Dein Gespräch ist trotzdem")}gespeichert.`, so the head went through the interface-language
+fold and the tail stayed German and lost its space. It is INVISIBLE in the language the app is
+authored in: to a German reader both halves are German and the sentence reads fine. `ConfirmEmail`
+carried the identical construction ("Melde dich an, dann" + "schicken wir dir einen neuen"), which is
+what makes it a class. The rule is now ONE `t()` per sentence, gated by `tests/uiStringSplit.test.ts`
+(a source scan for a `t()` used as JSX children and followed by literal letters).
+
+**"Ohne Bewertung" was translated as "Without marking",** which reads as an instruction about
+printing rather than a statement about grading. It is "Not assessed" now, and its sibling
+("Ohne Bewertung fortfahren") moved with it, since one German term should not produce two unrelated
+English ones on two screens.
+
