@@ -6623,3 +6623,20 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   `CLAUDE.md` · `docs/areas/PRAKTISCH-NAV.md` · `docs/DECISIONS.md` (§s212) ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session
   210 archived off to stay under the status file's line budget) · `docs/SESSION_PROMPT_LOG.md`
+
+### Prompt 2 (2026-08-15)
+
+> check the live site once it's deployed
+
+- **Response summary:** Confirmed the merge deployed rather than assuming it: GitHub Actions'
+  **Deploy site to GitHub Pages** run for the merge commit (`5cde413`) completed successfully at
+  11:45 UTC (`Deploy Supabase functions` did not run for this SHA, correctly, since the PR touched no
+  migration and no Edge Function). Could not go further than that: both `curl` (403 at the sandbox's
+  egress proxy) and `WebFetch` (`EGRESS_BLOCKED`) confirmed `genauly.de` itself is unreachable from
+  here, exactly as `CLAUDE.md` already states ("the sandbox cannot reach the live site; the founder
+  verifies live results"). Reported the deploy confirmation plus three concrete checks for the
+  founder: a cold open lands on the Bibliothek, the Spielplatz tab still opens normally afterward,
+  and (the one thing genuinely unverified end-to-end) a real Google sign-in round trip. No code
+  change; a verification + reporting turn only.
+- **Artifacts:** none (chat-only; the deploy confirmation is recorded here and in the session-212
+  handoff in `docs/PROJECT_STATUS.md`).
