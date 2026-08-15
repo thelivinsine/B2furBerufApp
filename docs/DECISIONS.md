@@ -2514,3 +2514,59 @@ printing rather than a statement about grading. It is "Not assessed" now, and it
 ("Ohne Bewertung fortfahren") moved with it, since one German term should not produce two unrelated
 English ones on two screens.
 
+## s212 — the front door is the Bibliothek, not the Spielplatz dashboard
+
+Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
+
+**The distinction that makes this safe: cold open versus in-app navigation.** `/` is the Spielplatz
+dashboard's route AND the Spielplatz nav tab's link target. Redirecting `/` itself, at the router
+level, would make tapping the Spielplatz tab bounce straight back to the Bibliothek — the tab would
+never open. The fix instead has to distinguish "the browser just loaded this page" from "the app,
+already running, navigated to this URL," and only redirect the first.
+
+**A JS module evaluates exactly once per real page load, and never again on a client-side route
+change.** That is precisely the distinction needed, so `lib/appEntry.ts` does the redirect as a
+side effect of its own top-level code (`history.replaceState`, not a React Router `<Navigate>`),
+imported second in `main.tsx` — right after `lib/authCallback.ts`, which already established the
+"must run before anything else, at module-eval time" pattern for exactly the same reason (Supabase's
+implicit auth callback lives in the URL hash, and React Router wipes it on mount). The PWA's
+`start_url`, a bookmark of the bare domain, and a hard reload all re-evaluate every module from
+scratch, so all three land on `/library`. Clicking the Spielplatz tab afterward is a `<Link>`, no
+reload, so the module never re-runs and Spielplatz renders exactly as it always has.
+
+**Why the search and hash are carried over untouched, not dropped.** Two things legitimately land on
+the bare root today, and neither reads the URL's PATH:
+- Google's OAuth PKCE callback. `useAuthStore.ts` sets `redirectTo: window.location.origin + "/"`,
+  so a real sign-in lands here with `?code=…`. `supabase-js`'s `detectSessionInUrl` only inspects the
+  query string, not the path, so relocating that query onto `/library` does not disturb it.
+- A legacy Supabase "Confirm signup" link, `#access_token=…` in the DEFAULT email template (the
+  reason `lib/authCallback.ts` exists at all, see its own doc comment and `ConfirmEmail.tsx`).
+  `authCallback.ts` snapshots the hash at its own module-eval time, which happens first, so the
+  token is already captured in memory before `appEntry.ts` touches the URL.
+
+Both were verified by reading the source rather than assumed: `grep` for `redirectTo` surfaced the
+OAuth case, and `authCallback.ts`'s own doc comment ("Before this existed the link went straight to
+the app root") surfaced the legacy-template case. Losing either silently would have turned a UX
+polish into a sign-in regression — the kind of failure that would not show up in a typical manual
+click-through, since nobody manually clicks through OAuth in a demo pass.
+
+**Why `RequireOnboarding` did not need to move.** `/library`'s route already carries the same
+onboarding gate `/` did, so a not-yet-onboarded cold visitor still ends up at `/welcome` — the
+redirect just relocates them there one hop earlier (`/` → `/library` → `/welcome` becomes `/library`
+→ `/welcome`). No new gate was needed; the existing one already covered the new entry point.
+
+**Why `public/spa-redirect.js` guarantees a genuine deep link is never caught by this.** GitHub Pages
+has no server-side routing, so a fresh visit to e.g. `/settings` 404s at the edge and is redirected
+by `public/404.html` to `/?/settings`; `spa-redirect.js` (a plain script, runs before any module)
+decodes that back to `/settings` via `history.replaceState` before `main.tsx` even starts loading.
+By the time `appEntry.ts` reads `window.location.pathname`, a mangled deep link has already been
+restored to its real path — so `pathname === "/"` only ever means an actual visit to the root.
+
+**Verification.** `tests/appEntry.test.ts` exercises the pure decision function directly (same split
+as `authCallback.ts`/`authCallback.test.ts`: a side-effecting module-eval top level backed by an
+exported, testable pure function) plus the live module-eval redirect itself. A real-browser check
+(Chromium, 430×932) confirmed all four cases render correctly, not just resolve to the right URL:
+a cold open of `/` shows the Bibliothek content; tapping the Spielplatz tab afterward shows the
+actual Dashboard; a deep link to `/anwenden` is untouched; a reload while on Spielplatz bounces back
+to the Bibliothek (a reload is a cold open too, which is the consistent reading of "when the app
+opens").

@@ -21,7 +21,7 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
 - **Vite 6** + **React 18** + **TypeScript 5.7** (strict, project references via `tsc -b`)
 - **Tailwind 3** (`tailwind.config.ts`), **Radix UI**, **framer-motion**, **lucide-react**,
   **recharts**; **zustand** state; **react-router-dom 6**. No test framework beyond Vitest +
-  targeted `scripts/*.mjs` gates.
+  `scripts/*.mjs` gates.
 
 ## Commands (index — full detail in `docs/areas/COMMANDS.md`)
 **Package manager is `pnpm`** (pinned; lockfile `pnpm-lock.yaml`). Never npm/yarn. `pnpm install` after pulling.
@@ -91,8 +91,8 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
 - **Only a task carrying the full brief is served** (Adressat, du/Sie, 2-5 Leitpunkte, Niveau,
   Textsorte, word target), because the AI grades Aufgabenerfüllung against it: **717 writing tasks,
   every one servable**, ≥2 per Unterthema per length, all 16 Textsorten live. A `du` brief never
-  names a title + surname (s200): the Adressat drives the Anrede. `tests/writingScope.test.ts` and
-  `tests/moduleScope.test.ts` gate it.
+  names a title + surname (s200). `tests/writingScope.test.ts` and `tests/moduleScope.test.ts` gate
+  it.
 - **A TAG IS EARNED, and a brief ASKS for what it is graded on.** ONE lexicon per rule in
   `scripts/`, shared by `lint:content` AND `tests/writingScope.test.ts`, so gate and test cannot drift.
   - **Branche** (`sector-markers.mjs`, founder s199): the brief must name that workplace (Beruf keeps
@@ -110,17 +110,17 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
 - **Reward color (Koralle, `--reward`)** is loot/combo/streak moments plus Fokus error underlines
   only; never general chrome or building marks.
 - **Locked structures** (change only on explicit founder request): the mobile bottom tab bar
-  (`PRAKTISCH-NAV.md`), the dialog/overlay recipe (`BRAND.md` §Dialog), the in-mission pixel chrome +
-  "failure is content, never lockout" + the ungated boss mission 1.6 (`GAME.md`), the
-  Himmelblau-fill/white-controls FilterRail and Aufgabe-rail answer (s189/s196, `ScopeRail.tsx`), the
-  sliding-pill switcher (`useSlidingPill`, no per-segment `layoutId`), the Prüfung module card
-  (s191/s196, `PRUEFUNG.md`), the Schreiben mobile anatomy, the zone's one frame (s195).
+  (`PRAKTISCH-NAV.md`), the dialog/overlay recipe (`BRAND.md` §Dialog), the in-mission pixel chrome + "failure
+  is content, never lockout" + the ungated boss mission 1.6 (`GAME.md`), the Himmelblau-fill/white-controls
+  FilterRail + Aufgabe-rail answer (`ScopeRail.tsx`, s189/s196), the sliding-pill switcher (`useSlidingPill`),
+  the Prüfung module card (`PRUEFUNG.md`), the Schreiben mobile anatomy.
 - **The nav runs ONE order and setup ends in the Bibliothek** (founder s207, `PRAKTISCH-NAV.md`):
   Bibliothek · Prüfung · Fortschritt · **Spielplatz** (**Beta**) · Einstellungen, bar and sidebar
   alike, from the single `navItems`; Bibliothek, Spielplatz and Einstellungen are the fixed slots
   (`NEVER_HIDEABLE`), only Prüfung + Fortschritt reorder. Onboarding hands over to `/library`.
   Named Praktisch through s209; renamed **Spielplatz** (founder s210, "Simulation" and "Alltag"
   both already taken elsewhere); the area guide keeps its old filename, `PRAKTISCH-NAV.md`.
+  **A cold open of the bare root lands on `/library` too** (founder s212, `lib/appEntry.ts`).
 - **A signed-in learner is restored from the cloud, never re-onboarded.** Signing in wipes the
   device-global cache first (account isolation), so `onboarded` and the profile can ONLY come back
   from `profiles.settings`, and `mergeRemoteSettings` adopts on `settings.onboarded === true` and
@@ -164,7 +164,7 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
 - **A failed cloud write is never silent** (s185). supabase-js returns `{ error }` instead of
   throwing, so an ignored result makes a broken sync look exactly like a working one: every push
   reads its error, retries with backoff, and after 3 failures flips `useAuthStore.syncHealth` to
-  `"failing"` ("Sync pausiert" in Settings). Never `await` a Supabase call and drop its result.
+  `"failing"`. Never `await` a Supabase call and drop its result.
 - **The cloud row is bounded, not append-forever** (DB audit R1/R4, s185; timers in
   `docs/PROJECT_FOUNDATION.md`): `RETAIN_DAYS` (400) folded into `activeDaysFolded`, `pg_cron`
   purging guests, cache rows and learner TEXT by NULLing columns, never deleting rows, so limits,
@@ -179,8 +179,8 @@ the two skills (`/design`, `/content`), the "why" in `docs/DECISIONS.md`, the bl
 - **A tile the learner EXPANDS obeys one rule, everywhere, filters included** (founder s189): at rest
   the page does not scroll; expanding releases the page's height cap (`.h-page-stage`); the tile is
   never taller than one screen (`.max-h-panel-stage`); ONE inner region scrolls (`min-h-0 flex-1
-  overflow-y-auto`), handing the scroll back to the page at its top (nothing sets
-  `overscroll-behavior`); and it scrolls into view via `useStagePanel` WITH `scroll-mt-*`/`-mb-*`.
+  overflow-y-auto`), handing scroll back to the page at its top; it scrolls into view via
+  `useStagePanel` WITH `scroll-mt-*`/`-mb-*`.
 - **A freshly opened page never scrolls.** Every trainer sizes its elastic element to the room left
   and gives up its preferred floor rather than push the resting page past one viewport
   (`useFillEditor`, `measureMobile`); the **exam** answers it with a stage instead (s186):

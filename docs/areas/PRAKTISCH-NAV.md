@@ -15,6 +15,23 @@ praktisch beside the settings; praktisch should be labeled as beta"):
 onboarding now hands a new learner straight to it (no taster session), and Spielplatz moved to the
 far end because that zone is still being built. `/` is unchanged as a route: still the Dashboard,
 still the app root and the catch-all target, just not the first tab.
+
+**A cold open of the bare root also lands on `/library`, not the Dashboard** (founder s212: "when
+the app opens the user sees the library instead of the playground"). `lib/appEntry.ts` runs at
+module-eval time, imported second in `main.tsx` right after `lib/authCallback.ts`: if
+`window.location.pathname === "/"` it calls `history.replaceState` to `/library` (search and hash
+preserved) BEFORE React Router ever sees the URL. A module evaluates exactly once per real page
+load, never on a client-side route change, so this only ever fires on a genuine cold open (the
+PWA's `start_url`, a bookmark of the bare domain, a hard reload) and never on an in-app navigation:
+tapping the Spielplatz tab is a `<Link>` click, not a reload, so it still shows the Dashboard.
+`/library` carries the same `RequireOnboarding` gate `/` did, so a not-yet-onboarded visitor still
+lands on `/welcome`, one hop earlier than before. The preserved search/hash matters for the two
+things that legitimately arrive on the bare root: Google's OAuth PKCE callback
+(`redirectTo: origin + "/"` in `useAuthStore.ts`, a bare `?code=…` that `supabase-js` consumes
+itself regardless of path) and a legacy Supabase "Confirm signup" link (`#access_token=…`, already
+snapshotted by `authCallback.ts` before this runs). `public/spa-redirect.js` has already restored
+any GitHub-Pages-mangled deep link (`/?/settings` → `/settings`) by the time this evaluates, so an
+actual deep link never reaches here with pathname `"/"`. Gated by `tests/appEntry.test.ts`.
 **The transfer zone came back and absorbed Schreiben in s182.** Audit P4 found the Sprechsimulation
 reachable only from the dashboard recommendation and ⌘K (the hub had been off `navItems` since
 2026-07-13, founder, for the demo). It returned to the desktop sidebar first; the founder then
