@@ -1,14 +1,15 @@
 # Project Status
 
-_Last updated: 2026-08-14 (session 212 made a cold app-open land on the Bibliothek instead of the
-Spielplatz dashboard. Session 211 fixed the Sprechen debrief: it no longer waits out a leg that
-cannot answer, and a failed grade no longer loses the transcript. Sessions 209-210 (the microphone
-repeat, the Spielplatz rename) are archived in
+_Last updated: 2026-08-15 (session 212 made a cold app-open land on the Bibliothek instead of the
+Spielplatz dashboard, merged as PR #857 and confirmed deployed. Session 211 fixed the Sprechen
+debrief: it no longer waits out a leg that cannot answer, and a failed grade no longer loses the
+transcript. Sessions 209-210 (the microphone repeat, the Spielplatz rename) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`, sessions 204-208 in the `W32` file
 beside it. All handoffs under their own "Resume here")._
 
 **Session 212 (2026-08-14, branch `claude/microphone-bug-fix-jc70vs`): the app now opens on the
-Bibliothek, not Spielplatz.**
+Bibliothek, not Spielplatz.** Shipped as PR **#857** → **`5cde413`**, squash-merged; Pages deploy
+confirmed green via GitHub Actions (`curl`/`WebFetch` cannot reach `genauly.de` itself from here).
 Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
 - **`/` stays the Spielplatz route** (the nav tab still links to it and must keep working), so the
   fix could not redirect `/` itself — it had to distinguish a COLD open (the PWA's `start_url`, a
@@ -137,10 +138,12 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 212 (2026-08-14): a cold app-open lands on the Bibliothek.**
-Branch `claude/microphone-bug-fix-jc70vs` (same branch as sessions 209-210), PR still pending as of
-this handoff.
+**Handoff after session 212 (2026-08-14/15): a cold app-open lands on the Bibliothek.**
+Branch `claude/microphone-bug-fix-jc70vs` (same branch as sessions 209-210), PR **#857** →
+**`5cde413`**, squash-merged. **Deploy confirmed** via GitHub Actions: `Deploy site to GitHub Pages`
+succeeded on `5cde413` at 2026-08-15 11:45 UTC. Post-merge housekeeping done, tree clean.
 Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
+→ "check the live site once it's deployed."
 
 - **The law to remember: a JS module runs once per real page load, never on a client-side route
   change.** That is the ONLY reason `/` could be redirected on a cold open without breaking the
@@ -150,10 +153,12 @@ Founder: "can you make sure when the app opens the user sees the library instead
 - **Never drop the search/hash when relocating a URL a real feature depends on.** The bare root
   carries Google's OAuth `?code=…` and a legacy Supabase `#access_token=…` by design (`grep` for
   `redirectTo` before assuming a path is free to repoint). `appEntry.ts` preserves both.
-- **Not verified live** (the sandbox has no way to test a real Google OAuth round trip or a real PWA
-  install), but reasoned through and documented in `docs/DECISIONS.md` §s212: neither consumer reads
-  the URL's path, only its query/hash, so relocating the path alone is safe. Worth a founder check on
-  an actual Google sign-in after this deploys, since that path could not be exercised here.
+- **Still not verified LIVE, only reasoned through** (`docs/DECISIONS.md` §s212): a real Google OAuth
+  round trip and a real PWA cold open. The sandbox cannot reach `genauly.de` at all (`curl` 403 at the
+  egress proxy, `WebFetch` reports `EGRESS_BLOCKED`) — this is the standing limit, not new to this
+  session. **Worth a founder check:** open the app fresh (or hard-refresh an installed PWA) and
+  confirm it lands on the Bibliothek; tap Spielplatz afterward and confirm it still opens normally;
+  one Google sign-in round trip if convenient, since that path could not be exercised at all here.
 - **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
   Supabase; the next content job is the reply-task wave (writing-audit P4).
 
