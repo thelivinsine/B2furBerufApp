@@ -110,3 +110,75 @@ so those were ruled out too. Picked from three collision-free options: **Spielpl
   · build · check:bundle 153.3 kB · lint:content (including the CLAUDE.md size ratchet: 349 lines).
 - **Verified in a real browser** at both breakpoints: the bottom tab bar reads "Spielplatz Beta" and
   the desktop sidebar reads "Spielplatz" with the BETA chip, both at 430×932 and 1280×900.
+
+## Session 211 (archived from PROJECT_STATUS.md by session 213)
+
+**Session 211 (2026-08-13, branch `claude/speaking-drills-review-issue-3589zm`): the Sprechen
+debrief waited three minutes on a leg that could not answer, then lost the conversation.**
+Founder: "the review of speaking drills still doesn't work. check what's the issue." Asked what the
+screen actually does, since four different faults produce that sentence; the answer named the
+symptom exactly: *"it spins for a long time and says the feedback cannot be generated or something
+like that and then asks me to try again later but then the progress is lost."* Practice
+conversations (`/simulation`), not the Modelltest. Third report of this screen (s196, s206, now).
+- **Root cause 1, the long spin.** The debrief LED on the free Gemini leg, which is the one call in
+  `converse` it cannot serve: `gemini-2.5-flash` reasons by default and Google bills thoughts as
+  output, so a whole-JSON answer over a fourteen-turn transcript comes back `MAX_TOKENS` with no
+  text. s206 fixed exactly this for TURNS (`think: false`) and left the debrief thinking. Every
+  debrief therefore paid a full leg's deadline before the model that could answer was even asked.
+  The debrief now leads on the paid model (`lead: "paid"`), Gemini stays behind it with thinking off
+  as a real fallback, so a dead paid provider degrades the debrief instead of removing it.
+- **Root cause 2, the failure at the end of the spin.** Per-leg deadlines (s206) do not bound a
+  cascade: three 60-second legs in series is a three-minute request, longer than the platform's own
+  ceiling, so the worst runs could be killed before reaching their own failure path. Added a TOTAL
+  budget (`DEBRIEF_BUDGET_MS` 100 s, `TURN_BUDGET_MS` 45 s); each leg is capped by what is left and
+  a leg that cannot finish in it is never started. Order and budget live in
+  `supabase/functions/_shared/aiCascade.ts` so they are unit-gated, not buried in a Deno file no
+  test can import. `DEBRIEF_MAX_TOKENS` 4096 → 8192, because both fallback legs spend that budget
+  reasoning before they write anything.
+- **Root cause 3, "the progress is lost", which was literally true.** `learner_text` was written by
+  the successful debrief and by nothing else, while the Verlauf reads `learner_text` and never
+  `turns`: a conversation whose grade failed rendered as "Das Transkript wurde inzwischen gelöscht."
+  over a row holding every word. It is now written turn by turn (so an abandoned conversation is on
+  record too) and re-asserted on the debrief's failure path.
+- **The next report will name its own cause.** `cascade` returns a reason with an empty result
+  (`unavailable` · `unreadable` · `timeout`; the client adds `network`), it is logged, and the
+  failure screen prints it as a small `Code: …` line.
+- New gate `tests/aiCascade.test.ts` (8 tests). Gates (measured 2026-08-13): typecheck · **727
+  tests** (60 files, up from 719) · lint 0 errors (84 warnings, unchanged baseline) · build ·
+  check:bundle 153.3 kB · lint:content (CLAUDE.md 349 lines).
+- **Not verifiable from the sandbox:** the network policy blocks the Supabase project, so the
+  provider-side behaviour of the founder's failing runs cannot be observed from here. The founder
+  confirms after the deploy.
+
+**Handoff after session 211 (2026-08-13): the Sprechen debrief no longer waits on a leg that cannot
+answer, a failed grade no longer looks like lost work, and the eight conversations that read as
+deleted were backfilled.**
+Branch `claude/speaking-drills-review-issue-3589zm`.
+Founder: "the review of speaking drills still doesn't work. check what's the issue." → *"it spins for
+a long time and says the feedback cannot be generated ... and then the progress is lost."*
+
+- **The law to remember: a cascade has an ORDER and a TOTAL budget, and both are properties of the
+  CALL.** Free-first is right for a spoken turn and wrong for the debrief, whose answer is a whole
+  JSON object the free leg spends its output budget thinking about. Per-leg deadlines do not bound a
+  three-leg cascade. Both rules now live in `supabase/functions/_shared/aiCascade.ts`, gated by
+  `tests/aiCascade.test.ts` — put sequence rules there, not inside a Deno file no test can import.
+- **A learner's work is written when they DO it, never when a grade succeeds.** `learner_text` is
+  written turn by turn now. Before touching any Verlauf, check which COLUMN it reads: this one read
+  `learner_text` and never `turns`, so the app told the learner their transcript was deleted while
+  the failure screen promised it was saved.
+- **The transcripts were never gone, and the old rows were recovered.** `turns` held every word;
+  only `learner_text`, the column the Verlauf reads, was empty. Migration `0021` backfills it from
+  `turns` for every existing row (idempotent). **Before assuming learner data is lost, check whether
+  it is simply in a column nothing displays.**
+- **Three copy bugs from the same screenshot are fixed:** the split sentence that rendered as
+  "Your conversation is stillgespeichert." (and its twin in `ConfirmEmail`), now gated by
+  `tests/uiStringSplit.test.ts` — **ONE `t()` per sentence, never a translated head with a literal
+  tail**, since the bug is invisible in German; "Das Transkript wurde inzwischen gelöscht." now
+  prints only past the 730-day retention clock, and a younger row says no transcript was saved; and
+  "Ohne Bewertung" reads "Not assessed" in English, not "Without marking".
+- **This needs a backend deploy to take effect:** merging to `main` runs `supabase.yml`, which
+  applies migrations (none here) and deploys every Edge Function. A feature-branch push changes
+  nothing live.
+- **Founder check after the deploy:** hold a short practice conversation at `/simulation`, press
+  Beenden, and confirm the feedback arrives in well under a minute. If it still fails, the screen now
+  prints `Code: …` under the message — that word is the diagnosis, so send it.

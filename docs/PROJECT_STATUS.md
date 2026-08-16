@@ -1,11 +1,35 @@
 # Project Status
 
-_Last updated: 2026-08-15 (session 212 made a cold app-open land on the Bibliothek instead of the
-Spielplatz dashboard, merged as PR #857 and confirmed deployed. Session 211 fixed the Sprechen
-debrief: it no longer waits out a leg that cannot answer, and a failed grade no longer loses the
-transcript. Sessions 209-210 (the microphone repeat, the Spielplatz rename) are archived in
+_Last updated: 2026-08-16 (session 213 gave the Sprechen/Schreiben Verlauf history fetch a 12s
+timeout, merged as PR #859. Session 212 made a cold app-open land on the Bibliothek instead of the
+Spielplatz dashboard, merged as PR #857 and confirmed deployed. Sessions 209-211 (the microphone
+repeat, the Spielplatz rename, the Sprechen debrief cascade fix) are archived in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`, sessions 204-208 in the `W32` file
 beside it. All handoffs under their own "Resume here")._
+
+**Session 213 (2026-08-16, branch `fix/verlauf-history-timeout`): a stuck Verlauf history fetch no
+longer spins forever.** Shipped as PR **#859** → **`47f0825`**, squash-merged.
+Founder asked what was next on the roadmap; the answer named the open item from the s211/s212
+handoffs: "the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable Supabase." Asked
+to implement it for both.
+- **Root cause:** `getSpeakingHistory` (`src/lib/speaking.ts`) and `getWritingHistory`
+  (`src/lib/writing.ts`) each `await`ed a plain Supabase query with no deadline. If the request hung
+  (dropped connection, unreachable project), the screen's `loading` state never cleared: the
+  `Loader2` spinner in `SprechenHistory.tsx`/`WritingHistory.tsx` ran indefinitely with no error, no
+  retry prompt, nothing.
+- **Fix:** new `withTimeout<T>(promise, ms, label)` in `src/lib/utils.ts` (`Promise.race` against a
+  `setTimeout` rejection). Both fetchers wrap their Supabase call(s) in it at a 12s budget; a timeout
+  throws into the existing `catch { return null; }`, which the screens already treat as "could not
+  load" (there was no new UI state to add). `writing.ts`'s three sequential step-down queries
+  (schema-migration fallback, s179/s181) are each wrapped individually, since a hang can happen on
+  any of them and the step-down logic still needs to see each query's own `error`/`data`.
+- Gates (measured 2026-08-16): typecheck clean for the touched files (the repo's pre-existing
+  Windows filename-case-collision errors in `CollocationGraph`/`WordGraph` are unrelated, present on
+  `main` already, and being fixed on a separate branch) · **735 tests** passing (one unrelated flaky
+  timeout in `writingAufgabe.test.tsx` reran green in isolation) · `lint-content` CI check passed.
+- **Artifacts:** `src/lib/utils.ts` · `src/lib/speaking.ts` · `src/lib/writing.ts` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session
+  211 archived off to stay under the status file's line budget) · `docs/SESSION_PROMPT_LOG.md`
 
 **Session 212 (2026-08-14, branch `claude/microphone-bug-fix-jc70vs`): the app now opens on the
 Bibliothek, not Spielplatz.** Shipped as PR **#857** → **`5cde413`**, squash-merged; Pages deploy
@@ -40,43 +64,6 @@ Founder: "can you make sure when the app opens the user sees the library instead
 - Gates (measured 2026-08-14): typecheck · **734 tests** (61 files, up from 727) · lint 0 errors
   (84 warnings, unchanged baseline) · build · check:bundle 153.5 kB · lint:content (CLAUDE.md 349
   lines / linter-counted 350).
-
-**Session 211 (2026-08-13, branch `claude/speaking-drills-review-issue-3589zm`): the Sprechen
-debrief waited three minutes on a leg that could not answer, then lost the conversation.**
-Founder: "the review of speaking drills still doesn't work. check what's the issue." Asked what the
-screen actually does, since four different faults produce that sentence; the answer named the
-symptom exactly: *"it spins for a long time and says the feedback cannot be generated or something
-like that and then asks me to try again later but then the progress is lost."* Practice
-conversations (`/simulation`), not the Modelltest. Third report of this screen (s196, s206, now).
-- **Root cause 1, the long spin.** The debrief LED on the free Gemini leg, which is the one call in
-  `converse` it cannot serve: `gemini-2.5-flash` reasons by default and Google bills thoughts as
-  output, so a whole-JSON answer over a fourteen-turn transcript comes back `MAX_TOKENS` with no
-  text. s206 fixed exactly this for TURNS (`think: false`) and left the debrief thinking. Every
-  debrief therefore paid a full leg's deadline before the model that could answer was even asked.
-  The debrief now leads on the paid model (`lead: "paid"`), Gemini stays behind it with thinking off
-  as a real fallback, so a dead paid provider degrades the debrief instead of removing it.
-- **Root cause 2, the failure at the end of the spin.** Per-leg deadlines (s206) do not bound a
-  cascade: three 60-second legs in series is a three-minute request, longer than the platform's own
-  ceiling, so the worst runs could be killed before reaching their own failure path. Added a TOTAL
-  budget (`DEBRIEF_BUDGET_MS` 100 s, `TURN_BUDGET_MS` 45 s); each leg is capped by what is left and
-  a leg that cannot finish in it is never started. Order and budget live in
-  `supabase/functions/_shared/aiCascade.ts` so they are unit-gated, not buried in a Deno file no
-  test can import. `DEBRIEF_MAX_TOKENS` 4096 → 8192, because both fallback legs spend that budget
-  reasoning before they write anything.
-- **Root cause 3, "the progress is lost", which was literally true.** `learner_text` was written by
-  the successful debrief and by nothing else, while the Verlauf reads `learner_text` and never
-  `turns`: a conversation whose grade failed rendered as "Das Transkript wurde inzwischen gelöscht."
-  over a row holding every word. It is now written turn by turn (so an abandoned conversation is on
-  record too) and re-asserted on the debrief's failure path.
-- **The next report will name its own cause.** `cascade` returns a reason with an empty result
-  (`unavailable` · `unreadable` · `timeout`; the client adds `network`), it is logged, and the
-  failure screen prints it as a small `Code: …` line.
-- New gate `tests/aiCascade.test.ts` (8 tests). Gates (measured 2026-08-13): typecheck · **727
-  tests** (60 files, up from 719) · lint 0 errors (84 warnings, unchanged baseline) · build ·
-  check:bundle 153.3 kB · lint:content (CLAUDE.md 349 lines).
-- **Not verifiable from the sandbox:** the network policy blocks the Supabase project, so the
-  provider-side behaviour of the founder's failing runs cannot be observed from here. The founder
-  confirms after the deploy.
 
 ## Where things stand
 
@@ -138,6 +125,33 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
+**Handoff after session 213 (2026-08-16): the Verlauf history fetch times out instead of spinning
+forever.**
+Branch `fix/verlauf-history-timeout`, PR **#859** → **`47f0825`**, squash-merged. Post-merge
+housekeeping done; the unrelated `fix/windows-case-collision-graph-helpers` branch's WIP (stashed
+during the merge) was restored on top of the new `main`, untouched.
+Founder: "what's next in to do?" → (after the Verlauf task was explained) "yes, implement that for
+both" → "yes, separate branch it and open the PR" → "merge it."
+
+- **The law to remember: a client-side `await supabase....` has no deadline of its own.** A dropped
+  connection or unreachable project leaves the promise pending forever, and any `loading` state
+  gated on it hangs with the spinner forever, no error, no retry. `withTimeout` (`src/lib/utils.ts`)
+  is the generic fix: `Promise.race` the query against a timer. It does not cancel the underlying
+  request, so a slow-but-eventually-successful query is still wasted network; that is fine here,
+  the goal was only to stop the UI hanging.
+- **`writing.ts`'s step-down queries needed the wrap on EACH query, not just the outer call.** It
+  runs up to three sequential queries falling back on schema-mismatch errors (s179/s181, columns
+  that may not exist yet post-migration). A hang can happen on any one of them, so each is wrapped
+  individually rather than wrapping the whole function body once.
+- **This was NOT verified against a real hung connection**, only reasoned through and typechecked/
+  unit-tested: the sandbox cannot simulate an unreachable Supabase project realistically, and the
+  existing `catch { return null; }` / `failed` UI path was already exercised by other tests. Worth a
+  founder check if this ever recurs: does the Verlauf now show "could not load" within ~12s instead
+  of spinning, on a genuinely bad connection.
+- **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4), 47
+  authored `source` texts plus a rendering slot that does not exist yet, waiting on a founder
+  placement pick from `preview/schreiben-source-text.html`.
+
 **Handoff after session 212 (2026-08-14/15): a cold app-open lands on the Bibliothek.**
 Branch `claude/microphone-bug-fix-jc70vs` (same branch as sessions 209-210), PR **#857** →
 **`5cde413`**, squash-merged. **Deploy confirmed** via GitHub Actions: `Deploy site to GitHub Pages`
@@ -159,45 +173,7 @@ Founder: "can you make sure when the app opens the user sees the library instead
   session. **Worth a founder check:** open the app fresh (or hard-refresh an installed PWA) and
   confirm it lands on the Bibliothek; tap Spielplatz afterward and confirm it still opens normally;
   one Google sign-in round trip if convenient, since that path could not be exercised at all here.
-- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
-  Supabase; the next content job is the reply-task wave (writing-audit P4).
-
-**Handoff after session 211 (2026-08-13): the Sprechen debrief no longer waits on a leg that cannot
-answer, a failed grade no longer looks like lost work, and the eight conversations that read as
-deleted were backfilled.**
-Branch `claude/speaking-drills-review-issue-3589zm`.
-Founder: "the review of speaking drills still doesn't work. check what's the issue." → *"it spins for
-a long time and says the feedback cannot be generated ... and then the progress is lost."*
-
-- **The law to remember: a cascade has an ORDER and a TOTAL budget, and both are properties of the
-  CALL.** Free-first is right for a spoken turn and wrong for the debrief, whose answer is a whole
-  JSON object the free leg spends its output budget thinking about. Per-leg deadlines do not bound a
-  three-leg cascade. Both rules now live in `supabase/functions/_shared/aiCascade.ts`, gated by
-  `tests/aiCascade.test.ts` — put sequence rules there, not inside a Deno file no test can import.
-- **A learner's work is written when they DO it, never when a grade succeeds.** `learner_text` is
-  written turn by turn now. Before touching any Verlauf, check which COLUMN it reads: this one read
-  `learner_text` and never `turns`, so the app told the learner their transcript was deleted while
-  the failure screen promised it was saved.
-- **The transcripts were never gone, and the old rows were recovered.** `turns` held every word;
-  only `learner_text`, the column the Verlauf reads, was empty. Migration `0021` backfills it from
-  `turns` for every existing row (idempotent). **Before assuming learner data is lost, check whether
-  it is simply in a column nothing displays.**
-- **Three copy bugs from the same screenshot are fixed:** the split sentence that rendered as
-  "Your conversation is stillgespeichert." (and its twin in `ConfirmEmail`), now gated by
-  `tests/uiStringSplit.test.ts` — **ONE `t()` per sentence, never a translated head with a literal
-  tail**, since the bug is invisible in German; "Das Transkript wurde inzwischen gelöscht." now
-  prints only past the 730-day retention clock, and a younger row says no transcript was saved; and
-  "Ohne Bewertung" reads "Not assessed" in English, not "Without marking".
-- **This needs a backend deploy to take effect:** merging to `main` runs `supabase.yml`, which
-  applies migrations (none here) and deploys every Edge Function. A feature-branch push changes
-  nothing live.
-- **Founder check after the deploy:** hold a short practice conversation at `/simulation`, press
-  Beenden, and confirm the feedback arrives in well under a minute. If it still fails, the screen now
-  prints `Code: …` under the message — that word is the diagnosis, so send it.
-- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
-  Supabase (client-side fetch, no deadline); the next content job is the reply-task wave
-  (writing-audit P4), 47 authored `source` texts plus a rendering slot that does not exist yet,
-  waiting on a founder placement pick from `preview/schreiben-source-text.html`.
+- **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4).
 
 **Handoff after session 210 (2026-08-10): the "Praktisch" tab is "Spielplatz" everywhere.**
 Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209), PR **#853** → **`53dc2e3`**,
@@ -218,7 +194,6 @@ Founder: "rename practice or praktsich as simulation."
   the filename question fresh rather than assuming the precedent.
 - **Verified in a real browser**, not just by grep: both the mobile bottom bar and the desktop
   sidebar were screenshotted after the change (430×932 and 1280×900).
-- **Still open, unchanged:** the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable
-  Supabase; the next content job is the reply-task wave (writing-audit P4), 47 authored `source`
-  texts plus a rendering slot that does not exist yet, waiting on a founder placement pick from
-  `preview/schreiben-source-text.html`.
+- **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4), 47
+  authored `source` texts plus a rendering slot that does not exist yet, waiting on a founder
+  placement pick from `preview/schreiben-source-text.html`.
