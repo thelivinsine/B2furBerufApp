@@ -1,6 +1,8 @@
 # Project Status
 
-_Last updated: 2026-08-16 (session 220, branch `fix-signup-onboarding-bugs`: fixed all five sign-up
+_Last updated: 2026-08-17 (session 221, branch `rls-migration-gate`: `lint:migrations` is now the
+access-control gate too, after evaluating an external security skill and importing only the one rule
+it had that we lacked. Session 220, branch `fix-signup-onboarding-bugs`: fixed all five sign-up
 → confirm → onboarding bugs found in session 215's live SMTP test. Session 219, no branch: found
 `genauly.de` fully offline — GitHub Pages had silently disabled itself when session 216 made the repo
 private (Free-plan Pages needs a public repo) — made the repo public again, re-enabled Pages, and
@@ -8,6 +10,18 @@ prerendered a real `/privacy` page so Google's OAuth consent-screen crawler (whi
 gets a 200 instead of the SPA's 404-redirect trick.
 Sessions 209-217 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
 sessions 204-208 in the `W32` file beside it. All handoffs under their own "Resume here")._
+
+**Session 221 (2026-08-17, branch `rls-migration-gate`): evaluated the external `vibe-security`
+skill (github.com/raroque/vibe-security-skill, MIT) and declined the import; took its one real
+finding as a CI gate instead.** Most of that skill is stack-mismatched (Expo, Firebase, Convex,
+Stripe, Next.js) or already law here (AI keys server-side + per-user caps + `ai_calls` metering,
+`.env` ignored, no `service_role` in `src/`, three legitimately-public `VITE_` vars), and it
+duplicates the built-in `/security-review`. The gap it did name was RLS, so `lint:migrations` now
+also fails a `create table` in `public` with no `enable row level security` in the same file, and a
+policy `for insert`/`for update`/`for all` with no `with check` (owner-column reassignment). Probed
+with a throwaway migration: both fire, `private.*` tables and `for select` correctly don't. The 21
+existing migrations pass unchanged; the one `using (true)` (`app_config` select, 0008) is the
+intentional public remote config. → `docs/areas/COMMANDS.md`.
 
 **Session 220 (2026-08-16, branch `fix-signup-onboarding-bugs`): fixed all five sign-up/onboarding
 bugs found in session 215's live SMTP test (none had been fixed yet).** Tracing found three actual

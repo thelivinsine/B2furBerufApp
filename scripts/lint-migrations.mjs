@@ -22,6 +22,17 @@
  *                                                   in the same file
  *   insert into                                   → needs `on conflict`
  *
+ * WHAT IT ALSO CHECKS (access control, s221). A `public` table is reachable by
+ * anyone holding the anon key, which ships in the browser bundle, so two RLS
+ * mistakes are silently catastrophic and both are ones an AI writing SQL makes
+ * by default:
+ *   create table public.<x>            → needs `enable row level security` in
+ *                                        the SAME file (RLS is OFF by default)
+ *   create policy ... for insert/update → needs `with check`, or the row's owner
+ *                                        column can be reassigned to another user
+ * A deliberate exception is written as `with check (true)`, never as a missing
+ * clause.
+ *
  * LEGACY BASELINE. Migrations up to and including `LEGACY_THROUGH` are already
  * recorded in the remote history, so `--include-all` will never re-apply them
  * and their (real) non-idempotent statements cannot fire again. They are
@@ -116,6 +127,15 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     }
   }
 
+  // Every table the file switches RLS on for, so a create can be paired to it.
+  const rlsEnabled = new Set();
+  for (const s of stmts) {
+    if (/^alter table\b/.test(s) && /\benable row level security\b/.test(s)) {
+      const name = nameAfter(s, "alter table(?: if exists)?");
+      if (name) rlsEnabled.add(name.replace(/^public\./, ""));
+    }
+  }
+
   const fail = (statement, rule) =>
     problems.push({ file, rule, statement: statement.slice(0, 110) });
 
@@ -129,12 +149,26 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     if (/^create (or replace )?function\b/.test(s) && !/^create or replace function\b/.test(s)) {
       fail(s, "needs OR REPLACE");
     }
+    if (/^create table\b/.test(s)) {
+      const name = nameAfter(s, "create table");
+      // Only `public` is exposed via PostgREST; a `private` table is unreachable.
+      if (name && !/^[\w]+\./.test(name.replace(/^public\./, "")) && !rlsEnabled.has(name.replace(/^public\./, ""))) {
+        fail(s, `needs ALTER TABLE ${name} ENABLE ROW LEVEL SECURITY in the same file`);
+      }
+    }
     for (const kind of ["policy", "trigger"]) {
       if (new RegExp(`^create ${kind}\\b`).test(s)) {
         const name = nameAfter(s, `create ${kind}`);
         if (!name || !dropped.has(`${kind}:${name}`)) {
           fail(s, `needs a preceding DROP ${kind.toUpperCase()} IF EXISTS "${name ?? "?"}"`);
         }
+      }
+    }
+    if (/^create policy\b/.test(s)) {
+      // No FOR clause means FOR ALL, which writes rows too.
+      const cmd = s.match(/\bfor (all|select|insert|update|delete)\b/)?.[1] ?? "all";
+      if (["all", "insert", "update"].includes(cmd) && !/\bwith check\b/.test(s)) {
+        fail(s, `FOR ${cmd.toUpperCase()} policy needs WITH CHECK (use WITH CHECK (true) if that is deliberate)`);
       }
     }
     if (/^insert into\b/.test(s) && !/on conflict/.test(s)) {

@@ -937,3 +937,40 @@ code touched. Condensed, one line per founder prompt:
   raise still open) and "Resume here" (dropped the now-done template step; only the live
   sign-up→confirm→onboarding click-through verification remains).
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`. [PR #871](https://github.com/thelivinsine/B2furBerufApp/pull/871).
+
+## Session 221 (2026-08-17, branch `rls-migration-gate`)
+
+### Prompt 1 (2026-08-17)
+
+> https://github.com/raroque/vibe-security-skill
+>
+> can you check this repo and evaluate if this is a useful skill to import to this project?
+
+- **Response summary:** Read the repo (MIT, ~950 stars, `SKILL.md` + 9 reference files) and audited
+  it against this stack. Recommended NOT importing: mobile/Expo, Firebase, Convex, Stripe and
+  Next.js sections don't apply; secrets, AI-key and rate-limit sections are already project law and
+  already clean in the repo (`.env`/`.env.*` gitignored with only `.env.example` tracked, no
+  `service_role` in `src/`, the three `VITE_` vars are all legitimately public); and it overlaps the
+  built-in `/security-review` skill plus the `security-auditor` agent. Flagged the one genuine gap:
+  its Supabase RLS checklist has two checks `lint:migrations` did not make.
+- **Artifacts:** none (chat-only).
+
+### Prompt 2 (2026-08-17)
+
+> add those two checks to lint:migrations
+
+- **Response summary:** Added both to `scripts/lint-migrations.mjs`: a `create table` in `public`
+  needs `enable row level security` in the same file (`private.*` exempt, no PostgREST reach), and a
+  policy `for insert`/`for update`/no-FOR-clause (= `FOR ALL`) needs `with check`, a deliberate
+  exception being written `with check (true)`. Verified by writing a throwaway `0099` migration with
+  both violations plus three should-pass cases: exactly the two expected failures fired, then deleted
+  it. All 21 existing migrations pass unchanged. Documented in `docs/areas/COMMANDS.md`.
+- **Artifacts:** `scripts/lint-migrations.mjs` · `docs/areas/COMMANDS.md`.
+
+### Prompt 3 (2026-08-17)
+
+> ship it
+
+- **Response summary:** Branched `rls-migration-gate`, updated `docs/PROJECT_STATUS.md` +
+  this log, ran the gates, opened and squash-merged the PR.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
