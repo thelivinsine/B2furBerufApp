@@ -12,7 +12,7 @@ secrets (none: no `.env`/`.env.local` ever committed, Supabase credentials live 
 Actions secrets) and confirmed GitHub Pages still publishes from a private repo on any plan
 (stopped being Pro-only in 2021), so `genauly.de` is unaffected. Founder flipped visibility to
 private via GitHub Settings themselves. No code changed; nothing to merge.
-- **Resume here:** nothing outstanding from this session. Next session should pick up the four
+- **Resume here:** nothing outstanding from this session. Next session should pick up the five
   auth/onboarding bugs from session 215's handoff below, still unfixed.
 
 **Session 215 (2026-08-16, no branch — dashboard-only work on Resend + Namecheap + Supabase): auth
@@ -32,17 +32,18 @@ by prompt; no code changed.
   live test failed with "Error sending confirmation email" because the Resend domain wasn't verified
   yet; retried after verification and it worked. **Confirmed live:** the confirmation email now
   arrives from `Genauly <hello@genauly.de>` with no Supabase branding.
-- **Three bugs surfaced by that live test, NOT yet fixed (next session):**
+- **Five bugs surfaced by that live testing, NOT yet fixed (next session, full detail in the
+  session 215 handoff below):**
   1. Clicking the email confirmation link asks the learner to log in again instead of completing
-     sign-in automatically — `/auth/confirm` (`src/features/auth/ConfirmEmail.tsx`) should be
-     completing the session from the link per the README's "What the app does with the link"
-     section; needs checking why it isn't.
+     sign-in automatically.
   2. After that manual login, the app dropped back to the landing page instead of entering the app,
-     requiring a SECOND login to actually get in. Likely a race or a lost redirect target somewhere
-     in the `/auth/confirm` → app-entry handoff; needs root-cause, not a retry-loop patch.
+     requiring a SECOND login to actually get in.
   3. Onboarding ("Wofür lernst du Deutsch?" screen) re-shows the AGB/Datenschutz consent checkbox
-     (pre-checked) even though the learner already ticked and submitted it once at signup —
-     redundant, should not ask twice.
+     (pre-checked) even though the learner already ticked and submitted it once at signup.
+  4. The ORIGINAL tab (where signup started) crashes to the "Kurz nicht erreichbar" fatal-error
+     screen once the confirmation link is opened in a new tab.
+  5. A freshly confirmed account skips onboarding entirely, landing straight on the Spielplatz
+     dashboard instead of asking "Wofür lernst du Deutsch?"/Niveau.
   Founder asked to document these for next session rather than fix now.
 - **Still open from the README:** step 2 (paste the branded `confirm-signup.html` /
   `reset-password.html` templates into Supabase → Authentication → Emails) and raising Supabase's
@@ -113,12 +114,12 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 215 (2026-08-16): Resend SMTP is live for auth emails, but signing up
-surfaced four auth/onboarding bugs that need fixing.** No branch, dashboard-only session (Namecheap
+surfaced five auth/onboarding bugs that need fixing.** No branch, dashboard-only session (Namecheap
 DNS + Private Email, Resend domain/API key, Supabase SMTP settings); nothing to merge.
 Founder walked through `docs/reference/auth-emails/README.md` step 1 live, then tested a real
 signup: "document these comments for now to address them in the next session."
 
-- **Priority for next session — four bugs found testing the new SMTP live, all in the sign-up →
+- **Priority for next session — five bugs found testing the new SMTP live, all in the sign-up →
   confirm → onboarding path, none fixed yet:**
   1. Clicking the confirmation email link does not sign the learner in automatically; they're asked
      to log in again. Start at `/auth/confirm` (`src/features/auth/ConfirmEmail.tsx`) and the
@@ -140,6 +141,16 @@ signup: "document these comments for now to address them in the next session."
      guessing a fix. Prime suspects given what's nearby: a stale-session/auth-state conflict between
      tabs, or the service-worker update-reload (`src/lib/swUpdate.ts`) firing on the original tab
      mid-flow.
+  5. **A freshly confirmed account skips onboarding entirely and lands straight on the Spielplatz
+     dashboard**, never asking "Wofür lernst du Deutsch?" (Beruf/Alltag/Prüfung/Beides) or the
+     Niveau question. The `RequireOnboarding` gate (see s212, `/library`'s cold-open redirect logic
+     in `src/lib/appEntry.ts`) is supposed to route a not-yet-onboarded learner to `/welcome`
+     first — something in the confirm-link → new-tab → session-established path is setting or
+     reading `onboarded` as already true, or bypassing the gate outright. Given bugs 1/2 above are
+     also in this exact handoff, likely the same root cause: whatever completes the session on the
+     confirm link is not going through the normal sign-in path that the onboarding gate expects.
+     Worth checking together with bug 3 (the onboarding screen that DOES still show the AGB
+     checkbox in other paths) once the real flow is traced.
 - **Resend SMTP setup itself worked and is confirmed live:** signup mail now arrives from
   `Genauly <hello@genauly.de>` with no Supabase branding. The one gotcha worth remembering: Resend
   domain verification has to actually finish (watch for "Not started" → "Verified" in Resend →
