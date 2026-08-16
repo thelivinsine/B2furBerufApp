@@ -272,9 +272,14 @@ re-derivation than P9 covered; do not "fix" one item in passing, fix the class o
     an opening-verb rule and is exactly the opposite; getting this wrong cost a re-run in s199.
   - **A supplied `source` text belongs to the REPLY genre, never to an opinion task (s200).** No exam
     supplies a text for a Forumsbeitrag or a Stellungnahme (Goethe B2 Teil 1, DTB B2 Teil 2), while
-    DTB B2 Teil 1 prints the customer mail you answer. `source` is read by nothing today, so this is
-    a rule for whoever wires it up: the honest target is the "Antworten Sie" tasks. The audit's P4
-    said the opposite and is marked WRONG in the report; the founder's own exam settled it.
+    DTB B2 Teil 1 prints the customer mail you answer. The audit's P4 said the opposite and is marked
+    WRONG in the report; the founder's own exam settled it. **Shipped s221:** all 47 "Antworten Sie"
+    tasks (the honest target) carry a `source` (2-4 sentences, voiced as the named `addressee`,
+    stating something concrete the Leitpunkte can respond to). Rendered as a "Text zur Aufgabe" tile
+    BEFORE the prompt (variant A, `preview/schreiben-source-text.html`) in `GuidedWritingTrainer.tsx`
+    and the Modelltest's `SchreibenPart.tsx` alike, and sent to `evaluate-writing` ahead of the
+    Aufgabe so Aufgabenerfüllung can check the reply against what was actually said, not a
+    paraphrase. No other task carries one; adding `source` to a non-reply task is a content bug.
   - **Textsorte:** all 16 exist; `bewerbung` lives under Bildung (`anerkennung` + `weiterbildung`)
     and, since s200, under Wohnen (a Wohnungsbewerbung). **One deliberate zero: C1 + E-Mail
     (privat)**, which has no exam analogue; the rail greys it with an honest count.

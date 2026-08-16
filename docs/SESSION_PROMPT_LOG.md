@@ -974,3 +974,61 @@ code touched. Condensed, one line per founder prompt:
 - **Response summary:** Branched `rls-migration-gate`, updated `docs/PROJECT_STATUS.md` +
   this log, ran the gates, opened and squash-merged the PR.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 222 (2026-08-17, branch `writing-reply-source-texts`)
+
+### Prompt 1 (2026-08-17)
+
+> what's next?
+
+- **Response summary:** `rls-migration-gate` (PR #872) was already merged to `main` and the branch
+  clean/up to date, so there was nothing pending on it. Pointed to `docs/PROJECT_STATUS.md`'s
+  "Resume here": a founder click-through of the live sign-up/confirm/onboarding flow, and the
+  reply-task wave (47 `source` texts) waiting on a placement pick from
+  `preview/schreiben-source-text.html`.
+- **Artifacts:** none (chat-only).
+
+### Prompt 2 (2026-08-17)
+
+> Text zur Aufgabe was not given for me in b2 fur beruf exam. The one-two line topic description and
+> what to write bullet points were the case. Why is there a need for text zur aufgabe?
+
+- **Response summary:** Explained the existing s200 decision (`docs/areas/CONTENT.md`): a source
+  text belongs to the REPLY genre only (telc's "Antworten Sie" shape), never to a
+  Stellungnahme/Forumsbeitrag, which is what the founder's own exam task was — so its absence there
+  was correct, not a gap. Noted the app's 47 authored reply-task source texts aren't wired into any
+  rendering slot yet.
+- **Artifacts:** none (chat-only).
+
+### Prompt 3 (2026-08-17)
+
+> variant a looks good
+
+- **Response summary:** Implemented variant A ("text first, then the task") from the already-founder-
+  reviewed `preview/schreiben-source-text.html`: a Himmelblau "Text zur Aufgabe" tile, no visible
+  edge, rendered before the prompt in `GuidedWritingTrainer.tsx` (card + pop-up) and
+  `SchreibenPart.tsx` (Modelltest), and wired `source` through `src/lib/writing.ts` into
+  `evaluate-writing`'s grading prompt. `pnpm typecheck`/`pnpm lint` clean; not yet visually verified
+  since no task carried a `source` value yet.
+- **Artifacts:** `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/exam/SchreibenPart.tsx`
+  · `src/lib/writing.ts` · `supabase/functions/evaluate-writing/index.ts`.
+
+### Prompt 4 (2026-08-17)
+
+> Yes, start on the 47 reply-task source texts.
+
+- **Response summary:** Identified the 47 "Antworten Sie" tasks in `writingPrompts.ts` (confirms the
+  s200 count exactly) and authored a short German source text for each, voiced as the task's own
+  `addressee`, stating something concrete the existing Leitpunkte already answer. No new content ids
+  or provenance rows needed (writing tasks ride one `wp_<themeId>` row per theme, already present for
+  all six touched themes). Updated `docs/areas/CONTENT.md`'s law statement to match ("read by
+  nothing" → shipped). Ran the full gate order (`lint:content`, `typecheck`, `lint`, `build`,
+  `check:bundle`, `test:unit`, all clean) and verified live in `pnpm preview`: onboarded as guest,
+  filtered Kurz to Kundenkommunikation, both draws rendered the tile correctly at desktop and mobile
+  width. Branched, updated `PROJECT_STATUS.md` (archived session 219 into the W33 file) and this log,
+  opened and squash-merged the PR.
+- **Artifacts:** `src/data/writingPrompts.ts` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/exam/SchreibenPart.tsx` · `src/lib/writing.ts` ·
+  `supabase/functions/evaluate-writing/index.ts` · `docs/areas/CONTENT.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.

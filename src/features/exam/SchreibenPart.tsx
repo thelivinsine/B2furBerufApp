@@ -60,6 +60,7 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
       addressee: task?.addressee,
       register: task?.register,
       words: task?.words,
+      source: task?.source,
       exam: true,
     });
     setSubmitting(false);
@@ -115,7 +116,15 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
               <Maximize2 className="h-4 w-4" />
             </button>
           </div>
-          <p className="text-sm leading-relaxed">{task.text}</p>
+          {task.source && (
+            <div className="mt-2 space-y-1.5 rounded-xl border border-accent/20 bg-accent/20 p-3 shadow-soft dark:border-accent/10 dark:bg-accent/10">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Text zur Aufgabe
+              </p>
+              <p className="text-[13.5px] leading-relaxed">{task.source}</p>
+            </div>
+          )}
+          <p className="mt-2 text-sm leading-relaxed">{task.text}</p>
           {task.points?.length ? (
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
               {task.points.map((p) => (
@@ -189,6 +198,14 @@ export function SchreibenPart({ run }: { run: MockExamRun }) {
             </DialogTitle>
             <DialogDescription className="text-xs">{taskMeta(task)}</DialogDescription>
           </DialogHeader>
+          {task.source && (
+            <div className="space-y-1.5 rounded-xl border border-accent/20 bg-accent/20 p-3 shadow-soft dark:border-accent/10 dark:bg-accent/10">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Text zur Aufgabe
+              </p>
+              <p className="text-[13.5px] leading-relaxed">{task.source}</p>
+            </div>
+          )}
           <p className="text-sm leading-relaxed">{task.text}</p>
           {task.points?.length ? (
             <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
