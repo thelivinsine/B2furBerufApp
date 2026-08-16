@@ -6852,3 +6852,21 @@ code touched. Condensed, one line per founder prompt:
   main file to its two-most-recent-handoffs rule.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`
   (session 214 archived off) · `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 215, continued (2026-08-16, no branch — one more bug found post-merge)
+
+### Prompt (2026-08-16)
+
+> I tried creating an account again and when clicked on confirm, the link is redirected to the app
+> in a new tab but it shows the spielplatz directly instead of asking the onboarding question of the
+> purpose and learner level. Document this too as it needs to be fixed.
+
+- **Response summary:** A fifth bug in the same sign-up/confirm flow: a freshly confirmed account
+  skips onboarding (`/welcome`'s "Wofür lernst du Deutsch?"/Niveau screen) entirely and lands
+  straight on the Spielplatz dashboard, meaning `RequireOnboarding`/`onboarded` is somehow being
+  treated as already satisfied on this path. Added as bug 5 to the session 215 handoff in
+  `PROJECT_STATUS.md`, alongside the existing four, with a note that it likely shares a root cause
+  with bugs 1/2 (the confirm-link session isn't going through the normal sign-in path the onboarding
+  gate expects). Bug counts corrected from "four" to "five" throughout the file. Docs only, no PR
+  needed (no code change).
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
