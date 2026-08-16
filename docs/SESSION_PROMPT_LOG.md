@@ -908,5 +908,5 @@ code touched. Condensed, one line per founder prompt:
   `tests/authCallback.test.ts` · `tests/cloudSync.test.ts` · `tests/onboarding.test.tsx` (new) ·
   `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 217 archived off) ·
-  `docs/SESSION_PROMPT_LOG.md`. Branch `fix-signup-onboarding-bugs`, PR pending.
+  `docs/SESSION_PROMPT_LOG.md`. Branch `fix-signup-onboarding-bugs`, [PR #870](https://github.com/thelivinsine/B2furBerufApp/pull/870).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
