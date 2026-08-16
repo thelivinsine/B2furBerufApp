@@ -3,7 +3,12 @@
 A map of everything in `docs/`, so a new session (or a new person) knows where to start and which
 documents are live vs. historical. **Start with `PROJECT_STATUS.md` → its `## Resume here` section.**
 
-_Last reviewed: 2026-07-24 (session 157 maintenance audit): added the `areas/` folder + catalog
+_Last reviewed: 2026-08-16 (session 218 maintenance audit): rotated `SESSION_PROMPT_LOG.md` (grown to
+~7,000 lines, 6x its ~1,200-line rotation budget) — sessions 152–208 moved into the W30 (extended),
+new W31 and new W32 archive chunks, live file now holds session 209 onward at ~700 lines; added the
+three `areas/` guides missing from that table (`PRUEFUNG.md`, `SPRECHEN.md`, `UI-LANGUAGE.md`), five
+missing `plans/` rows, five missing `reports/` rows, and the `reference/auth-emails/` row. Prior
+2026-07-24 (session 157 maintenance audit): added the `areas/` folder + catalog
 (the s155 CLAUDE.md restructure), noted the `/design` + `/content` skills, refreshed the CLAUDE.md
 row, added the W30 prompt-log archive row after rotating s133–151 out of the live log. Prior
 2026-07-20 (docs-optimization / maintenance pass): rebuilt this index against the

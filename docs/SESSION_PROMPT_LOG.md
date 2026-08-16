@@ -698,3 +698,34 @@ code touched. Condensed, one line per founder prompt:
   merged) and session 216 (repo made private). No code or doc content was stale, so the only
   maintenance needed was logging this prompt itself.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
+
+### Prompt 2 (2026-08-16)
+
+> are all the rules and practices well followed for all the memory files?
+
+- **Response summary:** Checked the persistent cross-session memory directory (separate from
+  `docs/`): it was empty, so there was nothing to audit for rule compliance yet.
+- **Artifacts:** none (chat-only).
+
+### Prompt 3 (2026-08-16)
+
+> read existing documentation on how to maintain the logs and docs
+
+- **Response summary:** Read `docs/README.md`'s "Documentation best practices" section (the actual
+  maintenance rules) and audited the repo against it. Found `SESSION_PROMPT_LOG.md` badly overdue
+  for rotation (~6,950 live lines vs. the ~1,200-line budget; last real rotation stopped at session
+  151/W30) and `docs/README.md`'s own `areas/`, `plans/`, `reports/` and `reference/` tables missing
+  several files that exist on disk (`areas/PRUEFUNG.md`/`SPRECHEN.md`/`UI-LANGUAGE.md`, five `plans/`
+  files, five `reports/` files, `reference/auth-emails/`).
+
+- **Prompt (2026-08-16):** "yes go for it"
+- **Response summary:** Rotated `SESSION_PROMPT_LOG.md`: sessions 152–171 appended to the existing
+  `archive/prompt-log/SESSION_PROMPT_LOG_2026-W30.md`, new `…W31.md` (sessions 173–183) and `…W32.md`
+  (sessions 184–208) created, live file now holds session 209 onward (~700 lines); updated the
+  archive `README.md` index to match. Patched `docs/README.md`'s stale tables with the missing rows
+  found above. **While this was in progress, PR #866 (a concurrent session's `genauly.de` outage
+  fix) merged to `main` carrying an identical prompt-log rotation and the same table fixes** — so by
+  the time this session went to commit, only `docs/README.md`'s "Last reviewed" header line (not
+  touched by #866) was still outstanding; bumped it to record this pass.
+- **Artifacts:** `docs/README.md` · (rotation itself already live via PR #866: `docs/SESSION_PROMPT_LOG.md`,
+  `docs/archive/prompt-log/SESSION_PROMPT_LOG_2026-W30/W31/W32.md`, `docs/archive/prompt-log/README.md`).
