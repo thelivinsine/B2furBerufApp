@@ -34,14 +34,30 @@ copy for crawlers. Also, per founder request, swapped the placeholder contact ad
 and `Impressum.tsx`, and filled the two `[Vollständiger Name]`/`[Full name]` operator-name
 placeholders in `Impressum.tsx` with "Suhas Pala" (the postal-address placeholders are still
 unfilled — the Impressum is not §5-TMG-compliant until the founder supplies a real address).
-- **Resume here:** founder still needs to (1) re-submit the Google OAuth consent screen for
-  verification now that the site and `/privacy` both actually respond, and (2) supply a real postal
-  address for `Impressum.tsx` (see the bracketed placeholders) — required for German legal
-  compliance, separate from the Google issue.
+**Founder re-submitted to Google and got a NEW, shorter failure list** (home page behind a login
+page, home page does not explain its purpose, app name mismatch) — the unresponsive/duplicate-URL
+items were gone, confirming the deploy fix worked, but these three were new information. Loaded
+`https://genauly.de/` in a real browser: it renders a full public landing page (hero, FAQ, "Log
+in"/"Start free", no gate) once React hydrates, contradicting "behind a login." Root cause was in
+`index.html`: the static pre-render inside `#root` (added in an earlier session for exactly this
+purpose) was hidden behind a `<noscript>` CSS toggle, so any JS-ENABLED crawler that snapshots
+before the ~1.5 MB of vendor JS finishes downloading and hydrating sees only a bare spinner, no
+text, no "Genauly" — reading as ungated-but-empty ("behind a login"), purposeless, and (since the
+only visible brand text was in `<title>`/`<img alt>`, not body text) a name mismatch. Fix: removed
+the `<noscript>` gate entirely so the explanatory content is visible by DEFAULT, for every client,
+regardless of when a crawler renders; React still clears it on mount, so real users only see a
+briefer flash of real content instead of a bare spinner (strict improvement, not a tradeoff).
+Verified the rebuilt page renders identically post-hydration (`pnpm preview`, checked in-browser,
+no console errors beyond an expected local-preview service-worker registration failure).
+- **Resume here:** founder still needs to (1) re-submit the Google OAuth consent screen once this
+  redeploys, and (2) supply a real postal address for `Impressum.tsx` (see the bracketed
+  placeholders) — required for German legal compliance, separate from the Google issue.
 - **Gates run clean:** `pnpm typecheck` · `pnpm lint:content` · `pnpm build` (prerender step
-  confirmed writing `dist/privacy/index.html` with the new email baked in).
+  confirmed writing `dist/privacy/index.html` with the new email baked in) · manual browser check of
+  the rebuilt `index.html` via `pnpm preview`.
 - **Artifacts:** `scripts/prerender-help.mjs` · `src/features/legal/PrivacyPolicy.tsx` ·
-  `src/features/legal/TermsOfService.tsx` · `src/features/legal/Impressum.tsx` ·
+  `src/features/legal/TermsOfService.tsx` · `src/features/legal/Impressum.tsx` · `index.html` ·
+  `.claude/launch.json` (new, `pnpm preview` config for local browser checks) ·
   `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 216 archived off, corrected)
   · `docs/SESSION_PROMPT_LOG.md`.
@@ -144,14 +160,17 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       "Passwort ändern" round-trip while signed in, and (if a Google account exists) "Passwort
       festlegen" from a Google-only sign-in.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
-- [ ] **Google sign-in branding verification — needs re-submitting (s219).** Google's last review
+- [ ] **Google sign-in branding verification — needs re-submitting (s219, round 2).** Round 1
       failed because `genauly.de` was completely offline (session 216 made the repo private, which
       silently disabled GitHub Pages) and `/privacy` 404'd even once the site came back (the SPA's
-      GitHub Pages redirect trick returns a real 404 status to non-JS crawlers). Both are fixed now:
-      the site is live and `/privacy` is a real prerendered 200 page (s219). Founder still needs to
-      re-submit via Google Cloud Console → OAuth consent screen → "I have fixed the issues." **Do
-      NOT re-click that button more than once per fix** — Google's async re-review takes hours to
-      days; wait for their email before re-submitting again.
+      GitHub Pages redirect trick returns a real 404 status to non-JS crawlers) — both fixed. Round 2
+      came back with a NEW list (home page behind a login, doesn't explain its purpose, app name
+      mismatch), root-caused to `index.html` hiding its crawler-facing static content behind a
+      `<noscript>` gate, so a JS-enabled crawler that snapshots before the ~1.5 MB JS bundle
+      hydrates saw a bare spinner. Fixed by making that content visible by default for every client
+      (s219). Founder still needs to re-submit via Google Cloud Console → OAuth consent screen →
+      "I have fixed the issues." **Do NOT re-click that button more than once per fix** — Google's
+      async re-review takes hours to days; wait for their email before re-submitting again.
 
 ## Resume here (next session)
 
