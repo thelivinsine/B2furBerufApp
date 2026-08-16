@@ -147,6 +147,11 @@ npm/yarn. Run `pnpm install` after pulling.
   **Never raise that baseline to silence a new file; fix the file.** The cost of a miss is high:
   the migration step runs BEFORE the Edge Function deploys in the same workflow, so one bad
   statement blocks every backend deploy behind it.
+  It is also the **access-control** gate (s221): a `create table` in `public` must be followed by
+  `enable row level security` in the same file (RLS is OFF by default and the anon key ships in the
+  browser bundle), and a policy `for insert`/`for update`/`for all` must carry `with check` or the
+  owner column can be reassigned to another user. A deliberate exception is written as
+  `with check (true)`, never as a missing clause. Tables in `private` are exempt (no PostgREST).
 - `pnpm check:contrast` — WCAG contrast gate for the brand token system: parses the `:root` and
   `.dark` HSL custom properties out of `src/index.css` and fails CI on contrast regressions
   (`scripts/check-contrast.mjs`). **Run after any change to the theme tokens in `src/index.css`.**
