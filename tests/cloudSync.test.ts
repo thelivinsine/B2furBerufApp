@@ -210,6 +210,41 @@ describe("onboarded survives a re-login", () => {
 });
 
 /**
+ * s215: a device that had `onboarded: true` locally from years of guest/offline
+ * use, but had never synced ANY account, let a brand-new account inherit that
+ * flag and skip straight to the dashboard without ever asking "Wofür lernst du
+ * Deutsch?". The shared-device wipe only fires for a DIFFERENT previous
+ * account, so a device with no sync history at all kept its local flag. The
+ * cloud is now the authority: a local `onboarded: true` is only trusted when
+ * some account has synced on this device before.
+ */
+describe("a device's local onboarding flag is not inherited by a new account (s215)", () => {
+  it("does not let a stale local flag skip onboarding on the device's first-ever sync", async () => {
+    // Local history: onboarded, but this device has NEVER synced any account
+    // (no SYNC_UID_KEY at all).
+    useSettingsStore.getState().completeOnboarding({ goal: "beruf", level: "B1" });
+    // The auto-provision trigger's empty row for a genuinely brand-new account.
+    remoteRows.profiles["brand-new"] = { id: "brand-new", name: null, settings: {} };
+
+    await startCloudSync("brand-new");
+
+    expect(useSettingsStore.getState().onboarded).toBe(false);
+  });
+
+  it("does NOT reset a returning account just because its cloud pull is momentarily stale", async () => {
+    useSettingsStore.getState().completeOnboarding({ goal: "beruf", level: "B1" });
+    // This account HAS synced on this device before (the returning-device case).
+    localStorage.setItem(SYNC_UID_KEY, "acct-a");
+    // Cloud row hasn't caught up to `onboarded: true` yet (e.g. offline push).
+    remoteRows.profiles["acct-a"] = { id: "acct-a", name: "", settings: {} };
+
+    await startCloudSync("acct-a");
+
+    expect(useSettingsStore.getState().onboarded).toBe(true);
+  });
+});
+
+/**
  * Sync health (database architecture audit R3, s185). supabase-js returns
  * `{ error }` instead of throwing, and the push helpers ignored that value
  * entirely: a push that never landed looked exactly like one that did, so a

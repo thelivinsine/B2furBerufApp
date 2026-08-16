@@ -31,7 +31,7 @@ import { NewPasswordForm } from "@/features/auth/NewPasswordForm";
  *
  * Whatever happens, the learner sees a plain answer instead of a silent bounce.
  */
-type Phase = "working" | "done" | "failed" | "recovery";
+type Phase = "working" | "done" | "failed" | "recovery" | "codeElsewhere";
 
 export function ConfirmEmail() {
   const t = useT();
@@ -64,9 +64,10 @@ export function ConfirmEmail() {
       setDetail(message ?? null);
       if (ok) {
         showToast("E-Mail bestätigt. Willkommen!", "success");
-        // Straight into the app: the session is live, so the guards will let
-        // them through. Replace, so Back does not return to a spent token.
-        navigate("/", { replace: true });
+        // Straight into the Bibliothek, same as every other entry point
+        // (onboarding s207, cold-open s212). Replace, so Back does not return
+        // to a spent token.
+        navigate("/library", { replace: true });
       }
     };
 
@@ -101,7 +102,20 @@ export function ConfirmEmail() {
       // (in which case a session exists) or the link was opened without its
       // parameters, e.g. copied by hand.
       const { data } = await supabase.auth.getSession();
-      finish(!!data.session, data.session ? undefined : "Kein Bestätigungs-Code in der Adresse.");
+      if (data.session) {
+        finish(true);
+        return;
+      }
+      if (AUTH_CALLBACK.hadCode) {
+        // The account IS confirmed server-side (Supabase already exchanged the
+        // code before this component mounted); there is just no session in
+        // THIS browser, because a PKCE `?code=` link only exchanges in the
+        // browser that started signUp. Telling them the link is invalid would
+        // send them in a loop; telling them to log in gets them in (s215).
+        setPhase("codeElsewhere");
+        return;
+      }
+      finish(false, "Kein Bestätigungs-Code in der Adresse.");
     })();
   }, [navigate, showToast]);
 
@@ -146,6 +160,19 @@ export function ConfirmEmail() {
                 }}
               />
             </div>
+          </>
+        )}
+
+        {phase === "codeElsewhere" && (
+          <>
+            <CheckCircle2 className="mx-auto mb-4 h-8 w-8 text-success" />
+            <h1 className="text-lg font-semibold text-foreground">{t("Bestätigt")}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("Dein Konto ist bestätigt. Melde dich hier an, um weiterzumachen.")}
+            </p>
+            <Button variant="gradient" className="mt-5 w-full" onClick={() => navigate("/")}>
+              Zur Anmeldung
+            </Button>
           </>
         )}
 

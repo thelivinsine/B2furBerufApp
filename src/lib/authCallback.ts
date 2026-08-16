@@ -32,6 +32,15 @@ export interface AuthCallbackParams {
   refreshToken: string | null;
   /** An error Supabase reported in the link itself (expired, already used). */
   errorDescription: string | null;
+  /**
+   * True if the URL carried Supabase's default `?code=` PKCE param. supabase-js
+   * consumes this itself via `detectSessionInUrl`, but the exchange only
+   * succeeds in the SAME BROWSER that started signUp (it needs a verifier from
+   * that browser's localStorage) — so this flags the case where the account IS
+   * confirmed server-side but no session resulted, e.g. the old email template
+   * still live, or the link opened on a different device (s215).
+   */
+  hadCode: boolean;
 }
 
 function readCallbackParams(): AuthCallbackParams {
@@ -42,6 +51,7 @@ function readCallbackParams(): AuthCallbackParams {
       accessToken: null,
       refreshToken: null,
       errorDescription: null,
+      hadCode: false,
     };
   }
   const search = new URLSearchParams(window.location.search);
@@ -54,6 +64,7 @@ function readCallbackParams(): AuthCallbackParams {
     accessToken: hash.get("access_token"),
     refreshToken: hash.get("refresh_token"),
     errorDescription: pick("error_description") ?? pick("error"),
+    hadCode: search.has("code"),
   };
 }
 

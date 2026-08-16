@@ -133,15 +133,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (initialised) return;
     initialised = true;
 
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
-        const user = data.session?.user ?? null;
-        set({ session: data.session, user, status: statusFor(user) });
-        if (user) startCloudSync(user.id);
-      })
-      .catch(() => set({ status: "signedOut" }));
-
+    // ONE writer for auth status. `onAuthStateChange` fires `INITIAL_SESSION`
+    // right after subscribing, with the same session `getSession()` would
+    // return, so a separate `getSession()` call here was a second writer racing
+    // the first: if it resolved AFTER a `SIGNED_IN` from a link just redeemed
+    // (e.g. on `/auth/confirm`), it overwrote a live session with `signedOut`,
+    // and `RequireOnboarding` treated that as resolved and bounced a freshly
+    // confirmed learner to the marketing page (founder report, s215).
     supabase.auth.onAuthStateChange((event, session) => {
       const prevId = get().user?.id;
       const user = session?.user ?? null;
@@ -151,7 +149,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         status: statusFor(user),
         ...(event === "PASSWORD_RECOVERY" ? { passwordRecovery: true } : {}),
       });
-      if (user && user.id !== prevId) startCloudSync(user.id);
+      // Floating on purpose, but never uncaught: another TAB can trigger this
+      // (supabase-js broadcasts auth events across tabs on the same storage
+      // key), so an unhandled rejection here would hit `main.tsx`'s global
+      // handler and could take down a tab the learner is still using (s215).
+      if (user && user.id !== prevId) void startCloudSync(user.id).catch(() => {});
       if (!user) stopCloudSync();
     });
   },

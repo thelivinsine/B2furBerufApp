@@ -40,12 +40,39 @@ import "./index.css";
  * expander, preserving the mobile-debug value without showing a scary wall of
  * monospace text to a learner.
  */
-function paintFatal(_label: string, detail: unknown): void {
+function describeError(detail: unknown): { message: string; stack: string } {
+  return {
+    message: detail instanceof Error ? detail.message : String(detail),
+    stack: detail instanceof Error ? detail.stack ?? "" : "",
+  };
+}
+
+/**
+ * Log a runtime error and stash it in sessionStorage, so a founder bug report
+ * can be diagnosed from the actual stack instead of guessed. Before this,
+ * neither global handler below nor `paintFatal` recorded anything anywhere —
+ * the only trace was the "Technische Details" expander, destroyed the moment
+ * the learner tapped "Neu laden" (s215).
+ */
+function reportError(label: string, detail: unknown): void {
+  const { message, stack } = describeError(detail);
+  console.error(`[${label}]`, detail);
+  try {
+    sessionStorage.setItem(
+      "b2beruf.lastError",
+      JSON.stringify({ label, message, stack, at: new Date().toISOString() }),
+    );
+  } catch {
+    /* private mode / quota: console.error above already ran */
+  }
+}
+
+function paintFatal(label: string, detail: unknown): void {
   const root = document.getElementById("root");
   if (!root || root.dataset.fatal === "1") return;
   root.dataset.fatal = "1";
-  const msg = detail instanceof Error ? detail.message : String(detail);
-  const stack = detail instanceof Error ? detail.stack ?? "" : "";
+  reportError(label, detail);
+  const { message: msg, stack } = describeError(detail);
   root.innerHTML = "";
 
   const wrap = document.createElement("div");
@@ -140,6 +167,17 @@ installLiveWorkFlush();
 // keyboard navigation (see index.css).
 trackInputMode();
 
+// Flips true once the root render call below returns without throwing. Before
+// this, BOTH handlers below treated every unhandled error/rejection for the
+// entire life of the tab as a fatal bootstrap failure and destructively wiped
+// #root — including one fired by a DIFFERENT tab (supabase-js broadcasts auth
+// events across tabs; an uncaught rejection from that handler killed a
+// perfectly working tab mid-signup, founder report s215). Once the app has
+// actually mounted, `RootErrorBoundary` and the per-route `errorElement`
+// (router.tsx) are the right net for a real render failure; a stray rejection
+// from anywhere else should be logged, not treated as the whole app being down.
+let appMounted = false;
+
 window.addEventListener("error", (e) => {
   const err = e.error ?? e.message;
   if (isChunkLoadError(err)) {
@@ -149,6 +187,10 @@ window.addEventListener("error", (e) => {
   // A Service Worker registration/update failure is non-fatal — the app runs
   // from the precache. Never let it crash the UI into the fatal screen.
   if (isServiceWorkerError(err)) return;
+  if (appMounted) {
+    reportError("Uncaught error", err);
+    return;
+  }
   paintFatal("App failed to load", err);
 });
 window.addEventListener("unhandledrejection", (e) => {
@@ -158,6 +200,10 @@ window.addEventListener("unhandledrejection", (e) => {
     return;
   }
   if (isServiceWorkerError(reason)) return;
+  if (appMounted) {
+    reportError("Unhandled rejection", reason);
+    return;
+  }
   paintFatal("App failed to load", reason);
 });
 
@@ -222,6 +268,7 @@ try {
       </RootErrorBoundary>
     </StrictMode>,
   );
+  appMounted = true;
 } catch (err) {
   paintFatal("App failed to start", err);
 }

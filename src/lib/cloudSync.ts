@@ -252,15 +252,22 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
   applyingRemote = false;
 }
 
-/** Adopt remote profile/settings on login when the local profile is empty. */
-function mergeRemoteSettings(profile: Record<string, unknown> | null) {
+/**
+ * Adopt remote profile/settings on login when the local profile is empty.
+ *
+ * `firstSyncOnDevice` is true the very first time ANY account syncs on this
+ * device (no `prevUid` yet). It matters for exactly one case: a device that
+ * has local `onboarded: true` left over from guest/offline use, signing into
+ * a BRAND-NEW account. `startCloudSync`'s shared-device wipe only fires for a
+ * DIFFERENT previous account, so that leftover flag survives and the new
+ * account skipped onboarding entirely, landing straight on the dashboard
+ * (founder report, s215). The cloud is the authority on whether THIS account
+ * has onboarded; a first-time local flag is not evidence about it.
+ */
+function mergeRemoteSettings(profile: Record<string, unknown> | null, firstSyncOnDevice: boolean) {
   if (!profile) return;
   const local = useSettingsStore.getState();
   const remoteSettings = (profile.settings as Partial<SettingsSnapshot>) ?? {};
-  // Only overwrite local settings from the cloud when the local user has not
-  // completed onboarding yet (fresh device); otherwise keep local and let the
-  // write-through push local → cloud.
-  if (local.onboarded) return;
   // Is this cloud profile worth adopting, or is it the empty row the
   // auto-provision trigger creates at sign-up? Ask the flag that answers that
   // question directly.
@@ -271,7 +278,16 @@ function mergeRemoteSettings(profile: Record<string, unknown> | null) {
   // was pushed to the cloud but never read back, so each new sign-in on a
   // device wiped the local flag and started onboarding again. The founder saw
   // the onboarding screen on every single log-in (s174).
-  if (remoteSettings.onboarded !== true) return;
+  if (remoteSettings.onboarded !== true) {
+    if (firstSyncOnDevice && local.onboarded) {
+      useSettingsStore.setState({ onboarded: false });
+    }
+    return;
+  }
+  // Only overwrite local settings from the cloud when the local user has not
+  // completed onboarding yet (fresh device); otherwise keep local and let the
+  // write-through push local → cloud.
+  if (local.onboarded) return;
   applyingRemote = true;
   useSettingsStore.setState({
     name: (profile.name as string) ?? local.name,
@@ -460,16 +476,29 @@ export async function startCloudSync(uid: string) {
   // treated as "same owner" so genuine offline/guest progress is preserved; the
   // guest→account upgrade keeps the same uid and never reaches this branch.
   const prevUid = readSyncedUid();
-  if (prevUid && prevUid !== uid) {
-    resetLocalStores();
-    // Same reason as in clearLocalAccountData: the autosaved drafts belong to
-    // the account that wrote them. The one-shot RESUME draft is deliberately
-    // kept: this branch is also the "wrote something, hit the login wall, signed
-    // in" path, where the text in flight is the arriving learner's own and
-    // WritingHub consumes it immediately.
-    clearAllAutosavedDrafts();
+  // No account has EVER synced on this device. Passed to mergeRemoteSettings:
+  // a local `onboarded: true` left over from guest/offline use is not evidence
+  // that THIS (brand-new) account has onboarded (s215).
+  const firstSyncOnDevice = !prevUid;
+  try {
+    if (prevUid && prevUid !== uid) {
+      resetLocalStores();
+      // Same reason as in clearLocalAccountData: the autosaved drafts belong to
+      // the account that wrote them. The one-shot RESUME draft is deliberately
+      // kept: this branch is also the "wrote something, hit the login wall, signed
+      // in" path, where the text in flight is the arriving learner's own and
+      // WritingHub consumes it immediately.
+      clearAllAutosavedDrafts();
+    }
+    writeSyncedUid(uid);
+  } catch {
+    // resetLocalStores() reaches zustand-persist's localStorage write, which is
+    // NOT guarded the way readSyncedUid/writeSyncedUid are. A full or
+    // unavailable localStorage (iOS Private Browsing, quota) must not throw
+    // here: this runs inside an auth callback that another TAB can trigger,
+    // and an uncaught throw there used to reach main.tsx's global handler and
+    // permanently kill a working tab (s215).
   }
-  writeSyncedUid(uid);
 
   userId = uid;
 
@@ -480,7 +509,7 @@ export async function startCloudSync(uid: string) {
       supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
     ]);
     mergeRemoteProgress(progress);
-    mergeRemoteSettings(profile);
+    mergeRemoteSettings(profile, firstSyncOnDevice);
   } catch {
     /* offline: keep local */
   } finally {

@@ -7,10 +7,19 @@
   the sender (From:) change, which is a separate step.
 
   THE LINK
-  `{{ .ConfirmationURL }}` is filled in by Supabase. It carries the learner to
-  `/auth/confirm` on genauly.de (the app pins that landing page itself via
-  `emailRedirectTo`, so it does not depend on the dashboard's Site URL), where
-  `src/features/auth/ConfirmEmail.tsx` completes the sign-in.
+  `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=signup` is spelled out
+  rather than using `{{ .ConfirmationURL }}`. Supabase's default confirmation
+  URL is a PKCE `?code=` link, which only works in the SAME BROWSER that ran
+  signUp (the code exchange needs a verifier that browser wrote to its own
+  localStorage) — a learner who opens the link on their phone, or in an email
+  app's in-app browser, gets "confirmed" server-side but never signed in
+  (founder report, s215). `token_hash` is exchanged with `verifyOtp()`
+  instead, which needs nothing from the originating browser and works from
+  any device. `reset-password.html` already uses this shape; see its comment.
+  `{{ .RedirectTo }}` resolves to `emailRedirectTo` from
+  `src/store/useAuthStore.ts` (pinned to this origin's `/auth/confirm`, not
+  the dashboard's Site URL), where `src/features/auth/ConfirmEmail.tsx`
+  completes the sign-in.
 
   WHY IT LOOKS LIKE THIS
   Email clients are twenty years behind browsers: no flexbox, no CSS variables,
@@ -48,7 +57,7 @@
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="border-radius:10px;background:#2866EB;">
-                  <a href="{{ .ConfirmationURL }}"
+                  <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=signup"
                      style="display:inline-block;padding:13px 26px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">
                     E-Mail bestätigen
                   </a>
@@ -63,7 +72,7 @@
               Der Button funktioniert nicht? Kopiere diese Adresse in deinen Browser:
             </p>
             <p style="margin:0;font-size:13px;line-height:1.6;word-break:break-all;">
-              <a href="{{ .ConfirmationURL }}" style="color:#3D74ED;">{{ .ConfirmationURL }}</a>
+              <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=signup" style="color:#3D74ED;">{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=signup</a>
             </p>
           </td>
         </tr>

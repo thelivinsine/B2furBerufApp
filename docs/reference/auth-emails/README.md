@@ -56,10 +56,13 @@ save. Subject lines are set in the same screen.
 | Confirm signup | `confirm-signup.html` | `Bestätige deine E-Mail` |
 | Reset password | `reset-password.html` | `Neues Passwort für Genauly` |
 
-Leave `{{ .ConfirmationURL }}` exactly as it is in `confirm-signup.html`: Supabase substitutes the
-real link there. `reset-password.html` is the one exception: it spells out
-`{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` instead, so the app can tell a
-password-reset link apart from a signup link by its `type` param. Leave that one as it is too.
+**Both templates spell out `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=…` instead of using
+`{{ .ConfirmationURL }}`.** Supabase's default `{{ .ConfirmationURL }}` is a PKCE `?code=` link,
+which only works in the SAME BROWSER that started the flow (the code exchange needs a verifier that
+browser wrote to its own localStorage) — a learner who opens the link on a different device, or in
+an email app's in-app browser, got "confirmed" server-side but was never signed in (founder report,
+s215). `token_hash` is exchanged with `verifyOtp()`, which needs nothing from the originating
+browser. Leave the substitution as it is in both files; don't switch back to `{{ .ConfirmationURL }}`.
 
 ## What the app does with the link
 

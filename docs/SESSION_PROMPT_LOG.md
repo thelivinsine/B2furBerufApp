@@ -835,4 +835,78 @@ code touched. Condensed, one line per founder prompt:
   Google Sign-In. No code changes this turn (Console navigation help + a product decision); this
   entry plus the two PRs already shipped earlier in the session (fix genauly.de outage + prerender
   /privacy #866, fix the noscript-gated boot content #868) are session 219's full artifact list.
+
+## Session 220 (branch `fix-signup-onboarding-bugs`)
+
+### Prompt 1 (2026-08-16)
+
+> what's next in the to-do?
+
+- **Response summary:** Read `docs/PROJECT_STATUS.md`'s "Open founder action items" and "Resume
+  here" sections and summarized both: founder-side items (Google Sign-In review still pending,
+  live-verify the session 217 password reset flow, paste email templates, fill in the Impressum
+  postal address, optional LanguageTool key) and the five sign-up/onboarding bugs found in session
+  215's live testing, none fixed yet.
+- **Artifacts:** none (chat-only).
+
+### Prompt 2 (2026-08-16)
+
+> I confirm the change password works. scope the bugs found and create a robust plan to fix them.
+
+- **Response summary:** Traced the five session-215 bug reports to three actual root causes (three
+  parallel Explore agents plus manual code verification against `useAuthStore.ts`, `ConfirmEmail.tsx`,
+  `router.tsx`, `cloudSync.ts`, `main.tsx`, and `@supabase/auth-js`'s own source): (A) the
+  confirmation email used a PKCE `?code=` link that only works in the browser that started signup —
+  Supabase's default `{{ .ConfirmationURL }}`; (B) `useAuthStore.init()` had two writers for auth
+  `status` racing (`getSession()` + `onAuthStateChange`), so a late `getSession()` resolution could
+  overwrite a live `SIGNED_IN` with `signedOut`, which `RequireOnboarding` treated as final and
+  bounced the learner to `/welcome`; (C) `startCloudSync`'s shared-device wipe only fires for a
+  genuinely different previous account, so a device with local `onboarded: true` from prior
+  guest/offline use (but no sync history) let a brand-new account inherit the flag and skip
+  onboarding. Also found: the onboarding consent checkbox re-renders unconditionally even when
+  already recorded, and an uncaught `startCloudSync` rejection — triggerable by a DIFFERENT tab via
+  supabase-js's cross-tab `BroadcastChannel` — hits a hair-trigger global handler in `main.tsx` that
+  permanently wipes a working tab's DOM, with no logging anywhere. Asked two clarifying questions
+  (bug 5's inheritance rule; bug 4's fix scope) — founder chose "the cloud is always the authority on
+  onboarded" and "fix the cause and narrow the trigger, with logging." Wrote a 6-part plan, got
+  approval, then implemented and verified all of it:
+  1. `confirm-signup.html` now uses the same `token_hash` link shape `reset-password.html` already
+     used (browser-independent), plus honest "you're confirmed, please log in" copy in
+     `ConfirmEmail.tsx` for the case where the old template is still live and no session resulted.
+  2. Deleted the duplicate `getSession()` writer in `useAuthStore.init()` (confirmed
+     `onAuthStateChange` always fires `INITIAL_SESSION` with the same data on subscribe, so this is a
+     genuine race removal, not a guard) and pointed the confirm-success navigation at `/library`
+     instead of `/`.
+  3. `mergeRemoteSettings` now takes `firstSyncOnDevice` and resets a locally-true `onboarded` flag
+     when the cloud disagrees and no account has ever synced on this device, without regressing the
+     session-174 fix for returning accounts (new regression test for exactly that case).
+  4. The AGB/Datenschutz checkbox in `Onboarding.tsx` now renders only when `hasConsented()` is false
+     at mount, read once so it doesn't vanish mid-tick.
+  5. `paintFatal` now logs to console + `sessionStorage`; the two global error/rejection handlers in
+     `main.tsx` only paint the destructive fatal screen before the app has mounted; caught the
+     `startCloudSync` promise and moved its destructive local-wipe prefix inside a `try` (it was
+     reaching zustand-persist's unguarded `localStorage.setItem`).
+  6. Named but deliberately NOT fixed: `swUpdate.ts` can reload a hidden tab mid-signup since
+     `hasLiveWork()` has no auth-surface claim — real, but not a crash and not reported.
+
+  All gates green: `pnpm typecheck`, `pnpm lint` (0 errors, only pre-existing warnings), `pnpm
+  test:unit` (745 passed, incl. 2 new cases in `cloudSync.test.ts`, 2 in `authCallback.test.ts`, and a
+  new `onboarding.test.tsx`), `pnpm build`, `pnpm check:bundle`. One flaky pre-existing test timeout
+  in `writingAufgabe.test.tsx` under full-suite parallel load, unrelated to this change, confirmed to
+  pass standalone and on a clean full-suite re-run. Verified live via `pnpm preview`: a stray
+  `Promise.reject` fired from the console post-mount left the UI fully alive and stashed the error in
+  `sessionStorage`; walked the onboarding flow through direct `localStorage` state changes and
+  confirmed the checkbox disappears (submit stays enabled) once consent is already on record, and
+  that completing onboarding lands on `/library`. Rotated session 217's full log entry out of
+  `PROJECT_STATUS.md` into the W33 archive (keeping the "two most recent sessions" rule) and updated
+  the "Open founder action items" list (password-reset flow confirmed working; email-template item
+  now explains why the confirm-signup template specifically still needs pasting).
+- **Artifacts:** `docs/reference/auth-emails/confirm-signup.html` ·
+  `docs/reference/auth-emails/reset-password.html` · `docs/reference/auth-emails/README.md` ·
+  `src/lib/authCallback.ts` · `src/features/auth/ConfirmEmail.tsx` · `src/store/useAuthStore.ts` ·
+  `src/lib/cloudSync.ts` · `src/features/onboarding/Onboarding.tsx` · `src/main.tsx` ·
+  `tests/authCallback.test.ts` · `tests/cloudSync.test.ts` · `tests/onboarding.test.tsx` (new) ·
+  `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 217 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md`. Branch `fix-signup-onboarding-bugs`, [PR #870](https://github.com/thelivinsine/B2furBerufApp/pull/870).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.

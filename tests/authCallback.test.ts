@@ -52,9 +52,15 @@ describe("auth callback parameters", () => {
     expect(m.AUTH_CALLBACK.accessToken).toBeNull();
   });
 
-  it("ignores a bare ?code= (supabase-js consumes that one itself)", async () => {
+  it("ignores a bare ?code= (supabase-js consumes that one itself), but flags it as hadCode", async () => {
     const m = await loadWithUrl("/?code=pkce-code");
     expect(m.hasAuthCallback()).toBe(false);
+    expect(m.AUTH_CALLBACK.hadCode).toBe(true);
+  });
+
+  it("reports hadCode false when the URL carries no ?code= at all", async () => {
+    const m = await loadWithUrl("/auth/confirm?token_hash=abc123&type=signup");
+    expect(m.AUTH_CALLBACK.hadCode).toBe(false);
   });
 
   it("pins the confirmation landing page to this origin, not to a dashboard setting", async () => {
