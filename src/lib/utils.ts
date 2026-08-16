@@ -52,6 +52,14 @@ export function uid(prefix = "id"): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/** Races a promise against a deadline; rejects on timeout instead of hanging forever. */
+export function withTimeout<T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
+  ]);
+}
+
 /** Normalises text for forgiving answer comparison. */
 export function normalize(s: string): string {
   return s

@@ -1,7 +1,10 @@
 import { supabase } from "@/lib/supabase";
 import { reportServerAllowance } from "@/lib/aiAllowance";
 import { TURNSTILE_ENABLED, useAuthStore } from "@/store/useAuthStore";
+import { withTimeout } from "@/lib/utils";
 import type { ThemeId, WeaknessCategory } from "@/types";
+
+const HISTORY_TIMEOUT_MS = 12_000;
 
 export interface WritingHistoryEntry {
   id: string;
@@ -78,27 +81,39 @@ export async function getWritingHistory(
     // optional columns rather than show a load error for something the UI treats
     // as optional anyway. Every column list stays literal, or the client's type
     // inference collapses.
-    const withEn = await supabase
-      .from("writing_evaluations")
-      .select(
-        "id, created_at, theme, length, text, weakness, insight, insight_en, cached, task_id, corrected_text",
-      )
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    const withEn = await withTimeout(
+      supabase
+        .from("writing_evaluations")
+        .select(
+          "id, created_at, theme, length, text, weakness, insight, insight_en, cached, task_id, corrected_text",
+        )
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      HISTORY_TIMEOUT_MS,
+      "getWritingHistory",
+    );
     if (!withEn.error && withEn.data) return withEn.data as WritingHistoryEntry[];
-    const { data, error } = await supabase
-      .from("writing_evaluations")
-      .select(
-        "id, created_at, theme, length, text, weakness, insight, cached, task_id, corrected_text",
-      )
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    const { data, error } = await withTimeout(
+      supabase
+        .from("writing_evaluations")
+        .select(
+          "id, created_at, theme, length, text, weakness, insight, cached, task_id, corrected_text",
+        )
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      HISTORY_TIMEOUT_MS,
+      "getWritingHistory",
+    );
     if (!error && data) return data as WritingHistoryEntry[];
-    const legacy = await supabase
-      .from("writing_evaluations")
-      .select("id, created_at, theme, length, text, weakness, insight, cached, task_id")
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    const legacy = await withTimeout(
+      supabase
+        .from("writing_evaluations")
+        .select("id, created_at, theme, length, text, weakness, insight, cached, task_id")
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      HISTORY_TIMEOUT_MS,
+      "getWritingHistory",
+    );
     if (legacy.error || !legacy.data) return null;
     return legacy.data as WritingHistoryEntry[];
   } catch {
