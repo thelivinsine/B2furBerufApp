@@ -6640,3 +6640,96 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   change; a verification + reporting turn only.
 - **Artifacts:** none (chat-only; the deploy confirmation is recorded here and in the session-212
   handoff in `docs/PROJECT_STATUS.md`).
+
+## Session 213 (branch `fix/verlauf-history-timeout`)
+
+### Prompt 1 (2026-08-16)
+
+> what's next in to do?
+
+- **Response summary:** Read `docs/PROJECT_STATUS.md`'s "Resume here" section and reported the three
+  open items from the session 211/212 handoffs: the founder verification still pending on the s212
+  cold-open deploy, the Sprechen/Schreiben Verlauf spinner having no timeout on an unreachable
+  Supabase, and the reply-task content wave (writing-audit P4). Asked which to start on. No code
+  change.
+- **Artifacts:** none (chat-only).
+
+### Prompt 2 (2026-08-16)
+
+> can you explain clearly on what do you mean by verlauf spinner task?
+
+- **Response summary:** Traced the concrete code path: `getSpeakingHistory` (`src/lib/speaking.ts`)
+  and `getWritingHistory` (`src/lib/writing.ts`) each `await` a Supabase query with no deadline, and
+  `SprechenHistory.tsx`/`WritingHistory.tsx` hold `loading = true` until that promise resolves. An
+  unreachable Supabase (network hiccup, DNS issue) leaves the spinner running with no timeout, no
+  error, and no way for the learner to know the app is broken versus just slow, unlike the Sprechen
+  debrief AI calls which got exactly this fix (a total time budget) in session 211. Proposed wrapping
+  the Supabase call with a timeout into the existing `failed` UI state. No code change; explanation
+  only, asked for confirmation before implementing.
+- **Artifacts:** none (chat-only).
+
+### Prompt 3 (2026-08-16)
+
+> yes, implement that for both
+
+- **Response summary:** Added `withTimeout<T>(promise, ms, label)` to `src/lib/utils.ts`
+  (`Promise.race` against a `setTimeout` rejection; accepts `PromiseLike<T>` so the Supabase
+  `PostgrestFilterBuilder` thenable type-checks without an intermediate cast). Wrapped
+  `getSpeakingHistory`'s single query and all three of `getWritingHistory`'s sequential step-down
+  queries (the schema-migration fallback chain from s179/s181) at a 12s budget each; a timeout throws
+  into the existing `catch { return null; }`, which the screens already render as "could not load."
+  Verified `pnpm typecheck` clean for the three touched files (found and confirmed as pre-existing/
+  unrelated: a Windows-only filename-case-collision error already present on `main`, being fixed on
+  a separate branch already checked out at the time) and `pnpm test:unit` 735/735 passing (one
+  unrelated flaky timeout in `writingAufgabe.test.tsx`, confirmed by rerunning it in isolation).
+- **Artifacts:** `src/lib/utils.ts` · `src/lib/speaking.ts` · `src/lib/writing.ts` (uncommitted at
+  this point).
+
+### Prompt 4 (2026-08-16)
+
+> is it live?
+
+- **Response summary:** No, nothing had been committed or pushed yet; explained that only
+  working-tree files had been edited and verified. Asked whether to commit and open a PR.
+- **Artifacts:** none.
+
+### Prompt 5 (2026-08-16)
+
+> Yes, separate branch it and open the PR
+
+- **Response summary:** The working branch (`fix/windows-case-collision-graph-helpers`) already
+  carried unrelated staged/unstaged WIP from an earlier session (a `CollocationGraph`/`WordGraph`
+  filename-casing fix), so the timeout fix needed its own clean branch to avoid bundling unrelated
+  changes into one PR. Extracted the diff for the three touched files only (`git diff` → patch file),
+  reverted them on the working branch, fetched `origin/main`, created `fix/verlauf-history-timeout`
+  off it, stashed the case-collision WIP that had carried over onto the new branch (`git checkout -b`
+  keeps uncommitted changes), applied the patch, confirmed `pnpm typecheck`/`pnpm test:unit` clean
+  (735/735) on the isolated branch, committed, pushed, and opened **PR #859** via `gh pr create`.
+  Restored the case-collision WIP onto the original branch via `git stash pop` afterward so it was
+  not lost.
+- **Artifacts:** commit `08aa991` on `fix/verlauf-history-timeout` · **PR #859** (github.com/
+  thelivinsine/B2furBerufApp/pull/859).
+
+### Prompt 6 (2026-08-16)
+
+> merge it
+
+- **Response summary:** Confirmed CI (`lint-content`) passed via `gh pr checks 859`, then
+  squash-merged with `gh pr merge 859 --squash --delete-branch`, landing as **`47f0825`** on `main`.
+  Did the required post-merge housekeeping: fetched `origin/main`, switched back to
+  `fix/windows-case-collision-graph-helpers`, `git reset --hard origin/main`, and popped the stashed
+  case-collision WIP back on top, leaving that branch exactly as found but rebased onto the new
+  `main`. Pruned the now-deleted remote branch ref locally.
+- **Artifacts:** merge commit `47f0825` on `main` (PR #859, squash-merged).
+
+### Prompt 7 (2026-08-16)
+
+> document the session
+
+- **Response summary:** Updated `docs/PROJECT_STATUS.md`: added the session 213 entry to the session
+  log and "Resume here" (with the s211 pending-item now resolved), archived session 211's session-log
+  and handoff blocks into `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (only the two
+  most recent sessions stay in the live file), and corrected two now-stale "Verlauf spinner has no
+  timeout" bullets left over in the session 210/212 handoffs. Appended this session's prompts here.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`
+  · `docs/SESSION_PROMPT_LOG.md`.
