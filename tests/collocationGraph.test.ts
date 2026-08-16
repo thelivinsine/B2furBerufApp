@@ -7,7 +7,7 @@ import {
   nodeRadiusForDegree,
   nounId,
   verbId,
-} from "@/features/collocations/collocationGraph";
+} from "@/features/collocations/collocationGraphModel";
 import type { VocabItem } from "@/types";
 
 function colloc(

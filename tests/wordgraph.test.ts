@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { Collocation, VocabItem } from "@/types";
 import { vocabulary } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
-import { buildWordGraph, normalizeForm, radiusForZipf } from "@/features/vocabulary/wordGraph";
+import { buildWordGraph, normalizeForm, radiusForZipf } from "@/features/vocabulary/wordGraphModel";
 
 /** Minimal vocab item; only the fields the graph builder reads are relevant. */
 function word(id: string, de: string, related: string[] = []): VocabItem {
