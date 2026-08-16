@@ -60,6 +60,13 @@ export function Onboarding() {
   const [level, setLevel] = useState<CefrLevel>("B2");
   // Guests never open AuthDialog, so setup gates on accepting the terms here.
   const [consent, setConsent] = useState(hasConsented());
+  // Whether consent was ALREADY recorded when this screen mounted (signed up
+  // through AuthDialog, which ticks it there). Captured once, separately from
+  // the live `consent` toggle above: if we instead hid the checkbox on
+  // `!consent`, it would vanish the instant someone who hadn't consented yet
+  // ticked it. Someone who already agreed in AuthDialog was being asked again
+  // here, pre-checked, which reads as broken (founder report, s215).
+  const [alreadyConsented] = useState(() => hasConsented());
 
   // The interface language follows the level chip the learner is LOOKING at,
   // not the one in the store (nothing is stored until they submit), so tapping
@@ -146,44 +153,46 @@ export function Onboarding() {
             </div>
           </div>
 
-          <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
-            />
-            {/* Composed as one sentence per language rather than three
-                translated fragments: the two links sit in different places in
-                German and English, and a fragment map cannot move them. */}
-            <span>
-              {lang === "de" ? (
-                <>
-                  Ich stimme den{" "}
-                  <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                    AGB
-                  </a>{" "}
-                  und der{" "}
-                  <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                    Datenschutzerklärung
-                  </a>{" "}
-                  zu.
-                </>
-              ) : (
-                <>
-                  I accept the{" "}
-                  <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                    Terms
-                  </a>{" "}
-                  and the{" "}
-                  <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                    Privacy Policy
-                  </a>
-                  .
-                </>
-              )}
-            </span>
-          </label>
+          {!alreadyConsented && (
+            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+              />
+              {/* Composed as one sentence per language rather than three
+                  translated fragments: the two links sit in different places in
+                  German and English, and a fragment map cannot move them. */}
+              <span>
+                {lang === "de" ? (
+                  <>
+                    Ich stimme den{" "}
+                    <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                      AGB
+                    </a>{" "}
+                    und der{" "}
+                    <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                      Datenschutzerklärung
+                    </a>{" "}
+                    zu.
+                  </>
+                ) : (
+                  <>
+                    I accept the{" "}
+                    <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                      Terms
+                    </a>{" "}
+                    and the{" "}
+                    <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                      Privacy Policy
+                    </a>
+                    .
+                  </>
+                )}
+              </span>
+            </label>
+          )}
 
           <Button variant="gradient" onClick={start} disabled={!consent} className="w-full gap-1.5">
             {t("Los geht's")} <ArrowRight className="h-4 w-4" />

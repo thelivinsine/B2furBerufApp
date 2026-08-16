@@ -1,13 +1,77 @@
 # Project Status
 
-_Last updated: 2026-08-16 (session 219, no branch: found `genauly.de` fully offline — GitHub Pages
-had silently disabled itself when session 216 made the repo private (Free-plan Pages needs a public
-repo) — made the repo public again, re-enabled Pages, and prerendered a real `/privacy` page so
-Google's OAuth consent-screen crawler (which doesn't run JS) gets a 200 instead of the SPA's
-404-redirect trick. Session 217, branch `password-reset-flow`: built password reset + change, a gap
-found while scoping a founder request about the Settings page.
-Sessions 209-216 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
+_Last updated: 2026-08-16 (session 220, branch `fix-signup-onboarding-bugs`: fixed all five sign-up
+→ confirm → onboarding bugs found in session 215's live SMTP test. Session 219, no branch: found
+`genauly.de` fully offline — GitHub Pages had silently disabled itself when session 216 made the repo
+private (Free-plan Pages needs a public repo) — made the repo public again, re-enabled Pages, and
+prerendered a real `/privacy` page so Google's OAuth consent-screen crawler (which doesn't run JS)
+gets a 200 instead of the SPA's 404-redirect trick.
+Sessions 209-217 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
 sessions 204-208 in the `W32` file beside it. All handoffs under their own "Resume here")._
+
+**Session 220 (2026-08-16, branch `fix-signup-onboarding-bugs`): fixed all five sign-up/onboarding
+bugs found in session 215's live SMTP test (none had been fixed yet).** Tracing found three actual
+root causes, not five independent bugs:
+- **The confirmation email used a PKCE `?code=` link** (Supabase's default `{{ .ConfirmationURL }}`),
+  which only exchanges for a session in the SAME BROWSER that started signup (the exchange needs a
+  verifier that browser wrote to its own localStorage) — opening the link on a different device
+  confirmed the account server-side but never signed the learner in. Fixed by switching
+  `confirm-signup.html` to the same `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=signup` shape
+  `reset-password.html` already used, which needs nothing from the originating browser
+  (`verifyOtp()`). **Founder still needs to paste the updated template into Supabase → Authentication
+  → Emails → Confirm signup for this fix to take effect** (`docs/reference/auth-emails/`).
+  `ConfirmEmail.tsx` also now tells the learner "you're confirmed, please log in" instead of "link
+  invalid" for the case where the old template is still live and a session didn't result.
+- **`useAuthStore.init()` had two writers for auth `status`** (`getSession()` and
+  `onAuthStateChange`, unguarded against staleness), so a late `getSession()` resolution could
+  overwrite a live `SIGNED_IN` (from a just-redeemed confirmation link) with `signedOut` —
+  `RequireOnboarding` (`router.tsx`) treated that as a resolved, genuine "not signed in" and bounced
+  the learner to `/welcome`, the marketing page, needing a second manual login. Fixed by deleting the
+  `getSession()` writer entirely: `onAuthStateChange` already fires `INITIAL_SESSION` with the same
+  data on subscribe (verified against `@supabase/auth-js`'s source), so there is now exactly one
+  writer and the race is gone, not just guarded. `ConfirmEmail.tsx` also now lands on `/library`
+  (matching every other entry point) instead of `/`, which used to route through the Dashboard.
+- **A device's local `onboarded: true` (from prior guest/offline use) was inherited by a brand-new
+  account.** `startCloudSync`'s shared-device wipe only fires for a genuinely DIFFERENT previous
+  account; a device that had never synced any account kept its local flag, so a fresh sign-up skipped
+  onboarding entirely and landed on the dashboard. Founder decision: the cloud is always the
+  authority on whether an account has onboarded. `mergeRemoteSettings` now takes
+  `firstSyncOnDevice` and resets a locally-true flag when the cloud disagrees and this device has
+  never synced before — the s174 fix (a returning account never loses `onboarded` to a momentarily
+  stale cloud pull) is unaffected and has a regression test.
+- **Two smaller, separately-caused bugs bundled in the same report:** the AGB/Datenschutz consent
+  checkbox in `Onboarding.tsx` re-rendered (pre-checked) even when already recorded at signup — now
+  hidden once `hasConsented()` is true at mount. And an uncaught `startCloudSync` rejection —
+  triggerable by a DIFFERENT tab, since supabase-js broadcasts auth events across tabs on the same
+  storage key — hit `main.tsx`'s hair-trigger global error handler, which treated ANY unhandled
+  rejection anywhere in a session's lifetime as a fatal bootstrap failure and destructively wiped a
+  perfectly working tab's DOM, with no logging anywhere. Founder decision: fix the cause and narrow
+  the trigger. `startCloudSync` calls are now caught; its destructive local-wipe prefix moved inside
+  a `try` (it was reaching zustand-persist's unguarded `localStorage.setItem`); `paintFatal` now logs
+  to console + `sessionStorage`; and the global handlers only paint the destructive screen BEFORE the
+  app has mounted (`RootErrorBoundary` + the router's `errorElement` are the right net once it has) —
+  a stray post-mount error is logged, not fatal.
+- **Gates run clean:** `pnpm typecheck` · `pnpm lint` (0 errors, only pre-existing warnings) ·
+  `pnpm test:unit` (745 passed, incl. 2 new test cases in `cloudSync.test.ts`, 2 in
+  `authCallback.test.ts`, and a new `onboarding.test.tsx`) · `pnpm build` · `pnpm check:bundle`.
+  Verified live in a real browser via `pnpm preview`: a stray `Promise.reject` fired from the console
+  after mount left the UI fully alive and stashed the error in `sessionStorage`; walked the onboarding
+  flow through localStorage state changes and confirmed the checkbox disappears (submit stays
+  enabled) once consent is already on record, and that completing onboarding lands on `/library`.
+- **Resume here:** paste the updated `confirm-signup.html` into Supabase (see above) — without that,
+  report #1 (link only works in the originating browser) is only half-fixed; the `ConfirmEmail.tsx`
+  fallback copy is the safety net until then. Then a founder click-through of the full sign-up →
+  confirm (in a DIFFERENT browser) → onboarding path on `genauly.de` is the real verification of
+  reports #1/#2/#5; opening the confirm link in a new tab while watching the original tab verifies
+  report #4 no longer crashes it.
+- **Artifacts:** `docs/reference/auth-emails/confirm-signup.html` ·
+  `docs/reference/auth-emails/reset-password.html` · `docs/reference/auth-emails/README.md` ·
+  `src/lib/authCallback.ts` · `src/features/auth/ConfirmEmail.tsx` · `src/store/useAuthStore.ts` ·
+  `src/lib/cloudSync.ts` · `src/features/onboarding/Onboarding.tsx` · `src/main.tsx` ·
+  `tests/authCallback.test.ts` · `tests/cloudSync.test.ts` · `tests/onboarding.test.tsx` (new) ·
+  `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 217 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md`.
 
 **Session 219 (2026-08-16, no branch): `genauly.de` was completely down — 404 on every route —
 because GitHub Pages silently disabled itself when session 216 made the repo private.** Founder
@@ -62,50 +126,6 @@ no console errors beyond an expected local-preview service-worker registration f
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 216 archived off, corrected)
   · `docs/SESSION_PROMPT_LOG.md`.
 
-**Session 217 (2026-08-16, branch `password-reset-flow`): learners can now reset a forgotten
-password and signed-in learners can change (or, for Google-only accounts, set) one from Settings.**
-Founder reported Settings has no "change password" option. Scoping it surfaced a bigger gap: the app
-is fully password-based but had **no recovery path at all** — no `resetPasswordForEmail` call, no
-"Passwort vergessen?" link, no set-password screen. A learner who forgot their password was
-permanently locked out. Both gaps share one shared form, so both were built together.
-- **`src/store/useAuthStore.ts`:** added `sendPasswordReset` (`resetPasswordForEmail`), `setPassword`
-  (`updateUser({ password })`), a `passwordRecovery` flag set on the `PASSWORD_RECOVERY` auth event
-  (the shape-independent recovery signal, works regardless of which of the three callback shapes the
-  link arrives in), and an exported `hasPasswordIdentity(user)` helper (email-identity vs.
-  Google-only), covered by `tests/authPassword.test.ts`.
-- **`src/features/auth/NewPasswordForm.tsx` (new):** the one set-password form, shared by both entry
-  points below.
-- **`ConfirmEmail.tsx`** (`/auth/confirm`, already outside every route guard): a `type=recovery` link
-  now renders the set-password form in place, instead of the old behaviour of dropping the learner
-  into the app with a live recovery session and nowhere to set a password.
-- **`AccountPanel.tsx`** (Settings → Konto & Cloud-Sync): new row, "Passwort ändern" for an
-  email-identity account or "Passwort festlegen" for a Google-only one; inline progressive
-  disclosure, matching Settings' existing row pattern (no dialogs anywhere in that page).
-- **`AuthDialog.tsx`:** "Passwort vergessen?" link on the login tab, reusing the existing "check your
-  inbox" panel shape with reset-specific, deliberately neutral copy ("Wenn es ein Konto mit dieser
-  Adresse gibt, ist ein Link unterwegs.") — Supabase answers a known and an unknown address
-  identically on purpose, so the UI must never confirm which.
-- **Also fixed:** `SaveProgressBanner.tsx`'s stale "Kein Passwort nötig." copy (a magic-link-era
-  leftover, factually wrong in a password-only app).
-- **`docs/reference/auth-emails/reset-password.html` + its README:** the reset link now spells out
-  `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` instead of `{{ .ConfirmationURL }}`,
-  so `type=recovery` always survives in the URL (the app also falls back to the `PASSWORD_RECOVERY`
-  event, so the flow works even before this template is pasted into Supabase).
-- **Gates run clean:** `pnpm typecheck` · `pnpm lint` (0 errors, only pre-existing warnings) ·
-  `pnpm test:unit` (740 passed, incl. the new file) · `pnpm build` · `pnpm check:bundle`. Not
-  exercised live (needs a real Supabase SMTP round-trip): a founder click-through of both flows on
-  `genauly.de` after deploy is the real verification.
-- **Resume here:** nothing outstanding once this merges beyond the founder's own verification pass
-  (see "Open founder action items" below) and the still-unfixed session-215 bug list, unrelated to
-  this change and carried forward below.
-- **Artifacts:** `src/store/useAuthStore.ts` · `src/features/auth/NewPasswordForm.tsx` (new) ·
-  `src/features/auth/ConfirmEmail.tsx` · `src/features/auth/AccountPanel.tsx` ·
-  `src/features/auth/AuthDialog.tsx` · `src/features/auth/SaveProgressBanner.tsx` ·
-  `src/lib/uiStrings.ts` · `docs/reference/auth-emails/reset-password.html` + `README.md` ·
-  `tests/authPassword.test.ts` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 215 archived off) ·
-  `docs/SESSION_PROMPT_LOG.md`.
-
 ## Where things stand
 
 The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the five-slot nav
@@ -151,14 +171,15 @@ in this list live in `docs/archive/PROJECT_STATUS_ARCHIVE.md` with their dates. 
 redeploy is done (s150: all three AI functions deployed on the Gemini-primary cascade,
 `GEMINI_API_KEY` set). Still open:
 - [x] **Resend SMTP is live** (s215): `genauly.de` verified in Resend, custom SMTP enabled in
-      Supabase, confirmation emails send from `hello@genauly.de`. Remaining from
-      `docs/reference/auth-emails/README.md`: paste the two branded templates (step 2) and raise
-      Supabase's "Emails per hour" rate limit now that a real sender is configured.
-      `reset-password.html`'s link shape changed in session 217 (s217); paste the current version.
-- [ ] **Verify the session 217 password-reset/change flow live** on `genauly.de` once deployed: an
-      "Anmelden" → "Passwort vergessen?" round-trip with a real email address, a Settings →
-      "Passwort ändern" round-trip while signed in, and (if a Google account exists) "Passwort
-      festlegen" from a Google-only sign-in.
+      Supabase, confirmation emails send from `hello@genauly.de`.
+- [x] **Session 217's password-reset/change flow confirmed working live** by the founder (s220).
+- [ ] **Paste BOTH updated email templates into Supabase → Authentication → Emails** (step 2 of
+      `docs/reference/auth-emails/README.md`) and raise Supabase's "Emails per hour" rate limit now
+      that a real sender is configured. Both templates now use the `token_hash` link shape (s217 for
+      reset, s220 for confirm-signup) — the confirm-signup one matters more than cosmetic: without it,
+      a confirmation link only signs a learner in if opened in the SAME BROWSER that signed up
+      (session 215's bug #1; `ConfirmEmail.tsx` has a fallback message but the real fix is the
+      template).
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [ ] **Google sign-in branding verification — awaiting Google's async re-review (s219, submitted
       round 3).** Round 1 failed because `genauly.de` was completely offline (session 216 made the
@@ -183,55 +204,22 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 215 (2026-08-16): Resend SMTP is live for auth emails, but signing up
-surfaced five auth/onboarding bugs that need fixing.** No branch, dashboard-only session (Namecheap
-DNS + Private Email, Resend domain/API key, Supabase SMTP settings); nothing to merge.
-Founder walked through `docs/reference/auth-emails/README.md` step 1 live, then tested a real
-signup: "document these comments for now to address them in the next session."
-
-- **Priority for next session — five bugs found testing the new SMTP live, all in the sign-up →
-  confirm → onboarding path, none fixed yet:**
-  1. Clicking the confirmation email link does not sign the learner in automatically; they're asked
-     to log in again. Start at `/auth/confirm` (`src/features/auth/ConfirmEmail.tsx`) and the
-     `emailRedirectTo`/session-completion logic in `src/store/useAuthStore.ts` — per the README this
-     link is supposed to complete sign-in on its own.
-  2. After that manual login, the app dropped back to the LANDING page instead of into the app,
-     needing a second login to actually get in. This is the more serious of the three (a real
-     new-signup drop-off risk) — trace the redirect target through the whole confirm→login handoff
-     rather than patching the symptom.
-  3. Onboarding's "Wofür lernst du Deutsch?" screen re-shows the AGB/Datenschutz consent checkbox
-     (pre-checked) even though it was already ticked once at signup. Cosmetic but redundant; find
-     where onboarding re-renders that checkbox and drop it if consent is already recorded.
-  4. **The ORIGINAL tab (where signup was started) hard-crashes to the "Kurz nicht erreichbar"
-     fatal-error screen** once the confirmation link is clicked in a NEW tab (email links open in a
-     new tab by default). This is `RootErrorBoundary`'s fallback (`src/main.tsx:164`) or the even
-     earlier `paintFatal()` module-eval crash net (`src/main.tsx:43`) — founder did not capture the
-     "Technische Details" text, so next session should reproduce this first (open signup, click the
-     confirm link in a separate tab, watch the original tab) to get the real error/stack before
-     guessing a fix. Prime suspects given what's nearby: a stale-session/auth-state conflict between
-     tabs, or the service-worker update-reload (`src/lib/swUpdate.ts`) firing on the original tab
-     mid-flow.
-  5. **A freshly confirmed account skips onboarding entirely and lands straight on the Spielplatz
-     dashboard**, never asking "Wofür lernst du Deutsch?" (Beruf/Alltag/Prüfung/Beides) or the
-     Niveau question. The `RequireOnboarding` gate (see s212, `/library`'s cold-open redirect logic
-     in `src/lib/appEntry.ts`) is supposed to route a not-yet-onboarded learner to `/welcome`
-     first — something in the confirm-link → new-tab → session-established path is setting or
-     reading `onboarded` as already true, or bypassing the gate outright. Given bugs 1/2 above are
-     also in this exact handoff, likely the same root cause: whatever completes the session on the
-     confirm link is not going through the normal sign-in path that the onboarding gate expects.
-     Worth checking together with bug 3 (the onboarding screen that DOES still show the AGB
-     checkbox in other paths) once the real flow is traced.
-- **Resend SMTP setup itself worked and is confirmed live:** signup mail now arrives from
-  `Genauly <hello@genauly.de>` with no Supabase branding. The one gotcha worth remembering: Resend
-  domain verification has to actually finish (watch for "Not started" → "Verified" in Resend →
-  Domains) before Supabase's SMTP send will succeed — the first live test failed with "Error sending
-  confirmation email" purely because of that timing, not a config mistake.
-  Also worth remembering for future Namecheap DNS work: an MX record option is HIDDEN from Advanced
-  DNS's "Add Record" Type dropdown until "Mail Settings" (near the top of the same page) is switched
-  to **Custom MX** first.
-- **Still open from the README:** paste the two branded templates
-  (`docs/reference/auth-emails/confirm-signup.html`, `reset-password.html`) into Supabase →
-  Authentication → Emails, and raise Supabase's "Emails per hour" rate limit.
+**Handoff after session 220 (2026-08-16, branch `fix-signup-onboarding-bugs`): all five session-215
+sign-up/onboarding bugs are fixed and merged (full detail in the session 220 log entry above).**
+- **Founder action still needed for bug #1 to be FULLY closed:** paste the updated
+  `confirm-signup.html` into Supabase → Authentication → Emails → Confirm signup (see "Open founder
+  action items" above). Until then, a learner who opens the confirmation link in a different browser
+  than the one that signed up still won't get signed in automatically — `ConfirmEmail.tsx` now at
+  least tells them plainly to log in instead of claiming the link is invalid, but the real fix is the
+  template.
+- **Real verification still needed:** a founder click-through of a fresh sign-up → confirm (ideally
+  in a different browser, the case the old template couldn't handle) → onboarding on `genauly.de`
+  after this deploys. That's the only way to prove reports #1/#2/#5 against the real Supabase/Resend
+  round-trip; unit tests and a local `pnpm preview` check covered as much as they can without one.
+- Resend SMTP gotcha, still worth remembering: domain verification has to actually finish (watch for
+  "Not started" → "Verified" in Resend → Domains) before Supabase's SMTP send will succeed. And for
+  future Namecheap DNS work: an MX record option is HIDDEN from Advanced DNS's "Add Record" Type
+  dropdown until "Mail Settings" (near the top of the same page) is switched to **Custom MX** first.
 - **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4), 47
   authored `source` texts plus a rendering slot that does not exist yet, waiting on a founder
   placement pick from `preview/schreiben-source-text.html`.

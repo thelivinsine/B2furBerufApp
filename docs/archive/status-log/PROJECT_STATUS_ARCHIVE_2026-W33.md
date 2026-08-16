@@ -316,3 +316,43 @@ visibility to private via GitHub Settings themselves. No code changed; nothing t
 **This assumption turned out to be wrong** — see session 219: GitHub Pages actually disabled itself
 the moment the repo went private (Free-plan Pages requires a public repo), taking `genauly.de` fully
 offline for two sessions before anyone noticed.
+
+## Session 217 (2026-08-16, branch `password-reset-flow`)
+
+Learners can now reset a forgotten password and signed-in learners can change (or, for Google-only
+accounts, set) one from Settings. Founder reported Settings has no "change password" option. Scoping
+it surfaced a bigger gap: the app is fully password-based but had **no recovery path at all** — no
+`resetPasswordForEmail` call, no "Passwort vergessen?" link, no set-password screen. A learner who
+forgot their password was permanently locked out. Both gaps share one shared form, so both were
+built together. **Confirmed working live by the founder in session 220.**
+- **`src/store/useAuthStore.ts`:** added `sendPasswordReset` (`resetPasswordForEmail`), `setPassword`
+  (`updateUser({ password })`), a `passwordRecovery` flag set on the `PASSWORD_RECOVERY` auth event
+  (the shape-independent recovery signal, works regardless of which of the three callback shapes the
+  link arrives in), and an exported `hasPasswordIdentity(user)` helper (email-identity vs.
+  Google-only), covered by `tests/authPassword.test.ts`.
+- **`src/features/auth/NewPasswordForm.tsx` (new):** the one set-password form, shared by both entry
+  points below.
+- **`ConfirmEmail.tsx`** (`/auth/confirm`, already outside every route guard): a `type=recovery` link
+  now renders the set-password form in place, instead of the old behaviour of dropping the learner
+  into the app with a live recovery session and nowhere to set a password.
+- **`AccountPanel.tsx`** (Settings → Konto & Cloud-Sync): new row, "Passwort ändern" for an
+  email-identity account or "Passwort festlegen" for a Google-only one; inline progressive
+  disclosure, matching Settings' existing row pattern (no dialogs anywhere in that page).
+- **`AuthDialog.tsx`:** "Passwort vergessen?" link on the login tab, reusing the existing "check your
+  inbox" panel shape with reset-specific, deliberately neutral copy ("Wenn es ein Konto mit dieser
+  Adresse gibt, ist ein Link unterwegs.") — Supabase answers a known and an unknown address
+  identically on purpose, so the UI must never confirm which.
+- **Also fixed:** `SaveProgressBanner.tsx`'s stale "Kein Passwort nötig." copy (a magic-link-era
+  leftover, factually wrong in a password-only app).
+- **`docs/reference/auth-emails/reset-password.html` + its README:** the reset link now spells out
+  `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` instead of `{{ .ConfirmationURL }}`,
+  so `type=recovery` always survives in the URL (the app also falls back to the `PASSWORD_RECOVERY`
+  event, so the flow works even before this template is pasted into Supabase).
+- **Gates run clean:** `pnpm typecheck` · `pnpm lint` (0 errors, only pre-existing warnings) ·
+  `pnpm test:unit` (740 passed, incl. the new file) · `pnpm build` · `pnpm check:bundle`.
+- **Artifacts:** `src/store/useAuthStore.ts` · `src/features/auth/NewPasswordForm.tsx` (new) ·
+  `src/features/auth/ConfirmEmail.tsx` · `src/features/auth/AccountPanel.tsx` ·
+  `src/features/auth/AuthDialog.tsx` · `src/features/auth/SaveProgressBanner.tsx` ·
+  `src/lib/uiStrings.ts` · `docs/reference/auth-emails/reset-password.html` + `README.md` ·
+  `tests/authPassword.test.ts`.
+
