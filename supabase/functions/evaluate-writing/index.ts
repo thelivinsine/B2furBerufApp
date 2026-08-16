@@ -294,11 +294,13 @@ interface TaskBrief {
   register: string | null;
   format: string | null;
   words: number | null;
+  source: string | null;
 }
 
 function buildUserPrompt(text: string, lt: LtBuckets | null, brief?: TaskBrief): string {
   let s = "";
   if (brief?.task) {
+    if (brief.source) s += `Text, auf den der Lernende reagiert:\n"""${brief.source}"""\n\n`;
     s += `Aufgabe:\n"""${brief.task}"""\n`;
     if (brief.points.length) {
       s += `\nInhaltspunkte, die der Text abdecken muss:\n`;
@@ -561,6 +563,7 @@ Deno.serve(async (req) => {
     addressee?: string;
     register?: string;
     words?: number;
+    source?: string;
   };
   try {
     body = await req.json();
@@ -592,6 +595,7 @@ Deno.serve(async (req) => {
   const format = clip(body.format, 32);
   const addressee = clip(body.addressee, 120);
   const register = body.register === "du" || body.register === "sie" ? body.register : null;
+  const source = clip(body.source, 800);
   const words =
     typeof body.words === "number" && body.words >= 30 && body.words <= 300
       ? Math.round(body.words)
@@ -740,7 +744,7 @@ Deno.serve(async (req) => {
     const monthIso = startOfMonth.toISOString();
     // The Aufgabe travels with every provider call (s167 P2), so the cascade
     // cannot silently downgrade to language-only grading on a fallback.
-    const brief: TaskBrief = { task, points, addressee, register, format, words };
+    const brief: TaskBrief = { task, points, addressee, register, format, words, source };
     const sys = buildSystemPrompt(level, !!task, exam);
     let out = await callGemini(text, lt, sys, brief);
     if (!out) {

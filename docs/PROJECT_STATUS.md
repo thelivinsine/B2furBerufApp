@@ -1,15 +1,45 @@
 # Project Status
 
-_Last updated: 2026-08-17 (session 221, branch `rls-migration-gate`: `lint:migrations` is now the
-access-control gate too, after evaluating an external security skill and importing only the one rule
-it had that we lacked. Session 220, branch `fix-signup-onboarding-bugs`: fixed all five sign-up
-→ confirm → onboarding bugs found in session 215's live SMTP test. Session 219, no branch: found
-`genauly.de` fully offline — GitHub Pages had silently disabled itself when session 216 made the repo
-private (Free-plan Pages needs a public repo) — made the repo public again, re-enabled Pages, and
-prerendered a real `/privacy` page so Google's OAuth consent-screen crawler (which doesn't run JS)
-gets a 200 instead of the SPA's 404-redirect trick.
-Sessions 209-217 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
+_Last updated: 2026-08-17 (session 222, branch `writing-reply-source-texts`: shipped the reply-task
+`source` wave, 47 tasks, closing the writing-audit P4 replacement that s200 called out as the honest
+target. Session 221, branch `rls-migration-gate`: `lint:migrations` is now the access-control gate
+too, after evaluating an external security skill and importing only the one rule it had that we
+lacked. Session 220, branch `fix-signup-onboarding-bugs`: fixed all five sign-up → confirm →
+onboarding bugs found in session 215's live SMTP test.
+Sessions 209-219 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
 sessions 204-208 in the `W32` file beside it. All handoffs under their own "Resume here")._
+
+**Session 222 (2026-08-17, branch `writing-reply-source-texts`): shipped the reply-task `source`
+wave — all 47 "Antworten Sie" tasks now carry the text the learner is replying to.** Founder asked
+why their real B2 für Beruf exam gave only a topic + Leitpunkte, no source text, contradicting the
+app's `preview/schreiben-source-text.html` framing; the answer was already on record (s200): a
+source text belongs to the REPLY genre only (telc's "Antworten Sie" shape), never to a
+Stellungnahme/Forumsbeitrag, and the founder's own exam was correctly the latter. Founder then
+picked **variant A** ("text first, then the task") from that existing preview.
+- **UI wiring** (`GuidedWritingTrainer.tsx`, `SchreibenPart.tsx`): a Himmelblau "Text zur Aufgabe"
+  tile, no visible edge (matches the Aufgabe-rail fill language), renders BEFORE the prompt whenever
+  a task carries a `source` — in the resting card, the expand-button pop-up, and the Modelltest's
+  Schreiben Teil, from one shared `taskSource` block per surface so it can't drift. `evaluate-writing`
+  now accepts `source`, bounds it (800 chars) same as every other learner-adjacent field, and feeds
+  it into the grading prompt ahead of the Aufgabe so Aufgabenerfüllung can check the reply against
+  what was actually said, not a paraphrase.
+- **Content:** authored 47 short (2-4 sentence) German source texts, one per reply-shaped task
+  across `customer`, `conflict`, `technology`, `behoerde`, `wohnen` and `freizeit`, each voiced as
+  the task's own `addressee` and stating something concrete the existing Leitpunkte already answer
+  (an order number, a missed appointment, a rejected claim). No new content ids and no new
+  provenance rows needed: `source` is a field on an EXISTING task, and the whole theme pool already
+  rides one `wp_<themeId>` provenance row (`docs/areas/CONTENT.md`) — verified all six rows already
+  existed before touching the bank.
+- **Gates run clean:** `pnpm lint:content` (0 errors, 14 pre-existing unrelated warnings) ·
+  `pnpm typecheck` · `pnpm lint` (0 errors) · `pnpm build` · `pnpm check:bundle` ·
+  `pnpm test:unit` (745 passed, unchanged — no test names `source`, none needed updating).
+  Verified live in a real browser via `pnpm preview`: onboarded as guest, filtered Kurz to
+  "Kundenkommunikation", and the first two draws (`wt_customer_s16`, `wt_customer_s02`) both
+  rendered the tile exactly per the approved preview, at desktop AND mobile (375px) width.
+- **Artifacts:** `src/data/writingPrompts.ts` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/exam/SchreibenPart.tsx` · `src/lib/writing.ts` ·
+  `supabase/functions/evaluate-writing/index.ts` · `docs/areas/CONTENT.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
 
 **Session 221 (2026-08-17, branch `rls-migration-gate`): evaluated the external `vibe-security`
 skill (github.com/raroque/vibe-security-skill, MIT) and declined the import; took its one real
@@ -87,59 +117,6 @@ root causes, not five independent bugs:
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 217 archived off) ·
   `docs/SESSION_PROMPT_LOG.md`.
 
-**Session 219 (2026-08-16, no branch): `genauly.de` was completely down — 404 on every route —
-because GitHub Pages silently disabled itself when session 216 made the repo private.** Founder
-asked for the Google OAuth consent-screen logo-update link, then shared Google's verification
-failure list (home page unresponsive, no privacy link, privacy URL unresponsive/same-as-home, app
-name mismatch). All of those traced back to one cause: `GET /repos/.../pages` was 404'ing and the
-last three "Deploy site to GitHub Pages" runs had failed with "Get Pages site failed" — Pages
-requires a public repo on the Free plan, so it turned itself off the moment session 216 flipped
-visibility (that session's docs entry wrongly assumed Pages survives on any plan; corrected in the
-archive). Fix, done live with the founder across several steps: repo back to public → re-enable
-Pages (Settings → Pages → Source: GitHub Actions) → re-ran the latest deploy workflow → set the
-custom domain `genauly.de` in Settings → Pages (DNS was already pointed correctly from earlier
-Namecheap work, so it verified immediately). `genauly.de` now returns 200.
-That fixed the home page, but `/privacy` still 404'd: it's the standard `spa-github-pages`
-redirect trick (a direct hit to any non-root path gets GitHub's real 404 response, which then
-JS-redirects into the SPA) — fine for a browser, but Google's automated checker does a plain HTTP
-GET and never runs the JS. Extended the existing `/hilfe` prerender step
-(`scripts/prerender-help.mjs`, previously help-only) to also render `/privacy` as a real static
-`dist/privacy/index.html` at build time: exported `PrivacyDe`/`PrivacyEn` from `PrivacyPolicy.tsx`
-(no router/hook dependencies, so they render standalone) and used `react-dom/server`'s
-`renderToStaticMarkup` on `PrivacyDe`, so the policy text has exactly one source, not a duplicated
-copy for crawlers. Also, per founder request, swapped the placeholder contact address
-(`thelivinsine@gmail.com`) for `hello@genauly.de` across `PrivacyPolicy.tsx`, `TermsOfService.tsx`,
-and `Impressum.tsx`, and filled the two `[Vollständiger Name]`/`[Full name]` operator-name
-placeholders in `Impressum.tsx` with "Suhas Pala" (the postal-address placeholders are still
-unfilled — the Impressum is not §5-TMG-compliant until the founder supplies a real address).
-**Founder re-submitted to Google and got a NEW, shorter failure list** (home page behind a login
-page, home page does not explain its purpose, app name mismatch) — the unresponsive/duplicate-URL
-items were gone, confirming the deploy fix worked, but these three were new information. Loaded
-`https://genauly.de/` in a real browser: it renders a full public landing page (hero, FAQ, "Log
-in"/"Start free", no gate) once React hydrates, contradicting "behind a login." Root cause was in
-`index.html`: the static pre-render inside `#root` (added in an earlier session for exactly this
-purpose) was hidden behind a `<noscript>` CSS toggle, so any JS-ENABLED crawler that snapshots
-before the ~1.5 MB of vendor JS finishes downloading and hydrating sees only a bare spinner, no
-text, no "Genauly" — reading as ungated-but-empty ("behind a login"), purposeless, and (since the
-only visible brand text was in `<title>`/`<img alt>`, not body text) a name mismatch. Fix: removed
-the `<noscript>` gate entirely so the explanatory content is visible by DEFAULT, for every client,
-regardless of when a crawler renders; React still clears it on mount, so real users only see a
-briefer flash of real content instead of a bare spinner (strict improvement, not a tradeoff).
-Verified the rebuilt page renders identically post-hydration (`pnpm preview`, checked in-browser,
-no console errors beyond an expected local-preview service-worker registration failure).
-- **Resume here:** founder still needs to (1) re-submit the Google OAuth consent screen once this
-  redeploys, and (2) supply a real postal address for `Impressum.tsx` (see the bracketed
-  placeholders) — required for German legal compliance, separate from the Google issue.
-- **Gates run clean:** `pnpm typecheck` · `pnpm lint:content` · `pnpm build` (prerender step
-  confirmed writing `dist/privacy/index.html` with the new email baked in) · manual browser check of
-  the rebuilt `index.html` via `pnpm preview`.
-- **Artifacts:** `scripts/prerender-help.mjs` · `src/features/legal/PrivacyPolicy.tsx` ·
-  `src/features/legal/TermsOfService.tsx` · `src/features/legal/Impressum.tsx` · `index.html` ·
-  `.claude/launch.json` (new, `pnpm preview` config for local browser checks) ·
-  `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 216 archived off, corrected)
-  · `docs/SESSION_PROMPT_LOG.md`.
-
 ## Where things stand
 
 The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the five-slot nav
@@ -176,8 +153,8 @@ cover is `docs/reports/CONTENT_AUDIT_2026-07-30.md` (session 178), whose backlog
 except P10** since s198. The writing bank has its own quality audit since s199,
 `docs/reports/writing-tasks-audit-2026-08-07.md`: the tasks read well, but a third of the Branche
 tags were unearned and the Niveau tag scaled the word target without scaling the task. **P1, P2, P3
-and P5 are shipped (s199, s200); P4 is marked WRONG in the report** and replaced by an optional
-reply-task wave.
+and P5 are shipped (s199, s200); P4 is marked WRONG in the report** and replaced by the reply-task
+`source` wave, shipped s222.
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`, and the ones that were ticked off
@@ -216,17 +193,20 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 220 (2026-08-16, branch `fix-signup-onboarding-bugs`): all five session-215
-sign-up/onboarding bugs are fixed and merged, and the founder has pasted both updated email templates
-into Supabase (full detail in the session 220 log entry above).**
-- **Real verification still needed:** a founder click-through of a fresh sign-up → confirm (ideally
-  in a different browser, the case the old template couldn't handle) → onboarding on `genauly.de`.
-  That's the only way to prove reports #1/#2/#5 against the real Supabase/Resend round-trip; unit
-  tests and a local `pnpm preview` check covered as much as they can without one.
+**Handoff after session 222 (2026-08-17, branch `writing-reply-source-texts`): the reply-task
+`source` wave is shipped and merged — no founder action needed on it.** The writing-audit P4
+replacement (47 "Antworten Sie" tasks, each now carrying a source text rendered before the prompt)
+is done; nothing pending here.
+- **Still open from session 220:** a founder click-through of a fresh sign-up → confirm (ideally in
+  a different browser, the case the old email template couldn't handle) → onboarding on
+  `genauly.de`. That's the only way to prove session 215's reports #1/#2/#5 against the real
+  Supabase/Resend round-trip; unit tests and a local `pnpm preview` check covered as much as they
+  can without one.
 - Resend SMTP gotcha, still worth remembering: domain verification has to actually finish (watch for
   "Not started" → "Verified" in Resend → Domains) before Supabase's SMTP send will succeed. And for
   future Namecheap DNS work: an MX record option is HIDDEN from Advanced DNS's "Add Record" Type
   dropdown until "Mail Settings" (near the top of the same page) is switched to **Custom MX** first.
-- **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4), 47
-  authored `source` texts plus a rendering slot that does not exist yet, waiting on a founder
-  placement pick from `preview/schreiben-source-text.html`.
+- **Still open from session 219:** a real postal address for `Impressum.tsx` (the bracketed
+  placeholders) — required for German legal compliance. And the Google OAuth consent-screen review
+  is still pending (see "Open founder action items" above); do not re-submit again without a Google
+  email prompting it.

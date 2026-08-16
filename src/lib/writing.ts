@@ -167,6 +167,8 @@ export async function evaluateWriting(input: {
   register?: string;
   /** Word target of the task, so underlength is detectable. */
   words?: number;
+  /** Reply-task source text (s200 wave): what the learner is reacting to. */
+  source?: string;
   /** Mock-exam mode (s186): also request the 0-100 exam score. */
   exam?: boolean;
 }): Promise<WritingEvalResult> {

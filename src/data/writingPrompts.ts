@@ -2500,6 +2500,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "email_halbformell",
         words: 40,
+        source: "Ich habe gestern meine Bestellung Nr. 4471 erhalten, aber zwei Artikel haben gefehlt. Bitte klären Sie das schnell, ich brauche die Teile diese Woche noch. Mit freundlichen Grüßen, T. Ferreira",
       },
       {
         id: "wt_customer_s02",
@@ -2515,6 +2516,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.1",
         format: "email_halbformell",
         words: 40,
+        source: "Ich habe vor einer Woche eine Anfrage zu meinem Vertrag geschickt und bisher keine Antwort erhalten. Können Sie mir bitte sagen, wie weit die Bearbeitung ist? Freundliche Grüße, C. Almeida",
       },
       {
         id: "wt_customer_s03",
@@ -2546,6 +2548,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Wir bestellen seit drei Jahren regelmäßig bei Ihnen und möchten für die nächste große Bestellung einen Sonderrabatt von 15 Prozent. Bitte teilen Sie uns mit, ob das möglich ist. Mit freundlichen Grüßen, R. Brandenburg",
       },
       {
         id: "wt_customer_s05",
@@ -2576,6 +2579,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "email_formell",
         words: 40,
+        source: "Das Gerät, das ich letzte Woche bei Ihnen gekauft habe, schaltet sich ständig von selbst aus. Ich möchte wissen, was Sie jetzt unternehmen. Mit freundlichen Grüßen, P. Novotny",
       },
       {
         id: "wt_customer_s07",
@@ -2607,6 +2611,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "nachricht",
         words: 40,
+        source: "Beim Export der Rechnungen stürzt die App bei mir seit dem letzten Update immer ab. Können Sie sich das bitte ansehen? Viele Grüße, S. Kellner",
       },
       {
         id: "wt_customer_s09",
@@ -2639,6 +2644,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "email_halbformell",
         words: 40,
+        source: "Wir möchten am Samstagabend zu acht bei Ihnen essen und würden gern draußen auf der Terrasse sitzen. Haben Sie da noch einen Tisch frei? Viele Grüße, M. Kraus",
       },
       {
         id: "wt_customer_s11",
@@ -2671,6 +2677,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "nachricht",
         words: 40,
+        source: "Findet der Yogakurs am Montagabend wie gewohnt statt? Ich wollte mich extra dafür freinehmen. Viele Grüße, K. Dorn",
       },
       {
         id: "wt_customer_s13",
@@ -2702,6 +2709,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Sie hatten mir zugesagt, die Wartung bis Freitag abzuschließen, aber bis heute ist niemand gekommen. Ich bin davon sehr enttäuscht. Mit freundlichen Grüßen, F. Wagner",
       },
       {
         id: "wt_customer_s15",
@@ -2718,6 +2726,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "C1",
         format: "email_formell",
         words: 120,
+        source: "Ich bin seit über zehn Jahren Kunde bei Ihnen und erwarte für den kürzlich aufgetretenen Ausfall eine vollständige Erstattung der letzten drei Monatsraten. Ich gehe davon aus, dass Sie meiner langjährigen Treue entsprechend entgegenkommen. Mit freundlichen Grüßen, A. Petrov",
       },
       {
         id: "wt_customer_s16",
@@ -2735,6 +2744,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Ich habe heute zufällig erfahren, dass mein Vater letzte Woche gestürzt ist. Warum wurde ich darüber nicht informiert? Das erwarte ich in Zukunft anders. Mit freundlichen Grüßen, I. Berger",
       },
       {
         id: "wt_customer_s17",
@@ -2752,6 +2762,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_halbformell",
         words: 100,
+        source: "Seit dem Update funktioniert die Exportfunktion in Ihrer Software bei mir nicht mehr. Können Sie sich das bitte ansehen? Mit freundlichen Grüßen, T. Weber",
       },
       {
         id: "wt_customer_s18",
@@ -2769,6 +2780,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_halbformell",
         words: 100,
+        source: "Die Waschmaschine, die Sie letzten Monat repariert haben, macht jetzt wieder dasselbe Geräusch wie vorher. Ich bin darüber sehr verärgert. Mit freundlichen Grüßen, B. Reinhardt",
       },
       {
         id: "wt_customer_s19",
@@ -2786,6 +2798,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Am Samstagabend mussten wir fast eine Stunde auf unser Essen warten, obwohl das Lokal nicht einmal voll war. Das war eine sehr enttäuschende Erfahrung. Mit freundlichen Grüßen, J. Kramer",
       },
       {
         id: "wt_customer_s20",
@@ -2803,6 +2816,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "An der frisch verputzten Wand im Wohnzimmer sind bereits mehrere Risse zu sehen. Ich möchte wissen, wie Sie das beheben. Mit freundlichen Grüßen, K. Ostermann",
       },
       {
         id: "wt_customer_s21",
@@ -2820,6 +2834,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Die heute angelieferte Palette war beim Öffnen teilweise beschädigt, mehrere Kartons waren eingedrückt. Bitte teilen Sie uns das weitere Vorgehen mit. Mit freundlichen Grüßen, Spedition Wendt",
       },
       {
         id: "wt_customer_s22",
@@ -2837,6 +2852,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_halbformell",
         words: 100,
+        source: "Ich möchte einen Toaster umtauschen, den ich vor zwei Wochen bei Ihnen gekauft habe, finde aber den Kassenbon nicht mehr. Geht das trotzdem? Freundliche Grüße, L. Novotny",
       },
       {
         id: "wt_customer_s23",
@@ -2854,6 +2870,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Bei der Kontrolle der heute gelieferten Teile haben wir Maßabweichungen von bis zu drei Millimetern festgestellt. Bitte prüfen Sie das dringend. Mit freundlichen Grüßen, Einkauf Semmler",
       },
       {
         id: "wt_customer_s24",
@@ -2871,6 +2888,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Können Sie mir bitte den aktuellen Stand der Konstruktionsfreigabe für unser Projekt mitteilen? Wir planen die nächsten Schritte danach. Mit freundlichen Grüßen, Dr. S. Wolff",
       },
       {
         id: "wt_customer_s25",
@@ -2888,6 +2906,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_halbformell",
         words: 100,
+        source: "Die Farbe, die Sie mir gestern gemacht haben, sieht leider ganz anders aus, als ich es mir vorgestellt hatte. Ich bin damit nicht zufrieden. Mit freundlichen Grüßen, N. Hartmann",
       },
       {
         id: "wt_customer_s26",
@@ -2905,6 +2924,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_halbformell",
         words: 100,
+        source: "Der Rückenkurs am Dienstagabend ist inzwischen so voll, dass man kaum noch Platz zum Üben hat. Können Sie da etwas ändern? Mit freundlichen Grüßen, D. Pfeiffer",
       },
       {
         id: "wt_customer_s27",
@@ -2922,6 +2942,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Im Analysebericht zur letzten Charge weichen die Werte deutlich von unseren eigenen Messungen ab. Bitte klären Sie das umgehend. Mit freundlichen Grüßen, QS Brenner",
       },
       {
         id: "wt_customer_s28",
@@ -2939,6 +2960,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Können Sie uns bitte die vollständige Dokumentation zur zuletzt gelieferten Charge zusenden? Wir benötigen sie für unsere interne Prüfung. Mit freundlichen Grüßen, Einkauf Halden",
       },
       {
         id: "wt_customer_s29",
@@ -2956,6 +2978,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "In den Sanitärbereichen im zweiten Stock ist uns seit Tagen eine mangelhafte Reinigung aufgefallen. Wir bitten um eine Stellungnahme. Mit freundlichen Grüßen, Dr. E. Kern",
       },
       {
         id: "wt_customer_s30",
@@ -2973,6 +2996,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 100,
+        source: "Uns wurde gemeldet, dass es letzte Nacht auf dem Gelände einen Vorfall gab. Bitte informieren Sie mich kurz darüber. Mit freundlichen Grüßen, W. Steiner",
       },
     ],
     long: [
@@ -3172,6 +3196,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Der Abend bei Ihnen letzten Freitag war für uns leider eine große Enttäuschung: Das bestellte Essen kam kalt und viel zu spät, und niemand hat sich entschuldigt. Für den Preis hatten wir mehr erwartet. Mit freundlichen Grüßen, B. Reinhardt",
       },
       {
         id: "wt_customer_l13",
@@ -3206,6 +3231,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "An der Kasse in Ihrer Filiale musste ich letzten Samstag über zwanzig Minuten warten, obwohl nur eine Kasse geöffnet war. Das ist mir schon mehrfach passiert. Mit freundlichen Grüßen, R. Pohl",
       },
       {
         id: "wt_customer_l15",
@@ -3258,6 +3284,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "In mehreren Büroräumen im dritten Stock ist die Reinigung seit Wochen deutlich schlechter geworden, es liegt Staub auf den Schränken und die Böden wirken ungereinigt. Wir bitten um eine Erklärung. Mit freundlichen Grüßen, T. Sundermann",
       },
       {
         id: "wt_customer_l18",
@@ -3360,6 +3387,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Mein Vater wird nach dem Krankenhausaufenthalt bald wieder zu Hause sein. Können Sie mir erklären, welche Betreuung er künftig bei Ihnen bekommen kann und was ich dafür tun muss? Mit freundlichen Grüßen, I. Berger",
       },
       {
         id: "wt_customer_l24",
@@ -3377,6 +3405,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Ihr System ist in den letzten zwei Wochen bereits dreimal ausgefallen, jedes Mal mitten am Arbeitstag. Das kostet uns Zeit und Vertrauen. Ich erwarte eine ausführliche Erklärung und eine Lösung. Mit freundlichen Grüßen, T. Weber",
       },
       {
         id: "wt_customer_l25",
@@ -3394,6 +3423,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Wir möchten unser Badezimmer sanieren lassen und hätten gern ein Angebot von Ihnen. Uns ist wichtig zu wissen, welche Möglichkeiten es preislich gibt und wie lange die Arbeiten dauern würden. Mit freundlichen Grüßen, E. Sahin",
       },
       {
         id: "wt_customer_l26",
@@ -3411,6 +3441,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Wir feiern im Herbst mit etwa 30 Personen bei Ihnen, und in der Gruppe gibt es mehrere Allergien, unter anderem gegen Nüsse und Laktose. Können Sie uns sagen, was möglich ist? Mit freundlichen Grüßen, H. Lang",
       },
       {
         id: "wt_customer_l27",
@@ -3428,6 +3459,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Der ursprünglich vereinbarte Fertigstellungstermin ist nun schon über zwei Wochen überschritten, ohne dass wir eine Erklärung erhalten haben. Bitte teilen Sie uns mit, woran es liegt und wann wir mit dem Haus rechnen können. Mit freundlichen Grüßen, K. Ostermann",
       },
       {
         id: "wt_customer_l28",
@@ -3445,6 +3477,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "In den letzten vier Wochen sind Ihre Lieferungen jedes Mal mehrere Stunden zu spät bei uns angekommen. Das bringt unsere eigene Produktion durcheinander. Bitte erklären Sie uns, woran das liegt. Mit freundlichen Grüßen, Logistik Wendt",
       },
       {
         id: "wt_customer_l29",
@@ -3461,6 +3494,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Ich suche ein neues Gerät für meine kleine Backstube, weiß aber nicht genau, welches Modell für unseren täglichen Bedarf geeignet ist. Können Sie mich dazu beraten? Mit freundlichen Grüßen, L. Novotny",
       },
       {
         id: "wt_customer_l30",
@@ -3478,6 +3512,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Bei den letzten drei Lieferungen haben wir deutliche Unterschiede in der Qualität der Teile festgestellt, manche entsprechen nicht unseren Vorgaben. Wir bitten um eine ausführliche Rückmeldung. Mit freundlichen Grüßen, QS Semmler",
       },
       {
         id: "wt_customer_l31",
@@ -3495,6 +3530,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Unsere Prüfung der gelieferten Baugruppe hat ergeben, dass zwei Werte nicht der vereinbarten Spezifikation entsprechen. Wir bitten um eine Stellungnahme zu unseren Messergebnissen. Mit freundlichen Grüßen, Dr. S. Wolff",
       },
       {
         id: "wt_customer_l32",
@@ -3512,6 +3548,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Meine Haut reagiert seit einiger Zeit empfindlich, und ich möchte gern wissen, welche Behandlung bei Ihnen dafür infrage kommt. Können Sie mir zwei Möglichkeiten vorstellen? Mit freundlichen Grüßen, N. Hartmann",
       },
       {
         id: "wt_customer_l33",
@@ -3529,6 +3566,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Ich war wegen einer Verletzung fast ein halbes Jahr nicht mehr im Studio und weiß nicht, wie ich am besten wieder einsteigen soll. Können Sie mir einen Trainingsplan empfehlen? Mit freundlichen Grüßen, D. Pfeiffer",
       },
       {
         id: "wt_customer_l34",
@@ -3546,6 +3584,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Wir suchen für unseren Reinigungsprozess eine geeignete Variante Ihres Produkts, sind uns aber nicht sicher, welche für unsere Anforderungen infrage kommt. Können Sie uns beraten? Mit freundlichen Grüßen, Einkauf Brenner",
       },
       {
         id: "wt_customer_l35",
@@ -3563,6 +3602,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Bei der Eingangskontrolle der Charge Nr. 3391 ist uns eine Auffälligkeit in der Verpackung aufgefallen. Wir bitten um eine schnelle Klärung, da wir die Charge sonst nicht freigeben können. Mit freundlichen Grüßen, QS Halden",
       },
       {
         id: "wt_customer_l36",
@@ -3580,6 +3620,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Wir überlegen, den Reinigungsumfang für die Büroetagen anzupassen, entweder häufiger oder gründlicher. Können Sie uns erklären, was das für Zeit und Kosten bedeuten würde? Mit freundlichen Grüßen, Dr. E. Kern",
       },
       {
         id: "wt_customer_l37",
@@ -3597,6 +3638,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_formell",
         words: 150,
+        source: "Laut unserem Vertrag sollten die Streifengänge auf dem Gelände alle zwei Stunden erfolgen, in der Dokumentation der letzten Woche finden wir aber deutlich weniger Einträge. Bitte klären Sie das auf. Mit freundlichen Grüßen, W. Steiner",
       },
     ],
   },
@@ -3658,6 +3700,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "email_halbformell",
         words: 100,
+        source: "Wegen Ihnen hat sich unser Projekt schon wieder verzögert, weil die Unterlagen viel zu spät kamen. Das kann so nicht weitergehen. Mit freundlichen Grüßen, J. Weinert",
       },
       {
         id: "wt_conflict_s05",
@@ -5002,6 +5045,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "email_halbformell",
         words: 40,
+        source: "Bitte starten Sie das Kassensystem einmal neu und prüfen Sie danach, ob der Fehler weiterhin auftritt. Melden Sie sich, falls das Problem bestehen bleibt. IT-Support, Ticket 4821",
       },
       {
         id: "wt_technology_s03",
@@ -7634,6 +7678,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.2",
         format: "email_formell",
         words: 40,
+        source: "Für die Bearbeitung Ihres Antrags benötigen wir noch die fehlenden Nachweise. Bitte reichen Sie diese innerhalb von zwei Wochen nach, sonst kann Ihr Antrag nicht bearbeitet werden. Sachbearbeitung, Az. 22-4471",
       },
       {
         id: "wt_behoerde_s05",
@@ -8603,6 +8648,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B2.1",
         format: "widerspruch",
         words: 150,
+        source: "Wir informieren Sie über eine Erhöhung Ihrer Kaltmiete um 60 Euro monatlich ab dem nächsten Quartal. Die Erhöhung ergibt sich aus der allgemeinen Marktentwicklung in Ihrer Straße. Hausverwaltung Meinhardt",
       },
       {
         id: "wt_wohnen_l03",
@@ -10815,6 +10861,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         level: "B1.1",
         format: "nachricht",
         words: 40,
+        source: "Hey, ich ziehe endlich in meine neue Wohnung und feiere am Samstag eine kleine Einweihungsparty ab 19 Uhr. Hast du Lust vorbeizukommen? Liebe Grüße, Ama",
       },
       {
         id: "wt_freizeit_s05",

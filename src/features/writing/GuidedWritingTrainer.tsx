@@ -446,6 +446,7 @@ export function GuidedWritingTrainer({
       addressee: task?.addressee,
       register: task?.register,
       words: task?.words,
+      source: task?.source,
     });
     setResult(res);
     setSubmitting(false);
@@ -526,6 +527,19 @@ export function GuidedWritingTrainer({
     revision: `${text}|${length}|${drawn?.theme}|${drawn?.ix}|${tooShort}|${pickerOpen}|${submitting}|${taskOpen}|${showCorrection}|${view}`,
   });
 
+  // Reply-task source text (s200 wave, variant A): the text the learner reacts
+  // to, rendered BEFORE the prompt, in the order the situation has (something
+  // arrives, then you answer it). Himmelblau tile, no visible edge, like the
+  // Aufgabe rails. Shared by the card and the pop-up, same as taskPoints.
+  const taskSource = task?.source ? (
+    <div className="space-y-1.5 rounded-xl border border-accent/20 bg-accent/20 p-3 shadow-soft dark:border-accent/10 dark:bg-accent/10">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        Text zur Aufgabe
+      </p>
+      <p className="text-[13.5px] leading-relaxed">{task.source}</p>
+    </div>
+  ) : null;
+
   // The Aufgabe's Adressat + Leitpunkte, shared by the card (capped, animated)
   // and the pop-up (never capped). Only tasks on the s167 schema carry them.
   const taskPoints = task?.points?.length ? (
@@ -560,6 +574,7 @@ export function GuidedWritingTrainer({
           </DialogTitle>
           <DialogDescription className="text-xs">{taskMeta}</DialogDescription>
         </DialogHeader>
+        {taskSource}
         <p className="text-sm leading-relaxed">{prompt}</p>
         {taskPoints && <div className="space-y-1.5">{taskPoints}</div>}
       </DialogContent>
@@ -686,6 +701,16 @@ export function GuidedWritingTrainer({
               writing field below its floor; the eyebrow + dice row above never
               scrolls away. */}
           <div ref={taskBodyRef} className="slim-scrollbar space-y-3">
+            {taskSource && (
+              <motion.div
+                key={`source|${drawn.theme}|${length}|${drawn.ix}`}
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15 }}
+              >
+                {taskSource}
+              </motion.div>
+            )}
             <motion.p
               key={`${drawn.theme}|${length}|${drawn.ix}`}
               initial={reduce ? false : { opacity: 0 }}
