@@ -2,7 +2,10 @@ import { supabase } from "@/lib/supabase";
 import { TURNSTILE_ENABLED, useAuthStore } from "@/store/useAuthStore";
 import { reportServerAllowance } from "@/lib/aiAllowance";
 import { redemittelCategories } from "@/data/redemittel";
+import { withTimeout } from "@/lib/utils";
 import type { ConversationBrief } from "@/types";
+
+const HISTORY_TIMEOUT_MS = 12_000;
 
 /** The model is sent the German label, not the raw enum id, so its verdict is
  *  about a thing a learner could actually do. */
@@ -211,13 +214,17 @@ export async function getSpeakingHistory(
   limit = 30,
 ): Promise<SpeakingHistoryEntry[] | null> {
   try {
-    const { data, error } = await supabase
-      .from("speaking_conversations")
-      .select(
-        "id, created_at, brief_id, exam, learner_text, corrected_text, goals_met, tip, tip_en, score",
-      )
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    const { data, error } = await withTimeout(
+      supabase
+        .from("speaking_conversations")
+        .select(
+          "id, created_at, brief_id, exam, learner_text, corrected_text, goals_met, tip, tip_en, score",
+        )
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      HISTORY_TIMEOUT_MS,
+      "getSpeakingHistory",
+    );
     if (error || !data) return null;
     return data as SpeakingHistoryEntry[];
   } catch {
