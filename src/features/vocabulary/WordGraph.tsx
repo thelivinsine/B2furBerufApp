@@ -24,14 +24,14 @@ import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
 import { frequencyBin } from "@/data/frequency";
 import { lifeAreaColor, lifeAreaOf, LIFE_AREAS, LIFE_AREA_COLORS } from "@/lib/graphPalette";
-import { buildWordGraph, type GraphNode } from "./wordGraph";
+import { buildWordGraph, type GraphNode } from "./wordGraphModel";
 import { SaveButton } from "./VocabViews";
 
 /**
  * The Wörter graph view (Bibliothek views, session 91): an Obsidian-style
  * force-directed map of the CURRENTLY FILTERED vocabulary. Node size = real
  * usage (wordfreq Zipf), node color = domain, links = authored `related`
- * terms + collocation pairs (see wordGraph.ts). Canvas-rendered so 642 nodes
+ * terms + collocation pairs (see wordGraphModel.ts). Canvas-rendered so 642 nodes
  * stay smooth on a phone; pinch/wheel zooms, drag pans (or moves a node),
  * tap selects a word and dims everything not connected to it.
  *

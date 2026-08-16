@@ -6733,3 +6733,33 @@ the backend, which the sandbox cannot reach. The founder verifies live.
   timeout" bullets left over in the session 210/212 handoffs. Appended this session's prompts here.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`
   · `docs/SESSION_PROMPT_LOG.md`.
+
+### Session 214 (2026-08-16, branch `fix/windows-case-collision-graph-helpers`)
+
+Local-environment session on the founder's Windows machine, run concurrently with session 213
+(PR #859); the branch/stash churn from that overlap is recorded in session 213's entries above.
+Condensed, one line per founder prompt:
+
+- *"clone the repo b2furberufapp locally"* → confirmed the folder already **is** the clone (remote
+  `thelivinsine/b2furberufapp`, on `main`); nothing to clone.
+- *"best practices working locally"* → gave the golden rules: branch/PR/merge never on `main`, pull
+  first, `pnpm build` green before push, pnpm-only, plain-English asks, founder verifies live.
+- *"explain the package.json change"* → the machine's global pnpm 11 had rewritten the
+  `packageManager` pin from `pnpm@10.33.0`; explained, recommended discarding.
+- *"update pnpm only if safe / do the analysis"* → verdict **not now**: pnpm 11 silently ignores the
+  `pnpm.overrides` react-router pin and risks the `.npmrc` guardrails. Reverted the file; ran
+  `corepack install` so the folder resolves to pinned v10 while global v11 stays elsewhere.
+- *"run pnpm install / build"* → install clean on v10; `pnpm build` exposed a Windows-only
+  case-collision (`WordGraph.tsx`/`wordGraph.ts`, `CollocationGraph.tsx`/`collocationGraph.ts`).
+- *"option B, scope it / yes"* → renamed the two lowercase helpers to `*Model.ts`, fixed 5 imports +
+  3 stale comments; build passes on Windows, graph tests pass. Mid-way the concurrent session stashed
+  and rebased this WIP (recovered).
+- *"is everything on main / the other session is done"* → confirmed PR #859 on `main`; this fix still
+  uncommitted. Landed it as its own PR after the other session closed.
+- *"document the session"* → this entry + the session 214 block in `PROJECT_STATUS.md`.
+
+- **Artifacts:** `src/features/vocabulary/wordGraphModel.ts` (renamed from `wordGraph.ts`) ·
+  `src/features/collocations/collocationGraphModel.ts` (renamed from `collocationGraph.ts`) ·
+  `src/features/vocabulary/WordGraph.tsx` · `src/features/collocations/CollocationGraph.tsx` ·
+  `tests/wordgraph.test.ts` · `tests/collocationGraph.test.ts` · `scripts/lint-content.mjs` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

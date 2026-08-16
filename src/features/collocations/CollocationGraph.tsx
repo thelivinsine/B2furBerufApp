@@ -18,12 +18,12 @@ import { EmptyState } from "@/components/shared/misc";
 import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
 import { lifeAreaColor, lifeAreaOf, LIFE_AREAS, LIFE_AREA_COLORS } from "@/lib/graphPalette";
-import { buildCollocationGraph, type CollocationNode } from "./collocationGraph";
+import { buildCollocationGraph, type CollocationNode } from "./collocationGraphModel";
 
 /**
  * The Kollokationen graph view (Bibliothek views): an Obsidian-style, canvas
  * force-directed map of the CURRENTLY FILTERED collocation bank as a bipartite
- * noun ↔ verb graph (see collocationGraph.ts). Built to shine when fully zoomed
+ * noun ↔ verb graph (see collocationGraphModel.ts). Built to shine when fully zoomed
  * out: nodes are pulled toward per-theme centroids so the themes form glowing
  * "islands", shared verbs settle between them as bridges, every node carries a
  * soft bloom, and edges are thin luminous arcs. Tap a node to see its partners.

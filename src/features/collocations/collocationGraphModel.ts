@@ -1,7 +1,7 @@
 import type { Collocation, VocabItem } from "@/types";
 import { themeById } from "@/data/themes";
 import { vocabulary } from "@/data/vocabulary";
-import { normalizeForm } from "../vocabulary/wordGraph";
+import { normalizeForm } from "../vocabulary/wordGraphModel";
 
 /**
  * Pure graph builder for the Kollokationen graph view (Bibliothek views).

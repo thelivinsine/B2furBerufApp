@@ -1491,7 +1491,7 @@ function lintVerifiedFingerprints(provenance, contentIndex) {
       warn(ds, id, `stale fingerprint (no longer review_status:verified) — re-run pnpm stamp:verified`);
 }
 
-/* Mirror of normalizeForm in src/features/vocabulary/wordGraph.ts — keep the
+/* Mirror of normalizeForm in src/features/vocabulary/wordGraphModel.ts — keep the
  * two in sync so the linter reports exactly the edges the graph would drop. */
 const RELATED_ARTICLE_RE = /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines)\s+/i;
 function normalizeForm(s) {
