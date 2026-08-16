@@ -25,6 +25,8 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
+import { renderToStaticMarkup } from "react-dom/server";
+import { createElement } from "react";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
@@ -139,8 +141,8 @@ function renderPage(template, { title, description, canonical, jsonLd, staticHtm
 
 /* ---------------------------------------------------------------- content */
 
-async function loadContent() {
-  const server = await createServer({
+async function createSsrServer() {
+  return createServer({
     root,
     configFile: path.join(root, "vite.config.ts"),
     logLevel: "error",
@@ -148,11 +150,6 @@ async function loadContent() {
     server: { middlewareMode: true, hmr: false },
     appType: "custom",
   });
-  try {
-    return await server.ssrLoadModule("/src/features/help/content.ts");
-  } finally {
-    await server.close();
-  }
 }
 
 function breadcrumbHtml(items) {
@@ -194,7 +191,10 @@ async function main() {
     process.exit(1);
   }
 
-  const { helpArticles, helpHub, helpCategories } = await loadContent();
+  const server = await createSsrServer();
+  const { helpArticles, helpHub, helpCategories } = await server.ssrLoadModule(
+    "/src/features/help/content.ts",
+  );
   const LANG = "de"; // prerender the German snapshot (binding/primary language)
 
   const written = [];
@@ -327,12 +327,60 @@ async function main() {
     written.push({ url: canonical, priority: "0.6", changefreq: "monthly" });
   }
 
+  /* ---- /privacy: a real 200 page, not the SPA's 404-redirect trick. Google's
+     OAuth consent-screen verifier (and other non-JS crawlers) fetch this URL
+     directly and never run the client router, so it needs actual content at
+     the real status code. Renders the SAME PrivacyDe component the app uses
+     (exported from PrivacyPolicy.tsx for this purpose), so there is no second
+     copy of the policy text. */
+  {
+    const { PrivacyDe } = await server.ssrLoadModule("/src/features/legal/PrivacyPolicy.tsx");
+    const { PRIVACY_LAST_UPDATED } = await server.ssrLoadModule("/src/lib/legalMeta.ts");
+    const canonical = `${ORIGIN}/privacy`;
+    const title = "Datenschutzerklärung";
+    const crumbs = [{ name: "Genauly", url: `${ORIGIN}/` }, { name: title, url: canonical }];
+
+    const staticHtml = staticShell({
+      title,
+      updated: PRIVACY_LAST_UPDATED.de,
+      breadcrumbHtml: breadcrumbHtml(crumbs),
+      bodyHtml: renderToStaticMarkup(createElement(PrivacyDe)),
+    });
+
+    const jsonLd = [
+      breadcrumbLd(crumbs),
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: title,
+        url: canonical,
+        inLanguage: "de",
+        isPartOf: { "@type": "WebSite", name: "Genauly", url: `${ORIGIN}/` },
+      },
+    ];
+
+    const html = renderPage(template, {
+      title: `${title} · Genauly`,
+      description: "Genauly Datenschutzerklärung: welche Daten wir erheben, warum, und deine Rechte.",
+      canonical,
+      jsonLd,
+      staticHtml,
+      ogType: "website",
+    });
+
+    const outDir = path.join(dist, "privacy");
+    await fs.mkdir(outDir, { recursive: true });
+    await fs.writeFile(path.join(outDir, "index.html"), html, "utf8");
+    written.push({ url: canonical, priority: "0.3", changefreq: "yearly" });
+  }
+
+  await server.close();
+
   /* ---- regenerate sitemap.xml (public marketing/legal routes + help) ---- */
   const staticRoutes = [
     { url: `${ORIGIN}/`, priority: "1.0", changefreq: "weekly" },
     { url: `${ORIGIN}/about`, priority: "0.7", changefreq: "monthly" },
     { url: `${ORIGIN}/sources`, priority: "0.4", changefreq: "monthly" },
-    { url: `${ORIGIN}/privacy`, priority: "0.3", changefreq: "yearly" },
     { url: `${ORIGIN}/terms`, priority: "0.3", changefreq: "yearly" },
   ];
   const urls = [...staticRoutes, ...written]

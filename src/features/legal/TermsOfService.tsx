@@ -5,7 +5,7 @@ const LAST_UPDATED: Record<Lang, string> = {
   de: "8. Juni 2026",
   en: "8 June 2026",
 };
-const CONTACT_EMAIL = "thelivinsine@gmail.com";
+const CONTACT_EMAIL = "hello@genauly.de";
 
 /**
  * Standalone /terms route (outside AppShell, like /privacy). Plain-language
