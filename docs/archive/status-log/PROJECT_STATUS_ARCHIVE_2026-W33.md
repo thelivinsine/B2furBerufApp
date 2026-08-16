@@ -3,6 +3,41 @@
 Archived from `docs/PROJECT_STATUS.md` on 2026-08-13 (session 211), which keeps only the two
 most recent session logs and handoffs.
 
+**Session 215 (2026-08-16, no branch — dashboard-only work on Resend + Namecheap + Supabase): auth
+emails now send from `hello@genauly.de` via Resend instead of Supabase's rate-limited built-in
+sender.** Founder walked through `docs/reference/auth-emails/README.md` step 1 live, guided prompt
+by prompt; no code changed.
+- **Namecheap DNS:** added Resend's DKIM/SPF/return-path records under Advanced DNS, plus an MX
+  record on host `send` (needed "Mail Settings" switched to **Custom MX** first before Namecheap's
+  Advanced DNS "Add Record" Type dropdown even offered "MX Record" — not obvious from the UI).
+  Founder also set up Namecheap Private Email (`hello@genauly.de` mailbox) on the already-purchased
+  plan; confirmed no conflict since Private Email's MX lands on `@` and Resend's is on `send`.
+- **Resend:** domain `genauly.de` verified (after DNS propagated — first check showed "Not started",
+  resolved by re-running Verify once records had propagated). Created a **Sending**-scope API key
+  (not Full access — least privilege, SMTP send is all this needs).
+- **Supabase → Authentication → SMTP Settings:** Custom SMTP enabled with `smtp.resend.com:465`,
+  username `resend`, password = the Resend API key, sender `hello@genauly.de` / `Genauly`. First
+  live test failed with "Error sending confirmation email" because the Resend domain wasn't verified
+  yet; retried after verification and it worked. **Confirmed live:** the confirmation email now
+  arrives from `Genauly <hello@genauly.de>` with no Supabase branding.
+- **Five bugs surfaced by that live testing, still unfixed as of session 217 (full detail carried
+  forward in `PROJECT_STATUS.md`'s "Resume here", since none are fixed yet):** the confirmation link
+  doesn't complete sign-in automatically; a second manual login drops back to the landing page
+  instead of the app; onboarding re-shows the pre-checked AGB/Datenschutz consent checkbox; the
+  original tab crashes to "Kurz nicht erreichbar" when the link opens in a new tab; a freshly
+  confirmed account skips onboarding and lands straight on Spielplatz. Session 217 built password
+  reset/change instead (a separate, adjacent gap found while scoping a founder request); these five
+  remain the next priority.
+- **Still open from the README:** step 2 (paste the branded `confirm-signup.html` /
+  `reset-password.html` templates into Supabase → Authentication → Emails) and raising Supabase's
+  "Emails per hour" rate limit now that a real sender is configured. `reset-password.html`'s link
+  shape changed in session 217 (now spells out `type=recovery` explicitly); paste the CURRENT version
+  when doing this step.
+- **Artifacts:** Namecheap Advanced DNS (`genauly.de`) · Namecheap Private Email (`hello@genauly.de`
+  mailbox) · Resend (domain + API key) · Supabase Auth SMTP Settings · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 213 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md`.
+
 **Session 214 (2026-08-16, branch `fix/windows-case-collision-graph-helpers`): the repo now builds
 on the founder's Windows laptop.** No app behavior changed; this was local tooling + a
 build-portability fix. Ran concurrently with session 213 (PR #859) in the same working tree, which

@@ -56,15 +56,20 @@ save. Subject lines are set in the same screen.
 | Confirm signup | `confirm-signup.html` | `Bestätige deine E-Mail` |
 | Reset password | `reset-password.html` | `Neues Passwort für Genauly` |
 
-Leave `{{ .ConfirmationURL }}` exactly as it is: Supabase substitutes the real link there.
+Leave `{{ .ConfirmationURL }}` exactly as it is in `confirm-signup.html`: Supabase substitutes the
+real link there. `reset-password.html` is the one exception: it spells out
+`{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` instead, so the app can tell a
+password-reset link apart from a signup link by its `type` param. Leave that one as it is too.
 
 ## What the app does with the link
 
 The link lands on **`/auth/confirm`** (`src/features/auth/ConfirmEmail.tsx`), which completes the
 sign-in and drops the learner into the app. The app pins that landing page itself, through
-`emailRedirectTo` in `src/store/useAuthStore.ts`, so it does not depend on the project's Site URL
-being right. It accepts every shape a Supabase confirmation link can arrive in, so the flow works
-whether or not these templates have been pasted yet.
+`emailRedirectTo` (signup) / `redirectTo` (reset) in `src/store/useAuthStore.ts`, so it does not
+depend on the project's Site URL being right. It accepts every shape a Supabase confirmation link
+can arrive in, so the flow works whether or not these templates have been pasted yet. A **reset**
+link (`type=recovery`) does not drop the learner into the app: it shows a "set a new password" form
+in place, then hands over to the app once the password is saved.
 
 One thing that DOES still have to be right in the dashboard: **Authentication → URL Configuration →
 Redirect URLs** must allow `https://genauly.de/**`, or Supabase refuses the redirect target. The

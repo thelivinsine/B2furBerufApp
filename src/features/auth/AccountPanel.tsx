@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Cloud, CloudOff, CloudAlert, LogOut, RefreshCw, UserCircle2 } from "lucide-react";
-import { useAuthStore } from "@/store/useAuthStore";
+import { hasPasswordIdentity, useAuthStore } from "@/store/useAuthStore";
 import { retryCloudSync } from "@/lib/cloudSync";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
+import { NewPasswordForm } from "@/features/auth/NewPasswordForm";
+import { useSessionStore } from "@/store/useSessionStore";
 import { useT, useTx, useUiLang, type UiLang } from "@/lib/uiLang";
 
 const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
@@ -35,9 +37,12 @@ export function AccountPanel() {
   const [intent, setIntent] = useState<AuthIntent>("signup");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const showToast = useSessionStore((s) => s.showToast);
   const t = useT();
   const tx = useTx();
   const lang = useUiLang();
+  const canChangePassword = hasPasswordIdentity(user);
 
   const syncing = status === "anonymous" || status === "signedIn";
   const failing = syncing && syncHealth === "failing";
@@ -113,6 +118,44 @@ export function AccountPanel() {
                 : "Erstelle ein Konto, um deinen Fortschritt geräteübergreifend zu sichern. Kein Konto nötig – du kannst auch als Gast weitermachen.",
             )}
           </p>
+        )}
+
+        {status === "signedIn" && (
+          <div className="border-t border-border pt-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">
+                  {t(canChangePassword ? "Passwort ändern" : "Passwort festlegen")}
+                </p>
+                {!canChangePassword && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("Melde dich künftig auch mit E-Mail und Passwort an.")}
+                  </p>
+                )}
+              </div>
+              {!changingPassword && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() => setChangingPassword(true)}
+                >
+                  {t(canChangePassword ? "Ändern" : "Festlegen")}
+                </Button>
+              )}
+            </div>
+            {changingPassword && (
+              <div className="mt-3">
+                <NewPasswordForm
+                  submitLabel={t(canChangePassword ? "Passwort ändern" : "Passwort festlegen")}
+                  onDone={() => {
+                    setChangingPassword(false);
+                    showToast("Passwort gespeichert.", "success");
+                  }}
+                />
+              </div>
+            )}
+          </div>
         )}
 
         <div className="flex flex-wrap gap-2 border-t border-border pt-3">

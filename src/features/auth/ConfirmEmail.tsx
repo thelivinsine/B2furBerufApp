@@ -9,6 +9,7 @@ import { AUTH_CALLBACK } from "@/lib/authCallback";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSessionStore } from "@/store/useSessionStore";
+import { NewPasswordForm } from "@/features/auth/NewPasswordForm";
 
 /**
  * Landing page for the "Bestätige deine E-Mail" link (`/auth/confirm`).
@@ -30,7 +31,7 @@ import { useSessionStore } from "@/store/useSessionStore";
  *
  * Whatever happens, the learner sees a plain answer instead of a silent bounce.
  */
-type Phase = "working" | "done" | "failed";
+type Phase = "working" | "done" | "failed" | "recovery";
 
 export function ConfirmEmail() {
   const t = useT();
@@ -47,6 +48,18 @@ export function ConfirmEmail() {
     ran.current = true;
 
     const finish = (ok: boolean, message?: string) => {
+      // A recovery link verifies exactly like a signup link (same `verifyOtp`
+      // / `setSession` / `getSession` calls above), so the branch happens
+      // here, after success, not in the shape-detection above. `AUTH_CALLBACK
+      // .type` catches shapes 1 and 3 (both carry `type=recovery`); the store
+      // flag catches shape 2 (`?code=`), where supabase-js already consumed
+      // the code and fired `PASSWORD_RECOVERY` before this component mounted.
+      const recovery =
+        ok && (AUTH_CALLBACK.type === "recovery" || useAuthStore.getState().passwordRecovery);
+      if (recovery) {
+        setPhase("recovery");
+        return;
+      }
       setPhase(ok ? "done" : "failed");
       setDetail(message ?? null);
       if (ok) {
@@ -115,6 +128,24 @@ export function ConfirmEmail() {
             <CheckCircle2 className="mx-auto mb-4 h-8 w-8 text-success" />
             <h1 className="text-lg font-semibold text-foreground">{t("Bestätigt")}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{t("Es geht gleich weiter.")}</p>
+          </>
+        )}
+
+        {phase === "recovery" && (
+          <>
+            <h1 className="text-lg font-semibold text-foreground">{t("Neues Passwort setzen")}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("Leg ein neues Passwort für dein Konto fest.")}
+            </p>
+            <div className="mt-5 text-left">
+              <NewPasswordForm
+                submitLabel={t("Passwort speichern")}
+                onDone={() => {
+                  showToast("Passwort gespeichert.", "success");
+                  navigate("/", { replace: true });
+                }}
+              />
+            </div>
           </>
         )}
 

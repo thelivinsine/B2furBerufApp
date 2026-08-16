@@ -52,6 +52,13 @@ interface AuthState {
   /** Epoch ms of the last push that landed, for the Settings status line. */
   lastSyncedAt: number | null;
   error: string | null;
+  /**
+   * Set once Supabase fires the `PASSWORD_RECOVERY` auth event. This is the
+   * shape-independent signal that a session came from a "reset password"
+   * link, so `/auth/confirm` can show the set-password form regardless of
+   * whether the link arrived as `?token_hash=`, `?code=`, or `#access_token=`.
+   */
+  passwordRecovery: boolean;
 
   init: () => void;
   signInAsGuest: (captchaToken?: string) => Promise<void>;
@@ -65,6 +72,16 @@ interface AuthState {
   signIn: (email: string, password: string, captchaToken?: string) => Promise<AuthOutcome>;
   /** Send the confirmation mail again (link expired, never arrived, wrong tab). */
   resendConfirmation: (email: string) => Promise<boolean>;
+  /**
+   * Request a "reset your password" email. Returns `true` for any non-error
+   * response: Supabase deliberately answers an unknown address the same way
+   * it answers a real one (no account enumeration), so the caller must show
+   * one neutral message for both and never claim "we sent it" specifically.
+   */
+  sendPasswordReset: (email: string, captchaToken?: string) => Promise<boolean>;
+  /** Set a new password on the current session (a recovery session from a
+   *  reset link, or a normal signed-in session changing/adding one). */
+  setPassword: (password: string) => Promise<boolean>;
   /** One-click sign-in via Google OAuth (redirect flow). */
   signInWithGoogle: (captchaToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -78,6 +95,13 @@ interface AuthState {
 function statusFor(user: User | null): AuthStatus {
   if (!user) return "signedOut";
   return user.is_anonymous ? "anonymous" : "signedIn";
+}
+
+/** Does this account have an email+password identity, or is it Google-only? */
+export function hasPasswordIdentity(user: User | null): boolean {
+  if (!user) return false;
+  if (user.identities?.some((i) => i.provider === "email")) return true;
+  return user.app_metadata?.providers?.includes("email") ?? false;
 }
 
 /** Turn common Supabase auth errors into friendly German copy. */
@@ -103,6 +127,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   syncHealth: "unknown",
   lastSyncedAt: null,
   error: null,
+  passwordRecovery: false,
 
   init: () => {
     if (initialised) return;
@@ -117,10 +142,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       })
       .catch(() => set({ status: "signedOut" }));
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
       const prevId = get().user?.id;
       const user = session?.user ?? null;
-      set({ session, user, status: statusFor(user) });
+      set({
+        session,
+        user,
+        status: statusFor(user),
+        ...(event === "PASSWORD_RECOVERY" ? { passwordRecovery: true } : {}),
+      });
       if (user && user.id !== prevId) startCloudSync(user.id);
       if (!user) stopCloudSync();
     });
@@ -217,6 +247,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return !error;
   },
 
+  sendPasswordReset: async (email, captchaToken) => {
+    set({ busy: true, error: null });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: confirmRedirectUrl(),
+      ...(captchaToken ? { captchaToken } : {}),
+    });
+    set({ busy: false });
+    // A real failure (rate limit, captcha) surfaces here. An unknown address
+    // does NOT: Supabase answers it identically to a known one on purpose.
+    if (error) set({ error: friendlyError(error.message) });
+    return !error;
+  },
+
+  setPassword: async (password) => {
+    set({ busy: true, error: null });
+    const { error } = await supabase.auth.updateUser({ password });
+    set({
+      busy: false,
+      error: error ? friendlyError(error.message) : null,
+      ...(error ? {} : { passwordRecovery: false }),
+    });
+    return !error;
+  },
+
   signInWithGoogle: async (captchaToken) => {
     set({ busy: true, error: null });
     const { error } = await supabase.auth.signInWithOAuth({
@@ -242,7 +296,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // shared device never sees (or merges in) this account's progress/profile.
     clearLocalAccountData();
     await supabase.auth.signOut();
-    set({ busy: false, session: null, user: null, status: "signedOut" });
+    set({ busy: false, session: null, user: null, status: "signedOut", passwordRecovery: false });
   },
 
   deleteAccount: async () => {
@@ -277,7 +331,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       /* token is already invalid post-deletion; ignore */
     }
-    set({ busy: false, session: null, user: null, status: "signedOut" });
+    set({ busy: false, session: null, user: null, status: "signedOut", passwordRecovery: false });
     return true;
   },
 

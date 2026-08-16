@@ -6870,3 +6870,72 @@ code touched. Condensed, one line per founder prompt:
   gate expects). Bug counts corrected from "four" to "five" throughout the file. Docs only, no PR
   needed (no code change).
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 217 (branch `password-reset-flow`)
+
+### Prompt 1 (2026-08-16)
+
+> the settings page doesn't seem to have a reset password option - scope it
+
+- **Response summary:** Explored Settings (`src/features/settings/Settings.tsx` +
+  `AccountPanel.tsx`), auth (`useAuthStore.ts`), and `/auth/confirm` (`ConfirmEmail.tsx`). Found the
+  missing Settings row was the smaller half of a bigger gap: the app is fully password-based
+  (`signInWithPassword`) but had no `resetPasswordForEmail` call anywhere, no "Passwort vergessen?"
+  link, and no set-password screen — a learner who forgot their password had no way back in.
+  `ConfirmEmail.tsx` already passed `type=recovery` into `verifyOtp` correctly but then dropped the
+  learner into the app with nowhere to set a password, and the branded reset-email template existed
+  but had never been pasted into Supabase. Asked the founder two scoping questions via
+  AskUserQuestion: (1) build both the forgot-password flow and the Settings row, or just one —
+  founder chose **both**; (2) what a Google-only account's Settings row should do — founder chose
+  **"Passwort festlegen"**, letting a Google user add a password as a second sign-in method rather
+  than hiding the row. Wrote the plan to
+  `~/.claude/plans/the-settings-page-doesn-t-majestic-wigderson.md` (store additions, a shared
+  `NewPasswordForm`, a recovery branch in `ConfirmEmail.tsx` reusing the existing unguarded route
+  instead of a new one, the Settings row, the "Passwort vergessen?" link, uiStrings, the email
+  template change, one small test) and got founder approval via ExitPlanMode.
+- **Artifacts:** plan file only, no code yet.
+
+### Prompt 2 (2026-08-16)
+
+> continue where you left off
+
+- **Response summary:** Continued post-approval research (reading `authCallback.ts`, the router's
+  `/auth/confirm` route, the reset-password email template + its README) to confirm the exact
+  mechanics before writing code.
+- **Artifacts:** none (research only).
+
+### Prompt 3 (2026-08-16)
+
+> continue implementing the plan
+
+- **Response summary:** Implemented the full plan: `sendPasswordReset`/`setPassword`/
+  `passwordRecovery`/`hasPasswordIdentity` in `useAuthStore.ts`; new `NewPasswordForm.tsx`; the
+  recovery branch in `ConfirmEmail.tsx`; the "Passwort ändern"/"Passwort festlegen" row in
+  `AccountPanel.tsx`; the "Passwort vergessen?" link + neutral reset-pending panel in
+  `AuthDialog.tsx` (copy deliberately never confirms whether an address has an account, matching
+  Supabase's own anti-enumeration behavior); fixed `SaveProgressBanner.tsx`'s stale "Kein Passwort
+  nötig." copy; added every new string to `uiStrings.ts`; changed `reset-password.html`'s link to
+  spell out `type=recovery` explicitly and updated its README; added `tests/authPassword.test.ts`.
+  Ran the full gate: `pnpm typecheck`, `pnpm lint` (0 errors), `pnpm test:unit` (740 passed),
+  `pnpm build`, `pnpm check:bundle` — all clean.
+- **Artifacts:** `src/store/useAuthStore.ts` · `src/features/auth/NewPasswordForm.tsx` (new) ·
+  `src/features/auth/ConfirmEmail.tsx` · `src/features/auth/AccountPanel.tsx` ·
+  `src/features/auth/AuthDialog.tsx` · `src/features/auth/SaveProgressBanner.tsx` ·
+  `src/lib/uiStrings.ts` · `docs/reference/auth-emails/reset-password.html` + `README.md` ·
+  `tests/authPassword.test.ts`.
+
+### Prompt 4 (2026-08-16)
+
+> once done - document the session and merge everything live
+
+- **Response summary:** Documented this entry plus the session 217 block in `PROJECT_STATUS.md`,
+  archiving session 215's narrative block into
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (its bug list stays live in the
+  current file's "Resume here", since none of it is fixed yet) to keep the live file to its
+  two-most-recent-handoffs rule. Opened a PR into `main` and squash-merged it per the standing
+  auto-ship rule. **Caveat:** this session did NOT fix the five session-215 auth/onboarding bugs
+  (confirmation-link sign-in, double login, re-shown consent checkbox, new-tab crash, skipped
+  onboarding) — those remain open and are unrelated to the password-reset/change feature built here.
+- **Artifacts:** `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 215 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md` · PR into `main`.

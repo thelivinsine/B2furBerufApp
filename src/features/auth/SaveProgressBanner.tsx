@@ -59,7 +59,7 @@ export function SaveProgressBanner({
                 </button>
               </div>
               <p className="mt-2 text-xs leading-snug text-muted-foreground">
-                {t("Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.")}
+                {t("Melde dich an, um auf allen Geräten weiterzulernen.")}
               </p>
               <Button
                 size="sm"
@@ -83,7 +83,7 @@ export function SaveProgressBanner({
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{t("Sichere deinen Fortschritt")}</p>
                 <p className="text-xs text-muted-foreground">
-                  {t("Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.")}
+                  {t("Melde dich an, um auf allen Geräten weiterzulernen.")}
                 </p>
               </div>
               <Button size="sm" variant="gradient" onClick={() => setAuthOpen(true)}>

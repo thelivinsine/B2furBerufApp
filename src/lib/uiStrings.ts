@@ -73,9 +73,29 @@ export const UI_EN: Record<string, string> = {
     "Create an account to keep your progress across devices. No account needed, you can also carry on as a guest.",
   "Als Gast fortfahren": "Continue as guest",
   "Sichere deinen Fortschritt": "Save your progress",
-  "Melde dich an, um auf allen Geräten weiterzulernen. Kein Passwort nötig.":
-    "Sign in to keep learning on all your devices. No password needed.",
+  "Melde dich an, um auf allen Geräten weiterzulernen.":
+    "Sign in to keep learning on all your devices.",
   "Hinweis schließen": "Dismiss",
+
+  /* ----------------------------------------------------------- password --- */
+  Passwort: "Password",
+  "Passwort ändern": "Change password",
+  "Passwort festlegen": "Set password",
+  "Melde dich künftig auch mit E-Mail und Passwort an.": "Sign in with email and password too, from now on.",
+  Ändern: "Change",
+  Festlegen: "Set",
+  "Mindestens 6 Zeichen": "At least 6 characters",
+  "Passwort verbergen": "Hide password",
+  "Passwort anzeigen": "Show password",
+  "Passwort vergessen?": "Forgot password?",
+  "Zurück zur Anmeldung": "Back to sign in",
+  "Wenn es ein Konto mit dieser Adresse gibt, ist ein Link unterwegs.":
+    "If an account exists for that address, a link is on its way.",
+  "Passwort zurücksetzen": "Reset password",
+  "Schau in dein Postfach.": "Check your inbox.",
+  "Neues Passwort setzen": "Set a new password",
+  "Leg ein neues Passwort für dein Konto fest.": "Set a new password for your account.",
+  "Passwort speichern": "Save password",
 
   /* --------------------------------------------------------- onboarding --- */
   "Wofür lernst du Deutsch?": "What are you learning German for?",
