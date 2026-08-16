@@ -160,6 +160,11 @@ reviewable offline.
 | `reports/security-review-2026-07-14.md` | Whole-app security review (s115). | one-off (s115) |
 | `reports/jury-review.json` | AI-jury tier sidecar consumed by `pnpm build:verification`. | hand-appended per review wave |
 | `reports/verified-hashes.json` | Content-fingerprint stamps for verified provenance rows (the tamper gate). | `pnpm stamp:verified` |
+| `reports/security-audit-2026-07-27.md` | Full-surface security review: bundle, Edge Functions, migrations/RLS, CI. | one-off (s174) |
+| `reports/db-architecture-audit-2026-08-04.md` | Database architecture audit; four fixes shipped, 2-year retention window chosen. | one-off (s185) |
+| `reports/pruefung-audit-2026-08-05.md` | Prüfung hub audit; all findings (P1-P35) shipped same session. | one-off (s194) |
+| `reports/writing-tasks-audit-2026-08-07.md` | Writing-task quality/Niveau-honesty/filter-fit audit behind the s199/s200 fixes. | one-off (s199) |
+| `reports/review-defects.md` (+ `.json`) | Review-Fehlerliste generated from founder review decisions. | `pnpm apply:reviews` |
 
 ## `archive/` — historical / superseded
 
@@ -187,6 +192,7 @@ reviewable offline.
 | `reference/SECURITY_AUDIT_PLAN.pdf` | Full security audit + remediation plan behind `strategy/SECURITY.md`. | 📎 Reference (binary) |
 | `reference/TAXONOMY_REDESIGN.pptx` | Slide version of the taxonomy deck. | 📎 Reference (binary) |
 | `reference/prompt-log-raw.jsonl` | Raw prompt capture from the old `UserPromptSubmit` auto-logging hook (removed 2026-06-25). **Frozen/superseded** by `SESSION_PROMPT_LOG.md`; a historical raw artifact, not maintained. | 🧊 Frozen |
+| `reference/auth-emails/` | Branded Supabase auth-email templates (`confirm-signup.html`, `reset-password.html`) + a README on pasting them into Supabase and the sender-domain setup. | 🟢 Live runbook |
 
 ## Documentation best practices
 
