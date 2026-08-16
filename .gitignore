@@ -16,3 +16,6 @@ scripts/vendor/lt-lib/
 scripts/vendor/.lt-pom/
 scripts/vendor/.lt-tmp/
 scripts/vendor/.freq-tmp/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
