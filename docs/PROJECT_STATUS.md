@@ -1,10 +1,50 @@
 # Project Status
 
-_Last updated: 2026-08-16 (session 217, branch `password-reset-flow`: built password reset + change,
-a gap found while scoping a founder request about the Settings page. Session 216 made the GitHub
-repo private, dashboard-only, no code changed.
-Sessions 209-215 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
+_Last updated: 2026-08-16 (session 219, no branch: found `genauly.de` fully offline — GitHub Pages
+had silently disabled itself when session 216 made the repo private (Free-plan Pages needs a public
+repo) — made the repo public again, re-enabled Pages, and prerendered a real `/privacy` page so
+Google's OAuth consent-screen crawler (which doesn't run JS) gets a 200 instead of the SPA's
+404-redirect trick. Session 217, branch `password-reset-flow`: built password reset + change, a gap
+found while scoping a founder request about the Settings page.
+Sessions 209-216 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
 sessions 204-208 in the `W32` file beside it. All handoffs under their own "Resume here")._
+
+**Session 219 (2026-08-16, no branch): `genauly.de` was completely down — 404 on every route —
+because GitHub Pages silently disabled itself when session 216 made the repo private.** Founder
+asked for the Google OAuth consent-screen logo-update link, then shared Google's verification
+failure list (home page unresponsive, no privacy link, privacy URL unresponsive/same-as-home, app
+name mismatch). All of those traced back to one cause: `GET /repos/.../pages` was 404'ing and the
+last three "Deploy site to GitHub Pages" runs had failed with "Get Pages site failed" — Pages
+requires a public repo on the Free plan, so it turned itself off the moment session 216 flipped
+visibility (that session's docs entry wrongly assumed Pages survives on any plan; corrected in the
+archive). Fix, done live with the founder across several steps: repo back to public → re-enable
+Pages (Settings → Pages → Source: GitHub Actions) → re-ran the latest deploy workflow → set the
+custom domain `genauly.de` in Settings → Pages (DNS was already pointed correctly from earlier
+Namecheap work, so it verified immediately). `genauly.de` now returns 200.
+That fixed the home page, but `/privacy` still 404'd: it's the standard `spa-github-pages`
+redirect trick (a direct hit to any non-root path gets GitHub's real 404 response, which then
+JS-redirects into the SPA) — fine for a browser, but Google's automated checker does a plain HTTP
+GET and never runs the JS. Extended the existing `/hilfe` prerender step
+(`scripts/prerender-help.mjs`, previously help-only) to also render `/privacy` as a real static
+`dist/privacy/index.html` at build time: exported `PrivacyDe`/`PrivacyEn` from `PrivacyPolicy.tsx`
+(no router/hook dependencies, so they render standalone) and used `react-dom/server`'s
+`renderToStaticMarkup` on `PrivacyDe`, so the policy text has exactly one source, not a duplicated
+copy for crawlers. Also, per founder request, swapped the placeholder contact address
+(`thelivinsine@gmail.com`) for `hello@genauly.de` across `PrivacyPolicy.tsx`, `TermsOfService.tsx`,
+and `Impressum.tsx`, and filled the two `[Vollständiger Name]`/`[Full name]` operator-name
+placeholders in `Impressum.tsx` with "Suhas Pala" (the postal-address placeholders are still
+unfilled — the Impressum is not §5-TMG-compliant until the founder supplies a real address).
+- **Resume here:** founder still needs to (1) re-submit the Google OAuth consent screen for
+  verification now that the site and `/privacy` both actually respond, and (2) supply a real postal
+  address for `Impressum.tsx` (see the bracketed placeholders) — required for German legal
+  compliance, separate from the Google issue.
+- **Gates run clean:** `pnpm typecheck` · `pnpm lint:content` · `pnpm build` (prerender step
+  confirmed writing `dist/privacy/index.html` with the new email baked in).
+- **Artifacts:** `scripts/prerender-help.mjs` · `src/features/legal/PrivacyPolicy.tsx` ·
+  `src/features/legal/TermsOfService.tsx` · `src/features/legal/Impressum.tsx` ·
+  `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 216 archived off, corrected)
+  · `docs/SESSION_PROMPT_LOG.md`.
 
 **Session 217 (2026-08-16, branch `password-reset-flow`): learners can now reset a forgotten
 password and signed-in learners can change (or, for Google-only accounts, set) one from Settings.**
@@ -49,15 +89,6 @@ permanently locked out. Both gaps share one shared form, so both were built toge
   `tests/authPassword.test.ts` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 215 archived off) ·
   `docs/SESSION_PROMPT_LOG.md`.
-
-**Session 216 (2026-08-16, no branch — GitHub repo settings only): the repo is now private.**
-Founder asked whether flipping visibility carried any risk. Checked git history for committed
-secrets (none: no `.env`/`.env.local` ever committed, Supabase credentials live only in GitHub
-Actions secrets) and confirmed GitHub Pages still publishes from a private repo on any plan
-(stopped being Pro-only in 2021), so `genauly.de` is unaffected. Founder flipped visibility to
-private via GitHub Settings themselves. No code changed; nothing to merge.
-- **Resume here:** nothing outstanding from this session. Next session should pick up the five
-  auth/onboarding bugs from session 215's handoff below, still unfixed.
 
 ## Where things stand
 
@@ -113,14 +144,14 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       "Passwort ändern" round-trip while signed in, and (if a Google account exists) "Passwort
       festlegen" from a Google-only sign-in.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
-- [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
-      The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
-      now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
-      Founder re-submitted via Google Cloud Console → OAuth consent screen → "I have fixed the issues."
-      Google's async re-review takes hours to days; wait for an email from Google's Trust and Safety
-      team. **Do NOT re-click "I have fixed the issues" again while waiting.** If issues remain,
-      escalate via the Google Developer forums with the raw-HTML evidence (visible in
-      `view-source:https://genauly.de`).
+- [ ] **Google sign-in branding verification — needs re-submitting (s219).** Google's last review
+      failed because `genauly.de` was completely offline (session 216 made the repo private, which
+      silently disabled GitHub Pages) and `/privacy` 404'd even once the site came back (the SPA's
+      GitHub Pages redirect trick returns a real 404 status to non-JS crawlers). Both are fixed now:
+      the site is live and `/privacy` is a real prerendered 200 page (s219). Founder still needs to
+      re-submit via Google Cloud Console → OAuth consent screen → "I have fixed the issues." **Do
+      NOT re-click that button more than once per fix** — Google's async re-review takes hours to
+      days; wait for their email before re-submitting again.
 
 ## Resume here (next session)
 

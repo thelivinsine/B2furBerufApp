@@ -2,7 +2,7 @@ import { useState } from "react";
 import { LegalChrome, Section, type Lang } from "./LegalChrome";
 import { PRIVACY_LAST_UPDATED as LAST_UPDATED } from "@/lib/legalMeta";
 
-const CONTACT_EMAIL = "thelivinsine@gmail.com";
+const CONTACT_EMAIL = "hello@genauly.de";
 
 /**
  * Standalone /privacy route (outside AppShell, like LandingPage). Plain-
@@ -35,7 +35,9 @@ function MailLink() {
   );
 }
 
-function PrivacyDe() {
+// Exported so scripts/prerender-help.mjs can render real static HTML for the
+// /privacy route (no router/hook deps here, unlike LegalChrome).
+export function PrivacyDe() {
   return (
     <>
       <Section title="Überblick">
@@ -299,7 +301,7 @@ function PrivacyDe() {
   );
 }
 
-function PrivacyEn() {
+export function PrivacyEn() {
   return (
     <>
       <Section title="Overview">

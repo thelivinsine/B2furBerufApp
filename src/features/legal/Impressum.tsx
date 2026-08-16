@@ -5,15 +5,16 @@ const LAST_UPDATED: Record<Lang, string> = {
   de: "8. Juni 2026",
   en: "8 June 2026",
 };
-const CONTACT_EMAIL = "thelivinsine@gmail.com";
+const CONTACT_EMAIL = "hello@genauly.de";
+const OPERATOR_NAME = "Suhas Pala";
 
 /**
  * Standalone /impressum route (outside AppShell, like /privacy and /terms).
  * Legal disclosure required for a commercial German site (§ 5 TMG / § 18 MStV).
  *
- * IMPORTANT: the bracketed placeholders below MUST be replaced with the real
- * operator name and a reachable postal address before public launch. An
- * Impressum with placeholder details is itself non-compliant.
+ * IMPORTANT: the bracketed placeholders below MUST be replaced with a
+ * reachable postal address before public launch. An Impressum with
+ * placeholder details is itself non-compliant.
  */
 export function Impressum() {
   const [lang, setLang] = useState<Lang>("de");
@@ -43,7 +44,7 @@ function ImpressumDe() {
     <>
       <Section title="Angaben gemäß § 5 TMG">
         <p>
-          [Vollständiger Name des Betreibers]
+          {OPERATOR_NAME}
           <br />
           [Straße und Hausnummer]
           <br />
@@ -63,7 +64,7 @@ function ImpressumDe() {
 
       <Section title="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV">
         <p>
-          [Vollständiger Name]
+          {OPERATOR_NAME}
           <br />
           [Anschrift wie oben]
         </p>
@@ -102,7 +103,7 @@ function ImpressumEn() {
     <>
       <Section title="Information pursuant to § 5 TMG">
         <p>
-          [Full name of the operator]
+          {OPERATOR_NAME}
           <br />
           [Street and number]
           <br />
@@ -122,7 +123,7 @@ function ImpressumEn() {
 
       <Section title="Responsible for content under § 18 (2) MStV">
         <p>
-          [Full name]
+          {OPERATOR_NAME}
           <br />
           [Address as above]
         </p>

@@ -69,8 +69,11 @@ area, and update it in the same PR as any rule change (history goes to `DECISION
 | `areas/CONTENT.md` | Content banks, schemas, taxonomy, linter checklist, provenance (pair with the `/content` skill) |
 | `areas/BIBLIOTHEK.md` | The `/library` tabs, views, graphs, FilterRail, search, Grammatik lessons |
 | `areas/SESSION.md` | The composed session engine, Üben auto-variety, focus mode, SRS engines |
+| `areas/PRUEFUNG.md` | The `/anwenden` zone: tabs, choosers, the run + deadline clock, Modelltest budget |
 | `areas/SCHREIBEN.md` | `/writing` Fokus/Kurz/Lang, rails, correction card, umlaut keys, AI cascade |
+| `areas/SPRECHEN.md` | The AI conversation partner: brief/conversation/debrief shape, layouts, Redemittel rail |
 | `areas/PRAKTISCH-NAV.md` | Dashboard Üben/Spielen, the locked bottom tab bar, header, feedback pill |
+| `areas/UI-LANGUAGE.md` | The A2/B1-English rule, the `t()` mechanism, what is converted and what is not |
 | `areas/GAME.md` | The Neuland layer: missions-as-data, scenes/sprites, pixel rules, hub surfaces |
 | `areas/BRAND.md` | Logo/wordmark rules, icons/favicons, theme tokens, dialog overlay convention |
 | `areas/LEGAL-ADMIN.md` | Legal pages, consent, GDPR self-service, `/sources`, the admin center |
@@ -109,6 +112,11 @@ too and keep them current-state-only.
 | File | What it is | Status |
 |---|---|---|
 | `plans/PHASE2_SETUP.md` | Founder checklist/runbook to switch on the Supabase backend + deploy the Edge Functions. | 🟢 Live runbook |
+| `plans/ADMIN_CONTROL_CENTER_PLAN.md` | Admin Control Center scoping report: four-expert panel + founder-resolved decisions on scope. | ✅ Complete (s143) |
+| `plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` | The chunked execution companion to the scoping plan, with a per-chunk model recommendation. | ✅ Complete (all chunks, s143) |
+| `plans/SCHREIBTRAINING_REDESIGN_PLAN.md` | Five-expert-panel redesign of Schreibtraining ("Satzlabor"): backlog item #6. | ✅ Shipped |
+| `plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md` | Catalog of grammatical dimensions/transformation ops for Fokus "Satzlabor", extending the Satzlabor plan. | 🟢 Reference |
+| `plans/SCHREIBEN-OVERHAUL.md` | Exam-realistic Aufgaben, a Niveau axis, real Branche differentiation for `/writing`. | ✅ Complete (s167/s181) |
 | `plans/LEARNING_ENGINE_PLAN.md` | Phased plan for backlog #26–#30 (latency capture, guess-first, voice variety, FSRS, speaking block, custom decks). Phases 0/1/3 shipped; Phase 2 + optional 1.5 pending. | 🟡 Partially shipped (active) |
 | `plans/GAME_IMPLEMENTATION_PLAN.md` | How to build the life-story RPG. G0 + G1 shipped (Kapitel 1 complete); G2 in progress. | 🟡 Active |
 | `plans/UEBEN_UI_REFINEMENTS_PLAN.md` | Founder round of Üben UI refinements (s100). Chunked; approved. | 🟡 Active |

@@ -305,3 +305,14 @@ Founder: "rename practice or praktsich as simulation."
   the filename question fresh rather than assuming the precedent.
 - **Verified in a real browser**, not just by grep: both the mobile bottom bar and the desktop
   sidebar were screenshotted after the change (430×932 and 1280×900).
+
+## Session 216 (2026-08-16, no branch — GitHub repo settings only)
+
+The repo went private. Founder asked whether flipping visibility carried any risk. Checked git
+history for committed secrets (none: no `.env`/`.env.local` ever committed, Supabase credentials
+live only in GitHub Actions secrets) and *believed* GitHub Pages still publishes from a private repo
+on any plan (stopped being Pro-only in 2021), so `genauly.de` looked unaffected. Founder flipped
+visibility to private via GitHub Settings themselves. No code changed; nothing to merge.
+**This assumption turned out to be wrong** — see session 219: GitHub Pages actually disabled itself
+the moment the repo went private (Free-plan Pages requires a public repo), taking `genauly.de` fully
+offline for two sessions before anyone noticed.
