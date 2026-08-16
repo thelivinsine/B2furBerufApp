@@ -173,13 +173,11 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 - [x] **Resend SMTP is live** (s215): `genauly.de` verified in Resend, custom SMTP enabled in
       Supabase, confirmation emails send from `hello@genauly.de`.
 - [x] **Session 217's password-reset/change flow confirmed working live** by the founder (s220).
-- [ ] **Paste BOTH updated email templates into Supabase → Authentication → Emails** (step 2 of
-      `docs/reference/auth-emails/README.md`) and raise Supabase's "Emails per hour" rate limit now
-      that a real sender is configured. Both templates now use the `token_hash` link shape (s217 for
-      reset, s220 for confirm-signup) — the confirm-signup one matters more than cosmetic: without it,
-      a confirmation link only signs a learner in if opened in the SAME BROWSER that signed up
-      (session 215's bug #1; `ConfirmEmail.tsx` has a fallback message but the real fix is the
-      template).
+- [x] **Both updated email templates pasted into Supabase → Authentication → Emails** (s220): the
+      `token_hash` link shape (s217 for reset, s220 for confirm-signup) is now live, so a confirmation
+      link works from any browser/device, not only the one that signed up (closes session 215's bug
+      #1 for real, not just `ConfirmEmail.tsx`'s fallback message). Still open: raise Supabase's
+      "Emails per hour" rate limit now that a real sender is configured.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [ ] **Google sign-in branding verification — awaiting Google's async re-review (s219, submitted
       round 3).** Round 1 failed because `genauly.de` was completely offline (session 216 made the
@@ -205,17 +203,12 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 ## Resume here (next session)
 
 **Handoff after session 220 (2026-08-16, branch `fix-signup-onboarding-bugs`): all five session-215
-sign-up/onboarding bugs are fixed and merged (full detail in the session 220 log entry above).**
-- **Founder action still needed for bug #1 to be FULLY closed:** paste the updated
-  `confirm-signup.html` into Supabase → Authentication → Emails → Confirm signup (see "Open founder
-  action items" above). Until then, a learner who opens the confirmation link in a different browser
-  than the one that signed up still won't get signed in automatically — `ConfirmEmail.tsx` now at
-  least tells them plainly to log in instead of claiming the link is invalid, but the real fix is the
-  template.
+sign-up/onboarding bugs are fixed and merged, and the founder has pasted both updated email templates
+into Supabase (full detail in the session 220 log entry above).**
 - **Real verification still needed:** a founder click-through of a fresh sign-up → confirm (ideally
-  in a different browser, the case the old template couldn't handle) → onboarding on `genauly.de`
-  after this deploys. That's the only way to prove reports #1/#2/#5 against the real Supabase/Resend
-  round-trip; unit tests and a local `pnpm preview` check covered as much as they can without one.
+  in a different browser, the case the old template couldn't handle) → onboarding on `genauly.de`.
+  That's the only way to prove reports #1/#2/#5 against the real Supabase/Resend round-trip; unit
+  tests and a local `pnpm preview` check covered as much as they can without one.
 - Resend SMTP gotcha, still worth remembering: domain verification has to actually finish (watch for
   "Not started" → "Verified" in Resend → Domains) before Supabase's SMTP send will succeed. And for
   future Namecheap DNS work: an MX record option is HIDDEN from Advanced DNS's "Add Record" Type
