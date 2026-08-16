@@ -182,3 +182,67 @@ a long time and says the feedback cannot be generated ... and then the progress 
 - **Founder check after the deploy:** hold a short practice conversation at `/simulation`, press
   Beenden, and confirm the feedback arrives in well under a minute. If it still fails, the screen now
   prints `Code: …` under the message — that word is the diagnosis, so send it.
+
+**Session 213 (2026-08-16, branch `fix/verlauf-history-timeout`): a stuck Verlauf history fetch no
+longer spins forever.** Shipped as PR **#859** → **`47f0825`**, squash-merged.
+Founder asked what was next on the roadmap; the answer named the open item from the s211/s212
+handoffs: "the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable Supabase." Asked
+to implement it for both.
+- **Root cause:** `getSpeakingHistory` (`src/lib/speaking.ts`) and `getWritingHistory`
+  (`src/lib/writing.ts`) each `await`ed a plain Supabase query with no deadline. If the request hung
+  (dropped connection, unreachable project), the screen's `loading` state never cleared: the
+  `Loader2` spinner in `SprechenHistory.tsx`/`WritingHistory.tsx` ran indefinitely with no error, no
+  retry prompt, nothing.
+- **Fix:** new `withTimeout<T>(promise, ms, label)` in `src/lib/utils.ts` (`Promise.race` against a
+  `setTimeout` rejection). Both fetchers wrap their Supabase call(s) in it at a 12s budget; a timeout
+  throws into the existing `catch { return null; }`, which the screens already treat as "could not
+  load" (there was no new UI state to add). `writing.ts`'s three sequential step-down queries
+  (schema-migration fallback, s179/s181) are each wrapped individually, since a hang can happen on
+  any of them and the step-down logic still needs to see each query's own `error`/`data`.
+- Gates (measured 2026-08-16): typecheck clean for the touched files (the repo's pre-existing
+  Windows filename-case-collision errors in `CollocationGraph`/`WordGraph` are unrelated, present on
+  `main` already, and being fixed on a separate branch) · **735 tests** passing (one unrelated flaky
+  timeout in `writingAufgabe.test.tsx` reran green in isolation) · `lint-content` CI check passed.
+- **Artifacts:** `src/lib/utils.ts` · `src/lib/speaking.ts` · `src/lib/writing.ts` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session
+  211 archived off to stay under the status file's line budget) · `docs/SESSION_PROMPT_LOG.md`
+
+**Handoff after session 213 (2026-08-16): the Verlauf history fetch times out instead of spinning
+forever.**
+Branch `fix/verlauf-history-timeout`, PR **#859** → **`47f0825`**, squash-merged. Post-merge
+housekeeping done; the unrelated `fix/windows-case-collision-graph-helpers` branch's WIP (stashed
+during the merge) was restored on top of the new `main`, untouched.
+Founder: "what's next in to do?" → (after the Verlauf task was explained) "yes, implement that for
+both" → "yes, separate branch it and open the PR" → "merge it."
+- **The law to remember: a client-side `await supabase....` has no deadline of its own.** A dropped
+  connection or unreachable project leaves the promise pending forever, and any `loading` state
+  gated on it hangs with the spinner forever, no error, no retry. `withTimeout` (`src/lib/utils.ts`)
+  is the generic fix: `Promise.race` the query against a timer. It does not cancel the underlying
+  request, so a slow-but-eventually-successful query is still wasted network; that is fine here,
+  the goal was only to stop the UI hanging.
+- **`writing.ts`'s step-down queries needed the wrap on EACH query, not just the outer call.** It
+  runs up to three sequential queries falling back on schema-mismatch errors (s179/s181, columns
+  that may not exist yet post-migration). A hang can happen on any one of them, so each is wrapped
+  individually rather than wrapping the whole function body once.
+- **This was NOT verified against a real hung connection**, only reasoned through and typechecked/
+  unit-tested: the sandbox cannot simulate an unreachable Supabase project realistically, and the
+  existing `catch { return null; }` / `failed` UI path was already exercised by other tests.
+
+**Handoff after session 210 (2026-08-10): the "Praktisch" tab is "Spielplatz" everywhere.**
+Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209), PR **#853** → **`53dc2e3`**,
+squash-merged and deployed. Post-merge housekeeping done, tree clean.
+Founder: "rename practice or praktsich as simulation."
+- **The name is "Spielplatz", not "Simulation".** "Simulation" collides with the existing
+  `/simulation` route (Sprechen practice) and "Prüfungssimulation"; "Alltag" collides with the
+  Berufsleben/Alltag life-area split. Both were ruled out before asking the founder to pick, and the
+  founder then asked for a name hinting at the game, which "Mission"/"Quest"/"Level"/"Welt" all
+  already meant something else for. **Before naming anything else in this nav, grep for the
+  candidate name first** — this is the second time a proposed name collided with something already
+  shipped (first was "Simulation" itself).
+- **The route stayed `/`.** Only the label, its English translation, and every comment/string
+  naming the tab changed. `docs/areas/PRAKTISCH-NAV.md` deliberately kept its OLD filename: renaming
+  a doc file is a bigger churn (six other docs link to it by name) than the value it returns, so the
+  content was renamed but the identifier was not. If a future session renames this tab again, decide
+  the filename question fresh rather than assuming the precedent.
+- **Verified in a real browser**, not just by grep: both the mobile bottom bar and the desktop
+  sidebar were screenshotted after the change (430×932 and 1280×900).

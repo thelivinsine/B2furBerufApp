@@ -6763,3 +6763,64 @@ Condensed, one line per founder prompt:
   `src/features/vocabulary/WordGraph.tsx` · `src/features/collocations/CollocationGraph.tsx` ·
   `tests/wordgraph.test.ts` · `tests/collocationGraph.test.ts` · `scripts/lint-content.mjs` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+
+### Session 215 (2026-08-16, no branch — dashboard-only: Namecheap, Resend, Supabase)
+
+Founder worked through `docs/reference/auth-emails/README.md` step 1 live, prompt by prompt; no
+code touched. Condensed, one line per founder prompt:
+
+- *"check the docs/reports/plans... which tasks are pending"* → read `PROJECT_STATUS.md`, summarized
+  the open founder action items and resume-here handoffs.
+- *"what is the smtp thing?"* → explained the Resend SMTP action item in plain terms.
+- *"i'm in step 1 of readme. I got the DKIM, SPF, etc in resend. What should I do now in namecheap?"*
+  → walked through adding those records in Namecheap Advanced DNS.
+- *"tjere's an MX record type in resend but the option type doesn't exist in namecheap, which one to
+  select?"* → first answer wrongly asserted Namecheap's Type dropdown had an MX option; founder
+  screenshotted the actual dropdown and called it out ("don't gaslight me"), correctly — the option
+  is hidden until Namecheap's "Mail Settings" is switched to **Custom MX** first.
+- *"I found it and added. All other records are also added from resend."* → confirmed, pointed at
+  Resend's Verify button next.
+- *"I still didn't setup the domain email address. how to do it on namecheap? I already purchased the
+  private email feature"* → walked through Namecheap Private Email mailbox setup; flagged a possible
+  MX conflict with Resend's MX record depending on its Host value.
+- *(screenshot: MX record Host = "send")* *"is this it?"* → confirmed no conflict (Private Email's MX
+  lands on `@`, Resend's is on `send`); cleared to proceed.
+- *"mailbox is set up, what's next"* → check Resend domain verification status, then API key + Supabase
+  SMTP settings.
+- *"correction: I used hello@genauly.de as mailbox name"* → noted, adjusted all subsequent guidance
+  from `hallo@` to `hello@genauly.de`.
+- *"should I select full access or sending for the api key if creating newly?"* → **Sending**, least
+  privilege.
+- *"created it, now what"* → gave the Supabase Custom SMTP field values to fill in.
+- *"test signup with a fresh email"* → declined to create the test account directly (account/password
+  creation is a prohibited action for the assistant to perform); directed founder to test it
+  themselves with a `+alias` address.
+- *(screenshot: "Error sending confirmation email")* → diagnosed as an SMTP-side failure, not a
+  signup-form issue; asked founder to check Resend domain status and Supabase Auth Logs.
+- *"on resent, it says not started"* → identified as the root cause: Resend won't send from an
+  unverified domain; told founder to force a Verify check.
+- *"now it's verified"* → told founder to retry the signup test.
+- *(screenshot: confirmation email successfully from hello@genauly.de)* *"got it now"* → confirmed
+  step 1 done; flagged remaining step 2 (templates) and the rate-limit bump.
+- *(screenshot: onboarding screen)* *"It works now. there are a couple of glitches though..."* →
+  three bugs reported (confirm-link doesn't auto-sign-in; post-login redirect drops to landing page
+  requiring a second login; onboarding re-shows an already-accepted AGB/Datenschutz checkbox); asked
+  to document for next session rather than fix now.
+- *"when done documenting, get me the confirm sign up and reset password code blocks so that I can
+  copy paste them in supabase"* → pasted both templates from `docs/reference/auth-emails/` inline
+  (code block only, comment header stripped) for direct copy-paste into Supabase → Authentication →
+  Emails.
+- *(screenshot: "Kurz nicht erreichbar" fatal-error card)* *"another bug to be documented - I get
+  this if I'm trying to login now in the original tab where I started logging in but after clicking
+  on confirm email address link, the app opened in a new tab. The original one has some trouble
+  showing the app."* → identified as `RootErrorBoundary`/`paintFatal()`'s fatal-crash screen
+  (`src/main.tsx`); founder hadn't captured "Technische Details", so flagged as bug 4, to be
+  reproduced and diagnosed properly next session rather than guessed at now.
+- *"done with the html code pasting"* → confirmed, continued documenting.
+- *"document the session, open a pr and merge to main"* → finished this entry + the session 215 block
+  in `PROJECT_STATUS.md`; opened a docs-only PR and squash-merged it per the standing auto-ship rule.
+
+- **Artifacts:** Namecheap Advanced DNS + Private Email (`genauly.de`) · Resend (domain verification
+  + Sending API key) · Supabase → Authentication → SMTP Settings · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 213 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md`

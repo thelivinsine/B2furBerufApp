@@ -1,11 +1,48 @@
 # Project Status
 
-_Last updated: 2026-08-16 (session 214 fixed a Windows-only build break from case-colliding graph
-filenames and pinned pnpm back to the project's v10, on the founder's local machine. Session 213
-gave the Sprechen/Schreiben Verlauf history fetch a 12s timeout, merged as PR #859. Session 212 made
-a cold app-open land on the Bibliothek instead of the Spielplatz dashboard, merged as PR #857.
-Sessions 209-211 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
+_Last updated: 2026-08-16 (session 215 set up the Resend custom-SMTP sender for auth emails, on the
+founder's own dashboards, and testing it live surfaced three auth/onboarding bugs to fix next
+session. Session 214 fixed a Windows-only build break from case-colliding graph filenames and
+pinned pnpm back to the project's v10, on the founder's local machine.
+Sessions 209-213 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
 sessions 204-208 in the `W32` file beside it. All handoffs under their own "Resume here")._
+
+**Session 215 (2026-08-16, no branch — dashboard-only work on Resend + Namecheap + Supabase): auth
+emails now send from `hello@genauly.de` via Resend instead of Supabase's rate-limited built-in
+sender.** Founder walked through `docs/reference/auth-emails/README.md` step 1 live, guided prompt
+by prompt; no code changed.
+- **Namecheap DNS:** added Resend's DKIM/SPF/return-path records under Advanced DNS, plus an MX
+  record on host `send` (needed "Mail Settings" switched to **Custom MX** first before Namecheap's
+  Advanced DNS "Add Record" Type dropdown even offered "MX Record" — not obvious from the UI).
+  Founder also set up Namecheap Private Email (`hello@genauly.de` mailbox) on the already-purchased
+  plan; confirmed no conflict since Private Email's MX lands on `@` and Resend's is on `send`.
+- **Resend:** domain `genauly.de` verified (after DNS propagated — first check showed "Not started",
+  resolved by re-running Verify once records had propagated). Created a **Sending**-scope API key
+  (not Full access — least privilege, SMTP send is all this needs).
+- **Supabase → Authentication → SMTP Settings:** Custom SMTP enabled with `smtp.resend.com:465`,
+  username `resend`, password = the Resend API key, sender `hello@genauly.de` / `Genauly`. First
+  live test failed with "Error sending confirmation email" because the Resend domain wasn't verified
+  yet; retried after verification and it worked. **Confirmed live:** the confirmation email now
+  arrives from `Genauly <hello@genauly.de>` with no Supabase branding.
+- **Three bugs surfaced by that live test, NOT yet fixed (next session):**
+  1. Clicking the email confirmation link asks the learner to log in again instead of completing
+     sign-in automatically — `/auth/confirm` (`src/features/auth/ConfirmEmail.tsx`) should be
+     completing the session from the link per the README's "What the app does with the link"
+     section; needs checking why it isn't.
+  2. After that manual login, the app dropped back to the landing page instead of entering the app,
+     requiring a SECOND login to actually get in. Likely a race or a lost redirect target somewhere
+     in the `/auth/confirm` → app-entry handoff; needs root-cause, not a retry-loop patch.
+  3. Onboarding ("Wofür lernst du Deutsch?" screen) re-shows the AGB/Datenschutz consent checkbox
+     (pre-checked) even though the learner already ticked and submitted it once at signup —
+     redundant, should not ask twice.
+  Founder asked to document these for next session rather than fix now.
+- **Still open from the README:** step 2 (paste the branded `confirm-signup.html` /
+  `reset-password.html` templates into Supabase → Authentication → Emails) and raising Supabase's
+  "Emails per hour" rate limit now that a real sender is configured.
+- **Artifacts:** Namecheap Advanced DNS (`genauly.de`) · Namecheap Private Email (`hello@genauly.de`
+  mailbox) · Resend (domain + API key) · Supabase Auth SMTP Settings · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 213 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md`.
 
 **Session 214 (2026-08-16, branch `fix/windows-case-collision-graph-helpers`): the repo now builds
 on the founder's Windows laptop.** No app behavior changed; this was local tooling + a
@@ -30,64 +67,6 @@ caused some branch/stash churn, all recovered.
   machine and passed cleanly at 30s, a timing flake, not a regression.)
 - **Resume here:** nothing outstanding once this merges. The win is local: Windows builds now work;
   nothing to verify on the live site since the build was never broken there.
-
-**Session 213 (2026-08-16, branch `fix/verlauf-history-timeout`): a stuck Verlauf history fetch no
-longer spins forever.** Shipped as PR **#859** → **`47f0825`**, squash-merged.
-Founder asked what was next on the roadmap; the answer named the open item from the s211/s212
-handoffs: "the Sprechen/Schreiben Verlauf spinner has no timeout on an unreachable Supabase." Asked
-to implement it for both.
-- **Root cause:** `getSpeakingHistory` (`src/lib/speaking.ts`) and `getWritingHistory`
-  (`src/lib/writing.ts`) each `await`ed a plain Supabase query with no deadline. If the request hung
-  (dropped connection, unreachable project), the screen's `loading` state never cleared: the
-  `Loader2` spinner in `SprechenHistory.tsx`/`WritingHistory.tsx` ran indefinitely with no error, no
-  retry prompt, nothing.
-- **Fix:** new `withTimeout<T>(promise, ms, label)` in `src/lib/utils.ts` (`Promise.race` against a
-  `setTimeout` rejection). Both fetchers wrap their Supabase call(s) in it at a 12s budget; a timeout
-  throws into the existing `catch { return null; }`, which the screens already treat as "could not
-  load" (there was no new UI state to add). `writing.ts`'s three sequential step-down queries
-  (schema-migration fallback, s179/s181) are each wrapped individually, since a hang can happen on
-  any of them and the step-down logic still needs to see each query's own `error`/`data`.
-- Gates (measured 2026-08-16): typecheck clean for the touched files (the repo's pre-existing
-  Windows filename-case-collision errors in `CollocationGraph`/`WordGraph` are unrelated, present on
-  `main` already, and being fixed on a separate branch) · **735 tests** passing (one unrelated flaky
-  timeout in `writingAufgabe.test.tsx` reran green in isolation) · `lint-content` CI check passed.
-- **Artifacts:** `src/lib/utils.ts` · `src/lib/speaking.ts` · `src/lib/writing.ts` ·
-  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session
-  211 archived off to stay under the status file's line budget) · `docs/SESSION_PROMPT_LOG.md`
-
-**Session 212 (2026-08-14, branch `claude/microphone-bug-fix-jc70vs`): the app now opens on the
-Bibliothek, not Spielplatz.** Shipped as PR **#857** → **`5cde413`**, squash-merged; Pages deploy
-confirmed green via GitHub Actions (`curl`/`WebFetch` cannot reach `genauly.de` itself from here).
-Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
-- **`/` stays the Spielplatz route** (the nav tab still links to it and must keep working), so the
-  fix could not redirect `/` itself — it had to distinguish a COLD open (the PWA's `start_url`, a
-  bookmark, a hard reload) from an in-app navigation to the same URL (tapping the Spielplatz tab).
-  New `src/lib/appEntry.ts`, imported second in `main.tsx` right after `lib/authCallback.ts` (same
-  "must run before React mounts" pattern, same reason): at module-eval time, which happens exactly
-  once per real page load and never on a client-side route change, it `history.replaceState`s a
-  bare `"/"` to `/library` before React Router ever sees the URL. A tab click afterward is a
-  `<Link>`, no reload, so the module never re-runs and Spielplatz still opens normally.
-- **Search and hash are carried over untouched**, because two things legitimately land on the bare
-  root and neither reads its PATH: Google's OAuth PKCE callback (`redirectTo: origin + "/"` in
-  `useAuthStore.ts`, a bare `?code=…` `supabase-js` consumes regardless of path) and a legacy
-  Supabase "Confirm signup" link (`#access_token=…`, already snapshotted by `authCallback.ts` before
-  this runs). Verified by reading the source, not assumed: losing either silently would have been a
-  sign-in regression hiding behind a UX polish. `public/spa-redirect.js` has already restored any
-  GitHub-Pages-mangled deep link before this evaluates, so a real deep link never reaches here with
-  pathname `"/"`. `/library` carries the same `RequireOnboarding` gate `/` did, so a not-yet-onboarded
-  visitor still lands on `/welcome`, one hop earlier than before.
-- New `tests/appEntry.test.ts` (7 tests): the pure decision function plus the live module-eval
-  redirect. **Verified in a real browser** (Chromium, 430×932, dev AND the production `preview`
-  build) that content renders correctly, not just that the URL resolves right: a cold open shows the
-  actual Bibliothek, tapping Spielplatz afterward shows the actual Dashboard, a deep link to
-  `/anwenden` is untouched, and a reload while on Spielplatz bounces back to the Bibliothek (a reload
-  is a cold open too).
-- Docs: `CLAUDE.md` (the nav-order law, compressed elsewhere to hold the 350-line budget: dropped a
-  redundant `(s195)` cross-reference to a rule the file already states in full two bullets earlier),
-  `docs/areas/PRAKTISCH-NAV.md` (the full mechanism), `docs/DECISIONS.md` (§s212).
-- Gates (measured 2026-08-14): typecheck · **734 tests** (61 files, up from 727) · lint 0 errors
-  (84 warnings, unchanged baseline) · build · check:bundle 153.5 kB · lint:content (CLAUDE.md 349
-  lines / linter-counted 350).
 
 ## Where things stand
 
@@ -133,10 +112,10 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`, and the ones
 in this list live in `docs/archive/PROJECT_STATUS_ARCHIVE.md` with their dates. The s147 Satzlabor
 redeploy is done (s150: all three AI functions deployed on the Gemini-primary cascade,
 `GEMINI_API_KEY` set). Still open:
-- [ ] **Add Resend SMTP** (Auth → SMTP settings). Was optional; now needed, because "Confirm email"
-      is ON and Supabase's built-in sender only allows a few messages an hour. Founder bought the
-      `genauly.de` mailbox 2026-07-27; next is verifying the domain in Resend, then the SMTP fields,
-      then pasting the two branded templates. Full steps: `docs/reference/auth-emails/README.md`.
+- [x] **Resend SMTP is live** (s215): `genauly.de` verified in Resend, custom SMTP enabled in
+      Supabase, confirmation emails send from `hello@genauly.de`. Remaining from
+      `docs/reference/auth-emails/README.md`: paste the two branded templates (step 2) and raise
+      Supabase's "Emails per hour" rate limit now that a real sender is configured.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
@@ -149,75 +128,45 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
 
 ## Resume here (next session)
 
-**Handoff after session 213 (2026-08-16): the Verlauf history fetch times out instead of spinning
-forever.**
-Branch `fix/verlauf-history-timeout`, PR **#859** → **`47f0825`**, squash-merged. Post-merge
-housekeeping done; the unrelated `fix/windows-case-collision-graph-helpers` branch's WIP (stashed
-during the merge) was restored on top of the new `main`, untouched.
-Founder: "what's next in to do?" → (after the Verlauf task was explained) "yes, implement that for
-both" → "yes, separate branch it and open the PR" → "merge it."
+**Handoff after session 215 (2026-08-16): Resend SMTP is live for auth emails, but signing up
+surfaced four auth/onboarding bugs that need fixing.** No branch, dashboard-only session (Namecheap
+DNS + Private Email, Resend domain/API key, Supabase SMTP settings); nothing to merge.
+Founder walked through `docs/reference/auth-emails/README.md` step 1 live, then tested a real
+signup: "document these comments for now to address them in the next session."
 
-- **The law to remember: a client-side `await supabase....` has no deadline of its own.** A dropped
-  connection or unreachable project leaves the promise pending forever, and any `loading` state
-  gated on it hangs with the spinner forever, no error, no retry. `withTimeout` (`src/lib/utils.ts`)
-  is the generic fix: `Promise.race` the query against a timer. It does not cancel the underlying
-  request, so a slow-but-eventually-successful query is still wasted network; that is fine here,
-  the goal was only to stop the UI hanging.
-- **`writing.ts`'s step-down queries needed the wrap on EACH query, not just the outer call.** It
-  runs up to three sequential queries falling back on schema-mismatch errors (s179/s181, columns
-  that may not exist yet post-migration). A hang can happen on any one of them, so each is wrapped
-  individually rather than wrapping the whole function body once.
-- **This was NOT verified against a real hung connection**, only reasoned through and typechecked/
-  unit-tested: the sandbox cannot simulate an unreachable Supabase project realistically, and the
-  existing `catch { return null; }` / `failed` UI path was already exercised by other tests. Worth a
-  founder check if this ever recurs: does the Verlauf now show "could not load" within ~12s instead
-  of spinning, on a genuinely bad connection.
-- **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4), 47
-  authored `source` texts plus a rendering slot that does not exist yet, waiting on a founder
-  placement pick from `preview/schreiben-source-text.html`.
-
-**Handoff after session 212 (2026-08-14/15): a cold app-open lands on the Bibliothek.**
-Branch `claude/microphone-bug-fix-jc70vs` (same branch as sessions 209-210), PR **#857** →
-**`5cde413`**, squash-merged. **Deploy confirmed** via GitHub Actions: `Deploy site to GitHub Pages`
-succeeded on `5cde413` at 2026-08-15 11:45 UTC. Post-merge housekeeping done, tree clean.
-Founder: "can you make sure when the app opens the user sees the library instead of the playground?"
-→ "check the live site once it's deployed."
-
-- **The law to remember: a JS module runs once per real page load, never on a client-side route
-  change.** That is the ONLY reason `/` could be redirected on a cold open without breaking the
-  Spielplatz tab, which links to the same URL. `lib/appEntry.ts` is the second import in `main.tsx`,
-  right after `lib/authCallback.ts` — the same slot, for the same reason: something that has to see
-  the URL before React Router rewrites it.
-- **Never drop the search/hash when relocating a URL a real feature depends on.** The bare root
-  carries Google's OAuth `?code=…` and a legacy Supabase `#access_token=…` by design (`grep` for
-  `redirectTo` before assuming a path is free to repoint). `appEntry.ts` preserves both.
-- **Still not verified LIVE, only reasoned through** (`docs/DECISIONS.md` §s212): a real Google OAuth
-  round trip and a real PWA cold open. The sandbox cannot reach `genauly.de` at all (`curl` 403 at the
-  egress proxy, `WebFetch` reports `EGRESS_BLOCKED`) — this is the standing limit, not new to this
-  session. **Worth a founder check:** open the app fresh (or hard-refresh an installed PWA) and
-  confirm it lands on the Bibliothek; tap Spielplatz afterward and confirm it still opens normally;
-  one Google sign-in round trip if convenient, since that path could not be exercised at all here.
-- **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4).
-
-**Handoff after session 210 (2026-08-10): the "Praktisch" tab is "Spielplatz" everywhere.**
-Branch `claude/microphone-bug-fix-jc70vs` (same branch as session 209), PR **#853** → **`53dc2e3`**,
-squash-merged and deployed. Post-merge housekeeping done, tree clean.
-Founder: "rename practice or praktsich as simulation."
-
-- **The name is "Spielplatz", not "Simulation".** "Simulation" collides with the existing
-  `/simulation` route (Sprechen practice) and "Prüfungssimulation"; "Alltag" collides with the
-  Berufsleben/Alltag life-area split. Both were ruled out before asking the founder to pick, and the
-  founder then asked for a name hinting at the game, which "Mission"/"Quest"/"Level"/"Welt" all
-  already meant something else for. **Before naming anything else in this nav, grep for the
-  candidate name first** — this is the second time a proposed name collided with something already
-  shipped (first was "Simulation" itself).
-- **The route stayed `/`.** Only the label, its English translation, and every comment/string
-  naming the tab changed. `docs/areas/PRAKTISCH-NAV.md` deliberately kept its OLD filename: renaming
-  a doc file is a bigger churn (six other docs link to it by name) than the value it returns, so the
-  content was renamed but the identifier was not. If a future session renames this tab again, decide
-  the filename question fresh rather than assuming the precedent.
-- **Verified in a real browser**, not just by grep: both the mobile bottom bar and the desktop
-  sidebar were screenshotted after the change (430×932 and 1280×900).
+- **Priority for next session — four bugs found testing the new SMTP live, all in the sign-up →
+  confirm → onboarding path, none fixed yet:**
+  1. Clicking the confirmation email link does not sign the learner in automatically; they're asked
+     to log in again. Start at `/auth/confirm` (`src/features/auth/ConfirmEmail.tsx`) and the
+     `emailRedirectTo`/session-completion logic in `src/store/useAuthStore.ts` — per the README this
+     link is supposed to complete sign-in on its own.
+  2. After that manual login, the app dropped back to the LANDING page instead of into the app,
+     needing a second login to actually get in. This is the more serious of the three (a real
+     new-signup drop-off risk) — trace the redirect target through the whole confirm→login handoff
+     rather than patching the symptom.
+  3. Onboarding's "Wofür lernst du Deutsch?" screen re-shows the AGB/Datenschutz consent checkbox
+     (pre-checked) even though it was already ticked once at signup. Cosmetic but redundant; find
+     where onboarding re-renders that checkbox and drop it if consent is already recorded.
+  4. **The ORIGINAL tab (where signup was started) hard-crashes to the "Kurz nicht erreichbar"
+     fatal-error screen** once the confirmation link is clicked in a NEW tab (email links open in a
+     new tab by default). This is `RootErrorBoundary`'s fallback (`src/main.tsx:164`) or the even
+     earlier `paintFatal()` module-eval crash net (`src/main.tsx:43`) — founder did not capture the
+     "Technische Details" text, so next session should reproduce this first (open signup, click the
+     confirm link in a separate tab, watch the original tab) to get the real error/stack before
+     guessing a fix. Prime suspects given what's nearby: a stale-session/auth-state conflict between
+     tabs, or the service-worker update-reload (`src/lib/swUpdate.ts`) firing on the original tab
+     mid-flow.
+- **Resend SMTP setup itself worked and is confirmed live:** signup mail now arrives from
+  `Genauly <hello@genauly.de>` with no Supabase branding. The one gotcha worth remembering: Resend
+  domain verification has to actually finish (watch for "Not started" → "Verified" in Resend →
+  Domains) before Supabase's SMTP send will succeed — the first live test failed with "Error sending
+  confirmation email" purely because of that timing, not a config mistake.
+  Also worth remembering for future Namecheap DNS work: an MX record option is HIDDEN from Advanced
+  DNS's "Add Record" Type dropdown until "Mail Settings" (near the top of the same page) is switched
+  to **Custom MX** first.
+- **Still open from the README:** paste the two branded templates
+  (`docs/reference/auth-emails/confirm-signup.html`, `reset-password.html`) into Supabase →
+  Authentication → Emails, and raise Supabase's "Emails per hour" rate limit.
 - **Still open, unchanged:** the next content job is the reply-task wave (writing-audit P4), 47
   authored `source` texts plus a rendering slot that does not exist yet, waiting on a founder
   placement pick from `preview/schreiben-source-text.html`.
