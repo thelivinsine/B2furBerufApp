@@ -1,10 +1,54 @@
 # Project Status
 
-_Last updated: 2026-08-16 (session 216 made the GitHub repo private, dashboard-only, no code
-changed. Session 215 set up the Resend custom-SMTP sender for auth emails, on the founder's own
-dashboards, and testing it live surfaced three auth/onboarding bugs to fix next session.
-Sessions 209-214 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
+_Last updated: 2026-08-16 (session 217, branch `password-reset-flow`: built password reset + change,
+a gap found while scoping a founder request about the Settings page. Session 216 made the GitHub
+repo private, dashboard-only, no code changed.
+Sessions 209-215 are archived in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`,
 sessions 204-208 in the `W32` file beside it. All handoffs under their own "Resume here")._
+
+**Session 217 (2026-08-16, branch `password-reset-flow`): learners can now reset a forgotten
+password and signed-in learners can change (or, for Google-only accounts, set) one from Settings.**
+Founder reported Settings has no "change password" option. Scoping it surfaced a bigger gap: the app
+is fully password-based but had **no recovery path at all** — no `resetPasswordForEmail` call, no
+"Passwort vergessen?" link, no set-password screen. A learner who forgot their password was
+permanently locked out. Both gaps share one shared form, so both were built together.
+- **`src/store/useAuthStore.ts`:** added `sendPasswordReset` (`resetPasswordForEmail`), `setPassword`
+  (`updateUser({ password })`), a `passwordRecovery` flag set on the `PASSWORD_RECOVERY` auth event
+  (the shape-independent recovery signal, works regardless of which of the three callback shapes the
+  link arrives in), and an exported `hasPasswordIdentity(user)` helper (email-identity vs.
+  Google-only), covered by `tests/authPassword.test.ts`.
+- **`src/features/auth/NewPasswordForm.tsx` (new):** the one set-password form, shared by both entry
+  points below.
+- **`ConfirmEmail.tsx`** (`/auth/confirm`, already outside every route guard): a `type=recovery` link
+  now renders the set-password form in place, instead of the old behaviour of dropping the learner
+  into the app with a live recovery session and nowhere to set a password.
+- **`AccountPanel.tsx`** (Settings → Konto & Cloud-Sync): new row, "Passwort ändern" for an
+  email-identity account or "Passwort festlegen" for a Google-only one; inline progressive
+  disclosure, matching Settings' existing row pattern (no dialogs anywhere in that page).
+- **`AuthDialog.tsx`:** "Passwort vergessen?" link on the login tab, reusing the existing "check your
+  inbox" panel shape with reset-specific, deliberately neutral copy ("Wenn es ein Konto mit dieser
+  Adresse gibt, ist ein Link unterwegs.") — Supabase answers a known and an unknown address
+  identically on purpose, so the UI must never confirm which.
+- **Also fixed:** `SaveProgressBanner.tsx`'s stale "Kein Passwort nötig." copy (a magic-link-era
+  leftover, factually wrong in a password-only app).
+- **`docs/reference/auth-emails/reset-password.html` + its README:** the reset link now spells out
+  `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` instead of `{{ .ConfirmationURL }}`,
+  so `type=recovery` always survives in the URL (the app also falls back to the `PASSWORD_RECOVERY`
+  event, so the flow works even before this template is pasted into Supabase).
+- **Gates run clean:** `pnpm typecheck` · `pnpm lint` (0 errors, only pre-existing warnings) ·
+  `pnpm test:unit` (740 passed, incl. the new file) · `pnpm build` · `pnpm check:bundle`. Not
+  exercised live (needs a real Supabase SMTP round-trip): a founder click-through of both flows on
+  `genauly.de` after deploy is the real verification.
+- **Resume here:** nothing outstanding once this merges beyond the founder's own verification pass
+  (see "Open founder action items" below) and the still-unfixed session-215 bug list, unrelated to
+  this change and carried forward below.
+- **Artifacts:** `src/store/useAuthStore.ts` · `src/features/auth/NewPasswordForm.tsx` (new) ·
+  `src/features/auth/ConfirmEmail.tsx` · `src/features/auth/AccountPanel.tsx` ·
+  `src/features/auth/AuthDialog.tsx` · `src/features/auth/SaveProgressBanner.tsx` ·
+  `src/lib/uiStrings.ts` · `docs/reference/auth-emails/reset-password.html` + `README.md` ·
+  `tests/authPassword.test.ts` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 215 archived off) ·
+  `docs/SESSION_PROMPT_LOG.md`.
 
 **Session 216 (2026-08-16, no branch — GitHub repo settings only): the repo is now private.**
 Founder asked whether flipping visibility carried any risk. Checked git history for committed
@@ -14,44 +58,6 @@ Actions secrets) and confirmed GitHub Pages still publishes from a private repo 
 private via GitHub Settings themselves. No code changed; nothing to merge.
 - **Resume here:** nothing outstanding from this session. Next session should pick up the five
   auth/onboarding bugs from session 215's handoff below, still unfixed.
-
-**Session 215 (2026-08-16, no branch — dashboard-only work on Resend + Namecheap + Supabase): auth
-emails now send from `hello@genauly.de` via Resend instead of Supabase's rate-limited built-in
-sender.** Founder walked through `docs/reference/auth-emails/README.md` step 1 live, guided prompt
-by prompt; no code changed.
-- **Namecheap DNS:** added Resend's DKIM/SPF/return-path records under Advanced DNS, plus an MX
-  record on host `send` (needed "Mail Settings" switched to **Custom MX** first before Namecheap's
-  Advanced DNS "Add Record" Type dropdown even offered "MX Record" — not obvious from the UI).
-  Founder also set up Namecheap Private Email (`hello@genauly.de` mailbox) on the already-purchased
-  plan; confirmed no conflict since Private Email's MX lands on `@` and Resend's is on `send`.
-- **Resend:** domain `genauly.de` verified (after DNS propagated — first check showed "Not started",
-  resolved by re-running Verify once records had propagated). Created a **Sending**-scope API key
-  (not Full access — least privilege, SMTP send is all this needs).
-- **Supabase → Authentication → SMTP Settings:** Custom SMTP enabled with `smtp.resend.com:465`,
-  username `resend`, password = the Resend API key, sender `hello@genauly.de` / `Genauly`. First
-  live test failed with "Error sending confirmation email" because the Resend domain wasn't verified
-  yet; retried after verification and it worked. **Confirmed live:** the confirmation email now
-  arrives from `Genauly <hello@genauly.de>` with no Supabase branding.
-- **Five bugs surfaced by that live testing, NOT yet fixed (next session, full detail in the
-  session 215 handoff below):**
-  1. Clicking the email confirmation link asks the learner to log in again instead of completing
-     sign-in automatically.
-  2. After that manual login, the app dropped back to the landing page instead of entering the app,
-     requiring a SECOND login to actually get in.
-  3. Onboarding ("Wofür lernst du Deutsch?" screen) re-shows the AGB/Datenschutz consent checkbox
-     (pre-checked) even though the learner already ticked and submitted it once at signup.
-  4. The ORIGINAL tab (where signup started) crashes to the "Kurz nicht erreichbar" fatal-error
-     screen once the confirmation link is opened in a new tab.
-  5. A freshly confirmed account skips onboarding entirely, landing straight on the Spielplatz
-     dashboard instead of asking "Wofür lernst du Deutsch?"/Niveau.
-  Founder asked to document these for next session rather than fix now.
-- **Still open from the README:** step 2 (paste the branded `confirm-signup.html` /
-  `reset-password.html` templates into Supabase → Authentication → Emails) and raising Supabase's
-  "Emails per hour" rate limit now that a real sender is configured.
-- **Artifacts:** Namecheap Advanced DNS (`genauly.de`) · Namecheap Private Email (`hello@genauly.de`
-  mailbox) · Resend (domain + API key) · Supabase Auth SMTP Settings · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 213 archived off) ·
-  `docs/SESSION_PROMPT_LOG.md`.
 
 ## Where things stand
 
@@ -101,6 +107,11 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       Supabase, confirmation emails send from `hello@genauly.de`. Remaining from
       `docs/reference/auth-emails/README.md`: paste the two branded templates (step 2) and raise
       Supabase's "Emails per hour" rate limit now that a real sender is configured.
+      `reset-password.html`'s link shape changed in session 217 (s217); paste the current version.
+- [ ] **Verify the session 217 password-reset/change flow live** on `genauly.de` once deployed: an
+      "Anmelden" → "Passwort vergessen?" round-trip with a real email address, a Settings →
+      "Passwort ändern" round-trip while signed in, and (if a Google account exists) "Passwort
+      festlegen" from a Google-only sign-in.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`

@@ -55,8 +55,17 @@ export function AuthDialog({
   intent?: AuthIntent;
 }) {
   const t = useT();
-  const { busy, error, status, signUp, signIn, signInWithGoogle, resendConfirmation, clearError } =
-    useAuthStore();
+  const {
+    busy,
+    error,
+    status,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    resendConfirmation,
+    sendPasswordReset,
+    clearError,
+  } = useAuthStore();
   const showToast = useSessionStore((s) => s.showToast);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -83,6 +92,10 @@ export function AuthDialog({
    * precisely how a stale unconfirmed account reads as "log-in is broken".
    */
   const [resendFor, setResendFor] = useState<string | null>(null);
+  /** A password-reset link was just requested for the address in the field.
+   *  Separate from `pending`: the copy must stay neutral about whether the
+   *  account actually exists (no account enumeration). */
+  const [resetRequested, setResetRequested] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +134,7 @@ export function AuthDialog({
     setHint(null);
     setPending(null);
     setResendFor(null);
+    setResetRequested(false);
   }, [open, intent]);
 
   const isSignup = mode === "signup";
@@ -215,6 +229,17 @@ export function AuthDialog({
     if (PUBLIC_PATHS.has(pathname)) navigate("/", { replace: true });
   };
 
+  const forgotPassword = async () => {
+    if (busy) return;
+    if (email.trim().length <= 3) {
+      setHint("Bitte gib deine E-Mail-Adresse ein.");
+      return;
+    }
+    setHint(null);
+    const ok = await sendPasswordReset(email.trim(), captchaToken ?? undefined);
+    if (ok) setResetRequested(true);
+  };
+
   const resend = async () => {
     const address = pending ?? resendFor;
     if (!address) return;
@@ -240,22 +265,51 @@ export function AuthDialog({
         <DialogHeader>
           <Logo variant="wordmark" className="mb-1 h-8 w-auto self-start" />
           <DialogTitle>
-            {pending ? "E-Mail bestätigen" : isSignup ? "Konto erstellen" : "Anmelden"}
+            {pending
+              ? "E-Mail bestätigen"
+              : resetRequested
+                ? t("Passwort zurücksetzen")
+                : isSignup
+                  ? "Konto erstellen"
+                  : "Anmelden"}
           </DialogTitle>
           <DialogDescription>
             {pending
               ? "Nur noch ein Klick, dann geht es los."
-              : isSignup
-                ? "Sichere deinen Fortschritt und lerne auf allen Geräten weiter."
-                : "Melde dich an, um auf allen Geräten weiterzulernen."}
+              : resetRequested
+                ? t("Schau in dein Postfach.")
+                : isSignup
+                  ? "Sichere deinen Fortschritt und lerne auf allen Geräten weiter."
+                  : "Melde dich an, um auf allen Geräten weiterzulernen."}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Confirmation pending. Deliberately a full panel that KEEPS the dialog
+        {/* Password-reset requested. Deliberately neutral about whether the
+            address has an account: Supabase answers both cases the same way
+            on purpose, so this copy must never confirm or deny either. */}
+        {resetRequested ? (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-accent/20 bg-accent/20 p-4 text-sm text-accent-ink shadow-soft">
+              <MailCheck className="mb-2 h-5 w-5" />
+              <p>{t("Wenn es ein Konto mit dieser Adresse gibt, ist ein Link unterwegs.")}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setResetRequested(false);
+                setHint(null);
+                clearError();
+              }}
+              className="w-full text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              {t("Zurück zur Anmeldung")}
+            </button>
+          </div>
+        ) : /* Confirmation pending. Deliberately a full panel that KEEPS the dialog
             open: this used to close the dialog behind a small toast, which the
             founder could barely see and which offered no way to get a new link
-            (s174). */}
-        {pending ? (
+            (s174). */
+        pending ? (
           <div className="space-y-4">
             <div className="rounded-xl border border-accent/20 bg-accent/20 p-4 text-sm text-accent-ink shadow-soft">
               <MailCheck className="mb-2 h-5 w-5" />
@@ -384,6 +438,15 @@ export function AuthDialog({
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
+            {!isSignup && (
+              <button
+                type="button"
+                onClick={forgotPassword}
+                className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              >
+                {t("Passwort vergessen?")}
+              </button>
+            )}
           </div>
 
           <TurnstileWidget onToken={setCaptchaToken} />
