@@ -6824,3 +6824,31 @@ code touched. Condensed, one line per founder prompt:
   + Sending API key) · Supabase → Authentication → SMTP Settings · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 213 archived off) ·
   `docs/SESSION_PROMPT_LOG.md`
+
+
+## Session 216 (no branch)
+
+### Prompt 1 (2026-08-16)
+
+> can I make the gitrepo private without any risks?
+
+- **Response summary:** Checked for committed secrets (`grep` over `.github` for keys, `git log`
+  for `.env`/`.env.local`) and found none: no env file ever committed, Supabase credentials live
+  only in GitHub Actions secrets. Confirmed GitHub Pages still publishes from a private repo on any
+  plan (stopped being Pro-only in 2021), so `genauly.de` keeps working; the live site itself stays
+  public either way, only the source becomes hidden. Flagged that anyone relying on a public
+  raw.githubusercontent.com URl or a GitHub-hosted badge would lose access. Visibility change itself
+  is a manual GitHub Settings action, not something to do on the founder's behalf.
+- **Artifacts:** none (chat-only).
+
+### Prompt 2 (2026-08-16)
+
+> it's private now. document the session and merge to main
+
+- **Response summary:** Founder flipped the repo to private themselves via GitHub Settings. No code
+  changed this session, so nothing to merge; confirmed `main` was already clean and up to date.
+  Documented this entry plus the session 216 block in `PROJECT_STATUS.md`, archiving the now-older
+  session 214 block into `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` to keep the
+  main file to its two-most-recent-handoffs rule.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md`
+  (session 214 archived off) · `docs/SESSION_PROMPT_LOG.md`.

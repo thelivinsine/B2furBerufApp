@@ -3,6 +3,30 @@
 Archived from `docs/PROJECT_STATUS.md` on 2026-08-13 (session 211), which keeps only the two
 most recent session logs and handoffs.
 
+**Session 214 (2026-08-16, branch `fix/windows-case-collision-graph-helpers`): the repo now builds
+on the founder's Windows laptop.** No app behavior changed; this was local tooling + a
+build-portability fix. Ran concurrently with session 213 (PR #859) in the same working tree, which
+caused some branch/stash churn, all recovered.
+- **pnpm pin restored.** The founder's machine has pnpm 11 installed globally and corepack was
+  defaulting to it, so every `pnpm` run rewrote `packageManager` from `pnpm@10.33.0` to v11, and
+  pnpm 11 then ignored the `pnpm.overrides` `react-router` pin and risked the `.npmrc` supply-chain
+  guardrails. Reverted the file and ran `corepack install` so the project folder resolves to pinned
+  v10 while the global v11 is untouched elsewhere. Upgrading to v11 is deferred: it needs a
+  deliberate migration of `overrides` + guardrail settings to `pnpm-workspace.yaml`, its own tested
+  PR. `pnpm install` and `pnpm build` then ran clean on v10.
+- **Windows case-collision fix (the branch's actual change).** `tsc -b` failed on Windows because
+  `WordGraph.tsx`/`wordGraph.ts` and `CollocationGraph.tsx`/`collocationGraph.ts` differ only by
+  case. Case-sensitive Linux (CI, deploy) builds them fine, so the live site was never affected;
+  Windows' case-insensitive FS makes the imports ambiguous. Renamed the two lowercase helper files
+  to `wordGraphModel.ts` and `collocationGraphModel.ts` and updated the 5 importing lines (2
+  components, 2 tests) plus 3 stale filename comments (incl. the `normalizeForm` mirror note in
+  `scripts/lint-content.mjs`). No content ids touched, so the id-permanence law does not apply.
+  After clearing a stale `node_modules/.vite` cache, `pnpm build` passes on Windows; graph unit
+  tests pass. (`writingAufgabe.test.tsx` timed out once at the default 5s on the cold, loaded
+  machine and passed cleanly at 30s, a timing flake, not a regression.)
+- **Resume here:** nothing outstanding once this merges. The win is local: Windows builds now work;
+  nothing to verify on the live site since the build was never broken there.
+
 **Session 209 (2026-08-10, branch `claude/microphone-bug-fix-jc70vs`): the microphone repeated
 everything the learner said, plus two Sprechen-screen corrections.**
 Shipped as PR **#850** → **`ca974d5`**, squash-merged; the Pages deploy succeeded on attempt 1, so
