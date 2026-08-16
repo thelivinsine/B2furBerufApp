@@ -909,4 +909,31 @@ code touched. Condensed, one line per founder prompt:
   `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W33.md` (session 217 archived off) ·
   `docs/SESSION_PROMPT_LOG.md`. Branch `fix-signup-onboarding-bugs`, [PR #870](https://github.com/thelivinsine/B2furBerufApp/pull/870).
-- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
+
+### Prompt 3 (2026-08-17)
+
+> give the confirm signup html code block so that I can copy it
+
+- **Response summary:** Read `docs/reference/auth-emails/confirm-signup.html` and posted its body
+  (everything below the explanatory HTML comment) as a copy-pasteable code block, with the suggested
+  subject line, for the founder to paste into Supabase → Authentication → Emails → Confirm signup.
+- **Artifacts:** none (chat-only).
+
+### Prompt 4 (2026-08-17)
+
+> Also give me the reset-password one, current version
+
+- **Response summary:** Same for `docs/reference/auth-emails/reset-password.html`.
+- **Artifacts:** none (chat-only).
+
+### Prompt 5 (2026-08-17)
+
+> done
+
+- **Response summary:** Founder confirmed both email templates are now pasted into Supabase, closing
+  the last piece of session 215's bug #1 (a confirmation link only signing in the originating browser)
+  for real — `ConfirmEmail.tsx`'s fallback message was only a safety net until this happened. Updated
+  `docs/PROJECT_STATUS.md`'s "Open founder action items" (template item now checked off, rate-limit
+  raise still open) and "Resume here" (dropped the now-done template step; only the live
+  sign-up→confirm→onboarding click-through verification remains).
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`. [PR #871](https://github.com/thelivinsine/B2furBerufApp/pull/871).
