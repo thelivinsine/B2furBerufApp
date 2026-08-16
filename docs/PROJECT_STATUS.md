@@ -160,17 +160,26 @@ redeploy is done (s150: all three AI functions deployed on the Gemini-primary ca
       "Passwort ändern" round-trip while signed in, and (if a Google account exists) "Passwort
       festlegen" from a Google-only sign-in.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
-- [ ] **Google sign-in branding verification — needs re-submitting (s219, round 2).** Round 1
-      failed because `genauly.de` was completely offline (session 216 made the repo private, which
-      silently disabled GitHub Pages) and `/privacy` 404'd even once the site came back (the SPA's
-      GitHub Pages redirect trick returns a real 404 status to non-JS crawlers) — both fixed. Round 2
-      came back with a NEW list (home page behind a login, doesn't explain its purpose, app name
-      mismatch), root-caused to `index.html` hiding its crawler-facing static content behind a
-      `<noscript>` gate, so a JS-enabled crawler that snapshots before the ~1.5 MB JS bundle
-      hydrates saw a bare spinner. Fixed by making that content visible by default for every client
-      (s219). Founder still needs to re-submit via Google Cloud Console → OAuth consent screen →
-      "I have fixed the issues." **Do NOT re-click that button more than once per fix** — Google's
-      async re-review takes hours to days; wait for their email before re-submitting again.
+- [ ] **Google sign-in branding verification — awaiting Google's async re-review (s219, submitted
+      round 3).** Round 1 failed because `genauly.de` was completely offline (session 216 made the
+      repo private, which silently disabled GitHub Pages) and `/privacy` 404'd even once the site
+      came back (the SPA's GitHub Pages redirect trick returns a real 404 status to non-JS
+      crawlers) — both fixed. Round 2 came back with a NEW list (home page behind a login, doesn't
+      explain its purpose, app name mismatch), root-caused to `index.html` hiding its crawler-facing
+      static content behind a `<noscript>` gate, so a JS-enabled crawler that snapshots before the
+      ~1.5 MB JS bundle hydrates saw a bare spinner. Fixed by making that content visible by default
+      for every client. Founder clicked "I have fixed the issues" → Proceed for round 3, but the
+      dialog immediately re-showed round 2's list: **this is expected, not a new failure** —
+      Proceed only submits the request, it does not run a live check inline, so the dialog shown
+      right after still reflects the last COMPLETED review until Google's Trust and Safety team
+      actually re-processes it (their own docs say hours to days). Confirmed independently that the
+      live page is correct (spoofed-Googlebot-UA curl, byte-identical to normal fetch, no
+      `robots.txt`/meta-robots block, fresh non-cached response). **Founder decided (s219) to keep
+      waiting on Google's review rather than drop Google Sign-In** — that was offered as an
+      alternative (email/password + guest already work with zero Google dependency) but declined for
+      now. **Do NOT re-click "I have fixed the issues" again** until an email arrives from Google, or
+      use Search Console's URL Inspection → "Test Live URL" for an independent look at what
+      Googlebot's renderer actually sees without waiting on the OAuth review queue.
 
 ## Resume here (next session)
 

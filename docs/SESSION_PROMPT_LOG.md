@@ -758,3 +758,81 @@ code touched. Condensed, one line per founder prompt:
   new console errors).
 - **Artifacts:** `index.html` · `.claude/launch.json` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+### Prompt 9 (2026-08-16)
+
+> [screenshot of Google's "Branding verification issues" dialog: same three issues as prompt 8,
+> radio buttons for "I have fixed the issues" / "I believe the issues found are incorrect"]
+
+- **Response summary:** Clarified this was the action dialog, not a fresh check result — verified
+  independently (curl with a spoofed Googlebot user-agent against `genauly.de`, byte-identical to a
+  normal fetch, no `robots.txt`/meta-robots block, fresh `Age: 0` response confirming no stale CDN
+  cache) that the raw HTML Google would fetch is correct. Advised selecting "I have fixed the
+  issues" → Proceed, not "issues are incorrect" (they were real against the old page). Also flagged
+  checking the OAuth consent screen's own App name field for stray whitespace/casing as a quick
+  sanity check.
+- **Artifacts:** none (verification only).
+
+### Prompt 10 (2026-08-16)
+
+> it says the same after clicking proceed
+
+- **Response summary:** Explained that clicking "Proceed" submits a re-review request, it does not
+  run a live check inline — the dialog shown right after is still displaying the last COMPLETED
+  review's results, since Google's async re-review (their Trust and Safety team) had not actually
+  run again yet. Pointed to Search Console's URL Inspection → "Test Live URL" → screenshot as the
+  most concrete independent way to see what Googlebot's own renderer sees, without waiting on the
+  OAuth team's queue.
+- **Artifacts:** none.
+
+### Prompt 11 (2026-08-16)
+
+> [screenshot of the Google Auth Platform "Overview" page after clicking into OAuth consent screen]
+> when I click on auth consent screen, I see this.. where to check the app name?
+
+- **Response summary:** Google renamed the OAuth consent screen UI to "Google Auth Platform" with a
+  new left-nav (Overview/Branding/Audience/Clients/Data Access/Verification Center/Settings).
+  Pointed to the "Branding" tab for the App name field. Also flagged an unrelated banner visible in
+  the screenshot ("Your free trial ends today") about the founder's GCP billing trial, separate from
+  the branding issue.
+- **Artifacts:** none.
+
+### Prompt 12 (2026-08-16)
+
+> [screenshot of the Branding tab: App name "Genauly" (correct, no typo), User support email
+> "thelivinsine@gmail.com" with a dropdown showing only that address + empty "Google Groups managed
+> by you"]
+> This is what I have here. How can I add the hello@genauly.de email id?
+
+- **Response summary:** Explained that "User support email" only accepts emails tied to a Google
+  Account the founder is authenticated as (or a Google Group they administer) — `hello@genauly.de`
+  is a regular mailbox (Namecheap/Resend), not a Google identity, so it can't appear there without
+  Google Workspace for the domain. Clarified this field is unrelated to the branding issues Google
+  flagged and doesn't need to change — the app's own public contact address (already switched to
+  `hello@genauly.de` in-app) is a separate thing entirely. Gave the Workspace-signup option as the
+  only real path if the founder wants it later, otherwise recommended leaving it as-is.
+- **Artifacts:** none.
+
+### Prompt 13 (2026-08-16)
+
+> what are some alternatives for hosting the app? can we not use google as it's giving me so much
+> trouble?
+
+- **Response summary:** Clarified a conflation in the question: hosting (GitHub Pages) and Google
+  Sign-In (one optional auth method) are unrelated; nothing about hosting needs to change or has
+  been affected by any of this. Framed the real decision as three options for the Google Sign-In
+  friction specifically: keep waiting on the (largely already-fixed) verification, drop Google
+  Sign-In entirely in favor of the existing email/password + guest flows, or leave the OAuth client
+  in Testing mode (100-user cap, not viable long-term). Asked which the founder preferred rather
+  than picking for them, since it is a product tradeoff, not a technical call.
+- **Artifacts:** none.
+
+### Prompt 14 (2026-08-16)
+
+> let's just keep waiting on Google's review. document the session
+
+- **Response summary:** Founder chose to keep waiting on Google's async review rather than drop
+  Google Sign-In. No code changes this turn (Console navigation help + a product decision); this
+  entry plus the two PRs already shipped earlier in the session (fix genauly.de outage + prerender
+  /privacy #866, fix the noscript-gated boot content #868) are session 219's full artifact list.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
