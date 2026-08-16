@@ -143,84 +143,26 @@
         ]
       }
     </script>
-    <!-- Boot splash control. The page CSP intentionally has no inline-script
-         allowance (script-src 'self' only), so we must NOT rely on JavaScript
-         to swap the boot fallback. Instead we default to the branded splash for
-         everyone and use <noscript> to reveal the verbose description ONLY when
-         scripting is disabled. The <noscript><style> override is CSP-safe
-         because style-src allows 'unsafe-inline'.
-         - Normal (JS) browsers: see only #boot-splash, so the brief moment
-           before React mounts reads as an intentional loading screen, never the
-           marketing wall.
-         - No-JS clients (link-preview crawlers, search engines, Google's OAuth
-           reviewer): the description text stays in the raw HTML AND is made
-           visible by the noscript override, so the home page still explains its
-           purpose. -->
-    <style>
-      /* Default for everyone: show the splash, hide the verbose description. */
-      #boot-seo {
-        display: none;
-      }
-      #boot-splash {
-        display: block;
-      }
-      .boot-spinner {
-        width: 28px;
-        height: 28px;
-        margin: 0 auto;
-        border-radius: 9999px;
-        border: 3px solid rgba(165, 180, 252, 0.25);
-        border-top-color: #9db9f9;
-        animation: boot-spin 0.8s linear infinite;
-      }
-      @keyframes boot-spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .boot-spinner {
-          animation-duration: 1.6s;
-        }
-      }
-    </style>
-    <!-- Scripting disabled: hide the splash (its spinner would never resolve)
-         and reveal the full description so crawlers/OAuth review see it. -->
-    <noscript>
-      <style>
-        #boot-seo {
-          display: block;
-        }
-        #boot-splash {
-          display: none;
-        }
-      </style>
-    </noscript>
   </head>
   <body>
-    <!-- Static pre-render fallback inside #root. It is shown before the React
-         bundle boots and, crucially, it is the only content that clients which
-         do NOT run JavaScript can see: link-preview crawlers, search engines,
-         and Google's OAuth branding reviewer (which fetches this page's RAW
-         HTML to check that the home page explains the app's purpose). Because
-         the app mounts with createRoot(#root).render(), React clears ALL of
-         this on boot, so real users never see it once the bundle loads.
-
-         Two variants share this block (toggled by the <noscript> rule in
-         <head>, which is CSP-safe since inline scripts are disallowed):
-         - #boot-seo: the full plain-language description, kept so the home page
-           always explains its purpose even with JavaScript disabled. Shown ONLY
-           to no-JS clients (crawlers / OAuth reviewer).
-         - #boot-splash: a minimal branded loading splash shown to real (JS)
-           browsers so the brief pre-React moment reads as an intentional
-           loading screen rather than a flash of marketing copy.
+    <!-- Static pre-render fallback inside #root, shown before the React bundle
+         boots and hydrates (createRoot(#root).render() then clears it). Always
+         visible by default, JS or not: a crawler that snapshots mid-load (e.g.
+         Google's OAuth branding reviewer, which fetches and renders this page
+         but does not necessarily wait for a heavy JS bundle to finish) must see
+         real explanatory content, not a bare loading spinner, or it reads as
+         "does not explain its purpose" / "behind a login page". A previous
+         version hid this behind <noscript> and showed only a spinner to any
+         JS-enabled client, which is exactly what caused that misread. Real
+         users now see a brief flash of this content instead of a blank
+         spinner, which is a strict improvement, not a tradeoff.
          Follows the no-em-dash writing rule (CLAUDE.md). -->
     <div id="root">
       <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:#131620;color:#e7e8ef;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
         <div style="max-width:42rem;text-align:center;">
           <h1 style="margin:0 0 .75rem;"><img src="/genauly-wordmark-dark.png" alt="Genauly" width="159" height="40" style="display:block;margin:0 auto;" /></h1>
           <p style="margin:0 0 1.25rem;font-size:1.125rem;font-weight:600;color:#9db9f9;">German for real life. Break through the B1 to B2 plateau.</p>
-          <div id="boot-seo">
+          <div>
             <p style="margin:0 0 1rem;font-size:1rem;line-height:1.6;color:#c6c3d4;">
               Genauly is a German learning app for adults who already know the
               basics but feel stuck at the intermediate level, typically somewhere
@@ -243,9 +185,6 @@
               <a href="https://genauly.de/privacy" style="color:#9db9f9;">Privacy Policy</a> ·
               <a href="https://genauly.de/terms" style="color:#9db9f9;">Terms of Service</a>
             </p>
-          </div>
-          <div id="boot-splash" aria-hidden="true">
-            <div class="boot-spinner"></div>
           </div>
         </div>
       </main>

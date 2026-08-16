@@ -729,3 +729,32 @@ code touched. Condensed, one line per founder prompt:
   touched by #866) was still outstanding; bumped it to record this pass.
 - **Artifacts:** `docs/README.md` · (rotation itself already live via PR #866: `docs/SESSION_PROMPT_LOG.md`,
   `docs/archive/prompt-log/SESSION_PROMPT_LOG_2026-W30/W31/W32.md`, `docs/archive/prompt-log/README.md`).
+
+### Prompt 8 (2026-08-16)
+
+> i checked again and here's what i get:
+>
+> Issues found from the previous verification attempt:
+> * Your home page is behind a login page.
+> * Your home page does not explain the purpose of your app.
+> * The app name "Genauly" configured for your OAuth consent screen does not match the app name on
+>   your home page.
+
+- **Response summary:** Progress confirmed: the unresponsive/duplicate-URL issues from round 1 were
+  gone, meaning the deploy fix held; this was a genuinely new, shorter list. Loaded `genauly.de` in a
+  real browser (Claude Browser tool) and confirmed it renders a full public landing page once
+  hydrated: hero, FAQ, "Log in"/"Start free", no gate anywhere — directly contradicting "behind a
+  login." Read `index.html` and found the real cause: the crawler-facing static content inside
+  `#root` (added in an earlier session specifically for Google's reviewer) was gated behind a
+  `<noscript>` CSS toggle, so it only appeared to clients with JavaScript fully disabled. A
+  JS-ENABLED crawler that snapshots before the ~1.5 MB of vendor JS finishes downloading and
+  hydrating sees only a bare loading spinner: no visible "Genauly" text, no explanation, which reads
+  exactly like "behind a login" + "doesn't explain purpose" + "name mismatch" (the brand name existed
+  only in `<title>`/`<img alt>`, not in visible body text, while the spinner was showing). Removed the
+  `<noscript>` gate so the explanatory content is visible by default for every client regardless of
+  render timing; React still clears it on mount, so real users see a shorter flash of real content
+  instead of a bare spinner rather than a tradeoff. Rebuilt, verified via `pnpm typecheck` and a real
+  browser check of the rebuilt page (`pnpm preview`, confirmed identical post-hydration rendering, no
+  new console errors).
+- **Artifacts:** `index.html` · `.claude/launch.json` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.
