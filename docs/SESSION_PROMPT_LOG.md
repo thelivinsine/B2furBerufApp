@@ -936,5 +936,4 @@ code touched. Condensed, one line per founder prompt:
   `docs/PROJECT_STATUS.md`'s "Open founder action items" (template item now checked off, rate-limit
   raise still open) and "Resume here" (dropped the now-done template step; only the live
   sign-up→confirm→onboarding click-through verification remains).
-- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
-- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`. [PR #871](https://github.com/thelivinsine/B2furBerufApp/pull/871).
